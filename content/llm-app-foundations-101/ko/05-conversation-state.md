@@ -3,7 +3,11 @@ title: "LLM App Foundations 101 (5/6): 대화 상태 관리 — 멀티턴 챗봇
 series: llm-app-foundations-101
 episode: 5
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/45"
+    published_at: '2026-05-02'
 targets:
   tistory: true
   medium: false

@@ -2,7 +2,11 @@
 series: web-development-101
 episode: 9
 title: "Web Development 101 (9/10): 성능과 캐싱"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/211"
+    published_at: '2026-05-26'
 targets:
   tistory: true
   medium: false

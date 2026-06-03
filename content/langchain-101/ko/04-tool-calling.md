@@ -3,7 +3,11 @@ title: "LangChain 101 (4/6): Tool Calling — 외부 도구 연결하기"
 series: langchain-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/68"
+    published_at: '2026-05-11'
 targets:
   tistory: true
   medium: false

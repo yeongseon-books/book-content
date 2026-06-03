@@ -3,7 +3,11 @@ title: "AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오
 series: ai-evaluation-101
 episode: 8
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/123"
+    published_at: '2026-05-18'
 targets:
   tistory: true
   medium: false

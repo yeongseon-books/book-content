@@ -3,7 +3,11 @@ title: "Korean AI Stack 101 (5/6): HyperCLOVA X와 Solar API 사용하기"
 series: korean-ai-stack-101
 episode: 5
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/130"
+    published_at: '2026-05-19'
 targets:
   tistory: true
   medium: false

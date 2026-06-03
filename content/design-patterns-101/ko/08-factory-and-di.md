@@ -2,7 +2,11 @@
 series: design-patterns-101
 episode: 8
 title: "디자인 패턴 101 (8/10): 팩토리와 의존성 주입"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/190"
+    published_at: '2026-05-24'
 targets:
   tistory: true
   medium: false

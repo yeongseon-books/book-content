@@ -3,7 +3,11 @@ title: 'Scaling 101: 언제 Scale Up vs Scale Out?'
 series: azure-app-service-101
 episode: 7
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/18"
+    published_at: '2026-04-17'
 targets:
   tistory: true
   medium: false

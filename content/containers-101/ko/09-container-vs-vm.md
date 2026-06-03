@@ -2,7 +2,11 @@
 series: containers-101
 episode: 9
 title: "Containers 101 (9/10): Containers vs VMs"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/251"
+    published_at: '2026-05-31'
 targets:
   tistory: true
   medium: false

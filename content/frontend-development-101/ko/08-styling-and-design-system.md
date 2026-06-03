@@ -2,7 +2,11 @@
 series: frontend-development-101
 episode: 8
 title: "Frontend Development 101 (8/10): 스타일링과 디자인 시스템"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/220"
+    published_at: '2026-05-27'
 targets:
   tistory: true
   medium: false

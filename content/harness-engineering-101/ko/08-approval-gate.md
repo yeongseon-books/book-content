@@ -3,7 +3,11 @@ title: "Harness Engineering 101 (8/10): Approval Gate — 사람 승인이 필�
 series: harness-engineering-101
 episode: 8
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/113"
+    published_at: '2026-05-17'
 targets:
   tistory: true
   medium: false

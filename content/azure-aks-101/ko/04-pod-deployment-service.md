@@ -3,7 +3,11 @@ title: "Azure Kubernetes Service 101 (4/7): Pod·Deployment·Service — 워크�
 series: azure-aks-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/36"
+    published_at: '2026-04-29'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: "AI Agent 101 (1/10): AI Agent란 무엇인가?"
 series: ai-agent-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/95"
+    published_at: '2026-05-15'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: "Azure Functions 101 (3/7): Host와 Worker — 함수는 누가 실행하
 series: azure-functions-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/28"
+    published_at: '2026-04-27'
 targets:
   tistory: true
   medium: false

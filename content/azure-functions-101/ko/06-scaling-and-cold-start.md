@@ -3,7 +3,11 @@ title: "Azure Functions 101 (6/7): 스케일링과 콜드 스타트 — 서버�
 series: azure-functions-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/31"
+    published_at: '2026-04-27'
 targets:
   tistory: true
   medium: false

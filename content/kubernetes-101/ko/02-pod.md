@@ -2,7 +2,11 @@
 series: kubernetes-101
 episode: 2
 title: "Kubernetes 101 (2/10): Pod"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/264"
+    published_at: '2026-06-02'
 targets:
   tistory: true
   medium: false

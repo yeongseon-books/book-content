@@ -3,7 +3,11 @@ title: "AI Web Development 101 (3/7): AI 챗봇 만들기 — Next.js와 Vercel 
 series: ai-web-dev-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/21"
+    published_at: '2026-04-25'
 targets:
   tistory: true
   medium: false

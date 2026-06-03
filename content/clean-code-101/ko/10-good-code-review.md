@@ -2,7 +2,11 @@
 series: clean-code-101
 episode: 10
 title: "Clean Code 101 (10/10): 좋은 코드 리뷰 기준"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/172"
+    published_at: '2026-05-22'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: "AI App Patterns 101 (6/6): Human-in-the-loop — 사람 개입 설계"
 series: ai-app-patterns-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/82"
+    published_at: '2026-05-13'
 targets:
   tistory: true
   medium: false

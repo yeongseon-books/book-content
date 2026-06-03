@@ -2,7 +2,11 @@
 series: frontend-development-101
 episode: 7
 title: "Frontend Development 101 (7/10): 폼과 유효성 검사"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/219"
+    published_at: '2026-05-27'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: "AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축
 series: ai-safety-guardrails-101
 episode: 10
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/142"
+    published_at: '2026-05-19'
 targets:
   tistory: true
   medium: false

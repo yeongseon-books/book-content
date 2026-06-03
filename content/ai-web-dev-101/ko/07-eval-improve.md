@@ -3,7 +3,11 @@ title: "AI Web Development 101 (7/7): AI 앱의 평가와 개선, 품질을 측�
 series: ai-web-dev-101
 episode: 7
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/25"
+    published_at: '2026-04-25'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: "Azure Functions 101 (5/7): 어떤 플랜을 선택해야 할까 — Cons
 series: azure-functions-101
 episode: 5
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/30"
+    published_at: '2026-04-27'
 targets:
   tistory: true
   medium: false

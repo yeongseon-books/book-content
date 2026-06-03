@@ -2,7 +2,11 @@
 series: clean-code-101
 episode: 1
 title: "Clean Code 101 (1/10): Clean Code란 무엇인가?"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/163"
+    published_at: '2026-05-22'
 targets:
   tistory: true
   medium: false

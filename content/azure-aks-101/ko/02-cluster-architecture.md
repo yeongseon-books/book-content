@@ -3,7 +3,11 @@ title: "Azure Kubernetes Service 101 (2/7): 클러스터 아키텍처 — Contro
 series: azure-aks-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/34"
+    published_at: '2026-04-29'
 targets:
   tistory: true
   medium: false

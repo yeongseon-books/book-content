@@ -188,7 +188,7 @@ def validate_article(path: Path, catalog: dict[str, dict]) -> tuple[list[str], l
     if status == "ready":
         warnings.append("status 'ready' is deprecated; use 'publish-ready' instead")
     # published status requires published URLs
-    if status == "published" and not fm.get("published"):
+    if status == "published" and not fm.get("published") and not fm.get("published_to"):
         errors.append("status is 'published' but no 'published' field with URLs")
 
     # publish-ready or higher requires last_reviewed

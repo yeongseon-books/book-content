@@ -3,7 +3,11 @@ title: "RAG Evaluation and Benchmarking 101 (2/6): 검색 성능 측정"
 series: rag-benchmark-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/90"
+    published_at: '2026-05-14'
 targets:
   tistory: true
   medium: false

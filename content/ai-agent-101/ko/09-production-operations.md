@@ -3,7 +3,11 @@ title: "AI Agent 101 (9/10): 운영"
 series: ai-agent-101
 episode: 9
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/103"
+    published_at: '2026-05-16'
 targets:
   tistory: true
   medium: false

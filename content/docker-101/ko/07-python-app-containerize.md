@@ -2,7 +2,11 @@
 series: docker-101
 episode: 7
 title: "Docker 101 (7/10): Python 앱 컨테이너화"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/259"
+    published_at: '2026-06-01'
 targets:
   tistory: true
   medium: false

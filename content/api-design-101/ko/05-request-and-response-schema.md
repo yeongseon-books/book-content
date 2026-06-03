@@ -3,7 +3,11 @@ title: "API Design 101 (5/10): Request와 response schema"
 series: api-design-101
 episode: 5
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/197"
+    published_at: '2026-05-24'
 targets:
   tistory: true
   medium: false

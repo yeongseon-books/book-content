@@ -3,7 +3,11 @@ title: "LangGraph 101 (4/6): 도구 호출 에이전트"
 series: langgraph-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/74"
+    published_at: '2026-05-12'
 targets:
   tistory: true
   medium: false

@@ -2,7 +2,11 @@
 series: design-patterns-101
 episode: 6
 title: "디자인 패턴 101 (6/10): 어댑터 패턴"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/188"
+    published_at: '2026-05-24'
 targets:
   tistory: true
   medium: false

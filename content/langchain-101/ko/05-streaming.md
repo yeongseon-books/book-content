@@ -3,7 +3,11 @@ title: "LangChain 101 (5/6): Streaming — 실시간 출력 처리"
 series: langchain-101
 episode: 5
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/69"
+    published_at: '2026-05-11'
 targets:
   tistory: true
   medium: false

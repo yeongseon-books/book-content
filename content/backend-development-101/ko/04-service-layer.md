@@ -2,7 +2,11 @@
 series: backend-development-101
 episode: 4
 title: "Backend Development 101 (4/10): Service Layer"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/226"
+    published_at: '2026-05-28'
 targets:
   tistory: true
   medium: false

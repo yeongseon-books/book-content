@@ -3,7 +3,11 @@ title: "LangGraph 101 (2/6): 상태 관리와 체크포인트"
 series: langgraph-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/72"
+    published_at: '2026-05-12'
 targets:
   tistory: true
   medium: false

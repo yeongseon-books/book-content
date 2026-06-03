@@ -3,7 +3,11 @@ title: "Harness Engineering 101 (6/10): Test Harness — 완료 조건을 테스
 series: harness-engineering-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/111"
+    published_at: '2026-05-17'
 targets:
   tistory: true
   medium: false

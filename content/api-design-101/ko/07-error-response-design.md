@@ -3,7 +3,11 @@ title: "API Design 101 (7/10): Error response 설계"
 series: api-design-101
 episode: 7
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/199"
+    published_at: '2026-05-24'
 targets:
   tistory: true
   medium: false

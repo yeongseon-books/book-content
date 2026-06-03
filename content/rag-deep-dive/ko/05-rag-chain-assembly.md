@@ -3,7 +3,11 @@ title: "RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL"
 series: rag-deep-dive
 episode: 5
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/87"
+    published_at: '2026-05-14'
 targets:
   tistory: true
   medium: false

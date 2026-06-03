@@ -3,7 +3,11 @@ title: "AI Agent 101 (10/10): 첫 Agent 만들기"
 series: ai-agent-101
 episode: 10
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/105"
+    published_at: '2026-05-16'
 targets:
   tistory: true
   medium: false

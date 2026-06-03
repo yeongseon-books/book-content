@@ -2,7 +2,11 @@
 series: containers-101
 episode: 3
 title: "Containers 101 (3/10): Runtime"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/245"
+    published_at: '2026-05-31'
 targets:
   tistory: true
   medium: false

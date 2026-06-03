@@ -3,7 +3,11 @@ title: '로그와 모니터링 기초: “앱이 느려요”에 답할 수 있�
 series: azure-app-service-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/17"
+    published_at: '2026-04-17'
 targets:
   tistory: true
   medium: false

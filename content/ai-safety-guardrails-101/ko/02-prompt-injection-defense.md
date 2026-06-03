@@ -3,7 +3,11 @@ title: "AI Safety & Guardrails 101 (2/10): Prompt Injection 방어"
 series: ai-safety-guardrails-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/134"
+    published_at: '2026-05-19'
 targets:
   tistory: true
   medium: false

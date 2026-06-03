@@ -3,7 +3,11 @@ title: "LangChain 101 (2/6): Prompt와 LLM Chain — 체인 첫 번째 구성"
 series: langchain-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/66"
+    published_at: '2026-05-11'
 targets:
   tistory: true
   medium: false

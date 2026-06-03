@@ -3,7 +3,11 @@ title: "LLM App Foundations 101 (6/6): 스트리밍 응답 처리 — 실시간�
 series: llm-app-foundations-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/46"
+    published_at: '2026-05-02'
 targets:
   tistory: true
   medium: false

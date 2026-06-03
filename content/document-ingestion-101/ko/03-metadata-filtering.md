@@ -3,7 +3,11 @@ title: "Document Ingestion 101 (3/6): 메타데이터 설계와 필터링"
 series: document-ingestion-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/61"
+    published_at: '2026-05-05'
 targets:
   tistory: true
   medium: false

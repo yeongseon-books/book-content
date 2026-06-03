@@ -3,7 +3,11 @@ title: "AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스"
 series: ai-safety-guardrails-101
 episode: 9
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/141"
+    published_at: '2026-05-19'
 targets:
   tistory: true
   medium: false

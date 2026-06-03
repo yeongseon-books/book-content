@@ -2,7 +2,11 @@
 series: kubernetes-101
 episode: 6
 title: "Kubernetes 101 (6/10): ConfigMap과 Secret"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/268"
+    published_at: '2026-06-02'
 targets:
   tistory: true
   medium: false

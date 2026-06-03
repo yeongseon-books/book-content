@@ -3,7 +3,11 @@ title: "AI Agent 101 (2/10): 컨텍스트 엔지니어링"
 series: ai-agent-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/96"
+    published_at: '2026-05-16'
 targets:
   tistory: true
   medium: false

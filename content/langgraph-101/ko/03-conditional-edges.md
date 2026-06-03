@@ -3,7 +3,11 @@ title: "LangGraph 101 (3/6): 조건부 엣지와 분기 흐름"
 series: langgraph-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/73"
+    published_at: '2026-05-12'
 targets:
   tistory: true
   medium: false

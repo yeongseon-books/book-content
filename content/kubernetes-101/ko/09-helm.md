@@ -2,7 +2,11 @@
 series: kubernetes-101
 episode: 9
 title: "Kubernetes 101 (9/10): Helm"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/271"
+    published_at: '2026-06-02'
 targets:
   tistory: true
   medium: false

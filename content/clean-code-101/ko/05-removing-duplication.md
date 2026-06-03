@@ -2,7 +2,11 @@
 series: clean-code-101
 episode: 5
 title: "Clean Code 101 (5/10): 중복 제거"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/167"
+    published_at: '2026-05-22'
 targets:
   tistory: true
   medium: false

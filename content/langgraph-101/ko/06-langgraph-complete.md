@@ -3,7 +3,11 @@ title: "LangGraph 101 (6/6): LangGraph 완성"
 series: langgraph-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/76"
+    published_at: '2026-05-12'
 targets:
   tistory: true
   medium: false

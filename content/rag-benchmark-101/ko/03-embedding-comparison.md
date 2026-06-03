@@ -3,7 +3,11 @@ title: "RAG Evaluation and Benchmarking 101 (3/6): 임베딩 모델 비교"
 series: rag-benchmark-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/91"
+    published_at: '2026-05-14'
 targets:
   tistory: true
   medium: false

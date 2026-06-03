@@ -3,7 +3,11 @@ title: "Harness Engineering 101 (3/10): Context Harness — Agent에게 줄 정�
 series: harness-engineering-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/108"
+    published_at: '2026-05-17'
 targets:
   tistory: true
   medium: false

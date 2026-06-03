@@ -2,7 +2,11 @@
 series: containers-101
 episode: 10
 title: "Containers 101 (10/10): 실전 컨테이너 앱 만들기"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/252"
+    published_at: '2026-05-31'
 targets:
   tistory: true
   medium: false

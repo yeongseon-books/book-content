@@ -3,7 +3,11 @@ title: "LLM App Foundations 101 (3/6): 프롬프트 엔지니어링 기초 — S
 series: llm-app-foundations-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/43"
+    published_at: '2026-05-02'
 targets:
   tistory: true
   medium: false

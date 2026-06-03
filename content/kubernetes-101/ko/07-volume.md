@@ -2,7 +2,11 @@
 series: kubernetes-101
 episode: 7
 title: "Kubernetes 101 (7/10): Volume"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/269"
+    published_at: '2026-06-02'
 targets:
   tistory: true
   medium: false

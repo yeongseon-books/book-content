@@ -2,7 +2,11 @@
 series: design-patterns-101
 episode: 9
 title: "디자인 패턴 101 (9/10): 패턴을 남용하지 않는 법"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/191"
+    published_at: '2026-05-24'
 targets:
   tistory: true
   medium: false

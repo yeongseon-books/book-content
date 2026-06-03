@@ -2,7 +2,11 @@
 series: docker-101
 episode: 1
 title: "Docker 101 (1/10): Docker란 무엇인가?"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/253"
+    published_at: '2026-06-01'
 targets:
   tistory: true
   medium: false

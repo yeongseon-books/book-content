@@ -3,7 +3,11 @@ title: "Azure Kubernetes Service 101 (6/7): 스케일링 — HPA, Cluster Autosc
 series: azure-aks-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/38"
+    published_at: '2026-04-29'
 targets:
   tistory: true
   medium: false

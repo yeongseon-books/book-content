@@ -2,7 +2,11 @@
 series: kubernetes-101
 episode: 5
 title: "Kubernetes 101 (5/10): Ingress"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/267"
+    published_at: '2026-06-02'
 targets:
   tistory: true
   medium: false

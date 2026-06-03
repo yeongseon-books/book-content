@@ -3,7 +3,11 @@ episode: 6
 language: ko
 last_reviewed: '2026-05-15'
 series: vector-search-101
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/58"
+    published_at: '2026-05-04'
 tags:
 - Vector Search
 - FAISS

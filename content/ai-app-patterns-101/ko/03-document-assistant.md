@@ -3,7 +3,11 @@ title: "AI App Patterns 101 (3/6): 문서 어시스턴트 — 요약, 추출, �
 series: ai-app-patterns-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/79"
+    published_at: '2026-05-13'
 targets:
   tistory: true
   medium: false

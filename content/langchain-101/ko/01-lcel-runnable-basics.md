@@ -3,7 +3,11 @@ title: "LangChain 101 (1/6): LangChain 소개 — LCEL과 Runnable 기본"
 series: langchain-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/65"
+    published_at: '2026-05-11'
 targets:
   tistory: true
   medium: false

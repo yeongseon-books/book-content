@@ -3,7 +3,11 @@ title: "RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2
 series: rag-deep-dive
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/84"
+    published_at: '2026-05-14'
 targets:
   tistory: true
   medium: false

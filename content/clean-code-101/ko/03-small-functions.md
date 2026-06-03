@@ -2,7 +2,11 @@
 series: clean-code-101
 episode: 3
 title: "Clean Code 101 (3/10): 함수 작게 만들기"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/165"
+    published_at: '2026-05-22'
 targets:
   tistory: true
   medium: false

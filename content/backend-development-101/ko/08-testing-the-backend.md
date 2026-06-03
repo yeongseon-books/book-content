@@ -2,7 +2,11 @@
 series: backend-development-101
 episode: 8
 title: "Backend Development 101 (8/10): 백엔드 테스트"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/230"
+    published_at: '2026-05-28'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: "AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지"
 series: ai-safety-guardrails-101
 episode: 8
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/140"
+    published_at: '2026-05-19'
 targets:
   tistory: true
   medium: false

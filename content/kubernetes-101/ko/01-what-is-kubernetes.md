@@ -2,7 +2,11 @@
 series: kubernetes-101
 episode: 1
 title: "Kubernetes 101 (1/10): Kubernetes란 무엇인가?"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/263"
+    published_at: '2026-06-02'
 targets:
   tistory: true
   medium: false

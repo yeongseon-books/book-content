@@ -3,7 +3,11 @@ title: "Azure Kubernetes Service 101 (3/7): 첫 클러스터 만들고 앱 배�
 series: azure-aks-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/35"
+    published_at: '2026-04-29'
 targets:
   tistory: true
   medium: false

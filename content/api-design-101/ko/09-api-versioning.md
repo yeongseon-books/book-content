@@ -3,7 +3,11 @@ title: "API Design 101 (9/10): Versioning"
 series: api-design-101
 episode: 9
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/201"
+    published_at: '2026-05-24'
 targets:
   tistory: true
   medium: false

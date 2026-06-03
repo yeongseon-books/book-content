@@ -3,7 +3,11 @@ title: "AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE"
 series: ai-evaluation-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/118"
+    published_at: '2026-05-18'
 targets:
   tistory: true
   medium: false

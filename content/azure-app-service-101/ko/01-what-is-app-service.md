@@ -3,7 +3,11 @@ title: Azure App Service란? - 플랫폼 아키텍처 이해하기
 series: azure-app-service-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/12"
+    published_at: '2026-04-10'
 targets:
   tistory: true
   medium: false

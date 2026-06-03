@@ -3,7 +3,11 @@ title: "Harness Engineering 101 (10/10): Production Harness — 운영 가능한
 series: harness-engineering-101
 episode: 10
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/115"
+    published_at: '2026-05-17'
 targets:
   tistory: true
   medium: false

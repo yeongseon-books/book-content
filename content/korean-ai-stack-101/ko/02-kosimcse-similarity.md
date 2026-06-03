@@ -3,7 +3,11 @@ title: "Korean AI Stack 101 (2/6): KoSimCSE로 문장 유사도 구현하기"
 series: korean-ai-stack-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/127"
+    published_at: '2026-05-19'
 targets:
   tistory: true
   medium: false

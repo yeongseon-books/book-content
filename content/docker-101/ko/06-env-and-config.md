@@ -2,7 +2,11 @@
 series: docker-101
 episode: 6
 title: "Docker 101 (6/10): 환경변수와 설정"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/258"
+    published_at: '2026-06-01'
 targets:
   tistory: true
   medium: false

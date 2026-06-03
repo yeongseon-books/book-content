@@ -2,7 +2,11 @@
 series: web-development-101
 episode: 2
 title: "Web Development 101 (2/10): HTML, CSS, JavaScript"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/204"
+    published_at: '2026-05-26'
 targets:
   tistory: true
   medium: false

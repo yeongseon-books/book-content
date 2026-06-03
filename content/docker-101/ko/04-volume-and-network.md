@@ -2,7 +2,11 @@
 series: docker-101
 episode: 4
 title: "Docker 101 (4/10): Volume과 Network"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/256"
+    published_at: '2026-06-01'
 targets:
   tistory: true
   medium: false

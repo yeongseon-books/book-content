@@ -3,7 +3,11 @@ title: "AI Web Development 101 (2/7): 프롬프트 엔지니어링 기초 — AI
 series: ai-web-dev-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/20"
+    published_at: '2026-04-25'
 targets:
   tistory: true
   medium: false

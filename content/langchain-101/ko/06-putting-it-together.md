@@ -3,7 +3,11 @@ title: "LangChain 101 (6/6): 실전 체인 조립 — 컴포넌트를 하나로 
 series: langchain-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/70"
+    published_at: '2026-05-11'
 targets:
   tistory: true
   medium: false

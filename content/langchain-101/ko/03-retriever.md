@@ -3,7 +3,11 @@ title: "LangChain 101 (3/6): Retriever — 문서 검색과 컨텍스트 주입"
 series: langchain-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/67"
+    published_at: '2026-05-11'
 targets:
   tistory: true
   medium: false

@@ -2,7 +2,11 @@
 series: docker-101
 episode: 8
 title: "Docker 101 (8/10): 데이터베이스와 함께 실행하기"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/260"
+    published_at: '2026-06-01'
 targets:
   tistory: true
   medium: false

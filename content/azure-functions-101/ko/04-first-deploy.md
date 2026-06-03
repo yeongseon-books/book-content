@@ -3,7 +3,11 @@ title: "Azure Functions 101 (4/7): 함수 하나 배포하기 — 로컬에서 A
 series: azure-functions-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/29"
+    published_at: '2026-04-27'
 targets:
   tistory: true
   medium: false

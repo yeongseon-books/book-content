@@ -3,7 +3,11 @@ title: "AI Web Development 101 (1/7): AI API 첫 걸음 — OpenAI API로 첫 �
 series: ai-web-dev-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/19"
+    published_at: '2026-04-25'
 targets:
   tistory: true
   medium: false

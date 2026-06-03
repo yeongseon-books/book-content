@@ -3,7 +3,11 @@ title: "LangGraph 101 (5/6): 멀티 에이전트 시스템"
 series: langgraph-101
 episode: 5
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/75"
+    published_at: '2026-05-12'
 targets:
   tistory: true
   medium: false

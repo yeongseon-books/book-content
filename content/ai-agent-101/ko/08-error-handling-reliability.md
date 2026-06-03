@@ -3,7 +3,11 @@ title: "AI Agent 101 (8/10): 에러 처리와 안정성"
 series: ai-agent-101
 episode: 8
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/102"
+    published_at: '2026-05-16'
 targets:
   tistory: true
   medium: false

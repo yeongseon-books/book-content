@@ -2,7 +2,11 @@
 series: frontend-development-101
 episode: 10
 title: "Frontend Development 101 (10/10): 작은 프론트엔드 앱 만들기"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/222"
+    published_at: '2026-05-27'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: "RAG Evaluation and Benchmarking 101 (1/6): RAG 평가 지표 이해"
 series: rag-benchmark-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/89"
+    published_at: '2026-05-14'
 targets:
   tistory: true
   medium: false

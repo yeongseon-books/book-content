@@ -3,7 +3,11 @@ title: "AI Web Development 101 (4/7): RAG 입문 — 내 데이터로 답하는 
 series: ai-web-dev-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/22"
+    published_at: '2026-04-25'
 targets:
   tistory: true
   medium: false

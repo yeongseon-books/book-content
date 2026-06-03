@@ -3,7 +3,11 @@ title: "AI Safety & Guardrails 101 (3/10): 출력 필터링과 콘텐츠 모더�
 series: ai-safety-guardrails-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/135"
+    published_at: '2026-05-19'
 targets:
   tistory: true
   medium: false

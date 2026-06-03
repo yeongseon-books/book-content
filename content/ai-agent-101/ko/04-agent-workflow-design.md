@@ -3,7 +3,11 @@ title: "AI Agent 101 (4/10): Agent Workflow 설계"
 series: ai-agent-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/98"
+    published_at: '2026-05-16'
 targets:
   tistory: true
   medium: false

@@ -2,7 +2,11 @@
 series: design-patterns-101
 episode: 1
 title: "디자인 패턴 101 (1/10): 디자인 패턴이란 무엇인가?"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/183"
+    published_at: '2026-05-23'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: "AI Evaluation 101 (5/10): Rubric 기반 채점 설계"
 series: ai-evaluation-101
 episode: 5
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/120"
+    published_at: '2026-05-18'
 targets:
   tistory: true
   medium: false

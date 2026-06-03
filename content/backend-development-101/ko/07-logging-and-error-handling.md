@@ -2,7 +2,11 @@
 series: backend-development-101
 episode: 7
 title: "Backend Development 101 (7/10): Logging과 Error Handling"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/229"
+    published_at: '2026-05-28'
 targets:
   tistory: true
   medium: false

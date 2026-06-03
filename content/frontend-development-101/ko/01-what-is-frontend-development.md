@@ -2,7 +2,11 @@
 series: frontend-development-101
 episode: 1
 title: "Frontend Development 101 (1/10): 프론트엔드 개발이란 무엇인가?"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/213"
+    published_at: '2026-05-27'
 targets:
   tistory: true
   medium: false

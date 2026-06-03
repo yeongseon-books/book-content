@@ -3,7 +3,11 @@ title: "Document Ingestion 101 (4/6): 증분 인덱싱 — 변경된 문서만 �
 series: document-ingestion-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/62"
+    published_at: '2026-05-05'
 targets:
   tistory: true
   medium: false

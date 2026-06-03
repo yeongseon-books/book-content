@@ -3,7 +3,11 @@ title: "Korean AI Stack 101 (6/6): 한국어 RAG 파이프라인 조합하기"
 series: korean-ai-stack-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/131"
+    published_at: '2026-05-19'
 targets:
   tistory: true
   medium: false

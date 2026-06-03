@@ -2,7 +2,11 @@
 series: design-patterns-101
 episode: 2
 title: "디자인 패턴 101 (2/10): 생성 패턴"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/184"
+    published_at: '2026-05-23'
 targets:
   tistory: true
   medium: false

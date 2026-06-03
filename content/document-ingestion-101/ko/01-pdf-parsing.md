@@ -3,7 +3,11 @@ title: "Document Ingestion 101 (1/6): PDF 파싱과 텍스트 추출"
 series: document-ingestion-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/59"
+    published_at: '2026-05-05'
 targets:
   tistory: true
   medium: false

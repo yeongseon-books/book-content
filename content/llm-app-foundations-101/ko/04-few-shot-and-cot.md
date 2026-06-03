@@ -3,7 +3,11 @@ title: "LLM App Foundations 101 (4/6): Few-shot과 Chain-of-Thought — 더 나�
 series: llm-app-foundations-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/44"
+    published_at: '2026-05-02'
 targets:
   tistory: true
   medium: false

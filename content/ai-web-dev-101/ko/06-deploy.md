@@ -3,7 +3,11 @@ title: "AI Web Development 101 (6/7): AI 웹 앱 배포하기: Vercel과 Azure�
 series: ai-web-dev-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/24"
+    published_at: '2026-04-25'
 targets:
   tistory: true
   medium: false

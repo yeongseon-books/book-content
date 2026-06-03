@@ -3,7 +3,11 @@ title: "AI App Patterns 101 (4/6): 에이전트와 도구 패턴 — 자율적 �
 series: ai-app-patterns-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/80"
+    published_at: '2026-05-13'
 targets:
   tistory: true
   medium: false

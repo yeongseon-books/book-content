@@ -3,7 +3,11 @@ title: "AI Agent 101 (3/10): Tool Use 기초"
 series: ai-agent-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/97"
+    published_at: '2026-05-16'
 targets:
   tistory: true
   medium: false

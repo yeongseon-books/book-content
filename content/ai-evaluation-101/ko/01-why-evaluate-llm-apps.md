@@ -3,7 +3,11 @@ title: "AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하
 series: ai-evaluation-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/116"
+    published_at: '2026-05-18'
 targets:
   tistory: true
   medium: false

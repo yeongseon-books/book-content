@@ -3,7 +3,11 @@ title: "Harness Engineering 101 (4/10): Constraint Harness — 규칙, 경계, �
 series: harness-engineering-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/109"
+    published_at: '2026-05-17'
 targets:
   tistory: true
   medium: false

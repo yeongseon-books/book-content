@@ -3,7 +3,11 @@ title: "API Design 101 (1/10): API란 무엇인가?"
 series: api-design-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/193"
+    published_at: '2026-05-24'
 targets:
   tistory: true
   medium: false

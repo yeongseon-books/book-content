@@ -2,7 +2,11 @@
 series: docker-101
 episode: 3
 title: "Docker 101 (3/10): Dockerfile 작성하기"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/255"
+    published_at: '2026-06-01'
 targets:
   tistory: true
   medium: false

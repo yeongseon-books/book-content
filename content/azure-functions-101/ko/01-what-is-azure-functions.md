@@ -7,7 +7,11 @@ ebook_title: 이벤트가 함수를 호출하는 세상
 series: azure-functions-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/26"
+    published_at: '2026-04-27'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: "AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이
 series: ai-evaluation-101
 episode: 7
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/122"
+    published_at: '2026-05-18'
 targets:
   tistory: true
   medium: false

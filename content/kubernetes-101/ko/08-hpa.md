@@ -2,7 +2,11 @@
 series: kubernetes-101
 episode: 8
 title: "Kubernetes 101 (8/10): HPA"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/270"
+    published_at: '2026-06-02'
 targets:
   tistory: true
   medium: false

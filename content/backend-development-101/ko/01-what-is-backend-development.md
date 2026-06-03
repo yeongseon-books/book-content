@@ -2,7 +2,11 @@
 series: backend-development-101
 episode: 1
 title: "Backend Development 101 (1/10): 백엔드 개발이란 무엇인가?"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/223"
+    published_at: '2026-05-28'
 targets:
   tistory: true
   medium: false

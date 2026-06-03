@@ -2,7 +2,11 @@
 series: clean-code-101
 episode: 6
 title: "Clean Code 101 (6/10): 오류 처리"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/168"
+    published_at: '2026-05-22'
 targets:
   tistory: true
   medium: false

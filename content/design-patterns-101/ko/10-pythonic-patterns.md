@@ -4,7 +4,11 @@ language: ko
 last_reviewed: '2026-05-23'
 seo_description: Python의 모듈, 함수, Protocol, 데코레이터로 GoF 패턴의 의도를 더 가볍게 표현하는 방법을 정리합니다.
 series: design-patterns-101
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/192"
+    published_at: '2026-05-24'
 tags:
 - Computer Science
 - DesignPatterns

@@ -2,7 +2,11 @@
 series: web-development-101
 episode: 3
 title: "Web Development 101 (3/10): 브라우저와 DOM"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/205"
+    published_at: '2026-05-26'
 targets:
   tistory: true
   medium: false

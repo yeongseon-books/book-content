@@ -2,7 +2,11 @@
 series: frontend-development-101
 episode: 4
 title: "Frontend Development 101 (4/10): 컴포넌트와 상태"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/216"
+    published_at: '2026-05-27'
 targets:
   tistory: true
   medium: false

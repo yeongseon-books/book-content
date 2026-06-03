@@ -3,7 +3,11 @@ episode: 1
 language: ko
 last_reviewed: '2026-05-15'
 series: llm-api-production-101
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/47"
+    published_at: '2026-05-03'
 tags:
 - LLM
 - OpenAI

@@ -2,7 +2,11 @@
 series: docker-101
 episode: 10
 title: "Docker 101 (10/10): 배포용 Docker 구성"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/262"
+    published_at: '2026-06-01'
 targets:
   tistory: true
   medium: false

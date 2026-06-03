@@ -3,7 +3,11 @@ title: "AI Evaluation 101 (2/10): 평가 데이터셋 설계하기"
 series: ai-evaluation-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/117"
+    published_at: '2026-05-18'
 targets:
   tistory: true
   medium: false

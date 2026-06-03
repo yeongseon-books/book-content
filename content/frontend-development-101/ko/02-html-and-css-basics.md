@@ -2,7 +2,11 @@
 series: frontend-development-101
 episode: 2
 title: "Frontend Development 101 (2/10): HTML과 CSS 기본"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/214"
+    published_at: '2026-05-27'
 targets:
   tistory: true
   medium: false

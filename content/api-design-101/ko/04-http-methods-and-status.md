@@ -3,7 +3,11 @@ title: "API Design 101 (4/10): HTTP method와 status code"
 series: api-design-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/196"
+    published_at: '2026-05-24'
 targets:
   tistory: true
   medium: false

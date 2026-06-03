@@ -2,7 +2,11 @@
 series: docker-101
 episode: 2
 title: "Docker 101 (2/10): Image와 Container"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/254"
+    published_at: '2026-06-01'
 targets:
   tistory: true
   medium: false

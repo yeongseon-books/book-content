@@ -3,7 +3,11 @@ title: "API Design 101 (10/10): 좋은 API 문서 만들기"
 series: api-design-101
 episode: 10
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/202"
+    published_at: '2026-05-24'
 targets:
   tistory: true
   medium: false

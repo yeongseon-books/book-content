@@ -3,7 +3,11 @@ title: "LLM App Foundations 101 (2/6): 토큰 이해하기 — 비용, 한계, �
 series: llm-app-foundations-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/41"
+    published_at: '2026-05-01'
 targets:
   tistory: true
   medium: false

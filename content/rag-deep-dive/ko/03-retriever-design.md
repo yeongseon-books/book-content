@@ -3,7 +3,11 @@ title: "RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR"
 series: rag-deep-dive
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/85"
+    published_at: '2026-05-14'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: "LLM App Foundations 101 (1/6): LLM API 첫걸음 — 모델에게 첫 �
 series: llm-app-foundations-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/40"
+    published_at: '2026-05-01'
 targets:
   tistory: true
   medium: false

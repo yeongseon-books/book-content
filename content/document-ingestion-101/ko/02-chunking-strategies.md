@@ -3,7 +3,11 @@ title: "Document Ingestion 101 (2/6): 청킹 전략 — 문서 유형별 최적�
 series: document-ingestion-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/60"
+    published_at: '2026-05-05'
 targets:
   tistory: true
   medium: false

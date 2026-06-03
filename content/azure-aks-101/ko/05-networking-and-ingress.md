@@ -3,7 +3,11 @@ title: "Azure Kubernetes Service 101 (5/7): 네트워킹과 Ingress — 클러�
 series: azure-aks-101
 episode: 5
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/37"
+    published_at: '2026-04-29'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: "RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — Prom
 series: rag-deep-dive
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/86"
+    published_at: '2026-05-14'
 targets:
   tistory: true
   medium: false

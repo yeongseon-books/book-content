@@ -2,7 +2,11 @@
 series: frontend-development-101
 episode: 5
 title: "Frontend Development 101 (5/10): 라우팅과 페이지"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/217"
+    published_at: '2026-05-27'
 targets:
   tistory: true
   medium: false

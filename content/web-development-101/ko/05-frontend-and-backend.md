@@ -2,7 +2,11 @@
 series: web-development-101
 episode: 5
 title: "Web Development 101 (5/10): Frontend와 Backend"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/207"
+    published_at: '2026-05-26'
 targets:
   tistory: true
   medium: false

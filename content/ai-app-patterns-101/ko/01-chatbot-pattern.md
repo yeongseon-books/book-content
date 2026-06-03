@@ -3,7 +3,11 @@ title: "AI App Patterns 101 (1/6): 챗봇 패턴 — 대화 이력과 상태 관
 series: ai-app-patterns-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/77"
+    published_at: '2026-05-13'
 targets:
   tistory: true
   medium: false

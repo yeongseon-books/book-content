@@ -3,7 +3,11 @@ title: "RAG Deep Dive (1/6): 문서 로딩과 청크 전략 — LangChain TextSp
 series: rag-deep-dive
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/83"
+    published_at: '2026-05-14'
 targets:
   tistory: true
   medium: false

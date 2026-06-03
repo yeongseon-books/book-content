@@ -3,7 +3,11 @@ title: "AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하
 series: ai-evaluation-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/119"
+    published_at: '2026-05-18'
 targets:
   tistory: true
   medium: false

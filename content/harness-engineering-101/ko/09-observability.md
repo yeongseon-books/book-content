@@ -3,7 +3,11 @@ title: "Harness Engineering 101 (9/10): Observability — Agent 작업을 추적
 series: harness-engineering-101
 episode: 9
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/114"
+    published_at: '2026-05-17'
 targets:
   tistory: true
   medium: false

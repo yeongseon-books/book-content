@@ -3,7 +3,11 @@ title: "RAG Evaluation and Benchmarking 101 (6/6): RAG 벤치마크 완성"
 series: rag-benchmark-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/94"
+    published_at: '2026-05-14'
 targets:
   tistory: true
   medium: false

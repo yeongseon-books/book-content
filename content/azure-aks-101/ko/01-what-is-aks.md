@@ -3,7 +3,11 @@ title: "Azure Kubernetes Service 101 (1/7): Azure Kubernetes Service란? — 직
 series: azure-aks-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/33"
+    published_at: '2026-04-29'
 targets:
   tistory: true
   medium: false

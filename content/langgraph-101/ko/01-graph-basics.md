@@ -3,7 +3,11 @@ title: "LangGraph 101 (1/6): LangGraph 소개와 그래프 기초"
 series: langgraph-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/71"
+    published_at: '2026-05-12'
 targets:
   tistory: true
   medium: false

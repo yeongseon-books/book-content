@@ -2,7 +2,11 @@
 series: web-development-101
 episode: 10
 title: "Web Development 101 (10/10): 작은 웹앱 만들기"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/212"
+    published_at: '2026-05-26'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: 'Hosting Models: 어떤 플랜을 선택해야 할까?'
 series: azure-app-service-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/14"
+    published_at: '2026-04-12'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: "AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가"
 series: ai-evaluation-101
 episode: 10
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/125"
+    published_at: '2026-05-18'
 targets:
   tistory: true
   medium: false

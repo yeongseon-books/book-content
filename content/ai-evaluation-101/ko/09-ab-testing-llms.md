@@ -3,7 +3,11 @@ title: "AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나
 series: ai-evaluation-101
 episode: 9
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/124"
+    published_at: '2026-05-18'
 targets:
   tistory: true
   medium: false

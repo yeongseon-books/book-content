@@ -3,7 +3,11 @@ title: "RAG Evaluation and Benchmarking 101 (5/6): 종단 간 RAG 파이프라�
 series: rag-benchmark-101
 episode: 5
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/93"
+    published_at: '2026-05-14'
 targets:
   tistory: true
   medium: false

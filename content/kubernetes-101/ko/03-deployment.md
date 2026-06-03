@@ -2,7 +2,11 @@
 series: kubernetes-101
 episode: 3
 title: "Kubernetes 101 (3/10): Deployment"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/265"
+    published_at: '2026-06-02'
 targets:
   tistory: true
   medium: false

@@ -2,7 +2,11 @@
 series: clean-code-101
 episode: 2
 title: "Clean Code 101 (2/10): 이름 짓기"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/164"
+    published_at: '2026-05-22'
 targets:
   tistory: true
   medium: false

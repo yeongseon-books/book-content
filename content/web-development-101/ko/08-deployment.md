@@ -2,7 +2,11 @@
 series: web-development-101
 episode: 8
 title: "Web Development 101 (8/10): 배포"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/210"
+    published_at: '2026-05-26'
 targets:
   tistory: true
   medium: false

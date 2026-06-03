@@ -2,7 +2,11 @@
 series: docker-101
 episode: 5
 title: "Docker 101 (5/10): Docker Compose"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/257"
+    published_at: '2026-06-01'
 targets:
   tistory: true
   medium: false

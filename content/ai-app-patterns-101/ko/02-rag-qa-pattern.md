@@ -3,7 +3,11 @@ title: "AI App Patterns 101 (2/6): RAG Q&A 패턴 — 문서 기반 질의응답
 series: ai-app-patterns-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/78"
+    published_at: '2026-05-13'
 targets:
   tistory: true
   medium: false

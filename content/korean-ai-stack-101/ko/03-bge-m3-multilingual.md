@@ -3,7 +3,11 @@ title: "Korean AI Stack 101 (3/6): BGE-M3 다국어 임베딩 실전"
 series: korean-ai-stack-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/128"
+    published_at: '2026-05-19'
 targets:
   tistory: true
   medium: false

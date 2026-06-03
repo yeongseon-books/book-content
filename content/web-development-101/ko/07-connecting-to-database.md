@@ -2,7 +2,11 @@
 series: web-development-101
 episode: 7
 title: "Web Development 101 (7/10): 데이터베이스 연결"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/209"
+    published_at: '2026-05-26'
 targets:
   tistory: true
   medium: false

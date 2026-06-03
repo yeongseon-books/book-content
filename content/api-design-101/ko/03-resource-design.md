@@ -3,7 +3,11 @@ title: "API Design 101 (3/10): 리소스 설계"
 series: api-design-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/195"
+    published_at: '2026-05-24'
 targets:
   tistory: true
   medium: false

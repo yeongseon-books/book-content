@@ -3,7 +3,11 @@ title: "Document Ingestion 101 (5/6): 다중 포맷 문서 파이프라인"
 series: document-ingestion-101
 episode: 5
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/63"
+    published_at: '2026-05-05'
 targets:
   tistory: true
   medium: false

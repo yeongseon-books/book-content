@@ -2,7 +2,11 @@
 series: frontend-development-101
 episode: 3
 title: "Frontend Development 101 (3/10): JavaScript 기본"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/215"
+    published_at: '2026-05-27'
 targets:
   tistory: true
   medium: false

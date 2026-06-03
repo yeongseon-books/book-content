@@ -3,7 +3,11 @@ title: "AI Safety & Guardrails 101 (1/10): AI Safety가 왜 중요한가"
 series: ai-safety-guardrails-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/133"
+    published_at: '2026-05-19'
 targets:
   tistory: true
   medium: false

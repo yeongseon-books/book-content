@@ -2,7 +2,11 @@
 series: containers-101
 episode: 7
 title: "Containers 101 (7/10): Registry"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/249"
+    published_at: '2026-05-31'
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,11 @@ title: "Azure Functions 101 (7/7): 모니터링과 운영 기초"
 series: azure-functions-101
 episode: 7
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/32"
+    published_at: '2026-04-27'
 targets:
   tistory: true
   medium: false

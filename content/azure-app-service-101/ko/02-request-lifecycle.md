@@ -3,7 +3,11 @@ title: 'Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까'
 series: azure-app-service-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/13"
+    published_at: '2026-04-11'
 targets:
   tistory: true
   medium: false

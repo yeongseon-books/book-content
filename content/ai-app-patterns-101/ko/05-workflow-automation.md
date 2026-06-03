@@ -3,7 +3,11 @@ title: "AI App Patterns 101 (5/6): 워크플로 자동화 — 다단계 체인 �
 series: ai-app-patterns-101
 episode: 5
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/81"
+    published_at: '2026-05-13'
 targets:
   tistory: true
   medium: false

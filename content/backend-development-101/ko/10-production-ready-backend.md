@@ -2,7 +2,11 @@
 series: backend-development-101
 episode: 10
 title: "Backend Development 101 (10/10): 운영 가능한 백엔드 구조"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/232"
+    published_at: '2026-05-28'
 targets:
   tistory: true
   medium: false

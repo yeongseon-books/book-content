@@ -3,7 +3,11 @@ title: "AI Evaluation 101 (6/10): RAG 시스템 평가하기"
 series: ai-evaluation-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/121"
+    published_at: '2026-05-18'
 targets:
   tistory: true
   medium: false

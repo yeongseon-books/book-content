@@ -2,7 +2,11 @@
 series: backend-development-101
 episode: 2
 title: "Backend Development 101 (2/10): HTTP 서버 만들기"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/224"
+    published_at: '2026-05-28'
 targets:
   tistory: true
   medium: false

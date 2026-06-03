@@ -2,7 +2,11 @@
 series: design-patterns-101
 episode: 4
 title: "디자인 패턴 101 (4/10): 행위 패턴"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/186"
+    published_at: '2026-05-23'
 targets:
   tistory: true
   medium: false

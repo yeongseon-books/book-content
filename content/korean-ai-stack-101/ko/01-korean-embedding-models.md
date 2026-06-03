@@ -3,7 +3,11 @@ title: "Korean AI Stack 101 (1/6): 한국어 임베딩 모델 비교 — KoSimCS
 series: korean-ai-stack-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/126"
+    published_at: '2026-05-19'
 targets:
   tistory: true
   medium: false

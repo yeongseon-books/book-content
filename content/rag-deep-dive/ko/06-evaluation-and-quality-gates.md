@@ -3,7 +3,11 @@ title: "RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 F
 series: rag-deep-dive
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/88"
+    published_at: '2026-05-14'
 targets:
   tistory: true
   medium: false

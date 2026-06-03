@@ -2,7 +2,11 @@
 series: clean-code-101
 episode: 7
 title: "Clean Code 101 (7/10): 주석과 문서화"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/169"
+    published_at: '2026-05-22'
 targets:
   tistory: true
   medium: false

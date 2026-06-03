@@ -2,7 +2,11 @@
 series: kubernetes-101
 episode: 10
 title: "Kubernetes 101 (10/10): 운영 관점의 Kubernetes"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/272"
+    published_at: '2026-06-02'
 targets:
   tistory: true
   medium: false

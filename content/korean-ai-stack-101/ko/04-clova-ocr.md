@@ -3,7 +3,11 @@ title: "Korean AI Stack 101 (4/6): CLOVA OCR API로 문서 텍스트 추출"
 series: korean-ai-stack-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/129"
+    published_at: '2026-05-19'
 targets:
   tistory: true
   medium: false

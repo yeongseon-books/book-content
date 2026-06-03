@@ -3,7 +3,11 @@ title: "Azure Functions 101 (2/7): 트리거와 바인딩 — 함수 입출력�
 series: azure-functions-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/27"
+    published_at: '2026-04-27'
 targets:
   tistory: true
   medium: false

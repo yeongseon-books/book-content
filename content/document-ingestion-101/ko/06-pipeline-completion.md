@@ -3,7 +3,11 @@ title: "Document Ingestion 101 (6/6): 문서 수집 파이프라인 완성"
 series: document-ingestion-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/64"
+    published_at: '2026-05-05'
 targets:
   tistory: true
   medium: false

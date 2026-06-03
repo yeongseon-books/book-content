@@ -2,7 +2,11 @@
 series: design-patterns-101
 episode: 7
 title: "디자인 패턴 101 (7/10): 옵저버 패턴"
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/189"
+    published_at: '2026-05-24'
 targets:
   tistory: true
   medium: false

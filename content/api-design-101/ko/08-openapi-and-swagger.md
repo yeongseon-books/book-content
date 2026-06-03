@@ -3,7 +3,11 @@ title: "API Design 101 (8/10): OpenAPI와 Swagger"
 series: api-design-101
 episode: 8
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/200"
+    published_at: '2026-05-24'
 targets:
   tistory: true
   medium: false

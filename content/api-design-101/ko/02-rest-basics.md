@@ -3,7 +3,11 @@ title: "API Design 101 (2/10): REST 기본"
 series: api-design-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
+published_to:
+  tistory:
+    url: "https://yeongseonchoe.tistory.com/194"
+    published_at: '2026-05-24'
 targets:
   tistory: true
   medium: false
