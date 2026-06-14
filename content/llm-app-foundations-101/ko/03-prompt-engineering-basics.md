@@ -439,9 +439,9 @@ def normalize_messages(system_text: str, history: list[dict[str, str]], user_tex
 - [LLM App Foundations 101 (1/6): LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
 - [LLM App Foundations 101 (2/6): 토큰 이해하기 — 비용, 한계, 컨텍스트 창](./02-understanding-tokens.md)
 - **LLM App Foundations 101 (3/6): 프롬프트 엔지니어링 기초 — System·User·Assistant 역할 (현재 글)**
-- LLM App Foundations 101 (4/6): Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기 (예정)
-- LLM App Foundations 101 (5/6): 대화 상태 관리 — 멀티턴 챗봇 만들기 (예정)
-- LLM App Foundations 101 (6/6): 스트리밍 응답 처리 — 실시간으로 출력 받기 (예정)
+- [LLM App Foundations 101 (4/6): Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기](./04-few-shot-and-cot.md)
+- [LLM App Foundations 101 (5/6): 대화 상태 관리 — 멀티턴 챗봇 만들기](./05-conversation-state.md)
+- [LLM App Foundations 101 (6/6): 스트리밍 응답 처리 — 실시간으로 출력 받기](./06-streaming-responses.md)
 
 <!-- toc:end -->
 

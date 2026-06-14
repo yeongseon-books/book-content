@@ -525,7 +525,7 @@ LangChain 스트리밍은 한 가지 변화로 시작합니다. `invoke()`를 `s
 - [LangChain 101 (3/6): Retriever — 문서 검색과 컨텍스트 주입](./03-retriever.md)
 - [LangChain 101 (4/6): Tool Calling — 외부 도구 연결하기](./04-tool-calling.md)
 - **LangChain 101 (5/6): Streaming — 실시간 출력 처리 (현재 글)**
-- LangChain 101 (6/6): 실전 체인 조립 — 컴포넌트를 하나로 연결하기 (예정)
+- [LangChain 101 (6/6): 실전 체인 조립 — 컴포넌트를 하나로 연결하기](./06-putting-it-together.md)
 
 <!-- toc:end -->
 

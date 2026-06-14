@@ -452,10 +452,10 @@ latency summary (ms)
 
 - [RAG Evaluation and Benchmarking 101 (1/6): RAG 평가 지표 이해](./01-evaluation-metrics.md)
 - **RAG Evaluation and Benchmarking 101 (2/6): 검색 성능 측정 (현재 글)**
-- RAG Evaluation and Benchmarking 101 (3/6): 임베딩 모델 비교 (예정)
-- RAG Evaluation and Benchmarking 101 (4/6): VectorDB 선택 기준 (예정)
-- RAG Evaluation and Benchmarking 101 (5/6): 종단 간 RAG 파이프라인 평가 (예정)
-- RAG Evaluation and Benchmarking 101 (6/6): RAG 벤치마크 완성 (예정)
+- [RAG Evaluation and Benchmarking 101 (3/6): 임베딩 모델 비교](./03-embedding-comparison.md)
+- [RAG Evaluation and Benchmarking 101 (4/6): VectorDB 선택 기준](./04-vectordb-selection.md)
+- [RAG Evaluation and Benchmarking 101 (5/6): 종단 간 RAG 파이프라인 평가](./05-e2e-evaluation.md)
+- [RAG Evaluation and Benchmarking 101 (6/6): RAG 벤치마크 완성](./06-benchmark-complete.md)
 
 <!-- toc:end -->
 

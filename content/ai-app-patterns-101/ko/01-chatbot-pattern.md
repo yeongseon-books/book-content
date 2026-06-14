@@ -564,11 +564,11 @@ def route_by_token_budget(estimated_tokens: int) -> str:
 ## 시리즈 목차
 
 - **AI App Patterns 101 (1/6): 챗봇 패턴 — 대화 이력과 상태 관리 (현재 글)**
-- AI App Patterns 101 (2/6): RAG Q&A 패턴 — 문서 기반 질의응답 (예정)
-- AI App Patterns 101 (3/6): 문서 어시스턴트 — 요약, 추출, 분류 (예정)
-- AI App Patterns 101 (4/6): 에이전트와 도구 패턴 — 자율적 도구 선택 (예정)
-- AI App Patterns 101 (5/6): 워크플로 자동화 — 다단계 체인 설계 (예정)
-- AI App Patterns 101 (6/6): Human-in-the-loop — 사람 개입 설계 (예정)
+- [AI App Patterns 101 (2/6): RAG Q&A 패턴 — 문서 기반 질의응답](./02-rag-qa-pattern.md)
+- [AI App Patterns 101 (3/6): 문서 어시스턴트 — 요약, 추출, 분류](./03-document-assistant.md)
+- [AI App Patterns 101 (4/6): 에이전트와 도구 패턴 — 자율적 도구 선택](./04-agent-tool-pattern.md)
+- [AI App Patterns 101 (5/6): 워크플로 자동화 — 다단계 체인 설계](./05-workflow-automation.md)
+- [AI App Patterns 101 (6/6): Human-in-the-loop — 사람 개입 설계](./06-human-in-the-loop.md)
 
 <!-- toc:end -->
 

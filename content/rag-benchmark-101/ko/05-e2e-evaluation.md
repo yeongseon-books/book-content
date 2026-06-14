@@ -473,7 +473,7 @@ RAGAS는 유용하지만 비용이 들기 때문에 실행 정책을 분리하�
 - [RAG Evaluation and Benchmarking 101 (3/6): 임베딩 모델 비교](./03-embedding-comparison.md)
 - [RAG Evaluation and Benchmarking 101 (4/6): VectorDB 선택 기준](./04-vectordb-selection.md)
 - **RAG Evaluation and Benchmarking 101 (5/6): 종단 간 RAG 파이프라인 평가 (현재 글)**
-- RAG Evaluation and Benchmarking 101 (6/6): RAG 벤치마크 완성 (예정)
+- [RAG Evaluation and Benchmarking 101 (6/6): RAG 벤치마크 완성](./06-benchmark-complete.md)
 
 <!-- toc:end -->
 

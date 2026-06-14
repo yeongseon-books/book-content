@@ -444,7 +444,7 @@ def clean_for_embedding(text: str, fmt: str) -> str:
 - [Document Ingestion 101 (3/6): 메타데이터 설계와 필터링](./03-metadata-filtering.md)
 - [Document Ingestion 101 (4/6): 증분 인덱싱 — 변경된 문서만 업데이트](./04-incremental-indexing.md)
 - **Document Ingestion 101 (5/6): 다중 포맷 문서 파이프라인 (현재 글)**
-- Document Ingestion 101 (6/6): 문서 수집 파이프라인 완성 (예정)
+- [Document Ingestion 101 (6/6): 문서 수집 파이프라인 완성](./06-pipeline-completion.md)
 
 <!-- toc:end -->
 

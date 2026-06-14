@@ -870,7 +870,7 @@ App Service는 로그가 없으면 추측으로 운영하게 됩니다. 반대�
 - [첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)](./04-first-deploy.md)
 - [Configuration 마스터하기: App Settings & 환경변수](./05-configuration.md)
 - **로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기 (현재 글)**
-- Scaling 101: 언제 Scale Up vs Scale Out? (예정)
+- [Scaling 101: 언제 Scale Up vs Scale Out?](./07-scaling-101.md)
 
 <!-- toc:end -->
 

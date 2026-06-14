@@ -401,11 +401,11 @@ Tool Harness는 도구 개수를 늘리는 기술이 아니라, 에이전트가 
 - [Harness Engineering 101 (3/10): Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기](./03-context-harness.md)
 - [Harness Engineering 101 (4/10): Constraint Harness — 규칙, 경계, 금지 행동 정의하기](./04-constraint-harness.md)
 - **Harness Engineering 101 (5/10): Tool Harness — Agent가 사용할 도구를 안전하게 설계하기 (현재 글)**
-- Harness Engineering 101 (6/10): Test Harness — 완료 조건을 테스트로 고정하기 (예정)
-- Harness Engineering 101 (7/10): Feedback Loop — 실패를 고치게 만드는 반복 구조 (예정)
-- Harness Engineering 101 (8/10): Approval Gate — 사람 승인이 필요한 지점 설계하기 (예정)
-- Harness Engineering 101 (9/10): Observability — Agent 작업을 추적하고 재현하기 (예정)
-- Harness Engineering 101 (10/10): Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
+- [Harness Engineering 101 (6/10): Test Harness — 완료 조건을 테스트로 고정하기](./06-test-harness.md)
+- [Harness Engineering 101 (7/10): Feedback Loop — 실패를 고치게 만드는 반복 구조](./07-feedback-loop.md)
+- [Harness Engineering 101 (8/10): Approval Gate — 사람 승인이 필요한 지점 설계하기](./08-approval-gate.md)
+- [Harness Engineering 101 (9/10): Observability — Agent 작업을 추적하고 재현하기](./09-observability.md)
+- [Harness Engineering 101 (10/10): Production Harness — 운영 가능한 Agent 작업 환경 만들기](./10-production-harness.md)
 
 <!-- toc:end -->
 

@@ -270,12 +270,12 @@ Azure Functions를 이해하는 첫걸음은 제품 기능을 외우는 데 있�
 ## 시리즈 목차
 
 - **Azure Functions 101 (1/7): Azure Functions란? — 이벤트가 함수를 호출하는 세상 (현재 글)**
-- Azure Functions 101 (2/7): 트리거와 바인딩 — 함수 입출력의 모든 것 (예정)
-- Azure Functions 101 (3/7): Host와 Worker — 함수는 누가 실행하는가 (예정)
-- Azure Functions 101 (4/7): 함수 하나 배포하기 — 로컬에서 Azure까지 (예정)
-- Azure Functions 101 (5/7): 어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated (예정)
-- Azure Functions 101 (6/7): 스케일링과 콜드 스타트 — 서버리스가 빨라지는 순간과 느려지는 순간 (예정)
-- Azure Functions 101 (7/7): 모니터링과 운영 기초 (예정)
+- [Azure Functions 101 (2/7): 트리거와 바인딩 — 함수 입출력의 모든 것](./02-triggers-and-bindings.md)
+- [Azure Functions 101 (3/7): Host와 Worker — 함수는 누가 실행하는가](./03-host-and-worker.md)
+- [Azure Functions 101 (4/7): 함수 하나 배포하기 — 로컬에서 Azure까지](./04-first-deploy.md)
+- [Azure Functions 101 (5/7): 어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
+- [Azure Functions 101 (6/7): 스케일링과 콜드 스타트 — 서버리스가 빨라지는 순간과 느려지는 순간](./06-scaling-and-cold-start.md)
+- [Azure Functions 101 (7/7): 모니터링과 운영 기초](./07-monitoring-and-ops.md)
 
 <!-- toc:end -->
 

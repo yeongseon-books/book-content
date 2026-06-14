@@ -342,8 +342,8 @@ def should_retry_tool(error_code: str, attempt: int) -> bool:
 - [LangGraph 101 (2/6): 상태 관리와 체크포인트](./02-state-and-checkpoints.md)
 - [LangGraph 101 (3/6): 조건부 엣지와 분기 흐름](./03-conditional-edges.md)
 - **LangGraph 101 (4/6): 도구 호출 에이전트 (현재 글)**
-- LangGraph 101 (5/6): 멀티 에이전트 시스템 (예정)
-- LangGraph 101 (6/6): LangGraph 완성 (예정)
+- [LangGraph 101 (5/6): 멀티 에이전트 시스템](./05-multi-agent.md)
+- [LangGraph 101 (6/6): LangGraph 완성](./06-langgraph-complete.md)
 
 <!-- toc:end -->
 

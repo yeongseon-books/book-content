@@ -386,7 +386,7 @@ az aks nodepool update \
 - [Azure Kubernetes Service 101 (4/7): Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식](./04-pod-deployment-service.md)
 - [Azure Kubernetes Service 101 (5/7): 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길](./05-networking-and-ingress.md)
 - **Azure Kubernetes Service 101 (6/7): 스케일링 — HPA, Cluster Autoscaler, KEDA (현재 글)**
-- Azure Kubernetes Service 101 (7/7): 모니터링과 운영 — Container Insights, 로그, 알람 (예정)
+- [Azure Kubernetes Service 101 (7/7): 모니터링과 운영 — Container Insights, 로그, 알람](./07-monitoring-and-ops.md)
 
 <!-- toc:end -->
 

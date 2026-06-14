@@ -457,9 +457,9 @@ def classify_query(query: str) -> str:
 - [Vector Search 101 (1/6): 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기](./01-what-is-embedding.md)
 - [Vector Search 101 (2/6): HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기](./02-huggingface-embeddings.md)
 - **Vector Search 101 (3/6): 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기 (현재 글)**
-- Vector Search 101 (4/6): FAISS 입문 — 고속 근사 최근접 이웃 검색 (예정)
-- Vector Search 101 (5/6): 청크 전략 — 긴 문서를 어떻게 나눌 것인가 (예정)
-- Vector Search 101 (6/6): 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지 (예정)
+- [Vector Search 101 (4/6): FAISS 입문 — 고속 근사 최근접 이웃 검색](./04-faiss-fundamentals.md)
+- [Vector Search 101 (5/6): 청크 전략 — 긴 문서를 어떻게 나눌 것인가](./05-chunking-strategies.md)
+- [Vector Search 101 (6/6): 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지](./06-vector-search-pipeline.md)
 
 <!-- toc:end -->
 

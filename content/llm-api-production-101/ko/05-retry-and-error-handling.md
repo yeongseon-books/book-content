@@ -419,7 +419,7 @@ print(trace)
 - [LLM API Production 101 (3/6): 스트리밍 심화 — 청크 처리와 오류 복구](./03-streaming-in-depth.md)
 - [LLM API Production 101 (4/6): 캐싱 전략 — 비용과 지연 시간 줄이기](./04-caching-strategies.md)
 - **LLM API Production 101 (5/6): 재시도와 오류 처리 — 안정적인 API 호출 만들기 (현재 글)**
-- LLM API Production 101 (6/6): 속도 제한 관리 — Rate Limit 대응 패턴 (예정)
+- [LLM API Production 101 (6/6): 속도 제한 관리 — Rate Limit 대응 패턴](./06-rate-limit-management.md)
 
 <!-- toc:end -->
 

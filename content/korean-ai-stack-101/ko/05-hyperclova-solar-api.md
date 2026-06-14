@@ -487,7 +487,7 @@ class SolarProvider(LLMProvider):
 - [Korean AI Stack 101 (3/6): BGE-M3 다국어 임베딩 실전](./03-bge-m3-multilingual.md)
 - [Korean AI Stack 101 (4/6): CLOVA OCR API로 문서 텍스트 추출](./04-clova-ocr.md)
 - **Korean AI Stack 101 (5/6): HyperCLOVA X와 Solar API 사용하기 (현재 글)**
-- Korean AI Stack 101 (6/6): 한국어 RAG 파이프라인 조합하기 (예정)
+- [Korean AI Stack 101 (6/6): 한국어 RAG 파이프라인 조합하기](./06-korean-rag-pipeline.md)
 
 <!-- toc:end -->
 

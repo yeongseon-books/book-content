@@ -445,8 +445,8 @@ Approval Gate는 사람이 검토하는 문화를 선언하는 장치가 아니�
 - [Harness Engineering 101 (6/10): Test Harness — 완료 조건을 테스트로 고정하기](./06-test-harness.md)
 - [Harness Engineering 101 (7/10): Feedback Loop — 실패를 고치게 만드는 반복 구조](./07-feedback-loop.md)
 - **Harness Engineering 101 (8/10): Approval Gate — 사람 승인이 필요한 지점 설계하기 (현재 글)**
-- Harness Engineering 101 (9/10): Observability — Agent 작업을 추적하고 재현하기 (예정)
-- Harness Engineering 101 (10/10): Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
+- [Harness Engineering 101 (9/10): Observability — Agent 작업을 추적하고 재현하기](./09-observability.md)
+- [Harness Engineering 101 (10/10): Production Harness — 운영 가능한 Agent 작업 환경 만들기](./10-production-harness.md)
 
 <!-- toc:end -->
 

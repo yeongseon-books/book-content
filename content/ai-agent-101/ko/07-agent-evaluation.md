@@ -529,9 +529,9 @@ agent 평가는 단순한 정답 채점이 아닙니다. 어떤 도구를 어떤
 - [AI Agent 101 (5/10): Memory와 State](./05-memory-and-state.md)
 - [AI Agent 101 (6/10): Multi-Agent 시스템](./06-multi-agent-systems.md)
 - **AI Agent 101 (7/10): Agent 평가 (현재 글)**
-- AI Agent 101 (8/10): 에러 처리와 안정성 (예정)
-- AI Agent 101 (9/10): 운영 (예정)
-- AI Agent 101 (10/10): 첫 Agent 만들기 (예정)
+- [AI Agent 101 (8/10): 에러 처리와 안정성](./08-error-handling-reliability.md)
+- [AI Agent 101 (9/10): 운영](./09-production-operations.md)
+- [AI Agent 101 (10/10): 첫 Agent 만들기](./10-building-first-agent.md)
 
 <!-- toc:end -->
 

@@ -438,7 +438,7 @@ chunk_payload = {
 - [Vector Search 101 (3/6): 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기](./03-cosine-similarity.md)
 - [Vector Search 101 (4/6): FAISS 입문 — 고속 근사 최근접 이웃 검색](./04-faiss-fundamentals.md)
 - **Vector Search 101 (5/6): 청크 전략 — 긴 문서를 어떻게 나눌 것인가 (현재 글)**
-- Vector Search 101 (6/6): 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지 (예정)
+- [Vector Search 101 (6/6): 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지](./06-vector-search-pipeline.md)
 
 <!-- toc:end -->
 

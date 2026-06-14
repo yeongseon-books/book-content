@@ -480,8 +480,8 @@ Tool Calling 루프는 세 부분으로 이루어집니다. `@tool`로 도구를
 - [LangChain 101 (2/6): Prompt와 LLM Chain — 체인 첫 번째 구성](./02-prompt-llm-chain.md)
 - [LangChain 101 (3/6): Retriever — 문서 검색과 컨텍스트 주입](./03-retriever.md)
 - **LangChain 101 (4/6): Tool Calling — 외부 도구 연결하기 (현재 글)**
-- LangChain 101 (5/6): Streaming — 실시간 출력 처리 (예정)
-- LangChain 101 (6/6): 실전 체인 조립 — 컴포넌트를 하나로 연결하기 (예정)
+- [LangChain 101 (5/6): Streaming — 실시간 출력 처리](./05-streaming.md)
+- [LangChain 101 (6/6): 실전 체인 조립 — 컴포넌트를 하나로 연결하기](./06-putting-it-together.md)
 
 <!-- toc:end -->
 

@@ -435,9 +435,9 @@ BGE-M3 dense 예제의 가치는 다국어 검색의 기준선을 선명하게 �
 - [Korean AI Stack 101 (1/6): 한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
 - [Korean AI Stack 101 (2/6): KoSimCSE로 문장 유사도 구현하기](./02-kosimcse-similarity.md)
 - **Korean AI Stack 101 (3/6): BGE-M3 다국어 임베딩 실전 (현재 글)**
-- Korean AI Stack 101 (4/6): CLOVA OCR API로 문서 텍스트 추출 (예정)
-- Korean AI Stack 101 (5/6): HyperCLOVA X와 Solar API 사용하기 (예정)
-- Korean AI Stack 101 (6/6): 한국어 RAG 파이프라인 조합하기 (예정)
+- [Korean AI Stack 101 (4/6): CLOVA OCR API로 문서 텍스트 추출](./04-clova-ocr.md)
+- [Korean AI Stack 101 (5/6): HyperCLOVA X와 Solar API 사용하기](./05-hyperclova-solar-api.md)
+- [Korean AI Stack 101 (6/6): 한국어 RAG 파이프라인 조합하기](./06-korean-rag-pipeline.md)
 
 <!-- toc:end -->
 

@@ -443,7 +443,7 @@ Observability는 에이전트가 무엇을 했는지 보는 기능이 아니라,
 - [Harness Engineering 101 (7/10): Feedback Loop — 실패를 고치게 만드는 반복 구조](./07-feedback-loop.md)
 - [Harness Engineering 101 (8/10): Approval Gate — 사람 승인이 필요한 지점 설계하기](./08-approval-gate.md)
 - **Harness Engineering 101 (9/10): Observability — Agent 작업을 추적하고 재현하기 (현재 글)**
-- Harness Engineering 101 (10/10): Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
+- [Harness Engineering 101 (10/10): Production Harness — 운영 가능한 Agent 작업 환경 만들기](./10-production-harness.md)
 
 <!-- toc:end -->
 

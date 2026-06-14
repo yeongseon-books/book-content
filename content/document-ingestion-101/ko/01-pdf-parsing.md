@@ -493,11 +493,11 @@ def extract_with_ocr_fallback(pdf_path: Path) -> list[dict[str, object]]:
 ## 시리즈 목차
 
 - **Document Ingestion 101 (1/6): PDF 파싱과 텍스트 추출 (현재 글)**
-- Document Ingestion 101 (2/6): 청킹 전략 — 문서 유형별 최적화 (예정)
-- Document Ingestion 101 (3/6): 메타데이터 설계와 필터링 (예정)
-- Document Ingestion 101 (4/6): 증분 인덱싱 — 변경된 문서만 업데이트 (예정)
-- Document Ingestion 101 (5/6): 다중 포맷 문서 파이프라인 (예정)
-- Document Ingestion 101 (6/6): 문서 수집 파이프라인 완성 (예정)
+- [Document Ingestion 101 (2/6): 청킹 전략 — 문서 유형별 최적화](./02-chunking-strategies.md)
+- [Document Ingestion 101 (3/6): 메타데이터 설계와 필터링](./03-metadata-filtering.md)
+- [Document Ingestion 101 (4/6): 증분 인덱싱 — 변경된 문서만 업데이트](./04-incremental-indexing.md)
+- [Document Ingestion 101 (5/6): 다중 포맷 문서 파이프라인](./05-multi-format-pipeline.md)
+- [Document Ingestion 101 (6/6): 문서 수집 파이프라인 완성](./06-pipeline-completion.md)
 
 <!-- toc:end -->
 

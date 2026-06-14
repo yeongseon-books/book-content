@@ -414,8 +414,8 @@ if __name__ == "__main__":
 - [RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
 - [RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR](./03-retriever-design.md)
 - **RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (현재 글)**
-- RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL (예정)
-- RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
+- [RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL](./05-rag-chain-assembly.md)
+- [RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness](./06-evaluation-and-quality-gates.md)
 
 <!-- toc:end -->
 

@@ -452,7 +452,7 @@ def sanitize_messages(messages: list[dict[str, str]]) -> list[dict[str, str]]:
 - [LLM App Foundations 101 (3/6): 프롬프트 엔지니어링 기초 — System·User·Assistant 역할](./03-prompt-engineering-basics.md)
 - [LLM App Foundations 101 (4/6): Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기](./04-few-shot-and-cot.md)
 - **LLM App Foundations 101 (5/6): 대화 상태 관리 — 멀티턴 챗봇 만들기 (현재 글)**
-- LLM App Foundations 101 (6/6): 스트리밍 응답 처리 — 실시간으로 출력 받기 (예정)
+- [LLM App Foundations 101 (6/6): 스트리밍 응답 처리 — 실시간으로 출력 받기](./06-streaming-responses.md)
 
 <!-- toc:end -->
 

@@ -279,7 +279,7 @@ def build_graph():
 - [LangGraph 101 (3/6): 조건부 엣지와 분기 흐름](./03-conditional-edges.md)
 - [LangGraph 101 (4/6): 도구 호출 에이전트](./04-tool-calling-agent.md)
 - **LangGraph 101 (5/6): 멀티 에이전트 시스템 (현재 글)**
-- LangGraph 101 (6/6): LangGraph 완성 (예정)
+- [LangGraph 101 (6/6): LangGraph 완성](./06-langgraph-complete.md)
 
 <!-- toc:end -->
 

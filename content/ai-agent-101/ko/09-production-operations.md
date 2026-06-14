@@ -525,7 +525,7 @@ production agent 운영의 핵심은 observability입니다. 어떤 요청이 �
 - [AI Agent 101 (7/10): Agent 평가](./07-agent-evaluation.md)
 - [AI Agent 101 (8/10): 에러 처리와 안정성](./08-error-handling-reliability.md)
 - **AI Agent 101 (9/10): 운영 (현재 글)**
-- AI Agent 101 (10/10): 첫 Agent 만들기 (예정)
+- [AI Agent 101 (10/10): 첫 Agent 만들기](./10-building-first-agent.md)
 
 <!-- toc:end -->
 
