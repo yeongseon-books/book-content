@@ -680,32 +680,6 @@ az webapp config appsettings set \
 }
 ```
 
-## 배포 로그에서 자주 보는 실패-복구 페어
-
-```text
-ERROR: Could not build wheels for psycopg2
-```
-
-```text
-조치: psycopg2-binary 버전 점검 또는 시스템 의존성이 포함된 이미지 전략으로 전환
-```
-
-```text
-ModuleNotFoundError: No module named 'src.app'
-```
-
-```text
-조치: startup command의 모듈 경로 재검증 (src.app:app)
-```
-
-```text
-Container didn't respond to HTTP pings on port: 8000
-```
-
-```text
-조치: PORT 바인딩 코드 확인, startup time 최적화, health endpoint 경량화
-```
-
 ---
 
 ## 처음 질문으로 돌아가기

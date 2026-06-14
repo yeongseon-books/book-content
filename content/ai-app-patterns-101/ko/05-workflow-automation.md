@@ -42,10 +42,6 @@ seo_description: 워크플로 자동화는 모델 선택권 대신 사람이 정
 
 ## 순차 체인
 
-### 단계 사이의 순차 handoff
-
-### 병렬 작업을 포함한 DAG 스타일 분기
-
 ![병렬 작업을 포함한 DAG 스타일 분기](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-02-dag-style-branching-with-parallel-work.ko.png)
 
 *병렬 작업을 포함한 DAG 스타일 분기*
