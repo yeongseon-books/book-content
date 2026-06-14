@@ -176,6 +176,62 @@ Audit issue (label: `audit` / `type/series-audit`)를 `Closes #NNNN`으로 닫�
 6. Tistory export: `make tistory SERIES=<series-id>` or `make tistory-one SERIES=<series-id> EPISODE=<N>`
 7. Hashnode export: `make hashnode SERIES=<series-id>` or `make hashnode-one SERIES=<series-id> EPISODE=<N>`
 
+## Tistory Manual Publishing (Browser Automation)
+
+Tistory는 Open API가 더 이상 작동하지 않으므로(404), 브라우저 자동화로 발행한다.
+Tistory의 dkaptcha(Kakao CAPTCHA) 보안 때문에 완전 자동화는 불가능하고, 사람이 캡챠를 풀어야 한다.
+
+### 사전 조건
+
+- `playwright-core` 설치: `.playwright-mcp/publish/` 디렉터리에 `npm install`
+- Chrome persistent user data dir: `/home/yeongseon/.cache/ms-playwright/mcp-chrome-67594cb/`
+- Tistory 로그인 세션이 user data dir에 보존되어 있어야 함 (Kakao 계정)
+
+### 발행 절차
+
+1. Export 생성: `make tistory-one SERIES=<series-id> EPISODE=<N>`
+2. Export 파일 확인: `exports/tistory/<series>/<NN>-<slug>.md`
+   - Tags 라인, 저작권 표시, 관련 시리즈 (링크 없는 경우) 제거 확인
+3. Tistory 관리 페이지에서 새 글 생성 (빈 글 + URL 번호 확보)
+4. 발행 스크립트 실행:
+
+```bash
+cd .playwright-mcp/publish
+node solve-captcha.mjs
+```
+
+5. 스크립트가 캡챠 이미지를 저장하고 대기:
+   - 이미지: `.playwright-mcp/captcha-image.jpg`
+   - 답변 파일: `.playwright-mcp/captcha-answer.txt`에 정답 기록
+6. 캡챠는 지도 기반 한국어 퀴즈 (장소명 빈칸 채우기)
+7. 정답 제출 후 자동으로 발행 완료
+
+### 핵심 기술 사항
+
+- **Route Interception**: `dkaptcha.kakao.com`은 headless Chrome에서 403을 반환하므로,
+  `page.route()`로 요청을 가로채 Node.js `fetch`로 대신 요청 (clean UA + Referer 헤더 설정)
+- **UA Spoofing**: context 레벨에서 `userAgent`를 일반 Chrome UA로 설정해야 함.
+  `HeadlessChrome`이 navigator.userAgent에 포함되면 캡챠가 "Bad Request" 반환
+- **Korean Input**: `inputEl.type(answer, { delay: 150 })`로 한 글자씩 입력.
+  IME 문제 발생 시 `evaluate()`로 value 직접 설정 + `dispatchEvent` 조합 사용
+- **Content 수정**: TinyMCE API 접근 → `tinymce.activeEditor.getContent()` / `.setContent()` / `.setDirty(true)`
+
+### 스크립트 목록
+
+| 파일 | 용도 |
+| --- | --- |
+| `.playwright-mcp/publish/solve-captcha.mjs` | 메인 발행 스크립트 (새 글 발행) |
+| `.playwright-mcp/publish/edit-and-republish.mjs` | 기존 글 수정 후 재발행 |
+| `.playwright-mcp/publish/fix-references.mjs` | 참고 자료 섹션 추가 등 소규모 수정 |
+
+### 콘텐츠 정리 규칙 (발행 전)
+
+Export 파일에서 다음을 제거한 후 발행:
+
+- `Tags: ...` 라인 (Tistory 태그 설정은 에디터 UI로 별도 관리)
+- `© 2026 영선북스. 이 글의 저작권은 저자에게 있습니다.` 저작권 표시
+- `관련 시리즈` 섹션 (실제 링크가 없는 경우 삭제, 링크가 있으면 유지)
+
 ## Public Asset Validation
 
 발행 전 public asset 검증:

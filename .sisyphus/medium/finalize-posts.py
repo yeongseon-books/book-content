@@ -118,6 +118,19 @@ def read_h1(text: str) -> str | None:
     return None
 
 
+def read_status(text: str) -> str | None:
+    """Extract 'status' field from YAML front matter, or None."""
+    lines = text.split("\n")
+    if not lines or lines[0].rstrip() != "---":
+        return None
+    for line in lines[1:]:
+        if line.rstrip() == "---":
+            break
+        if line.startswith("status:"):
+            return line.split(":", 1)[1].strip()
+    return None
+
+
 def load_planned(series_dir: Path) -> dict[str, dict[int, dict[str, str]]]:
     """Load planned.yaml if present; returns {variant: {idx: {title, filename}}}."""
     planned_path = series_dir / "planned.yaml"
@@ -160,8 +173,10 @@ def collect_series(series_dir: Path) -> dict[str, dict[int, dict[str, str]]]:
                 if not prefix:
                     continue
                 idx = int(prefix)
-                title = read_h1(md.read_text(encoding="utf-8")) or md.stem
-                result[variant][idx] = {"title": title, "filename": md.name}
+                text = md.read_text(encoding="utf-8")
+                title = read_h1(text) or md.stem
+                status = read_status(text)
+                result[variant][idx] = {"title": title, "filename": md.name, "status": status}
         for idx, info in planned.get(variant, {}).items():
             if idx not in result[variant]:
                 result[variant][idx] = info
@@ -182,7 +197,10 @@ def build_toc(
         elif idx == current_idx:
             lines.append(f"- **{e['title']} ({current_label})**")
         else:
-            lines.append(f"- {e['title']} ({upcoming_label})")
+            if e.get('status') == 'published':
+                lines.append(f"- [{e['title']}](./{e['filename']})")
+            else:
+                lines.append(f"- {e['title']} ({upcoming_label})")
     lines.append("")
     lines.append(TOC_END)
     return lines

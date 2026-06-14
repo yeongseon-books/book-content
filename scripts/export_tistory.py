@@ -35,7 +35,7 @@ EXPORT_DIR = REPO_ROOT / "exports" / "tistory"
 SERIES_YAML = REPO_ROOT / "series.yaml"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _transform import append_copyright, rewrite_public_asset_urls, transform_for_tistory
+from _transform import (    append_copyright,    resolve_cross_series_links_to_tistory,    resolve_tistory_toc_links,    rewrite_public_asset_urls,    transform_for_tistory,)
 
 
 def _load_meta() -> dict:
@@ -68,11 +68,81 @@ def find_article(series_dir: Path, episode: int) -> Path:
     return matches[0]
 
 
-def export_one(src: Path, dst: Path, *, local_assets: bool = False) -> None:
+def _read_front_matter(path: Path) -> dict:
+    """Read YAML front matter from a markdown file."""
+    text = path.read_text(encoding="utf-8")
+    if not text.startswith("---\n"):
+        return {}
+    end = text.index("\n---\n", 4)
+    return yaml.safe_load(text[4:end]) or {}
+
+
+def _build_series_toc_maps(series_dir: Path) -> tuple[dict[str, str], dict[str, str]]:
+    """Build filename→url and title→url maps for a series' ko/ directory.
+
+    Returns:
+        (filename_to_url, title_to_url)
+    """
+    filename_to_url: dict[str, str] = {}
+    title_to_url: dict[str, str] = {}
+    for md in sorted(series_dir.glob("*.md")):
+        fm = _read_front_matter(md)
+        pub = fm.get("published_to", {}).get("tistory", {})
+        url = pub.get("url", "")
+        if url:
+            filename_to_url[md.name] = url
+            title = fm.get("title", "")
+            if title:
+                title_to_url[title] = url
+    return filename_to_url, title_to_url
+
+
+def _build_cross_series_map() -> dict[str, str]:
+    """Build path→url map for all published articles across all series.
+
+    Keys are relative paths like 'ai-evaluation-101/ko/01-slug.md'.
+    """
+    path_to_url: dict[str, str] = {}
+    content_dir = REPO_ROOT / "content"
+    for series_dir in sorted(content_dir.iterdir()):
+        if not series_dir.is_dir():
+            continue
+        ko_dir = series_dir / "ko"
+        if not ko_dir.is_dir():
+            continue
+        for md in sorted(ko_dir.glob("*.md")):
+            fm = _read_front_matter(md)
+            pub = fm.get("published_to", {}).get("tistory", {})
+            url = pub.get("url", "")
+            if url:
+                # Key: series-id/ko/filename
+                rel = f"{series_dir.name}/ko/{md.name}"
+                path_to_url[rel] = url
+    return path_to_url
+
+
+# Cache for cross-series map (expensive to rebuild per file)
+_cross_series_cache: dict[str, str] | None = None
+
+
+def _get_cross_series_map() -> dict[str, str]:
+    global _cross_series_cache
+    if _cross_series_cache is None:
+        _cross_series_cache = _build_cross_series_map()
+    return _cross_series_cache
+
+
+def export_one(src: Path, dst: Path, *, local_assets: bool = False, series_dir: Path | None = None) -> None:
     text = src.read_text(encoding="utf-8")
     out = transform_for_tistory(text)
     if not local_assets:
         out = rewrite_public_asset_urls(out, _load_asset_base_url())
+    # Resolve series TOC links
+    if series_dir:
+        fn_map, title_map = _build_series_toc_maps(series_dir)
+        out = resolve_tistory_toc_links(out, fn_map, title_map)
+    # Resolve cross-series links
+    out = resolve_cross_series_links_to_tistory(out, _get_cross_series_map())
     meta = _load_meta()
     out = append_copyright(
         out,
@@ -110,7 +180,7 @@ def main() -> int:
 
     for src in sources:
         dst = series_out / src.name
-        export_one(src, dst, local_assets=args.local_assets)
+        export_one(src, dst, local_assets=args.local_assets, series_dir=series_ko)
         print(f"wrote {dst.relative_to(REPO_ROOT)}")
     print(f"\ntotal: {len(sources)} file(s) -> {series_out.relative_to(REPO_ROOT)}/")
     return 0

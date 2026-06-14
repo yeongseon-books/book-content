@@ -185,6 +185,74 @@ def rewrite_public_asset_urls(text: str, asset_base_url: str) -> str:
         lambda line: _rewrite_asset_line(line, asset_base_url),
     )
 
+# --------------- Tistory Link Resolution ---------------
+
+# TOC line: `- Title (예정)`
+TOC_UPCOMING_RE = re.compile(r'^(\s*-\s+)(.+?)\s*\(예정\)\s*$', re.MULTILINE)
+# TOC line: `- [Title](./NN-slug.md)` (past posts with local link)
+TOC_LOCAL_LINK_RE = re.compile(r'^(\s*-\s+)\[([^\]]+)\]\(\./([^)]+\.md)\)\s*$', re.MULTILINE)
+# Cross-series link: `[text](../../series/ko/file.md)`
+CROSS_SERIES_LINK_RE = re.compile(r'\[([^\]]+)\]\(\.\./\.\./([^)]+\.md)\)')
+
+
+def resolve_tistory_toc_links(
+    text: str,
+    filename_to_url: dict[str, str],
+    title_to_url: dict[str, str],
+) -> str:
+    """Resolve series TOC links to Tistory URLs.
+
+    Args:
+        text: Post body (after front-matter stripped).
+        filename_to_url: {'01-slug.md': 'https://yeongseonchoe.tistory.com/284'}
+        title_to_url: {'LLM Apps Ops 101 (2/6): LLM 비용 추적과 최적화': 'https://...'}
+    """
+    # Replace "(예정)" entries with links
+    def _replace_upcoming(m: re.Match) -> str:
+        prefix = m.group(1)
+        title = m.group(2).strip()
+        url = title_to_url.get(title)
+        if url:
+            return f"{prefix}[{title}]({url})"
+        return m.group(0)
+
+    text = TOC_UPCOMING_RE.sub(_replace_upcoming, text)
+
+    # Replace "./NN-slug.md" local links with Tistory URLs
+    def _replace_local(m: re.Match) -> str:
+        prefix = m.group(1)
+        title = m.group(2)
+        filename = m.group(3)
+        url = filename_to_url.get(filename)
+        if url:
+            return f"{prefix}[{title}]({url})"
+        return m.group(0)
+
+    text = TOC_LOCAL_LINK_RE.sub(_replace_local, text)
+    return text
+
+
+def resolve_cross_series_links_to_tistory(
+    text: str,
+    path_to_url: dict[str, str],
+) -> str:
+    """Resolve ../../series/lang/file.md links to Tistory URLs.
+
+    Args:
+        path_to_url: {'ai-evaluation-101/ko/01-slug.md': 'https://...'}
+    """
+    def _replace_link_line(line: str) -> str:
+        def _repl(m: re.Match) -> str:
+            link_text = m.group(1)
+            rel_path = m.group(2)
+            url = path_to_url.get(rel_path)
+            if url:
+                return f"[{link_text}]({url})"
+            return m.group(0)
+        return CROSS_SERIES_LINK_RE.sub(_repl, line)
+
+    return rewrite_outside_fences(text, _replace_link_line)
+
 
 
 # --------------- Copyright notice ---------------
