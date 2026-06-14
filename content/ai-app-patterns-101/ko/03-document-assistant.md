@@ -388,7 +388,7 @@ app = Flask(__name__)
 def summarize_document():
     text = request.json['text']
     style = request.json.get('style', 'technical')
-    # 실제로 실제로 SUMMARY_SYSTEM_PROMPT를 실행하여 호출합니다.
+    # 실제로 SUMMARY_SYSTEM_PROMPT를 실행하여 호출합니다.
     return jsonify({'summary': f'[{style}] 요약 예시: {text[:120]}...'})
 
 @app.post('/documents/extract')
