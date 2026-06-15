@@ -191,3 +191,19 @@ kubectl logs web
 다음 글에서는 이 Pod를 사람이 직접 관리하지 않고, 원하는 개수를 유지하고 롤링 업데이트까지 맡는 Deployment를 보겠습니다.
 
 Pod를 잘 설계하면 나중에 Deployment, HPA, PDB를 붙일 때 추가 비용이 크게 줄어듭니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Kubernetes 101 (1/10): Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
+- **Kubernetes 101 (2/10): Pod (현재 글)**
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap과 Secret](./06-configmap-and-secret.md)
+- [Kubernetes 101 (7/10): Volume](./07-volume.md)
+- [Kubernetes 101 (8/10): HPA](./08-hpa.md)
+- [Kubernetes 101 (9/10): Helm](./09-helm.md)
+- [운영 관점의 Kubernetes](./10-kubernetes-in-operation.md)
+
+<!-- toc:end -->

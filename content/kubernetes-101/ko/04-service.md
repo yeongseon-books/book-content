@@ -191,3 +191,19 @@ kubectl run dnscheck --rm -i --restart=Never --image=busybox -- nslookup web.def
 이 글에서는 Service를 변하는 파드 집합 앞에 안정적인 주소와 이름을 붙여 주는 객체로 정리했습니다. Kubernetes 네트워킹이 복잡해 보일 때도, 먼저 Service가 어떤 파드 집합을 어떤 이름으로 대표하는지부터 보면 흐름이 빠르게 정리됩니다.
 
 다음 글에서는 내부 통신을 넘어서, 외부에서 들어오는 HTTP 요청을 도메인과 경로 기준으로 어떻게 나누는지 Ingress를 보겠습니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Kubernetes 101 (1/10): Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- **Kubernetes 101 (4/10): Service (현재 글)**
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap과 Secret](./06-configmap-and-secret.md)
+- [Kubernetes 101 (7/10): Volume](./07-volume.md)
+- [Kubernetes 101 (8/10): HPA](./08-hpa.md)
+- [Kubernetes 101 (9/10): Helm](./09-helm.md)
+- [운영 관점의 Kubernetes](./10-kubernetes-in-operation.md)
+
+<!-- toc:end -->

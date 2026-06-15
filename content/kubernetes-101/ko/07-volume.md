@@ -193,3 +193,19 @@ kubectl get pv
 이 글에서는 Volume을 파드의 수명과 데이터의 수명을 분리하는 기본 도구로 정리했습니다. PVC는 워크로드가 원하는 저장소를 선언하고, StorageClass와 PV는 그 요청을 실제 디스크로 연결합니다.
 
 다음 글에서는 저장소가 아니라 트래픽 변화에 따라 파드 수를 자동으로 조절하는 방법, HPA를 보겠습니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Kubernetes 101 (1/10): Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap과 Secret](./06-configmap-and-secret.md)
+- **Kubernetes 101 (7/10): Volume (현재 글)**
+- [Kubernetes 101 (8/10): HPA](./08-hpa.md)
+- [Kubernetes 101 (9/10): Helm](./09-helm.md)
+- [운영 관점의 Kubernetes](./10-kubernetes-in-operation.md)
+
+<!-- toc:end -->

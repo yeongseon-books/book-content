@@ -383,3 +383,16 @@ curl --fail --max-time 10 https://$FQDN/healthz
 - 검증 결과(healthz, 오류율)
 
 이 기록은 장애 분석에서 "언제 무엇이 바뀌었는가"를 분 단위로 복원하는 기준점이 됩니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Azure Container Apps 101 (1/7): Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기](./01-what-is-aca.md)
+- [Azure Container Apps 101 (2/7): Environment, Container App, Revision — ACA in three words](./02-environment-app-revision.md)
+- **Azure Container Apps 101 (3/7): 첫 배포하기 — Python/FastAPI (현재 글)**
+- [Azure Container Apps 101 (4/7): Ingress와 트래픽 분할 — revision 기반 배포 전략](./04-ingress-and-traffic-split.md)
+- [Azure Container Apps 101 (5/7): 스케일링 — KEDA scaler와 zero-to-N](./05-scaling-with-keda.md)
+- [Azure Container Apps 101 (6/7): Dapr 통합 — 사이드카로 얻는 것](./06-dapr-integration.md)
+- [Azure Container Apps 101 (7/7): 모니터링과 운영 — Log Analytics와 Application Insights](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->

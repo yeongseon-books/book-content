@@ -203,3 +203,19 @@ kubectl describe hpa web
 이 글에서는 HPA를 메트릭 기반으로 Deployment의 replica 수를 자동 조절하는 계층으로 정리했습니다. 자동화의 품질은 requests 설정, 메트릭 신뢰도, 노드 확장 전략에 달려 있다는 점도 함께 봤습니다.
 
 다음 글에서는 이렇게 늘고 줄어드는 워크로드를 더 반복 가능하게 배포하기 위한 패키징 단위, Helm을 보겠습니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Kubernetes 101 (1/10): Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap과 Secret](./06-configmap-and-secret.md)
+- [Kubernetes 101 (7/10): Volume](./07-volume.md)
+- **Kubernetes 101 (8/10): HPA (현재 글)**
+- [Kubernetes 101 (9/10): Helm](./09-helm.md)
+- [운영 관점의 Kubernetes](./10-kubernetes-in-operation.md)
+
+<!-- toc:end -->

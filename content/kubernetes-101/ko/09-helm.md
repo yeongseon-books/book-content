@@ -188,3 +188,19 @@ helm history web
 이 글에서는 Helm을 공통 배포 구조와 환경별 차이를 분리하는 도구로 정리했습니다. 차트는 공유되는 계약이고, values는 환경별 차이를 담는 입력값이라는 감각을 잡아 두면 YAML 복사본이 빠르게 줄어듭니다.
 
 다음 글에서는 시리즈를 마무리하며, 실제 운영 관점에서 probes, RBAC, 관측성, GitOps를 어떻게 함께 봐야 하는지 정리하겠습니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Kubernetes 101 (1/10): Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap과 Secret](./06-configmap-and-secret.md)
+- [Kubernetes 101 (7/10): Volume](./07-volume.md)
+- [Kubernetes 101 (8/10): HPA](./08-hpa.md)
+- **Kubernetes 101 (9/10): Helm (현재 글)**
+- [운영 관점의 Kubernetes](./10-kubernetes-in-operation.md)
+
+<!-- toc:end -->

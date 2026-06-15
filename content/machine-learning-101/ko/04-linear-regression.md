@@ -296,3 +296,19 @@ a_preprocess = ColumnTransformer([
 - 피처 전처리와 모델을 하나의 파이프라인으로 묶었습니다.
 
 이 다섯 가지를 만족하면, 단순히 "모델이 돌아간다" 수준을 넘어 "재현 가능하고 설명 가능한 학습 시스템"에 가까워집니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Machine Learning 101 (1/10): Machine Learning이란 무엇인가?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): 지도학습과 비지도학습](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): 훈련/테스트 분할](./03-train-test-split.md)
+- **Machine Learning 101 (4/10): 선형 회귀 (현재 글)**
+- [Machine Learning 101 (5/10): 로지스틱 회귀](./05-logistic-regression.md)
+- [Machine Learning 101 (6/10): 결정 트리와 랜덤 포레스트](./06-decision-tree-and-random-forest.md)
+- [Machine Learning 101 (7/10): 군집화](./07-clustering.md)
+- [Machine Learning 101 (8/10): 과적합과 정규화](./08-overfitting-and-regularization.md)
+- [Machine Learning 101 (9/10): 모델 평가](./09-model-evaluation.md)
+- [ML 프로젝트 전체 흐름](./10-ml-project-workflow.md)
+
+<!-- toc:end -->
