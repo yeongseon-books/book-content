@@ -150,7 +150,7 @@ ADR이 저장소 깊은 곳에 숨어 있으면 리뷰어가 발견하지 못합
 | 7 | [DB 인덱스 튜닝](./docs/adr/0007-db-index-tuning.md) | Accepted | 2026-05-18 |
 ```
 
-이 표를 README의 "프로젝트 구조" 섹션 마지막에 넣으면, 저장소를 처음 보는 사람도 "이 사람은 기술 선택을 구조적으로 하는구나"라는 인상을 받습니다. 특히 칄용 담당자나 시니어 개발자가 리뷰할 때 판단력을 확인하는 첨경이 됩니다.
+이 표를 README의 "프로젝트 구조" 섹션 마지막에 넣으면, 저장소를 처음 보는 사람도 "이 사람은 기술 선택을 구조적으로 하는구나"라는 인상을 받습니다. 특히 채용 담당자나 시니어 개발자가 리뷰할 때 판단력을 확인하는 첩경이 됩니다.
 
 또한 이 표는 ADR 간 상태 변화를 한눈에 보여 줍니다. 3번 캐시 전략이 Superseded로 표시되어 있으면 "이 프로젝트는 초기 결정을 재검토하고 개선한 이력이 있다"는 메시지를 전달합니다. 이것이 단순 구현자와 설계자의 차이입니다.
 
@@ -186,7 +186,7 @@ ADR이 저장소 깊은 곳에 숨어 있으면 리뷰어가 발견하지 못합
   │   │        └─ 아니오 → 간단히 코드 주석으로 기록
   │   └─ 아니오 → 기록 불필요 (유일한 선택지)
   │
-  └─ 나중에 바꿠 가능성이 있는가?
+  └─ 나중에 바꿀 가능성이 있는가?
       ├─ 예 → ADR 작성 ✅ (미래 참조용)
       └─ 아니오 → 코드 주석으로 충분
 ```
@@ -223,7 +223,7 @@ SQLite를 기본 DB로 사용한다.
 
 ## Consequences
 - 장점: 배포 단순, 테스트 고립성, 비용 제로
-- 단점: 동시 접속 제한, 구모 커지면 전환 필수
+- 단점: 동시 접속 제한, 규모 커지면 전환 필수
 - 후속 조건: 사용자 100명 이상 시 PostgreSQL 전환 검토 (ADR-0008 예정)
 ```
 
@@ -535,7 +535,6 @@ ADR이 있는 프로젝트는 "이 사람은 기술 선택을 습관적으로 �
 - [Architecture Decision Records](https://adr.github.io/)
 - [ADR Tools - Nat Pryce](https://github.com/npryce/adr-tools)
 - [Documenting Architecture Decisions - Michael Nygard](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions)
-- [ThoughtWorks Tech Radar](https://www.thoughtworks.com/radar/techniques/lightweight-architecture-decision-records)
 - [ThoughtWorks Tech Radar](https://www.thoughtworks.com/radar/techniques/lightweight-architecture-decision-records)
 - [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/portfolio-project-101/ko)
 Tags: Portfolio, ADR, Decision, Architecture, Beginner

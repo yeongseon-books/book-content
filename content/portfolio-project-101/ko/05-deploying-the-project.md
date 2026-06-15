@@ -387,7 +387,7 @@ def health_check():
 | Vercel | 무제한 배포 | 서버리스/정적 사이트 | 프론트엔드, Next.js |
 | Render | 750시간/월 | 15분 불활동 시 sleep | API 서버 |
 | Railway | $5 크레딧/월 | 소진 시 정지 | 전체 스택 |
-| Fly.io | 3개 VM | 256MB RAM | 컬테이너 기반 |
+| Fly.io | 3개 VM | 256MB RAM | 컨테이너 기반 |
 | GitHub Pages | 무제한 | 정적 사이트만 | 포트폴리오 웹사이트 |
 
 추천 전략: 프론트엔드는 Vercel, API는 Render 또는 Railway, 포트폴리오 웹사이트는 GitHub Pages로 구성하면 월 비용 $0으로 운영할 수 있습니다. 비용이 발생하는 시점에 도달하면 그때 마이그레이션하면 됩니다.

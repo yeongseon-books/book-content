@@ -299,7 +299,7 @@ pytest --cov=src tests/
 ```markdown
 # sales-funnel-analysis
 
-> B2B SaaS 퍼널 전환율 하락 구간을 식별해 마케팅 예산 배분을 독습니다.
+> B2B SaaS 퍼널 전환율 하락 구간을 식별해 마케팅 예산 배분을 돕습니다.
 
 ## 결과 요약
 - 퍼널 3단계 전환율: 12% → 18% (개선 후)

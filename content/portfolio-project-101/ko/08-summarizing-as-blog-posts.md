@@ -66,7 +66,7 @@ GitHub 저장소는 결과물을 보여 주는 장소이지만, 검색으로 사
 
 **After**: 문제, 접근, 결과가 분리되어 있어 프로젝트의 가치가 짧은 시간 안에 드러납니다.
 
-전자의 글은 작성자 메모에 가깝고, 후자의 글은 독자 경험을 고려한 설명에 가깝습니다. 포트폴리오 글은 구현 일지이면서 동시에 독자를 안내하는 문서여야 합니다. 이 츨이를 만드는 것이 "문제 중심 구조"의 핵심입니다.
+전자의 글은 작성자 메모에 가깝고, 후자의 글은 독자 경험을 고려한 설명에 가깝습니다. 포트폴리오 글은 구현 일지이면서 동시에 독자를 안내하는 문서여야 합니다. 이 차이를 만드는 것이 "문제 중심 구조"의 핵심입니다.
 
 ## 단계별로 살펴보기
 
@@ -148,7 +148,7 @@ def normalize(date_str):
 
 - **토스(Toss) 기술 블로그**: 문제 상황을 독자가 공감할 수 있게 보여 주고, 해결 과정의 시행착오를 순서대로 나열합니다.
 - **우아한형제들 기술 블로그**: 변경 전후 수치를 표로 제시하고, 실제 코드와 배포 결과를 스크린샷으로 보여 줍니다.
-- **라인(LINE) 기술 블로그**: 대규모 시스템의 제약 조건을 먼저 설명하고, 그 안에서 최선의 선택이 뭘였는지 보여 줍니다.
+- **라인(LINE) 기술 블로그**: 대규모 시스템의 제약 조건을 먼저 설명하고, 그 안에서 최선의 선택이 뭐였는지 보여 줍니다.
 
 이 명의 블로그 모두 "뭔가 신기한 것을 썼다"가 아니라 "어려운 문제를 어떻게 풀었다"라는 구조입니다. 개인 포트폴리오 글도 동일한 구조를 따를 수 있습니다. 규모는 작아도 구조는 같을 수 있기 때문입니다.
 
@@ -342,7 +342,7 @@ Week 4: "2주 프로젝트에서 배운 것" — 회고와 다음 방향
 | --- | --- | --- |
 | Tistory | 한국어 SEO, 네이버 유입 | 한국어 제목, 키워드 중심 |
 | Hashnode | 개발자 커뮤니티, 영어권 | 영어 제목, 코드 비중 높음 |
-| Medium | 일반 독자 포함, 넘은 도달 | 설명 비중, 코드 최소화 |
+| Medium | 일반 독자 포함, 넓은 도달 | 설명 비중, 코드 최소화 |
 | dev.to | 개발자 전용, 태그 중심 발견 | 태그 3~5개, 짧은 글 |
 
 모든 플랫폼에 똑같은 글을 올리는 것보다, 핵심 메시지는 유지하되 길이와 코드 비중을 플랫폼에 맞게 조정하는 편이 효과적입니다.
@@ -424,7 +424,6 @@ CTA가 있으면 글이 일방적 정보 전달이 아니라 대화의 시작점
 
 - [On Writing Well - William Zinsser](https://www.harpercollins.com/products/on-writing-well-william-zinsser)
 - [Google Search Central](https://developers.google.com/search/docs)
-- [Hashnode for Devs](https://hashnode.com/)
 - [Hashnode for Devs](https://hashnode.com/)
 - [Writing for Engineers - Heinemeier Hansson](https://world.hey.com/dhh)
 - [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/portfolio-project-101/ko)

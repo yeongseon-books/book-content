@@ -134,7 +134,7 @@ X, y = load_iris(return_X_y=True)
 
 # 비지도: 군집
 km = KMeans(n_clusters=3, n_init=10, random_state=42).fit(X)
-print("Inertia:", km.inertia_)  # 응집도 (낙을수록 좋음)
+print("Inertia:", km.inertia_)  # 응집도 (낮을수록 좋음)
 
 # 지도: 분류
 clf = LogisticRegression(max_iter=1000).fit(X, y)

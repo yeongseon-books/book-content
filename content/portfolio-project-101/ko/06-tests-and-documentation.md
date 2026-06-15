@@ -303,7 +303,7 @@ pytest tests/test_scheduler.py -v
 ## CI 테스트 설정
 
 GitHub Actions에서 `pytest`를 자동 실행합니다.
-PR이 녀색이면 merge하지 않습니다.
+PR이 녹색이면 merge하지 않습니다.
 
 ## Flaky 테스트 처리
 
@@ -356,7 +356,7 @@ CI 배지는 작지만 강한 신호입니다. README 상단에 녹색 배지가
 2. GitHub 저장소 → Actions 탭 → 워크플로 선택 → "…" 메뉴 → "Create status badge"
 3. 생성된 Markdown을 README 상단에 붙여넣기
 
-커버리지 배지를 함께 넣으려면 Codecov나 Coveralls 같은 서비스를 연동합니다. 둑 다 무료 티어를 제공하므로 포트폴리오에 부담이 없습니다.
+커버리지 배지를 함께 넣으려면 Codecov나 Coveralls 같은 서비스를 연동합니다. 둘 다 무료 티어를 제공하므로 포트폴리오에 부담이 없습니다.
 
 ### conftest.py 패턴: 테스트 픽스처 구성
 

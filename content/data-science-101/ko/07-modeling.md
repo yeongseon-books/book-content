@@ -241,7 +241,7 @@ print("cv_auc:", cross_val_score(clf, X_train, y_train, cv=5, scoring="roc_auc")
 | 모델 | 장점 | 단점 | 추천 상황 |
 | --- | --- | --- | --- |
 | Logistic Regression | 빠름, 해석 쉬움 | 비선형 한계 | 베이스라인, 설명 필요 |
-| Random Forest | 강건함, 튜닝 난이도 중간 | 해석 상대적 어려움 | 일반 탭уляр 데이터 |
+| Random Forest | 강건함, 튜닝 난이도 중간 | 해석 상대적 어려움 | 일반 tabular 데이터 |
 | Gradient Boosting | 성능 우수 가능성 높음 | 튜닝/학습시간 증가 | 점수 극대화 필요 |
 
 ### 실험 운영 규칙
