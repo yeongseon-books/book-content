@@ -597,8 +597,8 @@ print(has_euler_path(g))  # 오일러 회로 존재
 - [Discrete Math 101 (6/10): 수열과 점화식](./06-sequences-and-recurrence.md)
 - [Discrete Math 101 (7/10): 조합과 경우의 수](./07-combinatorics.md)
 - [Discrete Math 101 (8/10): 그래프 이론 기초](./08-graph-theory-basics.md)
-- **트리와 그래프 탐색 (현재 글)**
-- 알고리즘과 이산수학의 연결 (예정)
+- **Discrete Math 101 (9/10): 트리와 그래프 탐색 (현재 글)**
+- [알고리즘과 이산수학의 연결](./10-discrete-math-and-algorithms.md)
 
 <!-- toc:end -->
 

@@ -456,12 +456,12 @@ lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
 - [Linux CLI 101 (2/10): 파일과 디렉터리 다루기](./02-files-and-directories.md)
 - [Linux CLI 101 (3/10): 권한과 소유자 이해하기](./03-permissions-and-ownership.md)
 - [Linux CLI 101 (4/10): cat, less, head, tail — 파일 내용 보기](./04-viewing-files.md)
-- **grep, find, xargs — 검색의 삼총사 (현재 글)**
-- pipe와 redirection (예정)
-- 프로세스 확인과 종료 (예정)
-- 환경변수와 PATH (예정)
-- 간단한 shell script (예정)
-- SSH와 원격 서버 접속 (예정)
+- **Linux CLI 101 (5/10): grep, find, xargs — 검색의 삼총사 (현재 글)**
+- [Linux CLI 101 (6/10): pipe와 redirection](./06-pipe-and-redirection.md)
+- [Linux CLI 101 (7/10): 프로세스 확인과 종료](./07-process-management.md)
+- [Linux CLI 101 (8/10): 환경변수와 PATH](./08-environment-variables.md)
+- [Linux CLI 101 (9/10): 간단한 shell script](./09-shell-script-basics.md)
+- [SSH와 원격 서버 접속](./10-ssh-and-remote.md)
 
 <!-- toc:end -->
 

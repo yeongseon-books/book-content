@@ -284,9 +284,9 @@ def atomic_write(path, data: bytes):
 - [Operating Systems 101 (5/10): 락, 뮤텍스, 세마포어](./05-locks-mutex-semaphore.md)
 - [Operating Systems 101 (6/10): 메모리 관리](./06-memory-management.md)
 - [Operating Systems 101 (7/10): 가상 메모리](./07-virtual-memory.md)
-- **파일 시스템 (현재 글)**
-- 시스템 콜 (예정)
-- 컨테이너와 운영체제 (예정)
+- **Operating Systems 101 (8/10): 파일 시스템 (현재 글)**
+- [Operating Systems 101 (9/10): 시스템 콜](./09-system-calls.md)
+- [컨테이너와 운영체제](./10-containers-and-the-os.md)
 
 <!-- toc:end -->
 

@@ -488,12 +488,12 @@ def run_prompt_ab(cases, prompt_a, prompt_b):
 ## 시리즈 목차
 
 - [AI Web Development 101 (1/7): AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기](./01-hello-ai-api.md)
-- **프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술 (현재 글)**
-- AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현 (예정)
-- RAG 입문 — 내 데이터로 답하는 AI 만들기 (예정)
-- AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기 (예정)
-- AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기 (예정)
-- AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법 (예정)
+- **AI Web Development 101 (2/7): 프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술 (현재 글)**
+- [AI Web Development 101 (3/7): AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현](./03-ai-chatbot.md)
+- [AI Web Development 101 (4/7): RAG 입문 — 내 데이터로 답하는 AI 만들기](./04-rag-intro.md)
+- [AI Web Development 101 (5/7): AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기](./05-ai-agent.md)
+- [AI Web Development 101 (6/7): AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기](./06-deploy.md)
+- [AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법](./07-eval-improve.md)
 
 <!-- toc:end -->
 

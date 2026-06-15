@@ -282,8 +282,8 @@ close(10) = 0
 - [Operating Systems 101 (6/10): 메모리 관리](./06-memory-management.md)
 - [Operating Systems 101 (7/10): 가상 메모리](./07-virtual-memory.md)
 - [Operating Systems 101 (8/10): 파일 시스템](./08-file-systems.md)
-- **시스템 콜 (현재 글)**
-- 컨테이너와 운영체제 (예정)
+- **Operating Systems 101 (9/10): 시스템 콜 (현재 글)**
+- [컨테이너와 운영체제](./10-containers-and-the-os.md)
 
 <!-- toc:end -->
 

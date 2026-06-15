@@ -438,8 +438,8 @@ LLM rate limiting은 더 이상 초당 요청 수 제한이 아닙니다. 토큰
 - [AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지](./06-toxicity-bias-detection.md)
 - [AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증](./07-hallucination-guardrails.md)
 - **AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지 (현재 글)**
-- AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스 (예정)
-- AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축 (예정)
+- [AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스](./09-audit-logging-compliance.md)
+- [AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
 
 <!-- toc:end -->
 

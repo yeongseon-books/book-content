@@ -334,11 +334,11 @@ Residual은 "원본을 보존"하는 경로이면서 동시에 "새 변환을 �
 - [LLM from Scratch 101 (2/9): 정수에서 벡터로, 그리고 위치](./02-embedding.md)
 - [LLM from Scratch 101 (3/9): 어떤 토큰을 얼마나 볼지 스스로 정하기](./03-attention.md)
 - **LLM from Scratch 101 (4/9): 블록 하나, 깊이의 단위 (현재 글)**
-- LLM from Scratch 101 (5/9): 조립: GPT 모델 클래스 완성 (예정)
-- LLM from Scratch 101 (6/9): 기울기로 배우기 (예정)
-- LLM from Scratch 101 (7/9): 샘플링 — 학습된 모델에서 글 뽑아내기 (예정)
-- LLM from Scratch 101 (8/9): 베이스 모델을 우리 작업에 맞추기 (예정)
-- LLM from Scratch 101 (9/9): 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍 (예정)
+- [LLM from Scratch 101 (5/9): 조립: GPT 모델 클래스 완성](./05-gpt-model.md)
+- [LLM from Scratch 101 (6/9): 기울기로 배우기](./06-training-loop.md)
+- [LLM from Scratch 101 (7/9): 샘플링 — 학습된 모델에서 글 뽑아내기](./07-inference.md)
+- [LLM from Scratch 101 (8/9): 베이스 모델을 우리 작업에 맞추기](./08-finetuning.md)
+- [LLM from Scratch 101 (9/9): 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍](./09-chatbot-wrapper.md)
 
 <!-- toc:end -->
 

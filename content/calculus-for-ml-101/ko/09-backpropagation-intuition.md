@@ -493,8 +493,8 @@ def numerical_grad(f, x, h=1e-5):
 - [Calculus for ML 101 (6/10): 손실 함수](./06-loss-function.md)
 - [Calculus for ML 101 (7/10): 경사하강법](./07-gradient-descent.md)
 - [Calculus for ML 101 (8/10): 최적화](./08-optimization.md)
-- **역전파 직관 (현재 글)**
-- 딥러닝에서의 미분 (예정)
+- **Calculus for ML 101 (9/10): 역전파 직관 (현재 글)**
+- [딥러닝에서의 미분](./10-calculus-in-deep-learning.md)
 
 <!-- toc:end -->
 

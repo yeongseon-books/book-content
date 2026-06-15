@@ -438,9 +438,9 @@ for t in thresholds:
 - [Machine Learning 101 (5/10): 로지스틱 회귀](./05-logistic-regression.md)
 - [Machine Learning 101 (6/10): 결정 트리와 랜덤 포레스트](./06-decision-tree-and-random-forest.md)
 - [Machine Learning 101 (7/10): 군집화](./07-clustering.md)
-- **Overfitting과 Regularization (현재 글)**
-- 모델 평가 (예정)
-- ML 프로젝트 전체 흐름 (예정)
+- **Machine Learning 101 (8/10): 과적합과 정규화 (현재 글)**
+- [Machine Learning 101 (9/10): 모델 평가](./09-model-evaluation.md)
+- [ML 프로젝트 전체 흐름](./10-ml-project-workflow.md)
 
 <!-- toc:end -->
 

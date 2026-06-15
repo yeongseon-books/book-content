@@ -206,11 +206,11 @@ ROC와 AUC는 임계값을 고르기 전 후보 모델의 순위화 능력을 �
 - [Model Evaluation 101 (3/10): 정확도의 한계](./03-limits-of-accuracy.md)
 - [Model Evaluation 101 (4/10): 정밀도와 재현율](./04-precision-and-recall.md)
 - [Model Evaluation 101 (5/10): F1 점수](./05-f1-score.md)
-- **ROC와 AUC 이해하기 (현재 글)**
-- 확률 보정 이해하기 (예정)
-- 교차 검증 이해하기 (예정)
-- 오류 분석으로 약점 찾기 (예정)
-- 평가 리포트 만들기 (예정)
+- **Model Evaluation 101 (6/10): ROC와 AUC 이해하기 (현재 글)**
+- [Model Evaluation 101 (7/10): 확률 보정 이해하기](./07-calibration.md)
+- [Model Evaluation 101 (8/10): 교차 검증 이해하기](./08-cross-validation.md)
+- [Model Evaluation 101 (9/10): 오류 분석으로 약점 찾기](./09-error-analysis.md)
+- [평가 리포트 만들기](./10-evaluation-report.md)
 
 <!-- toc:end -->
 

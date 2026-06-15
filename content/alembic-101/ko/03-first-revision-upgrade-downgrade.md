@@ -411,14 +411,14 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 
 - [Alembic 101 (1/10): 왜 Alembic인가, 그리고 init까지](./01-why-alembic-and-init.md)
 - [Alembic 101 (2/10): env.py와 target_metadata: 모델과 마이그레이션 연결](./02-env-py-and-target-metadata.md)
-- **첫 revision: upgrade와 downgrade를 손으로 작성 (현재 글)**
-- autogenerate: 잡는 것과 못 잡는 것의 경계 (예정)
-- branch와 merge: 동시에 만든 revision을 합치는 법 (예정)
-- 데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기 (예정)
-- online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기 (예정)
-- downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가 (예정)
-- 배포 순서와 blue/green: schema와 application code의 안전한 동기화 (예정)
-- Production과 team workflow: PR, CI, 모니터링, 그리고 incident response (예정)
+- **Alembic 101 (3/10): 첫 revision: upgrade와 downgrade를 손으로 작성 (현재 글)**
+- [Alembic 101 (4/10): autogenerate: 잡는 것과 못 잡는 것의 경계](./04-autogenerate-and-its-limits.md)
+- [Alembic 101 (5/10): branch와 merge: 동시에 만든 revision을 합치는 법](./05-branches-and-merges.md)
+- [Alembic 101 (6/10): 데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기](./06-data-migrations.md)
+- [Alembic 101 (7/10): online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기](./07-online-vs-offline-and-batch.md)
+- [Alembic 101 (8/10): downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가](./08-downgrade-strategy.md)
+- [Alembic 101 (9/10): 배포 순서와 blue/green: schema와 application code의 안전한 동기화](./09-deploy-ordering-and-blue-green.md)
+- [Production과 team workflow: PR, CI, 모니터링, 그리고 incident response](./10-production-and-team-workflow.md)
 
 <!-- toc:end -->
 

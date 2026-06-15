@@ -657,9 +657,9 @@ print(topological_sort(dependencies))
 - [Data Structures with Python 101 (5/10): 연결 리스트](./05-linked-lists.md)
 - [Data Structures with Python 101 (6/10): 트리와 이진 트리](./06-trees-and-binary-trees.md)
 - [Data Structures with Python 101 (7/10): 힙과 우선순위 큐](./07-heaps-and-priority-queues.md)
-- **그래프 표현 (현재 글)**
-- set과 집합 연산 (예정)
-- 자료구조 선택 기준 (예정)
+- **Data Structures with Python 101 (8/10): 그래프 표현 (현재 글)**
+- [Data Structures with Python 101 (9/10): set과 집합 연산](./09-sets-and-set-operations.md)
+- [자료구조 선택 기준](./10-choosing-data-structures.md)
 
 <!-- toc:end -->
 

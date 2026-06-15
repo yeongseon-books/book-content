@@ -461,16 +461,16 @@ D: (없음)
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **자료구조란 무엇인가? (현재 글)**
-- 배열과 동적 배열 (예정)
-- 연결 리스트 (예정)
-- 스택과 큐 (예정)
-- 해시 테이블 (예정)
-- 트리 (예정)
-- 이진 탐색 트리 (예정)
-- 힙 (예정)
-- 그래프 (예정)
-- 자료구조 선택 기준 (예정)
+- **Data Structures 101 (1/10): 자료구조란 무엇인가? (현재 글)**
+- [Data Structures 101 (2/10): 배열과 동적 배열](./02-arrays-and-dynamic-arrays.md)
+- [Data Structures 101 (3/10): 연결 리스트](./03-linked-lists.md)
+- [Data Structures 101 (4/10): 스택과 큐](./04-stacks-and-queues.md)
+- [Data Structures 101 (5/10): 해시 테이블](./05-hash-tables.md)
+- [Data Structures 101 (6/10): 트리](./06-trees.md)
+- [Data Structures 101 (7/10): 이진 탐색 트리](./07-binary-search-trees.md)
+- [Data Structures 101 (8/10): 힙](./08-heaps.md)
+- [Data Structures 101 (9/10): 그래프](./09-graphs.md)
+- [자료구조 선택 기준](./10-choosing-data-structures.md)
 
 <!-- toc:end -->
 

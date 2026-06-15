@@ -640,10 +640,10 @@ Python 표준 라이브러리는 힙 기반 우선순위 큐를 두 곳에서 �
 - [Data Structures with Python 101 (4/10): 해시 테이블과 dict](./04-hash-tables-and-dict.md)
 - [Data Structures with Python 101 (5/10): 연결 리스트](./05-linked-lists.md)
 - [Data Structures with Python 101 (6/10): 트리와 이진 트리](./06-trees-and-binary-trees.md)
-- **힙과 우선순위 큐 (현재 글)**
-- 그래프 표현 (예정)
-- set과 집합 연산 (예정)
-- 자료구조 선택 기준 (예정)
+- **Data Structures with Python 101 (7/10): 힙과 우선순위 큐 (현재 글)**
+- [Data Structures with Python 101 (8/10): 그래프 표현](./08-graph-representations.md)
+- [Data Structures with Python 101 (9/10): set과 집합 연산](./09-sets-and-set-operations.md)
+- [자료구조 선택 기준](./10-choosing-data-structures.md)
 
 <!-- toc:end -->
 

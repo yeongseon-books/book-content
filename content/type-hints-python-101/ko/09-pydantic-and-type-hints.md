@@ -671,8 +671,8 @@ POST /users 422 응답 핵심
 - [Type Hints in Python 101 (6/10): Protocol과 structural typing](./06-protocol-and-structural-typing.md)
 - [Type Hints in Python 101 (7/10): Generic 이해하기](./07-generic.md)
 - [Type Hints in Python 101 (8/10): mypy와 pyright 사용하기](./08-mypy-and-pyright.md)
-- **Pydantic과 타입 힌트 (현재 글)**
-- 타입 힌트를 잘 쓰는 기준 (예정)
+- **Type Hints in Python 101 (9/10): Pydantic과 타입 힌트 (현재 글)**
+- [타입 힌트를 잘 쓰는 기준](./10-type-hints-best-practices.md)
 
 <!-- toc:end -->
 

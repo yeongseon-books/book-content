@@ -490,8 +490,8 @@ D: (없음)
 - [Data Structures 101 (6/10): 트리](./06-trees.md)
 - [Data Structures 101 (7/10): 이진 탐색 트리](./07-binary-search-trees.md)
 - [Data Structures 101 (8/10): 힙](./08-heaps.md)
-- **그래프 (현재 글)**
-- 자료구조 선택 기준 (예정)
+- **Data Structures 101 (9/10): 그래프 (현재 글)**
+- [자료구조 선택 기준](./10-choosing-data-structures.md)
 
 <!-- toc:end -->
 

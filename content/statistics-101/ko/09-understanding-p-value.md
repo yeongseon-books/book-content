@@ -346,8 +346,8 @@ print('FDR 기각 여부:', rej_fdr)
 - [Statistics 101 (6/10): 신뢰구간](./06-confidence-interval.md)
 - [Statistics 101 (7/10): 가설검정](./07-hypothesis-testing.md)
 - [Statistics 101 (8/10): 상관과 회귀](./08-correlation-and-regression.md)
-- **p-value 이해하기 (현재 글)**
-- 통계적 사고방식 (예정)
+- **Statistics 101 (9/10): p-value 이해하기 (현재 글)**
+- [통계적 사고방식](./10-statistical-thinking.md)
 
 <!-- toc:end -->
 

@@ -381,7 +381,7 @@ async def tx(conn: aiosqlite.Connection):
 - [Python DB-API 101 (7/10): PEP 249 예외 계층과 SQLite 에러 처리](./07-error-handling-exception-hierarchy.md)
 - [Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링](./08-connection-pooling.md)
 - **Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기 (현재 글)**
-- Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
+- [Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업](./10-production-patterns.md)
 
 <!-- toc:end -->
 

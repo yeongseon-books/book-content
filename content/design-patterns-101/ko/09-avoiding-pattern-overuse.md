@@ -526,8 +526,8 @@ Factory 클래스를 지우고 생성 코드를 사용처에 인라인합니다.
 - [Design Patterns 101 (6/10): Adapter 패턴](./06-adapter-pattern.md)
 - [Design Patterns 101 (7/10): Observer 패턴](./07-observer-pattern.md)
 - [Design Patterns 101 (8/10): Factory와 의존성 주입](./08-factory-and-di.md)
-- **패턴을 남용하지 않는 법 (현재 글)**
-- Python에 어울리는 패턴 (예정)
+- **Design Patterns 101 (9/10): 패턴을 남용하지 않는 법 (현재 글)**
+- [Python에 어울리는 패턴](./10-pythonic-patterns.md)
 
 <!-- toc:end -->
 

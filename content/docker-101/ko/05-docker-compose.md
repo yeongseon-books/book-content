@@ -226,12 +226,12 @@ Compose는 팀이 처음으로 갖게 되는 환경 코드인 경우가 많습�
 - [Docker 101 (2/10): Image와 Container](./02-image-and-container.md)
 - [Docker 101 (3/10): Dockerfile 작성하기](./03-dockerfile.md)
 - [Docker 101 (4/10): Volume과 Network](./04-volume-and-network.md)
-- **Docker Compose (현재 글)**
-- 환경변수와 설정 (예정)
-- Python 앱 컨테이너화 (예정)
-- 데이터베이스와 함께 실행하기 (예정)
-- Image 최적화 (예정)
-- 배포용 Docker 구성 (예정)
+- **Docker 101 (5/10): Docker Compose (현재 글)**
+- [Docker 101 (6/10): 환경변수와 설정](./06-env-and-config.md)
+- [Docker 101 (7/10): Python 앱 컨테이너화](./07-python-app-containerize.md)
+- [Docker 101 (8/10): 데이터베이스와 함께 실행하기](./08-database-with-app.md)
+- [Docker 101 (9/10): Image 최적화](./09-image-optimization.md)
+- [배포용 Docker 구성](./10-production-docker.md)
 
 <!-- toc:end -->
 

@@ -578,14 +578,14 @@ PASS
 
 - [pytest 101 (1/10): 왜 테스트를 작성해야 할까?](./01-why-write-tests.md)
 - [pytest 101 (2/10): 첫 번째 pytest 테스트 작성하기](./02-first-pytest-test.md)
-- **assert와 예외 테스트 (현재 글)**
-- fixture 이해하기 (예정)
-- parametrization으로 테스트 케이스 늘리기 (예정)
-- mock과 monkeypatch (예정)
-- 파일, 환경변수, 시간 테스트하기 (예정)
-- coverage와 테스트 품질 보기 (예정)
-- GitHub Actions에서 테스트 자동화하기 (예정)
-- 테스트하기 쉬운 코드 구조 만들기 (예정)
+- **pytest 101 (3/10): assert와 예외 테스트 (현재 글)**
+- [pytest 101 (4/10): fixture 이해하기](./04-fixtures.md)
+- [pytest 101 (5/10): parametrization으로 테스트 케이스 늘리기](./05-parametrization.md)
+- [pytest 101 (6/10): mock과 monkeypatch](./06-mock-and-monkeypatch.md)
+- [pytest 101 (7/10): 파일, 환경변수, 시간 테스트하기](./07-testing-files-env-time.md)
+- [pytest 101 (8/10): coverage와 테스트 품질 보기](./08-coverage.md)
+- [pytest 101 (9/10): GitHub Actions에서 테스트 자동화하기](./09-ci-with-github-actions.md)
+- [테스트하기 쉬운 코드 구조 만들기](./10-testable-code.md)
 
 <!-- toc:end -->
 

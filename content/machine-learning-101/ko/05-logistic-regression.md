@@ -475,12 +475,12 @@ for t in thresholds:
 - [Machine Learning 101 (2/10): 지도학습과 비지도학습](./02-supervised-and-unsupervised.md)
 - [Machine Learning 101 (3/10): 훈련/테스트 분할](./03-train-test-split.md)
 - [Machine Learning 101 (4/10): 선형 회귀](./04-linear-regression.md)
-- **Logistic Regression (현재 글)**
-- 결정 트리와 랜덤 포레스트 (예정)
-- 군집화 (예정)
-- 과적합과 정규화 (예정)
-- 모델 평가 (예정)
-- ML 프로젝트 전체 흐름 (예정)
+- **Machine Learning 101 (5/10): 로지스틱 회귀 (현재 글)**
+- [Machine Learning 101 (6/10): 결정 트리와 랜덤 포레스트](./06-decision-tree-and-random-forest.md)
+- [Machine Learning 101 (7/10): 군집화](./07-clustering.md)
+- [Machine Learning 101 (8/10): 과적합과 정규화](./08-overfitting-and-regularization.md)
+- [Machine Learning 101 (9/10): 모델 평가](./09-model-evaluation.md)
+- [ML 프로젝트 전체 흐름](./10-ml-project-workflow.md)
 
 <!-- toc:end -->
 

@@ -406,9 +406,9 @@ class CreateCouponService:
 - [Software Design 101 (5/10): 인터페이스와 추상화](./05-interfaces-and-abstraction.md)
 - [Software Design 101 (6/10): 계층 아키텍처](./06-layered-architecture.md)
 - [Software Design 101 (7/10): 데이터 흐름 설계](./07-data-flow-design.md)
-- **변경 영향 줄이기 (현재 글)**
-- 설계 원칙 모음 (예정)
-- 작은 프로젝트로 설계 연습 (예정)
+- **Software Design 101 (8/10): 변경 영향 줄이기 (현재 글)**
+- [Software Design 101 (9/10): 설계 원칙 모음](./09-design-principles.md)
+- [작은 프로젝트로 설계 연습](./10-small-design-practice.md)
 
 <!-- toc:end -->
 

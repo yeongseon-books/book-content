@@ -468,8 +468,8 @@ AI 앱은 정상 동작 중에도 비용이 급증할 수 있으므로 일일 �
 - [AI Web Development 101 (3/7): AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현](./03-ai-chatbot.md)
 - [AI Web Development 101 (4/7): RAG 입문 — 내 데이터로 답하는 AI 만들기](./04-rag-intro.md)
 - [AI Web Development 101 (5/7): AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기](./05-ai-agent.md)
-- **AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기 (현재 글)**
-- AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법 (예정)
+- **AI Web Development 101 (6/7): AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기 (현재 글)**
+- [AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법](./07-eval-improve.md)
 
 <!-- toc:end -->
 

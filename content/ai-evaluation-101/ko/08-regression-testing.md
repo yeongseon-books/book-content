@@ -510,8 +510,8 @@ baseline 업데이트 PR에는 반드시 하락 케이스와 개선 케이스를
 - [AI Evaluation 101 (6/10): RAG 시스템 평가하기](./06-rag-evaluation.md)
 - [AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory](./07-agent-evaluation.md)
 - **AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게 (현재 글)**
-- AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가 (예정)
-- AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가 (예정)
+- [AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가](./09-ab-testing-llms.md)
+- [AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가](./10-production-evaluation.md)
 
 <!-- toc:end -->
 

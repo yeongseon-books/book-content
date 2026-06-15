@@ -374,16 +374,16 @@ for item in plan:
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **CS에 수학이 필요한 이유 (현재 글)**
-- 논리와 증명 (예정)
-- 집합과 함수 (예정)
-- 그래프 (예정)
-- 조합 (예정)
-- 확률 (예정)
-- 선형대수 (예정)
-- 미분 (예정)
-- 정보이론 (예정)
-- 알고리즘과 수학 (예정)
+- **Math for CS 101 (1/10): CS에 수학이 필요한 이유 (현재 글)**
+- [Math for CS 101 (2/10): 논리와 증명](./02-logic-and-proofs.md)
+- [Math for CS 101 (3/10): 집합과 함수](./03-sets-and-functions.md)
+- [Math for CS 101 (4/10): 그래프](./04-graphs.md)
+- [Math for CS 101 (5/10): 조합](./05-combinatorics.md)
+- [Math for CS 101 (6/10): 확률](./06-probability.md)
+- [Math for CS 101 (7/10): 선형대수](./07-linear-algebra.md)
+- [Math for CS 101 (8/10): 미분](./08-calculus.md)
+- [Math for CS 101 (9/10): 정보이론](./09-information-theory.md)
+- [알고리즘과 수학](./10-algorithms-and-math.md)
 
 <!-- toc:end -->
 

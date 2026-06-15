@@ -517,15 +517,15 @@ async def upload_document(
 ## 시리즈 목차
 
 - [Secure Coding 101 (1/10): Secure Coding이란 무엇인가?](./01-what-is-secure-coding.md)
-- **입력값 검증 (현재 글)**
-- 인증과 세션 (예정)
-- 인가와 권한 (예정)
-- 안전한 데이터 저장 (예정)
-- Secret과 키 관리 (예정)
-- SQL Injection과 ORM 안전 사용 (예정)
-- XSS와 CSRF 방어 (예정)
-- Dependency 취약점 관리 (예정)
-- 안전한 로깅과 감사 (예정)
+- **Secure Coding 101 (2/10): 입력값 검증 (현재 글)**
+- [Secure Coding 101 (3/10): 인증과 세션](./03-authentication-and-session.md)
+- [Secure Coding 101 (4/10): 인가와 권한](./04-authorization-and-permissions.md)
+- [Secure Coding 101 (5/10): 안전한 데이터 저장](./05-safe-data-storage.md)
+- [Secure Coding 101 (6/10): Secret과 키 관리](./06-secret-and-key-management.md)
+- [Secure Coding 101 (7/10): SQL Injection과 ORM 안전 사용](./07-sql-injection-and-orm.md)
+- [Secure Coding 101 (8/10): XSS와 CSRF 방어](./08-xss-and-csrf.md)
+- [Secure Coding 101 (9/10): Dependency 취약점 관리](./09-dependency-vulnerabilities.md)
+- [안전한 로깅과 감사](./10-safe-logging-and-audit.md)
 
 <!-- toc:end -->
 

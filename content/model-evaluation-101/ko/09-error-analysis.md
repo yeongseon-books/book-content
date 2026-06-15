@@ -165,8 +165,8 @@ print("ambiguous indices:", order.tolist())
 - [Model Evaluation 101 (6/10): ROC와 AUC 이해하기](./06-roc-and-auc.md)
 - [Model Evaluation 101 (7/10): 확률 보정 이해하기](./07-calibration.md)
 - [Model Evaluation 101 (8/10): 교차 검증 이해하기](./08-cross-validation.md)
-- **오류 분석으로 약점 찾기 (현재 글)**
-- 평가 리포트 만들기 (예정)
+- **Model Evaluation 101 (9/10): 오류 분석으로 약점 찾기 (현재 글)**
+- [평가 리포트 만들기](./10-evaluation-report.md)
 
 <!-- toc:end -->
 

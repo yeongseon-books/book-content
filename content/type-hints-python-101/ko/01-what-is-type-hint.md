@@ -591,16 +591,16 @@ ValueError: user_id must be numeric
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **Python type hint란 무엇인가? (현재 글)**
-- 기본 타입과 collection 타입 (예정)
-- Optional과 Union (예정)
-- 함수 타입 힌트 (예정)
-- TypedDict와 dataclass (예정)
-- Protocol과 structural typing (예정)
-- Generic 이해하기 (예정)
-- mypy와 pyright 사용하기 (예정)
-- Pydantic과 타입 힌트 (예정)
-- 타입 힌트를 잘 쓰는 기준 (예정)
+- **Type Hints in Python 101 (1/10): Python type hint란 무엇인가? (현재 글)**
+- [Type Hints in Python 101 (2/10): 기본 타입과 collection 타입](./02-basic-and-collection-types.md)
+- [Type Hints in Python 101 (3/10): Optional과 Union](./03-optional-and-union.md)
+- [Type Hints in Python 101 (4/10): 함수 타입 힌트](./04-function-type-hints.md)
+- [Type Hints in Python 101 (5/10): TypedDict와 dataclass](./05-typeddict-and-dataclass.md)
+- [Type Hints in Python 101 (6/10): Protocol과 structural typing](./06-protocol-and-structural-typing.md)
+- [Type Hints in Python 101 (7/10): Generic 이해하기](./07-generic.md)
+- [Type Hints in Python 101 (8/10): mypy와 pyright 사용하기](./08-mypy-and-pyright.md)
+- [Type Hints in Python 101 (9/10): Pydantic과 타입 힌트](./09-pydantic-and-type-hints.md)
+- [타입 힌트를 잘 쓰는 기준](./10-type-hints-best-practices.md)
 
 <!-- toc:end -->
 

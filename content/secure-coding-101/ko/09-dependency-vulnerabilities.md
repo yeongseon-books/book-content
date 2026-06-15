@@ -656,8 +656,8 @@ def check_package_health(package_name: str) -> dict:
 - [Secure Coding 101 (6/10): Secret과 키 관리](./06-secret-and-key-management.md)
 - [Secure Coding 101 (7/10): SQL Injection과 ORM 안전 사용](./07-sql-injection-and-orm.md)
 - [Secure Coding 101 (8/10): XSS와 CSRF 방어](./08-xss-and-csrf.md)
-- **Dependency 취약점 관리 (현재 글)**
-- 안전한 로깅과 감사 (예정)
+- **Secure Coding 101 (9/10): Dependency 취약점 관리 (현재 글)**
+- [안전한 로깅과 감사](./10-safe-logging-and-audit.md)
 
 <!-- toc:end -->
 

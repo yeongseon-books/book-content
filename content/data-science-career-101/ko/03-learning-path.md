@@ -347,14 +347,14 @@ What went well / Improve / Next
 
 - [Data Science Career 101 (1/10): 데이터 직무란 무엇인가](./01-what-is-data-career.md)
 - [Data Science Career 101 (2/10): 분석가 vs 사이언티스트 vs 엔지니어](./02-analyst-scientist-engineer.md)
-- **학습 경로 설계 (현재 글)**
-- 데이터 포트폴리오 (예정)
-- SQL과 분석 인터뷰 (예정)
-- ML 인터뷰 (예정)
-- 케이스 인터뷰 (예정)
-- 첫 직장 적응 (예정)
-- 도메인 전문성 쌓기 (예정)
-- 시니어 데이터 직무로 가는 길 (예정)
+- **Data Science Career 101 (3/10): 학습 경로 설계 (현재 글)**
+- [Data Science Career 101 (4/10): 데이터 포트폴리오](./04-data-portfolio.md)
+- [Data Science Career 101 (5/10): SQL과 분석 인터뷰](./05-sql-and-analytics-interview.md)
+- [Data Science Career 101 (6/10): ML 인터뷰](./06-ml-interview.md)
+- [Data Science Career 101 (7/10): 케이스 인터뷰](./07-case-interview.md)
+- [Data Science Career 101 (8/10): 첫 직장 적응](./08-first-job.md)
+- [Data Science Career 101 (9/10): 도메인 전문성 쌓기](./09-domain-expertise.md)
+- [시니어 데이터 직무로 가는 길](./10-path-to-senior.md)
 
 <!-- toc:end -->
 

@@ -419,8 +419,8 @@ git log --oneline | wc -l
 - [Portfolio Project 101 (6/10): 테스트와 문서화](./06-tests-and-documentation.md)
 - [Portfolio Project 101 (7/10): 기술적 의사결정 기록](./07-recording-tech-decisions.md)
 - [Portfolio Project 101 (8/10): 블로그 글로 정리하기](./08-summarizing-as-blog-posts.md)
-- **면접에서 설명하기 (현재 글)**
-- 포트폴리오 개선 체크리스트 (예정)
+- **Portfolio Project 101 (9/10): 면접에서 설명하기 (현재 글)**
+- [포트폴리오 개선 체크리스트](./10-portfolio-improvement-checklist.md)
 
 <!-- toc:end -->
 

@@ -593,12 +593,12 @@ select = ["S"]  # 보안 규칙 활성화
 - [GitHub Actions 101 (2/10): Workflow와 Job](./02-workflow-and-job.md)
 - [GitHub Actions 101 (3/10): Trigger 이해하기](./03-triggers.md)
 - [GitHub Actions 101 (4/10): Python 테스트 자동화](./04-python-test-automation.md)
-- **Lint와 Type Check (현재 글)**
-- 빌드 아티팩트 (예정)
-- Docker 빌드 (예정)
-- 배포 자동화 (예정)
-- Secret 관리 (예정)
-- 실전 CI/CD 파이프라인 (예정)
+- **GitHub Actions 101 (5/10): Lint와 Type Check (현재 글)**
+- [GitHub Actions 101 (6/10): 빌드 아티팩트](./06-build-artifact.md)
+- [GitHub Actions 101 (7/10): Docker 빌드](./07-docker-build.md)
+- [GitHub Actions 101 (8/10): 배포 자동화](./08-deploy-automation.md)
+- [GitHub Actions 101 (9/10): Secret 관리](./09-secret-management.md)
+- [실전 CI/CD 파이프라인](./10-real-world-cicd-pipeline.md)
 
 <!-- toc:end -->
 

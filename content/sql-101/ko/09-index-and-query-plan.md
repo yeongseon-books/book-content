@@ -544,8 +544,8 @@ SQL 리뷰를 사람 기억에 의존하면 시간이 지나면서 기준이 흔
 - [SQL 101 (6/10): 서브쿼리와 CTE](./06-subquery.md)
 - [SQL 101 (7/10): 윈도 함수](./07-window-function.md)
 - [SQL 101 (8/10): 데이터를 바꾸는 SQL — INSERT, UPDATE, DELETE](./08-insert-update-delete.md)
-- **인덱스와 쿼리 계획 (현재 글)**
-- 실전 분석 SQL (예정)
+- **SQL 101 (9/10): 인덱스와 쿼리 계획 (현재 글)**
+- [실전 분석 SQL](./10-practical-analysis-sql.md)
 
 <!-- toc:end -->
 

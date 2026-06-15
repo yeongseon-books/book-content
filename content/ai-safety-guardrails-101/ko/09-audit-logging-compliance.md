@@ -450,7 +450,7 @@ def log_audit_access(actor: str, reason: str, query_scope: str):
 - [AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증](./07-hallucination-guardrails.md)
 - [AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지](./08-rate-limiting-abuse-prevention.md)
 - **AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스 (현재 글)**
-- AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축 (예정)
+- [AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
 
 <!-- toc:end -->
 

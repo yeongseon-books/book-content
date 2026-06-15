@@ -603,8 +603,8 @@ flowchart LR
 - [Data Warehouse 101 (6/10): ETL과 ELT](./06-etl-and-elt.md)
 - [Data Warehouse 101 (7/10): BI와 Dashboard](./07-bi-and-dashboard.md)
 - [Data Warehouse 101 (8/10): Data Mart](./08-data-mart.md)
-- **성능 최적화 (현재 글)**
-- Warehouse 설계 예제 (예정)
+- **Data Warehouse 101 (9/10): 성능 최적화 (현재 글)**
+- [Warehouse 설계 예제](./10-warehouse-design-example.md)
 
 <!-- toc:end -->
 

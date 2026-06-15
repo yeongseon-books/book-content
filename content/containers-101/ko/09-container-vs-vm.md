@@ -487,8 +487,8 @@ flowchart LR
 - [Containers 101 (6/10): Network](./06-network.md)
 - [Containers 101 (7/10): Registry](./07-registry.md)
 - [Containers 101 (8/10): Container Security](./08-container-security.md)
-- **Containers vs VMs (현재 글)**
-- 실전 컨테이너 앱 만들기 (예정)
+- **Containers 101 (9/10): Containers vs VMs (현재 글)**
+- [실전 컨테이너 앱 만들기](./10-build-a-container-app.md)
 
 <!-- toc:end -->
 

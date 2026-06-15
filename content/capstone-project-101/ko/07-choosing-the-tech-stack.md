@@ -325,10 +325,10 @@ last_reviewed: '2026-05-14'
 - [Capstone Project 101 (4/10): 요구사항 정리](./04-organizing-requirements.md)
 - [Capstone Project 101 (5/10): 팀 역할 나누기](./05-splitting-team-roles.md)
 - [Capstone Project 101 (6/10): MVP 설계](./06-designing-the-mvp.md)
-- **기술 스택 선택 (현재 글)**
-- 일정 관리 (예정)
-- 발표 자료 만들기 (예정)
-- 프로젝트 회고 (예정)
+- **Capstone Project 101 (7/10): 기술 스택 선택 (현재 글)**
+- [Capstone Project 101 (8/10): 일정 관리](./08-schedule-management.md)
+- [Capstone Project 101 (9/10): 발표 자료 만들기](./09-presentation-materials.md)
+- [프로젝트 회고](./10-project-retrospective.md)
 
 <!-- toc:end -->
 

@@ -596,9 +596,9 @@ Toil은 반복되고 자동화 가능한 수작업이 사람 시간을 지속적
 - [SRE 101 (5/10): Monitoring](./05-monitoring.md)
 - [SRE 101 (6/10): Incident Response](./06-incident-response.md)
 - [SRE 101 (7/10): Postmortem](./07-postmortem.md)
-- **Toil 줄이기 (현재 글)**
-- Capacity Planning (예정)
-- 운영 가능한 시스템 만들기 (예정)
+- **SRE 101 (8/10): Toil 줄이기 (현재 글)**
+- [SRE 101 (9/10): Capacity Planning](./09-capacity-planning.md)
+- [운영 가능한 시스템 만들기](./10-building-operable-systems.md)
 
 <!-- toc:end -->
 

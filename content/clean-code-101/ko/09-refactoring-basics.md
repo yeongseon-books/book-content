@@ -611,8 +611,8 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 - [Clean Code 101 (6/10): 오류 처리](./06-error-handling.md)
 - [Clean Code 101 (7/10): 주석과 문서화](./07-comments-and-docs.md)
 - [Clean Code 101 (8/10): 테스트 가능한 코드](./08-testable-code.md)
-- **리팩토링 기초 (현재 글)**
-- 좋은 코드 리뷰 기준 (예정)
+- **Clean Code 101 (9/10): 리팩토링 기초 (현재 글)**
+- [좋은 코드 리뷰 기준](./10-good-code-review.md)
 
 <!-- toc:end -->
 

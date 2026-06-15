@@ -380,10 +380,10 @@ def reserve(event_id: str) -> bool:
 - [Serverless 101 (4/10): 콜드 스타트](./04-cold-start.md)
 - [Serverless 101 (5/10): 스케일링](./05-scaling.md)
 - [Serverless 101 (6/10): 상태 관리](./06-state-management.md)
-- **큐와 이벤트 기반 아키텍처 (현재 글)**
-- 관측성 (예정)
-- 비용 (예정)
-- 서버리스 앱 설계 (예정)
+- **Serverless 101 (7/10): 큐와 이벤트 기반 아키텍처 (현재 글)**
+- [Serverless 101 (8/10): 관측성](./08-observability.md)
+- [Serverless 101 (9/10): 비용](./09-cost.md)
+- [서버리스 앱 설계](./10-serverless-app-design.md)
 
 <!-- toc:end -->
 

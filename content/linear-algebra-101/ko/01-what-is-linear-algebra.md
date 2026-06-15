@@ -426,16 +426,16 @@ print('z:', z)
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **선형대수란 무엇인가? (현재 글)**
-- 벡터 (예정)
-- 행렬 (예정)
-- 내적과 거리 (예정)
-- 선형변환 (예정)
-- 기저와 차원 (예정)
-- 고유값과 고유벡터 (예정)
-- 행렬 분해 (예정)
-- PCA (예정)
-- 머신러닝에서의 선형대수 (예정)
+- **Linear Algebra 101 (1/10): 선형대수란 무엇인가? (현재 글)**
+- [Linear Algebra 101 (2/10): 벡터](./02-vectors.md)
+- [Linear Algebra 101 (3/10): 행렬](./03-matrices.md)
+- [Linear Algebra 101 (4/10): 내적과 거리](./04-inner-product-and-distance.md)
+- [Linear Algebra 101 (5/10): 선형변환](./05-linear-transformation.md)
+- [Linear Algebra 101 (6/10): 기저와 차원](./06-basis-and-dimension.md)
+- [Linear Algebra 101 (7/10): 고유값과 고유벡터](./07-eigenvalues-and-eigenvectors.md)
+- [Linear Algebra 101 (8/10): 행렬 분해](./08-matrix-decomposition.md)
+- [Linear Algebra 101 (9/10): PCA](./09-pca.md)
+- [머신러닝에서의 선형대수](./10-linear-algebra-in-ml.md)
 
 <!-- toc:end -->
 

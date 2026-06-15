@@ -461,13 +461,13 @@ config_change_flow:
 - [DevOps 101 (1/10): DevOps란 무엇인가?](./01-what-is-devops.md)
 - [DevOps 101 (2/10): CI 파이프라인](./02-ci-pipeline.md)
 - [DevOps 101 (3/10): CD와 배포 전략](./03-cd-and-deployment.md)
-- **환경 분리와 설정 관리 (현재 글)**
-- Infrastructure as Code (예정)
-- 컨테이너와 빌드 (예정)
-- 모니터링과 알림 (예정)
-- 로그 수집과 분석 (예정)
-- 장애 대응과 on-call (예정)
-- 운영 가능한 DevOps 흐름 (예정)
+- **DevOps 101 (4/10): 환경 분리와 설정 관리 (현재 글)**
+- [DevOps 101 (5/10): Infrastructure as Code](./05-infrastructure-as-code.md)
+- [DevOps 101 (6/10): 컨테이너와 빌드](./06-containers-and-build.md)
+- [DevOps 101 (7/10): 모니터링과 알림](./07-monitoring-and-alerting.md)
+- [DevOps 101 (8/10): 로그 수집과 분석](./08-logging-and-analysis.md)
+- [DevOps 101 (9/10): 장애 대응과 on-call](./09-incident-and-oncall.md)
+- [운영 가능한 DevOps 흐름](./10-operable-devops-flow.md)
 
 <!-- toc:end -->
 

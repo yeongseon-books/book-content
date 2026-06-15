@@ -372,8 +372,8 @@ SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
 - [Database Systems 101 (6/10): 격리 수준](./06-isolation-levels.md)
 - [Database Systems 101 (7/10): 정규화와 모델링](./07-normalization-and-modeling.md)
 - [Database Systems 101 (8/10): 쿼리 최적화](./08-query-optimization.md)
-- **복제와 백업 (현재 글)**
-- OLTP와 OLAP (예정)
+- **Database Systems 101 (9/10): 복제와 백업 (현재 글)**
+- [OLTP와 OLAP](./10-oltp-and-olap.md)
 
 <!-- toc:end -->
 

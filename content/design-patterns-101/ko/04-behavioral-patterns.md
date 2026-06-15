@@ -435,16 +435,16 @@ Visitor는 객체 구조(예: AST, 파일 트리)를 순회하면서 각 노드 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [디자인 패턴이란 무엇인가?](./01-what-are-design-patterns.md)
-- [Creational 패턴](./02-creational-patterns.md)
-- [Structural 패턴](./03-structural-patterns.md)
-- **Behavioral 패턴 (현재 글)**
-- Strategy 패턴 (예정)
-- Adapter 패턴 (예정)
-- Observer 패턴 (예정)
-- Factory와 의존성 주입 (예정)
-- 패턴을 남용하지 않는 법 (예정)
-- Python에 어울리는 패턴 (예정)
+- [Design Patterns 101 (1/10): 디자인 패턴이란 무엇인가?](./01-what-are-design-patterns.md)
+- [Design Patterns 101 (2/10): Creational 패턴](./02-creational-patterns.md)
+- [Design Patterns 101 (3/10): Structural 패턴](./03-structural-patterns.md)
+- **Design Patterns 101 (4/10): Behavioral 패턴 (현재 글)**
+- [Design Patterns 101 (5/10): Strategy 패턴](./05-strategy-pattern.md)
+- [Design Patterns 101 (6/10): Adapter 패턴](./06-adapter-pattern.md)
+- [Design Patterns 101 (7/10): Observer 패턴](./07-observer-pattern.md)
+- [Design Patterns 101 (8/10): Factory와 의존성 주입](./08-factory-and-di.md)
+- [Design Patterns 101 (9/10): 패턴을 남용하지 않는 법](./09-avoiding-pattern-overuse.md)
+- [Python에 어울리는 패턴](./10-pythonic-patterns.md)
 
 <!-- toc:end -->
 

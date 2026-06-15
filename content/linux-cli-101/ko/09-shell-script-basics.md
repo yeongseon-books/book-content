@@ -536,8 +536,8 @@ lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
 - [Linux CLI 101 (6/10): pipe와 redirection](./06-pipe-and-redirection.md)
 - [Linux CLI 101 (7/10): 프로세스 확인과 종료](./07-process-management.md)
 - [Linux CLI 101 (8/10): 환경변수와 PATH](./08-environment-variables.md)
-- **간단한 shell script (현재 글)**
-- SSH와 원격 서버 접속 (예정)
+- **Linux CLI 101 (9/10): 간단한 shell script (현재 글)**
+- [SSH와 원격 서버 접속](./10-ssh-and-remote.md)
 
 <!-- toc:end -->
 

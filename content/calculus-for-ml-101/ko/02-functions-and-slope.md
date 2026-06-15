@@ -512,15 +512,15 @@ ML에서는 이 차이가 매우 실용적입니다. activation 함수 하나를
 ## 시리즈 목차
 
 - [Calculus for ML 101 (1/10): 미분이란 무엇인가](./01-what-is-derivative.md)
-- **함수와 기울기 (현재 글)**
-- 편미분 (예정)
-- Gradient (예정)
-- 연쇄 법칙 (예정)
-- 손실 함수 (예정)
-- 경사하강법 (예정)
-- 최적화 (예정)
-- 역전파 직관 (예정)
-- 딥러닝에서의 미분 (예정)
+- **Calculus for ML 101 (2/10): 함수와 기울기 (현재 글)**
+- [Calculus for ML 101 (3/10): 편미분](./03-partial-derivatives.md)
+- [Calculus for ML 101 (4/10): Gradient](./04-gradient.md)
+- [Calculus for ML 101 (5/10): 연쇄 법칙](./05-chain-rule.md)
+- [Calculus for ML 101 (6/10): 손실 함수](./06-loss-function.md)
+- [Calculus for ML 101 (7/10): 경사하강법](./07-gradient-descent.md)
+- [Calculus for ML 101 (8/10): 최적화](./08-optimization.md)
+- [Calculus for ML 101 (9/10): 역전파 직관](./09-backpropagation-intuition.md)
+- [딥러닝에서의 미분](./10-calculus-in-deep-learning.md)
 
 <!-- toc:end -->
 

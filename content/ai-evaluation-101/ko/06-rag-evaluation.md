@@ -472,10 +472,10 @@ Context Recall은 reference 답변이 필요합니다. Reference 없이는 측�
 - [AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기](./04-llm-as-judge.md)
 - [AI Evaluation 101 (5/10): Rubric 기반 채점 설계](./05-rubric-based-scoring.md)
 - **AI Evaluation 101 (6/10): RAG 시스템 평가하기 (현재 글)**
-- AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory (예정)
-- AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게 (예정)
-- AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가 (예정)
-- AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가 (예정)
+- [AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory](./07-agent-evaluation.md)
+- [AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게](./08-regression-testing.md)
+- [AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가](./09-ab-testing-llms.md)
+- [AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가](./10-production-evaluation.md)
 
 <!-- toc:end -->
 

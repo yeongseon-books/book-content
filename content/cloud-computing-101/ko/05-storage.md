@@ -523,12 +523,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "app" {
 - [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
 - [Cloud Computing 101 (3/10): Region과 Availability Zone](./03-region-and-availability-zone.md)
 - [Cloud Computing 101 (4/10): Compute](./04-compute.md)
-- **Storage (현재 글)**
-- Network (예정)
-- Identity와 Security (예정)
-- Monitoring (예정)
-- Cost Management (예정)
-- Cloud Architecture 기초 (예정)
+- **Cloud Computing 101 (5/10): Storage (현재 글)**
+- [Cloud Computing 101 (6/10): Network](./06-network.md)
+- [Cloud Computing 101 (7/10): Identity와 Security](./07-identity-and-security.md)
+- [Cloud Computing 101 (8/10): Monitoring](./08-monitoring.md)
+- [Cloud Computing 101 (9/10): Cost Management](./09-cost-management.md)
+- [Cloud Architecture 기초](./10-cloud-architecture-basics.md)
 
 <!-- toc:end -->
 

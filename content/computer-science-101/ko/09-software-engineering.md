@@ -542,8 +542,8 @@ def generate_report(orders: list[dict]) -> str:
 - [Computer Science 101 (6/10): 운영체제](./06-operating-systems.md)
 - [Computer Science 101 (7/10): 네트워크](./07-networks.md)
 - [Computer Science 101 (8/10): 데이터베이스](./08-databases.md)
-- **소프트웨어 엔지니어링 (현재 글)**
-- AI와 데이터사이언스까지의 연결 (예정)
+- **Computer Science 101 (9/10): 소프트웨어 엔지니어링 (현재 글)**
+- [AI와 데이터사이언스까지의 연결](./10-ai-and-data-science.md)
 
 <!-- toc:end -->
 

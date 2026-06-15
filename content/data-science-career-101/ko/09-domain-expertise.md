@@ -355,8 +355,8 @@ IC Staff는 "내가 얼마나 많이 코딩했는가"보다 "조직 전체가 �
 - [Data Science Career 101 (6/10): ML 인터뷰](./06-ml-interview.md)
 - [Data Science Career 101 (7/10): 케이스 인터뷰](./07-case-interview.md)
 - [Data Science Career 101 (8/10): 첫 직장 적응](./08-first-job.md)
-- **도메인 전문성 쌓기 (현재 글)**
-- 시니어 데이터 직무로 가는 길 (예정)
+- **Data Science Career 101 (9/10): 도메인 전문성 쌓기 (현재 글)**
+- [시니어 데이터 직무로 가는 길](./10-path-to-senior.md)
 
 <!-- toc:end -->
 

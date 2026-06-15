@@ -470,14 +470,14 @@ H2 다음에 바로 H4를 쓰지 맙니다. H2 → H3 → H4 순서를 지킵니
 
 - [Technical Writing 101 (1/10): 기술 글쓰기란 무엇인가](./01-what-is-technical-writing.md)
 - [Technical Writing 101 (2/10): 독자 정의하기](./02-defining-the-reader.md)
-- **제목과 구조 잡기 (현재 글)**
-- 개념 설명하기 (예정)
-- 예제 코드 설명하기 (예정)
-- 그림과 표 사용하기 (예정)
-- README 작성하기 (예정)
-- 튜토리얼 작성하기 (예정)
-- 블로그와 문서 차이 (예정)
-- 발행 전 체크리스트 (예정)
+- **Technical Writing 101 (3/10): 제목과 구조 잡기 (현재 글)**
+- [Technical Writing 101 (4/10): 개념 설명하기](./04-explaining-concepts.md)
+- [Technical Writing 101 (5/10): 예제 코드 설명하기](./05-explaining-example-code.md)
+- [Technical Writing 101 (6/10): 그림과 표 사용하기](./06-using-figures-and-tables.md)
+- [Technical Writing 101 (7/10): README 작성하기](./07-writing-the-readme.md)
+- [Technical Writing 101 (8/10): 튜토리얼 작성하기](./08-writing-tutorials.md)
+- [Technical Writing 101 (9/10): 블로그와 문서 차이](./09-blog-vs-docs.md)
+- [발행 전 체크리스트](./10-pre-publish-checklist.md)
 
 <!-- toc:end -->
 

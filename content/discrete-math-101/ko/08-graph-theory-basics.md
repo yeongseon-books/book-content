@@ -619,9 +619,9 @@ def verify_identity(left: set[int], right: set[int]) -> bool:
 - [Discrete Math 101 (5/10): 증명 방법](./05-proof-techniques.md)
 - [Discrete Math 101 (6/10): 수열과 점화식](./06-sequences-and-recurrence.md)
 - [Discrete Math 101 (7/10): 조합과 경우의 수](./07-combinatorics.md)
-- **그래프 이론 기초 (현재 글)**
-- 트리와 그래프 탐색 (예정)
-- 알고리즘과 이산수학의 연결 (예정)
+- **Discrete Math 101 (8/10): 그래프 이론 기초 (현재 글)**
+- [Discrete Math 101 (9/10): 트리와 그래프 탐색](./09-trees-and-graph-traversal.md)
+- [알고리즘과 이산수학의 연결](./10-discrete-math-and-algorithms.md)
 
 <!-- toc:end -->
 

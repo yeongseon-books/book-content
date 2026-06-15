@@ -229,10 +229,10 @@ if (!result.success) showErrors(result.error.format());
 - [Frontend Development 101 (4/10): 컴포넌트와 상태](./04-components-and-state.md)
 - [Frontend Development 101 (5/10): 라우팅과 페이지](./05-routing-and-pages.md)
 - [Frontend Development 101 (6/10): API 호출과 비동기](./06-api-calls-and-async.md)
-- **폼과 유효성 검사 (현재 글)**
-- 스타일링과 디자인 시스템 (예정)
-- 빌드 도구와 번들링 (예정)
-- 작은 프론트엔드 앱 만들기 (예정)
+- **Frontend Development 101 (7/10): 폼과 유효성 검사 (현재 글)**
+- [Frontend Development 101 (8/10): 스타일링과 디자인 시스템](./08-styling-and-design-system.md)
+- [Frontend Development 101 (9/10): 빌드 도구와 번들링](./09-build-tools-and-bundling.md)
+- [작은 프론트엔드 앱 만들기](./10-building-a-small-frontend-app.md)
 
 <!-- toc:end -->
 

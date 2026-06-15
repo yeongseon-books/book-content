@@ -469,11 +469,11 @@ print(checks)
 - [Data Science 101 (3/10): 데이터 수집](./03-data-collection.md)
 - [Data Science 101 (4/10): 데이터 정제](./04-data-cleaning.md)
 - [Data Science 101 (5/10): 탐색적 데이터 분석](./05-exploratory-data-analysis.md)
-- **시각화 (현재 글)**
-- 모델링 (예정)
-- 평가 (예정)
-- 결과 해석 (예정)
-- 데이터 프로젝트 전체 흐름 (예정)
+- **Data Science 101 (6/10): 시각화 (현재 글)**
+- [Data Science 101 (7/10): 모델링](./07-modeling.md)
+- [Data Science 101 (8/10): 평가](./08-evaluation.md)
+- [Data Science 101 (9/10): 결과 해석](./09-result-interpretation.md)
+- [데이터 프로젝트 전체 흐름](./10-data-project-end-to-end.md)
 
 <!-- toc:end -->
 

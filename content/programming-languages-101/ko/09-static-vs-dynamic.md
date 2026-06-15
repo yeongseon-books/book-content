@@ -372,8 +372,8 @@ ValueError: amount must be >= 0
 - [Programming Languages 101 (6/10): 객체와 프로토타입](./06-objects-and-prototypes.md)
 - [Programming Languages 101 (7/10): 메모리 관리](./07-memory-management.md)
 - [Programming Languages 101 (8/10): 인터프리터와 컴파일러](./08-interpreter-and-compiler.md)
-- **정적 언어와 동적 언어 (현재 글)**
-- 좋은 언어 설계란 무엇인가? (예정)
+- **Programming Languages 101 (9/10): 정적 언어와 동적 언어 (현재 글)**
+- [좋은 언어 설계란 무엇인가?](./10-what-makes-good-language-design.md)
 
 <!-- toc:end -->
 

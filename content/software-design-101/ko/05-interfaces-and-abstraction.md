@@ -404,12 +404,12 @@ class CreateCouponService:
 - [Software Design 101 (2/10): 관심사 분리](./02-separation-of-concerns.md)
 - [Software Design 101 (3/10): 모듈과 경계](./03-modules-and-boundaries.md)
 - [Software Design 101 (4/10): 의존성 방향](./04-dependency-direction.md)
-- **인터페이스와 추상화 (현재 글)**
-- 계층 아키텍처 (예정)
-- 데이터 흐름 설계 (예정)
-- 변경 영향 줄이기 (예정)
-- 설계 원칙 모음 (예정)
-- 작은 프로젝트로 설계 연습 (예정)
+- **Software Design 101 (5/10): 인터페이스와 추상화 (현재 글)**
+- [Software Design 101 (6/10): 계층 아키텍처](./06-layered-architecture.md)
+- [Software Design 101 (7/10): 데이터 흐름 설계](./07-data-flow-design.md)
+- [Software Design 101 (8/10): 변경 영향 줄이기](./08-reducing-change-impact.md)
+- [Software Design 101 (9/10): 설계 원칙 모음](./09-design-principles.md)
+- [작은 프로젝트로 설계 연습](./10-small-design-practice.md)
 
 <!-- toc:end -->
 

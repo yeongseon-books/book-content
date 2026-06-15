@@ -509,11 +509,11 @@ cgroup은 CPU, 메모리, I/O 등 자원 사용량의 상한을 설정합니다.
 - [Computer Science 101 (3/10): 데이터 표현](./03-data-representation.md)
 - [Computer Science 101 (4/10): 알고리즘과 복잡도](./04-algorithms-and-complexity.md)
 - [Computer Science 101 (5/10): 컴퓨터 구조](./05-computer-architecture.md)
-- **운영체제 (현재 글)**
-- 네트워크 (예정)
-- 데이터베이스 (예정)
-- 소프트웨어 엔지니어링 (예정)
-- AI와 데이터사이언스까지의 연결 (예정)
+- **Computer Science 101 (6/10): 운영체제 (현재 글)**
+- [Computer Science 101 (7/10): 네트워크](./07-networks.md)
+- [Computer Science 101 (8/10): 데이터베이스](./08-databases.md)
+- [Computer Science 101 (9/10): 소프트웨어 엔지니어링](./09-software-engineering.md)
+- [AI와 데이터사이언스까지의 연결](./10-ai-and-data-science.md)
 
 <!-- toc:end -->
 

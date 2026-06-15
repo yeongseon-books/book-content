@@ -653,8 +653,8 @@ print(matched)  # ['글1']
 - [Data Structures with Python 101 (6/10): 트리와 이진 트리](./06-trees-and-binary-trees.md)
 - [Data Structures with Python 101 (7/10): 힙과 우선순위 큐](./07-heaps-and-priority-queues.md)
 - [Data Structures with Python 101 (8/10): 그래프 표현](./08-graph-representations.md)
-- **set과 집합 연산 (현재 글)**
-- 자료구조 선택 기준 (예정)
+- **Data Structures with Python 101 (9/10): set과 집합 연산 (현재 글)**
+- [자료구조 선택 기준](./10-choosing-data-structures.md)
 
 <!-- toc:end -->
 

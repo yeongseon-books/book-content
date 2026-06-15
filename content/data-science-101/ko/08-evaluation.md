@@ -452,9 +452,9 @@ print(checks)
 - [Data Science 101 (5/10): 탐색적 데이터 분석](./05-exploratory-data-analysis.md)
 - [Data Science 101 (6/10): 시각화](./06-visualization.md)
 - [Data Science 101 (7/10): 모델링](./07-modeling.md)
-- **평가 (현재 글)**
-- 결과 해석 (예정)
-- 데이터 프로젝트 전체 흐름 (예정)
+- **Data Science 101 (8/10): 평가 (현재 글)**
+- [Data Science 101 (9/10): 결과 해석](./09-result-interpretation.md)
+- [데이터 프로젝트 전체 흐름](./10-data-project-end-to-end.md)
 
 <!-- toc:end -->
 

@@ -466,10 +466,10 @@ Manifest를 읽으면 플랫폼별 이미지와 레이어 참조 관계를 확�
 - [Containers 101 (4/10): Dockerfile](./04-dockerfile.md)
 - [Containers 101 (5/10): Volume](./05-volume.md)
 - [Containers 101 (6/10): Network](./06-network.md)
-- **Registry (현재 글)**
-- Container Security (예정)
-- Containers vs VMs (예정)
-- 실전 컨테이너 앱 만들기 (예정)
+- **Containers 101 (7/10): Registry (현재 글)**
+- [Containers 101 (8/10): Container Security](./08-container-security.md)
+- [Containers 101 (9/10): Containers vs VMs](./09-container-vs-vm.md)
+- [실전 컨테이너 앱 만들기](./10-build-a-container-app.md)
 
 <!-- toc:end -->
 

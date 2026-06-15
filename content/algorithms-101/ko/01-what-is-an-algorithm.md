@@ -351,16 +351,16 @@ print(ok, detail)
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **알고리즘이란 무엇인가? (현재 글)**
-- 시간 복잡도와 공간 복잡도 (예정)
-- 탐색 알고리즘 (예정)
-- 정렬 알고리즘 (예정)
-- 재귀와 분할 정복 (예정)
-- 동적 계획법 (예정)
-- 그리디 알고리즘 (예정)
-- 그래프 알고리즘 (예정)
-- 문자열 알고리즘 기초 (예정)
-- 알고리즘 문제 풀이 전략 (예정)
+- **Algorithms 101 (1/10): 알고리즘이란 무엇인가? (현재 글)**
+- [Algorithms 101 (2/10): 시간 복잡도와 공간 복잡도](./02-time-and-space-complexity.md)
+- [Algorithms 101 (3/10): 탐색 알고리즘](./03-search-algorithms.md)
+- [Algorithms 101 (4/10): 정렬 알고리즘](./04-sorting-algorithms.md)
+- [Algorithms 101 (5/10): 재귀와 분할 정복](./05-recursion-and-divide-and-conquer.md)
+- [Algorithms 101 (6/10): 동적 계획법](./06-dynamic-programming.md)
+- [Algorithms 101 (7/10): 그리디 알고리즘](./07-greedy-algorithms.md)
+- [Algorithms 101 (8/10): 그래프 알고리즘](./08-graph-algorithms.md)
+- [Algorithms 101 (9/10): 문자열 알고리즘 기초](./09-string-algorithms.md)
+- [알고리즘 문제 풀이 전략](./10-problem-solving-strategies.md)
 
 <!-- toc:end -->
 

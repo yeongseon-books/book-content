@@ -379,8 +379,8 @@ Cache-Control: public, max-age=31536000, immutable
 - [Web Development 101 (6/10): 인증과 세션](./06-auth-and-sessions.md)
 - [Web Development 101 (7/10): 데이터베이스 연결](./07-connecting-to-database.md)
 - [Web Development 101 (8/10): 배포](./08-deployment.md)
-- **성능과 캐싱 (현재 글)**
-- 작은 웹앱 만들기 (예정)
+- **Web Development 101 (9/10): 성능과 캐싱 (현재 글)**
+- [작은 웹앱 만들기](./10-building-a-small-web-app.md)
 
 <!-- toc:end -->
 

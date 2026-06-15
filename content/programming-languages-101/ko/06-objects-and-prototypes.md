@@ -342,11 +342,11 @@ ValueError: amount must be >= 0
 - [Programming Languages 101 (3/10): 타입 시스템](./03-type-system.md)
 - [Programming Languages 101 (4/10): 스코프와 바인딩](./04-scope-and-binding.md)
 - [Programming Languages 101 (5/10): 함수와 클로저](./05-functions-and-closures.md)
-- **객체와 프로토타입 (현재 글)**
-- 메모리 관리 (예정)
-- 인터프리터와 컴파일러 (예정)
-- 정적 언어와 동적 언어 (예정)
-- 좋은 언어 설계란 무엇인가? (예정)
+- **Programming Languages 101 (6/10): 객체와 프로토타입 (현재 글)**
+- [Programming Languages 101 (7/10): 메모리 관리](./07-memory-management.md)
+- [Programming Languages 101 (8/10): 인터프리터와 컴파일러](./08-interpreter-and-compiler.md)
+- [Programming Languages 101 (9/10): 정적 언어와 동적 언어](./09-static-vs-dynamic.md)
+- [좋은 언어 설계란 무엇인가?](./10-what-makes-good-language-design.md)
 
 <!-- toc:end -->
 

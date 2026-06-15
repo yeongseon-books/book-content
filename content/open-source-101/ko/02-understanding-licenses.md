@@ -310,15 +310,15 @@ license = { text = "MIT" }
 ## 시리즈 목차
 
 - [Open Source 101 (1/10): 오픈소스란 무엇인가](./01-what-is-open-source.md)
-- **라이선스 이해하기 (현재 글)**
-- 이슈 읽기 (예정)
-- 풀 리퀘스트 만들기 (예정)
-- 좋은 리드미 문서 (예정)
-- 릴리스와 버전 관리 (예정)
-- 커뮤니티 운영 (예정)
-- 메인테이너의 역할 (예정)
-- 오픈소스 포트폴리오 (예정)
-- 내 첫 오픈소스 프로젝트 (예정)
+- **Open Source 101 (2/10): 라이선스 이해하기 (현재 글)**
+- [Open Source 101 (3/10): 이슈 읽기](./03-reading-issues.md)
+- [Open Source 101 (4/10): 풀 리퀘스트 만들기](./04-creating-pull-requests.md)
+- [Open Source 101 (5/10): 좋은 리드미 문서](./05-good-readme.md)
+- [Open Source 101 (6/10): 릴리스와 버전 관리](./06-release-and-versioning.md)
+- [Open Source 101 (7/10): 커뮤니티 운영](./07-community-management.md)
+- [Open Source 101 (8/10): 메인테이너의 역할](./08-maintainer-role.md)
+- [Open Source 101 (9/10): 오픈소스 포트폴리오](./09-open-source-portfolio.md)
+- [내 첫 오픈소스 프로젝트](./10-my-first-open-source-project.md)
 
 <!-- toc:end -->
 

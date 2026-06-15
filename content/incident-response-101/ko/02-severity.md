@@ -365,15 +365,15 @@ severity 변경 이력을 남기면 postmortem에서 "그때 왜 그렇게 판�
 ## 시리즈 목차
 
 - [Incident Response 101 (1/10): Incident란 무엇인가?](./01-what-is-incident.md)
-- **Severity 분류 (현재 글)**
-- 초기 대응 (예정)
-- Communication (예정)
-- Timeline 작성 (예정)
-- Root Cause Analysis (예정)
-- Mitigation과 Resolution (예정)
-- Postmortem (예정)
-- 재발 방지 (예정)
-- Incident Runbook 만들기 (예정)
+- **Incident Response 101 (2/10): Severity 분류 (현재 글)**
+- [Incident Response 101 (3/10): 초기 대응](./03-initial-response.md)
+- [Incident Response 101 (4/10): Communication](./04-communication.md)
+- [Incident Response 101 (5/10): Timeline 작성](./05-timeline.md)
+- [Incident Response 101 (6/10): Root Cause Analysis](./06-root-cause-analysis.md)
+- [Incident Response 101 (7/10): Mitigation과 Resolution](./07-mitigation-and-resolution.md)
+- [Incident Response 101 (8/10): Postmortem](./08-postmortem.md)
+- [Incident Response 101 (9/10): 재발 방지](./09-prevention.md)
+- [Incident Runbook 만들기](./10-incident-runbook.md)
 
 <!-- toc:end -->
 

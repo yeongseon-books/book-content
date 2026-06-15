@@ -478,8 +478,8 @@ CLT 기반 95% CI: [109.5, 269.1]
 - [Probability 101 (6/10): 기대값과 분산](./06-expectation-and-variance.md)
 - [Probability 101 (7/10): 이산분포](./07-discrete-distributions.md)
 - [Probability 101 (8/10): 연속분포](./08-continuous-distributions.md)
-- **대수의 법칙과 중심극한정리 (현재 글)**
-- 머신러닝에서의 확률 (예정)
+- **Probability 101 (9/10): 대수의 법칙과 중심극한정리 (현재 글)**
+- [머신러닝에서의 확률](./10-probability-in-ml.md)
 
 <!-- toc:end -->
 

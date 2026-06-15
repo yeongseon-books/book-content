@@ -322,52 +322,6 @@ Git 워크플로 측면에서는 보호 브랜치 규칙이 중요합니다. `ma
 
 - **메인테이너 역할을 나누려면 어떻게 해야 할까요?** **자주 기여하는 사람부터 리뷰어로 초대하고, 작은 의사결정부터 맡기고, 점진적으로 책임을 나누는 방식**으로 다음 세대의 메인테이너를 키워야 합니다.
 <!-- toc:begin -->
-
-## 스핑크스 기본 설정 예시
-
-메인테이너가 API 문서를 직접 쓰지 않고 docstring에서 자동 생성하면 유지보수 부담이 줄어듭니다. Python 프로젝트는 Sphinx가 표준입니다.
-
-```python
-# docs/conf.py
-project = 'MyProject'
-extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',  # Google/NumPy docstring
-    'sphinx.ext.viewcode',
-]
-
-html_theme = 'sphinx_rtd_theme'
-```
-
-```bash
-pip install sphinx sphinx-rtd-theme
-cd docs
-sphinx-quickstart
-sphinx-apidoc -o source/ ../myproject/
-make html
-```
-
-docstring 예시:
-
-```python
-def parse_version(version_string: str) -> tuple[int, int, int]:
-    """
-    Parse semantic version string.
-
-    Args:
-        version_string: Version in "MAJOR.MINOR.PATCH" format
-
-    Returns:
-        Tuple of (major, minor, patch)
-
-    Raises:
-        ValueError: If version_string is malformed
-    """
-    parts = version_string.split('.')
-    return (int(parts[0]), int(parts[1]), int(parts[2]))
-```
-
-이 방식은 코드와 문서를 한곳에서 관리하므로 불일치 가능성을 줄여 줍니다.
 ## 시리즈 목차
 
 - [Open Source 101 (1/10): 오픈소스란 무엇인가](./01-what-is-open-source.md)
@@ -377,9 +331,9 @@ def parse_version(version_string: str) -> tuple[int, int, int]:
 - [Open Source 101 (5/10): 좋은 리드미 문서](./05-good-readme.md)
 - [Open Source 101 (6/10): 릴리스와 버전 관리](./06-release-and-versioning.md)
 - [Open Source 101 (7/10): 커뮤니티 운영](./07-community-management.md)
-- **메인테이너의 역할 (현재 글)**
-- 오픈소스 포트폴리오 (예정)
-- 내 첫 오픈소스 프로젝트 (예정)
+- **Open Source 101 (8/10): 메인테이너의 역할 (현재 글)**
+- [Open Source 101 (9/10): 오픈소스 포트폴리오](./09-open-source-portfolio.md)
+- [내 첫 오픈소스 프로젝트](./10-my-first-open-source-project.md)
 
 <!-- toc:end -->
 

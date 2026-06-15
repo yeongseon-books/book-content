@@ -407,10 +407,10 @@ pytest --cov=src --cov-report=term-missing
 - [Testing 101 (4/10): E2E 테스트](./04-e2e-test.md)
 - [Testing 101 (5/10): 테스트 더블](./05-test-double.md)
 - [Testing 101 (6/10): Mock과 Stub](./06-mock-and-stub.md)
-- **테스트 커버리지 (현재 글)**
-- 회귀 테스트 (예정)
-- CI에서 테스트 실행하기 (예정)
-- 테스트 전략 세우기 (예정)
+- **Testing 101 (7/10): 테스트 커버리지 (현재 글)**
+- [Testing 101 (8/10): 회귀 테스트](./08-regression-test.md)
+- [Testing 101 (9/10): CI에서 테스트 실행하기](./09-tests-in-ci.md)
+- [테스트 전략 세우기](./10-test-strategy.md)
 
 <!-- toc:end -->
 

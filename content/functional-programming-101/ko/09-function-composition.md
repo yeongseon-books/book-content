@@ -653,8 +653,8 @@ print("Pass")
 - [Functional Programming 101 (6/10): 클로저와 partial](./06-closure-and-partial.md)
 - [Functional Programming 101 (7/10): 재귀와 꼬리 호출](./07-recursion.md)
 - [Functional Programming 101 (8/10): 지연 평가와 제너레이터](./08-lazy-evaluation.md)
-- **함수 합성과 파이프라인 (현재 글)**
-- 객체지향과 함수형의 균형 (예정)
+- **Functional Programming 101 (9/10): 함수 합성과 파이프라인 (현재 글)**
+- [객체지향과 함수형의 균형](./10-oop-and-fp-balance.md)
 
 <!-- toc:end -->
 

@@ -576,15 +576,15 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 ## 시리즈 목차
 
 - [Clean Code 101 (1/10): Clean Code란 무엇인가?](./01-what-is-clean-code.md)
-- **이름 짓기 (현재 글)**
-- 함수 작게 만들기 (예정)
-- 조건문 줄이기 (예정)
-- 중복 제거 (예정)
-- 오류 처리 (예정)
-- 주석과 문서화 (예정)
-- 테스트 가능한 코드 (예정)
-- 리팩토링 기초 (예정)
-- 좋은 코드 리뷰 기준 (예정)
+- **Clean Code 101 (2/10): 이름 짓기 (현재 글)**
+- [Clean Code 101 (3/10): 함수 작게 만들기](./03-small-functions.md)
+- [Clean Code 101 (4/10): 조건문 줄이기](./04-simplifying-conditionals.md)
+- [Clean Code 101 (5/10): 중복 제거](./05-removing-duplication.md)
+- [Clean Code 101 (6/10): 오류 처리](./06-error-handling.md)
+- [Clean Code 101 (7/10): 주석과 문서화](./07-comments-and-docs.md)
+- [Clean Code 101 (8/10): 테스트 가능한 코드](./08-testable-code.md)
+- [Clean Code 101 (9/10): 리팩토링 기초](./09-refactoring-basics.md)
+- [좋은 코드 리뷰 기준](./10-good-code-review.md)
 
 <!-- toc:end -->
 

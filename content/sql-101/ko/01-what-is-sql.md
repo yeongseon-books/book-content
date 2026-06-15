@@ -512,16 +512,16 @@ SQL은 데이터를 다루는 팀이 함께 사용하는 공용어입니다. 핵
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **SQL이란 무엇인가? (현재 글)**
-- SELECT 기본 (예정)
-- WHERE와 조건 (예정)
-- JOIN 이해하기 (예정)
-- GROUP BY와 집계 함수 (예정)
-- 서브쿼리와 CTE (예정)
-- 윈도 함수 (예정)
-- 데이터를 바꾸는 SQL — INSERT, UPDATE, DELETE (예정)
-- 인덱스와 쿼리 계획 (예정)
-- 실전 분석 SQL (예정)
+- **SQL 101 (1/10): SQL이란 무엇인가? (현재 글)**
+- [SQL 101 (2/10): SELECT 기본](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE와 조건](./03-where-and-conditions.md)
+- [SQL 101 (4/10): JOIN 이해하기](./04-join.md)
+- [SQL 101 (5/10): GROUP BY와 집계 함수](./05-group-by-and-aggregate.md)
+- [SQL 101 (6/10): 서브쿼리와 CTE](./06-subquery.md)
+- [SQL 101 (7/10): 윈도 함수](./07-window-function.md)
+- [SQL 101 (8/10): 데이터를 바꾸는 SQL — INSERT, UPDATE, DELETE](./08-insert-update-delete.md)
+- [SQL 101 (9/10): 인덱스와 쿼리 계획](./09-index-and-query-plan.md)
+- [실전 분석 SQL](./10-practical-analysis-sql.md)
 
 <!-- toc:end -->
 

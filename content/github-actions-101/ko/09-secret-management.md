@@ -606,8 +606,8 @@ GitHub Actions에서 secret 관리는 저장, 노출, 권한, 회전을 함께 �
 - [GitHub Actions 101 (6/10): 빌드 아티팩트](./06-build-artifact.md)
 - [GitHub Actions 101 (7/10): Docker 빌드](./07-docker-build.md)
 - [GitHub Actions 101 (8/10): 배포 자동화](./08-deploy-automation.md)
-- **Secret 관리 (현재 글)**
-- 실전 CI/CD 파이프라인 (예정)
+- **GitHub Actions 101 (9/10): Secret 관리 (현재 글)**
+- [실전 CI/CD 파이프라인](./10-real-world-cicd-pipeline.md)
 
 <!-- toc:end -->
 

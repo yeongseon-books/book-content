@@ -363,11 +363,11 @@ def bump_version(key: str, current: int):
 - [Serverless 101 (3/10): 트리거와 이벤트](./03-trigger-and-event.md)
 - [Serverless 101 (4/10): 콜드 스타트](./04-cold-start.md)
 - [Serverless 101 (5/10): 스케일링](./05-scaling.md)
-- **상태 관리 (현재 글)**
-- 큐와 이벤트 기반 아키텍처 (예정)
-- 관측성 (예정)
-- 비용 (예정)
-- 서버리스 앱 설계 (예정)
+- **Serverless 101 (6/10): 상태 관리 (현재 글)**
+- [Serverless 101 (7/10): 큐와 이벤트 기반 아키텍처](./07-queue-and-event-driven.md)
+- [Serverless 101 (8/10): 관측성](./08-observability.md)
+- [Serverless 101 (9/10): 비용](./09-cost.md)
+- [서버리스 앱 설계](./10-serverless-app-design.md)
 
 <!-- toc:end -->
 

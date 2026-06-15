@@ -395,9 +395,9 @@ Sort
 - [Database Systems 101 (5/10): 트랜잭션과 ACID](./05-transactions-and-acid.md)
 - [Database Systems 101 (6/10): 격리 수준](./06-isolation-levels.md)
 - [Database Systems 101 (7/10): 정규화와 모델링](./07-normalization-and-modeling.md)
-- **쿼리 최적화 (현재 글)**
-- 복제와 백업 (예정)
-- OLTP와 OLAP (예정)
+- **Database Systems 101 (8/10): 쿼리 최적화 (현재 글)**
+- [Database Systems 101 (9/10): 복제와 백업](./09-replication-and-backup.md)
+- [OLTP와 OLAP](./10-oltp-and-olap.md)
 
 <!-- toc:end -->
 

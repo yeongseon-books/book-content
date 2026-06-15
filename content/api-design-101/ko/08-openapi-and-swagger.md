@@ -438,9 +438,9 @@ OpenAPI는 API의 프로토콜이자 문서이자 코드 생성 입력입니다.
 - [API Design 101 (5/10): Request와 response schema](./05-request-and-response-schema.md)
 - [API Design 101 (6/10): Pagination과 filtering](./06-pagination-and-filtering.md)
 - [API Design 101 (7/10): Error response 설계](./07-error-response-design.md)
-- **OpenAPI와 Swagger (현재 글)**
-- Versioning (예정)
-- 좋은 API 문서 만들기 (예정)
+- **API Design 101 (8/10): OpenAPI와 Swagger (현재 글)**
+- [API Design 101 (9/10): Versioning](./09-api-versioning.md)
+- [좋은 API 문서 만들기](./10-writing-good-api-docs.md)
 
 <!-- toc:end -->
 

@@ -409,11 +409,11 @@ pagination은 성능과 정확성이 만나는 지점입니다. offset은 구현
 - [API Design 101 (3/10): 리소스 설계](./03-resource-design.md)
 - [API Design 101 (4/10): HTTP method와 status code](./04-http-methods-and-status.md)
 - [API Design 101 (5/10): Request와 response schema](./05-request-and-response-schema.md)
-- **Pagination과 filtering (현재 글)**
-- Error response 설계 (예정)
-- OpenAPI와 Swagger (예정)
-- Versioning (예정)
-- 좋은 API 문서 만들기 (예정)
+- **API Design 101 (6/10): Pagination과 filtering (현재 글)**
+- [API Design 101 (7/10): Error response 설계](./07-error-response-design.md)
+- [API Design 101 (8/10): OpenAPI와 Swagger](./08-openapi-and-swagger.md)
+- [API Design 101 (9/10): Versioning](./09-api-versioning.md)
+- [좋은 API 문서 만들기](./10-writing-good-api-docs.md)
 
 <!-- toc:end -->
 

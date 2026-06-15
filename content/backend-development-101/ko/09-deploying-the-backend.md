@@ -532,8 +532,8 @@ services:
 - [Backend Development 101 (6/10): 인증과 권한](./06-auth-and-authorization.md)
 - [Backend Development 101 (7/10): Logging과 Error Handling](./07-logging-and-error-handling.md)
 - [Backend Development 101 (8/10): 백엔드 테스트](./08-testing-the-backend.md)
-- **백엔드 배포 (현재 글)**
-- 운영 가능한 백엔드 구조 (예정)
+- **Backend Development 101 (9/10): 백엔드 배포 (현재 글)**
+- [운영 가능한 백엔드 구조](./10-production-ready-backend.md)
 
 <!-- toc:end -->
 

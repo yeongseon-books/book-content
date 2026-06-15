@@ -482,7 +482,7 @@ Dapr 전환 후에는 앱 로그에 component 이름을 함께 남기는 습관�
 - [Azure Container Apps 101 (4/7): Ingress와 트래픽 분할 — revision 기반 배포 전략](./04-ingress-and-traffic-split.md)
 - [Azure Container Apps 101 (5/7): 스케일링 — KEDA scaler와 zero-to-N](./05-scaling-with-keda.md)
 - **Azure Container Apps 101 (6/7): Dapr 통합 — 사이드카로 얻는 것 (현재 글)**
-- Azure Container Apps 101 (7/7): 모니터링과 운영 — Log Analytics와 Application Insights (예정)
+- [Azure Container Apps 101 (7/7): 모니터링과 운영 — Log Analytics와 Application Insights](./07-monitoring-and-ops.md)
 
 <!-- toc:end -->
 

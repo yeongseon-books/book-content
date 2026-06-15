@@ -343,9 +343,9 @@ last_reviewed: '2026-05-14'
 - [Data Science Career 101 (5/10): SQL과 분석 인터뷰](./05-sql-and-analytics-interview.md)
 - [Data Science Career 101 (6/10): ML 인터뷰](./06-ml-interview.md)
 - [Data Science Career 101 (7/10): 케이스 인터뷰](./07-case-interview.md)
-- **첫 직장 적응 (현재 글)**
-- 도메인 전문성 쌓기 (예정)
-- 시니어 데이터 직무로 가는 길 (예정)
+- **Data Science Career 101 (8/10): 첫 직장 적응 (현재 글)**
+- [Data Science Career 101 (9/10): 도메인 전문성 쌓기](./09-domain-expertise.md)
+- [시니어 데이터 직무로 가는 길](./10-path-to-senior.md)
 
 <!-- toc:end -->
 

@@ -227,14 +227,14 @@ document.getElementById("list").addEventListener("click", (event) => {
 
 - [Frontend Development 101 (1/10): 프론트엔드 개발이란 무엇인가?](./01-what-is-frontend-development.md)
 - [Frontend Development 101 (2/10): HTML과 CSS 기본](./02-html-and-css-basics.md)
-- **JavaScript 기본 (현재 글)**
-- 컴포넌트와 상태 (예정)
-- 라우팅과 페이지 (예정)
-- API 호출과 비동기 (예정)
-- 폼과 유효성 검사 (예정)
-- 스타일링과 디자인 시스템 (예정)
-- 빌드 도구와 번들링 (예정)
-- 작은 프론트엔드 앱 만들기 (예정)
+- **Frontend Development 101 (3/10): JavaScript 기본 (현재 글)**
+- [Frontend Development 101 (4/10): 컴포넌트와 상태](./04-components-and-state.md)
+- [Frontend Development 101 (5/10): 라우팅과 페이지](./05-routing-and-pages.md)
+- [Frontend Development 101 (6/10): API 호출과 비동기](./06-api-calls-and-async.md)
+- [Frontend Development 101 (7/10): 폼과 유효성 검사](./07-forms-and-validation.md)
+- [Frontend Development 101 (8/10): 스타일링과 디자인 시스템](./08-styling-and-design-system.md)
+- [Frontend Development 101 (9/10): 빌드 도구와 번들링](./09-build-tools-and-bundling.md)
+- [작은 프론트엔드 앱 만들기](./10-building-a-small-frontend-app.md)
 
 <!-- toc:end -->
 

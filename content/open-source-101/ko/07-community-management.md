@@ -298,39 +298,6 @@ CI 배지는 기술 상태만 보여 주지만, 운영 상태는 라벨 체계�
 
 - **프로젝트가 커지면서 커뮤니티 운영도 어떻게 바뀔까요?** 중핵 운영자 외에 **부운영자, 리뷰어, 문서 담당**으로 역할을 나누고, 규칙을 문서화해서 새로 들어온 사람도 일관성 있게 기여할 수 있게 해야 합니다.
 <!-- toc:begin -->
-
-## 제안서 템플릿
-
-커뮤니티가 생기면 새 기능이나 큰 변경을 제안하는 경로가 필요합니다. Rust나 Python PEP 같은 RFC(Request for Comments) 체계를 참고하면 좋습니다.
-
-```markdown
-# RFC Template
-
-## Meta
-- RFC ID: 001
-- Author: @username
-- Status: Draft | Review | Accepted | Rejected
-
-## Summary
-One paragraph: what problem does this solve?
-
-## Motivation
-Why now? Why not keep the status quo?
-
-## Detailed Design
-How does this work? Code examples, API surface, migration path.
-
-## Drawbacks
-What are the costs? Complexity, maintenance, breaking changes?
-
-## Alternatives
-What other approaches were considered?
-
-## Unresolved Questions
-What needs to be answered before accepting?
-```
-
-이 템플릿을 `rfcs/` 폴더에 넣고, Pull Request로 제안하게 하면 큰 결정에 커뮤니티 피드백을 받을 수 있습니다. Python의 PEP, Rust의 RFC, Kubernetes의 KEP가 모두 비슷한 구조입니다. 소규모 프로젝트는 이 절차를 간소화해도 되지만, 큰 방향 결정은 기록으로 남기는 편이 좋습니다.
 ## 시리즈 목차
 
 - [Open Source 101 (1/10): 오픈소스란 무엇인가](./01-what-is-open-source.md)
@@ -339,10 +306,10 @@ What needs to be answered before accepting?
 - [Open Source 101 (4/10): 풀 리퀘스트 만들기](./04-creating-pull-requests.md)
 - [Open Source 101 (5/10): 좋은 리드미 문서](./05-good-readme.md)
 - [Open Source 101 (6/10): 릴리스와 버전 관리](./06-release-and-versioning.md)
-- **커뮤니티 운영 (현재 글)**
-- 메인테이너의 역할 (예정)
-- 오픈소스 포트폴리오 (예정)
-- 내 첫 오픈소스 프로젝트 (예정)
+- **Open Source 101 (7/10): 커뮤니티 운영 (현재 글)**
+- [Open Source 101 (8/10): 메인테이너의 역할](./08-maintainer-role.md)
+- [Open Source 101 (9/10): 오픈소스 포트폴리오](./09-open-source-portfolio.md)
+- [내 첫 오픈소스 프로젝트](./10-my-first-open-source-project.md)
 
 <!-- toc:end -->
 

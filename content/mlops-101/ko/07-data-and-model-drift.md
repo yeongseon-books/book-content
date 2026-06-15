@@ -533,10 +533,10 @@ def daily_drift_report(
 - [MLOps 101 (4/10): 모델 학습 파이프라인](./04-training-pipeline.md)
 - [MLOps 101 (5/10): 모델 배포](./05-model-deployment.md)
 - [MLOps 101 (6/10): 모델 모니터링](./06-model-monitoring.md)
-- **데이터 드리프트와 모델 드리프트 (현재 글)**
-- 재학습 (예정)
-- 피처 스토어 (예정)
-- 운영 가능한 ML 시스템 (예정)
+- **MLOps 101 (7/10): 데이터 드리프트와 모델 드리프트 (현재 글)**
+- [MLOps 101 (8/10): 재학습](./08-retraining.md)
+- [MLOps 101 (9/10): 피처 스토어](./09-feature-store.md)
+- [운영 가능한 ML 시스템](./10-production-ml-system.md)
 
 <!-- toc:end -->
 

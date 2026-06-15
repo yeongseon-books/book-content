@@ -379,15 +379,15 @@ if __name__ == "__main__":
 ## 시리즈 목차
 
 - [Portfolio Project 101 (1/10): 포트폴리오 프로젝트란 무엇인가](./01-what-is-a-portfolio-project.md)
-- **좋은 프로젝트의 조건 (현재 글)**
-- README 작성 (예정)
-- 데모 만들기 (예정)
-- 배포하기 (예정)
-- 테스트와 문서화 (예정)
-- 기술적 의사결정 기록 (예정)
-- 블로그 글로 정리하기 (예정)
-- 면접에서 설명하기 (예정)
-- 포트폴리오 개선 체크리스트 (예정)
+- **Portfolio Project 101 (2/10): 좋은 프로젝트의 조건 (현재 글)**
+- [Portfolio Project 101 (3/10): README 작성](./03-writing-the-readme.md)
+- [Portfolio Project 101 (4/10): 데모 만들기](./04-building-the-demo.md)
+- [Portfolio Project 101 (5/10): 배포하기](./05-deploying-the-project.md)
+- [Portfolio Project 101 (6/10): 테스트와 문서화](./06-tests-and-documentation.md)
+- [Portfolio Project 101 (7/10): 기술적 의사결정 기록](./07-recording-tech-decisions.md)
+- [Portfolio Project 101 (8/10): 블로그 글로 정리하기](./08-summarizing-as-blog-posts.md)
+- [Portfolio Project 101 (9/10): 면접에서 설명하기](./09-explaining-in-interviews.md)
+- [포트폴리오 개선 체크리스트](./10-portfolio-improvement-checklist.md)
 
 <!-- toc:end -->
 

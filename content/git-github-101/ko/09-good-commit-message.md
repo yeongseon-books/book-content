@@ -477,8 +477,8 @@ git push
 - [Git & GitHub 101 (6/10): GitHub repository 만들기 - remote, push, pull 한 번에 익히기](./06-github-repository.md)
 - [Git & GitHub 101 (7/10): Pull Request로 협업하기 - branch에서 review를 거쳐 main까지](./07-pull-request.md)
 - [Git & GitHub 101 (8/10): Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법](./08-issue-and-project.md)
-- **좋은 commit message 쓰기: Conventional Commits와 좋은 본문 (현재 글)**
-- 실전 Git workflow 만들기: issue부터 release까지 한 흐름으로 (예정)
+- **Git & GitHub 101 (9/10): 좋은 commit message 쓰기: Conventional Commits와 좋은 본문 (현재 글)**
+- [실전 Git workflow 만들기: issue부터 release까지 한 흐름으로](./10-real-world-workflow.md)
 
 <!-- toc:end -->
 

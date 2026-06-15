@@ -564,8 +564,8 @@ tests/test_checkout.py::test_apply_coupon_handles_edge_values[INVALID] PASSED
 - [pytest 101 (6/10): mock과 monkeypatch](./06-mock-and-monkeypatch.md)
 - [pytest 101 (7/10): 파일, 환경변수, 시간 테스트하기](./07-testing-files-env-time.md)
 - [pytest 101 (8/10): coverage와 테스트 품질 보기](./08-coverage.md)
-- **GitHub Actions에서 테스트 자동화하기 (현재 글)**
-- 테스트하기 쉬운 코드 구조 만들기 (예정)
+- **pytest 101 (9/10): GitHub Actions에서 테스트 자동화하기 (현재 글)**
+- [테스트하기 쉬운 코드 구조 만들기](./10-testable-code.md)
 
 <!-- toc:end -->
 

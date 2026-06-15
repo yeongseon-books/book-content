@@ -540,15 +540,15 @@ IP 주소는 한 컴퓨터의 번호가 아니라 "어느 네트워크의 몇 �
 ## 시리즈 목차
 
 - [Computer Networks 101 (1/10): 네트워크란 무엇인가?](./01-what-is-a-network.md)
-- **IP와 subnet (현재 글)**
-- TCP와 UDP (예정)
-- DNS (예정)
-- HTTP와 HTTPS (예정)
-- TLS 기초 (예정)
-- 라우팅과 NAT (예정)
-- Load Balancer (예정)
-- WebSocket과 실시간 통신 (예정)
-- 네트워크 문제 디버깅 (예정)
+- **Computer Networks 101 (2/10): IP와 subnet (현재 글)**
+- [Computer Networks 101 (3/10): TCP와 UDP](./03-tcp-and-udp.md)
+- [Computer Networks 101 (4/10): DNS](./04-dns.md)
+- [Computer Networks 101 (5/10): HTTP와 HTTPS](./05-http-and-https.md)
+- [Computer Networks 101 (6/10): TLS 기초](./06-tls-basics.md)
+- [Computer Networks 101 (7/10): 라우팅과 NAT](./07-routing-and-nat.md)
+- [Computer Networks 101 (8/10): Load Balancer](./08-load-balancer.md)
+- [Computer Networks 101 (9/10): WebSocket과 실시간 통신](./09-websocket-and-realtime.md)
+- [네트워크 문제 디버깅](./10-debugging-network-problems.md)
 
 <!-- toc:end -->
 

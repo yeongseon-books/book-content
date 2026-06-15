@@ -507,9 +507,9 @@ Kubernetes의 kube-proxy는 내부적으로 iptables 또는 IPVS를 사용합니
 - [Computer Networks 101 (5/10): HTTP와 HTTPS](./05-http-and-https.md)
 - [Computer Networks 101 (6/10): TLS 기초](./06-tls-basics.md)
 - [Computer Networks 101 (7/10): 라우팅과 NAT](./07-routing-and-nat.md)
-- **Load Balancer (현재 글)**
-- WebSocket과 실시간 통신 (예정)
-- 네트워크 문제 디버깅 (예정)
+- **Computer Networks 101 (8/10): Load Balancer (현재 글)**
+- [Computer Networks 101 (9/10): WebSocket과 실시간 통신](./09-websocket-and-realtime.md)
+- [네트워크 문제 디버깅](./10-debugging-network-problems.md)
 
 <!-- toc:end -->
 

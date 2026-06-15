@@ -616,9 +616,9 @@ def estimate(amount: int, is_weekend: bool) -> int:
 - [Object-Oriented Programming 101 (5/10): 다형성](./05-polymorphism.md)
 - [Object-Oriented Programming 101 (6/10): 추상화](./06-abstraction.md)
 - [Object-Oriented Programming 101 (7/10): 합성과 상속](./07-composition-vs-inheritance.md)
-- **SOLID 원칙 기초 (현재 글)**
-- 객체지향 설계 예제 (예정)
-- 객체지향을 언제 피해야 할까? (예정)
+- **Object-Oriented Programming 101 (8/10): SOLID 원칙 기초 (현재 글)**
+- [Object-Oriented Programming 101 (9/10): 객체지향 설계 예제](./09-oop-design-example.md)
+- [객체지향을 언제 피해야 할까?](./10-when-to-avoid-oop.md)
 
 <!-- toc:end -->
 

@@ -491,10 +491,10 @@ async def create_order_endpoint(payload: dict, request: Request):
 - [Backend Development 101 (4/10): Service Layer](./04-service-layer.md)
 - [Backend Development 101 (5/10): Database Layer](./05-database-layer.md)
 - [Backend Development 101 (6/10): 인증과 권한](./06-auth-and-authorization.md)
-- **Logging과 Error Handling (현재 글)**
-- 백엔드 테스트 (예정)
-- 백엔드 배포 (예정)
-- 운영 가능한 백엔드 구조 (예정)
+- **Backend Development 101 (7/10): Logging과 Error Handling (현재 글)**
+- [Backend Development 101 (8/10): 백엔드 테스트](./08-testing-the-backend.md)
+- [Backend Development 101 (9/10): 백엔드 배포](./09-deploying-the-backend.md)
+- [운영 가능한 백엔드 구조](./10-production-ready-backend.md)
 
 <!-- toc:end -->
 

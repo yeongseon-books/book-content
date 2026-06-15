@@ -460,8 +460,8 @@ async def metrics_middleware(request: Request, call_next):
 - [Observability 101 (6/10): 대시보드 설계](./06-dashboard-design.md)
 - [Observability 101 (7/10): 경보와 온콜](./07-alert-and-oncall.md)
 - [Observability 101 (8/10): 서비스 수준 지표와 목표 기초](./08-sli-and-slo.md)
-- **비용과 카디널리티 (현재 글)**
-- 운영 가능한 관측성 스택 (예정)
+- **Observability 101 (9/10): 비용과 카디널리티 (현재 글)**
+- [운영 가능한 관측성 스택](./10-production-observability-stack.md)
 
 <!-- toc:end -->
 

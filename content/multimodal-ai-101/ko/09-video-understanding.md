@@ -384,8 +384,8 @@ weekly_health = {
 - [Multimodal AI 101 (6/10): 오디오 처리와 Whisper STT](./06-audio-whisper.md)
 - [Multimodal AI 101 (7/10): Diffusion으로 Text-to-Image 생성](./07-text-to-image-diffusion.md)
 - [Multimodal AI 101 (8/10): Multimodal Embedding과 Cross-modal 검색](./08-multimodal-embeddings.md)
-- **Video 이해 - Frame Sampling에서 Video-LLaVA까지 (현재 글)**
-- Production Multimodal Application 구축 (예정)
+- **Multimodal AI 101 (9/10): Video 이해 - Frame Sampling에서 Video-LLaVA까지 (현재 글)**
+- [Production Multimodal Application 구축](./10-production-multimodal-app.md)
 
 <!-- toc:end -->
 

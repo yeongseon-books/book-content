@@ -565,8 +565,8 @@ alerts:
 - [Distributed Systems 101 (6/10): 합의와 Raft](./06-consensus-and-raft.md)
 - [Distributed Systems 101 (7/10): 리더 선출](./07-leader-election.md)
 - [Distributed Systems 101 (8/10): 메시지 큐와 이벤트 소싱](./08-message-queue-and-event-sourcing.md)
-- **분산 트랜잭션 (현재 글)**
-- 운영 가능한 분산 시스템 패턴 (예정)
+- **Distributed Systems 101 (9/10): 분산 트랜잭션 (현재 글)**
+- [운영 가능한 분산 시스템 패턴](./10-operable-distributed-patterns.md)
 
 <!-- toc:end -->
 

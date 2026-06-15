@@ -703,14 +703,14 @@ print(bfs_levels(graph, "A"))
 
 - [Data Structures with Python 101 (1/10): 자료구조란 무엇인가?](./01-what-are-data-structures.md)
 - [Data Structures with Python 101 (2/10): 배열과 리스트](./02-arrays-and-lists.md)
-- **스택과 큐 (현재 글)**
-- 해시 테이블과 dict (예정)
-- 연결 리스트 (예정)
-- 트리와 이진 트리 (예정)
-- 힙과 우선순위 큐 (예정)
-- 그래프 표현 (예정)
-- set과 집합 연산 (예정)
-- 자료구조 선택 기준 (예정)
+- **Data Structures with Python 101 (3/10): 스택과 큐 (현재 글)**
+- [Data Structures with Python 101 (4/10): 해시 테이블과 dict](./04-hash-tables-and-dict.md)
+- [Data Structures with Python 101 (5/10): 연결 리스트](./05-linked-lists.md)
+- [Data Structures with Python 101 (6/10): 트리와 이진 트리](./06-trees-and-binary-trees.md)
+- [Data Structures with Python 101 (7/10): 힙과 우선순위 큐](./07-heaps-and-priority-queues.md)
+- [Data Structures with Python 101 (8/10): 그래프 표현](./08-graph-representations.md)
+- [Data Structures with Python 101 (9/10): set과 집합 연산](./09-sets-and-set-operations.md)
+- [자료구조 선택 기준](./10-choosing-data-structures.md)
 
 <!-- toc:end -->
 

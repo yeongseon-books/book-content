@@ -678,7 +678,8 @@ GPU: 동일 연산 반복, 데이터 독립 → 행렬 곱셈, 렌더링, AI 추
   - 락 경합은 임계 구역을 직렬화하여 암달의 법칙에 의한 확장성 상한을 만듭니다. False sharing은 논리적으로 독립인 데이터가 같은 캐시 라인에 있어 불필요한 일관성 트래픽을 발생시킵니다. 둘 다 코어를 추가해도 성능이 오르지 않거나 오히려 떨어지는 원인입니다.
 
 <!-- toc:begin -->
-## 이 시리즈
+## 시리즈 목차
+
 - [Computer Architecture 101 (1/10): 컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
 - [Computer Architecture 101 (2/10): 데이터 표현 — bit, byte, integer, floating point](./02-data-representation.md)
 - [Computer Architecture 101 (3/10): CPU와 명령어](./03-cpu-and-instructions.md)
@@ -688,7 +689,7 @@ GPU: 동일 연산 반복, 데이터 독립 → 행렬 곱셈, 렌더링, AI 추
 - [Computer Architecture 101 (7/10): 파이프라인](./07-pipelining.md)
 - [Computer Architecture 101 (8/10): I/O와 장치](./08-io-and-devices.md)
 - **Computer Architecture 101 (9/10): 병렬성과 멀티코어 (현재 글)**
-- Computer Architecture 101 (10/10): 성능을 이해하는 법 (예정)
+- [Computer Architecture 101 (10/10): 성능을 이해하는 법](./10-understanding-performance.md)
 
 <!-- toc:end -->
 

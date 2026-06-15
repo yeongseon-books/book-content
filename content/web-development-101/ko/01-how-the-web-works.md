@@ -356,16 +356,16 @@ Cache-Control: public, max-age=31536000, immutable
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **웹은 어떻게 동작하는가? (현재 글)**
-- HTML, CSS, JavaScript (예정)
-- 브라우저와 DOM (예정)
-- HTTP와 API (예정)
-- Frontend와 Backend (예정)
-- 인증과 세션 (예정)
-- 데이터베이스 연결 (예정)
-- 배포 (예정)
-- 성능과 캐싱 (예정)
-- 작은 웹앱 만들기 (예정)
+- **Web Development 101 (1/10): 웹은 어떻게 동작하는가? (현재 글)**
+- [Web Development 101 (2/10): HTML, CSS, JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): 브라우저와 DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP와 API](./04-http-and-api.md)
+- [Web Development 101 (5/10): Frontend와 Backend](./05-frontend-and-backend.md)
+- [Web Development 101 (6/10): 인증과 세션](./06-auth-and-sessions.md)
+- [Web Development 101 (7/10): 데이터베이스 연결](./07-connecting-to-database.md)
+- [Web Development 101 (8/10): 배포](./08-deployment.md)
+- [Web Development 101 (9/10): 성능과 캐싱](./09-performance-and-caching.md)
+- [작은 웹앱 만들기](./10-building-a-small-web-app.md)
 
 <!-- toc:end -->
 

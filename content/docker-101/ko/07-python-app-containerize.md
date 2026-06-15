@@ -227,10 +227,10 @@ Python 컨테이너화의 진짜 어려움은 단순 실행이 아니라 신호�
 - [Docker 101 (4/10): Volume과 Network](./04-volume-and-network.md)
 - [Docker 101 (5/10): Docker Compose](./05-docker-compose.md)
 - [Docker 101 (6/10): 환경변수와 설정](./06-env-and-config.md)
-- **Python 앱 컨테이너화 (현재 글)**
-- 데이터베이스와 함께 실행하기 (예정)
-- Image 최적화 (예정)
-- 배포용 Docker 구성 (예정)
+- **Docker 101 (7/10): Python 앱 컨테이너화 (현재 글)**
+- [Docker 101 (8/10): 데이터베이스와 함께 실행하기](./08-database-with-app.md)
+- [Docker 101 (9/10): Image 최적화](./09-image-optimization.md)
+- [배포용 Docker 구성](./10-production-docker.md)
 
 <!-- toc:end -->
 

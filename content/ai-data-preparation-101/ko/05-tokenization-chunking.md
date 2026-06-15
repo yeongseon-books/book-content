@@ -467,12 +467,12 @@ def release_readiness(summary: dict) -> tuple[bool, list[str]]:
 - [AI Data Preparation 101 (2/10): 원본 데이터 수집과 카탈로깅](./02-source-data-collection-cataloging.md)
 - [AI Data Preparation 101 (3/10): 데이터 정제와 중복 제거](./03-cleaning-deduplication.md)
 - [AI Data Preparation 101 (4/10): 학습 데이터 PII 탐지와 익명화](./04-pii-detection-anonymization.md)
-- **Tokenization과 Chunking 전략 (현재 글)**
-- 데이터 품질 필터링 — Heuristic과 Classifier (예정)
-- 합성 데이터 생성 — Self-Instruct부터 Distillation까지 (예정)
-- 데이터 증강 기법 — EDA부터 Back-Translation까지 (예정)
-- 학습/평가/테스트 분할과 Contamination 통제 (예정)
-- 프로덕션 데이터 파이프라인 구축 (예정)
+- **AI Data Preparation 101 (5/10): Tokenization과 Chunking 전략 (현재 글)**
+- [AI Data Preparation 101 (6/10): 데이터 품질 필터링 — Heuristic과 Classifier](./06-quality-filtering.md)
+- [AI Data Preparation 101 (7/10): 합성 데이터 생성 — Self-Instruct부터 Distillation까지](./07-synthetic-data-generation.md)
+- [AI Data Preparation 101 (8/10): 데이터 증강 기법 — EDA부터 Back-Translation까지](./08-data-augmentation.md)
+- [AI Data Preparation 101 (9/10): 학습/평가/테스트 분할과 Contamination 통제](./09-train-eval-test-splitting.md)
+- [프로덕션 데이터 파이프라인 구축](./10-production-data-pipeline.md)
 
 <!-- toc:end -->
 

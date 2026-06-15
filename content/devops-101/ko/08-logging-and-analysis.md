@@ -431,9 +431,9 @@ scrape_configs:
 - [DevOps 101 (5/10): Infrastructure as Code](./05-infrastructure-as-code.md)
 - [DevOps 101 (6/10): 컨테이너와 빌드](./06-containers-and-build.md)
 - [DevOps 101 (7/10): 모니터링과 알림](./07-monitoring-and-alerting.md)
-- **로그 수집과 분석 (현재 글)**
-- 장애 대응과 on-call (예정)
-- 운영 가능한 DevOps 흐름 (예정)
+- **DevOps 101 (8/10): 로그 수집과 분석 (현재 글)**
+- [DevOps 101 (9/10): 장애 대응과 on-call](./09-incident-and-oncall.md)
+- [운영 가능한 DevOps 흐름](./10-operable-devops-flow.md)
 
 <!-- toc:end -->
 

@@ -436,14 +436,14 @@ class OrderResponse(BaseModel):
 
 - [Backend Development 101 (1/10): 백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
 - [Backend Development 101 (2/10): HTTP 서버 만들기](./02-building-an-http-server.md)
-- **Routing과 Controller (현재 글)**
-- Service Layer (예정)
-- Database Layer (예정)
-- 인증과 권한 (예정)
-- Logging과 Error Handling (예정)
-- 백엔드 테스트 (예정)
-- 백엔드 배포 (예정)
-- 운영 가능한 백엔드 구조 (예정)
+- **Backend Development 101 (3/10): Routing과 Controller (현재 글)**
+- [Backend Development 101 (4/10): Service Layer](./04-service-layer.md)
+- [Backend Development 101 (5/10): Database Layer](./05-database-layer.md)
+- [Backend Development 101 (6/10): 인증과 권한](./06-auth-and-authorization.md)
+- [Backend Development 101 (7/10): Logging과 Error Handling](./07-logging-and-error-handling.md)
+- [Backend Development 101 (8/10): 백엔드 테스트](./08-testing-the-backend.md)
+- [Backend Development 101 (9/10): 백엔드 배포](./09-deploying-the-backend.md)
+- [운영 가능한 백엔드 구조](./10-production-ready-backend.md)
 
 <!-- toc:end -->
 

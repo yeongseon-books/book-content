@@ -513,10 +513,10 @@ promtool test rules tests/alert_rules_test.yaml
 - [Observability 101 (4/10): 구조화된 로깅](./04-structured-logging.md)
 - [Observability 101 (5/10): 분산 트레이싱 기초](./05-distributed-tracing.md)
 - [Observability 101 (6/10): 대시보드 설계](./06-dashboard-design.md)
-- **경보와 온콜 (현재 글)**
-- 서비스 수준 지표와 목표 기초 (예정)
-- 비용과 카디널리티 (예정)
-- 운영 가능한 관측성 스택 (예정)
+- **Observability 101 (7/10): 경보와 온콜 (현재 글)**
+- [Observability 101 (8/10): 서비스 수준 지표와 목표 기초](./08-sli-and-slo.md)
+- [Observability 101 (9/10): 비용과 카디널리티](./09-cost-and-cardinality.md)
+- [운영 가능한 관측성 스택](./10-production-observability-stack.md)
 
 <!-- toc:end -->
 

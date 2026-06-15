@@ -773,9 +773,9 @@ ACME_API_URL=https://staging.acme.dev acme deploy
 - [Python Package 101 (5/10): PyPI에 배포하기 — TestPyPI부터 실제 배포까지](./05-publishing-to-pypi.md)
 - [Python Package 101 (6/10): 버전 관리와 릴리스](./06-versioning-and-releases.md)
 - **Python Package 101 (7/10): CLI 패키지 만들기 (현재 글)**
-- Python Package 101 (8/10): 타입 힌트와 정적 검사 (예정)
-- Python Package 101 (9/10): 문서화 — README, MkDocs, API Reference (예정)
-- Python Package 101 (10/10): 실전 패키지 템플릿 만들기 (예정)
+- [Python Package 101 (8/10): 타입 힌트와 정적 검사](./08-type-hints-and-static-analysis.md)
+- [Python Package 101 (9/10): 문서화 — README, MkDocs, API Reference](./09-documentation.md)
+- [Python Package 101 (10/10): 실전 패키지 템플릿 만들기](./10-package-template.md)
 
 <!-- toc:end -->
 

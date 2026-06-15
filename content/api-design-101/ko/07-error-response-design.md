@@ -406,10 +406,10 @@ error response는 API의 두 번째 얼굴입니다. envelope의 모양을 한 �
 - [API Design 101 (4/10): HTTP method와 status code](./04-http-methods-and-status.md)
 - [API Design 101 (5/10): Request와 response schema](./05-request-and-response-schema.md)
 - [API Design 101 (6/10): Pagination과 filtering](./06-pagination-and-filtering.md)
-- **Error response 설계 (현재 글)**
-- OpenAPI와 Swagger (예정)
-- Versioning (예정)
-- 좋은 API 문서 만들기 (예정)
+- **API Design 101 (7/10): Error response 설계 (현재 글)**
+- [API Design 101 (8/10): OpenAPI와 Swagger](./08-openapi-and-swagger.md)
+- [API Design 101 (9/10): Versioning](./09-api-versioning.md)
+- [좋은 API 문서 만들기](./10-writing-good-api-docs.md)
 
 <!-- toc:end -->
 

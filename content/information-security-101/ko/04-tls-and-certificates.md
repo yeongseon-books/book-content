@@ -551,13 +551,13 @@ if __name__ == "__main__":
 - [Information Security 101 (1/10): 정보보안이란 무엇인가?](./01-what-is-information-security.md)
 - [Information Security 101 (2/10): 인증과 인가](./02-authentication-and-authorization.md)
 - [Information Security 101 (3/10): 암호화와 해시](./03-cryptography-and-hash.md)
-- **TLS와 인증서 (현재 글)**
-- 웹 보안 기초 (예정)
-- SQL 인젝션과 XSS (예정)
-- 비밀 정보 관리 (예정)
-- 권한 최소화 (예정)
-- 로그와 감사 (예정)
-- 보안 사고 대응 (예정)
+- **Information Security 101 (4/10): TLS와 인증서 (현재 글)**
+- [Information Security 101 (5/10): 웹 보안 기초](./05-web-security-basics.md)
+- [Information Security 101 (6/10): SQL 인젝션과 XSS](./06-sql-injection-and-xss.md)
+- [Information Security 101 (7/10): 비밀 정보 관리](./07-secret-management.md)
+- [Information Security 101 (8/10): 권한 최소화](./08-least-privilege.md)
+- [Information Security 101 (9/10): 로그와 감사](./09-logging-and-audit.md)
+- [보안 사고 대응](./10-incident-response.md)
 
 <!-- toc:end -->
 

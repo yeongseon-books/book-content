@@ -366,9 +366,9 @@ def bfs_levels(graph, start):
 - [Algorithms 101 (5/10): 재귀와 분할 정복](./05-recursion-and-divide-and-conquer.md)
 - [Algorithms 101 (6/10): 동적 계획법](./06-dynamic-programming.md)
 - [Algorithms 101 (7/10): 그리디 알고리즘](./07-greedy-algorithms.md)
-- **그래프 알고리즘 (현재 글)**
-- 문자열 알고리즘 기초 (예정)
-- 알고리즘 문제 풀이 전략 (예정)
+- **Algorithms 101 (8/10): 그래프 알고리즘 (현재 글)**
+- [Algorithms 101 (9/10): 문자열 알고리즘 기초](./09-string-algorithms.md)
+- [알고리즘 문제 풀이 전략](./10-problem-solving-strategies.md)
 
 <!-- toc:end -->
 

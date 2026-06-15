@@ -525,11 +525,11 @@ n-1로 나눔 (비편향): E[s²] = 3.9977
 - [Probability 101 (3/10): 조건부확률](./03-conditional-probability.md)
 - [Probability 101 (4/10): 베이즈 정리](./04-bayes-theorem.md)
 - [Probability 101 (5/10): 확률변수](./05-random-variables.md)
-- **기대값과 분산 (현재 글)**
-- 이산분포 (예정)
-- 연속분포 (예정)
-- 대수의 법칙과 중심극한정리 (예정)
-- 머신러닝에서의 확률 (예정)
+- **Probability 101 (6/10): 기대값과 분산 (현재 글)**
+- [Probability 101 (7/10): 이산분포](./07-discrete-distributions.md)
+- [Probability 101 (8/10): 연속분포](./08-continuous-distributions.md)
+- [Probability 101 (9/10): 대수의 법칙과 중심극한정리](./09-lln-and-clt.md)
+- [머신러닝에서의 확률](./10-probability-in-ml.md)
 
 <!-- toc:end -->
 

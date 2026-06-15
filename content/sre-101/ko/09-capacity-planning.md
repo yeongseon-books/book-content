@@ -596,8 +596,8 @@ capacity planning은 미래 수요와 공급을 숫자로 맞추는 작업입니
 - [SRE 101 (6/10): Incident Response](./06-incident-response.md)
 - [SRE 101 (7/10): Postmortem](./07-postmortem.md)
 - [SRE 101 (8/10): Toil 줄이기](./08-reducing-toil.md)
-- **Capacity Planning (현재 글)**
-- 운영 가능한 시스템 만들기 (예정)
+- **SRE 101 (9/10): Capacity Planning (현재 글)**
+- [운영 가능한 시스템 만들기](./10-building-operable-systems.md)
 
 <!-- toc:end -->
 

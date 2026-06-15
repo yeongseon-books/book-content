@@ -424,9 +424,9 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 - [Alembic 101 (5/10): branch와 merge: 동시에 만든 revision을 합치는 법](./05-branches-and-merges.md)
 - [Alembic 101 (6/10): 데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기](./06-data-migrations.md)
 - [Alembic 101 (7/10): online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기](./07-online-vs-offline-and-batch.md)
-- **downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가 (현재 글)**
-- 배포 순서와 blue/green: schema와 application code의 안전한 동기화 (예정)
-- Production과 team workflow: PR, CI, 모니터링, 그리고 incident response (예정)
+- **Alembic 101 (8/10): downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가 (현재 글)**
+- [Alembic 101 (9/10): 배포 순서와 blue/green: schema와 application code의 안전한 동기화](./09-deploy-ordering-and-blue-green.md)
+- [Production과 team workflow: PR, CI, 모니터링, 그리고 incident response](./10-production-and-team-workflow.md)
 
 <!-- toc:end -->
 

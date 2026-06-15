@@ -270,12 +270,12 @@ F1은 여전히 유용한 요약 지표이지만, 절차가 빠지면 금세 낙
 - [Model Evaluation 101 (2/10): 훈련·검증·테스트 데이터 나누기](./02-train-val-test.md)
 - [Model Evaluation 101 (3/10): 정확도의 한계](./03-limits-of-accuracy.md)
 - [Model Evaluation 101 (4/10): 정밀도와 재현율](./04-precision-and-recall.md)
-- **F1 점수 (현재 글)**
-- ROC와 AUC 이해하기 (예정)
-- 확률 보정 이해하기 (예정)
-- 교차 검증 이해하기 (예정)
-- 오류 분석으로 약점 찾기 (예정)
-- 평가 리포트 만들기 (예정)
+- **Model Evaluation 101 (5/10): F1 점수 (현재 글)**
+- [Model Evaluation 101 (6/10): ROC와 AUC 이해하기](./06-roc-and-auc.md)
+- [Model Evaluation 101 (7/10): 확률 보정 이해하기](./07-calibration.md)
+- [Model Evaluation 101 (8/10): 교차 검증 이해하기](./08-cross-validation.md)
+- [Model Evaluation 101 (9/10): 오류 분석으로 약점 찾기](./09-error-analysis.md)
+- [평가 리포트 만들기](./10-evaluation-report.md)
 
 <!-- toc:end -->
 

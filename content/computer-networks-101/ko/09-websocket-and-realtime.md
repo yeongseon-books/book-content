@@ -522,8 +522,8 @@ WebSocket은 HTTP로 시작하지만, 응답 이후에는 더 이상 HTTP가 아
 - [Computer Networks 101 (6/10): TLS 기초](./06-tls-basics.md)
 - [Computer Networks 101 (7/10): 라우팅과 NAT](./07-routing-and-nat.md)
 - [Computer Networks 101 (8/10): Load Balancer](./08-load-balancer.md)
-- **WebSocket과 실시간 통신 (현재 글)**
-- 네트워크 문제 디버깅 (예정)
+- **Computer Networks 101 (9/10): WebSocket과 실시간 통신 (현재 글)**
+- [네트워크 문제 디버깅](./10-debugging-network-problems.md)
 
 <!-- toc:end -->
 

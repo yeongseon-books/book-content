@@ -372,9 +372,9 @@ ProgrammingError -> 즉시 수정 대상
 - [Python DB-API 101 (5/10): Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
 - [Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249)](./06-row-factories-adapters.md)
 - **Python DB-API 101 (7/10): PEP 249 예외 계층과 SQLite 에러 처리 (현재 글)**
-- Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
-- Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기 (예정)
-- Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
+- [Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링](./08-connection-pooling.md)
+- [Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기](./09-async-aiosqlite.md)
+- [Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업](./10-production-patterns.md)
 
 <!-- toc:end -->
 

@@ -532,8 +532,8 @@ venv: .venv
 - [Python 101 (6/10): 함수와 인자: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
 - [Python 101 (7/10): 모듈과 패키지: import, __init__, __name__](./07-modules-and-packages.md)
 - [Python 101 (8/10): 파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
-- **클래스와 객체: 데이터와 동작을 함께 묶기 (현재 글)**
-- 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (예정)
+- **Python 101 (9/10): 클래스와 객체: 데이터와 동작을 함께 묶기 (현재 글)**
+- [표준 라이브러리 투어: datetime, pathlib, json, collections, itertools](./10-standard-library-tour.md)
 
 <!-- toc:end -->
 

@@ -372,9 +372,9 @@ print(model.summary())
 - [Statistics 101 (5/10): 추정](./05-estimation.md)
 - [Statistics 101 (6/10): 신뢰구간](./06-confidence-interval.md)
 - [Statistics 101 (7/10): 가설검정](./07-hypothesis-testing.md)
-- **상관과 회귀 (현재 글)**
-- p-value 이해하기 (예정)
-- 통계적 사고방식 (예정)
+- **Statistics 101 (8/10): 상관과 회귀 (현재 글)**
+- [Statistics 101 (9/10): p-value 이해하기](./09-understanding-p-value.md)
+- [통계적 사고방식](./10-statistical-thinking.md)
 
 <!-- toc:end -->
 

@@ -335,8 +335,8 @@ Q&A는 즉흥 대응만 믿지 말고, 예상 질문과 답변을 미리 정리�
 - [Capstone Project 101 (6/10): MVP 설계](./06-designing-the-mvp.md)
 - [Capstone Project 101 (7/10): 기술 스택 선택](./07-choosing-the-tech-stack.md)
 - [Capstone Project 101 (8/10): 일정 관리](./08-schedule-management.md)
-- **발표 자료 만들기 (현재 글)**
-- 프로젝트 회고 (예정)
+- **Capstone Project 101 (9/10): 발표 자료 만들기 (현재 글)**
+- [프로젝트 회고](./10-project-retrospective.md)
 
 <!-- toc:end -->
 

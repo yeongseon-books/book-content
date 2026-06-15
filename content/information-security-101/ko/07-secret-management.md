@@ -498,10 +498,10 @@ def load_db_credential() -> dict:
 - [Information Security 101 (4/10): TLS와 인증서](./04-tls-and-certificates.md)
 - [Information Security 101 (5/10): 웹 보안 기초](./05-web-security-basics.md)
 - [Information Security 101 (6/10): SQL 인젝션과 XSS](./06-sql-injection-and-xss.md)
-- **비밀 정보 관리 (현재 글)**
-- 권한 최소화 (예정)
-- 로그와 감사 (예정)
-- 보안 사고 대응 (예정)
+- **Information Security 101 (7/10): 비밀 정보 관리 (현재 글)**
+- [Information Security 101 (8/10): 권한 최소화](./08-least-privilege.md)
+- [Information Security 101 (9/10): 로그와 감사](./09-logging-and-audit.md)
+- [보안 사고 대응](./10-incident-response.md)
 
 <!-- toc:end -->
 

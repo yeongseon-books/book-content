@@ -619,9 +619,9 @@ pyright: 로컬 편집 단계에서 즉시 피드백 제공
 - [Type Hints in Python 101 (5/10): TypedDict와 dataclass](./05-typeddict-and-dataclass.md)
 - [Type Hints in Python 101 (6/10): Protocol과 structural typing](./06-protocol-and-structural-typing.md)
 - [Type Hints in Python 101 (7/10): Generic 이해하기](./07-generic.md)
-- **mypy와 pyright 사용하기 (현재 글)**
-- Pydantic과 타입 힌트 (예정)
-- 타입 힌트를 잘 쓰는 기준 (예정)
+- **Type Hints in Python 101 (8/10): mypy와 pyright 사용하기 (현재 글)**
+- [Type Hints in Python 101 (9/10): Pydantic과 타입 힌트](./09-pydantic-and-type-hints.md)
+- [타입 힌트를 잘 쓰는 기준](./10-type-hints-best-practices.md)
 
 <!-- toc:end -->
 

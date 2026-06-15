@@ -409,11 +409,11 @@ E. 해답 없음 케이스: 종료 조건 검증
 - [Algorithms with Python 101 (3/10): 선형 탐색과 이진 탐색](./03-linear-and-binary-search.md)
 - [Algorithms with Python 101 (4/10): 정렬 알고리즘](./04-sorting-algorithms.md)
 - [Algorithms with Python 101 (5/10): 재귀와 분할 정복](./05-recursion-and-divide-and-conquer.md)
-- **동적 계획법 기초 (현재 글)**
-- 그래프 탐색 — BFS와 DFS (예정)
-- 최단 경로 기초 (예정)
-- 그리디 알고리즘 (예정)
-- 코딩 테스트 문제 접근법 (예정)
+- **Algorithms with Python 101 (6/10): 동적 계획법 기초 (현재 글)**
+- [Algorithms with Python 101 (7/10): 그래프 탐색 — BFS와 DFS](./07-graph-traversal-bfs-dfs.md)
+- [Algorithms with Python 101 (8/10): 최단 경로 기초](./08-shortest-path-basics.md)
+- [Algorithms with Python 101 (9/10): 그리디 알고리즘](./09-greedy-algorithms.md)
+- [코딩 테스트 문제 접근법](./10-coding-test-strategies.md)
 
 <!-- toc:end -->
 

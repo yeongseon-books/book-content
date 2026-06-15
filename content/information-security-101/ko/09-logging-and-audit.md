@@ -567,8 +567,8 @@ def create_audit_record(
 - [Information Security 101 (6/10): SQL 인젝션과 XSS](./06-sql-injection-and-xss.md)
 - [Information Security 101 (7/10): 비밀 정보 관리](./07-secret-management.md)
 - [Information Security 101 (8/10): 권한 최소화](./08-least-privilege.md)
-- **로그와 감사 (현재 글)**
-- 보안 사고 대응 (예정)
+- **Information Security 101 (9/10): 로그와 감사 (현재 글)**
+- [보안 사고 대응](./10-incident-response.md)
 
 <!-- toc:end -->
 

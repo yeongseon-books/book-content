@@ -492,10 +492,10 @@ flowchart LR
 - [Data Warehouse 101 (4/10): Star Schema](./04-star-schema.md)
 - [Data Warehouse 101 (5/10): Partition과 Clustering](./05-partition-and-clustering.md)
 - [Data Warehouse 101 (6/10): ETL과 ELT](./06-etl-and-elt.md)
-- **BI와 Dashboard (현재 글)**
-- Data Mart (예정)
-- 성능 최적화 (예정)
-- Warehouse 설계 예제 (예정)
+- **Data Warehouse 101 (7/10): BI와 Dashboard (현재 글)**
+- [Data Warehouse 101 (8/10): Data Mart](./08-data-mart.md)
+- [Data Warehouse 101 (9/10): 성능 최적화](./09-performance-optimization.md)
+- [Warehouse 설계 예제](./10-warehouse-design-example.md)
 
 <!-- toc:end -->
 

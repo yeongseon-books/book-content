@@ -344,16 +344,16 @@ print("Pass")
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **함수형 프로그래밍이란 무엇인가? (현재 글)**
-- 순수 함수와 부수효과 (예정)
-- immutable 데이터 (예정)
-- 고차 함수 (예정)
-- map, filter, reduce (예정)
-- 클로저와 partial (예정)
-- 재귀와 꼬리 호출 (예정)
-- 지연 평가와 제너레이터 (예정)
-- 함수 합성과 파이프라인 (예정)
-- 객체지향과 함수형의 균형 (예정)
+- **Functional Programming 101 (1/10): 함수형 프로그래밍이란 무엇인가? (현재 글)**
+- [Functional Programming 101 (2/10): 순수 함수와 부수효과](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): immutable 데이터](./03-immutable-data.md)
+- [Functional Programming 101 (4/10): 고차 함수](./04-higher-order-functions.md)
+- [Functional Programming 101 (5/10): map, filter, reduce](./05-map-filter-reduce.md)
+- [Functional Programming 101 (6/10): 클로저와 partial](./06-closure-and-partial.md)
+- [Functional Programming 101 (7/10): 재귀와 꼬리 호출](./07-recursion.md)
+- [Functional Programming 101 (8/10): 지연 평가와 제너레이터](./08-lazy-evaluation.md)
+- [Functional Programming 101 (9/10): 함수 합성과 파이프라인](./09-function-composition.md)
+- [객체지향과 함수형의 균형](./10-oop-and-fp-balance.md)
 
 <!-- toc:end -->
 

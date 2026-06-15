@@ -347,9 +347,9 @@ flowchart LR
 - [Software Engineering 101 (5/10): 테스트 전략](./05-testing-strategy.md)
 - [Software Engineering 101 (6/10): 버전 관리와 릴리스](./06-version-control-and-release.md)
 - [Software Engineering 101 (7/10): 문서화](./07-documentation.md)
-- **협업 프로세스 (현재 글)**
-- 유지보수와 기술부채 (예정)
-- 좋은 소프트웨어의 기준 (예정)
+- **Software Engineering 101 (8/10): 협업 프로세스 (현재 글)**
+- [Software Engineering 101 (9/10): 유지보수와 기술부채](./09-maintenance-and-tech-debt.md)
+- [좋은 소프트웨어의 기준](./10-what-makes-good-software.md)
 
 <!-- toc:end -->
 

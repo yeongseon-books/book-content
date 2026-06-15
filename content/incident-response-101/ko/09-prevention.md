@@ -430,8 +430,8 @@ oncall_rotation:
 - [Incident Response 101 (6/10): Root Cause Analysis](./06-root-cause-analysis.md)
 - [Incident Response 101 (7/10): Mitigation과 Resolution](./07-mitigation-and-resolution.md)
 - [Incident Response 101 (8/10): Postmortem](./08-postmortem.md)
-- **재발 방지 (현재 글)**
-- Incident Runbook 만들기 (예정)
+- **Incident Response 101 (9/10): 재발 방지 (현재 글)**
+- [Incident Runbook 만들기](./10-incident-runbook.md)
 
 <!-- toc:end -->
 

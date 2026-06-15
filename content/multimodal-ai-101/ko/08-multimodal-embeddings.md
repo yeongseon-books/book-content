@@ -380,9 +380,9 @@ CLIP, SigLIP, ImageBind는 비슷해 보여도 지원 modality와 학습 목표�
 - [Multimodal AI 101 (5/10): Multimodal RAG: 이미지와 텍스트를 함께 검색하기](./05-multimodal-rag.md)
 - [Multimodal AI 101 (6/10): 오디오 처리와 Whisper STT](./06-audio-whisper.md)
 - [Multimodal AI 101 (7/10): Diffusion으로 Text-to-Image 생성](./07-text-to-image-diffusion.md)
-- **Multimodal Embedding과 Cross-modal 검색 (현재 글)**
-- Video 이해 - Frame Sampling에서 Video-LLaVA까지 (예정)
-- Production Multimodal Application 구축 (예정)
+- **Multimodal AI 101 (8/10): Multimodal Embedding과 Cross-modal 검색 (현재 글)**
+- [Multimodal AI 101 (9/10): Video 이해 - Frame Sampling에서 Video-LLaVA까지](./09-video-understanding.md)
+- [Production Multimodal Application 구축](./10-production-multimodal-app.md)
 
 <!-- toc:end -->
 

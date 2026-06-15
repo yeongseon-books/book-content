@@ -500,9 +500,9 @@ resource "aws_cloudwatch_metric_alarm" "http_5xx_rate" {
 - [Cloud Computing 101 (5/10): Storage](./05-storage.md)
 - [Cloud Computing 101 (6/10): Network](./06-network.md)
 - [Cloud Computing 101 (7/10): Identity와 Security](./07-identity-and-security.md)
-- **Monitoring (현재 글)**
-- Cost Management (예정)
-- Cloud Architecture 기초 (예정)
+- **Cloud Computing 101 (8/10): Monitoring (현재 글)**
+- [Cloud Computing 101 (9/10): Cost Management](./09-cost-management.md)
+- [Cloud Architecture 기초](./10-cloud-architecture-basics.md)
 
 <!-- toc:end -->
 

@@ -276,14 +276,14 @@ print(f"정규성 검정 p-value(로그 변환 후): {p:.4f}")
 
 - [Statistics 101 (1/10): 통계란 무엇인가?](./01-what-is-statistics.md)
 - [Statistics 101 (2/10): 평균, 중앙값, 분산](./02-mean-median-variance.md)
-- **분포 (현재 글)**
-- 표본과 모집단 (예정)
-- 추정 (예정)
-- 신뢰구간 (예정)
-- 가설검정 (예정)
-- 상관과 회귀 (예정)
-- p-value 이해하기 (예정)
-- 통계적 사고방식 (예정)
+- **Statistics 101 (3/10): 분포 (현재 글)**
+- [Statistics 101 (4/10): 표본과 모집단](./04-sample-and-population.md)
+- [Statistics 101 (5/10): 추정](./05-estimation.md)
+- [Statistics 101 (6/10): 신뢰구간](./06-confidence-interval.md)
+- [Statistics 101 (7/10): 가설검정](./07-hypothesis-testing.md)
+- [Statistics 101 (8/10): 상관과 회귀](./08-correlation-and-regression.md)
+- [Statistics 101 (9/10): p-value 이해하기](./09-understanding-p-value.md)
+- [통계적 사고방식](./10-statistical-thinking.md)
 
 <!-- toc:end -->
 

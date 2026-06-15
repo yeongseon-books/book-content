@@ -426,9 +426,9 @@ postmortem 품질은 문서 작성보다 회의 운영에서 크게 갈립니다
 - [Incident Response 101 (5/10): Timeline 작성](./05-timeline.md)
 - [Incident Response 101 (6/10): Root Cause Analysis](./06-root-cause-analysis.md)
 - [Incident Response 101 (7/10): Mitigation과 Resolution](./07-mitigation-and-resolution.md)
-- **Postmortem (현재 글)**
-- 재발 방지 (예정)
-- Incident Runbook 만들기 (예정)
+- **Incident Response 101 (8/10): Postmortem (현재 글)**
+- [Incident Response 101 (9/10): 재발 방지](./09-prevention.md)
+- [Incident Runbook 만들기](./10-incident-runbook.md)
 
 <!-- toc:end -->
 

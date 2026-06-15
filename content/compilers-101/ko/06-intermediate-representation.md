@@ -280,11 +280,11 @@ IR은 컴파일러를 둘로 깨끗하게 나누는 다리입니다. 다음 글�
 - [Compilers 101 (3/10): 파싱과 AST](./03-parsing-and-ast.md)
 - [Compilers 101 (4/10): 시맨틱 분석](./04-semantic-analysis.md)
 - [Compilers 101 (5/10): 심볼 테이블과 스코프](./05-symbol-table-and-scope.md)
-- **중간 표현 (현재 글)**
-- 최적화 기초 (예정)
-- 코드 생성 (예정)
-- JIT vs AOT (예정)
-- 작은 인터프리터 만들기 (예정)
+- **Compilers 101 (6/10): 중간 표현 (현재 글)**
+- [Compilers 101 (7/10): 최적화 기초](./07-optimization-basics.md)
+- [Compilers 101 (8/10): 코드 생성](./08-code-generation.md)
+- [Compilers 101 (9/10): JIT vs AOT](./09-jit-vs-aot.md)
+- [작은 인터프리터 만들기](./10-building-a-tiny-interpreter.md)
 
 <!-- toc:end -->
 

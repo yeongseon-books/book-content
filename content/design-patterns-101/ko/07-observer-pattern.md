@@ -435,10 +435,10 @@ Observer는 공짜가 아닙니다. 도입하면 다음을 잃습니다.
 - [Design Patterns 101 (4/10): Behavioral 패턴](./04-behavioral-patterns.md)
 - [Design Patterns 101 (5/10): Strategy 패턴](./05-strategy-pattern.md)
 - [Design Patterns 101 (6/10): Adapter 패턴](./06-adapter-pattern.md)
-- **Observer 패턴 (현재 글)**
-- Factory와 의존성 주입 (예정)
-- 패턴을 남용하지 않는 법 (예정)
-- Python에 어울리는 패턴 (예정)
+- **Design Patterns 101 (7/10): Observer 패턴 (현재 글)**
+- [Design Patterns 101 (8/10): Factory와 의존성 주입](./08-factory-and-di.md)
+- [Design Patterns 101 (9/10): 패턴을 남용하지 않는 법](./09-avoiding-pattern-overuse.md)
+- [Python에 어울리는 패턴](./10-pythonic-patterns.md)
 
 <!-- toc:end -->
 

@@ -234,8 +234,8 @@ npx source-map-explorer "dist/assets/*.js"
 - [Frontend Development 101 (6/10): API 호출과 비동기](./06-api-calls-and-async.md)
 - [Frontend Development 101 (7/10): 폼과 유효성 검사](./07-forms-and-validation.md)
 - [Frontend Development 101 (8/10): 스타일링과 디자인 시스템](./08-styling-and-design-system.md)
-- **빌드 도구와 번들링 (현재 글)**
-- 작은 프론트엔드 앱 만들기 (예정)
+- **Frontend Development 101 (9/10): 빌드 도구와 번들링 (현재 글)**
+- [작은 프론트엔드 앱 만들기](./10-building-a-small-frontend-app.md)
 
 <!-- toc:end -->
 

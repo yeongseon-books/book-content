@@ -453,8 +453,8 @@ print('축소 전후:', X.shape, Xk.shape)
 - [Linear Algebra 101 (6/10): 기저와 차원](./06-basis-and-dimension.md)
 - [Linear Algebra 101 (7/10): 고유값과 고유벡터](./07-eigenvalues-and-eigenvectors.md)
 - [Linear Algebra 101 (8/10): 행렬 분해](./08-matrix-decomposition.md)
-- **PCA (현재 글)**
-- 머신러닝에서의 선형대수 (예정)
+- **Linear Algebra 101 (9/10): PCA (현재 글)**
+- [머신러닝에서의 선형대수](./10-linear-algebra-in-ml.md)
 
 <!-- toc:end -->
 

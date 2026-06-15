@@ -577,10 +577,10 @@ README는 프로젝트 소개문이 아니라 실행 입구입니다. 첫 방문
 - [Technical Writing 101 (4/10): 개념 설명하기](./04-explaining-concepts.md)
 - [Technical Writing 101 (5/10): 예제 코드 설명하기](./05-explaining-example-code.md)
 - [Technical Writing 101 (6/10): 그림과 표 사용하기](./06-using-figures-and-tables.md)
-- **README 작성하기 (현재 글)**
-- 튜토리얼 작성하기 (예정)
-- 블로그와 문서 차이 (예정)
-- 발행 전 체크리스트 (예정)
+- **Technical Writing 101 (7/10): README 작성하기 (현재 글)**
+- [Technical Writing 101 (8/10): 튜토리얼 작성하기](./08-writing-tutorials.md)
+- [Technical Writing 101 (9/10): 블로그와 문서 차이](./09-blog-vs-docs.md)
+- [발행 전 체크리스트](./10-pre-publish-checklist.md)
 
 <!-- toc:end -->
 

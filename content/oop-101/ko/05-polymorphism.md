@@ -604,12 +604,12 @@ def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
 - [Object-Oriented Programming 101 (2/10): 클래스와 인스턴스](./02-classes-and-instances.md)
 - [Object-Oriented Programming 101 (3/10): 캡슐화](./03-encapsulation.md)
 - [Object-Oriented Programming 101 (4/10): 상속](./04-inheritance.md)
-- **다형성 (현재 글)**
-- 추상화 (예정)
-- 합성과 상속 (예정)
-- SOLID 원칙 기초 (예정)
-- 객체지향 설계 예제 (예정)
-- 객체지향을 언제 피해야 할까? (예정)
+- **Object-Oriented Programming 101 (5/10): 다형성 (현재 글)**
+- [Object-Oriented Programming 101 (6/10): 추상화](./06-abstraction.md)
+- [Object-Oriented Programming 101 (7/10): 합성과 상속](./07-composition-vs-inheritance.md)
+- [Object-Oriented Programming 101 (8/10): SOLID 원칙 기초](./08-solid-principles.md)
+- [Object-Oriented Programming 101 (9/10): 객체지향 설계 예제](./09-oop-design-example.md)
+- [객체지향을 언제 피해야 할까?](./10-when-to-avoid-oop.md)
 
 <!-- toc:end -->
 

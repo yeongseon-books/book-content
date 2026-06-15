@@ -452,8 +452,8 @@ print(checks)
 - [Data Science 101 (6/10): 시각화](./06-visualization.md)
 - [Data Science 101 (7/10): 모델링](./07-modeling.md)
 - [Data Science 101 (8/10): 평가](./08-evaluation.md)
-- **결과 해석 (현재 글)**
-- 데이터 프로젝트 전체 흐름 (예정)
+- **Data Science 101 (9/10): 결과 해석 (현재 글)**
+- [데이터 프로젝트 전체 흐름](./10-data-project-end-to-end.md)
 
 <!-- toc:end -->
 

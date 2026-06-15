@@ -229,8 +229,8 @@ JIT와 AOT는 결국 “언제 컴파일할 것인가?”라는 한 질문에서
 - [Compilers 101 (6/10): 중간 표현](./06-intermediate-representation.md)
 - [Compilers 101 (7/10): 최적화 기초](./07-optimization-basics.md)
 - [Compilers 101 (8/10): 코드 생성](./08-code-generation.md)
-- **JIT vs AOT (현재 글)**
-- 작은 인터프리터 만들기 (예정)
+- **Compilers 101 (9/10): JIT vs AOT (현재 글)**
+- [작은 인터프리터 만들기](./10-building-a-tiny-interpreter.md)
 
 <!-- toc:end -->
 

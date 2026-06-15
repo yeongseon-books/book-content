@@ -572,10 +572,10 @@ Docker 빌드 자동화의 핵심은 Buildx, 캐시, 태그 전략, 권한 설�
 - [GitHub Actions 101 (4/10): Python 테스트 자동화](./04-python-test-automation.md)
 - [GitHub Actions 101 (5/10): Lint와 Type Check](./05-lint-and-typecheck.md)
 - [GitHub Actions 101 (6/10): 빌드 아티팩트](./06-build-artifact.md)
-- **Docker 빌드 (현재 글)**
-- 배포 자동화 (예정)
-- Secret 관리 (예정)
-- 실전 CI/CD 파이프라인 (예정)
+- **GitHub Actions 101 (7/10): Docker 빌드 (현재 글)**
+- [GitHub Actions 101 (8/10): 배포 자동화](./08-deploy-automation.md)
+- [GitHub Actions 101 (9/10): Secret 관리](./09-secret-management.md)
+- [실전 CI/CD 파이프라인](./10-real-world-cicd-pipeline.md)
 
 <!-- toc:end -->
 

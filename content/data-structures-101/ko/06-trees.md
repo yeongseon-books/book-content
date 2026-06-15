@@ -485,11 +485,11 @@ D: (없음)
 - [Data Structures 101 (3/10): 연결 리스트](./03-linked-lists.md)
 - [Data Structures 101 (4/10): 스택과 큐](./04-stacks-and-queues.md)
 - [Data Structures 101 (5/10): 해시 테이블](./05-hash-tables.md)
-- **트리 (현재 글)**
-- 이진 탐색 트리 (예정)
-- 힙 (예정)
-- 그래프 (예정)
-- 자료구조 선택 기준 (예정)
+- **Data Structures 101 (6/10): 트리 (현재 글)**
+- [Data Structures 101 (7/10): 이진 탐색 트리](./07-binary-search-trees.md)
+- [Data Structures 101 (8/10): 힙](./08-heaps.md)
+- [Data Structures 101 (9/10): 그래프](./09-graphs.md)
+- [자료구조 선택 기준](./10-choosing-data-structures.md)
 
 <!-- toc:end -->
 

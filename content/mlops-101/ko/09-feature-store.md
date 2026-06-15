@@ -597,8 +597,8 @@ def validate_online_offline_consistency(
 - [MLOps 101 (6/10): 모델 모니터링](./06-model-monitoring.md)
 - [MLOps 101 (7/10): 데이터 드리프트와 모델 드리프트](./07-data-and-model-drift.md)
 - [MLOps 101 (8/10): 재학습](./08-retraining.md)
-- **피처 스토어 (현재 글)**
-- 운영 가능한 ML 시스템 (예정)
+- **MLOps 101 (9/10): 피처 스토어 (현재 글)**
+- [운영 가능한 ML 시스템](./10-production-ml-system.md)
 
 <!-- toc:end -->
 

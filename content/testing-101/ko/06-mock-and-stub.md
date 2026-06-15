@@ -380,11 +380,11 @@ Mock과 Stub은 비슷해 보이지만 목표가 다릅니다. 결과를 확인�
 - [Testing 101 (3/10): 통합 테스트](./03-integration-test.md)
 - [Testing 101 (4/10): E2E 테스트](./04-e2e-test.md)
 - [Testing 101 (5/10): 테스트 더블](./05-test-double.md)
-- **Mock과 Stub (현재 글)**
-- 테스트 커버리지 (예정)
-- 회귀 테스트 (예정)
-- CI에서 테스트 실행하기 (예정)
-- 테스트 전략 세우기 (예정)
+- **Testing 101 (6/10): Mock과 Stub (현재 글)**
+- [Testing 101 (7/10): 테스트 커버리지](./07-test-coverage.md)
+- [Testing 101 (8/10): 회귀 테스트](./08-regression-test.md)
+- [Testing 101 (9/10): CI에서 테스트 실행하기](./09-tests-in-ci.md)
+- [테스트 전략 세우기](./10-test-strategy.md)
 
 <!-- toc:end -->
 

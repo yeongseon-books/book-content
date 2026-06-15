@@ -561,9 +561,9 @@ def evaluate_ab_test(
 - [MLOps 101 (5/10): 모델 배포](./05-model-deployment.md)
 - [MLOps 101 (6/10): 모델 모니터링](./06-model-monitoring.md)
 - [MLOps 101 (7/10): 데이터 드리프트와 모델 드리프트](./07-data-and-model-drift.md)
-- **재학습 (현재 글)**
-- 피처 스토어 (예정)
-- 운영 가능한 ML 시스템 (예정)
+- **MLOps 101 (8/10): 재학습 (현재 글)**
+- [MLOps 101 (9/10): 피처 스토어](./09-feature-store.md)
+- [운영 가능한 ML 시스템](./10-production-ml-system.md)
 
 <!-- toc:end -->
 

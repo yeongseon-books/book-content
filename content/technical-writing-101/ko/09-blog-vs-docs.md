@@ -529,8 +529,8 @@ Diátaxis 프레임워크는 글을 네 가지 목적으로 분류합니다.
 - [Technical Writing 101 (6/10): 그림과 표 사용하기](./06-using-figures-and-tables.md)
 - [Technical Writing 101 (7/10): README 작성하기](./07-writing-the-readme.md)
 - [Technical Writing 101 (8/10): 튜토리얼 작성하기](./08-writing-tutorials.md)
-- **블로그와 문서 차이 (현재 글)**
-- 발행 전 체크리스트 (예정)
+- **Technical Writing 101 (9/10): 블로그와 문서 차이 (현재 글)**
+- [발행 전 체크리스트](./10-pre-publish-checklist.md)
 
 <!-- toc:end -->
 

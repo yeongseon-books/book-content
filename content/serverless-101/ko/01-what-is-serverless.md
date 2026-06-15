@@ -492,16 +492,16 @@ SAM을 쓰든 Serverless Framework를 쓰든 중요한 것은 도구 선택보�
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **서버리스란 무엇인가? (현재 글)**
-- 함수형 서비스(FaaS)란 무엇인가? (예정)
-- 트리거와 이벤트 (예정)
-- 콜드 스타트 (예정)
-- 스케일링 (예정)
-- 상태 관리 (예정)
-- 큐와 이벤트 기반 아키텍처 (예정)
-- 관측성 (예정)
-- 비용 (예정)
-- 서버리스 앱 설계 (예정)
+- **Serverless 101 (1/10): 서버리스란 무엇인가? (현재 글)**
+- [Serverless 101 (2/10): 함수형 서비스(FaaS)란 무엇인가?](./02-function-as-a-service.md)
+- [Serverless 101 (3/10): 트리거와 이벤트](./03-trigger-and-event.md)
+- [Serverless 101 (4/10): 콜드 스타트](./04-cold-start.md)
+- [Serverless 101 (5/10): 스케일링](./05-scaling.md)
+- [Serverless 101 (6/10): 상태 관리](./06-state-management.md)
+- [Serverless 101 (7/10): 큐와 이벤트 기반 아키텍처](./07-queue-and-event-driven.md)
+- [Serverless 101 (8/10): 관측성](./08-observability.md)
+- [Serverless 101 (9/10): 비용](./09-cost.md)
+- [서버리스 앱 설계](./10-serverless-app-design.md)
 
 <!-- toc:end -->
 

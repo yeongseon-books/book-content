@@ -516,15 +516,15 @@ print(f"양성 판정의 {1-precision:.1%}는 오경보")
 ## 시리즈 목차
 
 - [Probability 101 (1/10): 확률이란 무엇인가?](./01-what-is-probability.md)
-- **사건과 표본공간 (현재 글)**
-- 조건부확률 (예정)
-- 베이즈 정리 (예정)
-- 확률변수 (예정)
-- 기대값과 분산 (예정)
-- 이산분포 (예정)
-- 연속분포 (예정)
-- 대수의 법칙과 중심극한정리 (예정)
-- 머신러닝에서의 확률 (예정)
+- **Probability 101 (2/10): 사건과 표본공간 (현재 글)**
+- [Probability 101 (3/10): 조건부확률](./03-conditional-probability.md)
+- [Probability 101 (4/10): 베이즈 정리](./04-bayes-theorem.md)
+- [Probability 101 (5/10): 확률변수](./05-random-variables.md)
+- [Probability 101 (6/10): 기대값과 분산](./06-expectation-and-variance.md)
+- [Probability 101 (7/10): 이산분포](./07-discrete-distributions.md)
+- [Probability 101 (8/10): 연속분포](./08-continuous-distributions.md)
+- [Probability 101 (9/10): 대수의 법칙과 중심극한정리](./09-lln-and-clt.md)
+- [머신러닝에서의 확률](./10-probability-in-ml.md)
 
 <!-- toc:end -->
 

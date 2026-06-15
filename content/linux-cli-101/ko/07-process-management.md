@@ -453,10 +453,10 @@ journalctl -u my-api -n 50 --no-pager | grep -E 'ERROR|CRITICAL|timeout|Failed' 
 - [Linux CLI 101 (4/10): cat, less, head, tail — 파일 내용 보기](./04-viewing-files.md)
 - [Linux CLI 101 (5/10): grep, find, xargs — 검색의 삼총사](./05-grep-find-xargs.md)
 - [Linux CLI 101 (6/10): pipe와 redirection](./06-pipe-and-redirection.md)
-- **프로세스 확인과 종료 (현재 글)**
-- 환경변수와 PATH (예정)
-- 간단한 shell script (예정)
-- SSH와 원격 서버 접속 (예정)
+- **Linux CLI 101 (7/10): 프로세스 확인과 종료 (현재 글)**
+- [Linux CLI 101 (8/10): 환경변수와 PATH](./08-environment-variables.md)
+- [Linux CLI 101 (9/10): 간단한 shell script](./09-shell-script-basics.md)
+- [SSH와 원격 서버 접속](./10-ssh-and-remote.md)
 
 <!-- toc:end -->
 

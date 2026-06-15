@@ -391,8 +391,8 @@ CI는 테스트를 팀 공통 기준으로 바꾸는 장치입니다. 노트북�
 - [Testing 101 (6/10): Mock과 Stub](./06-mock-and-stub.md)
 - [Testing 101 (7/10): 테스트 커버리지](./07-test-coverage.md)
 - [Testing 101 (8/10): 회귀 테스트](./08-regression-test.md)
-- **CI에서 테스트 실행하기 (현재 글)**
-- 테스트 전략 세우기 (예정)
+- **Testing 101 (9/10): CI에서 테스트 실행하기 (현재 글)**
+- [테스트 전략 세우기](./10-test-strategy.md)
 
 <!-- toc:end -->
 

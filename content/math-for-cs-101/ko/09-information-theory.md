@@ -541,8 +541,8 @@ print("KL을 줄이는 것이 곧 교차 엔트로피 손실을 줄이는 것입
 - [Math for CS 101 (6/10): 확률](./06-probability.md)
 - [Math for CS 101 (7/10): 선형대수](./07-linear-algebra.md)
 - [Math for CS 101 (8/10): 미분](./08-calculus.md)
-- **정보이론 (현재 글)**
-- 알고리즘과 수학 (예정)
+- **Math for CS 101 (9/10): 정보이론 (현재 글)**
+- [알고리즘과 수학](./10-algorithms-and-math.md)
 
 <!-- toc:end -->
 

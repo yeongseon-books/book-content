@@ -613,8 +613,8 @@ Unit Economics를 월별로 추적하면 비용이 올라도 효율이 유지되
 - [Cloud Computing 101 (6/10): Network](./06-network.md)
 - [Cloud Computing 101 (7/10): Identity와 Security](./07-identity-and-security.md)
 - [Cloud Computing 101 (8/10): Monitoring](./08-monitoring.md)
-- **Cost Management (현재 글)**
-- Cloud Architecture 기초 (예정)
+- **Cloud Computing 101 (9/10): Cost Management (현재 글)**
+- [Cloud Architecture 기초](./10-cloud-architecture-basics.md)
 
 <!-- toc:end -->
 

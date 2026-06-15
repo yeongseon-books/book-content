@@ -374,15 +374,15 @@ REST는 단순한 URL 컨벤션이 아니라, 여섯 가지 아키텍처 제약�
 ## 시리즈 목차
 
 - [API Design 101 (1/10): API란 무엇인가?](./01-what-is-an-api.md)
-- **REST 기본 (현재 글)**
-- 리소스 설계 (예정)
-- HTTP method와 status code (예정)
-- Request와 response schema (예정)
-- Pagination과 filtering (예정)
-- Error response 설계 (예정)
-- OpenAPI와 Swagger (예정)
-- Versioning (예정)
-- 좋은 API 문서 만들기 (예정)
+- **API Design 101 (2/10): REST 기본 (현재 글)**
+- [API Design 101 (3/10): 리소스 설계](./03-resource-design.md)
+- [API Design 101 (4/10): HTTP method와 status code](./04-http-methods-and-status.md)
+- [API Design 101 (5/10): Request와 response schema](./05-request-and-response-schema.md)
+- [API Design 101 (6/10): Pagination과 filtering](./06-pagination-and-filtering.md)
+- [API Design 101 (7/10): Error response 설계](./07-error-response-design.md)
+- [API Design 101 (8/10): OpenAPI와 Swagger](./08-openapi-and-swagger.md)
+- [API Design 101 (9/10): Versioning](./09-api-versioning.md)
+- [좋은 API 문서 만들기](./10-writing-good-api-docs.md)
 
 <!-- toc:end -->
 

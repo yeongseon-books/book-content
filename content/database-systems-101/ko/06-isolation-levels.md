@@ -384,11 +384,11 @@ SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
 - [Database Systems 101 (3/10): SQL과 쿼리 처리](./03-sql-and-query-processing.md)
 - [Database Systems 101 (4/10): 인덱스](./04-indexes.md)
 - [Database Systems 101 (5/10): 트랜잭션과 ACID](./05-transactions-and-acid.md)
-- **격리 수준 (현재 글)**
-- 정규화와 모델링 (예정)
-- 쿼리 최적화 (예정)
-- 복제와 백업 (예정)
-- OLTP와 OLAP (예정)
+- **Database Systems 101 (6/10): 격리 수준 (현재 글)**
+- [Database Systems 101 (7/10): 정규화와 모델링](./07-normalization-and-modeling.md)
+- [Database Systems 101 (8/10): 쿼리 최적화](./08-query-optimization.md)
+- [Database Systems 101 (9/10): 복제와 백업](./09-replication-and-backup.md)
+- [OLTP와 OLAP](./10-oltp-and-olap.md)
 
 <!-- toc:end -->
 

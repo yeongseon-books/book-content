@@ -242,12 +242,12 @@ LSP 서버의 중심 자료구조가 바로 심볼 테이블입니다. “모든
 - [Compilers 101 (2/10): 렉시컬 분석](./02-lexical-analysis.md)
 - [Compilers 101 (3/10): 파싱과 AST](./03-parsing-and-ast.md)
 - [Compilers 101 (4/10): 시맨틱 분석](./04-semantic-analysis.md)
-- **심볼 테이블과 스코프 (현재 글)**
-- 중간 표현 (예정)
-- 최적화 기초 (예정)
-- 코드 생성 (예정)
-- JIT vs AOT (예정)
-- 작은 인터프리터 만들기 (예정)
+- **Compilers 101 (5/10): 심볼 테이블과 스코프 (현재 글)**
+- [Compilers 101 (6/10): 중간 표현](./06-intermediate-representation.md)
+- [Compilers 101 (7/10): 최적화 기초](./07-optimization-basics.md)
+- [Compilers 101 (8/10): 코드 생성](./08-code-generation.md)
+- [Compilers 101 (9/10): JIT vs AOT](./09-jit-vs-aot.md)
+- [작은 인터프리터 만들기](./10-building-a-tiny-interpreter.md)
 
 <!-- toc:end -->
 

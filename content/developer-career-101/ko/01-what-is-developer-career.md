@@ -385,16 +385,16 @@ print(f"목표 범위: {target_min:,} ~ {target_max:,}원")
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **개발자 커리어란 무엇인가 (현재 글)**
-- 직무 이해하기 (예정)
-- 학습 계획 세우기 (예정)
-- 이력서와 포트폴리오 (예정)
-- 코딩 인터뷰 준비 (예정)
-- 시스템 디자인 인터뷰 (예정)
-- 첫 직장 적응 (예정)
-- 사이드 프로젝트와 학습 (예정)
-- 멘토링과 네트워킹 (예정)
-- 시니어로 가는 길 (예정)
+- **Developer Career 101 (1/10): 개발자 커리어란 무엇인가 (현재 글)**
+- [Developer Career 101 (2/10): 직무 이해하기](./02-understanding-roles.md)
+- [Developer Career 101 (3/10): 학습 계획 세우기](./03-learning-plan.md)
+- [Developer Career 101 (4/10): 이력서와 포트폴리오](./04-resume-and-portfolio.md)
+- [Developer Career 101 (5/10): 코딩 인터뷰 준비](./05-coding-interview.md)
+- [Developer Career 101 (6/10): 시스템 디자인 인터뷰](./06-system-design-interview.md)
+- [Developer Career 101 (7/10): 첫 직장 적응](./07-first-job.md)
+- [Developer Career 101 (8/10): 사이드 프로젝트와 학습](./08-side-projects.md)
+- [Developer Career 101 (9/10): 멘토링과 네트워킹](./09-mentoring-networking.md)
+- [시니어로 가는 길](./10-path-to-senior.md)
 
 <!-- toc:end -->
 

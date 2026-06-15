@@ -432,8 +432,8 @@ E. 해답 없음 케이스: 종료 조건 검증
 - [Algorithms with Python 101 (6/10): 동적 계획법 기초](./06-dynamic-programming-basics.md)
 - [Algorithms with Python 101 (7/10): 그래프 탐색 — BFS와 DFS](./07-graph-traversal-bfs-dfs.md)
 - [Algorithms with Python 101 (8/10): 최단 경로 기초](./08-shortest-path-basics.md)
-- **그리디 알고리즘 (현재 글)**
-- 코딩 테스트 문제 접근법 (예정)
+- **Algorithms with Python 101 (9/10): 그리디 알고리즘 (현재 글)**
+- [코딩 테스트 문제 접근법](./10-coding-test-strategies.md)
 
 <!-- toc:end -->
 

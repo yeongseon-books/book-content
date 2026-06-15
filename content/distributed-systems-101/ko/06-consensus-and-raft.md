@@ -563,11 +563,11 @@ def test_leader_crash_during_commit():
 - [Distributed Systems 101 (3/10): RPC와 메시지 전달](./03-rpc-and-message-passing.md)
 - [Distributed Systems 101 (4/10): 일관성과 CAP](./04-consistency-and-cap.md)
 - [Distributed Systems 101 (5/10): 복제](./05-replication.md)
-- **합의와 Raft (현재 글)**
-- 리더 선출 (예정)
-- 메시지 큐와 이벤트 소싱 (예정)
-- 분산 트랜잭션 (예정)
-- 운영 가능한 분산 시스템 패턴 (예정)
+- **Distributed Systems 101 (6/10): 합의와 Raft (현재 글)**
+- [Distributed Systems 101 (7/10): 리더 선출](./07-leader-election.md)
+- [Distributed Systems 101 (8/10): 메시지 큐와 이벤트 소싱](./08-message-queue-and-event-sourcing.md)
+- [Distributed Systems 101 (9/10): 분산 트랜잭션](./09-distributed-transaction.md)
+- [운영 가능한 분산 시스템 패턴](./10-operable-distributed-patterns.md)
 
 <!-- toc:end -->
 

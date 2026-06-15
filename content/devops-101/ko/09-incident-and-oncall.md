@@ -438,8 +438,8 @@ oncall:
 - [DevOps 101 (6/10): 컨테이너와 빌드](./06-containers-and-build.md)
 - [DevOps 101 (7/10): 모니터링과 알림](./07-monitoring-and-alerting.md)
 - [DevOps 101 (8/10): 로그 수집과 분석](./08-logging-and-analysis.md)
-- **장애 대응과 on-call (현재 글)**
-- 운영 가능한 DevOps 흐름 (예정)
+- **DevOps 101 (9/10): 장애 대응과 on-call (현재 글)**
+- [운영 가능한 DevOps 흐름](./10-operable-devops-flow.md)
 
 <!-- toc:end -->
 

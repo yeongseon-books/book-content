@@ -264,12 +264,12 @@ DB와 네트워크를 함께 학습할 때는 요청 경로를 시간 축으로 
 - [Computer Science Major 101 (2/10): 1학년 과목 이해하기](./02-first-year-subjects.md)
 - [Computer Science Major 101 (3/10): 자료구조와 알고리즘](./03-data-structures-and-algorithms.md)
 - [Computer Science Major 101 (4/10): 시스템 과목 이해하기](./04-systems-subjects.md)
-- **데이터베이스와 네트워크 (현재 글)**
-- AI와 데이터사이언스 (예정)
-- 프로젝트 과목 (예정)
-- 전공 공부 방법 (예정)
-- 포트폴리오로 연결하기 (예정)
-- 졸업 전 갖춰야 할 역량 (예정)
+- **Computer Science Major 101 (5/10): 데이터베이스와 네트워크 (현재 글)**
+- [Computer Science Major 101 (6/10): AI와 데이터사이언스](./06-ai-and-data-science.md)
+- [Computer Science Major 101 (7/10): 프로젝트 과목](./07-project-subjects.md)
+- [Computer Science Major 101 (8/10): 전공 공부 방법](./08-how-to-study-cs.md)
+- [Computer Science Major 101 (9/10): 포트폴리오로 연결하기](./09-build-your-portfolio.md)
+- [졸업 전 갖춰야 할 역량](./10-skills-before-graduation.md)
 
 <!-- toc:end -->
 

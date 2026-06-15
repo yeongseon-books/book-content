@@ -394,12 +394,12 @@ weekly_health = {
 - [Multimodal AI 101 (2/10): Image Encoder: CLIP과 ViT](./02-image-encoders-clip-vit.md)
 - [Multimodal AI 101 (3/10): Vision-Language Model 아키텍처](./03-vlm-architecture.md)
 - [Multimodal AI 101 (4/10): Image Captioning과 OCR 파이프라인](./04-captioning-ocr-pipelines.md)
-- **Multimodal RAG: 이미지와 텍스트를 함께 검색하기 (현재 글)**
-- 오디오 처리와 Whisper STT (예정)
-- Diffusion으로 Text-to-Image 생성 (예정)
-- Multimodal Embedding과 Cross-modal 검색 (예정)
-- Video 이해 - Frame Sampling에서 Video-LLaVA까지 (예정)
-- Production Multimodal Application 구축 (예정)
+- **Multimodal AI 101 (5/10): Multimodal RAG: 이미지와 텍스트를 함께 검색하기 (현재 글)**
+- [Multimodal AI 101 (6/10): 오디오 처리와 Whisper STT](./06-audio-whisper.md)
+- [Multimodal AI 101 (7/10): Diffusion으로 Text-to-Image 생성](./07-text-to-image-diffusion.md)
+- [Multimodal AI 101 (8/10): Multimodal Embedding과 Cross-modal 검색](./08-multimodal-embeddings.md)
+- [Multimodal AI 101 (9/10): Video 이해 - Frame Sampling에서 Video-LLaVA까지](./09-video-understanding.md)
+- [Production Multimodal Application 구축](./10-production-multimodal-app.md)
 
 <!-- toc:end -->
 

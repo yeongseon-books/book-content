@@ -453,8 +453,8 @@ curl -fsS https://app.example.com/healthz
 - [Kubernetes 101 (6/10): ConfigMap과 Secret](./06-configmap-and-secret.md)
 - [Kubernetes 101 (7/10): Volume](./07-volume.md)
 - [Kubernetes 101 (8/10): HPA](./08-hpa.md)
-- **Helm (현재 글)**
-- 운영 관점의 Kubernetes (예정)
+- **Kubernetes 101 (9/10): Helm (현재 글)**
+- [운영 관점의 Kubernetes](./10-kubernetes-in-operation.md)
 
 <!-- toc:end -->
 

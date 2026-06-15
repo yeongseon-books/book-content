@@ -214,8 +214,8 @@ docker history myapp:opt
 - [Docker 101 (6/10): 환경변수와 설정](./06-env-and-config.md)
 - [Docker 101 (7/10): Python 앱 컨테이너화](./07-python-app-containerize.md)
 - [Docker 101 (8/10): 데이터베이스와 함께 실행하기](./08-database-with-app.md)
-- **Image 최적화 (현재 글)**
-- 배포용 Docker 구성 (예정)
+- **Docker 101 (9/10): Image 최적화 (현재 글)**
+- [배포용 Docker 구성](./10-production-docker.md)
 
 <!-- toc:end -->
 

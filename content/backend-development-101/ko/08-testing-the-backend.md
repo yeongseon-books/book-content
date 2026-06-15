@@ -473,9 +473,9 @@ pytest -m "not e2e" -n auto --maxfail=1
 - [Backend Development 101 (5/10): Database Layer](./05-database-layer.md)
 - [Backend Development 101 (6/10): 인증과 권한](./06-auth-and-authorization.md)
 - [Backend Development 101 (7/10): Logging과 Error Handling](./07-logging-and-error-handling.md)
-- **백엔드 테스트 (현재 글)**
-- 백엔드 배포 (예정)
-- 운영 가능한 백엔드 구조 (예정)
+- **Backend Development 101 (8/10): 백엔드 테스트 (현재 글)**
+- [Backend Development 101 (9/10): 백엔드 배포](./09-deploying-the-backend.md)
+- [운영 가능한 백엔드 구조](./10-production-ready-backend.md)
 
 <!-- toc:end -->
 

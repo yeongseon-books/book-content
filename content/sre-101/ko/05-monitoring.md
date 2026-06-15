@@ -452,12 +452,12 @@ monitoring은 데이터를 많이 쌓는 일이 아니라, 시스템 상태를 �
 - [SRE 101 (2/10): Reliability](./02-reliability.md)
 - [SRE 101 (3/10): SLI, SLO, SLA](./03-sli-slo-sla.md)
 - [SRE 101 (4/10): Error Budget](./04-error-budget.md)
-- **Monitoring (현재 글)**
-- Incident Response (예정)
-- Postmortem (예정)
-- Toil 줄이기 (예정)
-- Capacity Planning (예정)
-- 운영 가능한 시스템 만들기 (예정)
+- **SRE 101 (5/10): Monitoring (현재 글)**
+- [SRE 101 (6/10): Incident Response](./06-incident-response.md)
+- [SRE 101 (7/10): Postmortem](./07-postmortem.md)
+- [SRE 101 (8/10): Toil 줄이기](./08-reducing-toil.md)
+- [SRE 101 (9/10): Capacity Planning](./09-capacity-planning.md)
+- [운영 가능한 시스템 만들기](./10-building-operable-systems.md)
 
 <!-- toc:end -->
 

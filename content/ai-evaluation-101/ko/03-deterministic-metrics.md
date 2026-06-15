@@ -396,13 +396,13 @@ def metric_distribution_report(rows: list[dict]) -> pd.DataFrame:
 - [AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
 - [AI Evaluation 101 (2/10): 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
 - **AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE (현재 글)**
-- AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기 (예정)
-- AI Evaluation 101 (5/10): Rubric 기반 채점 설계 (예정)
-- AI Evaluation 101 (6/10): RAG 시스템 평가하기 (예정)
-- AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory (예정)
-- AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게 (예정)
-- AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가 (예정)
-- AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가 (예정)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기](./04-llm-as-judge.md)
+- [AI Evaluation 101 (5/10): Rubric 기반 채점 설계](./05-rubric-based-scoring.md)
+- [AI Evaluation 101 (6/10): RAG 시스템 평가하기](./06-rag-evaluation.md)
+- [AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory](./07-agent-evaluation.md)
+- [AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게](./08-regression-testing.md)
+- [AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가](./09-ab-testing-llms.md)
+- [AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가](./10-production-evaluation.md)
 
 <!-- toc:end -->
 

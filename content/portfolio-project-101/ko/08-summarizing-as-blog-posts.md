@@ -414,9 +414,9 @@ CTA가 있으면 글이 일방적 정보 전달이 아니라 대화의 시작점
 - [Portfolio Project 101 (5/10): 배포하기](./05-deploying-the-project.md)
 - [Portfolio Project 101 (6/10): 테스트와 문서화](./06-tests-and-documentation.md)
 - [Portfolio Project 101 (7/10): 기술적 의사결정 기록](./07-recording-tech-decisions.md)
-- **블로그 글로 정리하기 (현재 글)**
-- 면접에서 설명하기 (예정)
-- 포트폴리오 개선 체크리스트 (예정)
+- **Portfolio Project 101 (8/10): 블로그 글로 정리하기 (현재 글)**
+- [Portfolio Project 101 (9/10): 면접에서 설명하기](./09-explaining-in-interviews.md)
+- [포트폴리오 개선 체크리스트](./10-portfolio-improvement-checklist.md)
 
 <!-- toc:end -->
 

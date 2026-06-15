@@ -268,63 +268,6 @@ Thank you to our sponsors!
 
 - **"X개 프로젝트 기여"라고 쓰면 되는 건가요?** 아닙니다. **어떤 문제를 푸는 기여였고, 어떤 리뷰를 받았고, 그 경험에서 뭘 배웠는지**를 구체적으로 적을 때 포트폴리오의 신뢰도가 올라갑니다.
 <!-- toc:begin -->
-
-## 펜딩 없이 지속하는 법
-
-모든 오픈소스 프로젝트가 펜딩을 받을 필요는 없습니다. 펜딩이 없어도 오래 지속하는 프로젝트들이 많습니다. 다음은 펜딩 없이 지속하는 전략입니다.
-
-**1. 범위를 작게 유지**
-
-프로젝트 범위를 작게 유지하면 유지보수 부담이 줄어듭니다. 하나의 문제를 잘 푸는 도구는 모든 문제를 푸려는 플랫폼보다 오래 갑니다.
-
-```markdown
-## Non-goals
-
-- We will NOT add GUI
-- We will NOT support Python 2
-- We will NOT become a framework
-```
-
-**2. 자동화를 최대화**
-
-CI/CD, 테스트, 린트, 문서 배포를 모두 자동화하면 메인테이너의 수동 작업이 줄어듭니다.
-
-```yaml
-# .github/workflows/ci.yml
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - run: pytest
-    - run: ruff check
-```
-
-**3. 기여자를 메인테이너로 승격**
-
-한 명이 모든 것을 책임지려고 하면 금방 지칩니다. 정기적으로 기여하는 사람을 committer나 maintainer로 승격하면 bus factor가 올라갑니다.
-
-```markdown
-## Maintainers
-
-- @alice (founder)
-- @bob (committer since 2024)
-- @carol (docs maintainer)
-```
-
-**4. 휴면기를 인정**
-
-모든 프로젝트가 항상 활발해야 하는 것은 아닙니다. 프로젝트가 안정된 상태라면, README에 "Stable, not abandoned"라고 명시하는 것도 좋습니다.
-
-```markdown
-## Status
-
-This project is stable and maintained.
-We accept bug fixes but do not plan major new features.
-```
-
-펜딩 없이 지속하는 프로젝트는 펜딩을 받는 프로젝트보다 덜 중요하지 않습니다. 오히려 범위를 작게 유지하고 자동화를 잘 구축한 프로젝트가 더 오래 갑니다.
 ## 시리즈 목차
 
 - [Open Source 101 (1/10): 오픈소스란 무엇인가](./01-what-is-open-source.md)
@@ -335,8 +278,8 @@ We accept bug fixes but do not plan major new features.
 - [Open Source 101 (6/10): 릴리스와 버전 관리](./06-release-and-versioning.md)
 - [Open Source 101 (7/10): 커뮤니티 운영](./07-community-management.md)
 - [Open Source 101 (8/10): 메인테이너의 역할](./08-maintainer-role.md)
-- **오픈소스 포트폴리오 (현재 글)**
-- 내 첫 오픈소스 프로젝트 (예정)
+- **Open Source 101 (9/10): 오픈소스 포트폴리오 (현재 글)**
+- [내 첫 오픈소스 프로젝트](./10-my-first-open-source-project.md)
 
 <!-- toc:end -->
 

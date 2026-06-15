@@ -417,9 +417,9 @@ peak 값이 step마다 계속 오르면 텐서 참조 누수 가능성을 의심
 - [LLM from Scratch 101 (4/9): 블록 하나, 깊이의 단위](./04-transformer-block.md)
 - [LLM from Scratch 101 (5/9): 조립: GPT 모델 클래스 완성](./05-gpt-model.md)
 - **LLM from Scratch 101 (6/9): 기울기로 배우기 (현재 글)**
-- LLM from Scratch 101 (7/9): 샘플링 — 학습된 모델에서 글 뽑아내기 (예정)
-- LLM from Scratch 101 (8/9): 베이스 모델을 우리 작업에 맞추기 (예정)
-- LLM from Scratch 101 (9/9): 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍 (예정)
+- [LLM from Scratch 101 (7/9): 샘플링 — 학습된 모델에서 글 뽑아내기](./07-inference.md)
+- [LLM from Scratch 101 (8/9): 베이스 모델을 우리 작업에 맞추기](./08-finetuning.md)
+- [LLM from Scratch 101 (9/9): 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍](./09-chatbot-wrapper.md)
 
 <!-- toc:end -->
 

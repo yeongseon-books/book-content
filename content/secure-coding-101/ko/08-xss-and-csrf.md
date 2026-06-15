@@ -518,9 +518,9 @@ CSP 강화 체크리스트:
 - [Secure Coding 101 (5/10): 안전한 데이터 저장](./05-safe-data-storage.md)
 - [Secure Coding 101 (6/10): Secret과 키 관리](./06-secret-and-key-management.md)
 - [Secure Coding 101 (7/10): SQL Injection과 ORM 안전 사용](./07-sql-injection-and-orm.md)
-- **XSS와 CSRF 방어 (현재 글)**
-- Dependency 취약점 관리 (예정)
-- 안전한 로깅과 감사 (예정)
+- **Secure Coding 101 (8/10): XSS와 CSRF 방어 (현재 글)**
+- [Secure Coding 101 (9/10): Dependency 취약점 관리](./09-dependency-vulnerabilities.md)
+- [안전한 로깅과 감사](./10-safe-logging-and-audit.md)
 
 <!-- toc:end -->
 

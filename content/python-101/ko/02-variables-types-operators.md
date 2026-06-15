@@ -511,15 +511,15 @@ def safe_run(fn, *args, **kwargs):
 ## 시리즈 목차
 
 - [Python 101 (1/10): 왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
-- **변수, 타입, 연산자 (현재 글)**
-- 문자열과 포매팅 (예정)
-- list, tuple, set, dict (예정)
-- 제어 흐름: if, for, while, comprehension (예정)
-- 함수와 인자: def, args, kwargs, default, lambda (예정)
-- 모듈과 패키지: import, __init__, __name__ (예정)
-- 파일 I/O와 예외 처리 (예정)
-- 클래스와 객체: 데이터와 동작을 함께 묶기 (예정)
-- 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (예정)
+- **Python 101 (2/10): 변수, 타입, 연산자 (현재 글)**
+- [Python 101 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): 제어 흐름: if, for, while, comprehension](./05-control-flow.md)
+- [Python 101 (6/10): 함수와 인자: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
+- [Python 101 (7/10): 모듈과 패키지: import, __init__, __name__](./07-modules-and-packages.md)
+- [Python 101 (8/10): 파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
+- [Python 101 (9/10): 클래스와 객체: 데이터와 동작을 함께 묶기](./09-classes-and-objects.md)
+- [표준 라이브러리 투어: datetime, pathlib, json, collections, itertools](./10-standard-library-tour.md)
 
 <!-- toc:end -->
 

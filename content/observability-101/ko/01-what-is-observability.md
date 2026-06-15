@@ -401,16 +401,16 @@ Expected output:
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **관측성이란 무엇인가? (현재 글)**
-- 메트릭, 로그, 트레이스 (예정)
-- 메트릭 수집과 시각화 (예정)
-- 구조화된 로깅 (예정)
-- 분산 트레이싱 기초 (예정)
-- 대시보드 설계 (예정)
-- 경보와 온콜 (예정)
-- 서비스 수준 지표와 목표 기초 (예정)
-- 비용과 카디널리티 (예정)
-- 운영 가능한 관측성 스택 (예정)
+- **Observability 101 (1/10): 관측성이란 무엇인가? (현재 글)**
+- [Observability 101 (2/10): 메트릭, 로그, 트레이스](./02-metric-log-trace.md)
+- [Observability 101 (3/10): 메트릭 수집과 시각화](./03-metric-collection.md)
+- [Observability 101 (4/10): 구조화된 로깅](./04-structured-logging.md)
+- [Observability 101 (5/10): 분산 트레이싱 기초](./05-distributed-tracing.md)
+- [Observability 101 (6/10): 대시보드 설계](./06-dashboard-design.md)
+- [Observability 101 (7/10): 경보와 온콜](./07-alert-and-oncall.md)
+- [Observability 101 (8/10): 서비스 수준 지표와 목표 기초](./08-sli-and-slo.md)
+- [Observability 101 (9/10): 비용과 카디널리티](./09-cost-and-cardinality.md)
+- [운영 가능한 관측성 스택](./10-production-observability-stack.md)
 
 <!-- toc:end -->
 

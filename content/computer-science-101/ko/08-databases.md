@@ -511,9 +511,9 @@ PgBouncer나 ProxySQL 같은 외부 풀링 프록시를 두면 앱 서버가 수
 - [Computer Science 101 (5/10): 컴퓨터 구조](./05-computer-architecture.md)
 - [Computer Science 101 (6/10): 운영체제](./06-operating-systems.md)
 - [Computer Science 101 (7/10): 네트워크](./07-networks.md)
-- **데이터베이스 (현재 글)**
-- 소프트웨어 엔지니어링 (예정)
-- AI와 데이터사이언스까지의 연결 (예정)
+- **Computer Science 101 (8/10): 데이터베이스 (현재 글)**
+- [Computer Science 101 (9/10): 소프트웨어 엔지니어링](./09-software-engineering.md)
+- [AI와 데이터사이언스까지의 연결](./10-ai-and-data-science.md)
 
 <!-- toc:end -->
 
