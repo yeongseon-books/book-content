@@ -30,7 +30,6 @@ last_reviewed: '2026-05-15'
 
 ![Data Science 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/10/10-01-concept-at-a-glance.ko.png)
 *Data Science 101 10장 흐름 개요*
-> 데이터 프로젝트 전체 흐름의 핵심은 기능 이름이 아니라, 입력을 받는 경계에서 결과를 내보내는 경계까지 어떤 기준으로 데이터를 검증하고 처리할 것인가를 명확히 정하는 데 있습니다.
 
 ## 먼저 던지는 질문
 

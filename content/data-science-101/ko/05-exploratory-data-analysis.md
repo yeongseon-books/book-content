@@ -30,7 +30,6 @@ EDA를 잘한다는 말은 화려한 그래프를 많이 그린다는 뜻이 아
 
 ![Data Science 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/05/05-01-concept-at-a-glance.ko.png)
 *Data Science 101 5장 흐름 개요*
-> 탐색적 데이터 분석의 핵심은 기능 이름이 아니라, 입력을 받는 경계에서 결과를 내보내는 경계까지 어떤 기준으로 데이터를 검증하고 처리할 것인가를 명확히 정하는 데 있습니다.
 
 ## 먼저 던지는 질문
 
@@ -348,120 +347,6 @@ print("saved", out / "run_meta.json")
 ### 마무리 보강: 운영 전 확인 포인트
 
 최종 공유 전에 아래 항목을 마지막으로 점검합니다. 첫째, 결과 수치와 기준 기간이 문장 안에 함께 있는지 확인합니다. 둘째, 독자가 오해할 수 있는 축약 표현을 제거합니다. 셋째, 실행 오너와 재검토 날짜를 명시합니다. 이 세 가지는 글의 길이보다 품질을 크게 좌우하는 요소입니다.
-
-## 실무 심화: 분석 설계를 운영 가능한 루프로 만들기
-
-앞에서 다룬 개념을 실제 팀 운영으로 연결하려면, 분석 노트 수준을 넘어 반복 가능한 실험 루프를 만들어야 합니다. 핵심은 세 가지입니다. 첫째, 피처를 만드는 규칙이 코드와 문서에 동시에 남아야 합니다. 둘째, 시각화는 설명용 그림이 아니라 의사결정 트리거를 확인하는 점검 도구여야 합니다. 셋째, 모델 평가는 점수 한 줄이 아니라 행동 변화까지 포함해 해석해야 합니다.
-
-### 넘파이와 판다스로 만드는 피처 테이블 예시
-
-```python
-import numpy as np
-import pandas as pd
-
-orders = pd.read_csv('orders.csv', parse_dates=['ordered_at'])
-users = pd.read_csv('users.csv', parse_dates=['signup_at'])
-
-base = orders.merge(users[['user_id', 'signup_at', 'country']], on='user_id', how='left')
-base['days_since_signup'] = (base['ordered_at'] - base['signup_at']).dt.days.clip(lower=0)
-base['is_weekend'] = base['ordered_at'].dt.dayofweek.isin([5, 6]).astype(int)
-base['amount_log1p'] = np.log1p(base['amount'].clip(lower=0))
-
-agg = (
-    base.groupby('user_id', as_index=False)
-    .agg(
-        order_count=('order_id', 'count'),
-        avg_amount=('amount', 'mean'),
-        recent_amount=('amount', 'last'),
-        signup_age=('days_since_signup', 'max'),
-        weekend_ratio=('is_weekend', 'mean'),
-    )
-)
-
-print(agg.head())
-```
-
-이 예시는 원본 테이블을 그대로 쓰지 않고, 분석 목적에 맞는 사용자 단위 피처셋으로 변환합니다. `log1p` 같은 변환은 분포 왜곡을 완화하고, `weekend_ratio`처럼 행동 패턴 피처를 추가하면 단순 합계보다 설명력이 좋아지는 경우가 많습니다.
-
-### 맷플롯립으로 분포와 구간별 패턴 확인
-
-```python
-import matplotlib.pyplot as plt
-
-fig, ax = plt.subplots(1, 2, figsize=(12, 4))
-agg['avg_amount'].hist(bins=30, edgecolor='black', ax=ax[0])
-ax[0].set_title('평균 주문금액 분포')
-ax[0].set_xlabel('avg_amount')
-
-agg.sort_values('signup_age').reset_index(drop=True)['order_count'].rolling(100).mean().plot(ax=ax[1])
-ax[1].set_title('가입 경과일 기준 주문수 이동평균')
-ax[1].set_ylabel('rolling mean')
-
-plt.tight_layout()
-plt.show()
-```
-
-시각화의 목적은 "예쁜 차트"가 아니라 이상 신호를 빨리 찾는 것입니다. 분포가 한쪽으로 치우치면 로그 변환을 검토하고, 구간별 이동평균이 급변하면 세그먼트 분할 기준을 다시 정하는 식으로 다음 행동을 결정합니다.
-
-### sklearn 파이프라인으로 전처리와 모델을 한 번에 관리
-
-```python
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.impute import SimpleImputer
-from sklearn.linear_model import LogisticRegression
-
-num_cols = ['order_count', 'avg_amount', 'recent_amount', 'signup_age', 'weekend_ratio']
-cat_cols = ['country']
-
-numeric = Pipeline([
-    ('imputer', SimpleImputer(strategy='median')),
-    ('scaler', StandardScaler()),
-])
-
-categorical = Pipeline([
-    ('imputer', SimpleImputer(strategy='most_frequent')),
-    ('onehot', OneHotEncoder(handle_unknown='ignore')),
-])
-
-preprocess = ColumnTransformer([
-    ('num', numeric, num_cols),
-    ('cat', categorical, cat_cols),
-])
-
-model = Pipeline([
-    ('preprocess', preprocess),
-    ('clf', LogisticRegression(max_iter=1000, class_weight='balanced')),
-])
-```
-
-파이프라인을 쓰면 학습과 추론 경로가 동일해져서 재현성이 올라갑니다. "노트북에서는 되는데 배치에서는 안 된다" 같은 문제를 줄이는 가장 확실한 방법 중 하나입니다.
-
-### 간단한 A/B 테스트 설계 템플릿
-
-실험 설계는 모델링 못지않게 중요합니다. 아래 템플릿은 마케팅 메시지 개선 같은 실무 시나리오에서 바로 쓸 수 있습니다.
-
-| 항목 | 설계 예시 |
-| --- | --- |
-| 가설 | 신규 온보딩 메시지를 바꾸면 7일 재방문율이 증가합니다. |
-| 모집단 | 지난 14일 내 가입한 신규 사용자(사내 계정 제외) |
-| 무작위 배정 | user_id 해시 기준 50:50 |
-| 1차 지표 | 7일 재방문율 |
-| 가드레일 지표 | 고객센터 문의율, 결제 실패율 |
-| 실험 기간 | 최소 2주 또는 표본 수 도달 시점 |
-| 중지 조건 | 가드레일 지표 악화가 기준 임계치 초과 |
-
-A/B 테스트에서 가장 흔한 실수는 결과를 너무 빨리 확정하는 것입니다. 중간 결과를 여러 번 들여다보는 경우, 사전에 정한 중지 규칙과 분석 계획을 문서로 고정해 두지 않으면 우연한 변동을 효과로 오해할 수 있습니다.
-
-### 운영 체크포인트
-
-- 피처 생성 규칙을 코드와 문서에 동시에 남깁니다.
-- EDA 그래프마다 "이 그래프를 보고 어떤 결정을 내릴지"를 한 줄로 적습니다.
-- 모델 점수와 함께 비용, 지연, 운영 복잡도를 같이 평가합니다.
-- A/B 테스트는 가설, 표본, 중지 규칙을 실험 시작 전에 고정합니다.
-- 결과 발표 문서는 "무엇을 배웠고 다음 주에 무엇을 바꿀지"로 마무리합니다.
-
 ## 처음 질문으로 돌아가기
 
 - **모델을 만들기 전에 데이터의 모양을 어떻게 빠르게 읽을 수 있을까요?**
