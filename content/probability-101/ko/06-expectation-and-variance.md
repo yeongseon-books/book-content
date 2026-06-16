@@ -285,7 +285,7 @@ from scipy import stats
 # 정규분포 N(0, 1)
 rv = stats.norm(0, 1)
 for k in [1, 2, 3]:
-    # 서로 재미있는 재미있는 P(|X| ≥ k)
+    # 실제 P(|X| ≥ k)와 체비셰프 상한 비교
     tail_prob = 2 * (1 - rv.cdf(k))
     chebyshev_bound = 1 / k**2
     print(f"k={k}: 정규분포 실제={tail_prob:.4f}, 체비셰프 상한={chebyshev_bound:.4f}")

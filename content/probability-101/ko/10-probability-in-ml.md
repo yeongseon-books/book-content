@@ -277,7 +277,7 @@ from sklearn.model_selection import cross_val_score
 X, y = make_classification(n_samples=300, n_features=20, n_informative=5,
                            n_redundant=10, random_state=42)
 
-# C = 1/lambda: 작을수록 강한 교육화 = 강한 사전
+# C = 1/lambda: 작을수록 강한 정규화 = 강한 사전
 for C in [0.01, 0.1, 1.0, 10.0, 100.0]:
     clf = LogisticRegression(C=C, max_iter=1000, random_state=42)
     scores = cross_val_score(clf, X, y, cv=5, scoring='neg_log_loss')
