@@ -101,7 +101,7 @@ Builds pipelines and storage as data infrastructure.
 Trains, deploys, and monitors models.
 ```
 
-ML 엔지니어는 모델을 연구 대상이 아니라 운영 대상로 다룹니다. 학습, 배포, 모니터링을 하나의 시스템으로 보는 감각이 중요합니다.
+ML 엔지니어는 모델을 연구 대상이 아니라 운영 대상으로 다룹니다. 학습, 배포, 모니터링을 하나의 시스템으로 보는 감각이 중요합니다.
 
 ### 단계 5 — 분석 엔지니어
 ```text
