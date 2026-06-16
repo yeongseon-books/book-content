@@ -213,7 +213,7 @@ GB-초는 `3,000만 * 1GB * 0.12초 = 360만 GB-초`입니다. 여기에 호출 
 
 비용 최적화는 "가장 싼 설정"을 찾는 작업이 아니라 "서비스 품질을 지키면서 낭비를 줄이는 작업"입니다. 따라서 지연 지표와 오류율을 함께 기록한 상태에서만 비용 실험을 진행해야 합니다.
 
-### 인터페이스 게이트웨이와 다이너모디비를 포함한 총비용 관점
+### API Gateway와 DynamoDB를 포함한 총비용 관점
 
 Lambda만 보면 저렴해 보여도 API Gateway 요청 비용과 DynamoDB 읽기/쓰기 비용을 합치면 비중이 달라집니다. 특히 요청 수가 큰 API는 게이트웨이 비용이, 상태 변경이 잦은 워크로드는 저장소 비용이 빠르게 증가합니다.
 
@@ -276,7 +276,7 @@ Lambda만 보면 저렴해 보여도 API Gateway 요청 비용과 DynamoDB 읽�
 - [Cloud Functions 요금](https://cloud.google.com/functions/pricing)
 - [Azure Functions 요금](https://azure.microsoft.com/pricing/details/functions/)
 
-### 비용운영와 추가 읽을거리
+### FinOps와 추가 읽을거리
 
 - [FinOps Foundation](https://www.finops.org/)
 - [AWS Lambda Power Tuning (GitHub)](https://github.com/alexcasalboni/aws-lambda-power-tuning)
