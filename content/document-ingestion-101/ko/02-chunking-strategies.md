@@ -315,51 +315,6 @@ chunk.metadata.update(
 
 추가로, 정책 변경 직후에는 상위 질의 20~50개를 고정해 `recall@k`와 `source diversity`를 비교하는 습관을 권장합니다. 청크 수가 예쁘게 나와도 실제 질의 회수율이 떨어지면 변경을 되돌리는 편이 맞습니다.
 
-## 실전 점검 체크리스트 확장
-
-아래 체크리스트는 배포 직전 10분 점검용으로 자주 사용합니다. 문서 수집 파이프라인은 기능이 아니라 경계 검증으로 안정성이 결정되므로, 매 실행에서 같은 항목을 반복 확인하는 습관이 중요합니다.
-
-- 입력 파일 수가 평소 범위에서 크게 벗어나지 않는지 확인합니다.
-- 실패 문서 비율이 임계치(예: 3%)를 넘지 않는지 확인합니다.
-- 샘플 문서 3건 이상에 대해 source, page, chunk_id 추적이 가능한지 확인합니다.
-- 메타데이터 필드 누락(`source`, `format`, `doc_type`)이 0건인지 확인합니다.
-- 벡터 검색 샘플 질의에서 기대 출처가 상위 결과에 포함되는지 확인합니다.
-
-```python
-def quick_health_report(stats: dict[str, int | float]) -> None:
-    print(f"files_total={stats['files_total']}")
-    print(f"failed_total={stats['failed_total']}")
-    print(f"chunks_total={stats['chunks_total']}")
-    print(f"metadata_missing={stats['metadata_missing']}")
-    print(f"smoke_passed={stats['smoke_passed']}")
-```
-
-이 정도 점검만 자동화해도 "돌아갔다"와 "운영 가능한 상태로 끝났다"를 구분할 수 있습니다. 장기적으로는 이 리포트를 누적해 주간 추세를 보고, 특정 단계에서 실패율이 증가하는 패턴을 조기에 잡는 것이 좋습니다.
-
-## 마무리 운영 기준
-
-문서 수집 파이프라인은 새 기능보다 기준 유지가 더 중요합니다. 그래서 팀 단위 운영에서는 아래 네 가지를 주간 기준으로 고정해 두는 편이 좋습니다.
-
-- 파싱 품질 지표(평균 문자 수, OCR 비율, 재처리 비율)
-- 청킹 품질 지표(평균 길이, 극단 길이 비율, 정책 버전 분포)
-- 메타데이터 품질 지표(필수 필드 누락률, 정규화 실패 건수)
-- 검색 검증 지표(샘플 질의 recall@k, 출처 회수율)
-
-이 네 축을 함께 보면 어느 경계에서 품질이 떨어지는지 빠르게 확인할 수 있습니다. 결국 안정적인 ingestion은 화려한 모델 선택보다, 입력 품질과 단계 계약을 지속적으로 측정하는 운영 루틴에서 만들어집니다.
-
-## 임베딩 모델 토큰 제한과 청킹 크기의 관계
-
-청킹 크기를 정할 때 임베딩 모델의 최대 입력 토큰 수를 함께 고려해야 합니다. 예를 들어 `text-embedding-3-small`은 8191 토큰까지 받지만, 실제로 512 토큰 이하에서 가장 안정적인 유사도를 보이는 경우가 많습니다. 그래서 `chunk_size`를 문자 수로 설정하더라도, 최종 청크의 토큰 수가 모델 sweet spot을 넘지 않는지 확인하는 검증 단계를 추가하는 편이 좋습니다.
-
-```python
-from __future__ import annotations
-
-import tiktoken
-
-def estimate_tokens(text: str, model: str = 'cl100k_base') -> int:
-    enc = tiktoken.get_encoding(model)
-    return len(enc.encode(text))
-
 def flag_over_limit(chunks: list[str], max_tokens: int = 512) -> list[int]:
     return [i for i, chunk in enumerate(chunks) if estimate_tokens(chunk) > max_tokens]
 ```
