@@ -341,17 +341,17 @@ watch -n 15 "az containerapp replica list --name api --resource-group $RG -o tab
 ## 처음 질문으로 돌아가기
 
 - **Azure Container Apps는 선언형 스케일링 신호를 바탕으로 replica 수를 어떻게 결정할까요?**
-  - Azure Container Apps는 선언형 스케일링 신호를 바탕으로 replica 수를 어떻게 결정할까요 — 본문에서 단계별로 설명합니다.
+  - 스케일링은 세 단계 선언형 파이프라인으로 보면 단순해집니다
 - **내장 HTTP/TCP 규칙과 사용자 정의 KEDA scaler의 차이는 무엇일까요?**
-  - 내장 HTTP/TCP 규칙과 사용자 정의 KEDA scaler의 차이는 무엇일까요 — 본문에서 단계별로 설명합니다.
+  - - Azure Container Apps는 어떤 신호를 보고 replica 수를 결정하며, 그 판단은 어디에서 이루어질까요? - 내장 HTTP/TCP 규칙과 사용자 정의 KEDA scaler 중 언제 무엇을 써야 할까요? - `min-replicas 0`(scale-to-zero)는 언제 안전하고, 언제 위험할까요? -
 - **`min-replicas 0`(scale-to-zero)는 언제 안전하고, 언제 위험할까요?**
-  - `min-replicas 0`(scale-to-zero)는 언제 안전하고, 언제 위험할까요 — 본문에서 단계별로 설명합니다.
+  - - Azure Container Apps는 어떤 신호를 보고 replica 수를 결정하며, 그 판단은 어디에서 이루어질까요? - 내장 HTTP/TCP 규칙과 사용자 정의 KEDA scaler 중 언제 무엇을 써야 할까요? - `min-replicas 0`(scale-to-zero)는 언제 안전하고, 언제 위험할까요? -
 - **이 글이 답할 질문에서 가장 흔한 실수는 무엇일까요?**
   - - Azure Container Apps는 어떤 신호를 보고 replica 수를 결정하며, 그 판단은 어디에서 이루어질까요?
 - **왜 이 글이 중요한가을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 왜 이 글이 중요한가을 실무에 적용할 때 주의할 점은 무엇일까요 — 본문에서 단계별로 설명합니다.
+  - - Azure Container Apps는 어떤 신호를 보고 replica 수를 결정하며, 그 판단은 어디에서 이루어질까요? - 내장 HTTP/TCP 규칙과 사용자 정의 KEDA scaler 중 언제 무엇을 써야 할까요? - `min-replicas 0`(scale-to-zero)는 언제 안전하고, 언제 위험할까요? -
 - **멘탈 모델의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 멘탈 모델의 핵심 원리를 한 문장으로 설명하면 무엇일까요 — 본문에서 단계별로 설명합니다.
+  - 스케일링은 세 단계 선언형 파이프라인으로 보면 단순해집니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

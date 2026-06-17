@@ -372,11 +372,11 @@ def open_prod_conn(path: str) -> sqlite3.Connection:
 ## 처음 질문으로 돌아가기
 
 - **`busy_timeout`, `timeout`, 애플리케이션 retry는 서로 무엇이 다르고 왜 함께 써야 할까요?**
-  - `busy_timeout`, `timeout`, 애플리케이션 retry는 서로 무엇이 다르고 왜 함께 써야 할까요 — 본문에서 구체적으로 다룹니다.
+  - 세 개념이 비슷해 보여도 다른 층에서 동작합니다
 - **slow query 로그, OpenTelemetry span, BUSY 발생률은 SQLite 운영 상태를 어떻게 드러내 줄까요?**
   - > SQLite가 파일이라는 사실은 운영을 단순하게 만들지만, "그냥 파일"이라는 생각은 위험하다. 트랜잭션 중인 파일을 cp로 복사하면 손상된 사본이 생긴다. SQLite는 가볍지만, DBMS다.
 - **`Connection.backup()`과 `restore_check()`까지 포함한 흐름이 왜 `cp app.db`보다 중요한가요?**
-  - `Connection.backup()`과 `restore_check()`까지 포함한 흐름이 왜 `cp app.db`보다 중요한가요 — 본문에서 구체적으로 다룹니다.
+  - > SQLite가 파일이라는 사실은 운영을 단순하게 만들지만, "그냥 파일"이라는 생각은 위험하다
 - **Mental Model: SQLite도 "DB"다에서 가장 흔한 실수는 무엇일까요?**
   - > SQLite가 파일이라는 사실은 운영을 단순하게 만들지만, "그냥 파일"이라는 생각은 위험하다. 트랜잭션 중인 파일을 cp로 복사하면 손상된 사본이 생긴다. SQLite는 가볍지만, DBMS다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

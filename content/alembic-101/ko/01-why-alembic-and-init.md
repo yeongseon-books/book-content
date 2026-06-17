@@ -428,11 +428,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **마이그레이션 도구가 실제로 해결하는 문제는 무엇일까요?**
-  - 마이그레이션 도구가 실제로 해결하는 문제는 무엇일까요 — 본문에서 구체적으로 다룹니다.
+  - > Alembic은 **DB 스키마를 위한 git**입니다
 - **왜 `Base.metadata.create_all`만으로는 운영 환경을 버틸 수 없을까요?**
   - Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
 - **revision, head, `alembic_version` 테이블은 각각 어떤 역할을 할까요?**
-  - revision, head, `alembic_version` 테이블은 각각 어떤 역할을 할까요 — 본문에서 구체적으로 다룹니다.
+  - > Alembic은 **DB 스키마를 위한 git**입니다
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
   - > Alembic은 **DB 스키마를 위한 git**입니다. 각 마이그레이션 파일은 commit이고, `alembic_version` 테이블은 현재 HEAD 포인터이며, `upgrade head`는 fast-forward이고, `downgrade -1`은 한 단계 reset에 가깝습니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

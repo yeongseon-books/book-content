@@ -471,11 +471,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **`env.py`는 정확히 무엇이고 언제 실행될까요?**
-  - `env.py`는 정확히 무엇이고 언제 실행될까요 — 본문에서 구체적으로 다룹니다.
+  - > `env.py`는 Alembic이 **모든 명령마다 실행하는 부트 스크립트**입니다
 - **왜 `target_metadata`는 선택 사항이 아니라 필수일까요?**
-  - 왜 `target_metadata`는 선택 사항이 아니라 필수일까요 — 본문에서 구체적으로 다룹니다.
+  - > `env.py`는 Alembic이 **모든 명령마다 실행하는 부트 스크립트**입니다
 - **DB URL을 환경 변수에서 안전하게 읽는 패턴은 어떻게 만들까요?**
-  - DB URL을 환경 변수에서 안전하게 읽는 패턴은 어떻게 만들까요 — 본문에서 구체적으로 다룹니다.
+  - `env.py`는 Alembic의 부트 스크립트이고, 실제로 핵심은 두 가지입니다
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
   - > `env.py`는 Alembic이 **모든 명령마다 실행하는 부트 스크립트**입니다. 각 실행(`upgrade`, `revision --autogenerate` 등)에서 Alembic은 (1) `alembic.ini`를 읽고, (2) `env.py`를 실행해 connection과 metadata를 얻고, (3) `versions/` 아래의 revision을 적용합니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

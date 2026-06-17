@@ -472,7 +472,7 @@ augmentation의 핵심은 기술 이름이 아니라 의사결정 흐름입니�
 ## 처음 질문으로 돌아가기
 
 - **augmentation은 synthetic generation과 무엇이 다른가요?**
-  - augmentation은 synthetic generation과 무엇이 다른가요 — 본문에서 구체적으로 다룹니다.
+  - 증강은 라벨링 예산이 부족할 때 특히 유용합니다
 - **minority class와 typo robustness 문제를 어떤 decision path로 풀어야 하나요?**
   - 오탈자 강건성까지 함께 보고 싶다면, minority class augmentation과 같은 배치에 섞기보다 slice를 분리하는 편이 좋습니다.
 - **EDA, back-translation, paraphrase, AST transform은 각각 언제 선택하고 언제 멈춰야 하나요?**

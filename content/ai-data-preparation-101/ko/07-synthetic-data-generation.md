@@ -409,9 +409,9 @@ Self-Instruct는 coverage를 넓히고, Evol-Instruct는 난도를 높이고, RA
 - **도메인 파인튜닝용 synthetic batch는 어떤 입력에서 시작해 어떤 산출물로 끝나야 할까요?**
   - 아래 예시는 seed task 입력, generation contract, validation, rejection, dataset write path를 하나로 묶은 최소 운영 골격입니다.
 - **Self-Instruct, Evol-Instruct, RAG eval, distillation은 어느 시점에 선택해야 할까요?**
-  - Self-Instruct, Evol-Instruct, RAG eval, distillation은 어느 시점에 선택해야 할까요 — 본문에서 구체적으로 다룹니다.
+  - 합성 데이터는 사람 라벨링을 완전히 대체하지는 못해도, seed task가 적은 도메인에서 instruction tuning 데이터와 평가용 QA pair를 빠르게 늘리는 데 매우 유용합니다
 - **생성된 JSON 산출물은 어떤 검증 게이트를 통과해야 실제 데이터셋에 편입할 수 있을까요?**
-  - 생성된 JSON 산출물은 어떤 검증 게이트를 통과해야 실제 데이터셋에 편입할 수 있을까요 — 본문에서 구체적으로 다룹니다.
+  - 실무에서는 “잘 생성된 샘플”보다 “왜 버렸는지 설명할 수 있는 샘플”이 더 중요합니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - 합성 데이터는 사람 라벨링을 완전히 대체하지는 못해도, seed task가 적은 도메인에서 instruction tuning 데이터와 평가용 QA pair를 빠르게 늘리는 데 매우 유용합니다.
 - **하나의 운영 시나리오로 이해할 때 실무에 적용할 때 주의할 점은 무엇일까요?**

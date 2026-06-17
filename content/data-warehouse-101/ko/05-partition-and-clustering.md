@@ -590,17 +590,17 @@ flowchart LR
 ## 처음 질문으로 돌아가기
 
 - **Partition과 Clustering은 각각 어떤 문제를 해결할까요?**
-  - Partition과 Clustering은 각각 어떤 문제를 해결할까요 — 본문에서 구체적으로 다룹니다.
+  - - Partition의 정의와 효과 - Clustering의 정의와 효과 - Pruning이 동작하는 방식 - 적용 실습 5단계 - 입문 단계에서 자주 나오는 실수 5가지 Warehouse fact 테이블은 쉽게 수십억 행으로 커집니다
 - **Pruning은 실제로 어떻게 비용을 줄일까요?**
-  - Pruning은 실제로 어떻게 비용을 줄일까요 — 본문에서 구체적으로 다룹니다.
+  - - Partition의 정의와 효과 - Clustering의 정의와 효과 - Pruning이 동작하는 방식 - 적용 실습 5단계 - 입문 단계에서 자주 나오는 실수 5가지 Warehouse fact 테이블은 쉽게 수십억 행으로 커집니다
 - **Partition key와 cluster key는 어떤 기준으로 고를까요?**
-  - Partition key와 cluster key는 어떤 기준으로 고를까요 — 본문에서 구체적으로 다룹니다.
+  - - Partition의 정의와 효과 - Clustering의 정의와 효과 - Pruning이 동작하는 방식 - 적용 실습 5단계 - 입문 단계에서 자주 나오는 실수 5가지 Warehouse fact 테이블은 쉽게 수십억 행으로 커집니다
 - **이 글에서 배울 것에서 가장 흔한 실수는 무엇일까요?**
   - Warehouse fact 테이블은 쉽게 수십억 행으로 커집니다. 날짜 기준 partition만 잘 잡아도 엔진은 읽지 않아도 될 데이터를 대부분 건너뜁니다. 이 절약이 곧 속도와 비용 둘 다에 바로 연결됩니다.
 - **개념 한눈에 보기을 실무에 적용할 때 주의할 점은 무엇일까요?**
   - Partition은 큰 테이블을 범위(보통 날짜)로 나누어 필요한 부분만 스캔하고, Clustering은 같은 값을 물리적으로 가깝게 배치해 I/O를 줄입니다. 둘을 함께 쓰면 수억 행 테이블도 빠르게 조회할 수 있습니다.
 - **전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요 — 본문에서 구체적으로 다룹니다.
+  - - Partition의 정의와 효과 - Clustering의 정의와 효과 - Pruning이 동작하는 방식 - 적용 실습 5단계 - 입문 단계에서 자주 나오는 실수 5가지 Warehouse fact 테이블은 쉽게 수십억 행으로 커집니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

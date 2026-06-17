@@ -438,7 +438,7 @@ def log_audit_access(actor: str, reason: str, query_scope: str):
 - **감사 로그는 일반 디버그 로그와 무엇이 달라야 compliance에 쓸 수 있을까요?**
   - 컴플라이언스 보고 자동화를 하려면 스키마가 흔들리면 안 됩니다. 아래는 운영에서 자주 쓰는 필수 필드 집합입니다.
 - **PII masking, append-only storage, decision rationale은 각각 어떤 증거를 남길까요?**
-  - PII masking, append-only storage, decision rationale은 각각 어떤 증거를 남길까요 — 본문에서 구체적으로 다룹니다.
+  - 감사 로깅이 잘 되어 있으면 규제 대응과 사고 조사가 훨씬 쉬워집니다
 - **자동 compliance report를 만들려면 로그 schema에 무엇이 고정되어야 할까요?**
   - 컴플라이언스 보고 자동화를 하려면 스키마가 흔들리면 안 됩니다. 아래는 운영에서 자주 쓰는 필수 필드 집합입니다.
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**

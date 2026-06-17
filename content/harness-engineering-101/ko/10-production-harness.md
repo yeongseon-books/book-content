@@ -399,11 +399,11 @@ Production Harness는 앞선 아홉 가지 harness를 예쁘게 모아 놓는 �
 ## 처음 질문으로 돌아가기
 
 - **Production Harness는 여러 harness를 어떻게 하나의 배포 가능한 운영 스택으로 묶을까요?**
-  - Production Harness는 여러 harness를 어떻게 하나의 배포 가능한 운영 스택으로 묶을까요 — 본문에서 구체적으로 다룹니다.
+  - Production Harness가 중요한 첫 번째 이유는 조합 복잡성입니다
 - **점진적 rollout과 rollback은 agent 시스템에서 왜 설계의 일부여야 할까요?**
-  - 점진적 rollout과 rollback은 agent 시스템에서 왜 설계의 일부여야 할까요 — 본문에서 구체적으로 다룹니다.
+  - Production Harness가 중요한 첫 번째 이유는 조합 복잡성입니다
 - **새벽 장애를 견디려면 runbook에는 어떤 실행 정보가 있어야 할까요?**
-  - 새벽 장애를 견디려면 runbook에는 어떤 실행 정보가 있어야 할까요 — 본문에서 구체적으로 다룹니다.
+  - Production Harness가 중요한 첫 번째 이유는 조합 복잡성입니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - Production Harness가 중요한 첫 번째 이유는 조합 복잡성입니다. 부품이 많아질수록 어느 하나의 품질보다 서로가 어떻게 연결되는지가 더 큰 장애 원인이 됩니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

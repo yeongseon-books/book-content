@@ -440,7 +440,7 @@ curl -fsS https://app.example.com/healthz
 ## 처음 질문으로 돌아가기
 
 - **liveness, readiness, startup probe는 어떤 역할을 나눌까요?**
-  - liveness, readiness, startup probe는 어떤 역할을 나눌까요 — 본문에서 구체적으로 다룹니다.
+  - 이 그림은 운영이 단일 기능이 아니라 연결된 체계라는 점을 보여 줍니다
 - **RBAC와 NetworkPolicy는 왜 운영의 기본 경계일까요?**
   - 같은 헬스 체크처럼 보여도 역할은 다릅니다. liveness는 다시 시작해야 하는지를, readiness는 지금 트래픽을 받아도 되는지를 판단합니다. 운영에서 이 둘을 섞으면 배포와 장애 대응이 함께 흔들립니다.
 - **메트릭, 로그, 트레이스는 왜 함께 봐야 할까요?**

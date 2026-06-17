@@ -401,11 +401,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **`alembic revision`이 만들어 주는 파일 구조는 어떻게 생겼을까요?**
-  - `alembic revision`이 만들어 주는 파일 구조는 어떻게 생겼을까요 — 본문에서 구체적으로 다룹니다.
+  - > revision 파일은 **`upgrade(): N → N+1`과 `downgrade(): N+1 → N`이라는 함수 쌍**입니다
 - **`op.create_table`, `op.add_column`, `op.drop_column`, `op.execute`는 각각 언제 쓸까요?**
-  - `op.create_table`, `op.add_column`, `op.drop_column`, `op.execute`는 각각 언제 쓸까요 — 본문에서 구체적으로 다룹니다.
+  - > revision 파일은 **`upgrade(): N → N+1`과 `downgrade(): N+1 → N`이라는 함수 쌍**입니다
 - **`upgrade()`와 `downgrade()`를 어떻게 대칭으로 유지할 수 있을까요?**
-  - `upgrade()`와 `downgrade()`를 어떻게 대칭으로 유지할 수 있을까요 — 본문에서 구체적으로 다룹니다.
+  - > revision 파일은 **`upgrade(): N → N+1`과 `downgrade(): N+1 → N`이라는 함수 쌍**입니다
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
   - > revision 파일은 **`upgrade(): N → N+1`과 `downgrade(): N+1 → N`이라는 함수 쌍**입니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

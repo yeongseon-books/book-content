@@ -425,11 +425,11 @@ target_metadata = Base.metadata
 ## 처음 질문으로 돌아가기
 
 - **`DeclarativeBase`는 어떤 역할을 하고 왜 `MetaData`와 함께 묶일까요?**
-  - `DeclarativeBase`는 어떤 역할을 하고 왜 `MetaData`와 함께 묶일까요 — 본문에서 구체적으로 다룹니다.
+  - > ORM 모델 클래스는 "파이썬 클래스 + Core `Table`"의 결합입니다
 - **`Mapped[T]`와 `mapped_column`은 타입 힌트, 컬럼 정의와 어떻게 연결될까요?**
-  - `Mapped[T]`와 `mapped_column`은 타입 힌트, 컬럼 정의와 어떻게 연결될까요 — 본문에서 구체적으로 다룹니다.
+  - > ORM 모델 클래스는 "파이썬 클래스 + Core `Table`"의 결합입니다
 - **`__tablename__`, `__table_args__`, `repr`는 언제부터 필요해질까요?**
-  - `__tablename__`, `__table_args__`, `repr`는 언제부터 필요해질까요 — 본문에서 구체적으로 다룹니다.
+  - > ORM 모델 클래스는 "파이썬 클래스 + Core `Table`"의 결합입니다
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
   - > ORM 모델 클래스는 "파이썬 클래스 + Core `Table`"의 결합입니다. `DeclarativeBase`는 그 바인딩의 그릇(`MetaData`)이고, `mapped_column`은 그 안에 들어갈 `Column`을 타입 힌트로부터 만들어 주는 헬퍼입니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

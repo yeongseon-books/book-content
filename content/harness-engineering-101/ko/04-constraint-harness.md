@@ -405,11 +405,11 @@ Constraint Harness는 에이전트에게 덜 자유를 주기 위한 장치가 �
 ## 처음 질문으로 돌아가기
 
 - **Constraint Harness는 prompt 규칙과 무엇이 달라야 실제로 agent 행동을 제한할까요?**
-  - Constraint Harness는 prompt 규칙과 무엇이 달라야 실제로 agent 행동을 제한할까요 — 본문에서 구체적으로 다룹니다.
+  - Constraint Harness가 중요한 첫 번째 이유는 사고 반경입니다
 - **capability, resource, behavior, scope 제약은 각각 어떤 위험을 막을까요?**
-  - capability, resource, behavior, scope 제약은 각각 어떤 위험을 막을까요 — 본문에서 구체적으로 다룹니다.
+  - Constraint Harness가 중요한 첫 번째 이유는 사고 반경입니다
 - **제약이 실행 계약이 되려면 코드와 로그에 무엇이 남아야 할까요?**
-  - 제약이 실행 계약이 되려면 코드와 로그에 무엇이 남아야 할까요 — 본문에서 구체적으로 다룹니다.
+  - 에이전트 제약은 하나의 큰 윤리 선언이 아니라 capability, resource, behavioral, scope처럼 여러 메커니즘으로 분리된 실행 계약입니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - Constraint Harness가 중요한 첫 번째 이유는 사고 반경입니다. 잘못된 판단 하나가 데이터 수정, 외부 발송, 비용 폭증으로 이어질 수 있기 때문입니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

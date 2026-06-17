@@ -415,11 +415,11 @@ PEP 249의 parameter binding은 SQL injection을 차단하는 가장 단순하�
 ## 처음 질문으로 돌아가기
 
 - **왜 `find_user_BAD("Alice' OR 1=1 --")`는 전체 행을 유출하지만 `WHERE name = ?`는 빈 결과를 돌려줄까요?**
-  - 왜 `find_user_BAD("Alice' OR 1=1 --")`는 전체 행을 유출하지만 `WHERE name = ?`는 빈 결과를 돌려줄까요 — 본문에서 구체적으로 다룹니다.
+  - > SQL injection은 query string과 사용자 입력이 하나의 문자열로 합쳐지는 순간 시작됩니다
 - **sqlite3에서 `?`, `:name`, `module.paramstyle`은 언제 구분해서 써야 하고 driver 이관 때 무엇을 먼저 확인해야 할까요?**
-  - sqlite3에서 `?`, `:name`, `module.paramstyle`은 언제 구분해서 써야 하고 driver 이관 때 무엇을 먼저 확인해야 할까요 — 본문에서 구체적으로 다룹니다.
+  - 1. **f-string으로 SQL 조립** — 가장 흔하고 가장 위험. code review에서 무관용으로 막아야 합니다
 - **`IN (...)`, `ORDER BY`, table name처럼 placeholder가 못 들어가는 자리는 어떻게 안전하게 처리해야 할까요?**
-  - `IN (...)`, `ORDER BY`, table name처럼 placeholder가 못 들어가는 자리는 어떻게 안전하게 처리해야 할까요 — 본문에서 구체적으로 다룹니다.
+  - > SQL injection은 query string과 사용자 입력이 하나의 문자열로 합쳐지는 순간 시작됩니다
 - **Mental Model — query string과 값을 끝까지 분리에서 가장 흔한 실수는 무엇일까요?**
   - > SQL injection은 query string과 사용자 입력이 하나의 문자열로 합쳐지는 순간 시작됩니다. parameter binding은 이 둘을 끝까지 분리해서, 값이 SQL 문법으로 다시 해석되지 못하게 막습니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

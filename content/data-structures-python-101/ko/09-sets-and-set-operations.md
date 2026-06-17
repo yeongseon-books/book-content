@@ -620,7 +620,7 @@ print(matched)  # ['글1']
 - **`set`은 왜 중복 제거와 membership test에 강할까요?**
   - `<=` 연산자는 부분집합 검사입니다. `target_tags <= tags`는 "target_tags의 모든 원소가 tags에 포함되는가"를 의미합니다.
 - **충돌과 hashability는 set에서 어떤 의미를 가질까요?**
-  - 충돌과 hashability는 set에서 어떤 의미를 가질까요 — 본문에서 구체적으로 다룹니다.
+  - - 권한 집합은 교집합·부분집합 검사와 함께 관리됩니다
 - **왜 `frozenset`은 set 원소나 dict 키가 될 수 있고 plain `set`은 안 될까요?**
   - set은 해시 테이블을 유지해야 하므로 같은 원소 수에서 list보다 메모리를 더 씁니다. frozenset은 set과 거의 동일한 크기입니다 (불변일 뿐 내부 구조는 같습니다). 메모리를 더 쓰는 대가로 O(1) membership test를 얻는 것이 핵심 교환입니다.
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**

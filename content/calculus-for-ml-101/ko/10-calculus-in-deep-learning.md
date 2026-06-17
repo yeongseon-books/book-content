@@ -439,9 +439,9 @@ def set_seed(seed=42):
 - **딥러닝 학습 루프는 어떤 단계로 구성되고 각 단계에서 미분은 어디에 등장할까요?**
   - 아래는 실제 학습 루프를 단계별로 해부한 표입니다.
 - **forward pass와 loss computation은 backward를 위해 무엇을 준비할까요?**
-  - forward pass와 loss computation은 backward를 위해 무엇을 준비할까요 — 본문에서 구체적으로 다룹니다.
+  - 딥러닝 프레임워크는 training loop를 매우 간결하게 감춰 줍니다
 - **gradient 계산과 optimizer update는 어떻게 연결될까요?**
-  - gradient 계산과 optimizer update는 어떻게 연결될까요 — 본문에서 구체적으로 다룹니다.
+  - 딥러닝 프레임워크는 training loop를 매우 간결하게 감춰 줍니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - 딥러닝 프레임워크는 training loop를 매우 간결하게 감춰 줍니다. 그래서 코드는 짧아지지만, 각 단계의 의미가 흐려지기 쉽습니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

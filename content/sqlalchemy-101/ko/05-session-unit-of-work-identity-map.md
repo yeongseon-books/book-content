@@ -441,9 +441,9 @@ Session 계층을 운영에서 다룰 때는 "어느 요청이 어떤 트랜잭�
 - **`Session`은 단순한 connection 래퍼가 아니라 무엇을 관리할까요?**
   - 운영에서 Session 계층은 다음 지표로 감시하면 효과가 큽니다.
 - **Unit of Work는 변경을 어떻게 모으고, 언제 SQL로 내보낼까요?**
-  - Unit of Work는 변경을 어떻게 모으고, 언제 SQL로 내보낼까요 — 본문에서 구체적으로 다룹니다.
+  - > `Session`은 작업 메모지(Unit of Work)와 캐시 노트(Identity Map)를 한 권의 노트로 묶어 둔 것입니다
 - **`flush()`와 `commit()`은 어떤 순서와 의미 차이가 있을까요?**
-  - `flush()`와 `commit()`은 어떤 순서와 의미 차이가 있을까요 — 본문에서 구체적으로 다룹니다.
+  - > `Session`은 작업 메모지(Unit of Work)와 캐시 노트(Identity Map)를 한 권의 노트로 묶어 둔 것입니다
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
   - > `Session`은 작업 메모지(Unit of Work)와 캐시 노트(Identity Map)를 한 권의 노트로 묶어 둔 것입니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

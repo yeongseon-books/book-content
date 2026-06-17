@@ -373,17 +373,17 @@ az deployment group what-if \
 ## 처음 질문으로 돌아가기
 
 - **ACA의 세 가지 운영 단위인 Environment, Container App, Revision은 정확히 어떤 책임을 가질까요?**
-  - ACA의 세 가지 운영 단위인 Environment, Container App, Revision은 정확히 어떤 책임을 가질까요 — 본문에서 단계별로 설명합니다.
+  - 다음 변경은 새 Revision을 만듭니다
 - **어떤 변경은 새 Revision을 만들고, 어떤 변경은 만들지 않을까요?**
-  - 어떤 변경은 새 Revision을 만들고, 어떤 변경은 만들지 않을까요 — 본문에서 단계별로 설명합니다.
+  - 다음 변경은 새 Revision을 만듭니다
 - **Single Revision mode와 Multiple Revision mode는 무엇이 다르고, 각각 언제 맞을까요?**
-  - Single Revision mode와 Multiple Revision mode는 무엇이 다르고, 각각 언제 맞을까요 — 본문에서 단계별로 설명합니다.
+  - ACA를 처음 만지면 포털과 CLI에 같은 세 단어가 반복해서 등장합니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - ACA를 처음 만지면 포털과 CLI에 같은 세 단어가 반복해서 등장합니다. Environment, Container App, Revision. 이름은 비슷해 보여도 실제로는 수명, 가변성, 소유 범위가 모두 다릅니다.
 - **멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요 — 본문에서 단계별로 설명합니다.
+  - > Environment는 "건물", Container App은 "사무실", Revision은 "그날의 자리 배치"입니다
 - **계층부터 먼저 보기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 계층부터 먼저 보기의 핵심 원리를 한 문장으로 설명하면 무엇일까요 — 본문에서 단계별로 설명합니다.
+  - Environment는 ACA의 공유 경계입니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -505,9 +505,9 @@ WebSocket은 HTTP로 시작하지만, 응답 이후에는 더 이상 HTTP가 아
 - **WebSocket 연결은 HTTP에서 어떻게 업그레이드될까요?**
   - SSE 서버 예시:
 - **WebSocket, SSE, long-polling 중 언제 무엇을 골라야 할까요?**
-  - WebSocket, SSE, long-polling 중 언제 무엇을 골라야 할까요 — 본문에서 구체적으로 다룹니다.
+  - 핵심 전환점은 `101 Switching Protocols`입니다
 - **ping/pong, 재연결, backpressure는 왜 운영의 핵심일까요?**
-  - ping/pong, 재연결, backpressure는 왜 운영의 핵심일까요 — 본문에서 구체적으로 다룹니다.
+  - 핵심 전환점은 `101 Switching Protocols`입니다
 - **핵심 그림에서 가장 흔한 실수는 무엇일까요?**
   - 핵심 전환점은 `101 Switching Protocols`입니다. 응답 전까지는 HTTP였던 연결이, 그 뒤에는 WebSocket 프레임 스트림으로 동작합니다. 같은 TCP 소켓을 재사용하므로 추가 핸드셰이크가 없습니다.
 - **이 코드에서 먼저 볼 점을 실무에 적용할 때 주의할 점은 무엇일까요?**

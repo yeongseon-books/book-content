@@ -400,11 +400,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **`alembic revision --autogenerate`는 내부에서 무엇을 비교할까요?**
-  - `alembic revision --autogenerate`는 내부에서 무엇을 비교할까요 — 본문에서 구체적으로 다룹니다.
+  - > Autogenerate는 **현재 DB(ground truth)와 `target_metadata`(desired state)의 diff를 만들고, 그 차이를 `op` 호출로 직렬화하는 도구**입니다
 - **어떤 변경은 잘 잡고, 어떤 변경은 놓치거나 옵션이 필요할까요?**
-  - 어떤 변경은 잘 잡고, 어떤 변경은 놓치거나 옵션이 필요할까요 — 본문에서 구체적으로 다룹니다.
+  - > Autogenerate는 **현재 DB(ground truth)와 `target_metadata`(desired state)의 diff를 만들고, 그 차이를 `op` 호출로 직렬화하는 도구**입니다
 - **`compare_type`, `compare_server_default`, `include_object`, `include_name`은 언제 필요할까요?**
-  - `compare_type`, `compare_server_default`, `include_object`, `include_name`은 언제 필요할까요 — 본문에서 구체적으로 다룹니다.
+  - > Autogenerate는 **현재 DB(ground truth)와 `target_metadata`(desired state)의 diff를 만들고, 그 차이를 `op` 호출로 직렬화하는 도구**입니다
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
   - > Autogenerate는 **현재 DB(ground truth)와 `target_metadata`(desired state)의 diff를 만들고, 그 차이를 `op` 호출로 직렬화하는 도구**입니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

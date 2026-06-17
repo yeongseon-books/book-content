@@ -352,11 +352,11 @@ az webapp log tail --name $APP --resource-group $RG
 ## 처음 질문으로 돌아가기
 
 - **첫 번째 Function App을 만들기 전에 어떤 파라미터를 먼저 확정해야 할까요?**
-  - 첫 번째 Function App을 만들기 전에 어떤 파라미터를 먼저 확정해야 할까요 — 본문에서 구체적으로 다룹니다.
+  - Azure Functions를 설명하는 글은 많지만, 실제 배포 흐름을 끝까지 밟아 보면 개념이 훨씬 빨리 고정됩니다
 - **zip deploy, GitHub Actions, VS Code 직접 배포 중에서 무엇부터 시작하는 편이 좋을까요?**
-  - zip deploy, GitHub Actions, VS Code 직접 배포 중에서 무엇부터 시작하는 편이 좋을까요 — 본문에서 구체적으로 다룹니다.
+  - 가장 기본적인 CLI 경로는 세 가지 도구면 충분합니다
 - **Function App은 왜 연결된 Storage Account를 반드시 필요로 할까요?**
-  - Function App은 왜 연결된 Storage Account를 반드시 필요로 할까요 — 본문에서 구체적으로 다룹니다.
+  - Azure Functions를 설명하는 글은 많지만, 실제 배포 흐름을 끝까지 밟아 보면 개념이 훨씬 빨리 고정됩니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - Azure Functions를 설명하는 글은 많지만, 실제 배포 흐름을 끝까지 밟아 보면 개념이 훨씬 빨리 고정됩니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

@@ -441,7 +441,7 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 - **무엇을 바꾸는가을 실무에 적용할 때 주의할 점은 무엇일까요?**
   - What is changing
 - **왜 바꾸는가의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 왜 바꾸는가의 핵심 원리를 한 문장으로 설명하면 무엇일까요 — 본문에서 구체적으로 다룹니다.
+  - 좋은 리뷰 코멘트는 실행 가능해야 합니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

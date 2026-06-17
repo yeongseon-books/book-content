@@ -461,7 +461,7 @@ Context Recall은 reference 답변이 필요합니다. Reference 없이는 측�
 - **RAG 평가는 왜 답변 하나가 아니라 retrieval과 generation을 나눠 봐야 할까요?**
   - 다음 글에서는 단일 응답이 아닌 **agent의 trajectory**를 평가하는 법을 다룹니다.
 - **context precision, context recall, faithfulness, answer relevance는 각각 무엇을 진단할까요?**
-  - context precision, context recall, faithfulness, answer relevance는 각각 무엇을 진단할까요 — 본문에서 구체적으로 다룹니다.
+  - RAG는 검색과 생성이 분리되어 있기 때문에, 점검도 두 층으로 나뉘어야 합니다
 - **검색과 생성 중 어디가 망가졌는지 어떻게 좁혀야 할까요?**
   - 다음 글에서는 단일 응답이 아닌 **agent의 trajectory**를 평가하는 법을 다룹니다.
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**

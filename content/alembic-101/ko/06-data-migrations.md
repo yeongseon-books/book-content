@@ -446,9 +446,9 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 - **data migration은 schema migration과 무엇이 다를까요?**
   - 3단계 분리 패턴에서 revision 의존성을 명확히 적어 두면 사고 분석이 쉬워집니다.
 - **`op.execute`는 raw SQL과 SQLAlchemy Core 중 어떤 스타일로 쓸 수 있을까요?**
-  - `op.execute`는 raw SQL과 SQLAlchemy Core 중 어떤 스타일로 쓸 수 있을까요 — 본문에서 구체적으로 다룹니다.
+  - > data migration은 **schema는 그대로 두고 row를 변환하는 revision**입니다
 - **큰 데이터셋은 어떤 batch 패턴으로 나누어 처리해야 할까요?**
-  - 큰 데이터셋은 어떤 batch 패턴으로 나누어 처리해야 할까요 — 본문에서 구체적으로 다룹니다.
+  - > data migration은 **schema는 그대로 두고 row를 변환하는 revision**입니다
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
   - > data migration은 **schema는 그대로 두고 row를 변환하는 revision**입니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

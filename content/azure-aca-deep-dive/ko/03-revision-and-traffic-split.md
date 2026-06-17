@@ -363,11 +363,11 @@ ACA의 Revision 모델을 제대로 이해하려면 배포 단위와 노출 단�
 ## 처음 질문으로 돌아가기
 
 - **어떤 변경은 새 Revision을 만들고, 어떤 변경은 만들지 않을까요?**
-  - 어떤 변경은 새 Revision을 만들고, 어떤 변경은 만들지 않을까요 — 본문에서 구체적으로 다룹니다.
+  - ACA를 운영하는 팀이 가장 자주 체감하는 기능 중 하나가 Revision입니다
 - **single revision mode와 multiple revision mode는 운영상 무엇을 바꿀까요?**
-  - single revision mode와 multiple revision mode는 운영상 무엇을 바꿀까요 — 본문에서 구체적으로 다룹니다.
+  - ACA를 운영하는 팀이 가장 자주 체감하는 기능 중 하나가 Revision입니다
 - **label과 traffic weight는 각각 어떤 다른 라우팅 문제를 풀까요?**
-  - label과 traffic weight는 각각 어떤 다른 라우팅 문제를 풀까요 — 본문에서 구체적으로 다룹니다.
+  - ACA를 운영하는 팀이 가장 자주 체감하는 기능 중 하나가 Revision입니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - ACA를 운영하는 팀이 가장 자주 체감하는 기능 중 하나가 Revision입니다. 그런데 Revision을 단순한 배포 이력으로 이해하면 rollout이 자꾸 설명되지 않습니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

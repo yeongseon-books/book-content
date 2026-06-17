@@ -382,11 +382,11 @@ kubectl get pods -l app=fastapi-hello -w
 ## 처음 질문으로 돌아가기
 
 - **Pod와 컨테이너는 왜 같은 말이 아니며, 왜 Kubernetes는 Pod를 스케줄링 단위로 볼까요?**
-  - Pod와 컨테이너는 왜 같은 말이 아니며, 왜 Kubernetes는 Pod를 스케줄링 단위로 볼까요 — 본문에서 구체적으로 다룹니다.
+  - - Pod와 컨테이너를 같은 개념으로 생각하기 쉽지만, Kubernetes는 Pod를 스케줄링 단위로 봅니다
 - **Deployment는 Pod를 직접 여러 개 만드는 것과 무엇이 다를까요?**
-  - Deployment는 Pod를 직접 여러 개 만드는 것과 무엇이 다를까요 — 본문에서 구체적으로 다룹니다.
+  - 많은 Kubernetes 장애는 생각보다 아래층에서 시작합니다
 - **Service는 왜 Pod IP를 직접 쓰지 않게 만드는 걸까요?**
-  - Service는 왜 Pod IP를 직접 쓰지 않게 만드는 걸까요 — 본문에서 구체적으로 다룹니다.
+  - 많은 Kubernetes 장애는 생각보다 아래층에서 시작합니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - 많은 Kubernetes 장애는 생각보다 아래층에서 시작합니다. 외부 요청이 실패해도 Ingress 문제가 아니라 Service selector 오타일 수 있고, Pod가 재생성되는 이유는 애플리케이션 코드가 아니라 Deployment 전략이나 probe 설정 때문일 수 있습니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

@@ -428,11 +428,11 @@ Observability는 에이전트가 무엇을 했는지 보는 기능이 아니라,
 ## 처음 질문으로 돌아가기
 
 - **Observability Harness는 agent 실행을 나중에 어떻게 다시 구성할 수 있게 해야 할까요?**
-  - Observability Harness는 agent 실행을 나중에 어떻게 다시 구성할 수 있게 해야 할까요 — 본문에서 구체적으로 다룹니다.
+  - Agent가 무엇을 했는지 모르면 디버깅도 개선도 불가능합니다
 - **trace, replay, cost·latency dashboard는 각각 어떤 운영 질문에 답할까요?**
-  - trace, replay, cost·latency dashboard는 각각 어떤 운영 질문에 답할까요 — 본문에서 구체적으로 다룹니다.
+  - Observability가 중요한 첫 번째 이유는 재현성입니다
 - **어떤 신호가 사람을 깨워야 하는 alert가 되어야 할까요?**
-  - 어떤 신호가 사람을 깨워야 하는 alert가 되어야 할까요 — 본문에서 구체적으로 다룹니다.
+  - Observability가 중요한 첫 번째 이유는 재현성입니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - Observability가 중요한 첫 번째 이유는 재현성입니다. 사고가 났을 때 당시 모델이 어떤 prompt와 retrieved context를 봤는지 모르면 같은 문제를 다시 만들 수 없습니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

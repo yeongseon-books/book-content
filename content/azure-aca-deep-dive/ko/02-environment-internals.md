@@ -251,11 +251,11 @@ Environment는 ACA에서 가장 과소평가되기 쉬운 리소스이지만, �
 ## 처음 질문으로 돌아가기
 
 - **Environment는 왜 단순한 부모 리소스가 아니라 실제 격리 경계일까요?**
-  - Environment는 왜 단순한 부모 리소스가 아니라 실제 격리 경계일까요 — 본문에서 구체적으로 다룹니다.
+  - Environment를 볼 때 가장 먼저 머리에 남겨야 할 문장은 이것입니다
 - **네트워크 범위는 Revision이나 App이 아니라 왜 Environment에서 시작될까요?**
-  - 네트워크 범위는 Revision이나 App이 아니라 왜 Environment에서 시작될까요 — 본문에서 구체적으로 다룹니다.
+  - Environment를 잘못 이해하면 ACA의 여러 기능을 제각각 따로 보게 됩니다
 - **Log Analytics workspace를 Environment 수준에서 공유한다는 말은 운영상 무엇을 뜻할까요?**
-  - Log Analytics workspace를 Environment 수준에서 공유한다는 말은 운영상 무엇을 뜻할까요 — 본문에서 구체적으로 다룹니다.
+  - Environment를 잘못 이해하면 ACA의 여러 기능을 제각각 따로 보게 됩니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - Environment를 잘못 이해하면 ACA의 여러 기능을 제각각 따로 보게 됩니다. Ingress는 네트워크 기능, Dapr는 미들웨어 기능, 로그는 관측 기능, Revision은 배포 기능처럼 흩어져 보입니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

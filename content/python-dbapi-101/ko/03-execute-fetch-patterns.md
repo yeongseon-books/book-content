@@ -370,11 +370,11 @@ def timed(fn, *args, **kwargs):
 ## 처음 질문으로 돌아가기
 
 - **`execute`, `executemany`, `fetchone`, `fetchall`, `fetchmany`는 각각 언제 써야 할까요?**
-  - `execute`, `executemany`, `fetchone`, `fetchall`, `fetchmany`는 각각 언제 써야 할까요 — 본문에서 구체적으로 다룹니다.
+  - `cursor.execute(operation, parameters=None)`은 single SQL statement를 실행합니다
 - **큰 결과셋을 메모리를 터뜨리지 않고 처리하려면 어떤 패턴을 써야 할까요?**
   - DB-API 코드는 SQL 문장보다 경계 관리가 더 중요합니다. 연결 수명, 커서 재사용 범위, 커밋/롤백 시점을 코드로 드러내야 장애 시 복구가 쉬워집니다.
 - **`cursor.description`은 어떤 메타데이터를 제공할까요?**
-  - `cursor.description`은 어떤 메타데이터를 제공할까요 — 본문에서 구체적으로 다룹니다.
+  - `cursor.execute(operation, parameters=None)`은 single SQL statement를 실행합니다
 - **6. 어떤 메서드를 언제 쓰나에서 가장 흔한 실수는 무엇일까요?**
   - 1. **결과셋이 큰 query에 `fetchall()` 호출** - 100만 row가 나오면 그대로 OOM. 항상 결과 크기를 가정하지 않고 streaming pattern을 default로 둡니다.
 - **7. 결과 메타데이터을 실무에 적용할 때 주의할 점은 무엇일까요?**

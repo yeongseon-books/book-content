@@ -394,11 +394,11 @@ Pod sandbox에 네트워크가 어떻게 연결되고, Azure CNI Pod Subnet, Nod
 ## 처음 질문으로 돌아가기
 
 - **kubelet은 정확히 무엇을 감시하고 어떤 시점에 CRI를 호출할까요?**
-  - kubelet은 정확히 무엇을 감시하고 어떤 시점에 CRI를 호출할까요 — 본문에서 구체적으로 다룹니다.
+  - 노드 실행 경로를 모르면 Pending 이후의 모든 문제를 비슷한 범주로 오해하게 됩니다
 - **dockershim이 사라진 뒤 AKS 노드 디버깅 방식은 왜 달라졌을까요?**
   - node-local 문제를 빠르게 줄이려면 kubelet 이벤트와 CRI 상태를 같은 타임라인으로 묶어 보는 습관이 필요합니다.
 - **`RunPodSandbox`, `PullImage`, `CreateContainer`, `StartContainer`는 왜 이 순서로 호출될까요?**
-  - `RunPodSandbox`, `PullImage`, `CreateContainer`, `StartContainer`는 왜 이 순서로 호출될까요 — 본문에서 구체적으로 다룹니다.
+  - 노드 실행 경로를 모르면 Pending 이후의 모든 문제를 비슷한 범주로 오해하게 됩니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - 노드 실행 경로를 모르면 Pending 이후의 모든 문제를 비슷한 범주로 오해하게 됩니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

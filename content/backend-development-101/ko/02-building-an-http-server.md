@@ -425,7 +425,7 @@ Content-Length: 17
 - **HTTP는 TCP 위에서 어떻게 동작할까요?**
   - HTTP는 전송 계층인 TCP 위에서 동작합니다. HTTP 자체는 연결을 여닫지 않고, TCP가 만든 양방향 바이트 채널을 사용합니다.
 - **status code와 header는 왜 단순 장식이 아니라 계약일까요?**
-  - status code와 header는 왜 단순 장식이 아니라 계약일까요 — 본문에서 구체적으로 다룹니다.
+  - 요청은 크게 request line, headers, body로 나뉩니다
 - **Request Anatomy: 무엇을 읽고 어떤 결정을 내리는가에서 가장 흔한 실수는 무엇일까요?**
   - 요청은 크게 request line, headers, body로 나뉩니다. 중요한 점은 이 값들이 단순 메타데이터가 아니라 서버 분기 로직의 입력이라는 사실입니다.
 - **Response Anatomy: 클라이언트가 다음 행동을 결정하는 정보을 실무에 적용할 때 주의할 점은 무엇일까요?**

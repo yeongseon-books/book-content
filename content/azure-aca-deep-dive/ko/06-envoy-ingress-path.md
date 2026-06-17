@@ -347,11 +347,11 @@ ACA의 Ingress를 정확하게 이해하려면 제품이 문서화한 ingress �
 ## 처음 질문으로 돌아가기
 
 - **ACA의 public ingress 표면과 숨은 라우팅 계층은 어떻게 구분해 이해해야 할까요?**
-  - ACA의 public ingress 표면과 숨은 라우팅 계층은 어떻게 구분해 이해해야 할까요 — 본문에서 구체적으로 다룹니다.
+  - Ingress 문제를 앱부터 의심하는 습관은 ACA에서 특히 비효율적입니다
 - **TLS는 어디서 종료되고, 앱은 원래 요청 정보를 어떤 header로 복구할까요?**
-  - TLS는 어디서 종료되고, 앱은 원래 요청 정보를 어떤 header로 복구할까요 — 본문에서 구체적으로 다룹니다.
+  - - **Ingress 문제를 앱 코드부터 의심하면 안 됩니다.
 - **Revision traffic split은 요청 경로의 어느 지점에서 실제가 될까요?**
-  - Revision traffic split은 요청 경로의 어느 지점에서 실제가 될까요 — 본문에서 구체적으로 다룹니다.
+  - Ingress 문제를 앱부터 의심하는 습관은 ACA에서 특히 비효율적입니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - Ingress 문제를 앱부터 의심하는 습관은 ACA에서 특히 비효율적입니다. 사용자가 컨테이너 코드에 도달하기 전에 이미 public edge, TLS termination, host 처리, forwarded header, revision selection, ready replica 선택 같은 여러 층을 통과하기 때문입니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

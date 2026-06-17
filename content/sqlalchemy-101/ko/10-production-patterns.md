@@ -459,9 +459,9 @@ SessionLocal = sessionmaker(bind=engine, expire_on_commit=False, autoflush=True)
 ## 처음 질문으로 돌아가기
 
 - **connection pool은 어떤 기준으로 크기와 재사용 정책을 정해야 할까요?**
-  - connection pool은 어떤 기준으로 크기와 재사용 정책을 정해야 할까요 — 본문에서 구체적으로 다룹니다.
+  - > 프로덕션 SQLAlchemy는 세 개의 손잡이로 조율합니다
 - **`pool_pre_ping`, `pool_recycle`은 어떤 장애를 줄여 줄까요?**
-  - `pool_pre_ping`, `pool_recycle`은 어떤 장애를 줄여 줄까요 — 본문에서 구체적으로 다룹니다.
+  - 장애를 겪은 뒤 팀이 같은 질문을 반복하면 품질이 빨리 올라갑니다
 - **N+1 회귀나 느린 쿼리를 운영에서 어떻게 관측할 수 있을까요?**
   - 7편에서 다룬 N+1은 운영 이전 CI에서 막아야 합니다. 다음 두 단계를 파이프라인에 넣으면 회귀율이 크게 줄어듭니다.
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**

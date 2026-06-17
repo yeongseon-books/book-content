@@ -411,7 +411,7 @@ Whisper는 음성을 텍스트 파이프라인으로 연결하는 가장 실용�
 ## 처음 질문으로 돌아가기
 
 - **왜 Whisper가 오픈소스 STT의 사실상 기본값처럼 자리 잡았을까요?**
-  - 왜 Whisper가 오픈소스 STT의 사실상 기본값처럼 자리 잡았을까요 — 본문에서 구체적으로 다룹니다.
+  - 음성은 멀티모달 제품에서 가장 빠르게 사용량이 커지는 입력입니다
 - **Whisper 아키텍처는 어떤 방식으로 30초 오디오를 텍스트와 timestamp로 바꿀까요?**
   - Whisper를 운영에 붙이면 "대체로 잘 된다"는 표현은 거의 의미가 없습니다. 최소한 WER(Word Error Rate), CER(Character Error Rate), segment latency, 무음 구간 hallucination 비율을 동시에 기록해야 품질 추이를 해석할 수 있습니다.
 - **로컬 추론, faster-whisper, OpenAI API 호출은 각각 어떤 상황에서 유리할까요?**

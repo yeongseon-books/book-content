@@ -552,7 +552,7 @@ tests/test_checkout.py::test_apply_coupon_handles_edge_values[INVALID] PASSED
 - **GitHub Actions workflow를 여러 조각이 아니라 하나의 최종 파일로 어떻게 조립할까요?**
   - 기본 workflow에 아래 세 가지를 추가하면 운영 안정성이 올라갑니다.
 - **Python 3.10, 3.11, 3.12를 동시에 검증하면서도 피드백 속도를 유지하려면 무엇을 신경 써야 할까요?**
-  - Python 3.10, 3.11, 3.12를 동시에 검증하면서도 피드백 속도를 유지하려면 무엇을 신경 써야 할까요 — 본문에서 구체적으로 다룹니다.
+  - > push/PR 이벤트가 들어오면 GitHub Actions가 같은 workflow를 기준으로 여러 Python 버전을 병렬 검증하고, 대표 실행 하나에서 커버리지 아티팩트를 남긴다고 생각하면 됩니다.
 - **핵심 개념 잡기에서 가장 흔한 실수는 무엇일까요?**
   - > push/PR 이벤트가 들어오면 GitHub Actions가 같은 workflow를 기준으로 여러 Python 버전을 병렬 검증하고, 대표 실행 하나에서 커버리지 아티팩트를 남긴다고 생각하면 됩니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

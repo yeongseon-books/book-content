@@ -196,17 +196,17 @@ kubectl run dnscheck --rm -i --restart=Never --image=busybox -- nslookup web.def
 ## 처음 질문으로 돌아가기
 
 - **Service는 정확히 어떤 문제를 해결할까요?**
-  - Service는 정확히 어떤 문제를 해결할까요 — 본문에서 단계별로 설명합니다.
+  - Service는 특정 파드를 직접 고정해 가리키지 않습니다
 - **ClusterIP, NodePort, LoadBalancer는 언제 갈라질까요?**
-  - ClusterIP, NodePort, LoadBalancer는 언제 갈라질까요 — 본문에서 단계별로 설명합니다.
+  - Service는 특정 파드를 직접 고정해 가리키지 않습니다
 - **selector와 labels는 왜 정확히 맞아야 할까요?**
-  - selector와 labels는 왜 정확히 맞아야 할까요 — 본문에서 단계별로 설명합니다.
+  - Service는 특정 파드를 직접 고정해 가리키지 않습니다
 - **한눈에 보는 구조에서 가장 흔한 실수는 무엇일까요?**
   - Service는 특정 파드를 직접 고정해 가리키지 않습니다. 라벨로 선택된 파드 집합을 뒤에 두고, 앞단에는 안정적인 가상 IP와 이름을 제공합니다. 클라이언트는 뒤에서 어떤 파드가 바뀌는지 신경 쓰지 않고 Service 이름만 알면 됩니다.
 - **도입 전과 후을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 도입 전과 후을 실무에 적용할 때 주의할 점은 무엇일까요 — 본문에서 단계별로 설명합니다.
+  - Service가 없으면 클라이언트가 Pod IP를 직접 호출해야 합니다
 - **검증 흐름의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 검증 흐름의 핵심 원리를 한 문장으로 설명하면 무엇일까요 — 본문에서 단계별로 설명합니다.
+  - - Service는 있는데 Endpoints가 비어 있으면 selector와 labels 불일치를 먼저 봅니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -269,11 +269,11 @@ warm-up이 반복 실패하면 endpoint 로직보다 먼저 status code 계약�
 ## 처음 질문으로 돌아가기
 
 - **App Service에서 cold start 비용은 실제로 어떤 준비 단계들의 합일까요?**
-  - App Service에서 cold start 비용은 실제로 어떤 준비 단계들의 합일까요 — 본문에서 구체적으로 다룹니다.
+  - 사용자가 느끼는 첫 요청 비용은 사실상 ready worker를 바로 쓰는 warm path와, 아직 ready하지 않은 실행 단위를 깨워서 준비시키는 cold path의 차이입니다
 - **Always On은 어떤 종류의 coldness를 줄이고, 어떤 종류의 startup cost에는 거의 도움을 주지 못할까요?**
-  - Always On은 어떤 종류의 coldness를 줄이고, 어떤 종류의 startup cost에는 거의 도움을 주지 못할까요 — 본문에서 구체적으로 다룹니다.
+  - cold start를 정확히 이해하지 못하면 운영 설정이 전부 감각 의존이 됩니다
 - **Windows와 Linux는 warm-up readiness를 어떤 다른 도구와 설정으로 표현할까요?**
-  - Windows와 Linux는 warm-up readiness를 어떤 다른 도구와 설정으로 표현할까요 — 본문에서 구체적으로 다룹니다.
+  - cold start를 정확히 이해하지 못하면 운영 설정이 전부 감각 의존이 됩니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - cold start를 정확히 이해하지 못하면 운영 설정이 전부 감각 의존이 됩니다. Always On을 켜면 다 해결될 것처럼 기대하거나, health endpoint를 warm-up endpoint 대신 사용하거나, Linux에서 `WEBSITE_WARMUP_STATUSES`를 좁히지 않아 아직 준비되지 않은 응답이 readiness로 받아들여지는 실수가 반복됩니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

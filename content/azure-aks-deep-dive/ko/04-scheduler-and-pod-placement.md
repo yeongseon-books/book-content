@@ -410,9 +410,9 @@ HPA가 replica를 늘리고, Cluster Autoscaler가 node를 늘릴 때 왜 race w
 ## 처음 질문으로 돌아가기
 
 - **kube-scheduler는 하나의 Pod에 대해 어떤 단계로 노드 후보를 좁혀 갈까요?**
-  - kube-scheduler는 하나의 Pod에 대해 어떤 단계로 노드 후보를 좁혀 갈까요 — 본문에서 구체적으로 다룹니다.
+  - 스케줄링을 이해하지 못하면 Pending Pod의 원인을 뒤쪽 계층으로 너무 빨리 밀어 버리게 됩니다
 - **`nodeSelector`, affinity, taint/toleration, topology spread는 서로 어떤 다른 의도를 표현할까요?**
-  - `nodeSelector`, affinity, taint/toleration, topology spread는 서로 어떤 다른 의도를 표현할까요 — 본문에서 구체적으로 다룹니다.
+  - 스케줄링을 이해하지 못하면 Pending Pod의 원인을 뒤쪽 계층으로 너무 빨리 밀어 버리게 됩니다
 - **Filter에서 모두 탈락한 경우와 feasible node는 있었지만 Binding이 실패한 경우는 어떻게 구분할까요?**
   - AKS에서는 system pool과 user pool을 분리한 뒤, user pool을 workload 성격별로 나누는 설계가 흔합니다.
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**

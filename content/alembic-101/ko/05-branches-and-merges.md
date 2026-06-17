@@ -441,9 +441,9 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 - **언제 Alembic revision graph가 branch로 갈라질까요?**
   - `alembic merge`로 생성된 파일은 변경이 없어 보여서 대충 넘어가기 쉽습니다. 그래도 다음은 반드시 확인해야 합니다.
 - **`branch_labels`와 `depends_on`은 각각 정확히 무슨 역할일까요?**
-  - `branch_labels`와 `depends_on`은 각각 정확히 무슨 역할일까요 — 본문에서 구체적으로 다룹니다.
+  - > alembic revision graph는 git과 같은 **DAG(directed acyclic graph)**입니다
 - **두 개의 head를 `alembic merge`로 어떻게 합칠까요?**
-  - 두 개의 head를 `alembic merge`로 어떻게 합칠까요 — 본문에서 구체적으로 다룹니다.
+  - > alembic revision graph는 git과 같은 **DAG(directed acyclic graph)**입니다
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
   - > alembic revision graph는 git과 같은 **DAG(directed acyclic graph)**입니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

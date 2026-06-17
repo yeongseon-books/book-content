@@ -737,7 +737,7 @@ pip은 wheel이 있으면 wheel을 우선 선택하고, 해당 플랫폼의 whee
 ## 처음 질문으로 돌아가기
 
 - **wheel과 sdist는 무엇이 다를까요?**
-  - wheel과 sdist는 무엇이 다를까요 — 본문에서 구체적으로 다룹니다.
+  - - sdist(source distribution)와 wheel(built distribution)의 차이 - `python -m build`로 두 가지 배포판을 생성하는 방법 - `.
 - **`python -m build`는 어떤 파일을 만들까요?**
   - sdist에 어떤 파일이 포함되는지 제어하는 방법입니다.
 - **`.whl` 파일 안에는 무엇이 들어 있을까요?**
@@ -747,7 +747,7 @@ pip은 wheel이 있으면 wheel을 우선 선택하고, 해당 플랫폼의 whee
 - **멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?**
   - sdist는 요리 레시피이고, wheel은 이미 완성된 냉동식품에 가깝습니다. 레시피를 전달하면 받는 쪽에서 직접 조리해야 하지만, 완성품은 곧바로 꺼내 쓸 수 있습니다.
 - **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요 — 본문에서 구체적으로 다룹니다.
+  - - sdist(source distribution)와 wheel(built distribution)의 차이 - `python -m build`로 두 가지 배포판을 생성하는 방법 - `.
 
 <!-- toc:begin -->
 ## 시리즈 목차

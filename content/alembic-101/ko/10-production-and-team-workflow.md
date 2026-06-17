@@ -400,11 +400,11 @@ SELECT COUNT(*) FROM users WHERE phone IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **one-revision-per-PR 원칙은 왜 중요할까요?**
-  - one-revision-per-PR 원칙은 왜 중요할까요 — 본문에서 구체적으로 다룹니다.
+  - > migration은 **“가장 비가역적인 코드 변경”**입니다
 - **Alembic-aware PR template과 CI checks는 어떻게 구성할까요?**
   - run: alembic check
 - **dev=SQLite, staging+prod=PostgreSQL 같은 multi-environment 전략은 어떻게 가져갈까요?**
-  - dev=SQLite, staging+prod=PostgreSQL 같은 multi-environment 전략은 어떻게 가져갈까요 — 본문에서 구체적으로 다룹니다.
+  - > migration은 **“가장 비가역적인 코드 변경”**입니다
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
   - > migration은 **“가장 비가역적인 코드 변경”**입니다. 일반 코드는 버튼 한 번으로 revert할 수 있어도, schema 변경은 데이터를 끌고 가기 때문에 훨씬 되돌리기 어렵습니다. 그래서 PR 단계에서부터 일반 코드보다 더 엄격하게 다뤄야 합니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

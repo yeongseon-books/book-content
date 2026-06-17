@@ -406,7 +406,7 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **Alembic이 제공하는 두 실행 모드, online과 offline은 어떻게 다를까요?**
-  - Alembic이 제공하는 두 실행 모드, online과 offline은 어떻게 다를까요 — 본문에서 구체적으로 다룹니다.
+  - > Alembic은 두 모드로 실행됩니다
 - **`--sql`로 실제 SQL을 어떻게 미리 볼 수 있을까요?**
   - `--sql` 출력은 길어서 대충 넘기기 쉽습니다. 아래 항목을 고정해서 읽으면 리뷰 품질이 올라갑니다.
 - **DBA 리뷰용 SQL 스크립트는 어떤 흐름으로 만들까요?**

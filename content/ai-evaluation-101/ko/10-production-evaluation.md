@@ -447,7 +447,7 @@ def release_gate(snapshot: dict) -> tuple[bool, str]:
 - **운영 평가는 배포 전 평가를 어떤 지속 루프로 닫아야 할까요?**
   - 평가는 배포 전 한 번이 아니라 운영 중 계속되는 활동입니다. AI Evaluation 101 시리즈를 마칩니다.
 - **production trace sampling, drift detection, shadow mode는 각각 어떤 신호를 잡을까요?**
-  - production trace sampling, drift detection, shadow mode는 각각 어떤 신호를 잡을까요 — 본문에서 구체적으로 다룹니다.
+  - 운영 평가는 배포 후 품질을 추적하는 유일한 현실적 방법입니다
 - **운영 평가 비용을 통제하면서 실패를 regression set으로 되돌리는 기준은 무엇일까요?**
   - 평가는 배포 전 한 번이 아니라 운영 중 계속되는 활동입니다. AI Evaluation 101 시리즈를 마칩니다.
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**

@@ -361,7 +361,7 @@ ProgrammingError -> 즉시 수정 대상
 - **`IntegrityError`, `OperationalError`, `ProgrammingError`를 만나면 retry, 4xx 응답, 즉시 실패를 어떻게 나눠야 할까요?**
   - > 예외 클래스는 운영 의사결정의 신호다. retry할지, 4xx로 돌려줄지, 즉시 fail할지를 클래스 하나로 표현할 수 있어야 한다.
 - **같은 `OperationalError` 안에서도 `SQLITE_BUSY`, `SQLITE_LOCKED`, `SQLITE_CORRUPT`를 왜 따로 봐야 할까요?**
-  - 같은 `OperationalError` 안에서도 `SQLITE_BUSY`, `SQLITE_LOCKED`, `SQLITE_CORRUPT`를 왜 따로 봐야 할까요 — 본문에서 구체적으로 다룹니다.
+  - > 예외 클래스는 운영 의사결정의 신호다
 - **retry 데코레이터를 붙일 때 왜 `with conn:` 트랜잭션 전체를 함수 안에 넣어야 할까요?**
   - `IntegrityError`, `ProgrammingError`, `CORRUPT`는 모두 False를 돌려줍니다.
 - **Mental Model: 예외는 "이 에러를 어떻게 다뤄야 하는가"의 신호에서 가장 흔한 실수는 무엇일까요?**

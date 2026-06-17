@@ -339,11 +339,11 @@ chain = {
 ## 처음 질문으로 돌아가기
 
 - **agent가 엉뚱하게 행동할 때 prompt 문장보다 먼저 어떤 context 경계를 확인해야 할까요?**
-  - agent가 엉뚱하게 행동할 때 prompt 문장보다 먼저 어떤 context 경계를 확인해야 할까요 — 본문에서 구체적으로 다룹니다.
+  - context engineering은 agent 품질의 바닥을 결정합니다
 - **system prompt, 대화 기록, tool 설명, 현재 state는 각각 어떤 책임을 나눌까요?**
-  - system prompt, 대화 기록, tool 설명, 현재 state는 각각 어떤 책임을 나눌까요 — 본문에서 구체적으로 다룹니다.
+  - - **System Prompt**: agent의 정체성과 기본 행동 규칙 - **Conversation History**: 직전 대화 맥락과 이미 교환된 사실 - **Tool Descriptions**: 사용 가능한 수단과 입력 계약 - **State Information**: 현재 작업 단계와 남은 일 아래 예시는
 - **context가 길어질수록 무엇을 버리고 무엇을 유지할지 어떻게 판단해야 할까요?**
-  - context가 길어질수록 무엇을 버리고 무엇을 유지할지 어떻게 판단해야 할까요 — 본문에서 구체적으로 다룹니다.
+  - context engineering은 agent 품질의 바닥을 결정합니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - context engineering은 agent 품질의 바닥을 결정합니다. 좋은 모델도 잘못된 컨텍스트 안에서는 흔들리고, 상대적으로 작은 모델도 역할과 규칙이 명확하면 꽤 안정적으로 동작합니다. 따라서 이 주제는 모델 튜닝 이전에 먼저 다뤄야 하는 기본기입니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

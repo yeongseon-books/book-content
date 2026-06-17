@@ -369,9 +369,9 @@ CLIP, SigLIP, ImageBind는 비슷해 보여도 지원 modality와 학습 목표�
 - **Multimodal embedding은 텍스트 임베딩과 무엇이 다르고, 왜 cross-modal search의 핵심일까요?**
   - CLIP 단독 검색은 빠르지만 도메인 제약을 반영하기 어렵습니다. 예를 들어 전자상거래에서는 카테고리, 가격대, 재고 상태 같은 메타데이터를 함께 써야 실사용 품질이 올라갑니다.
 - **CLIP, SigLIP, ImageBind는 어떤 공통점과 차이를 가지며 무엇을 기준으로 선택해야 할까요?**
-  - CLIP, SigLIP, ImageBind는 어떤 공통점과 차이를 가지며 무엇을 기준으로 선택해야 할까요 — 본문에서 구체적으로 다룹니다.
+  - 멀티모달 embedding은 retrieval 품질을 확장하는 가장 현실적인 방법 중 하나입니다
 - **OpenCLIP으로 벡터를 추출할 때 preprocessing과 normalization은 왜 계약 수준으로 중요할까요?**
-  - OpenCLIP으로 벡터를 추출할 때 preprocessing과 normalization은 왜 계약 수준으로 중요할까요 — 본문에서 구체적으로 다룹니다.
+  - 검색 실패는 단순 오류가 아니라 임베딩 개선 데이터입니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - 멀티모달 embedding은 retrieval 품질을 확장하는 가장 현실적인 방법 중 하나입니다. 거대한 생성 모델을 매번 호출하지 않아도, 검색과 추천의 초기 후보군을 훨씬 정확하게 만들 수 있기 때문입니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

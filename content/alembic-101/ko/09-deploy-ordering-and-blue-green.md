@@ -486,11 +486,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **migration-first와 code-first deploy ordering은 어떻게 다를까요?**
-  - migration-first와 code-first deploy ordering은 어떻게 다를까요 — 본문에서 구체적으로 다룹니다.
+  - > migration은 항상 **“코드보다 먼저, 그리고 코드보다 더 넓은 호환성으로”** 배포됩니다
 - **왜 blue/green deploy는 두 앱 버전과 동시에 호환되는 schema를 요구할까요?**
-  - 왜 blue/green deploy는 두 앱 버전과 동시에 호환되는 schema를 요구할까요 — 본문에서 구체적으로 다룹니다.
+  - deploy ordering은 Alembic 기능이 아니라 운영 정책입니다
 - **NOT NULL 강화는 왜 두 단계로 나눠야 할까요?**
-  - NOT NULL 강화는 왜 두 단계로 나눠야 할까요 — 본문에서 구체적으로 다룹니다.
+  - - **CI/CD stage를 `migrate` → `deploy`로 고정합니다.
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
   - > migration은 항상 **“코드보다 먼저, 그리고 코드보다 더 넓은 호환성으로”** 배포됩니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

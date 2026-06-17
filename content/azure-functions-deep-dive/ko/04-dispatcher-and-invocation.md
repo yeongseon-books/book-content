@@ -253,11 +253,11 @@ TotalMs=425
 ## 처음 질문으로 돌아가기
 
 - **dispatcher는 한 번의 invocation을 어떤 단계로 나눠 처리할까요?**
-  - dispatcher는 한 번의 invocation을 어떤 단계로 나눠 처리할까요 — 본문에서 구체적으로 다룹니다.
+  - Azure Functions는 다양한 트리거를 지원하지만, 워커로 넘어가는 순간에는 모두 같은 invocation 파이프라인으로 정규화됩니다
 - **invocation context는 어디서 만들어지고 누가 해제할까요?**
-  - invocation context는 어디서 만들어지고 누가 해제할까요 — 본문에서 구체적으로 다룹니다.
+  - Azure Functions는 다양한 트리거를 지원하지만, 워커로 넘어가는 순간에는 모두 같은 invocation 파이프라인으로 정규화됩니다
 - **`maxConcurrentRequests`, `batchSize` 같은 동시성 제어는 어디에서 실제로 영향을 줄까요?**
-  - `maxConcurrentRequests`, `batchSize` 같은 동시성 제어는 어디에서 실제로 영향을 줄까요 — 본문에서 구체적으로 다룹니다.
+  - Azure Functions는 다양한 트리거를 지원하지만, 워커로 넘어가는 순간에는 모두 같은 invocation 파이프라인으로 정규화됩니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - Azure Functions는 다양한 트리거를 지원하지만, 워커로 넘어가는 순간에는 모두 같은 invocation 파이프라인으로 정규화됩니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

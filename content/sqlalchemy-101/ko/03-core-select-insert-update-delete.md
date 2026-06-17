@@ -523,11 +523,11 @@ INFO sqlalchemy.engine.Engine COMMIT
 ## 처음 질문으로 돌아가기
 
 - **`select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요?**
-  - `select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요 — 본문에서 구체적으로 다룹니다.
+  - 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다
 - **`insert`, `update`, `delete`를 2.x 트랜잭션 모델과 함께 어떻게 써야 할까요?**
-  - `insert`, `update`, `delete`를 2.x 트랜잭션 모델과 함께 어떻게 써야 할까요 — 본문에서 구체적으로 다룹니다.
+  - 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다
 - **`JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요?**
-  - `JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요 — 본문에서 구체적으로 다룹니다.
+  - 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
   - 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다. `select(...)`로 시작해서 `where`, `order_by`, `limit` 같은 메서드를 호출하면 새로운 statement 객체가 반환되고, 마지막에 Connection이 그것을 실행해 `Result`를 돌려줍니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

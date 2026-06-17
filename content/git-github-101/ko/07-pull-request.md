@@ -498,7 +498,7 @@ git push
 ## 처음 질문으로 돌아가기
 
 - **Pull Request는 plain `git merge`와 무엇이 다를까요?**
-  - Pull Request는 plain `git merge`와 무엇이 다를까요 — 본문에서 구체적으로 다룹니다.
+  - 흐름은 단순해 보이지만 각 단계의 목적이 다릅니다
 - **branch를 만들고 commit한 뒤 PR을 열기까지의 순서는 어떻게 될까요?**
   - branch → push → PR → review → merge를 매번 비슷한 방식으로 수행하면 협업 비용이 급격히 줄어듭니다. 아래는 가장 많이 쓰는 표준 절차입니다.
 - **review comment에는 왜 같은 branch에 commit을 더하는 방식으로 답할까요?**

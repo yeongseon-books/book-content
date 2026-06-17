@@ -565,7 +565,7 @@ if __name__ == "__main__":
 - **`RetrievalQA` 같은 고전 API와 LCEL 조립은 각각 어떤 경계를 숨기고 드러낼까요?**
   - `langchain/chains/retrieval_qa/base.py`를 먼저 보면 `BaseRetrievalQA`가 눈에 들어옵니다.
 - **retriever, prompt, llm, parser를 직접 이으면 디버깅에서 무엇이 쉬워질까요?**
-  - retriever, prompt, llm, parser를 직접 이으면 디버깅에서 무엇이 쉬워질까요 — 본문에서 구체적으로 다룹니다.
+  - 예제 파일: `en/05-rag-chain-assembly/main.py` - 같은 retriever와 같은 LLM을 두고도 classic chain과 LCEL chain의 조립 표면이 다릅니다
 - **체인 조립 후 source document를 잃지 않으려면 어디서 결과 형태를 고정해야 할까요?**
   - LCEL에서 가장 자주 보게 되는 RAG 기본형은 다음과 같습니다.
 - **최소 실행 예제에서 가장 흔한 실수는 무엇일까요?**

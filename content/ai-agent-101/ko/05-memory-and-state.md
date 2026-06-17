@@ -365,9 +365,9 @@ short-term memory는 현재 세션의 working set이고, long-term memory는 나
 - **agent memory와 state를 같은 저장소로 보면 어떤 설계 문제가 생길까요?**
   - memory를 한 저장소로 몰아넣으면 초기에 단순하지만, 곧 품질 문제와 보안 문제가 함께 발생합니다. 운영에서는 단기 실행 상태, 세션 메모리, 장기 사용자 프로필을 분리하는 구조가 안전합니다.
 - **short-term memory, long-term memory, execution state는 각각 언제 필요할까요?**
-  - short-term memory, long-term memory, execution state는 각각 언제 필요할까요 — 본문에서 구체적으로 다룹니다.
+  - memory 설계는 agent의 체감 품질을 결정합니다
 - **context window가 부족해질 때 무엇을 요약하고 무엇을 그대로 남겨야 할까요?**
-  - context window가 부족해질 때 무엇을 요약하고 무엇을 그대로 남겨야 할까요 — 본문에서 구체적으로 다룹니다.
+  - memory 설계는 agent의 체감 품질을 결정합니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - memory 설계는 agent의 체감 품질을 결정합니다. 사용자가 같은 말을 반복하지 않게 해 주고, 긴 작업을 중간에 잊지 않게 해 주며, 후속 질문을 자연스럽게 이어 주기 때문입니다. 동시에 잘못 설계하면 비용과 오류를 폭발시키는 가장 빠른 길이 되기도 합니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

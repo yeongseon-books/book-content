@@ -396,7 +396,7 @@ error response는 API의 두 번째 얼굴입니다. envelope의 모양을 한 �
 - **좋은 error response는 어떤 요소로 이루어질까요?**
   - RFC 7807(2023년에 RFC 9457로 개정)은 에러 응답의 표준 스키마를 정의합니다.
 - **RFC 7807 `application/problem+json`은 왜 유용할까요?**
-  - RFC 7807 `application/problem+json`은 왜 유용할까요 — 본문에서 구체적으로 다룹니다.
+  - 성공 경로는 하나지만 에러 경로는 수십, 수백 개입니다
 - **validation error는 어떤 모양으로 표현해야 할까요?**
   - 이 응답으로는 클라이언트가 어떤 필드를 고쳐야 하는지 알 수 없습니다.
 - **에러 응답이 API의 두 번째 얼굴인 이유에서 가장 흔한 실수는 무엇일까요?**

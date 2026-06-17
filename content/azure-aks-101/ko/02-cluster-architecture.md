@@ -353,11 +353,11 @@ kubectl get nodes -L kubernetes.azure.com/mode,kubernetes.azure.com/agentpool
 ## 처음 질문으로 돌아가기
 
 - **API server, scheduler, controller manager, etcd는 각각 어떤 일을 할까요?**
-  - API server, scheduler, controller manager, etcd는 각각 어떤 일을 할까요 — 본문에서 구체적으로 다룹니다.
+  - AKS 운영에서 많은 문제는 “클러스터가 이상하다”는 막연한 문장으로 시작합니다
 - **Node Pool은 단순한 VM 묶음 이상으로 왜 중요한 관리 단위일까요?**
   - AKS 운영에서 많은 문제는 “클러스터가 이상하다”는 막연한 문장으로 시작합니다. 하지만 실제 원인은 매우 다릅니다.
 - **system node pool과 user node pool을 분리해야 하는 실무적 이유는 무엇일까요?**
-  - system node pool과 user node pool을 분리해야 하는 실무적 이유는 무엇일까요 — 본문에서 구체적으로 다룹니다.
+  - 실제 현장에서는 “설계했다”보다 “설계가 지켜지고 있는지 검증했다”가 더 중요합니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - AKS 운영에서 많은 문제는 “클러스터가 이상하다”는 막연한 문장으로 시작합니다. 하지만 실제 원인은 매우 다릅니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

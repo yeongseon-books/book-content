@@ -326,7 +326,7 @@ rollout:
 - **breaking change와 non-breaking change는 어떻게 구분할까요?**
   - versioning에서 가장 중요한 첫 단계는 "무엇이 breaking인가"를 팀 전체가 동일하게 판단하는 것입니다.
 - **URL versioning과 header versioning은 각각 어떤 장단점이 있을까요?**
-  - URL versioning과 header versioning은 각각 어떤 장단점이 있을까요 — 본문에서 구체적으로 다룹니다.
+  - versioning에서 가장 중요한 첫 단계는 "무엇이 breaking인가"를 팀 전체가 동일하게 판단하는 것입니다
 - **semver, calver 같은 호환성 정책은 어떻게 읽어야 할까요?**
   - 문서에서 맞아 보이던 선택이 운영에서 실패하는 이유는 대부분 관측 지점이 없기 때문입니다. 그래서 설계 단계에서 아래 세 가지를 같이 준비해야 합니다.
 - **Breaking vs Non-breaking — 먼저 정의해야 운영할 수 있다에서 가장 흔한 실수는 무엇일까요?**

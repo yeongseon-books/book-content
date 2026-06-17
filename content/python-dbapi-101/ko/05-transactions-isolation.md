@@ -371,11 +371,11 @@ sqlite3의 transaction은 driver가 친절하게 자동 관리해 주지만, 그
 ## 처음 질문으로 돌아가기
 
 - **sqlite3는 정확히 언제 암묵적 `BEGIN`을 시작하고 `con.in_transaction`은 그 경계를 어떻게 보여 줄까요?**
-  - sqlite3는 정확히 언제 암묵적 `BEGIN`을 시작하고 `con.in_transaction`은 그 경계를 어떻게 보여 줄까요 — 본문에서 구체적으로 다룹니다.
+  - > transaction은 `commit()`과 `rollback()`이라는 함수 이름이 아니라, "어디부터 어디까지를 한 덩어리로 묶을 것인가"를 정하는 경계입니다
 - **`DEFERRED`, `IMMEDIATE`, `EXCLUSIVE`와 WAL mode를 함께 보면 write 충돌 시점이 어떻게 달라질까요?**
-  - `DEFERRED`, `IMMEDIATE`, `EXCLUSIVE`와 WAL mode를 함께 보면 write 충돌 시점이 어떻게 달라질까요 — 본문에서 구체적으로 다룹니다.
+  - > transaction은 `commit()`과 `rollback()`이라는 함수 이름이 아니라, "어디부터 어디까지를 한 덩어리로 묶을 것인가"를 정하는 경계입니다
 - **commit 누락, 장시간 lock 대기, nested 작업은 이 글의 어떤 패턴으로 각각 다뤄야 할까요?**
-  - commit 누락, 장시간 lock 대기, nested 작업은 이 글의 어떤 패턴으로 각각 다뤄야 할까요 — 본문에서 구체적으로 다룹니다.
+  - > transaction은 `commit()`과 `rollback()`이라는 함수 이름이 아니라, "어디부터 어디까지를 한 덩어리로 묶을 것인가"를 정하는 경계입니다
 - **Mental Model — connection이 transaction 단위에서 가장 흔한 실수는 무엇일까요?**
   - > transaction은 `commit()`과 `rollback()`이라는 함수 이름이 아니라, "어디부터 어디까지를 한 덩어리로 묶을 것인가"를 정하는 경계입니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

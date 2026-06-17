@@ -437,11 +437,11 @@ def test_relationship_contract(session: Session):
 ## 처음 질문으로 돌아가기
 
 - **`ForeignKey`와 `relationship()`은 왜 항상 한 쌍처럼 이해해야 할까요?**
-  - `ForeignKey`와 `relationship()`은 왜 항상 한 쌍처럼 이해해야 할까요 — 본문에서 구체적으로 다룹니다.
+  - > `ForeignKey`는 SQL 레벨의 참조이고, `relationship()`은 객체 레벨의 탐색 통로입니다
 - **`back_populates`와 `backref`는 어떤 기준으로 선택할까요?**
-  - `back_populates`와 `backref`는 어떤 기준으로 선택할까요 — 본문에서 구체적으로 다룹니다.
+  - > `ForeignKey`는 SQL 레벨의 참조이고, `relationship()`은 객체 레벨의 탐색 통로입니다
 - **컬렉션 조작, flush, SQL 실행 시점은 어떻게 연결될까요?**
-  - 컬렉션 조작, flush, SQL 실행 시점은 어떻게 연결될까요 — 본문에서 구체적으로 다룹니다.
+  - > `ForeignKey`는 SQL 레벨의 참조이고, `relationship()`은 객체 레벨의 탐색 통로입니다
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
   - > `ForeignKey`는 SQL 레벨의 참조이고, `relationship()`은 객체 레벨의 탐색 통로입니다. `back_populates`는 양방향 통로의 두 끝을 연결해 "한쪽에서 바뀐 컬렉션이 다른 쪽에서도 즉시 반영"되게 만드는 장치입니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**

@@ -411,7 +411,7 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 - **production에서 downgrade는 언제 가능하고 언제 사실상 불가능할까요?**
   - 팀 정책은 문장보다 표로 고정하는 편이 운영에 유리합니다.
 - **어떤 종류의 변경이 irreversible하며, 어떻게 다뤄야 할까요?**
-  - 어떤 종류의 변경이 irreversible하며, 어떻게 다뤄야 할까요 — 본문에서 구체적으로 다룹니다.
+  - > downgrade는 두 종류로 나뉩니다
 - **expand-contract는 downgrade 가능성을 어떻게 회복시킬까요?**
   - 팀 정책은 문장보다 표로 고정하는 편이 운영에 유리합니다.
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**

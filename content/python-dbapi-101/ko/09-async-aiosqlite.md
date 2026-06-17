@@ -366,9 +366,9 @@ async def tx(conn: aiosqlite.Connection):
 ## 처음 질문으로 돌아가기
 
 - **`aiosqlite`는 SQLite를 진짜 비동기로 만드는 것이 아니라면 정확히 무엇을 비동기로 바꿔 주는 걸까요?**
-  - `aiosqlite`는 SQLite를 진짜 비동기로 만드는 것이 아니라면 정확히 무엇을 비동기로 바꿔 주는 걸까요 — 본문에서 구체적으로 다룹니다.
+  - > aiosqlite는 SQLite를 비동기로 바꾸지 않는다
 - **`async with aiosqlite.connect(...)`, `transactional()`, `SQLitePool`은 각각 어떤 경계를 맡고 왜 분리해야 할까요?**
-  - `async with aiosqlite.connect(...)`, `transactional()`, `SQLitePool`은 각각 어떤 경계를 맡고 왜 분리해야 할까요 — 본문에서 구체적으로 다룹니다.
+  - > aiosqlite는 SQLite를 비동기로 바꾸지 않는다
 - **async 핸들러에서 동기 `sqlite3`를 쓰거나, 한 `aiosqlite` connection을 여러 코루틴이 같이 잡으면 어떤 문제가 생길까요?**
   - `aiosqlite`는 풀을 기본 제공하지 않습니다. 직접 만든다면 다음과 같은 모양이 됩니다.
 - **Mental Model: aiosqlite는 sqlite3 + thread + Future에서 가장 흔한 실수는 무엇일까요?**

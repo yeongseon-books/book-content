@@ -232,11 +232,11 @@ autoscale 규칙은 한 번 만들고 끝나지 않습니다. 트래픽 계절�
 ## 처음 질문으로 돌아가기
 
 - **scale-up과 scale-out은 App Service에서 실제로 무엇을 바꿀까요?**
-  - scale-up과 scale-out은 App Service에서 실제로 무엇을 바꿀까요 — 본문에서 구체적으로 다룹니다.
+  - 스케일링을 한 줄 버튼으로 이해하면 사용자 체감 지연을 설명할 수 없게 됩니다
 - **autoscale rule은 앱이 아니라 왜 App Service Plan에 붙는다고 봐야 할까요?**
-  - autoscale rule은 앱이 아니라 왜 App Service Plan에 붙는다고 봐야 할까요 — 본문에서 구체적으로 다룹니다.
+  - 이 주제를 이해할 때 가장 중요한 문장은 이것입니다
 - **Azure Monitor autoscale은 어떤 cadence와 observation window로 규칙을 평가할까요?**
-  - Azure Monitor autoscale은 어떤 cadence와 observation window로 규칙을 평가할까요 — 본문에서 구체적으로 다룹니다.
+  - 스케일링을 한 줄 버튼으로 이해하면 사용자 체감 지연을 설명할 수 없게 됩니다
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - 스케일링을 한 줄 버튼으로 이해하면 사용자 체감 지연을 설명할 수 없게 됩니다. CPU가 높아졌는데 왜 바로 capacity가 늘지 않았는지, metrics는 이미 올라갔는데 왜 요청 큐가 여전히 길었는지, 인스턴스 수가 늘었는데 왜 첫 요청 지연은 남았는지를 설명하려면 scale-out을 제어 루프로 읽어야 합니다.
 - **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**

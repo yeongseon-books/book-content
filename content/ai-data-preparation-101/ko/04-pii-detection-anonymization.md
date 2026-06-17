@@ -445,7 +445,7 @@ PII 처리는 탐지 한 번으로 끝나는 부가 작업이 아닙니다. dete
 ## 처음 질문으로 돌아가기
 
 - **PII 처리 파이프라인을 detection, classification, anonymization, audit로 나누는 이유는 무엇일까요?**
-  - PII 처리 파이프라인을 detection, classification, anonymization, audit로 나누는 이유는 무엇일까요 — 본문에서 구체적으로 다룹니다.
+  - PII 처리를 제대로 하면 학습 데이터 안전성이 올라가고, 규제 대응과 배포 리스크가 동시에 낮아집니다
 - **regex만으로 잡히는 정보와 NER가 추가로 잡아내는 정보는 어떻게 다를까요?**
   - 탐지기가 확신이 낮은 항목은 자동 치환보다 검수 큐로 보내는 편이 안전합니다. Label Studio에 span annotation으로 검수 큐를 만들면 운영자가 false negative를 빠르게 수정할 수 있습니다.
 - **redact, mask, pseudonymize, synthesize는 각각 어떤 운영 목적에 맞을까요?**

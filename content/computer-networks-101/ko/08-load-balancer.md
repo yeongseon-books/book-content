@@ -491,13 +491,13 @@ Kubernetes의 kube-proxy는 내부적으로 iptables 또는 IPVS를 사용합니
 - **L4 로드밸런서와 L7 로드밸런서는 어떻게 다를까요?**
   - 고성능이 필요한 환경에서는 L4 로드밸런서의 DSR(Direct Server Return) 모드를 사용합니다.
 - **round-robin, least connections, hash 같은 분산 알고리즘은 언제 쓰일까요?**
-  - round-robin, least connections, hash 같은 분산 알고리즘은 언제 쓰일까요 — 본문에서 구체적으로 다룹니다.
+  - L4 로드밸런서는 TCP/UDP 흐름(IP + 포트)만 보고 백엔드를 고릅니다
 - **헬스체크와 graceful drain은 왜 신뢰성의 핵심일까요?**
-  - 헬스체크와 graceful drain은 왜 신뢰성의 핵심일까요 — 본문에서 구체적으로 다룹니다.
+  - L4 로드밸런서는 TCP/UDP 흐름(IP + 포트)만 보고 백엔드를 고릅니다
 - **핵심 그림에서 가장 흔한 실수는 무엇일까요?**
   - L4 로드밸런서는 TCP/UDP 흐름(IP + 포트)만 보고 백엔드를 고릅니다. L7 로드밸런서는 HTTP 요청(URL, 헤더, 쿠키)까지 파싱한 뒤 라우팅을 결정합니다.
 - **적용 전후 비교을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 적용 전후 비교을 실무에 적용할 때 주의할 점은 무엇일까요 — 본문에서 구체적으로 다룹니다.
+  - - 클라우드에서는 AWS ALB(L7), NLB(L4), GCP HTTP(S) LB, Azure Application Gateway 등을 사용합니다
 - **단계별로 따라하기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
   - L4 로드밸런서는 TCP/UDP 흐름(IP + 포트)만 보고 백엔드를 고릅니다. L7 로드밸런서는 HTTP 요청(URL, 헤더, 쿠키)까지 파싱한 뒤 라우팅을 결정합니다.
 

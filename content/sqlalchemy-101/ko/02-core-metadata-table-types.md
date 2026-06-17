@@ -456,11 +456,11 @@ Production에서는 `metadata.create_all`을 직접 부르지 않고 Alembic mig
 ## 처음 질문으로 돌아가기
 
 - **`MetaData`는 어떤 역할을 하고 왜 스키마 카탈로그라고 부를까요?**
-  - `MetaData`는 어떤 역할을 하고 왜 스키마 카탈로그라고 부를까요 — 본문에서 구체적으로 다룹니다.
+  - `MetaData`는 schema의 **카탈로그**입니다
 - **`Table`과 `Column`을 Python 객체로 두면 어떤 실수가 줄어들까요?**
-  - `Table`과 `Column`을 Python 객체로 두면 어떤 실수가 줄어들까요 — 본문에서 구체적으로 다룹니다.
+  - `MetaData`는 schema의 **카탈로그**입니다
 - **SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요?**
-  - SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요 — 본문에서 구체적으로 다룹니다.
+  - `MetaData`는 schema의 **카탈로그**입니다
 - **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
   - `MetaData`는 schema의 **카탈로그**입니다. application이 알고 있는 모든 `Table` 정의를 담아 두는 컨테이너이고, 그 컨테이너를 통째로 Engine에 던지면 schema가 만들어지거나 비교됩니다.
 - **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
