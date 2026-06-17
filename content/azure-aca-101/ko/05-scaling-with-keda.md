@@ -324,6 +324,16 @@ watch -n 15 "az containerapp replica list --name api --resource-group $RG -o tab
 
 - [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aca-101/ko/05-scaling-with-keda)
 
+## 운영 체크리스트
+
+- [ ] Azure Container Apps는 선언형 스케일링 신호를 바탕으로 replica 수를 어떻게 결정할 수 있다
+- [ ] 내장 HTTP/TCP 규칙과 사용자 정의 KEDA scaler의 차이는 무엇인지 이해했다
+- [ ] `min-replicas 0`(scale-to-zero)는 언제 안전하고, 언제 위험할 수 있다
+- [ ] 이 글이 답할 질문에서 가장 흔한 실수는 무엇인지 이해했다
+- [ ] 왜 이 글이 중요한가을 실무에 적용할 때 주의할 점은 무엇인지 이해했다
+
+---
+
 ## 정리
 
 이 글은 azure-aca-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
