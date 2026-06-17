@@ -43,9 +43,8 @@ seo_description: ToolNode와 tools_condition으로 도구 호출 루프를 명�
 - LangGraph tool-calling agent는 왜 LLM과 tool 실행 envelope를 분리해서 봐야 할까요?
 - 도구 호출을 반복할 때 state에는 어떤 실행 흔적이 남아야 할까요?
 - 안전한 dispatcher 없이 tool call을 실행하면 어떤 위험이 생길까요?
-- 왜 이 구조가 중요한가에서 가장 흔한 실수는 무엇일까요?
-- Tool-calling Agent를 실행 경계로 읽기을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 최소 실행 예제의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 왜 이 구조가 중요한가
 
@@ -335,12 +334,6 @@ def should_retry_tool(error_code: str, attempt: int) -> bool:
   - 도구 호출 에이전트에서 가장 먼저 잡아야 할 문장은 이것입니다. **Tool-calling Agent는 LLM + 안전한 tool 실행 envelope**입니다.
 - **안전한 dispatcher 없이 tool call을 실행하면 어떤 위험이 생길까요?**
   - 도구 호출 에이전트에서 가장 먼저 잡아야 할 문장은 이것입니다. **Tool-calling Agent는 LLM + 안전한 tool 실행 envelope**입니다.
-- **왜 이 구조가 중요한가에서 가장 흔한 실수는 무엇일까요?**
-  - 도구 호출 에이전트를 배우는 이유를 “LLM이 계산도 하고 검색도 하게 만들 수 있으니까”라고만 설명하면 너무 약합니다.
-- **Tool-calling Agent를 실행 경계로 읽기을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 도구 호출 에이전트에서 가장 먼저 잡아야 할 문장은 이것입니다. **Tool-calling Agent는 LLM + 안전한 tool 실행 envelope**입니다.
-- **최소 실행 예제의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 가장 작은 tool loop 예제로 보겠습니다. 모델이 질문을 읽고 필요한 경우 도구 호출을 요청하고, `ToolNode`가 실제 도구를 실행한 뒤, 그 결과를 다시 모델이 읽어 최종 답을 만듭니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

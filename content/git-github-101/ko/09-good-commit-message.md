@@ -37,9 +37,8 @@ seo_description: 좋은 commit message 구조와 Conventional Commits 실무 규
 - 좋은 commit message는 왜 코드만큼 중요한 자산일까요?
 - subject, body, footer는 각각 무엇을 담아야 할까요?
 - Conventional Commits의 `feat`, `fix`, `docs` 같은 type은 무엇을 해결할까요?
-- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- Subject, Body, Footer를 더 정확히 쓰는 기준의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 `git log`는 미래의 자신과 동료에게 보내는 편지입니다. `git blame`으로 특정 줄에 도달했을 때 message가 선명하면 5초 만에 맥락이 살아나고, `fix`, `update`, `wip` 같은 제목만 있으면 원래 diff와 PR을 다시 읽어야 합니다.
 
@@ -464,12 +463,6 @@ git push
   - subject, body, footer는 각각 무엇을 담아야 할까요에 대해 본문에서 실무 예시와 함께 답합니다.
 - **Conventional Commits의 `feat`, `fix`, `docs` 같은 type은 무엇을 해결할까요?**
   - Conventional Commits 1.0.0은 복잡한 문법이 아니라 세 줄 규칙으로 요약할 수 있습니다.
-- **핵심 그림에서 가장 흔한 실수는 무엇일까요?**
-  - 여기서 먼저 볼 것은 세 가지입니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - Conventional Commits를 실제 팀에서 쓰려면 "형식"보다 "의미 매핑"을 먼저 고정해야 합니다.
-- **Subject, Body, Footer를 더 정확히 쓰는 기준의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - subject는 "이 commit이 브랜치에 적용될 때 일어나는 변화"를 한 줄로 적는 영역입니다. 그래서 명령형이 잘 맞습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

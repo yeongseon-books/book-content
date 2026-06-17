@@ -42,9 +42,8 @@ seo_description: aiosqlite는 SQLite를 비동기로 바꾸지 않는다. connec
 - `aiosqlite`는 SQLite를 진짜 비동기로 만드는 것이 아니라면 정확히 무엇을 비동기로 바꿔 주는 걸까요?
 - `async with aiosqlite.connect(...)`, `transactional()`, `SQLitePool`은 각각 어떤 경계를 맡고 왜 분리해야 할까요?
 - async 핸들러에서 동기 `sqlite3`를 쓰거나, 한 `aiosqlite` connection을 여러 코루틴이 같이 잡으면 어떤 문제가 생길까요?
-- Mental Model: aiosqlite는 sqlite3 + thread + Future에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 적용 전과 후: FastAPI 핸들러의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## Mental Model: aiosqlite는 sqlite3 + thread + Future
 
@@ -371,12 +370,6 @@ async def tx(conn: aiosqlite.Connection):
   - > aiosqlite는 SQLite를 비동기로 바꾸지 않는다
 - **async 핸들러에서 동기 `sqlite3`를 쓰거나, 한 `aiosqlite` connection을 여러 코루틴이 같이 잡으면 어떤 문제가 생길까요?**
   - `aiosqlite`는 풀을 기본 제공하지 않습니다. 직접 만든다면 다음과 같은 모양이 됩니다.
-- **Mental Model: aiosqlite는 sqlite3 + thread + Future에서 가장 흔한 실수는 무엇일까요?**
-  - > aiosqlite는 SQLite를 비동기로 바꾸지 않는다. connection마다 백그라운드 스레드를 띄우고, `await`되는 메서드 호출을 그 스레드의 큐로 넣고, 결과를 Future로 받아 이벤트 루프에 돌려준다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - `aiosqlite.connect()`는 동기 sqlite3 connection과 비슷한 인터페이스를 제공하지만, 모든 메서드가 코루틴입니다. `async with`로 닫고, `async for`로 결과를 순회합니다.
-- **적용 전과 후: FastAPI 핸들러의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 문제 두 가지: (1) `execute()`가 이벤트 루프를 막고, (2) 전역 connection을 공유해 트랜잭션 경계가 모호합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

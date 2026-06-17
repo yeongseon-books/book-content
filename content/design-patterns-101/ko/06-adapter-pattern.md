@@ -40,9 +40,8 @@ last_reviewed: '2026-05-23'
 - Adapter를 두면 정확히 어떤 의존성이 끊어질까요?
 - Anti-Corruption Layer와 Adapter는 같은 것일까요, 다른 것일까요?
 - Adapter가 많아지면 어떤 비용이 쌓일까요?
-- 외부 SDK를 도메인이 원하는 모양으로 바꾸기에서 가장 흔한 실수는 무엇일까요?
-- Python에서 다중상속 기반 Class Adapter를 피해야 하는 이유을 실무에 적용할 때 주의할 점은 무엇일까요?
-- API 버전 마이그레이션에서 Adapter가 자연스러운 이유의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 외부 SDK를 도메인이 원하는 모양으로 바꾸기
 
@@ -467,12 +466,6 @@ class StripeAdapterWithErrorTranslation:
   - Domain-Driven Design에서 Anti-Corruption Layer(ACL)는 외부 바운디드 컨텍스트의 모델이 내부 도메인을 오염시키지 못하게 막는 번역 계층입니다. Adapter는 이 ACL을 구현하는 가장 흔한 수단입니다.
 - **Adapter가 많아지면 어떤 비용이 쌓일까요?**
   - Adapter는 공짜가 아닙니다. 프로젝트에 Adapter가 쌓이면 다음 비용이 누적됩니다.
-- **외부 SDK를 도메인이 원하는 모양으로 바꾸기에서 가장 흔한 실수는 무엇일까요?**
-  - Adapter의 핵심은 한 문장입니다. **도메인이 외부 SDK의 언어를 배우지 않게 만드는 것.** 도메인은 자기가 정의한 Protocol만 알면 되고, 외부 SDK의 메서드 이름, 예외 타입, 응답 구조는 Adapter 안에 갇힙니다.
-- **Python에서 다중상속 기반 Class Adapter를 피해야 하는 이유을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - GoF 책은 Adapter를 두 가지로 나눕니다. Object Adapter(합성)와 Class Adapter(다중 상속). C++에서는 Class Adapter가 자연스러운 선택지였지만, Python에서는 거의 항상 Object Adapter가 낫습니다.
-- **API 버전 마이그레이션에서 Adapter가 자연스러운 이유의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - API v1에서 v2로 마이그레이션할 때, 모든 클라이언트를 한 번에 전환하는 것은 현실적으로 불가능합니다. 이때 Adapter는 v1 인터페이스를 유지하면서 내부적으로 v2를 호출하는 호환 계층 역할을 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

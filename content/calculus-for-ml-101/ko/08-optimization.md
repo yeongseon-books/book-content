@@ -40,9 +40,8 @@ last_reviewed: '2026-05-12'
 - plain gradient descent는 실제 딥러닝 학습에서 어떤 약점을 드러낼까요?
 - momentum은 왜 관성이라는 비유로 설명하는 편이 가장 이해가 쉬울까요?
 - RMSProp과 Adam은 좌표별 gradient scale 차이를 어떻게 완화할까요?
-- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
-- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -458,12 +457,7 @@ for step, batch in enumerate(loader):
   - 실무에서 optimizer는 training recipe의 중심입니다
 - **RMSProp과 Adam은 좌표별 gradient scale 차이를 어떻게 완화할까요?**
   - 실무에서 optimizer는 training recipe의 중심입니다
-- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - 실무에서 optimizer는 training recipe의 중심입니다. 같은 모델과 데이터라도 optimizer, learning-rate schedule, weight decay 설정이 바뀌면 수렴 속도와 최종 성능이 크게 달라집니다.
-- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 최적화를 가장 실용적으로 이해하는 방법은 plain GD가 어디서 힘들어하는지 먼저 보는 것입니다.
-- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 최적화를 가장 실용적으로 이해하는 방법은 plain GD가 어디서 힘들어하는지 먼저 보는 것입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

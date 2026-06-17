@@ -37,9 +37,8 @@ HuggingFaceEmbeddings와 FAISS IndexFlatL2는 텍스트를 벡터로 바꾸고 �
 - 문서 임베딩과 질의 임베딩은 왜 같은 모델을 쓰면서도 호출 경로를 분리해서 봐야 할까요?
 - FAISS `IndexFlatL2`는 검색할 때 실제로 어떤 계산을 반복할까요?
 - 인덱스가 빠르게 답해도 메타데이터 매핑이 틀리면 어떤 문제가 생길까요?
-- 최소 실행 예제에서 가장 흔한 실수는 무엇일까요?
-- 소스 버전을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 1. `OpenAIEmbeddings`는 어떤 벡터를 만들고 무엇을 분리하는가의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 최소 실행 예제
 
@@ -415,12 +414,6 @@ if __name__ == "__main__":
 - **FAISS `IndexFlatL2`는 검색할 때 실제로 어떤 계산을 반복할까요?**
   - FAISS의 `IndexFlatL2`는 자주 “기본 인덱스”, “brute-force 인덱스” 정도로 설명됩니다.
 - **인덱스가 빠르게 답해도 메타데이터 매핑이 틀리면 어떤 문제가 생길까요?**
-  - LangChain 0.2.17에서 우리가 흔히 쓰는 `OpenAIEmbeddings`는 `langchain_community.embeddings.openai`에 있습니다.
-- **최소 실행 예제에서 가장 흔한 실수는 무엇일까요?**
-  - 예제 파일: `en/02-embeddings-and-vector-index/main.py`
-- **소스 버전을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 이 글의 LangChain 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17), FAISS C++ 코드 인용은 [`facebookresearch/faiss @ c72ef8a`](https://github.com/facebookresearch/faiss/tree/c72ef8a) 기준입니다.
-- **1. `OpenAIEmbeddings`는 어떤 벡터를 만들고 무엇을 분리하는가의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
   - LangChain 0.2.17에서 우리가 흔히 쓰는 `OpenAIEmbeddings`는 `langchain_community.embeddings.openai`에 있습니다.
 
 <!-- toc:begin -->

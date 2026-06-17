@@ -37,9 +37,8 @@ RetrievalQA는 편하지만 많은 단계를 감춥니다. 여기서는 LCEL 파
 - `RetrievalQA` 같은 고전 API와 LCEL 조립은 각각 어떤 경계를 숨기고 드러낼까요?
 - retriever, prompt, llm, parser를 직접 이으면 디버깅에서 무엇이 쉬워질까요?
 - 체인 조립 후 source document를 잃지 않으려면 어디서 결과 형태를 고정해야 할까요?
-- 최소 실행 예제에서 가장 흔한 실수는 무엇일까요?
-- 소스 버전을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 3. LCEL로 RAG 체인 조립하기: dict literal은 왜 `RunnableParallel`이 되는가의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 최소 실행 예제
 
@@ -567,12 +566,6 @@ if __name__ == "__main__":
 - **retriever, prompt, llm, parser를 직접 이으면 디버깅에서 무엇이 쉬워질까요?**
   - 예제 파일: `en/05-rag-chain-assembly/main.py` - 같은 retriever와 같은 LLM을 두고도 classic chain과 LCEL chain의 조립 표면이 다릅니다
 - **체인 조립 후 source document를 잃지 않으려면 어디서 결과 형태를 고정해야 할까요?**
-  - LCEL에서 가장 자주 보게 되는 RAG 기본형은 다음과 같습니다.
-- **최소 실행 예제에서 가장 흔한 실수는 무엇일까요?**
-  - 예제 파일: `en/05-rag-chain-assembly/main.py`
-- **소스 버전을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 이 글의 모든 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다.
-- **3. LCEL로 RAG 체인 조립하기: dict literal은 왜 `RunnableParallel`이 되는가의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
   - LCEL에서 가장 자주 보게 되는 RAG 기본형은 다음과 같습니다.
 
 <!-- toc:begin -->

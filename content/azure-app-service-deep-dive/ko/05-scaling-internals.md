@@ -39,9 +39,8 @@ autoscale은 다이어그램 안에서는 거의 즉시 반응하는 것처럼 �
 - scale-up과 scale-out은 App Service에서 실제로 무엇을 바꿀까요?
 - autoscale rule은 앱이 아니라 왜 App Service Plan에 붙는다고 봐야 할까요?
 - Azure Monitor autoscale은 어떤 cadence와 observation window로 규칙을 평가할까요?
-- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
-- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -237,12 +236,7 @@ autoscale 규칙은 한 번 만들고 끝나지 않습니다. 트래픽 계절�
   - 이 주제를 이해할 때 가장 중요한 문장은 이것입니다
 - **Azure Monitor autoscale은 어떤 cadence와 observation window로 규칙을 평가할까요?**
   - 스케일링을 한 줄 버튼으로 이해하면 사용자 체감 지연을 설명할 수 없게 됩니다
-- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - 스케일링을 한 줄 버튼으로 이해하면 사용자 체감 지연을 설명할 수 없게 됩니다. CPU가 높아졌는데 왜 바로 capacity가 늘지 않았는지, metrics는 이미 올라갔는데 왜 요청 큐가 여전히 길었는지, 인스턴스 수가 늘었는데 왜 첫 요청 지연은 남았는지를 설명하려면 scale-out을 제어 루프로 읽어야 합니다.
-- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 이 주제를 이해할 때 가장 중요한 문장은 이것입니다. **App Service scale-out은 앱이 서버를 직접 띄우는 과정이 아니라, autoscale 또는 수동 조작이 App Service Plan의 desired instance count를 바꾸고, 플랫폼이 그 desired state를 worker capacity로 반영한 뒤, 새 worker가 readiness를 통과해야 비로소 라우팅 대상이 되는 과정입니다.
-- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 이 주제를 이해할 때 가장 중요한 문장은 이것입니다. **App Service scale-out은 앱이 서버를 직접 띄우는 과정이 아니라, autoscale 또는 수동 조작이 App Service Plan의 desired instance count를 바꾸고, 플랫폼이 그 desired state를 worker capacity로 반영한 뒤, 새 worker가 readiness를 통과해야 비로소 라우팅 대상이 되는 과정입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

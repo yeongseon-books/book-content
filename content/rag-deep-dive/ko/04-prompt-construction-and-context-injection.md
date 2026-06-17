@@ -37,9 +37,8 @@ PromptTemplate과 MessagesPlaceholder는 검색된 컨텍스트를 LLM이 읽는
 - 프롬프트 템플릿은 문자열 포맷팅이 아니라 어떤 입력 계약을 검증할까요?
 - 검색된 context를 메시지에 주입할 때 누락·순서·역할은 왜 중요할까요?
 - RAG 프롬프트에서 질문과 근거를 분리하지 않으면 어떤 디버깅 문제가 생길까요?
-- 최소 실행 예제에서 가장 흔한 실수는 무엇일까요?
-- 소스 버전을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 1. `PromptTemplate` 내부 동작과 입력 변수 검증의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 최소 실행 예제
 
@@ -407,12 +406,6 @@ if __name__ == "__main__":
   - 예제 파일: `en/04-prompt-construction-and-context-injection/main.py` - `partial(question=...)` 뒤에는 실제 입력 변수 집합이 줄어듭니다
 - **RAG 프롬프트에서 질문과 근거를 분리하지 않으면 어떤 디버깅 문제가 생길까요?**
   - 좋은 RAG 프롬프트는 단순히 “문맥을 보고 답하라”로 끝나지 않습니다. 증거를 어떻게 다뤄야 하는지, 문맥이 부족할 때는 어떻게 말해야 하는지, 여러 청크가 같은 내용을 반복하거나 일부만 겹칠 때는 출처를 어떻게 표기해야 하는지를 명시해 주는 편이 훨씬 안전합니다.
-- **최소 실행 예제에서 가장 흔한 실수는 무엇일까요?**
-  - 예제 파일: `en/04-prompt-construction-and-context-injection/main.py`
-- **소스 버전을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 이 글의 모든 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다.
-- **1. `PromptTemplate` 내부 동작과 입력 변수 검증의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 소스에서 `PromptTemplate`는 `langchain_core.prompts.prompt.PromptTemplate`에 있지만, 실제 성격은 상속 구조를 같이 봐야 분명해집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

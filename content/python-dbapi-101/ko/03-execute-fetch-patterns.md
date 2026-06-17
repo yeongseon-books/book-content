@@ -41,9 +41,8 @@ DB-API의 모든 query 실행은 결국 cursor의 `execute()`, `executemany()`�
 - `execute`, `executemany`, `fetchone`, `fetchall`, `fetchmany`는 각각 언제 써야 할까요?
 - 큰 결과셋을 메모리를 터뜨리지 않고 처리하려면 어떤 패턴을 써야 할까요?
 - `cursor.description`은 어떤 메타데이터를 제공할까요?
-- 6. 어떤 메서드를 언제 쓰나에서 가장 흔한 실수는 무엇일까요?
-- 7. 결과 메타데이터을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 8. Streaming + transformation 실전 예제의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 1. execute - 한 번의 query
 
@@ -375,12 +374,6 @@ def timed(fn, *args, **kwargs):
   - DB-API 코드는 SQL 문장보다 경계 관리가 더 중요합니다. 연결 수명, 커서 재사용 범위, 커밋/롤백 시점을 코드로 드러내야 장애 시 복구가 쉬워집니다.
 - **`cursor.description`은 어떤 메타데이터를 제공할까요?**
   - `cursor.execute(operation, parameters=None)`은 single SQL statement를 실행합니다
-- **6. 어떤 메서드를 언제 쓰나에서 가장 흔한 실수는 무엇일까요?**
-  - 1. **결과셋이 큰 query에 `fetchall()` 호출** - 100만 row가 나오면 그대로 OOM. 항상 결과 크기를 가정하지 않고 streaming pattern을 default로 둡니다.
-- **7. 결과 메타데이터을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - `cursor.description`은 마지막 SELECT의 column metadata를 7-tuple list로 반환합니다.
-- **8. Streaming + transformation 실전 예제의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - CSV로 export하는 ETL을 streaming + chunk로 작성합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

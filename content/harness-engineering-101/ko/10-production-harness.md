@@ -39,9 +39,8 @@ Production Harness는 앞선 모든 harness를 하나의 배포 가능한 단위
 - Production Harness는 여러 harness를 어떻게 하나의 배포 가능한 운영 스택으로 묶을까요?
 - 점진적 rollout과 rollback은 agent 시스템에서 왜 설계의 일부여야 할까요?
 - 새벽 장애를 견디려면 runbook에는 어떤 실행 정보가 있어야 할까요?
-- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
-- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 왜 이 글이 중요한가
 Production Harness가 중요한 첫 번째 이유는 조합 복잡성입니다. 부품이 많아질수록 어느 하나의 품질보다 서로가 어떻게 연결되는지가 더 큰 장애 원인이 됩니다.
@@ -404,12 +403,7 @@ Production Harness는 앞선 아홉 가지 harness를 예쁘게 모아 놓는 �
   - Production Harness가 중요한 첫 번째 이유는 조합 복잡성입니다
 - **새벽 장애를 견디려면 runbook에는 어떤 실행 정보가 있어야 할까요?**
   - Production Harness가 중요한 첫 번째 이유는 조합 복잡성입니다
-- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - Production Harness가 중요한 첫 번째 이유는 조합 복잡성입니다. 부품이 많아질수록 어느 하나의 품질보다 서로가 어떻게 연결되는지가 더 큰 장애 원인이 됩니다.
-- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - Production Harness는 새로운 기술 조각 하나가 아니라 조립 규칙입니다. Task, Context, Constraint, Tool, Test, Feedback, Approval, Observability를 요청 흐름과 배포 흐름 안에서 함께 움직이게 만들어야 합니다.
-- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - Production Harness는 새로운 기술 조각 하나가 아니라 조립 규칙입니다. Task, Context, Constraint, Tool, Test, Feedback, Approval, Observability를 요청 흐름과 배포 흐름 안에서 함께 움직이게 만들어야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -43,9 +43,8 @@ seo_description: OpenAPI 3와 Swagger UI로 계약을 문서, 검증, SDK로 연
 - OpenAPI 3 문서는 어떤 구조로 이루어질까요?
 - Swagger UI와 Redoc은 각각 어떤 역할을 할까요?
 - code-first와 schema-first는 어떤 차이가 있을까요?
-- OpenAPI란 무엇인가에서 가장 흔한 실수는 무엇일까요?
-- Code-first 대 Schema-first을 실무에 적용할 때 주의할 점은 무엇일까요?
-- Spec 파일 구성 팁의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## OpenAPI란 무엇인가
 
@@ -430,12 +429,6 @@ OpenAPI는 API의 프로토콜이자 문서이자 코드 생성 입력입니다.
   - 실무에서는 내부용은 Swagger UI(`/docs`), 외부 공개 문서는 Redoc을 쓰는 팀이 많습니다.
 - **code-first와 schema-first는 어떤 차이가 있을까요?**
   - OpenAPI Specification(OAS)은 REST API의 구조를 기계가 읽을 수 있는 형태로 기술하는 표준입니다
-- **OpenAPI란 무엇인가에서 가장 흔한 실수는 무엇일까요?**
-  - OpenAPI Specification(OAS)은 REST API의 구조를 기계가 읽을 수 있는 형태로 기술하는 표준입니다.
-- **Code-first 대 Schema-first을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - API spec을 만드는 두 가지 접근법이 있습니다. 어느 쪽이든 "spec이 존재하고 코드와 동기화된다"는 결과는 같아야 합니다.
-- **Spec 파일 구성 팁의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 규모가 커지면 하나의 `openapi.yaml`이 수천 줄이 됩니다. `$ref`로 파일을 분리하면 PR diff가 읽기 쉬워집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

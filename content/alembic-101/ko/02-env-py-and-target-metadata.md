@@ -35,9 +35,8 @@ seo_description: Alembic의 부트 스크립트인 env.py 설정법과 target_me
 - `env.py`는 정확히 무엇이고 언제 실행될까요?
 - 왜 `target_metadata`는 선택 사항이 아니라 필수일까요?
 - DB URL을 환경 변수에서 안전하게 읽는 패턴은 어떻게 만들까요?
-- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 1편의 scaffold 상태에서 Alembic은 아직 모델 metadata의 위치를 모릅니다. 그래서 `alembic revision --autogenerate`를 실행해도 빈 파일이 나옵니다. `env.py`에 모델 metadata를 알려 주는 한 줄이 없으면, Alembic은 live DB schema와 무엇을 비교해야 하는지조차 알 수 없습니다.
 
@@ -476,12 +475,6 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
   - > `env.py`는 Alembic이 **모든 명령마다 실행하는 부트 스크립트**입니다
 - **DB URL을 환경 변수에서 안전하게 읽는 패턴은 어떻게 만들까요?**
   - `env.py`는 Alembic의 부트 스크립트이고, 실제로 핵심은 두 가지입니다
-- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
-  - > `env.py`는 Alembic이 **모든 명령마다 실행하는 부트 스크립트**입니다. 각 실행(`upgrade`, `revision --autogenerate` 등)에서 Alembic은 (1) `alembic.ini`를 읽고, (2) `env.py`를 실행해 connection과 metadata를 얻고, (3) `versions/` 아래의 revision을 적용합니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 기본 `env.py`는 보통 두 함수를 정의합니다.
-- **변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 기본 `env.py`는 보통 두 함수를 정의합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

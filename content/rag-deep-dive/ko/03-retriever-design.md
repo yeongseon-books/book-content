@@ -37,9 +37,8 @@ VectorStoreRetriever와 MMR은 관련성과 다양성 사이 균형점을 retrie
 - `BaseRetriever`는 검색 구현마다 무엇을 같은 호출 계약으로 묶어 줄까요?
 - `similarity`, `similarity_score_threshold`, `mmr`는 각각 어떤 검색 실패를 줄이려는 선택일까요?
 - 검색 결과가 이상할 때 callback과 파라미터 로그는 어떤 단서를 줄까요?
-- 최소 실행 예제에서 가장 흔한 실수는 무엇일까요?
-- 소스 버전을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 2. `VectorStoreRetriever`는 어디에서 분기하는가의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 최소 실행 예제
 
@@ -483,12 +482,6 @@ if __name__ == "__main__":
   - LangChain 0.2.17에서 retriever의 기준 인터페이스는 `langchain_core.retrievers.BaseRetriever`입니다.
 - **검색 결과가 이상할 때 callback과 파라미터 로그는 어떤 단서를 줄까요?**
   - LangChain 0.2.17에서 retriever의 기준 인터페이스는 `langchain_core.retrievers.BaseRetriever`입니다.
-- **최소 실행 예제에서 가장 흔한 실수는 무엇일까요?**
-  - 예제 파일: `en/03-retriever-design/main.py`
-- **소스 버전을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 이 글의 모든 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다.
-- **2. `VectorStoreRetriever`는 어디에서 분기하는가의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - `VectorStoreRetriever`는 이름 그대로 vector store 위에 얹힌 기본 retriever입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -41,9 +41,8 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 - `sqlite3.Row`, dict, dataclass, Pydantic row factory는 어떤 상황에서 각각 선택해야 할까요?
 - `Decimal`, `Enum`, JSON 값을 SQLite와 안전하게 왕복하려면 adapter, converter, `detect_types`를 어떻게 묶어야 할까요?
 - 컬럼 순서 변경, `REAL` 금액 저장, view/join 결과 타입 유실 같은 문제를 이 글의 패턴으로 어떻게 줄일 수 있을까요?
-- Mental Model — 두 단계 변환에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## Mental Model — 두 단계 변환
 
@@ -355,12 +354,6 @@ row factory는 **shape**, adapter/converter는 **value**를 다룬다는 두 축
   - > SQLite에서 Python으로 값이 넘어올 때는 먼저 **값 단위 타입 변환**이 일어나고, 그다음에 **행 단위 shape 변환**이 일어납니다
 - **컬럼 순서 변경, `REAL` 금액 저장, view/join 결과 타입 유실 같은 문제를 이 글의 패턴으로 어떻게 줄일 수 있을까요?**
   - row factory와 converter를 파일마다 다르게 두면 데이터 모양이 흔들립니다. connection 팩토리에서 한 번에 등록하는 방식이 유지보수에 유리합니다.
-- **Mental Model — 두 단계 변환에서 가장 흔한 실수는 무엇일까요?**
-  - > SQLite에서 Python으로 값이 넘어올 때는 먼저 **값 단위 타입 변환**이 일어나고, 그다음에 **행 단위 shape 변환**이 일어납니다. 이 순서를 분리해서 보면 adapter/converter와 row factory를 어디에 둘지 명확해집니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 가장 가벼운 row factory. tuple처럼 인덱스로도, dict처럼 이름으로도 접근됩니다.
-- **적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - `SELECT` 컬럼 순서가 바뀌면 가격이 갑자기 name으로 곱해집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

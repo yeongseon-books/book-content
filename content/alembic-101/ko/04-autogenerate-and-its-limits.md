@@ -36,9 +36,8 @@ autogenerate는 매우 강력하지만, 의도까지 읽어 주는 도구는 아
 - `alembic revision --autogenerate`는 내부에서 무엇을 비교할까요?
 - 어떤 변경은 잘 잡고, 어떤 변경은 놓치거나 옵션이 필요할까요?
 - `compare_type`, `compare_server_default`, `include_object`, `include_name`은 언제 필요할까요?
-- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 autogenerate는 Alembic에서 가장 생산성이 큰 기능이지만, “버튼 한 번 누르면 끝”이라고 믿는 순간 사고가 시작됩니다. generated file을 그대로 커밋했다가 column rename이 drop+create로 풀리고, 그 결과 데이터가 사라지는 일은 실제로 흔합니다.
 
@@ -405,12 +404,6 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
   - > Autogenerate는 **현재 DB(ground truth)와 `target_metadata`(desired state)의 diff를 만들고, 그 차이를 `op` 호출로 직렬화하는 도구**입니다
 - **`compare_type`, `compare_server_default`, `include_object`, `include_name`은 언제 필요할까요?**
   - > Autogenerate는 **현재 DB(ground truth)와 `target_metadata`(desired state)의 diff를 만들고, 그 차이를 `op` 호출로 직렬화하는 도구**입니다
-- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
-  - > Autogenerate는 **현재 DB(ground truth)와 `target_metadata`(desired state)의 diff를 만들고, 그 차이를 `op` 호출로 직렬화하는 도구**입니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - `alembic revision --autogenerate -m "..."`는 다음 순서로 동작합니다.
-- **변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - `alembic revision --autogenerate -m "..."`는 다음 순서로 동작합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

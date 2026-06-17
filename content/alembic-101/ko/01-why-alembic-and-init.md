@@ -35,9 +35,8 @@ Alembic을 처음 접하면 명령어보다 먼저 이런 의문이 생깁니다
 - 마이그레이션 도구가 실제로 해결하는 문제는 무엇일까요?
 - 왜 `Base.metadata.create_all`만으로는 운영 환경을 버틸 수 없을까요?
 - revision, head, `alembic_version` 테이블은 각각 어떤 역할을 할까요?
-- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 스키마 변경은 production 사고의 단골 원인입니다. 코드는 git으로, 인프라는 Terraform으로 관리하면서도 “누가 어떤 SQL을 어느 환경에 실행했는가”만 수작업으로 남기는 팀이 의외로 많습니다. 그러면 staging은 조용히 production과 어긋나고, 문제가 생겼을 때도 스키마를 어디까지 되돌려야 하는지 누구도 자신 있게 말하지 못합니다.
 
@@ -433,12 +432,6 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
   - Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
 - **revision, head, `alembic_version` 테이블은 각각 어떤 역할을 할까요?**
   - > Alembic은 **DB 스키마를 위한 git**입니다
-- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
-  - > Alembic은 **DB 스키마를 위한 git**입니다. 각 마이그레이션 파일은 commit이고, `alembic_version` 테이블은 현재 HEAD 포인터이며, `upgrade head`는 fast-forward이고, `downgrade -1`은 한 단계 reset에 가깝습니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 각 마이그레이션 파일은 고유한 `revision` ID와 부모를 가리키는 `down_revision`을 가집니다.
-- **변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 각 마이그레이션 파일은 고유한 `revision` ID와 부모를 가리키는 `down_revision`을 가집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

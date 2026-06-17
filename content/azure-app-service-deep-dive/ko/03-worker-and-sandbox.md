@@ -39,9 +39,8 @@ seo_description: Windows 샌드박스와 Linux 컨테이너 경계를 비교해 
 - App Service의 worker는 실제로 어떤 실행 경계를 의미할까요?
 - Windows code app에서 App Service sandbox는 무엇을 허용하고 무엇을 제한할까요?
 - 왜 registry write와 GDI/User32 계열 제약이 Windows App Service에서 자주 문제를 만들까요?
-- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
-- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -275,12 +274,7 @@ az webapp config appsettings list -n my-app -g my-rg   --query "[?name=='WEBSITE
   - 운영에서 worker를 제대로 이해하지 못하면 런타임 문제와 플랫폼 계약 문제를 계속 섞게 됩니다
 - **왜 registry write와 GDI/User32 계열 제약이 Windows App Service에서 자주 문제를 만들까요?**
   - 운영에서 worker를 제대로 이해하지 못하면 런타임 문제와 플랫폼 계약 문제를 계속 섞게 됩니다
-- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - 운영에서 worker를 제대로 이해하지 못하면 런타임 문제와 플랫폼 계약 문제를 계속 섞게 됩니다.
-- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 이 글에서 가장 먼저 고정해야 할 문장은 이것입니다. **App Service의 worker는 하나의 용어이지만, Windows에서는 sandbox 안의 IIS-hosted process이고, Linux에서는 container contract 안의 프로세스입니다.
-- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 이 글에서 가장 먼저 고정해야 할 문장은 이것입니다. **App Service의 worker는 하나의 용어이지만, Windows에서는 sandbox 안의 IIS-hosted process이고, Linux에서는 container contract 안의 프로세스입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

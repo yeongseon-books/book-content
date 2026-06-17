@@ -42,9 +42,8 @@ seo_description: AsyncSession과 aiosqlite를 써서 비동기 SQLAlchemy를 안
 - `create_async_engine`과 `AsyncSession`은 동기 버전과 무엇이 같고 무엇이 다를까요?
 - URL에 `sqlite+aiosqlite` 같은 비동기 드라이버 표기는 왜 중요할까요?
 - async 환경에서는 왜 암묵적 IO를 피해야 할까요?
-- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 FastAPI, Starlette, aiohttp 같은 async 프레임워크에서 동기 SQLAlchemy를 그대로 쓰면 이벤트 루프가 블록됩니다. SQLAlchemy 2.x의 async API는 1.4부터 정식 도입돼 안정화됐고, SQLite도 `aiosqlite` 드라이버로 같은 패턴을 쓸 수 있습니다.
 
@@ -512,12 +511,6 @@ async 환경에서도 원칙은 동일합니다. 트랜잭션을 짧게 유지�
   - async 프로젝트에서는 관계 접근 계약을 문서로 못 박아 두는 편이 좋습니다.
 - **async 환경에서는 왜 암묵적 IO를 피해야 할까요?**
   - async ORM에서 가장 많이 만나는 오류를 먼저 재현해 보겠습니다.
-- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
-  - > async SQLAlchemy는 **기존 ORM의 얇은 awaitable wrapper**입니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - `from sqlalchemy.ext.asyncio import create_async_engine`로 만든 엔진은 `AsyncEngine`입니다. 동기 `Engine`과 거의 같지만, `connect`/`begin`이 async context manager입니다.
-- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 동기 코드를 async로 옮기는 1대1 매핑입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

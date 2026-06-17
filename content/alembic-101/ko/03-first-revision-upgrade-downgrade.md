@@ -35,9 +35,8 @@ autogenerate가 편리하더라도, 한 번은 직접 써 봐야 자동 생성 �
 - `alembic revision`이 만들어 주는 파일 구조는 어떻게 생겼을까요?
 - `op.create_table`, `op.add_column`, `op.drop_column`, `op.execute`는 각각 언제 쓸까요?
 - `upgrade()`와 `downgrade()`를 어떻게 대칭으로 유지할 수 있을까요?
-- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 autogenerate가 아무리 좋아도 최종 산출물은 결국 같은 `op` 호출들의 조합입니다. 직접 한 번 작성해 본 사람과 그렇지 않은 사람의 차이는 명확합니다. 자동 생성된 파일을 읽고 “여기서 rename이 drop+add로 풀렸다” 같은 문제를 눈치챌 수 있는지가 달라집니다.
 
@@ -406,12 +405,6 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
   - > revision 파일은 **`upgrade(): N → N+1`과 `downgrade(): N+1 → N`이라는 함수 쌍**입니다
 - **`upgrade()`와 `downgrade()`를 어떻게 대칭으로 유지할 수 있을까요?**
   - > revision 파일은 **`upgrade(): N → N+1`과 `downgrade(): N+1 → N`이라는 함수 쌍**입니다
-- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
-  - > revision 파일은 **`upgrade(): N → N+1`과 `downgrade(): N+1 → N`이라는 함수 쌍**입니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 위에서부터 읽으면 (1) revision 자신의 ID와 부모 ID, (2) `upgrade`/`downgrade` 쌍이 전부입니다. `branch_labels`와 `depends_on`은 5편에서 다룹니다.
-- **변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 위에서부터 읽으면 (1) revision 자신의 ID와 부모 ID, (2) `upgrade`/`downgrade` 쌍이 전부입니다. `branch_labels`와 `depends_on`은 5편에서 다룹니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

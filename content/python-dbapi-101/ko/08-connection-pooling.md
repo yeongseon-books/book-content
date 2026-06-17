@@ -41,9 +41,8 @@ seo_description: SQLite connection은 다른 DB의 client/server connection과 �
 - `sqlite3.threadsafety`와 `check_same_thread`는 각각 무엇을 보장하고, 어떤 조합에서 connection 공유를 피해야 할까요?
 - 요청별 connection, 스레드별 connection, 단일 shared connection, 단일 writer 큐 중에서 SQLite에 맞는 선택 기준은 무엇일까요?
 - FastAPI에서 전역 connection 대신 `Depends(get_db)`와 `BEGIN IMMEDIATE` 패턴을 쓰면 어떤 사고를 줄일 수 있을까요?
-- Mental Model: connection은 "파일을 연 핸들"이다에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## Mental Model: connection은 "파일을 연 핸들"이다
 
@@ -377,12 +376,6 @@ class Pool:
   - 쓰기 처리량이 병목이라면, 다음 패턴을 고려할 수 있습니다.
 - **FastAPI에서 전역 connection 대신 `Depends(get_db)`와 `BEGIN IMMEDIATE` 패턴을 쓰면 어떤 사고를 줄일 수 있을까요?**
   - > SQLite connection은 다른 DB의 client/server connection과 다르다. 별도 프로세스가 없고, 락은 파일 시스템 락이며, connection 객체는 본질적으로 파일 핸들 + 캐시 + 트랜잭션 상태다.
-- **Mental Model: connection은 "파일을 연 핸들"이다에서 가장 흔한 실수는 무엇일까요?**
-  - > SQLite connection은 다른 DB의 client/server connection과 다르다. 별도 프로세스가 없고, 락은 파일 시스템 락이며, connection 객체는 본질적으로 파일 핸들 + 캐시 + 트랜잭션 상태다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - SQLite C 라이브러리는 컴파일 시 세 가지 native 모드 중 하나를 가집니다.
-- **적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 문제는 두 스레드가 동시에 `execute()`를 호출하면, `serialized` 모드라도 cursor 상태와 트랜잭션 경계가 뒤섞입니다. 한 스레드가 `BEGIN`한 트랜잭션을 다른 스레드가 무심코 `commit()`해 버릴 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

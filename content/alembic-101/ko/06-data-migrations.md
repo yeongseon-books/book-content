@@ -35,9 +35,8 @@ seo_description: 데이터 마이그레이션은 "schema는 그대로 두고 row
 - data migration은 schema migration과 무엇이 다를까요?
 - `op.execute`는 raw SQL과 SQLAlchemy Core 중 어떤 스타일로 쓸 수 있을까요?
 - 큰 데이터셋은 어떤 batch 패턴으로 나누어 처리해야 할까요?
-- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 `ALTER TABLE`만 migration은 아닙니다. column rename, enum 값 변경, JSON 구조 변환처럼 schema와 함께 데이터도 바뀌는 작업이 많습니다. 문제는 이런 data migration을 schema revision 안에 그대로 섞으면 큰 데이터셋에서 lock과 timeout이 폭발하고, `downgrade`는 사실상 불가능해진다는 사실입니다.
 
@@ -449,12 +448,6 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
   - > data migration은 **schema는 그대로 두고 row를 변환하는 revision**입니다
 - **큰 데이터셋은 어떤 batch 패턴으로 나누어 처리해야 할까요?**
   - > data migration은 **schema는 그대로 두고 row를 변환하는 revision**입니다
-- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
-  - > data migration은 **schema는 그대로 두고 row를 변환하는 revision**입니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 빠르고 단순하지만 dialect에 묶이고 IDE 도움도 적습니다.
-- **변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 빠르고 단순하지만 dialect에 묶이고 IDE 도움도 적습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

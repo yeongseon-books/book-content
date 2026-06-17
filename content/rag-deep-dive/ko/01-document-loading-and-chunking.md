@@ -37,9 +37,8 @@ PyPDFLoader와 RecursiveCharacterTextSplitter는 문서를 청크로 나누는 �
 - 유사도 검색이 시작되기 전, 로더와 splitter 경계는 왜 검색 품질을 좌우할까요?
 - Character, Recursive, Token splitter는 같은 텍스트를 어떻게 다르게 자를까요?
 - `chunk_overlap`이 설정값만큼 정확히 겹치지 않는 것처럼 보일 때 어디를 봐야 할까요?
-- 최소 실행 예제에서 가장 흔한 실수는 무엇일까요?
-- Retry policy을 실무에 적용할 때 주의할 점은 무엇일까요?
-- Operator action의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 최소 실행 예제
 
@@ -467,12 +466,6 @@ RAG 파이프라인의 앞단은 생각보다 단순한 코드로 이루어져 �
   - 정답 숫자는 없습니다. 대신 틀린 접근은 분명합니다. 문서 종류가 다른데도 모든 코퍼스에 `chunk_size=1000, chunk_overlap=200`을 일괄 적용하는 방식입니다.
 - **`chunk_overlap`이 설정값만큼 정확히 겹치지 않는 것처럼 보일 때 어디를 봐야 할까요?**
   - 예제 파일: `en/01-document-loading-and-chunking/main.py`
-- **최소 실행 예제에서 가장 흔한 실수는 무엇일까요?**
-  - 예제 파일: `en/01-document-loading-and-chunking/main.py`
-- **Retry policy을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - The worker retries a failed message three times.
-- **Operator action의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - The on-call engineer checks the exception chain and the original payload.
 
 <!-- toc:begin -->
 ## 시리즈 목차

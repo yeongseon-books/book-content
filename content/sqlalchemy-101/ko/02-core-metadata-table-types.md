@@ -42,9 +42,8 @@ seo_description: MetaData, Table, Column으로 스키마를 Python 객체로 모
 - `MetaData`는 어떤 역할을 하고 왜 스키마 카탈로그라고 부를까요?
 - `Table`과 `Column`을 Python 객체로 두면 어떤 실수가 줄어들까요?
 - SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요?
-- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 raw SQL로 schema를 관리하면 한 가지 큰 문제가 생깁니다. application code 안의 INSERT/SELECT 문에 적힌 컬럼 이름이 실제 schema와 어긋나도 컴파일 시점에 알 수 없습니다. 운영 중에 갑자기 `no such column` 같은 오류가 발생하고, IDE는 컬럼 이름 자동완성도 해주지 못합니다.
 
@@ -461,12 +460,6 @@ Production에서는 `metadata.create_all`을 직접 부르지 않고 Alembic mig
   - `MetaData`는 schema의 **카탈로그**입니다
 - **SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요?**
   - `MetaData`는 schema의 **카탈로그**입니다
-- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
-  - `MetaData`는 schema의 **카탈로그**입니다. application이 알고 있는 모든 `Table` 정의를 담아 두는 컨테이너이고, 그 컨테이너를 통째로 Engine에 던지면 schema가 만들어지거나 비교됩니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - `MetaData()`는 빈 카탈로그를 만듭니다. application 전체에 하나만 두는 것이 일반적이며, 보통 `db.py` 같은 모듈에 module-level 변수로 둡니다.
-- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 이제 컬럼 이름 typo는 schema 정의 시점이나 IDE 자동완성에서 잡힙니다. `users.c.name`을 통해 컬럼을 참조할 수 있고, 같은 schema 객체를 select/insert/update에 모두 재사용합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

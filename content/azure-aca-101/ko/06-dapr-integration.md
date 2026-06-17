@@ -35,9 +35,8 @@ Dapr는 마이크로서비스에서 반복되는 배관 작업을 많이 줄여 
 - Dapr가 무엇이며, 그 사이드카는 ACA 안에서 정확히 어디에 붙을까요?
 - App 수준 설정과 Environment 수준 component는 왜 분리해서 봐야 할까요?
 - Service invocation, Pub/Sub, State store, Secret store 네 가지 핵심 구성요소는 각각 어떤 문제를 해결할까요?
-- 이 글이 답할 질문에서 가장 흔한 실수는 무엇일까요?
-- 왜 이 글이 중요한가을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 멘탈 모델의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 이 글이 답할 질문
 
@@ -366,7 +365,6 @@ az containerapp logs show --name api-app --resource-group $RG --follow
 - [ ] App 수준 설정과 Environment 수준 component는 왜 분리해서 봐야 할 수 있다
 - [ ] Service invocation, Pub/Sub, State store, Secret store 네 가지 핵심 구성요소는 각각 어떤 문제를 해결할 수 있다
 - [ ] 이 글이 답할 질문에서 가장 흔한 실수는 무엇인지 이해했다
-- [ ] 왜 이 글이 중요한가을 실무에 적용할 때 주의할 점은 무엇인지 이해했다
 
 ---
 
@@ -382,12 +380,7 @@ az containerapp logs show --name api-app --resource-group $RG --follow
   - - Dapr 사이드카는 ACA pod 안의 어디에 붙고, 앱은 어떤 엔드포인트를 호출할까요? - App 수준의 `--enable-dapr` 설정과 Environment 수준 component가 왜 분리될까요? - Service invocation, Pub/Sub, State store, Secret store는 각각
 - **Service invocation, Pub/Sub, State store, Secret store 네 가지 핵심 구성요소는 각각 어떤 문제를 해결할까요?**
   - `--enable-dapr true`를 주면 ACA는 앱 컨테이너 옆에 `daprd` 사이드카를 띄웁니다
-- **이 글이 답할 질문에서 가장 흔한 실수는 무엇일까요?**
-  - - Dapr 사이드카는 ACA pod 안의 어디에 붙고, 앱은 어떤 엔드포인트를 호출할까요?
-- **왜 이 글이 중요한가을 실무에 적용할 때 주의할 점은 무엇일까요?**
   - - Dapr 사이드카는 ACA pod 안의 어디에 붙고, 앱은 어떤 엔드포인트를 호출할까요? - App 수준의 `--enable-dapr` 설정과 Environment 수준 component가 왜 분리될까요? - Service invocation, Pub/Sub, State store, Secret store는 각각
-- **멘탈 모델의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - Dapr는 두 수준으로 보면 단순해집니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

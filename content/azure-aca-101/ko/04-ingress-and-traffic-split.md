@@ -36,9 +36,8 @@ Ingress와 트래픽 분할은 ACA에서 가장 중요한 운영 레버 두 개�
 - ACA의 관리형 Ingress는 무엇을 책임지고(TLS, external/internal 노출, Revision 라우팅), 무엇은 책임지지 않을까요?
 - `external`, `internal`, `disabled` ingress mode의 차이는 정확히 무엇일까요?
 - Single mode와 Multiple mode는 트래픽 분배 동작을 어떻게 바꿀까요?
-- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
-- 멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 요청 경로의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -354,7 +353,6 @@ az containerapp ingress traffic show --name myapi --resource-group $RG -o json
 - [ ] ACA의 관리형 Ingress는 무엇을 책임지고(TLS, external/internal 노출, Revision 라우팅), 무엇은 책임지지 않을까요
 - [ ] `external`, `internal`, `disabled` ingress mode의 차이는 정확히 무엇인지 이해했다
 - [ ] Single mode와 Multiple mode는 트래픽 분배 동작을 어떻게 바꿀까요
-- [ ] 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇인지 이해했다
 - [ ] 멘탈 모델을 실무에 적용할 때 주의할 점은 무엇인지 이해했다
 
 ---
@@ -371,12 +369,7 @@ az containerapp ingress traffic show --name myapi --resource-group $RG -o json
   - ACA의 가장 강력한 프로덕션 기능 중 하나가 revision 기반 traffic split입니다
 - **Single mode와 Multiple mode는 트래픽 분배 동작을 어떻게 바꿀까요?**
   - 트래픽 분할만으로 모든 위험을 제어할 수는 없습니다
-- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - ACA의 가장 강력한 프로덕션 기능 중 하나가 revision 기반 traffic split입니다. 하지만 이 기능을 제대로 쓰려면 먼저 ingress 설정이 맞아 있어야 합니다.
-- **멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - > Ingress는 ACA의 "정문"이고, 트래픽 가중치는 "엘리베이터 배차 비율"입니다
-- **요청 경로의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - ACA의 관리형 Ingress 레이어는 정문 역할을 하고, 그 뒤에서 가중치에 따라 active Revision으로 트래픽을 보냅니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

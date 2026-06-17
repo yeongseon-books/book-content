@@ -42,9 +42,8 @@ seo_description: 예외 클래스는 운영 의사결정의 신호다. retry할�
 - `IntegrityError`, `OperationalError`, `ProgrammingError`를 만나면 retry, 4xx 응답, 즉시 실패를 어떻게 나눠야 할까요?
 - 같은 `OperationalError` 안에서도 `SQLITE_BUSY`, `SQLITE_LOCKED`, `SQLITE_CORRUPT`를 왜 따로 봐야 할까요?
 - retry 데코레이터를 붙일 때 왜 `with conn:` 트랜잭션 전체를 함수 안에 넣어야 할까요?
-- Mental Model: 예외는 "이 에러를 어떻게 다뤄야 하는가"의 신호에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념: SQLite 에러 코드와 PEP 249 매핑을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 적용 전과 후: 예외 처리 안티패턴 vs 권장 패턴의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## Mental Model: 예외는 "이 에러를 어떻게 다뤄야 하는가"의 신호
 
@@ -364,12 +363,6 @@ ProgrammingError -> 즉시 수정 대상
   - > 예외 클래스는 운영 의사결정의 신호다
 - **retry 데코레이터를 붙일 때 왜 `with conn:` 트랜잭션 전체를 함수 안에 넣어야 할까요?**
   - `IntegrityError`, `ProgrammingError`, `CORRUPT`는 모두 False를 돌려줍니다.
-- **Mental Model: 예외는 "이 에러를 어떻게 다뤄야 하는가"의 신호에서 가장 흔한 실수는 무엇일까요?**
-  - > 예외 클래스는 운영 의사결정의 신호다. retry할지, 4xx로 돌려줄지, 즉시 fail할지를 클래스 하나로 표현할 수 있어야 한다.
-- **핵심 개념: SQLite 에러 코드와 PEP 249 매핑을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - SQLite는 결과 코드를 두 단계로 정의합니다. **Primary result code**(`SQLITE_BUSY`, `SQLITE_CONSTRAINT`)와 **Extended result code**(`SQLITE_BUSY_RECOVERY`, `SQLITE_CONSTRAINT_UNIQUE`)입니다.
-- **적용 전과 후: 예외 처리 안티패턴 vs 권장 패턴의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 문제점이 세 가지 있습니다. 첫째, UNIQUE 위반과 디스크 full을 같은 로그로 남깁니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

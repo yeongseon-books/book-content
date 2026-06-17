@@ -39,9 +39,8 @@ Azure Container Apps를 처음 보면 설명이 꽤 단순합니다. 컨테이�
 - ACA는 정확히 어떤 추상화 위에 어떤 추상화를 올린 서비스일까요?
 - AKS와 비교할 때 Microsoft가 대신 떠안는 운영 책임과 사용자가 여전히 이해해야 할 책임은 무엇일까요?
 - Environment는 단순한 상위 리소스가 아니라 왜 실제 격리 경계라고 봐야 할까요?
-- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
-- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -257,12 +256,7 @@ az containerapp show \
   - ACA의 전체 구조를 한 번에 보면 시리즈가 훨씬 읽기 쉬워집니다
 - **Environment는 단순한 상위 리소스가 아니라 왜 실제 격리 경계라고 봐야 할까요?**
   - - **ACA는 Kubernetes를 안 쓰는 서비스가 아닙니다.
-- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
   - ACA를 제품 표면만 보고 쓰면 초기 경험은 편합니다. 하지만 실제 운영에서 부딪히는 문제는 대부분 추상화 아래층에서 발생합니다.
-- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - ACA를 이해할 때 가장 유용한 문장은 이것입니다. **Azure Container Apps는 정확한 substrate가 공개되지 않은 Microsoft 관리 Kubernetes 위에, Environment·Revision·Ingress·Autoscaling·Dapr 같은 제품 기능을 올린 관리형 표면**입니다.
-- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - ACA를 이해할 때 가장 유용한 문장은 이것입니다. **Azure Container Apps는 정확한 substrate가 공개되지 않은 Microsoft 관리 Kubernetes 위에, Environment·Revision·Ingress·Autoscaling·Dapr 같은 제품 기능을 올린 관리형 표면**입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -41,9 +41,8 @@ sqlite3는 편의를 위해 트랜잭션을 암묵적으로 시작합니다. 이
 - sqlite3는 정확히 언제 암묵적 `BEGIN`을 시작하고 `con.in_transaction`은 그 경계를 어떻게 보여 줄까요?
 - `DEFERRED`, `IMMEDIATE`, `EXCLUSIVE`와 WAL mode를 함께 보면 write 충돌 시점이 어떻게 달라질까요?
 - commit 누락, 장시간 lock 대기, nested 작업은 이 글의 어떤 패턴으로 각각 다뤄야 할까요?
-- Mental Model — connection이 transaction 단위에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## Mental Model — connection이 transaction 단위
 
@@ -376,12 +375,6 @@ sqlite3의 transaction은 driver가 친절하게 자동 관리해 주지만, 그
   - > transaction은 `commit()`과 `rollback()`이라는 함수 이름이 아니라, "어디부터 어디까지를 한 덩어리로 묶을 것인가"를 정하는 경계입니다
 - **commit 누락, 장시간 lock 대기, nested 작업은 이 글의 어떤 패턴으로 각각 다뤄야 할까요?**
   - > transaction은 `commit()`과 `rollback()`이라는 함수 이름이 아니라, "어디부터 어디까지를 한 덩어리로 묶을 것인가"를 정하는 경계입니다
-- **Mental Model — connection이 transaction 단위에서 가장 흔한 실수는 무엇일까요?**
-  - > transaction은 `commit()`과 `rollback()`이라는 함수 이름이 아니라, "어디부터 어디까지를 한 덩어리로 묶을 것인가"를 정하는 경계입니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - SQLite는 동시 접근을 4단계 lock으로 제어합니다: UNLOCKED → SHARED → RESERVED → PENDING → EXCLUSIVE.
-- **적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - `con.close()`는 commit하지 않습니다. 실수로 commit을 빠뜨리면 데이터가 그대로 사라집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -42,9 +42,8 @@ SQLAlchemy Core를 쓸 때 진짜 생산성이 나오는 지점은 문자열 SQL
 - `select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요?
 - `insert`, `update`, `delete`를 2.x 트랜잭션 모델과 함께 어떻게 써야 할까요?
 - `JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요?
-- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 raw SQL 문자열로만 작업하면 다음 세 가지 비용이 누적됩니다. 첫째, 컬럼 이름 변경이 발생할 때마다 application 전체 grep이 필요합니다. 둘째, 같은 SQL을 여러 곳에서 약간씩 다르게 적게 되어 동작이 미묘하게 달라집니다. 셋째, dialect 차이를 모두 손으로 처리해야 합니다.
 
@@ -528,12 +527,6 @@ INFO sqlalchemy.engine.Engine COMMIT
   - 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다
 - **`JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요?**
   - 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다
-- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
-  - 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다. `select(...)`로 시작해서 `where`, `order_by`, `limit` 같은 메서드를 호출하면 새로운 statement 객체가 반환되고, 마지막에 Connection이 그것을 실행해 `Result`를 돌려줍니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - `select(*cols_or_tables)`는 SELECT 대상이 될 컬럼이나 테이블을 받습니다.
-- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 문제: 문자열 조립이 깨지기 쉽고, `LIMIT`처럼 binding되지 않는 부분에서 type 오류·SQL injection 위험이 생깁니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

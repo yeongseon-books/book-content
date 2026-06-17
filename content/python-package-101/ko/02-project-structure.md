@@ -35,9 +35,8 @@ seo_description: src layout과 pyproject.toml로 Python 프로젝트 구조를 �
 - flat layout과 src layout은 무엇이 다를까요?
 - `pyproject.toml`은 무엇이고 왜 `setup.py`를 대체할까요?
 - `[build-system]`과 `[project]`에는 무엇이 들어갈까요?
-- 이 글에서 배우는 내용에서 가장 흔한 실수는 무엇일까요?
-- 멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 이 글에서 배우는 내용
 
@@ -732,12 +731,6 @@ repos:
 - **`pyproject.toml`은 무엇이고 왜 `setup.py`를 대체할까요?**
   - - flat layout과 src layout의 차이와 선택 기준 - `pyproject.toml`에서 꼭 알아야 할 섹션 - 최소 구성을 갖춘 `pyproject.
 - **`[build-system]`과 `[project]`에는 무엇이 들어갈까요?**
-  - - flat layout과 src layout의 차이와 선택 기준 - `pyproject.toml`에서 꼭 알아야 할 섹션 - 최소 구성을 갖춘 `pyproject.
-- **이 글에서 배우는 내용에서 가장 흔한 실수는 무엇일까요?**
-  - 프로젝트 구조가 어긋나면 `import`가 꼬이고, 빌드 도구가 파일을 찾지 못하고, 로컬에서는 통과하던 테스트가 CI에서는 실패합니다. 이런 문제는 대개 로직보다 구조에서 먼저 시작합니다. 따라서 초기에 표준 구조를 잡아두는 편이 나중에 훨씬 저렴합니다.
-- **멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - flat layout은 가게 앞 진열대에 상품을 바로 올려두는 방식이고, src layout은 상품을 창고(`src/`)에 넣고 선반(설치)으로만 꺼내는 방식입니다. 창고를 거치면 “설치하지 않아도 잘 되네”라는 착각이 원천적으로 줄어듭니다.
-- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
   - - flat layout과 src layout의 차이와 선택 기준 - `pyproject.toml`에서 꼭 알아야 할 섹션 - 최소 구성을 갖춘 `pyproject.
 
 <!-- toc:begin -->

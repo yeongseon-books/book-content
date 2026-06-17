@@ -36,9 +36,8 @@ production에서 migration은 일반 application code보다 훨씬 비가역적�
 - one-revision-per-PR 원칙은 왜 중요할까요?
 - Alembic-aware PR template과 CI checks는 어떻게 구성할까요?
 - dev=SQLite, staging+prod=PostgreSQL 같은 multi-environment 전략은 어떻게 가져갈까요?
-- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 앞선 아홉 편은 한 명의 엔지니어가 자신의 환경에서 migration을 안전하게 적용하는 방법을 설명했습니다. 하지만 팀이 동시에 schema를 바꾸기 시작하면 문제가 달라집니다. 두 사람이 동시에 revision을 만들면 multi-head가 생기고, downgrade 검증이 없으면 rollback이 깨지며, production schema가 drift하기 시작하면 어디부터 손대야 할지도 모르게 됩니다. 운영 안정성은 코드 품질이 아니라 workflow 품질에서 나옵니다.
 
@@ -405,12 +404,6 @@ SELECT COUNT(*) FROM users WHERE phone IS NULL;
   - run: alembic check
 - **dev=SQLite, staging+prod=PostgreSQL 같은 multi-environment 전략은 어떻게 가져갈까요?**
   - > migration은 **“가장 비가역적인 코드 변경”**입니다
-- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
-  - > migration은 **“가장 비가역적인 코드 변경”**입니다. 일반 코드는 버튼 한 번으로 revert할 수 있어도, schema 변경은 데이터를 끌고 가기 때문에 훨씬 되돌리기 어렵습니다. 그래서 PR 단계에서부터 일반 코드보다 더 엄격하게 다뤄야 합니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 여러 schema 변경을 한 PR에 묶으면 두 가지 문제가 생깁니다.
-- **변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 여러 schema 변경을 한 PR에 묶으면 두 가지 문제가 생깁니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

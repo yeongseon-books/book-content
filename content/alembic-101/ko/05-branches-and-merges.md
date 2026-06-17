@@ -35,9 +35,8 @@ seo_description: alembic revision graph는 git 브랜치와 똑같이 DAG(direct
 - 언제 Alembic revision graph가 branch로 갈라질까요?
 - `branch_labels`와 `depends_on`은 각각 정확히 무슨 역할일까요?
 - 두 개의 head를 `alembic merge`로 어떻게 합칠까요?
-- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 여러 사람이 병렬로 PR을 여는 팀에서는 Alembic branch가 거의 매주 생깁니다. branch 자체는 자연스러운 현상이지만, deploy 직전에 `Multiple head revisions are present`가 튀어나오면 공포감이 커집니다. 이 글은 그 순간을 차분하게 정리하는 가이드입니다.
 
@@ -444,12 +443,6 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
   - > alembic revision graph는 git과 같은 **DAG(directed acyclic graph)**입니다
 - **두 개의 head를 `alembic merge`로 어떻게 합칠까요?**
   - > alembic revision graph는 git과 같은 **DAG(directed acyclic graph)**입니다
-- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
-  - > alembic revision graph는 git과 같은 **DAG(directed acyclic graph)**입니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 이 상태에서 `alembic heads`를 실행하면 두 개의 head가 보입니다.
-- **변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 이 상태에서 `alembic heads`를 실행하면 두 개의 head가 보입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

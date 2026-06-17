@@ -42,9 +42,8 @@ seo_description: SQLAlchemy 2.x의 Engine과 Connection, 트랜잭션 경계를 
 - `Engine`은 정확히 무엇이고, `Connection`과 어떻게 역할을 나눌까요?
 - SQLAlchemy 2.x가 트랜잭션을 더 명시적으로 다루는 이유는 무엇일까요?
 - `connect()`와 `begin()`은 언제 구분해서 써야 할까요?
-- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
-- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 많은 SQLAlchemy 입문 자료가 ORM의 `Base = declarative_base()`부터 시작합니다. 그 결과 ORM이 아닌 곳에서 문제가 발생했을 때, 예컨대 connection이 끊어졌거나 transaction이 의도와 다르게 commit되었을 때, 어디를 들여다봐야 할지 감을 잡기 어렵습니다. Engine과 Connection은 ORM의 Session을 받쳐주는 토대이고, Session 내부에서 문제가 생기면 결국 Connection 수준에서 디버깅해야 합니다.
 
@@ -436,12 +435,6 @@ print(engine.pool.status())
   - Engine과 Connection을 이해했다는 말은 결국 로그 한 줄만 보고 현재 상태를 설명할 수 있다는 뜻입니다. 아래 예시는 `echo=True`에서 실제로 자주 보게 되는 출력이며, 각 줄이 무엇을 의미하는지 짚어 둡니다.
 - **`connect()`와 `begin()`은 언제 구분해서 써야 할까요?**
   - SQLAlchemy의 Engine은 "데이터베이스와 통신할 수 있는 능력 그 자체를 객체화한 것"입니다
-- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
-  - SQLAlchemy의 Engine은 "데이터베이스와 통신할 수 있는 능력 그 자체를 객체화한 것"입니다. Connection 객체가 실제 통신 채널이고, Engine은 그 채널을 만들 수 있는 권한과 설정을 들고 있는 factory입니다.
-- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - SQLAlchemy는 두 개의 큰 계층으로 이루어져 있습니다. **Core**는 SQL을 Python 표현식으로 빌드하고 Engine/Connection으로 실행하는 계층입니다.
-- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 문제: connection lifecycle을 사람이 관리해야 하고, transaction 경계가 모호하며, parameter binding 형식이 driver마다 다릅니다(`?`, `%s`, `:name` 등).
 
 <!-- toc:begin -->
 ## 시리즈 목차

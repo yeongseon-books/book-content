@@ -35,9 +35,8 @@ seo_description: 가상환경은 프로젝트마다 독립된 패키지 공간�
 - 왜 가상환경이 필요하고 어떻게 동작할까요?
 - `pip freeze`와 `requirements.txt`는 어떤 관계일까요?
 - `uv`는 `pip`와 무엇이 다를까요?
-- 이 글에서 배우는 내용에서 가장 흔한 실수는 무엇일까요?
-- 멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?
-- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
+- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
+- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
 ## 이 글에서 배우는 내용
 
@@ -675,12 +674,6 @@ DEP003: 'tomli' is imported but not in requirements (transitive dependency)
 - **`pip freeze`와 `requirements.txt`는 어떤 관계일까요?**
   - - `python -m venv`로 가상환경을 만들고 활성화하는 방법 - `pip install`, `pip freeze`로 의존성을 관리하는 방법 - `requirements.txt`와 `pyproject.
 - **`uv`는 `pip`와 무엇이 다를까요?**
-  - - `python -m venv`로 가상환경을 만들고 활성화하는 방법 - `pip install`, `pip freeze`로 의존성을 관리하는 방법 - `requirements.txt`와 `pyproject.
-- **이 글에서 배우는 내용에서 가장 흔한 실수는 무엇일까요?**
-  - 프로젝트 A는 `requests==2.28`을 쓰고, 프로젝트 B는 `requests==2.31`을 쓸 수 있습니다.
-- **멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 가상환경은 프로젝트마다 전용 냉장고를 하나씩 두는 것과 비슷합니다. 모두가 시스템 Python 하나를 공유하면 누군가가 내 재료를 바꾸거나 치워 버릴 수 있습니다. 프로젝트마다 냉장고를 분리하면 서로 영향을 주지 않습니다.
-- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
   - - `python -m venv`로 가상환경을 만들고 활성화하는 방법 - `pip install`, `pip freeze`로 의존성을 관리하는 방법 - `requirements.txt`와 `pyproject.
 
 <!-- toc:begin -->
