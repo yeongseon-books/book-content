@@ -31,13 +31,11 @@ Python은 기본적으로 mutable 객체를 많이 쓰는 언어이지만, 동�
 ![Functional Programming 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/03/03-01-big-picture.ko.png)
 *Functional Programming 101 3장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Python에서 mutable 타입과 immutable 타입은 어떻게 구분할까요?
 - `tuple`, `frozenset`, `NamedTuple`, `frozen dataclass`는 각각 언제 유용할까요?
 - 함수 경계에서 원본 변경을 막으려면 어떤 패턴이 필요할까요?
-
-## 왜 중요한가
 
 mutable 데이터는 "누가, 언제, 무엇을 바꿨는가"를 추적하기 어렵게 만듭니다. 함수 하나가 받은 리스트를 직접 수정해 버리면, 호출한 쪽에서는 예상하지 못한 시점에 원본이 바뀐 상태를 만나게 됩니다. 이런 문제는 디버깅 비용을 크게 높입니다.
 
@@ -273,7 +271,7 @@ for i, s in enumerate(history):
 
 다만 큰 데이터 구조를 매번 전부 복사하는 방식은 비효율적일 수 있습니다. 그래서 불변성은 문법이 아니라 설계 원칙으로 이해해야 합니다. 제너레이터, 구조적 공유, 얕은 복사 전략과 함께 써야 실무적으로 균형이 맞습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] Python의 mutable 타입과 immutable 타입을 구분할 수 있다
 - [ ] `tuple`과 `frozenset`의 용도를 설명할 수 있다

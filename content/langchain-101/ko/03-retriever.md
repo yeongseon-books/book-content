@@ -36,7 +36,7 @@ LangChain은 이 검색 단계를 *VectorStore*와 *Retriever*로 나눠 표현�
 *전체 흐름 한눈에 보기*
 > Retriever는 스스로 지식을 저장하지 않습니다. 질문을 받아, 모델에게 보여 줄 가치가 있는 문서 일부를 골라 주는 검색 경계입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Retriever는 VectorStore 검색 결과를 어떻게 LLM 컨텍스트로 바꿀까요?
 - 검색 결과가 비어 있거나 엉뚱할 때 모델보다 먼저 어디를 확인해야 할까요?
@@ -443,7 +443,7 @@ Retriever는 단순 기술 컴포넌트 같지만, 이 정책까지 포함해야
 - 검색 품질 문제를 프롬프트 문제로 오진하는 경우가 많습니다. prompt를 바꾸기 전에 chunking, embedding, `k`를 먼저 확인해야 합니다.
 - 문서를 단순히 이어 붙이면 context window를 금방 넘길 수 있으므로, `format_docs`는 길이 제어 지점이기도 합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] VectorStore와 Retriever 차이를 설명할 수 있다
 - [ ] 가장 먼저 조정할 `search_kwargs`가 무엇인지 안다

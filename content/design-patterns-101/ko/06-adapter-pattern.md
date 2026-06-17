@@ -35,7 +35,7 @@ last_reviewed: '2026-05-23'
 *외부 SDK 호출이 Adapter 경계를 거쳐 도메인에 도달하는 흐름*
 > Adapter 패턴은 어느 한쪽도 다시 쓰지 않고, 거의 맞지만 정확히는 다른 두 인터페이스 사이에 얇은 번역기를 끼워 넣는 도구입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Adapter를 두면 정확히 어떤 의존성이 끊어질까요?
 - Anti-Corruption Layer와 Adapter는 같은 것일까요, 다른 것일까요?
@@ -460,7 +460,7 @@ class StripeAdapterWithErrorTranslation:
 
 도메인은 `PaymentError`만 알면 됩니다. `retriable` 플래그를 보고 재시도 여부를 결정할 수 있고, Stripe 고유의 예외 계층은 Adapter 밖으로 새지 않습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] Adapter 패턴이 필요한 상황을 예로 들 수 있습니다.
 - [ ] 클래스 어댑터와 객체 어댑터의 차이를 말할 수 있습니다.

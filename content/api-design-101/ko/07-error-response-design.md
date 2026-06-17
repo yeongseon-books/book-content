@@ -38,7 +38,7 @@ seo_description: 일관된 error response를 만드는 envelope, code, validatio
 
 > 에러 응답 설계는 '실패를 알리는 일'이 아니라 '클라이언트가 다음 행동을 결정할 수 있게 실패를 분류해 주는 일'입니다 — code·message·details·trace_id가 한 자리에 모이지 않으면 5xx 폭주가 곧바로 운영 마비로 이어집니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 좋은 error response는 어떤 요소로 이루어질까요?
 - RFC 7807 `application/problem+json`은 왜 유용할까요?
@@ -369,7 +369,7 @@ OpenTelemetry를 사용하는 환경이라면 `traceparent` header(W3C Trace Con
 - **First check:** 같은 404라도 어떤 endpoint는 문자열, 어떤 endpoint는 JSON 객체를 반환한다면 envelope 통일이 아직 끝나지 않은 상태입니다.
 - **Failure mode:** 보안 민감 정보를 `detail`에 그대로 넣거나 trace id를 빼먹으면, 지원 속도와 보안 태세가 동시에 나빠집니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 모든 에러가 같은 envelope(RFC 7807 또는 동등한 구조)를 공유하는가?
 - [ ] error code가 안정적인 문자열이며 문서화되어 있는가?

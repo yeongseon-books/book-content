@@ -37,13 +37,11 @@ Service까지 배우면 클러스터 내부 통신은 어느 정도 정리됩니
 
 > Ingress는 외부 노출 기능이 아니라 '여러 서비스를 하나의 진입점 뒤에 두고 HTTP 계층에서 라우팅과 TLS를 모으는 자리'입니다 — 도메인·경로 규칙·인증서 종료가 각 Service에 흩어지지 않고 한 곳에 모일 때 운영 일관성이 비로소 생깁니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Ingress와 IngressController는 왜 따로 이해해야 할까요?
 - 여러 서비스를 하나의 도메인 아래에서 어떻게 나눌 수 있을까요?
 - `host`, `path`, `pathType`은 어떤 차이를 만들까요?
-
-## 왜 중요한가
 
 서비스 수가 적을 때는 앱마다 LoadBalancer Service를 하나씩 두는 방법도 가능해 보입니다. 하지만 서비스가 늘어나면 외부 IP, 인증서, 라우팅 정책, 보안 정책이 모두 흩어집니다. 구조가 단순해 보이는 대신 운영 부담과 비용이 빠르게 커집니다.
 
@@ -52,8 +50,6 @@ Ingress는 이 문제를 해결하기 위한 공통 진입점입니다. 중요�
 ## 한눈에 보는 구조
 
 외부 로드 밸런서는 보통 클러스터 앞단에서 트래픽을 받아들이고, IngressController는 Ingress 규칙을 실제 프록시 동작으로 바꿉니다. 결국 Ingress는 "어디로 보낼지"를 선언하고, Controller는 "어떻게 보낼지"를 실행합니다.
-
-## 핵심 용어
 
 - Ingress: L7 HTTP 라우팅 규칙을 담는 객체입니다.
 - IngressController: Ingress 규칙을 실제 프록시 설정으로 적용하는 실행체입니다.
@@ -159,8 +155,6 @@ curl -sk -H 'Host: example.com' https://<ingress-address>/api
 - TLS handshake가 실패하면 인증서 자체보다 Secret 네임스페이스와 secretName 오타를 먼저 점검합니다.
 - `/`는 되는데 `/api`가 엉뚱한 서비스로 가면 path 우선순위와 pathType 해석이 어긋난 경우가 많습니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - Ingress는 규칙이고 Controller는 실행체입니다.
 - `pathType: Prefix`는 가장 흔한 기본 선택입니다.
 - TLS는 Ingress 지점에서 종료할 수 있습니다.
@@ -181,7 +175,7 @@ curl -sk -H 'Host: example.com' https://<ingress-address>/api
 
 시니어 엔지니어는 Ingress 문법만 보지 않고, 지금 쓰는 Controller가 어떤 기능과 제약을 갖는지도 함께 봅니다. 같은 Ingress 객체라도 구현체마다 동작 범위가 다를 수 있기 때문입니다. Gateway API가 주목받는 이유도 이 지점과 이어집니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] IngressController가 설치되어 있는가
 - [ ] `pathType`을 명시했는가

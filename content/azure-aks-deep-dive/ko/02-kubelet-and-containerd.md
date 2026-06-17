@@ -38,7 +38,7 @@ kubelet이 무엇을 결정하고, CRI가 어떤 계약을 제공하고, contain
 *Azure Kubernetes Service Deep Dive 2장 흐름 개요*
 > kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - kubelet은 정확히 무엇을 감시하고 어떤 시점에 CRI를 호출할까요?
 - dockershim이 사라진 뒤 AKS 노드 디버깅 방식은 왜 달라졌을까요?

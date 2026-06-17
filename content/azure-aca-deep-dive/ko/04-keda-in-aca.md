@@ -34,7 +34,7 @@ Microsoft 문서가 ACA scaling을 KEDA-powered라고 명시하는 이유도 여
 *Azure Container Apps Deep Dive 4장 흐름 개요*
 > ACA 안의 KEDA — Scale Rule이 만드는 것의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - ACA의 scale rule은 KEDA에서 어떤 형태의 제어 루프로 읽는 편이 가장 정확할까요?
 - 왜 scale rule은 app-scope가 아니라 revision-scope에 속할까요?

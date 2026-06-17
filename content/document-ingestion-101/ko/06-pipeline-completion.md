@@ -34,7 +34,7 @@ seo_description: 완성된 수집 파이프라인은 단계 수보다 단계 간
 *End-to-end ingestion pipeline flow*
 > 완성된 수집 파이프라인은 단계 수가 아니라, 각 단계가 다음 단계로 깨지지 않고 넘겨지는지로 판단해야 합니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 완성된 문서 수집 파이프라인은 어떤 단계별 검증 체크포인트를 가져야 할까요?
 - 파싱, 정규화, 청킹, 인덱싱 중 어디서 실패했는지 어떻게 빠르게 알 수 있을까요?
@@ -174,8 +174,6 @@ result=policy.pdf chunk_id=chunk-00 preview=PDF source: access policy and retent
 result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the original file name and format.
 ```
 
-## 이 코드에서 먼저 봐야 할 점
-
 ### 모니터링과 복구 경로
 
 ![Monitoring and recovery flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-monitoring-and-recovery-path.ko.png)
@@ -202,7 +200,7 @@ result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the o
 - 임베딩 품질과 파이프라인의 정합성은 다른 문제입니다. 데모 단계에서는 재현성이 우선입니다.
 - 재로드 단계를 건너뛰면 배포 시점의 경로 문제와 직렬화 문제가 나중까지 숨어 버립니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 세 가지 형식을 모두 로드했습니다.
 - [ ] 청크 수가 납득 가능한지 확인했습니다.

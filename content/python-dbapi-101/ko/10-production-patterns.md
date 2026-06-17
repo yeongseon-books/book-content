@@ -36,7 +36,7 @@ seo_description: SQLite가 파일이라는 사실은 운영을 단순하게 만�
 ![Python DB-API 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-02-mental-model-sqlite-is-still-a-dbms.ko.png)
 *Python DB-API 101 10장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `busy_timeout`, `timeout`, 애플리케이션 retry는 서로 무엇이 다르고 왜 함께 써야 할까요?
 - slow query 로그, OpenTelemetry span, BUSY 발생률은 SQLite 운영 상태를 어떻게 드러내 줄까요?
@@ -311,7 +311,7 @@ production에서 흔히 쓰는 SLO 항목과 측정 방법:
 
 알림 임계치 예: BUSY 발생률 1% 초과, slow query 비율 5% 초과, 백업 실패 1회. 너무 민감하면 알림 피로가 생기고, 너무 둔하면 사고를 놓칩니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] connection 팩토리에 WAL, foreign_keys, busy_timeout이 모두 설정되어 있는가?
 - [ ] retry는 BUSY/LOCKED만 대상으로 하며 max_attempts/jitter가 있는가?

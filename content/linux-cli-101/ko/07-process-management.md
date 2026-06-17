@@ -30,7 +30,7 @@ seo_description: 프로세스 조회, 종료, 백그라운드 실행 기법을 �
 ![Linux CLI 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/07/07-01-mental-model.ko.png)
 *Linux CLI 101 7장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 프로세스와 프로그램은 무엇이 다를까요?
 - `ps`, `top`, `pgrep`, `kill`은 어떤 순서로 쓰면 좋을까요?
@@ -188,7 +188,7 @@ SSH 세션이 끊어지면 해당 세션에서 실행한 포그라운드 프로�
 - `ps aux | grep python`에서 grep 자신이 같이 보이면 `pgrep -af "python app.py"`로 범위를 좁히세요. PID를 잘못 잡는 실수가 실제 장애보다 더 흔합니다.
 - SSH가 끊긴 뒤 작업이 사라졌다면 포그라운드로 실행했는지부터 확인하세요. 장시간 작업은 `nohup`, `tmux`, `systemd-run` 중 하나를 기본 습관으로 두는 편이 안전합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `ps aux`로 시스템의 모든 프로세스를 확인할 수 있다
 - [ ] `kill`과 `kill -9`의 차이를 설명할 수 있다

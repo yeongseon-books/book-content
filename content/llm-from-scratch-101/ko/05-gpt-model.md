@@ -35,7 +35,7 @@ forward와 loss가 한 클래스 안에 모이면 학습 루프, 평가, 추론�
 ![LLM from Scratch 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.ko.png)
 *LLM from Scratch 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - GPT 클래스는 어떤 순서로 부품을 호출할까요?
 - token embedding과 LM head를 묶는 weight tying은 왜 유용할까요?

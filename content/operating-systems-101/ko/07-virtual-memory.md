@@ -32,7 +32,7 @@ last_reviewed: '2026-05-15'
 ![Operating Systems 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/07/07-01-how-a-virtual-address-reaches-ram.ko.png)
 *Operating Systems 101 7장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 가상 주소와 물리 주소는 왜 굳이 분리되어 있을까요?
 - 페이지, 페이지 테이블, TLB는 어떤 역할 분담을 할까요?
@@ -176,7 +176,7 @@ print('col-major', time.time() - t)
 - 백엔드: fork 기반 워커 모델 (gunicorn, uwsgi)에서 CoW 활용
 - 성능 튜닝: perf 등으로 TLB miss / page fault 측정
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 가상 주소와 물리 주소의 차이를 안다
 - [ ] minor fault와 major fault의 비용 차이를 안다

@@ -37,13 +37,11 @@ seo_description: 풀, 관측, 마이그레이션, 배포 순서로 SQLAlchemy �
 *SQLAlchemy 101 10장 흐름 개요*
 > 프로덕션 패턴: 풀, 관측, 마이그레이션, 배포의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - connection pool은 어떤 기준으로 크기와 재사용 정책을 정해야 할까요?
 - `pool_pre_ping`, `pool_recycle`은 어떤 장애를 줄여 줄까요?
 - N+1 회귀나 느린 쿼리를 운영에서 어떻게 관측할 수 있을까요?
-
-## 왜 중요한가
 
 지금까지 다룬 내용은 모두 "코드가 정확히 동작하는가"였습니다. production은 한 단계 더 나갑니다. 같은 코드라도 풀 사이즈가 잘못되면 동시성에서 무너지고, 관측이 없으면 어디가 느린지 모르고, 마이그레이션 순서를 잘못 잡으면 배포 한 번이 장애가 됩니다.
 
@@ -207,7 +205,7 @@ def write_with_retry(session, obj):
 - **schema 마이그레이션 전용 IAM/계정 분리.** 일반 워크로드 계정으로 DDL을 못 치게 막아 사고 방지.
 - **slow query log + APM trace + alert** 세 축이 갖춰지면 대부분의 회귀를 사전에 잡습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `pool_size`, `max_overflow`, `pool_pre_ping`, `pool_recycle`, `pool_timeout`을 명시했다
 - [ ] DB의 max_connections를 풀 합계로 넘지 않는다

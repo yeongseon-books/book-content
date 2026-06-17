@@ -32,23 +32,17 @@ last_reviewed: '2026-05-15'
 ![Distributed Systems 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/04/04-01-concept-at-a-glance.ko.png)
 *Distributed Systems 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 여기서 말하는 일관성은 정확히 무엇이며 트랜잭션의 C와 어떻게 다를까요?
 - linearizable, sequential, causal, eventual은 어떤 스펙트럼을 이룰까요?
 - CAP 정리는 무엇을 말하며, 어디서 자주 오해될까요?
 
-## 왜 중요한가
-
 데이터베이스가 강한 일관성을 가진다, eventual consistency에 가깝다 같은 한 줄 설명은 설계 전체를 바꿉니다. 어떤 화면을 만들 수 있는지, 재시도 정책을 어떻게 둘지, 장애 시 어떤 동작을 허용할지가 모두 여기서 갈립니다. 이 언어를 모르면 데이터베이스 문서를 읽을 때 핵심을 놓치게 됩니다.
 
 > 일관성 모델은 데이터가 맺는 사회적 계약입니다.
 
-## 한눈에 보는 개념
-
 왼쪽으로 갈수록 직관적이지만 비싸고, 오른쪽으로 갈수록 싸고 가용성이 높지만 직관에서 멀어집니다.
-
-## 핵심 용어
 
 - **Linearizability**: 시스템 전체가 하나의 시간선 위에서 동작하는 것처럼 보이는 모델입니다.
 - **Sequential consistency**: 모든 노드가 같은 순서를 보지만, 실제 시간 순서까지 보장하지는 않는 모델입니다.
@@ -140,8 +134,6 @@ def happens_before(a, b):
 
 인과 일관성은 happens-before 관계만 보존하면 됩니다. 서로 독립적인 동시 사건은 어떤 순서로 보여도 괜찮습니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - 일관성은 이분법이 아니라 스펙트럼입니다.
 - 같은 시스템 안에서도 화면이나 데이터셋마다 다른 모델을 선택할 수 있습니다.
 - read-your-writes는 약한 모델에서 사용자 경험을 지키는 핵심 기술입니다.
@@ -155,8 +147,6 @@ def happens_before(a, b):
 4. **read-your-writes가 자동이라고 생각합니다.** 직접 구현해야 합니다.
 5. **파티션을 무시한 채 강한 일관성을 약속합니다.** 운영에서 곧바로 깨집니다.
 
-## 실무에서는 이렇게 드러납니다
-
 Spanner, etcd, ZooKeeper는 linearizable에 가깝게 동작하는 CP 계열입니다. DynamoDB, Cassandra, Redis Cluster는 기본적으로 eventual에 가까운 AP 성향을 가집니다. 같은 회사 안에서도 결제 시스템은 CP, 추천 캐시는 AP를 선택하는 경우가 흔합니다. PACELC는 파티션이 없는 평상시에도 지연과 일관성 사이의 비용을 보게 해 줍니다. 예를 들어 Cassandra는 `ONE`으로 읽으면 1ms 내로 응답하지만 오래된 값을 반환할 수 있고, `QUORUM`으로 읽으면 5ms 걸리지만 최신 값을 보장합니다. 이 선택을 엔드포인트별로 다르게 하는 것이 성숙한 설계입니다.
 
 ## 시니어 엔지니어는 이렇게 생각합니다
@@ -168,7 +158,7 @@ Spanner, etcd, ZooKeeper는 linearizable에 가깝게 동작하는 CP 계열입�
 - 모델이 이름 붙어 있지 않은 문서는 신뢰하지 않습니다.
 - 충돌 해소 전략을 설계 시점에 미리 정하고, 복구 시나리오를 테스트합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] linearizable과 eventual의 차이를 한 줄로 말할 수 있는가?
 - [ ] 파티션이 없을 때 CAP를 어떻게 이해해야 하는지 설명할 수 있는가?

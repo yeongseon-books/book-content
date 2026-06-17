@@ -32,7 +32,7 @@ last_reviewed: '2026-05-15'
 ![Operating Systems 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.ko.png)
 *Operating Systems 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 뮤텍스, 재진입 락, 세마포어, 조건 변수는 무엇이 다를까요?
 - 데드락은 어떤 조건이 겹칠 때 만들어질까요?
@@ -213,7 +213,7 @@ q.join(); q.put(None); c.join()
 - GUI/게임: 메인 스레드 단일 소유 + 큐로 외부 입력 전달
 - 분산 시스템: 같은 개념을 분산 락(예: Redis SETNX, etcd lease)으로 구현
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] mutex, RLock, semaphore, condition의 차이를 안다
 - [ ] 데드락의 네 가지 조건을 말할 수 있는가

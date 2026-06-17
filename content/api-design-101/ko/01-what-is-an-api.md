@@ -36,7 +36,7 @@ seo_description: API의 정의, 역할, 좋은 API의 조건을 시리즈의 첫
 ![클라이언트-API 계약-서버 구조](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/01/01-01-concept-at-a-glance.ko.png)
 *클라이언트와 서버 사이에 API 계약이 놓이는 구조*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - API는 정확히 무엇이며, 왜 시스템의 외부 계약이라고 부를까요?
 - 라이브러리 API와 웹 API는 무엇이 같고 무엇이 다를까요?
@@ -278,7 +278,7 @@ GitHub REST API, Stripe API, Google Maps API는 모두 OpenAPI 명세를 제공�
 - **First check:** 클라이언트 예제가 서버 내부 경로나 private 함수 이름을 언급한다면 이미 계약 경계가 무너지고 있는 신호입니다.
 - **Failure mode:** 상태 코드를 무시하고 본문만 읽는 클라이언트가 늘어나면, 이후 에러 설계와 버전 관리 단계에서 하위 호환성이 급격히 나빠집니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 이 API에 공개 문서가 있는가?
 - [ ] 입력과 출력의 형태가 명시적인가?

@@ -38,7 +38,7 @@ seo_description: 에이전트는 여러 단계를 거쳐 답을 만듭니다. �
 *Agent 평가하기 - 단일 응답이 아닌 trajectory*
 > Agent 평가는 정답보다 실행 궤적을 함께 봐야 운영 판단이 가능합니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - agent 평가는 왜 단일 응답보다 trajectory를 함께 봐야 할까요?
 - tool selection, step count, recovery metric은 각각 어떤 운영 리스크를 잡을까요?
@@ -380,8 +380,6 @@ def classify_failure(run: dict) -> str:
 운영 관점에서는 이 책임 분리가 품질 개선 속도를 좌우합니다.
 
 장기적으로 누적 효과가 큽니다.
-
-## 이 코드에서 먼저 봐야 할 점
 
 - 가장 먼저 end-to-end와 step-level을 나누는 부분부터 보시면 좋습니다. 최종 성공률은 헤드라인 수치이고, step-level은 실패 원인 분석 도구입니다.
 - tool confusion 예제는 에이전트가 헷갈리는 도구 쌍을 바로 보여 줍니다. 프롬프트에 어떤 예시를 추가해야 할지도 여기서 드러납니다.

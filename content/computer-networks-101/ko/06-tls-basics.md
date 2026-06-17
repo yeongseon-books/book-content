@@ -29,13 +29,11 @@ last_reviewed: '2026-05-15'
 ![Computer Networks 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/06/06-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 6장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - TLS가 보장하는 세 가지는 무엇일까요?
 - 핸드셰이크는 어떤 순서로 진행될까요?
 - 인증서, CA, 체인, trust store는 어떤 관계일까요?
-
-## 왜 중요한가
 
 TLS를 머릿속에 그리지 못하면 인증서 만료 사고가 생겼을 때 손을 대기 어렵고, self-signed 인증서를 그냥 무시하는 위험한 코드도 쉽게 들어갑니다. mTLS, 서비스 메시, zero-trust 같은 현대 인프라는 TLS를 기본 전제로 삼습니다. "왜 안전한가"를 자기 언어로 설명하지 못하면 보안 설계는 금세 관성에 휩쓸립니다.
 
@@ -64,8 +62,6 @@ TLS 1.3 핸드셰이크 (1-RTT):
 ```
 
 TLS 1.2에서는 2-RTT가 필요했지만, TLS 1.3은 키 교환과 인증서 전달을 하나의 왕복으로 합칩니다. 재접속 시에는 0-RTT도 가능합니다.
-
-## 핵심 용어
 
 | 용어 | 의미 |
 | --- | --- |
@@ -503,7 +499,7 @@ TLS 장애 진단에서 가장 흔한 시나리오 세 가지는 다음과 같�
 2. **중간 인증서 누락**: 서버에서 leaf만 전송 → Android/Java 클라이언트 실패 (macOS/iOS는 AIA로 자동 보완). 해결: `fullchain.pem` 배포
 3. **SNI 미설정**: 하나의 IP에 여러 도메인을 호스팅할 때 ClientHello에 hostname이 빠지면 잘못된 인증서 반환. 해결: `server_hostname` 파라미터 확인
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] TLS의 세 가지 보장(기밀성, 무결성, 신원 확인)을 설명할 수 있다
 - [ ] 인증서, CA, 체인, trust store의 관계를 안다

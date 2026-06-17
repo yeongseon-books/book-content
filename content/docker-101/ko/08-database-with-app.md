@@ -37,7 +37,7 @@ last_reviewed: '2026-05-15'
 
 > 앱과 DB를 함께 실행하는 구조에서는 세 가지 리듬이 항상 같이 갑니다 — 데이터 영속성(volume), 준비 상태 확인(healthcheck/depends_on), 그리고 마이그레이션 자동화. 이 셋 중 하나라도 빠지면 배포마다 사람이 들어가야 하고, 환경이 점점 일관성을 잃습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Compose로 PostgreSQL과 앱을 어떻게 함께 띄울까요?
 - healthcheck와 시작 순서는 어떻게 연결해야 할까요?
@@ -48,8 +48,6 @@ last_reviewed: '2026-05-15'
 앱은 뜨지만 DB가 준비되지 않은 상태에서 연결을 시도하면 cold start 사고가 납니다. 반대로 DB는 떠 있는데 마이그레이션이 아직 적용되지 않았으면 애플리케이션은 엉뚱한 스키마를 보고 실패합니다. 결국 앱과 DB 경계는 가장 흔한 장애 지점이면서, 동시에 가장 큰 자동화 기회이기도 합니다.
 
 특히 새 환경을 만들 때마다 수동 SQL을 실행하거나, 웹 컨테이너가 뜰 때마다 migration을 함께 돌리는 방식은 시간이 지나면 반드시 문제를 만듭니다. 마이그레이션은 자동이어야 하고, 가능하면 단일 실행자로 분리되어야 합니다.
-
-## 핵심 용어
 
 - **Migration**: 데이터베이스 스키마를 버전 관리하는 방식입니다.
 - **Seed**: 초기 기준 데이터를 넣는 작업입니다.
@@ -163,8 +161,6 @@ docker compose exec db pg_dump -U postgres app > app.sql
 - web이 바로 죽으면 DB readiness보다 migration 성공 여부를 먼저 확인합니다. `docker compose logs migrate`가 가장 빠른 단서입니다.
 - `pg_dump` 백업이 비어 있으면 DB 이름이나 권한보다 먼저 실제 volume에 데이터가 쌓였는지 확인합니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - `condition: service_healthy`가 실제 준비 상태를 보장합니다.
 - `migrate`는 한 번만 실행되는 init container 역할을 합니다.
 - seed는 반드시 여러 번 실행해도 같은 상태를 유지해야 합니다.
@@ -197,7 +193,7 @@ docker compose exec db pg_dump -U postgres app > app.sql
 
 이 기준을 잡고 나면 다음 글의 이미지 최적화도 왜 중요한지 명확해집니다. 앱과 DB 구성이 안정되면, 이제 빌드와 pull 속도를 줄여 팀 전체 피드백 루프를 더 빠르게 만들 수 있기 때문입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] DB에 healthcheck가 있습니다.
 - [ ] migration이 one-shot 컨테이너로 분리되어 있습니다.

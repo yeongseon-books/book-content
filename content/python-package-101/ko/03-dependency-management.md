@@ -30,7 +30,7 @@ seo_description: 가상환경은 프로젝트마다 독립된 패키지 공간�
 ![Python Package 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/03/03-01-mental-model.ko.png)
 *Python Package 101 3장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 왜 가상환경이 필요하고 어떻게 동작할까요?
 - `pip freeze`와 `requirements.txt`는 어떤 관계일까요?
@@ -42,8 +42,6 @@ seo_description: 가상환경은 프로젝트마다 독립된 패키지 공간�
 - `pip install`, `pip freeze`로 의존성을 관리하는 방법
 - `requirements.txt`와 `pyproject.toml` `dependencies`의 차이
 - `uv`로 더 빠르게 환경과 패키지를 관리하는 방법
-
-## 왜 중요한가
 
 프로젝트 A는 `requests==2.28`을 쓰고, 프로젝트 B는 `requests==2.31`을 쓸 수 있습니다. 두 프로젝트가 시스템 Python 하나를 공유하면, 한쪽을 위해 설치한 버전이 다른 쪽을 깨뜨릴 수 있습니다. 의존성 관리는 결국 이런 충돌을 피하면서 재현 가능한 환경을 만드는 일입니다.
 
@@ -222,7 +220,7 @@ dependencies = ["requests>=2.28"]
 
 최근에는 `uv`가 빠르게 표준 도구로 자리 잡고 있습니다. 가상환경 생성, 패키지 설치, lock 파일 관리까지 한 도구에서 처리하고 실행 속도도 빠르기 때문입니다. 새 프로젝트라면 초반부터 `uv`를 적극적으로 고려할 만합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `python -m venv`로 가상환경을 만들고 활성화할 수 있다
 - [ ] `pip freeze > requirements.txt`로 환경을 고정할 수 있다

@@ -36,7 +36,7 @@ DB-API의 두 핵심 객체는 connection과 cursor입니다. 이름은 평범�
 
 > Connection은 '네트워크 세션'이고 Cursor는 '하나의 쿼리 진행 상태'입니다 — 누가 트랜잭션을 들고 있고, 누가 fetch 위치를 들고 있는지 분리해서 보지 못하면 connection leak·이상한 isolation·예상 못 한 rollback이 모두 같은 자리에서 터집니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Connection과 cursor는 각각 어떤 책임을 가질까요?
 - `with` context manager는 connection과 cursor 자원을 어떻게 보호할까요?
@@ -219,7 +219,7 @@ cur.execute("SELECT 1")  # PostgreSQL: errors or discards the previous result
 
 server-side cursor를 쓰는 환경에서는 이전 결과를 다 읽거나 명시적으로 `cur.close()` 후 새 query를 던져야 합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `with sqlite3.connect(...) as conn:` 패턴으로 자원 누수 없이 query를 실행했다.
 - [ ] Cursor를 여러 개 열어 동시에 동일 connection에서 read하는 동작을 확인했다.

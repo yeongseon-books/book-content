@@ -33,13 +33,11 @@ seo_description: 좋은 commit message 구조와 Conventional Commits 실무 규
 
 > 좋은 commit message는 친절의 문제가 아니라 'history가 문서로 기능하느냐'의 문제입니다 — subject·body·footer 구조와 Conventional Commits는 '무엇을·왜·어떤 영향과 함께' 바꿨는지를 미래의 자신과 동료가 PR을 다시 열지 않고도 읽게 만드는 장치입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 좋은 commit message는 왜 코드만큼 중요한 자산일까요?
 - subject, body, footer는 각각 무엇을 담아야 할까요?
 - Conventional Commits의 `feat`, `fix`, `docs` 같은 type은 무엇을 해결할까요?
-
-## 왜 중요한가
 
 `git log`는 미래의 자신과 동료에게 보내는 편지입니다. `git blame`으로 특정 줄에 도달했을 때 message가 선명하면 5초 만에 맥락이 살아나고, `fix`, `update`, `wip` 같은 제목만 있으면 원래 diff와 PR을 다시 읽어야 합니다.
 
@@ -375,7 +373,7 @@ Subject does not match the Conventional Commits format.
 
 운영 조직에서는 type을 기반으로 배포 리스크를 빠르게 스캔합니다. 예를 들어 릴리스 직전 `git log --oneline`에서 `feat!`나 `BREAKING CHANGE`가 보이면, 문서/마이그레이션 공지를 같이 확인합니다. 반대로 대부분이 `docs`, `test`, `chore`라면 사용자 영향이 낮은 배포로 분류할 수 있습니다. message 규칙이 곧 배포 커뮤니케이션 비용을 줄이는 이유가 여기 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] subject가 50자 이하, 명령형, 마침표 없음 규칙을 따릅니까?
 - [ ] type이 Conventional Commits 분류 중 하나입니까?

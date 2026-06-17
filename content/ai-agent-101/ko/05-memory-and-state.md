@@ -38,7 +38,7 @@ agent가 한두 번의 tool call로 끝나면 기억 문제는 크게 드러나�
 *메모리와 상태 분리*
 > Memory는 과거를 보존하는 층이고, state는 지금 실행이 어디까지 왔는지 말해 주는 층입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - agent memory와 state를 같은 저장소로 보면 어떤 설계 문제가 생길까요?
 - short-term memory, long-term memory, execution state는 각각 언제 필요할까요?

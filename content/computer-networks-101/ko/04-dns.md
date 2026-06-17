@@ -29,13 +29,11 @@ last_reviewed: '2026-05-15'
 ![Computer Networks 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/04/04-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - DNS 계층 구조는 어떻게 되어 있을까요?
 - recursive resolver와 캐시는 어떤 역할을 할까요?
 - A, AAAA, CNAME, MX, TXT 레코드는 각각 어디에 쓰일까요?
-
-## 왜 중요한가
 
 "인터넷이 안 된다"는 문제의 상당수는 DNS에서 시작되고, 그중 많은 경우가 TTL과 캐시를 잘못 이해한 탓입니다. DNS를 모르면 배포 후에도 왜 예전 IP로 붙는지 설명하기 어렵고, 서비스 이전이나 리전 failover도 예측하기 힘들어집니다. 게다가 모든 HTTP 요청은 DNS 조회로 시작하기 때문에 성능 분석에서도 빠지지 않습니다.
 
@@ -60,8 +58,6 @@ last_reviewed: '2026-05-15'
 ```
 
 위 그림에서 recursive resolver가 한 번 답을 받으면 TTL 동안 캐시에 저장합니다. 다음에 같은 질의가 오면 authoritative 서버까지 가지 않고 캐시에서 바로 응답합니다. 이것이 DNS가 빠르면서도 동시에 변경이 느린 이유입니다.
-
-## 핵심 용어
 
 | 용어 | 의미 |
 | --- | --- |
@@ -532,7 +528,7 @@ spec:
 
 이 차이만 알아도 Kubernetes 환경에서 외부 API 호출 지연의 상당수를 해결할 수 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] DNS 계층 구조를 말할 수 있다
 - [ ] A, AAAA, CNAME, MX, TXT, NS, SOA의 용도를 안다

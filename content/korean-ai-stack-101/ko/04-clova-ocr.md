@@ -33,7 +33,7 @@ seo_description: 쓸 만한 OCR 결과는 평문이 아니라, 의미 있는 줄
 ![Korean AI Stack 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-core-flow.ko.png)
 *Korean AI Stack 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - OCR을 붙일 때는 텍스트 정확도부터 봐야 할까요, 아니면 응답 구조부터 봐야 할까요?
 - bounding box와 `lineBreak` 힌트는 후처리에서 왜 그렇게 중요할까요?
@@ -211,8 +211,6 @@ def call_clova_ocr(image_path):
 
 반환 형식은 mock dict와 같으므로 1~4단계 로직은 그대로 재사용됩니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - `inferText`만큼이나 `lineBreak`를 꼼꼼히 봐야 합니다. 이 습관 하나가 영수증과 표 정확도를 크게 바꿉니다.
 - 줄별 최소 confidence는 자연스러운 재검토 큐를 만듭니다.
 - raw payload와 후처리 텍스트를 함께 저장하는 습관이 이후 모델 교체 때 가장 큰 자산이 됩니다.
@@ -240,7 +238,7 @@ def call_clova_ocr(image_path):
 - **이미지 전처리**: 기울기 보정, 노이즈 제거, 이진화를 OCR 전에 수행하면 평균 confidence가 눈에 띄게 올라갑니다.
 - **모니터링**: 일별 처리량, 평균 confidence, 재구성 실패율을 대시보드로 보면 모델 변경 여파를 빨리 감지할 수 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] raw payload와 후처리 텍스트를 함께 저장합니다.
 - [ ] downstream에서 `lineBreak`, 좌표, confidence 중 무엇이 필요한지 정했습니다.

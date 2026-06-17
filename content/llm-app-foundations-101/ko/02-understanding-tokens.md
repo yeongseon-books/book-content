@@ -36,7 +36,7 @@ LLM API를 처음 연결하면 대개 답변 품질에 먼저 눈이 갑니다. 
 ![토큰이 비용과 한계로 이어지는 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-understanding-tokens-cost-limits-and-con.ko.png)
 *토큰이 비용과 한계로 이어지는 전체 그림*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 토큰은 단어가 아니라 왜 예산 단위로 봐야 할까요?
 - `prompt_tokens`, `completion_tokens`, `total_tokens`는 각각 어떤 비용을 보여 줄까요?

@@ -33,7 +33,7 @@ seo_description: 함수 시그니처는 "호출자가 무엇을 줘야 하고, �
 *Python 101 6장 흐름 개요*
 > 함수와 인자: def, args, kwargs, default, lambda의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 긴 positional 호출을 keyword-only 시그니처로 바꾸면 호출부가 어떻게 달라질까요?
 - `*args`, `**kwargs`, unpacking은 함수 호출과 wrapper에서 어떤 모양으로 묶이고 다시 펼쳐질까요?
@@ -329,7 +329,7 @@ def with_logging(fn):
 
 이 두 패턴은 다음 글의 모듈·패키지에서 import 경계를 넘어 호출될 때 다시 등장합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `def`로 함수를 만들고 `return` 값과 부수효과를 구분해서 설명할 수 있습니다.
 - [ ] positional, keyword, default, `*args`, `**kwargs` 다섯 가지 인자 형태를 시그니처에 섞어 쓸 수 있습니다.

@@ -38,7 +38,7 @@ KEDA의 진짜 가치는 event source를 HPA가 읽을 수 있는 구조로 연�
 *Azure Kubernetes Service Deep Dive 6장 흐름 개요*
 > KEDA 내부 — ScaledObject가 HPA를 만드는 방식의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - KEDA는 ScaledObject를 어떻게 generated HPA로 바꾸고, 그 과정에서 무엇을 보장할까요?
 - metrics adapter는 external metrics 경로에서 어디까지를 책임질까요?

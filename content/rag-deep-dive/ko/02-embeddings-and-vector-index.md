@@ -32,7 +32,7 @@ HuggingFaceEmbeddings와 FAISS IndexFlatL2는 텍스트를 벡터로 바꾸고 �
 *문서와 질의 임베딩 호출 흐름*
 > 임베딩은 청크를 좌표로 바꾸고, 벡터 인덱스는 좌표 사이 거리를 검색 순위로 바꿉니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 문서 임베딩과 질의 임베딩은 왜 같은 모델을 쓰면서도 호출 경로를 분리해서 봐야 할까요?
 - FAISS `IndexFlatL2`는 검색할 때 실제로 어떤 계산을 반복할까요?
@@ -115,7 +115,7 @@ Operators inspect the exception chain before replaying the message.
 - 반환된 row id가 예상한 원문 텍스트와 다시 연결되는지
 
 <!-- a-grade-example:end -->
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 문서 임베딩과 질의 임베딩 호출 경로를 구분했다.
 - [ ] FAISS가 반환하는 값이 거리인지 유사도인지 확인했다.

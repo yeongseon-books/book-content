@@ -34,7 +34,7 @@ Azure Functions를 운영하다 보면 가장 먼저 부딪히는 질문은 의�
 *Azure Functions Deep Dive 1장 흐름 개요*
 > 호스트 부팅 — `WebJobsScriptHostService`부터 따라가기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Functions Host는 정확히 어떤 프로세스이며, 어떤 순서로 부팅될까요?
 - `host.json`은 단순 설정 파일일까요, 아니면 런타임 동작을 바꾸는 실제 구성 입력일까요?

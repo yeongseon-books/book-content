@@ -32,7 +32,7 @@ VectorDB 비교는 브랜드 비교가 아니라 같은 벡터와 같은 질의�
 *같은 벡터를 flat과 IVF에 넣는 비교 구조*
 > VectorDB 선택은 **브랜드 이름을 고르는 일**이 아닙니다. 같은 임베딩 벡터가 서로 다른 인덱스 구조 안에서 어떻게 동작하는지 측정하는 실험입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - VectorDB는 기능 목록이 아니라 어떤 운영 조건으로 비교해야 할까요?
 - 같은 임베딩과 corpus에서 VectorDB만 바꿔 보려면 무엇을 고정해야 할까요?
@@ -196,7 +196,7 @@ recall = np.mean([recall_at_k(a, e) for a, e in zip(ivf_results, flat_results)])
 
 또 검색 품질 목표도 도메인마다 다릅니다. 일반적인 RAG 응답이라면 recall 0.95 정도가 실용적일 수 있지만, 법률·의료처럼 누락 비용이 큰 도메인은 0.99 이상을 목표로 잡아야 할 수 있습니다. 따라서 VectorDB 선택은 빠른 것이 아니라 **내 도메인에서 필요한 정확도를 어떤 비용으로 달성하는가**의 문제입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 ![실제 운영 조건으로 인덱스를 고르는 판단 축](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-04-index-decision-axes-for-real-workloads.ko.png)
 

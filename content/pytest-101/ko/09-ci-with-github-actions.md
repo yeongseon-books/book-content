@@ -29,13 +29,11 @@ last_reviewed: '2026-05-17'
 ![pytest 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/09/09-01-github-actions-workflow-overview.ko.png)
 *pytest 101 9장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - PR을 열 때마다 테스트를 수동으로 실행하는 습관에 의존하지 않으려면 어떻게 해야 할까요?
 - GitHub Actions workflow를 여러 조각이 아니라 하나의 최종 파일로 어떻게 조립할까요?
 - Python 3.10, 3.11, 3.12를 동시에 검증하면서도 피드백 속도를 유지하려면 무엇을 신경 써야 할까요?
-
-## 왜 중요한가
 
 CI가 없으면 테스트가 코드 품질 규칙이 아니라 개인의 성실성 문제로 남습니다. 개발자가 바쁘거나 급하면 한 번쯤 빼먹게 되고, 그 한 번이 main 브랜치의 회귀 버그로 이어집니다.
 
@@ -355,7 +353,7 @@ workflow를 저장하고 브랜치에 push한 뒤에는 “실행됐다”로 �
 
 그래서 첫 번째 목표는 화려한 자동화가 아니라 단순하고 일관된 기본 검증선입니다. push와 PR마다 같은 pytest 명령이 돌고, 실패하면 머지되지 않는 상태까지 만들면 이미 큰 품질 차이가 납니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `.github/workflows/test.yml`에 push와 pull request trigger를 모두 설정했다
 - [ ] Python 3.10, 3.11, 3.12 matrix를 구성했다

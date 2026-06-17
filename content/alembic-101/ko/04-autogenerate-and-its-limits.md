@@ -31,13 +31,11 @@ autogenerate는 매우 강력하지만, 의도까지 읽어 주는 도구는 아
 ![Alembic 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.ko.png)
 *Alembic 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `alembic revision --autogenerate`는 내부에서 무엇을 비교할까요?
 - 어떤 변경은 잘 잡고, 어떤 변경은 놓치거나 옵션이 필요할까요?
 - `compare_type`, `compare_server_default`, `include_object`, `include_name`은 언제 필요할까요?
-
-## 왜 중요한가
 
 autogenerate는 Alembic에서 가장 생산성이 큰 기능이지만, “버튼 한 번 누르면 끝”이라고 믿는 순간 사고가 시작됩니다. generated file을 그대로 커밋했다가 column rename이 drop+create로 풀리고, 그 결과 데이터가 사라지는 일은 실제로 흔합니다.
 
@@ -229,7 +227,7 @@ PY
 - **라이브러리 소유 테이블을 격리합니다.** Celery, APScheduler 같은 third-party 테이블은 exclusion으로 빼는 편이 좋습니다.
 - **CI에서 `alembic check`를 돌립니다.** model과 migration drift를 자동으로 감지합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 생성된 파일을 한 줄씩 읽고 의심스러운 부분을 손으로 고쳤다
 - [ ] rename이 drop + add로 풀린 부분이 없다

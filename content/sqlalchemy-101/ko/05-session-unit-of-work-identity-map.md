@@ -37,13 +37,11 @@ ORM 모델을 정의했다고 해서 곧바로 안전한 데이터 작업이 되
 *SQLAlchemy 101 5장 흐름 개요*
 > Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `Session`은 단순한 connection 래퍼가 아니라 무엇을 관리할까요?
 - Unit of Work는 변경을 어떻게 모으고, 언제 SQL로 내보낼까요?
 - `flush()`와 `commit()`은 어떤 순서와 의미 차이가 있을까요?
-
-## 왜 중요한가
 
 Session을 잘 이해하지 못한 채로 ORM을 쓰면 정체불명의 동작에 자주 부딪칩니다. 대표적인 예를 들면 다음과 같습니다.
 
@@ -298,7 +296,7 @@ with Session(engine) as session:
 - **트랜잭션 외부의 객체 사용**: 응답 직전에 객체 속성을 미리 dict로 변환해 두면, detached 상태와 무관하게 직렬화할 수 있습니다.
 - 테스트: 각 테스트마다 SAVEPOINT를 활용해 빠르게 롤백하는 패턴(`Session(begin_nested=True)` 또는 `connection.begin()`을 감싸는 패턴)이 널리 쓰입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] Session을 요청/작업 단위로 생성하고 닫는가?
 - [ ] commit과 flush의 차이를 이해하고, 필요 시 명시적으로 호출하는가?

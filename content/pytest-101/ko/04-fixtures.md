@@ -29,7 +29,7 @@ last_reviewed: '2026-05-12'
 ![pytest 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/04/04-01-big-picture.ko.png)
 *pytest 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - fixture는 일반 함수와 무엇이 다를까요?
 - fixture를 테스트 함수에 어떻게 자동으로 주입할까요?
@@ -246,7 +246,7 @@ fixture 설계는 테스트의 가독성과 유지보수성을 좌우합니다. 
 
 scope 선택 기준도 단순합니다. “이 데이터나 자원을 테스트끼리 공유해도 안전한가?”를 먼저 묻는 것입니다. 안전하지 않다면 function scope가 기본값이고, 불변 자원이라면 module이나 session scope를 검토할 수 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `@pytest.fixture`로 fixture를 정의하고 주입했다
 - [ ] `yield` fixture로 setup과 teardown을 분리했다

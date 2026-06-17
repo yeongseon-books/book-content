@@ -38,7 +38,7 @@ seo_description: Multi-agent 시스템의 핵심인 역할 분리와 위임 구�
 *멀티 에이전트 handoff 그래프*
 > Multi-agent가 필요한 순간은 agent 수를 늘리고 싶을 때가 아니라, 한 agent 안에 넣기에는 책임 경계가 서로 충돌할 때입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - single agent로 충분한 업무와 multi-agent가 필요한 업무는 어디서 갈라질까요?
 - supervisor, worker, handoff 계약은 각각 어떤 책임을 가져야 할까요?

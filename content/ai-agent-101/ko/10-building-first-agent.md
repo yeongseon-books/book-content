@@ -38,7 +38,7 @@ seo_description: 작은 research assistant agent를 직접 구현하며 핵심 �
 *end-to-end 구현 지도*
 > 첫 agent는 데모가 아니라 경계, tool, memory, eval을 한 번에 검증하는 작은 운영 골격이어야 합니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 첫 agent를 만들 때 연구 도우미가 맡을 범위와 맡지 않을 범위는 어디서 정해야 할까요?
 - tool, memory, agent loop, eval은 어떤 순서로 붙여야 실패가 작게 보일까요?

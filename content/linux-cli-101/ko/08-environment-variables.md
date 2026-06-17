@@ -30,7 +30,7 @@ seo_description: 환경변수와 PATH가 명령 실행과 설정 전달에 쓰�
 ![Linux CLI 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/08/08-01-big-picture.ko.png)
 *Linux CLI 101 8장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 환경변수는 어떤 방식으로 프로세스에 전달될까요?
 - `export`와 로컬 Shell 변수는 무엇이 다를까요?
@@ -201,7 +201,7 @@ Python 스크립트에서 `os.environ["MY_VAR"]`를 읽으려면, Shell에서 `e
 
 반면 환경변수가 너무 많아지면 관리가 어려워집니다. 이때는 `.env` 파일을 환경별로 관리하거나, AWS Parameter Store, HashiCorp Vault 같은 시크릿 관리 도구로 넘어갑니다. 하지만 모든 것의 출발점은 `export`와 `$PATH`를 이해하는 것입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `echo $PATH`의 출력을 읽고 명령어 검색 순서를 설명할 수 있다
 - [ ] `export`와 단순 변수 대입의 차이를 안다

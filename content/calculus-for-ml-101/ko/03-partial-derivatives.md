@@ -35,7 +35,7 @@ last_reviewed: '2026-05-12'
 ![Calculus for ML 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/03/03-01-concept-at-a-glance.ko.png)
 *Calculus for ML 101 3장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 입력이 여러 개인 함수에서는 왜 변수별로 기울기를 따로 봐야 할까요?
 - 편미분에서 "다른 변수는 고정한다"는 약속은 실제로 무엇을 뜻할까요?

@@ -34,7 +34,7 @@ autoscale은 다이어그램 안에서는 거의 즉시 반응하는 것처럼 �
 *Azure App Service Deep Dive 5장 흐름 개요*
 > 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - scale-up과 scale-out은 App Service에서 실제로 무엇을 바꿀까요?
 - autoscale rule은 앱이 아니라 왜 App Service Plan에 붙는다고 봐야 할까요?

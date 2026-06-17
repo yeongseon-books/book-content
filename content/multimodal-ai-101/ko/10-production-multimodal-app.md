@@ -39,7 +39,7 @@ seo_description: 지금까지 9편에 걸쳐 image encoder, VLM 아키텍처, ca
 *Multimodal AI 101 10장 흐름 개요*
 > Production Multimodal Application 구축의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - production 멀티모달 앱은 어떤 end-to-end 구성 요소를 반드시 분리해서 설계해야 할까요?
 - FastAPI 입구, inference worker, cache, object storage, observability는 어떤 순서로 연결되는 편이 안정적일까요?

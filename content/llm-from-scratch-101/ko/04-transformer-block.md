@@ -35,7 +35,7 @@ seo_description: 지난 글에서 CausalSelfAttention까지 만들고 나면 한
 ![LLM from Scratch 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.ko.png)
 *LLM from Scratch 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - FeedForward는 왜 `Linear(C, 4C) -> GELU -> Linear(4C, C)` 형태를 많이 쓸까요?
 - residual connection은 학습을 어떻게 안정화할까요?

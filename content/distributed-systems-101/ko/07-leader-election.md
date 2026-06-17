@@ -32,23 +32,17 @@ last_reviewed: '2026-05-15'
 ![Distributed Systems 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/07/07-01-concept-at-a-glance.ko.png)
 *Distributed Systems 101 7장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 왜 리더 선출이 필요하며 어떤 안전 조건이 필요할까요?
 - lease와 heartbeat는 각각 어떤 역할을 할까요?
 - fencing token은 왜 이전 리더를 막는 핵심 장치일까요?
 
-## 왜 중요한가
-
 분산 시스템에서 치명적인 버그 상당수는 두 리더가 동시에 존재하는 순간 발생합니다. 두 리더가 같은 자원에 동시에 쓰기 시작하면 데이터는 곧바로 깨집니다. 올바른 리더 선출은 어떤 시점에도 하나의 리더만 권한을 가진다는 약속을 만들어 냅니다.
 
 > 좋은 리더 선출은 리더가 둘인 순간이 없다는 약속입니다.
 
-## 한눈에 보는 개념
-
 여러 후보가 lock service에 lease를 요청하고, 한 후보만 리더가 되어 heartbeat로 lease를 갱신합니다.
-
-## 핵심 용어
 
 - **Leader**: 특정 시점에 쓰기 권한을 가진 노드입니다.
 - **Lease**: TTL이 지나면 자동 만료되는 임시 권한입니다.
@@ -152,8 +146,6 @@ def write(token, data):
 
 리더를 고르는 일은 lease 저장소가 맡고, 최종 쓰기 허용 여부는 자원 서버가 판단합니다. 선출 이벤트만 남기고 토큰 검증을 빼면 상황은 보여도 실제 보호는 하지 못합니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - lease는 자동 만료되므로 네트워크 파티션을 자연스럽게 다룹니다.
 - heartbeat는 TTL보다 충분히 자주 보내야 합니다.
 - token의 본질은 단조 증가에 있습니다.
@@ -167,8 +159,6 @@ def write(token, data):
 4. **token을 랜덤 값으로 만듭니다.** 비교 가능한 순서가 사라집니다.
 5. **split-brain 복구를 수동 절차에 맡깁니다.** 설계가 자동으로 막아야 합니다.
 
-## 실무에서는 이렇게 드러납니다
-
 Kubernetes의 `kube-controller-manager`와 `kube-scheduler`는 etcd lease를 사용해 리더를 선출합니다. ZooKeeper의 ephemeral znode도 본질적으로 같은 패턴입니다. Kafka controller, HDFS NameNode HA, 분산 cron 역시 lease와 fencing의 변형으로 볼 수 있습니다.
 
 ## 시니어 엔지니어는 이렇게 생각합니다
@@ -179,7 +169,7 @@ Kubernetes의 `kube-controller-manager`와 `kube-scheduler`는 etcd lease를 사
 - 리더 교체 중 진행 중이던 요청이 어떻게 처리되는지 명세에 남깁니다.
 - split-brain 시나리오를 테스트로 강제로 재현합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] lease와 heartbeat의 역할을 한 줄로 설명할 수 있는가?
 - [ ] fencing token이 왜 단조 증가해야 하는지 말할 수 있는가?

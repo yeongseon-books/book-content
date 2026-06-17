@@ -30,7 +30,7 @@ seo_description: ACA 관측성은 플랫폼, 애플리케이션, 사이드카라
 *Azure Container Apps 101 7장 흐름 개요*
 > 모니터링과 운영 — Log Analytics와 Application Insights의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - ACA 관측성은 어떤 계층 구조로 나뉠까요?
 - `ContainerAppConsoleLogs_CL`와 `ContainerAppSystemLogs_CL`는 무엇이 다를까요?
@@ -441,7 +441,7 @@ ACA에서는 revision 단위로 신호가 정리되므로, 알림과 런북을 r
 
 이 다섯 장이 준비되면 서비스 성숙도는 빠르게 올라갑니다. 특히 신입 엔지니어가 투입되어도 동일한 기준으로 운영할 수 있어 팀 전체의 평균 대응 시간이 짧아집니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] ACA Environment가 Log Analytics workspace에 연결돼 있습니까?
 - [ ] `ContainerAppConsoleLogs_CL`와 `ContainerAppSystemLogs_CL` 모두 데이터가 들어오고 있습니까?

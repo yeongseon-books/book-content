@@ -36,7 +36,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 ![Python DB-API 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
 *Python DB-API 101 6장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `sqlite3.Row`, dict, dataclass, Pydantic row factory는 어떤 상황에서 각각 선택해야 할까요?
 - `Decimal`, `Enum`, JSON 값을 SQLite와 안전하게 왕복하려면 adapter, converter, `detect_types`를 어떻게 묶어야 할까요?
@@ -167,7 +167,7 @@ view나 join 결과는 선언된 타입 정보가 사라집니다. 별칭에 `[t
 
 ---
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] connection 생성 시 `row_factory`를 명시적으로 설정한다.
 - [ ] 인덱스로 컬럼을 꺼내는 코드는 hot path 외에는 사용하지 않는다.

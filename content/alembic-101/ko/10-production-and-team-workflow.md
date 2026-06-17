@@ -31,13 +31,11 @@ production에서 migration은 일반 application code보다 훨씬 비가역적�
 ![Alembic 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/10/10-01-diagram-the-team-level-alembic-operating.ko.png)
 *Alembic 101 10장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - one-revision-per-PR 원칙은 왜 중요할까요?
 - Alembic-aware PR template과 CI checks는 어떻게 구성할까요?
 - dev=SQLite, staging+prod=PostgreSQL 같은 multi-environment 전략은 어떻게 가져갈까요?
-
-## 왜 중요한가
 
 앞선 아홉 편은 한 명의 엔지니어가 자신의 환경에서 migration을 안전하게 적용하는 방법을 설명했습니다. 하지만 팀이 동시에 schema를 바꾸기 시작하면 문제가 달라집니다. 두 사람이 동시에 revision을 만들면 multi-head가 생기고, downgrade 검증이 없으면 rollback이 깨지며, production schema가 drift하기 시작하면 어디부터 손대야 할지도 모르게 됩니다. 운영 안정성은 코드 품질이 아니라 workflow 품질에서 나옵니다.
 
@@ -309,7 +307,7 @@ alembic upgrade head
 - **schema 변경은 업무 시간대에 배포합니다.** 사고가 났을 때 대응 인력이 바로 있어야 합니다.
 - **post-mortem에 schema-change verification 흐름을 반드시 포함합니다.** 무엇이 빠졌는지 되짚어야 같은 사고를 막을 수 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] PR template이 one PR = one revision 원칙을 강제한다
 - [ ] CI가 alembic check, upgrade+downgrade, head-count guard, SQL preview, fresh DB smoke를 자동 실행한다

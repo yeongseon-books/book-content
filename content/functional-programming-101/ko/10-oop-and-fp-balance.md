@@ -31,13 +31,11 @@ Python은 애초에 다중 패러다임 언어입니다. 데이터 모델은 객
 ![Functional Programming 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.ko.png)
 *Functional Programming 101 10장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 객체지향과 함수형은 각각 어떤 문제에 더 잘 맞을까요?
 - 두 패러다임을 섞을 때 가장 실용적인 기본 패턴은 무엇일까요?
 - Functional Core, Imperative Shell은 Python에서 어떻게 적용할 수 있을까요?
-
-## 왜 중요한가
 
 "OOP만 써라" 또는 "FP만 써라"는 생산 코드 기준으로는 비현실적입니다. 실제 시스템에는 상태를 오래 들고 있어야 하는 부분도 있고, 입력을 받아 값을 변환하기만 하면 되는 부분도 있습니다. 두 성격을 같은 도구로 밀어붙이면 오히려 코드가 더 나빠집니다.
 
@@ -424,7 +422,7 @@ Bad port: validation failed: ['port must be 1-65535']
 
 이 시리즈에서 다룬 순수 함수, 불변 데이터, 고차 함수, 클로저, 제너레이터, 함수 합성은 서로 따로 떨어진 기술이 아닙니다. 모두 더 작고 예측 가능한 계산 단위를 만들기 위한 도구입니다. 객체지향과 함수형의 균형을 잡는 일은 그 도구들을 상황에 맞게 조합하는 판단에서 시작합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 객체지향과 함수형의 장단점을 비교할 수 있다
 - [ ] Functional Core, Imperative Shell 패턴을 설명할 수 있다

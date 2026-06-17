@@ -36,7 +36,7 @@ seo_description: ChatPromptTemplate과 OutputParser를 이어 첫 LLM Chain을 �
 *전체 흐름 한눈에 보기*
 > 프롬프트 체인은 문자열 이어 붙이기를 조금 예쁘게 만든 것이 아닙니다. 애플리케이션 입력을 모델이 기대하는 메시지 형식으로 바꾸는, 타입이 있는 변환 파이프라인입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - ChatPromptTemplate는 단순 문자열 포맷팅과 무엇이 다를까요?
 - 여러 입력 변수와 parser를 붙이면 체인의 입출력 모양은 어떻게 바뀔까요?
@@ -388,7 +388,7 @@ for msg in rendered.messages:
 - JSON 파싱은 모델이 따라야 할 스키마를 프롬프트에서 강하게 제한할 때에만 안정적입니다.
 - fallback 체인이 기본 체인과 다른 출력 모양을 반환하면 장애 대응이 훨씬 어려워집니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 여러 변수를 받는 `ChatPromptTemplate`용 입력 dict를 만들 수 있다
 - [ ] 언제 `StrOutputParser`면 충분하고, 언제 구조화 파싱이 필요한지 안다

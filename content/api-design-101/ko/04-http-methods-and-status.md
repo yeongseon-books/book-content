@@ -36,19 +36,15 @@ seo_description: GET부터 DELETE까지, 예측 가능한 API를 만드는 응�
 ![API Design 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/04/04-01-concept-at-a-glance.ko.png)
 *API Design 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - GET, POST, PUT, PATCH, DELETE는 각각 무엇을 의미할까요?
 - safe와 idempotent는 어떻게 다를까요?
 - 2xx, 3xx, 4xx, 5xx 계열은 어떻게 읽어야 할까요?
 
-## 왜 중요한가
-
 method와 status code는 클라이언트의 분기 로직을 결정합니다. 잘못된 코드를 반환하면 클라이언트는 재시도가 안전한지조차 판단할 수 없습니다. 이 둘은 API의 예측 가능성을 만드는 핵심 쌍입니다.
 
 > status code는 단순한 숫자가 아니라 계약입니다.
-
-## 한눈에 보는 개념
 
 | Method | 의미 | Safe | Idempotent | 대표 성공 코드 |
 |--------|------|------|------------|--------------|
@@ -67,8 +63,6 @@ method와 status code는 클라이언트의 분기 로직을 결정합니다. �
 - **Idempotent**: 동일 요청을 N번 보내도 결과가 1번과 같습니다. DELETE는 이미 삭제된 리소스를 다시 삭제해도 결과가 같습니다.
 
 이 구분이 중요한 이유: 네트워크 실패 시 클라이언트가 안전하게 재시도할 수 있는지를 결정하기 때문입니다. Idempotent한 method는 timeout 시 다시 보내도 안전합니다. Non-idempotent한 POST는 그렇지 않아서 idempotency key가 필요합니다.
-
-## 핵심 용어
 
 | 용어 | 정의 | 예시 |
 |------|------|------|
@@ -216,8 +210,6 @@ def create():
 4. **PATCH로 전체 대체를 합니다.** PUT의 의미가 무너집니다.
 5. **404와 401, 403을 혼동합니다.** 보안 정보가 새거나 인증 버그를 가립니다.
 
-## 실무에서는 이렇게 드러납니다
-
 ### GitHub API 응답 패턴
 
 ```http
@@ -260,7 +252,7 @@ Stripe는 POST에 Idempotency-Key 헤더를 보내면 동일 요청을 중복 �
 - **First check:** 비슷한 실패를 `400`, `409`, `422` 중 아무 숫자로나 섞어 쓰고 있다면 클라이언트 계약이 이미 모호해진 상태입니다.
 - **Failure mode:** 모든 성공을 `200`으로 뭉개면 캐시 정책, SDK 예외 처리, 재시도 제어가 전부 본문 파싱에 의존하게 됩니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 생성은 201 + Location을 반환하는가?
 - [ ] 성공적인 삭제는 204를 반환하는가?

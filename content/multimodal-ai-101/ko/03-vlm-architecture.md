@@ -38,7 +38,7 @@ seo_description: 2편에서 본 CLIP은 image와 text를 같은 공간에 정렬
 *Multimodal AI 101 3장 흐름 개요*
 > Vision-Language Model 아키텍처의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - VLM은 어떤 경로로 image encoder의 출력을 LLM 입력으로 연결할까요?
 - Vision Encoder + Adapter + LLM이라는 공통 뼈대는 왜 대부분의 모델에서 반복될까요?

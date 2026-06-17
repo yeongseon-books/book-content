@@ -29,7 +29,7 @@ last_reviewed: '2026-05-12'
 ![pytest 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/02/02-01-big-picture.ko.png)
 *pytest 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - pytest는 테스트 파일과 함수를 어떤 규칙으로 자동 탐색할까요?
 - 프로덕션 코드와 테스트 코드는 어떤 디렉터리 구조로 나누는 편이 좋을까요?
@@ -234,7 +234,7 @@ pytest -x
 
 특히 `src/` 레이아웃은 프로덕션 코드와 테스트 코드를 분리한다는 점에서 장기 유지보수에 유리합니다. 패키지 설치, import 경로, 배포 경계가 더 명확해지기 때문입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `src/` 레이아웃으로 프로젝트를 구성했다
 - [ ] `pyproject.toml`에 `testpaths`와 `pythonpath`를 설정했다

@@ -37,7 +37,7 @@ seo_description: 예외 클래스는 운영 의사결정의 신호다. retry할�
 ![Python DB-API 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-02-mental-model-an-exception-is-a-signal-ab.ko.png)
 *Python DB-API 101 7장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `IntegrityError`, `OperationalError`, `ProgrammingError`를 만나면 retry, 4xx 응답, 즉시 실패를 어떻게 나눠야 할까요?
 - 같은 `OperationalError` 안에서도 `SQLITE_BUSY`, `SQLITE_LOCKED`, `SQLITE_CORRUPT`를 왜 따로 봐야 할까요?
@@ -305,7 +305,7 @@ def post_user(payload: UserCreate, conn=Depends(get_conn)):
 
 `ProgrammingError`나 `InterfaceError`는 별도 핸들러를 만들지 않고 기본 500으로 두되, 알림 채널(예: Sentry)에 자동 전송되도록 설정합니다. 이 예외들은 코드 버그이므로 retry나 사용자 안내가 아닌 즉시 수정 대상입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `try/except Exception`을 좁은 예외 클래스로 교체했는가?
 - [ ] retry는 `OperationalError` 중 BUSY/LOCKED 계열만 대상으로 하는가?

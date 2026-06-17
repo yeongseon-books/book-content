@@ -32,7 +32,7 @@ seo_description: Python 클래스의 생성자, 메서드, dunder 메서드 설�
 ![Object-Oriented Programming 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/02/02-01-big-picture.ko.png)
 *Object-Oriented Programming 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 생성자(`__init__`)는 어디까지 책임져야 하고, 어디서부터 과해질까요?
 - 인스턴스 메서드, 클래스 메서드, 정적 메서드는 어떤 기준으로 나눠야 할까요?
@@ -259,7 +259,7 @@ print(sys.getsizeof(rp.__dict__))  # size of regular instance __dict__
 
 Python 3.7 이후에는 `dataclasses`를 먼저 고려합니다. 보일러플레이트 코드를 줄이면서도 필요하면 커스텀 메서드를 추가할 수 있어 대부분의 데이터 중심 클래스에 적합합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 생성자에서 유효성 검증을 수행할 수 있다
 - [ ] `@classmethod`로 대안 생성자를 만들 수 있다

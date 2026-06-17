@@ -29,13 +29,11 @@ last_reviewed: '2026-05-15'
 ![Computer Networks 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 8장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - L4 로드밸런서와 L7 로드밸런서는 어떻게 다를까요?
 - round-robin, least connections, hash 같은 분산 알고리즘은 언제 쓰일까요?
 - 헬스체크와 graceful drain은 왜 신뢰성의 핵심일까요?
-
-## 왜 중요한가
 
 로드밸런서는 단순한 분배기가 아닙니다. 실제로는 시스템의 신뢰성과 배포 전략을 결정하는 장치입니다. blue-green 배포, canary 릴리스, 리전 failover, 자동 스케일링은 모두 로드밸런서 위에서 성립합니다. 헬스체크 하나를 잘못 만들면 죽은 서버에 트래픽이 가거나, 멀쩡한 서버가 풀에서 빠질 수 있습니다.
 
@@ -74,8 +72,6 @@ L4 로드밸런서는 TCP/UDP 흐름(IP + 포트)만 보고 백엔드를 고릅�
 | 성능 | 매우 높음 (패킷 전달) | 상대적으로 낮음 (HTTP 파싱 비용) |
 | 재시도 | 불가 | 요청 단위로 가능 |
 | 대표 도구 | AWS NLB, LVS, IPVS | AWS ALB, nginx, Envoy, HAProxy |
-
-## 핵심 용어
 
 | 용어 | 의미 |
 | --- | --- |
@@ -464,7 +460,7 @@ Kubernetes의 kube-proxy는 내부적으로 iptables 또는 IPVS를 사용합니
 - 전체 백엔드가 동시에 헬스체크 실패하면? → 마지막 1대는 유지하는 "panic mode"가 있는가?
 - LB 자체가 장애나면? → DNS failover 또는 anycast로 다른 LB로 전환되는가?
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] L4와 L7의 차이를 판단 기준, TLS 종료, 재시도 가능 여부로 설명할 수 있다
 - [ ] 헬스체크 정책을 interval, threshold, endpoint 관점에서 설계할 수 있다

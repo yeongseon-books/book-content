@@ -30,13 +30,11 @@ seo_description: alembic revision graph는 git 브랜치와 똑같이 DAG(direct
 ![Alembic 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/05/05-01-diagram-merging-multiple-heads-back-to-o.ko.png)
 *Alembic 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 언제 Alembic revision graph가 branch로 갈라질까요?
 - `branch_labels`와 `depends_on`은 각각 정확히 무슨 역할일까요?
 - 두 개의 head를 `alembic merge`로 어떻게 합칠까요?
-
-## 왜 중요한가
 
 여러 사람이 병렬로 PR을 여는 팀에서는 Alembic branch가 거의 매주 생깁니다. branch 자체는 자연스러운 현상이지만, deploy 직전에 `Multiple head revisions are present`가 튀어나오면 공포감이 커집니다. 이 글은 그 순간을 차분하게 정리하는 가이드입니다.
 
@@ -245,7 +243,7 @@ alembic heads
 - **`depends_on`은 꼭 필요할 때만 씁니다.** 대개는 두 revision을 한 PR로 묶는 편이 더 단순합니다.
 - **`alembic history --verbose`로 graph를 읽습니다.** 사고가 났을 때 가장 빠른 파악 도구입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] merge 후 `alembic heads`가 single head를 반환한다
 - [ ] merge revision의 `upgrade`와 `downgrade`는 비어 있다

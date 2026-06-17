@@ -30,7 +30,7 @@ seo_description: 타입 힌트는 함수의 입력과 출력 타입을 명시하
 ![Python Package 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/08/08-01-mental-model.ko.png)
 *Python Package 101 8장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 타입 힌트는 왜 필요하고 런타임에 영향을 줄까요?
 - `mypy`는 어떤 오류를 잡아 줄까요?
@@ -42,8 +42,6 @@ seo_description: 타입 힌트는 함수의 입력과 출력 타입을 명시하
 - `mypy`로 정적 타입 검사를 실행하는 방법
 - `py.typed`로 타입 정보를 패키지와 함께 배포하는 방법
 - Generic, Union, Optional 같은 고급 타입 사용법
-
-## 왜 중요한가
 
 Python은 동적 타입 언어이기 때문에 작은 프로젝트에서는 자유롭게 느껴집니다. 하지만 코드가 커질수록 “이 함수에 무엇을 넘겨야 하지?”를 코드만 보고 즉시 판단하기 어려워집니다. 타입 힌트는 IDE 자동완성과 정적 분석을 가능하게 하고, `mypy`는 실행 전 단계에서 오류를 먼저 알려 줍니다.
 
@@ -243,7 +241,7 @@ mypy src/  # resolves import type errors for requests
 
 새 프로젝트라면 처음부터 `strict = true`로 시작하는 편이 좋습니다. 반대로 기존 프로젝트에서는 새 파일부터 타입을 추가하고 점진적으로 넓혀 가는 전략이 현실적입니다. 실무에서는 전면 도입보다 **점진적 도입**이 성공 확률이 높습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 함수 인자와 반환값에 타입 힌트를 추가할 수 있다
 - [ ] `mypy`로 타입 오류를 검사할 수 있다

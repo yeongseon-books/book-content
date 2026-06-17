@@ -30,7 +30,7 @@ seo_description: cat, less, head, tail로 파일 내용을 읽는 기본 흐름�
 ![Linux CLI 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/04/04-01-big-picture.ko.png)
 *Linux CLI 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 파일을 통째로 볼 때와 일부만 볼 때는 어떤 명령을 골라야 할까요?
 - `less`가 단순 출력보다 더 안전한 이유는 무엇일까요?
@@ -195,7 +195,7 @@ cat header.csv data1.csv data2.csv > combined.csv
 
 운영 환경에서 가장 많이 쓰는 조합은 `tail -f` + `grep`입니다. `tail -f app.log | grep --line-buffered ERROR`를 띄워두면 에러가 발생하는 즉시 화면에 나타납니다. 장애 대응 시 이 조합을 모르면 "로그 파일을 에디터로 열어서 새로고침"하는 비효율에 빠집니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `cat`, `less`, `head`, `tail`의 용도를 구분할 수 있다
 - [ ] `less`에서 검색(`/`)과 종료(`q`)를 할 수 있다

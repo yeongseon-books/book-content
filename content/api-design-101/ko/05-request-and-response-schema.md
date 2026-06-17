@@ -36,19 +36,15 @@ seo_description: 요청과 응답 schema를 흔들림 없이 설계하는 기준
 ![API Design 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/05/05-01-concept-at-a-glance.ko.png)
 *API Design 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - JSON과 content type은 어떤 식으로 계약에 들어갈까요?
 - 필드 이름 규칙은 어떻게 정해야 할까요?
 - validation은 어디에서, 어떤 방식으로 해야 할까요?
 
-## 왜 중요한가
-
 schema가 흔들리면 클라이언트도 함께 흔들립니다. 좋은 schema는 읽기 쉽고, 시간이 지나도 진화하기 쉽습니다. 경계에서 validation을 해 두면 내부 코드도 훨씬 깨끗하게 유지할 수 있습니다.
 
 > schema는 데이터의 문법입니다.
-
-## 한눈에 보는 개념
 
 Schema 설계는 네 가지 영역을 다룹니다:
 
@@ -65,8 +61,6 @@ Schema 설계는 네 가지 영역을 다룹니다:
 | Validation layer | schema 강제 지점 | Pydantic, marshmallow, JSON Schema |
 
 이 분리가 선명해야 handler가 비즈니스 로직에 집중할 수 있습니다. 경계 검증이 약하면 예외 처리, 기본값 보정, 타입 변환이 서비스 코드 곳곳으로 흩어지기 시작합니다.
-
-## 핵심 용어
 
 | 용어 | 정의 | 예시 |
 |------|------|------|
@@ -203,8 +197,6 @@ float를 쓰면 `0.1 + 0.2 = 0.30000000000000004` 같은 오차가 누적됩니�
 4. **금액에 float를 씁니다.** 사소한 반올림 오차가 실제 금액 오류가 됩니다.
 5. **필드 이름을 지나치게 줄입니다.** 몇 달 뒤에는 읽는 사람도 뜻을 모르게 됩니다.
 
-## 실무에서는 이렇게 드러납니다
-
 ### FastAPI의 schema 자동화
 
 ```python
@@ -269,7 +261,7 @@ schema를 코드로 정의하면 문서(OpenAPI), 검증, 타입 안전성이 �
 - **First check:** 응답 예제에 내부 ORM 필드나 임시 축약어가 그대로 보이면 입력·출력 schema 분리가 약한 상태입니다.
 - **Failure mode:** 시간대와 금액 표현을 초기에 통일하지 않으면, 이후 분석 파이프라인과 프런트엔드 포맷터가 각자 보정 로직을 들고 가게 됩니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 모든 endpoint에 입력 schema가 있는가?
 - [ ] 응답 schema가 입력 schema와 분리되어 있는가?

@@ -32,7 +32,7 @@ RetrievalQA는 편하지만 많은 단계를 감춥니다. 여기서는 LCEL 파
 *RetrievalQA가 chain_type별 조립 경로를 고르는 분기*
 > RAG 체인은 질문에서 근거, 프롬프트, 답변으로 이어지는 실행 그래프이며, LCEL은 그 경계를 더 명시적으로 드러냅니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `RetrievalQA` 같은 고전 API와 LCEL 조립은 각각 어떤 경계를 숨기고 드러낼까요?
 - retriever, prompt, llm, parser를 직접 이으면 디버깅에서 무엇이 쉬워질까요?
@@ -147,7 +147,7 @@ if __name__ == "__main__":
 - 스트리밍과 중간 단계 관측이 필요해지는 순간 classic chain의 편의성이 빠르게 한계에 닿습니다.
 
 <!-- a-grade-example:end -->
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] classic `RetrievalQA`와 LCEL 체인을 같은 질의로 비교했다.
 - [ ] 문서 리스트가 문자열 컨텍스트로 접히는 지점을 코드에서 확인했다.

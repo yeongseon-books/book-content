@@ -30,7 +30,7 @@ seo_description: PyPI는 Python 패키지의 앱스토어이고, twine은 빌드
 ![Python Package 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/05/05-01-mental-model.ko.png)
 *Python Package 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - PyPI와 TestPyPI는 무엇이 다를까요?
 - `twine`은 정확히 어떤 역할을 할까요?
@@ -42,8 +42,6 @@ seo_description: PyPI는 Python 패키지의 앱스토어이고, twine은 빌드
 - `twine`으로 패키지를 업로드하는 방법
 - TestPyPI에서 먼저 검증한 뒤 PyPI에 배포하는 흐름
 - 업로드 실패를 다루는 기본 원칙
-
-## 왜 중요한가
 
 패키지를 만들고 빌드해도, 다른 사람이 `pip install`로 설치할 수 없으면 사실상 배포한 것이 아닙니다. PyPI에 올리면 전 세계 어디서든 설치할 수 있고, 사내 저장소에 올리면 팀 내부 패키지 배포 체계를 만들 수 있습니다.
 
@@ -206,7 +204,7 @@ twine upload dist/*    # upload only the current version
 
 패키지 이름도 초기에 신중하게 고르는 편이 좋습니다. 한 번 공개 배포를 시작하면 이름을 바꾸기 어렵기 때문입니다. 직관적이고, 기존 패키지와 충돌하지 않으며, 검색하기 쉬운 이름을 우선적으로 검토해야 합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] TestPyPI 계정을 만들고 API 토큰을 발급할 수 있다
 - [ ] `twine check`로 빌드 결과물을 검증할 수 있다

@@ -34,7 +34,7 @@ gRPC 채널이 준비되었다고 해서 설명이 끝난 것은 아닙니다. �
 *Azure Functions Deep Dive 4장 흐름 개요*
 > Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - dispatcher는 한 번의 invocation을 어떤 단계로 나눠 처리할까요?
 - invocation context는 어디서 만들어지고 누가 해제할까요?

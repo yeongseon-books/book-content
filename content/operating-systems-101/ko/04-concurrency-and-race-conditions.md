@@ -32,7 +32,7 @@ last_reviewed: '2026-05-15'
 ![Operating Systems 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.ko.png)
 *Operating Systems 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 경쟁 상태는 정확히 언제 발생한다고 말할 수 있을까요?
 - 원자성, 가시성, 순서성은 어떤 식으로 서로 다른 실패를 만들까요?
@@ -207,7 +207,7 @@ print(total)
 - 분산 시스템: 여러 노드의 race는 분산 락 또는 원자적 연산으로 해결
 - UI: 메인 스레드 외 접근을 차단하는 단일 소유 모델
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] Race condition을 한 문장으로 정의할 수 있는가
 - [ ] 원자성, 가시성, 순서성을 구분할 수 있는가

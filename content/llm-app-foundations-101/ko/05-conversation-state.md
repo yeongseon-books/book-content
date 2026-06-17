@@ -36,7 +36,7 @@ LLM은 기본적으로 애플리케이션의 대화 상태를 무료로 보관�
 ![멀티턴 이력이 누적되는 전체 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-01-managing-conversation-state-building-a-m.ko.png)
 *멀티턴 이력이 누적되는 전체 구조*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 멀티턴 챗봇의 기억은 모델 안에 있을까요, 요청 안에 있을까요?
 - 전체 이력, 슬라이딩 윈도우, 요약 압축은 언제 갈라질까요?

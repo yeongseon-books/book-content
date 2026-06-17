@@ -28,7 +28,7 @@ title: "Data Structures with Python 101 (7/10): 힙과 우선순위 큐"
 ![Data Structures with Python 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/07/07-01-big-picture.ko.png)
 *Data Structures with Python 101 7장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 가장 작은 값이나 가장 큰 값을 빠르게 꺼내려면 어떤 구조가 필요할까요?
 - 힙은 왜 정렬보다 우선순위 처리에 유리할까요?
@@ -41,8 +41,6 @@ title: "Data Structures with Python 101 (7/10): 힙과 우선순위 큐"
 > 힙은 부모 노드가 자식보다 항상 작거나 큰 값을 유지하는 완전 이진 트리입니다.
 
 이 구조는 Dijkstra 최단 경로, 작업 스케줄러, 이벤트 시뮬레이션 같은 핵심 알고리즘의 기반입니다. 즉, 힙은 이론용 구조가 아니라, “가장 중요한 것 하나를 계속 빨리 꺼내야 하는” 실전 문제의 기본 도구입니다.
-
-## 핵심 개념 한눈에 보기
 
 > 힙 = 부모가 자식보다 항상 작도록 유지되는 완전 이진 트리 (min-heap 기준)
 
@@ -192,8 +190,6 @@ merged = list(heapq.merge(list1, list2, list3))
 print(merged)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 ```
 
-## 이 코드에서 먼저 봐야 할 점
-
 - `heapq`는 최소 힙만 직접 지원하므로 최대 힙은 값 부호 반전으로 구현합니다.
 - `heapify`는 O(n)이지만 원소를 하나씩 `heappush`하면 O(n log n)입니다.
 - 우선순위가 같은 원소를 안전하게 처리하려면 counter를 함께 넣는 패턴이 유용합니다.
@@ -225,7 +221,7 @@ print(merged)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
 또 하나 기억할 점은 Top-K 문제가 면접과 실무 모두에서 자주 나온다는 사실입니다. 전체 정렬 대신 O(n log k) 힙 해법을 떠올릴 수 있느냐가 구조 이해도의 차이를 만듭니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 힙의 구조와 힙 속성을 설명할 수 있다
 - [ ] `heapq`의 `heapify`, `heappush`, `heappop`을 사용할 수 있다

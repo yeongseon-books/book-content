@@ -33,7 +33,7 @@ last_reviewed: '2026-05-15'
 ![Backend Development 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/03/03-01-concept-at-a-glance.ko.png)
 *Backend Development 101 3장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - router와 controller는 각각 무엇을 책임져야 할까요?
 - path, query, body parameter는 언제 어떻게 나눠 써야 할까요?

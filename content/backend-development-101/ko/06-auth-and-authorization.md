@@ -33,7 +33,7 @@ last_reviewed: '2026-05-15'
 ![Backend Development 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.ko.png)
 *Backend Development 101 6장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - authentication과 authorization은 무엇이 다를까요?
 - 비밀번호 저장에서 최소한으로 지켜야 할 안전 기준은 무엇일까요?

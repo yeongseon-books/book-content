@@ -31,13 +31,11 @@ last_reviewed: '2026-05-12'
 ![Functional Programming 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/07/07-01-big-picture.ko.png)
 *Functional Programming 101 7장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 재귀 함수는 어떤 구조를 가져야 안전하게 동작할까요?
 - base case는 왜 항상 먼저 생각해야 할까요?
 - Python에서 꼬리 재귀는 왜 이론만큼 실용적이지 않을까요?
-
-## 왜 중요한가
 
 트리 순회, 분할 정복, 중첩 구조 해제, 수학적 정의 같은 문제는 재귀로 표현할 때 가장 자연스럽습니다. 반복문으로도 풀 수는 있지만, 문제 구조 자체가 사라져 코드가 오히려 덜 읽힐 수 있습니다.
 
@@ -315,7 +313,7 @@ print(total_size_iterative(file_tree))  # 3300
 
 결국 재귀와 반복의 선택은 우아함과 안정성의 균형입니다. 구조를 드러내는 데 재귀가 압도적으로 좋다면 쓰되, 운영 환경에서 스택 리스크가 생기면 주저 없이 명시적 스택으로 옮기는 것이 실전적인 판단입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 재귀 함수의 올바른 base case를 설정할 수 있다
 - [ ] 재귀 호출에서 스택 프레임이 어떻게 쌓이는지 설명할 수 있다

@@ -32,23 +32,17 @@ last_reviewed: '2026-05-15'
 ![Distributed Systems 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/02/02-01-concept-at-a-glance.ko.png)
 *Distributed Systems 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 장애 모델이란 무엇이며 왜 장애를 모델링해야 할까요?
 - crash, omission, timing, Byzantine은 어떻게 다를까요?
 - 네트워크 파티션은 왜 별도 범주로 봐야 할까요?
 
-## 왜 중요한가
-
 알고리즘이 노드가 어떤 방식으로 망가지는지를 명시하지 않으면 정확성도 비용도 말할 수 없습니다. Raft, Paxos, BFT 계열 알고리즘이 서로 다른 이유는 각자가 전제하는 장애 모델이 다르기 때문입니다. 이 어휘를 모르면 논문도 문서도 절반밖에 읽히지 않습니다.
 
 > 장애 모델은 알고리즘의 가격표입니다.
 
-## 한눈에 보는 개념
-
 오른쪽으로 갈수록 더 험한 세계를 가정합니다. 세계가 험해질수록 알고리즘은 더 비싸지고 더 많은 노드를 요구합니다.
-
-## 핵심 용어
 
 - **Crash (fail-stop)**: 노드가 멈추면 그대로 멈춘 상태로 남는 모델입니다.
 - **Omission**: 노드가 가끔 메시지를 빠뜨리거나 누락하는 모델입니다.
@@ -135,8 +129,6 @@ sudo iptables -F
 ```
 
 파티션은 노드는 살아 있지만 서로를 볼 수 없는 상태입니다. 4편의 CAP는 바로 이 상황을 중심으로 전개됩니다.
-
-## 이 코드에서 먼저 봐야 할 점
 
 - 같은 장애처럼 보여도 실제로는 종류와 대응 방식이 다릅니다.
 - 메시지 누락과 지연 장애는 타임아웃으로만 가늠할 수 있고, 그 판단도 완전하지 않습니다.
@@ -347,8 +339,6 @@ def write_with_fence(key: str, value: str, fence_token: int) -> bool:
 
 ---
 
-## 실무에서는 이렇게 드러납니다
-
 대부분의 인터넷 서비스는 crash와 partition을 중심에 둔 CFT 모델을 전제로 합니다. 금융이나 블록체인 계열은 Byzantine까지 고려하는 BFT 계열을 선택합니다. Kubernetes, Spanner, Cassandra 같은 시스템의 설계 문서를 보면 어떤 장애 모델을 겨냥했는지가 분명히 적혀 있습니다. 예를 들어 Kubernetes의 etcd는 Raft를 사용하므로 crash-recovery를 전제하고, Cassandra는 gossip 기반 장애 감지로 네트워크 파티션 상황에서도 가용성을 유지하도록 설계되어 있습니다. 장애 모델을 명시하지 않은 시스템은 암묵적으로 crash-stop을 가정하는 경우가 많은데, 이때 파티션이 발생하면 예측 불가능한 동작이 나타납니다.
 
 ## 시니어 엔지니어는 이렇게 생각합니다
@@ -359,7 +349,7 @@ def write_with_fence(key: str, value: str, fence_token: int) -> bool:
 - 타임아웃 값은 네트워크 측정값을 기준으로 정합니다.
 - 장애 모델이 명시되지 않은 문서나 제품 설명은 곧바로 경계합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] crash와 omission의 차이를 한 줄로 말할 수 있는가?
 - [ ] Byzantine이 왜 더 비싼지 설명할 수 있는가?

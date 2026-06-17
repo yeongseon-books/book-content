@@ -28,7 +28,7 @@ last_reviewed: '2026-05-17'
 ![Data Structures with Python 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/09/09-01-set.ko.png)
 *Data Structures with Python 101 9장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `set`은 왜 중복 제거와 membership test에 강할까요?
 - 충돌과 hashability는 set에서 어떤 의미를 가질까요?
@@ -41,8 +41,6 @@ last_reviewed: '2026-05-17'
 > `set`은 값을 저장하지 않는 dict와 같은 해시 테이블 계열 구조입니다.
 
 그래서 set을 배울 때는 `|`, `&` 같은 문법만 익히는 것으로 끝나면 안 됩니다. hashability, collision, uniqueness가 어떻게 맞물리는지까지 이해해야 실전에서 제대로 사용할 수 있습니다.
-
-## 핵심 개념 한눈에 보기
 
 > `set` = 중복 없는 키만 저장하는 해시 테이블 기반 컬렉션
 
@@ -197,8 +195,6 @@ print([article["title"] for article in matches])
 
 태그 필터링은 좋은 실무 예시입니다. 다만 이 예시가 의미 있으려면 먼저 membership과 subset 검사가 왜 빠른지 내부 모델부터 이해해야 합니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - set은 key-only hash table로 이해하는 편이 가장 정확합니다.
 - set에서도 collision은 발생하지만 uniqueness와 membership semantics는 깨지지 않습니다.
 - dedup은 해시가 탐색 범위를 좁히고 equality가 동일성을 확정하기 때문에 성립합니다.
@@ -229,7 +225,7 @@ print([article["title"] for article in matches])
 
 또한 정확성은 원소 semantics에 달려 있다는 점도 압니다. equality나 해시가 불안정하면 set은 더 이상 믿을 수 있는 dedup 도구가 아닙니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] set이 dict와 같은 해시 테이블 계열 구조라는 점을 설명할 수 있다
 - [ ] collision과 equality가 어떻게 함께 올바른 dedup을 만드는지 설명할 수 있다

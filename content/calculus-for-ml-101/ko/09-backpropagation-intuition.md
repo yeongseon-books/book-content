@@ -35,7 +35,7 @@ last_reviewed: '2026-05-12'
 ![Calculus for ML 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.ko.png)
 *Calculus for ML 101 9장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 역전파는 수많은 weight의 gradient를 왜 한 번에 계산할 수 있을까요?
 - 계산 그래프 관점에서 순전파와 역전파는 각각 무엇을 남길까요?

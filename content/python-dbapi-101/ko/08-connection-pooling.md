@@ -36,7 +36,7 @@ seo_description: SQLite connection은 다른 DB의 client/server connection과 �
 ![Python DB-API 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-02-mental-model-a-connection-is-a-file-hand.ko.png)
 *Python DB-API 101 8장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `sqlite3.threadsafety`와 `check_same_thread`는 각각 무엇을 보장하고, 어떤 조합에서 connection 공유를 피해야 할까요?
 - 요청별 connection, 스레드별 connection, 단일 shared connection, 단일 writer 큐 중에서 SQLite에 맞는 선택 기준은 무엇일까요?
@@ -313,7 +313,7 @@ threading.Thread(target=writer_worker, daemon=True).start()
 
 읽기는 그대로 요청별 connection을 사용하면 됩니다. WAL 모드 덕분에 reader는 writer를 기다리지 않습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `sqlite3.threadsafety` 값을 확인했는가?
 - [ ] connection 전략(요청별 / 스레드별 / 단일 / 큐)을 한 가지로 정했는가?

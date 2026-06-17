@@ -32,7 +32,7 @@ last_reviewed: '2026-05-15'
 ![Operating Systems 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.ko.png)
 *Operating Systems 101 10장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 컨테이너와 가상 머신은 격리 방식이 어떻게 다를까요?
 - namespace는 "무엇이 보이는가"를, cgroup은 "얼마나 쓸 수 있는가"를 어떻게 나눌까요?
@@ -168,7 +168,7 @@ docker run --rm alpine sh -c "
 - 서버리스: gVisor, Firecracker 같은 추가 격리 계층
 - 개발 환경: docker compose / dev container로 환경 재현
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 컨테이너와 VM의 차이를 설명할 수 있다
 - [ ] namespace와 cgroup의 역할을 안다

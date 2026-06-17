@@ -39,7 +39,7 @@ Python으로 데이터베이스를 다룬 적이 있다면 `sqlite3`, `psycopg`,
 
 > 드라이버를 갈아끼울 수 있다는 말은 'connect → cursor → execute → fetch → commit'이라는 한 가지 일생 주기를 모든 RDBMS가 공유한다는 뜻이고, 이것이 PEP 249가 지난 30년간 살아남은 진짜 이유입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - PEP 249 이전에는 Python의 데이터베이스 접근 코드가 왜 그렇게 제각각이었을까요?
 - DB-API 2.0은 정확히 어떤 다섯 가지를 표준화했을까요?
@@ -224,7 +224,7 @@ cur.execute(f"SELECT * FROM users WHERE name = '{name}'")
 
 `threadsafety=1`인 driver는 connection을 thread간 공유 불가입니다. sqlite3는 default가 `check_same_thread=True`라 다른 thread에서 쓰면 에러. multi-threaded app에서는 thread당 connection을 만들거나 connection pool을 씁니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] sqlite3로 connect → cursor → execute → fetch → close 사이클을 한 번 돌렸다.
 - [ ] 같은 코드를 PostgreSQL(psycopg) 드라이버로 옮길 때 무엇이 달라지는지 확인했다.

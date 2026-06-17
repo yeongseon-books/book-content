@@ -31,13 +31,11 @@ last_reviewed: '2026-05-12'
 ![Functional Programming 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.ko.png)
 *Functional Programming 101 6장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 클로저는 바깥 스코프의 변수를 어떻게 기억할까요?
 - 자유 변수와 cell object는 디버깅에서 왜 중요한 단서일까요?
 - `functools.partial`은 어떤 상황에서 클로저보다 더 적합할까요?
-
-## 왜 중요한가
 
 클로저는 클래스를 쓰지 않고도 작은 상태를 캡슐화하게 해 줍니다. 상태가 단순하고 메서드도 하나면, 클래스보다 클로저가 훨씬 가볍고 읽기 쉬운 경우가 많습니다.
 
@@ -327,7 +325,7 @@ if should_retry(event["status"]):
 
 `functools.partial`은 과소평가된 도구입니다. `lambda x: f(x, fixed_arg)`보다 의도가 더 명확하고 `repr()`에도 고정 인자가 드러나서 디버깅에도 유리합니다. 좋은 팀은 클로저와 `partial`을 감으로 고르지 않고, 상태 기억이 필요한지 인자만 고정하면 되는지로 구분합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 클로저가 바깥 변수를 기억하는 메커니즘을 설명할 수 있다
 - [ ] `nonlocal`이 필요한 경우와 아닌 경우를 구분할 수 있다

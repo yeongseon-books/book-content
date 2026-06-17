@@ -47,7 +47,7 @@ seo_description: Ep1~9에서 cleaning, dedup, PII redaction, tokenization, chunk
 *Architecture - a 6-stage pipeline*
 > 프로덕션 데이터 파이프라인 구축의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 여러 데이터 준비 단계를 실제 운영 가능한 하나의 파이프라인으로 묶으려면 어떤 시스템 속성이 필요할까요?
 - DVC와 stage fingerprint는 데이터 버전 관리와 idempotency를 어떻게 함께 해결할까요?

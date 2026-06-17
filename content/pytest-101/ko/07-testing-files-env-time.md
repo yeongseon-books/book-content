@@ -29,7 +29,7 @@ last_reviewed: '2026-05-12'
 ![pytest 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/07/07-01-big-picture.ko.png)
 *pytest 101 7장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 파일 테스트에서 왜 실제 경로 대신 `tmp_path`를 써야 할까요?
 - 환경변수는 왜 테스트마다 격리해야 할까요?
@@ -317,7 +317,7 @@ def test_not_billing_day():
 
 특히 `tmp_path`는 pytest에서 가장 실용적인 내장 fixture 중 하나입니다. 파일 I/O 테스트를 시작할 때 가장 먼저 떠올릴 기본 도구라고 생각해도 좋습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `tmp_path`로 임시 파일을 만들고 테스트했다
 - [ ] `monkeypatch.setenv/delenv`로 환경변수를 격리했다

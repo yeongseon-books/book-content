@@ -35,7 +35,7 @@ last_reviewed: '2026-05-12'
 ![Calculus for ML 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.ko.png)
 *Calculus for ML 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 함수가 다른 함수 안에 들어갈 때 전체 미분은 왜 단순 합이 아니라 곱으로 연결될까요?
 - 바깥 함수와 안쪽 함수를 구분하는 가장 실용적인 방법은 무엇일까요?

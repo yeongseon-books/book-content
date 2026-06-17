@@ -34,7 +34,7 @@ Microsoft Learn이 Environment를 설명할 때 반복하는 문장이 있습니
 *Azure Container Apps Deep Dive 2장 흐름 개요*
 > Environment 내부 — 네트워크·관측·Dapr 스코프의 경계의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Environment는 왜 단순한 부모 리소스가 아니라 실제 격리 경계일까요?
 - 네트워크 범위는 Revision이나 App이 아니라 왜 Environment에서 시작될까요?

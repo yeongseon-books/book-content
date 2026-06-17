@@ -34,7 +34,7 @@ Azure Container Apps에서 Dapr를 처음 켜면 기능이 아주 가볍게 보�
 *Azure Container Apps Deep Dive 5장 흐름 개요*
 > Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - ACA에서 Dapr를 켠다는 것은 런타임에 정확히 무엇이 추가된다는 뜻일까요?
 - sidecar injection은 어떤 upstream 모델로 이해하는 편이 가장 정확할까요?

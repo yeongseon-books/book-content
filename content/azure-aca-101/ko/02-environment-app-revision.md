@@ -31,7 +31,7 @@ ACA에서는 Environment, Container App, Revision이라는 세 단어를 계속 
 *Azure Container Apps 101 2장 흐름 개요*
 > Environment, Container App, Revision — ACA in three words의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - ACA의 세 가지 운영 단위인 Environment, Container App, Revision은 정확히 어떤 책임을 가질까요?
 - 어떤 변경은 새 Revision을 만들고, 어떤 변경은 만들지 않을까요?

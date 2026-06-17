@@ -30,19 +30,15 @@ last_reviewed: '2026-05-12'
 ![Compilers 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/02/02-01-big-picture.ko.png)
 *Compilers 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 토큰은 정확히 무엇이고, 렉서는 어떤 문제를 해결할까요?
 - 정규식 기반 렉서는 어떻게 동작할까요?
 - longest-match 규칙은 왜 중요할까요?
 
-## 왜 중요한가
-
 `SyntaxError: unexpected token`이 어디에서 오는지 정확히 답할 수 있는 사람과 그렇지 못한 사람의 차이는 대개 lexical analysis를 실제로 들여다봤는지에 달려 있습니다. 좋은 렉서는 단지 토큰을 자르는 도구가 아니라, 좋은 오류 메시지의 시작점이기도 합니다.
 
 > 토큰을 잘못 자르면, 그다음 모든 단계가 같은 잘못된 분할 위에 세워집니다.
-
-## 핵심 개념 한눈에 보기
 
 ```mermaid
 flowchart LR
@@ -54,8 +50,6 @@ flowchart LR
 ```
 
 이 단계의 핵심은 두 가지입니다. **가장 긴 매치를 고르는 것**과 **위치 정보를 끝까지 들고 가는 것**입니다.
-
-## 핵심 용어
 
 - 토큰: 렉서가 만들어 내는 의미 있는 단위입니다. 보통 `(kind, text, position)`의 조합으로 생각합니다.
 - **렉심(lexeme)**: 토큰 안의 실제 텍스트 부분입니다.
@@ -205,8 +199,6 @@ for tok in tokenize.generate_tokens(io.StringIO(src).readline):
 
 CPython의 렉서를 직접 볼 수 있습니다. `OP`, `NAME`, `NUMBER`, `NEWLINE`, `COMMENT` 같은 토큰이 line/column 정보와 함께 나옵니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - 테이블 기반 렉서는 토큰 추가와 변경을 **데이터 수정**으로 바꿉니다.
 - longest-match는 SPEC 순서나 명시적 길이 비교로 보장합니다.
 - 키워드는 렉서의 정규식 자체가 아니라 후처리로 분리합니다.
@@ -232,7 +224,7 @@ CPython의 렉서를 직접 볼 수 있습니다. `OP`, `NAME`, `NUMBER`, `NEWLI
 - 사내 DSL이라면 먼저 `re`와 표 하나로 충분한지 검토합니다.
 - 오류 복구 전략을 렉서 단계부터 설계합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 토큰을 한 문장으로 정의할 수 있습니까?
 - [ ] longest-match를 한 문장으로 설명할 수 있습니까?

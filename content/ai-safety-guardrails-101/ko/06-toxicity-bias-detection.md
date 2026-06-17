@@ -38,7 +38,7 @@ seo_description: 따라서 toxicity는 inline guardrail로, bias는 offline audi
 *독성·편향 guardrail 흐름*
 > 독성은 지금 막아야 할 위험이고, 편향은 오래 측정해 줄여야 할 시스템 성향입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 독성 차단과 편향 측정은 왜 같은 문제로 묶으면 안 될까요?
 - 실시간 moderation과 offline audit은 각각 어떤 신호를 담당해야 할까요?

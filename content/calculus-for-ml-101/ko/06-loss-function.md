@@ -35,7 +35,7 @@ last_reviewed: '2026-05-12'
 ![Calculus for ML 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.ko.png)
 *Calculus for ML 101 6장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 손실 함수는 단순한 평가 지표와 무엇이 다를까요?
 - 회귀에서 MSE를, 분류에서 cross entropy를 자주 쓰는 이유는 무엇일까요?

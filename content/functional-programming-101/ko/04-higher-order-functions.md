@@ -31,13 +31,11 @@ last_reviewed: '2026-05-12'
 ![Functional Programming 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/04/04-01-big-picture.ko.png)
 *Functional Programming 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 고차 함수는 어떤 두 형태로 나타날까요?
 - `sorted`, `map`, `filter`는 왜 고차 함수의 대표 예시일까요?
 - 함수를 반환하는 팩토리 패턴은 어떤 상황에서 유용할까요?
-
-## 왜 중요한가
 
 반복 패턴을 함수로 추출하다 보면 어느 시점부터는 로직의 뼈대는 같고, 실제로 달라지는 것은 조건식이나 후처리 방식뿐인 경우가 많습니다. 이때 동작을 함수로 받아들이면 전략 패턴을 클래스 없이도 간결하게 구현할 수 있습니다.
 
@@ -321,7 +319,7 @@ print(slugify("  Functional Programming Guide  "))  # functional-programmi
 
 다만 추상화가 항상 정답은 아닙니다. 정말로 함수 인자를 받아야 하는지, 단순한 코드를 괜히 일반화하고 있지는 않은지 계속 점검해야 합니다. 좋은 고차 함수는 중복을 줄이지만, 나쁜 고차 함수는 읽는 사람의 인지 부하만 늘립니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 고차 함수의 두 형태를 설명할 수 있다
 - [ ] `sorted(key=...)`에 적절한 함수를 전달할 수 있다

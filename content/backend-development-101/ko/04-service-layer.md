@@ -33,7 +33,7 @@ controller에서 시작한 코드가 시간이 지나면서 gRPC 핸들러, CLI 
 ![Backend Development 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/04/04-01-concept-at-a-glance.ko.png)
 *Backend Development 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 비즈니스 로직은 왜 controller도 repository도 아닌 service가 맡아야 할까요?
 - controller, service, repository는 각각 어디까지 책임져야 할까요?
@@ -422,7 +422,7 @@ class PlaceOrderService:
 
 Service Layer는 컨트롤러를 얇게 만들기 위한 미적 추상이 아닙니다. 여러 인터페이스가 같은 비즈니스 규칙을 공유하게 만드는 운영 안전장치입니다. DI는 테스트와 교체 가능성을 열고, 트랜잭션 경계를 service가 소유해야 멀티 저장소 유스케이스에서 원자성을 지킬 수 있습니다. 도메인 예외를 경계에서 번역하면 transport가 바뀌어도 규칙 코드는 흔들리지 않습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 서비스 레이어의 역할을 설명할 수 있습니다.
 - [ ] 컨트롤러와 서비스의 책임 차이를 말할 수 있습니다.

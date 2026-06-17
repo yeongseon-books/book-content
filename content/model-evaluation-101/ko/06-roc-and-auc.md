@@ -31,7 +31,7 @@ ROC와 AUC는 임계값을 아직 고정하지 않았을 때 후보 모델을 �
 ![Model Evaluation 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/06/06-01-concept-at-a-glance.ko.png)
 *Model Evaluation 101 6장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `ROC-AUC 0.819`와 `PR-AUC 0.463`이 함께 나오면 무엇을 다르게 읽어야 할까요?
 - `FPR <= 0.05` 제약 아래에서 임계값 0.141를 고르면 혼동 행렬과 비용은 어떻게 바뀌나요?

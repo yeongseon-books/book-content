@@ -36,7 +36,7 @@ Kubernetes는 바로 그 운영 문제를 표준화한 시스템입니다. 다�
 *Azure Kubernetes Service 101 1장 흐름 개요*
 > Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - AKS는 self-managed Kubernetes와 비교할 때 정확히 무엇을 대신 운영해 줄까요?
 - 관리형 Kubernetes라고 해도 왜 여전히 `kubectl`, YAML, Service, Ingress를 이해해야 할까요?

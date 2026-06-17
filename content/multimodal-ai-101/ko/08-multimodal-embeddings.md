@@ -39,7 +39,7 @@ seo_description: 5편에서 multimodal RAG의 큰 그림을 살펴봤다면, 이
 *Multimodal AI 101 8장 흐름 개요*
 > Multimodal Embedding과 Cross-modal 검색의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Multimodal embedding은 텍스트 임베딩과 무엇이 다르고, 왜 cross-modal search의 핵심일까요?
 - CLIP, SigLIP, ImageBind는 어떤 공통점과 차이를 가지며 무엇을 기준으로 선택해야 할까요?

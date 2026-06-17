@@ -38,7 +38,7 @@ self-managed Kubernetes라면 `etcd` 백업 전략, `kube-apiserver` 플래그, 
 *Azure Kubernetes Service Deep Dive 1장 흐름 개요*
 > Control Plane 해부 — AKS가 사용자에게서 가린 것의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - AKS control plane은 정확히 어떤 컴포넌트로 이루어져 있고, 사용자는 그중 무엇을 직접 볼 수 있을까요?
 - 관리형 control plane이라는 약속은 어디까지를 의미하고, 어디부터는 여전히 사용자의 운영 책임일까요?

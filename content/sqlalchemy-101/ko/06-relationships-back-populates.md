@@ -37,13 +37,11 @@ seo_description: relationship과 back_populates로 양방향 ORM 관계를 안�
 *SQLAlchemy 101 6장 흐름 개요*
 > ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `ForeignKey`와 `relationship()`은 왜 항상 한 쌍처럼 이해해야 할까요?
 - `back_populates`와 `backref`는 어떤 기준으로 선택할까요?
 - 컬렉션 조작, flush, SQL 실행 시점은 어떻게 연결될까요?
-
-## 왜 중요한가
 
 관계 정의가 어긋나면 다음과 같은 문제가 자주 생깁니다.
 
@@ -322,7 +320,7 @@ association table은 단순 다대다 매핑에만 적합합니다. "언제 태�
 - **동결된 컬렉션 가져오기**: 응답 직전에 `list(user.orders)`로 명시적 변환을 두면 detached 후에도 안전하게 직렬화할 수 있습니다.
 - **테스트 fixture**: 부모만 만들어 자식을 함께 채우는 패턴이 익숙해지면 fixture 코드가 단순해집니다. ORM의 cascade는 fixture에서도 그대로 동작합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 양쪽 모두에 `relationship` + `back_populates`가 있는가?
 - [ ] 자식 쪽 컬럼에 `ForeignKey`가 명시되어 있는가?

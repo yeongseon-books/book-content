@@ -36,7 +36,7 @@ sqlite3는 편의를 위해 트랜잭션을 암묵적으로 시작합니다. 이
 ![Python DB-API 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.ko.png)
 *Python DB-API 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - sqlite3는 정확히 언제 암묵적 `BEGIN`을 시작하고 `con.in_transaction`은 그 경계를 어떻게 보여 줄까요?
 - `DEFERRED`, `IMMEDIATE`, `EXCLUSIVE`와 WAL mode를 함께 보면 write 충돌 시점이 어떻게 달라질까요?
@@ -320,7 +320,7 @@ with dst:
 
 ---
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `con.close()` 전에 항상 `con.commit()` 또는 `with con:`로 끝낸다.
 - [ ] write가 포함된 함수는 `isolation_level='IMMEDIATE'`로 시작한다.

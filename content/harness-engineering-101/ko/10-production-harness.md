@@ -34,7 +34,7 @@ Production Harness는 앞선 모든 harness를 하나의 배포 가능한 단위
 *Production Harness - 운영 가능한 Agent 작업 환경 만들기*
 > Production Harness는 agent를 만드는 마지막 장식이 아니라, 변경을 안전하게 배포하고 되돌리고 설명하게 만드는 운영 스택입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Production Harness는 여러 harness를 어떻게 하나의 배포 가능한 운영 스택으로 묶을까요?
 - 점진적 rollout과 rollback은 agent 시스템에서 왜 설계의 일부여야 할까요?

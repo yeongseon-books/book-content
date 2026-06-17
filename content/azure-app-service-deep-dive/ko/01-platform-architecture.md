@@ -34,7 +34,7 @@ App Service를 오래 운영할수록 가장 자주 듣는 말은 의외로 비�
 *Azure App Service Deep Dive 1장 흐름 개요*
 > App Service 플랫폼 아키텍처 — Front-End·Worker·File Server의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - App Service의 "플랫폼"은 실제로 어떤 박스들로 나눠서 이해해야 할까요?
 - App Service Plan은 단순한 과금 단위가 아니라 어떤 격리와 용량의 의미를 가질까요?

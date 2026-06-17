@@ -37,13 +37,11 @@ seo_description: MetaData, Table, Column으로 스키마를 Python 객체로 모
 *SQLAlchemy 101 2장 흐름 개요*
 > SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `MetaData`는 어떤 역할을 하고 왜 스키마 카탈로그라고 부를까요?
 - `Table`과 `Column`을 Python 객체로 두면 어떤 실수가 줄어들까요?
 - SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요?
-
-## 왜 중요한가
 
 raw SQL로 schema를 관리하면 한 가지 큰 문제가 생깁니다. application code 안의 INSERT/SELECT 문에 적힌 컬럼 이름이 실제 schema와 어긋나도 컴파일 시점에 알 수 없습니다. 운영 중에 갑자기 `no such column` 같은 오류가 발생하고, IDE는 컬럼 이름 자동완성도 해주지 못합니다.
 
@@ -435,7 +433,7 @@ app/
 
 Production에서는 `metadata.create_all`을 직접 부르지 않고 Alembic migration으로 schema를 관리하는 편이 안전합니다. 그러나 test fixture, 로컬 dev DB 초기화, demo 환경 등에서는 `create_all`이 여전히 가장 빠른 부트스트랩 방법입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `MetaData`를 module-level 단일 instance로 두었다
 - [ ] `naming_convention`을 첫 단계부터 적용했다

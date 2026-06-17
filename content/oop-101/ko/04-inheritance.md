@@ -32,7 +32,7 @@ seo_description: Python 상속, 오버라이딩, super(), MRO를 실무 기준�
 ![Object-Oriented Programming 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/04/04-01-concept-overview.ko.png)
 *Object-Oriented Programming 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 상속이 코드 중복을 줄일 수는 있지만, 왜 동시에 강한 결합도 만들까요?
 - 오버라이딩과 `super()`는 어떤 식으로 함께 써야 안전할까요?
@@ -288,7 +288,7 @@ print(Duck.__mro__)
 | 특정 자식만 초기화 순서 예외가 많음 | `super()` 호출 규칙이 깨져 디버깅이 어려워집니다 | 생성 책임을 팩토리나 조립 코드로 이동합니다 |
 | 부모 타입으로 받았는데 자식마다 사용 가능한 메서드가 다름 | 리스코프 치환 원칙이 흔들려 호출부가 타입 검사로 돌아갑니다 | 상속 계층을 나누거나, 공통 계약을 더 작은 인터페이스로 재정의합니다 |
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 단일 상속으로 부모 클래스를 확장할 수 있다
 - [ ] `super()`로 부모 메서드를 호출할 수 있다

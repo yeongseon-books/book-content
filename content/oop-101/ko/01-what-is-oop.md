@@ -32,7 +32,7 @@ seo_description: 객체지향의 핵심 아이디어와 절차지향 코드와�
 ![Object-Oriented Programming 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/01/01-01-big-picture.ko.png)
 *Object-Oriented Programming 101 1장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 객체지향은 절차지향과 무엇이 다르고, 왜 등장했을까요?
 - 클래스, 인스턴스, 속성, 메서드는 어떤 관계로 이해하면 쉬울까요?
@@ -259,7 +259,7 @@ print(s1.introduce())  # Alice at Code Academy, grade 3
 
 실무에서는 "이것을 클래스로 만들어야 할까?"라는 질문을 자주 합니다. 답은 대부분 "관련 데이터와 행위가 함께 변경되는가?"입니다. 함께 변경된다면 하나의 클래스로 묶는 것이 유지보수에 유리합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 절차지향과 객체지향의 차이를 설명할 수 있다
 - [ ] 클래스와 인스턴스의 관계를 이해한다

@@ -29,13 +29,11 @@ last_reviewed: '2026-05-15'
 ![Computer Networks 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 7장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 라우팅 테이블은 어떻게 읽어야 할까요?
 - default gateway와 longest-prefix match는 어떻게 동작할까요?
 - NAT는 출발지 IP와 포트를 어떻게 바꿀까요?
-
-## 왜 중요한가
 
 라우팅을 모르면 "왜 회사 네트워크에서만 안 되지?"라는 질문에 답하기 어렵습니다. NAT를 모르면 "왜 집에서는 안 되고 사무실에서는 되지?", "왜 외부에서 우리 서버로 바로 못 들어오지?" 같은 문제가 설명되지 않습니다. VPN, 컨테이너 네트워크, 클라우드 VPC 역시 결국 라우팅과 NAT의 변형입니다.
 
@@ -60,8 +58,6 @@ last_reviewed: '2026-05-15'
 ```
 
 패킷은 호스트 A에서 출발할 때 사설 IP를 달고 있습니다. 첫 번째 라우터(default gateway)가 NAT를 수행해 공인 IP로 바꾸고, 이후 라우터들은 공인 IP 기준으로 다음 홉을 결정합니다. 응답이 돌아올 때는 NAT 테이블을 역으로 참조해 원래 사설 IP로 되돌립니다.
-
-## 핵심 용어
 
 | 용어 | 의미 |
 | --- | --- |
@@ -395,7 +391,7 @@ Destination      Target          Status
 0.0.0.0/0        igw-xyz789      active
 ```
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 라우팅 테이블을 읽고 각 필드의 의미를 설명할 수 있다
 - [ ] longest-prefix match의 동작 원리를 예시로 보여줄 수 있다

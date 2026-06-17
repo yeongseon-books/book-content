@@ -32,7 +32,7 @@ Python은 여기서 특히 흥미롭습니다. 상속만으로 다형성을 만�
 ![Object-Oriented Programming 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/05/05-01-big-picture.ko.png)
 *Object-Oriented Programming 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 다형성은 왜 타입 분기문을 줄이는 가장 강력한 도구일까요?
 - 상속 기반 다형성과 덕 타이핑은 어떤 차이로 쓰일까요?
@@ -270,7 +270,7 @@ Python에서 다형성은 "의도적으로 설계"하기보다 "자연스럽게 
 
 타입 안전성이 중요한 프로젝트에서는 `Protocol`을 적극 활용합니다. 런타임에는 아무 영향이 없지만 타입 검사기(mypy)가 인터페이스 위반을 잡아줍니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 상속 기반 다형성을 구현할 수 있다
 - [ ] 덕 타이핑의 원리를 이해하고 활용할 수 있다

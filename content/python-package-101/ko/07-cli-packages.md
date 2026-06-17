@@ -30,7 +30,7 @@ seo_description: entry point와 click으로 pip install 후 바로 실행 가능
 ![Python Package 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/07/07-01-mental-model.ko.png)
 *Python Package 101 7장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `pip install` 후 바로 실행되는 명령어는 어떻게 만들까요?
 - `[project.scripts]` entry point는 어떻게 동작할까요?
@@ -42,8 +42,6 @@ seo_description: entry point와 click으로 pip install 후 바로 실행 가능
 - `argparse`로 기본 CLI를 만드는 방법
 - `click`으로 선언형 CLI를 만드는 방법
 - 서브커맨드 구조를 설계하는 방법
-
-## 왜 중요한가
 
 사용자는 `python my_script.py`보다 `mytool`처럼 바로 실행되는 명령어를 더 편하게 받아들입니다. 패키지에 entry point를 등록해 두면 설치 직후 터미널에서 명령어를 바로 사용할 수 있어 배포 경험이 크게 좋아집니다.
 
@@ -265,7 +263,7 @@ CLI에서 가장 중요한 것은 기능 수보다 **일관된 인터페이스**
 
 `argparse`는 외부 의존성이 없어 가볍고 기본기 위주로 쓰기 좋습니다. 반면 `click`은 서브커맨드, 프롬프트, 컬러 출력, 테스트 러너까지 갖추고 있어 독립 CLI 패키지에서는 생산성이 더 높습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `[project.scripts]`로 entry point를 등록할 수 있다
 - [ ] `argparse`로 기본 CLI를 만들 수 있다

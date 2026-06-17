@@ -33,13 +33,11 @@ branch를 나누는 일보다 더 중요한 것은 다시 합치는 일입니다
 
 > merge는 'commit을 섞는 일'이 아니라 '두 history를 어디서 만나게 할지 결정하는 일'입니다 — 같은 줄을 양쪽에서 다르게 고쳤다면 Git이 답을 만들지 못하고, conflict는 도구의 실패가 아니라 사람의 결정이 필요한 정상적인 상태 표시입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - fast-forward merge는 언제 일어날까요?
 - three-way merge는 왜 부모가 두 개인 commit을 만들까요?
 - conflict marker의 `HEAD` 쪽과 incoming branch 쪽은 어떻게 읽을까요?
-
-## 왜 중요한가
 
 branch를 나눠 작업했다면 결국 언젠가는 다시 합쳐야 합니다. PR이 merge될 때도, 동료의 변경을 내 branch에 가져올 때도, 장시간 작업한 기능을 `main`에 올릴 때도 merge가 일어납니다.
 
@@ -371,7 +369,7 @@ merge 전에는 가능한 한 `main`을 최신으로 맞추는 편이 좋습니�
 
 무엇보다 conflict marker를 지웠다고 끝이 아닙니다. merge 후에는 반드시 빌드와 테스트를 다시 돌려 결과가 여전히 정상인지 확인해야 합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] fast-forward가 언제 일어나고 Git이 어떤 문구를 출력하는지 설명할 수 있습니다.
 - [ ] three-way merge commit이 왜 부모를 둘 가지는지 설명할 수 있습니다.

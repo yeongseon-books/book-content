@@ -37,7 +37,7 @@ Pod가 어느 주소 공간에서 IP를 받는지, VNet의 희소한 IP를 무�
 *Azure Kubernetes Service Deep Dive 3장 흐름 개요*
 > CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - kubenet, Azure CNI Pod Subnet, Azure CNI Node Subnet, Azure CNI Overlay는 IP 소비와 라우팅 면에서 무엇이 다를까요?
 - Pod IP가 실제 VNet 공간을 직접 소비할 때 어떤 운영 한계가 가장 먼저 드러날까요?

@@ -30,7 +30,7 @@ seo_description: 리눅스 트리 구조를 파악하고 cd, ls부터 cp, mv, rm
 ![Linux CLI 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/02/02-01-big-picture.ko.png)
 *Linux CLI 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 절대 경로와 상대 경로는 언제 다르게 느껴질까요?
 - `pwd`, `cd`, `ls`만으로 현재 위치를 어떻게 읽어야 할까요?
@@ -186,7 +186,7 @@ cp -r src/ backup/      # Correct: recursive copy
 
 팀에서는 위험한 명령어에 안전장치를 겁니다. `.bashrc`에 `alias rm='rm -i'`를 넣어 삭제 전 확인을 받거나, `trash-cli` 같은 휴지통 도구를 씁니다. 서버에서는 `rm` 대신 `mv`로 임시 폴더에 옮긴 뒤, 일정 기간 후 정리하는 패턴이 안전합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `pwd`로 현재 위치를 확인하고 `cd`로 이동할 수 있다
 - [ ] 절대 경로와 상대 경로의 차이를 설명할 수 있다

@@ -32,7 +32,7 @@ VectorStoreRetriever와 MMR은 관련성과 다양성 사이 균형점을 retrie
 *invoke와 callback이 이어지는 호출 흐름*
 > Retriever는 최근접 이웃 몇 개를 가져오는 도구가 아닙니다. 후보 근거를 최종 컨텍스트로 바꾸는 정책 계층입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `BaseRetriever`는 검색 구현마다 무엇을 같은 호출 계약으로 묶어 줄까요?
 - `similarity`, `similarity_score_threshold`, `mmr`는 각각 어떤 검색 실패를 줄이려는 선택일까요?
@@ -106,7 +106,7 @@ if __name__ == "__main__":
 - retriever threshold와 vector store raw score threshold는 같은 계층이 아닙니다.
 
 <!-- a-grade-example:end -->
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] similarity와 MMR을 같은 질의로 비교해 봤다.
 - [ ] `fetch_k`를 `k`보다 충분히 크게 잡아 봤다.

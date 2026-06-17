@@ -36,7 +36,7 @@ last_reviewed: '2026-05-15'
 ![예시 기반 유도와 단계적 추론의 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.ko.png)
 *예시 기반 유도와 단계적 추론의 전체 그림*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - few-shot은 무엇을 가르치고 chain-of-thought는 무엇을 가르칠까요?
 - zero-shot, few-shot, CoT 중 언제 어떤 도구를 골라야 할까요?

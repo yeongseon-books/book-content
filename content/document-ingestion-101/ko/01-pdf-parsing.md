@@ -34,7 +34,7 @@ seo_description: PDF 파싱의 첫 목표는 시각 문서를 검증 가능한 �
 *PDF generation and extraction flow*
 > PDF 파싱의 첫 목표는 시각 문서를 검증 가능한 문자열 목록으로 바꾸는 일입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - PDF 파일은 왜 단순한 텍스트 파일처럼 읽을 수 없을까요?
 - 페이지 구조와 메타데이터를 추출 단계에서 보존하지 않으면 RAG에서 무엇이 막힐까요?
@@ -150,8 +150,6 @@ page=1 chars=190 preview=Page 1 Document ingestion notes ...
 page=2 chars=173 preview=Page 2 Operational checks ...
 ```
 
-## 이 코드에서 먼저 봐야 할 점
-
 ### 페이지 메타데이터가 다음 단계로 이어지는 방식
 
 ![Page metadata fields per document](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/01/01-01-how-page-metadata-carries-forward.ko.png)
@@ -178,7 +176,7 @@ OCR은 모든 PDF의 기본 경로가 아니라, 텍스트 레이어를 확인�
 - 문자 수가 많다고 해서 자동으로 품질이 좋은 것은 아닙니다. 읽기 순서와 반복 머리글 문제도 함께 봐야 합니다.
 - 복잡한 레이아웃에서는 라이브러리 비교가 필요하지만, 첫 튜토리얼은 재현 가능한 단순 샘플에서 시작하는 편이 좋습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 스크립트가 PDF를 직접 생성합니다.
 - [ ] 페이지 수와 문자 수를 함께 출력합니다.

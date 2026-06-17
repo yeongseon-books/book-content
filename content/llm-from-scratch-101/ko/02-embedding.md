@@ -35,7 +35,7 @@ seo_description: 토크나이저까지 만들고 나면 잠깐 멍해집니다. 
 ![LLM from Scratch 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/02/02-01-sinusoidal-vs-learned-positional-embeddi.ko.png)
 *LLM from Scratch 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `nn.Embedding`은 실제로 어떤 연산을 수행할까요?
 - 토큰 임베딩만으로는 왜 충분하지 않을까요?

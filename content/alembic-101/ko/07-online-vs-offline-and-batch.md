@@ -31,13 +31,11 @@ production 배포 직전에는 migration이 실제로 어떤 SQL을 내보낼지
 ![Alembic 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.ko.png)
 *Alembic 101 7장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Alembic이 제공하는 두 실행 모드, online과 offline은 어떻게 다를까요?
 - `--sql`로 실제 SQL을 어떻게 미리 볼 수 있을까요?
 - DBA 리뷰용 SQL 스크립트는 어떤 흐름으로 만들까요?
-
-## 왜 중요한가
 
 외부 DBA 검토가 필요하거나 변경 영향이 커서 PR 리뷰만으로는 불안할 때, migration이 실제로 어떤 SQL을 실행할지 미리 봐야 합니다. 이때 쓰는 도구가 Alembic의 offline mode입니다.
 
@@ -235,7 +233,7 @@ PY
 - **production deploy는 online + transaction으로 수행합니다.** offline SQL 파일을 수동으로 돌리면 transaction 경계와 `alembic_version` 동기화 리스크가 생깁니다.
 - **`alembic upgrade <prev>:head --sql`을 `make ddl-preview` 같은 명령으로 고정합니다.** 팀 전체의 습관을 표준화하기 쉽습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `--sql`을 쓸 때 `<from>:<to>` 구문을 이해하고 있다
 - [ ] offline mode에서 data migration 결과를 기대하지 않는다

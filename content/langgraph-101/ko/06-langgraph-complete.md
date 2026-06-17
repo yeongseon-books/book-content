@@ -38,7 +38,7 @@ seo_description: routing, tool loop, checkpoint를 하나의 LangGraph로 묶어
 *supervisor와 tool loop가 결합된 통합 그래프*
 > 완성형 에이전트의 기준은 기능을 모두 붙였는지가 아니라, 경로 선택과 도구 실행과 상태 복구를 각각 설명할 수 있는지입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 완성형 LangGraph 앱은 왜 하나의 거대한 프롬프트가 아니라 협력하는 상태 기계로 봐야 할까요?
 - 체크포인트, 분기, tool call, 멀티턴 이력을 붙여도 어떤 state 계약은 끝까지 유지해야 할까요?
@@ -228,7 +228,6 @@ if __name__ == "__main__":
 
 이 예제는 시리즈 마지막 예제로서 의도적으로 과하지 않게 구성돼 있습니다. direct path, tool path, checkpoint만 넣고도 이미 운영에 필요한 핵심 골격이 모두 보입니다. 첫 번째 턴은 supervisor가 `direct_answer`로 보내고, 두 번째 턴은 `tool_agent`와 `ToolNode` 루프를 열며, 마지막에는 `app.get_state(config)`로 실제 저장 상태를 확인합니다. route를 잘못 잡으면 첫 턴부터 비용이 새고, tool loop 종료가 약하면 두 번째 턴에서 불필요한 왕복이 생기고, checkpoint가 없으면 “같은 대화 안에서 두 종류의 요청을 처리했다”는 사실 자체가 사라집니다.
 
-## 이 코드에서 먼저 봐야 할 점
 ![checkpoint와 route 상태 구조](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-02-what-to-notice-in-this-code.ko.png)
 *checkpoint와 route 상태 구조*
 

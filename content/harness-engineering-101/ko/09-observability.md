@@ -35,7 +35,7 @@ Observability는 로그를 많이 남기는 일이 아니라, 한 번의 실행�
 *Observability - Agent 작업을 추적하고 재현하기*
 > 관측 가능한 agent는 “무슨 답을 했나”가 아니라 “어떤 입력, context, tool, 비용, 판단으로 그 답이 나왔나”를 말할 수 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Observability Harness는 agent 실행을 나중에 어떻게 다시 구성할 수 있게 해야 할까요?
 - trace, replay, cost·latency dashboard는 각각 어떤 운영 질문에 답할까요?

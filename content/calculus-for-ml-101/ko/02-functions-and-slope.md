@@ -35,7 +35,7 @@ last_reviewed: '2026-05-12'
 ![Calculus for ML 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.ko.png)
 *Calculus for ML 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 함수는 왜 단순한 수식이 아니라 입력과 출력의 계약으로 이해해야 할까요?
 - 선형 함수의 기울기와 비선형 함수의 국소 기울기는 어떻게 다를까요?

@@ -29,7 +29,7 @@ last_reviewed: '2026-05-12'
 ![pytest 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/01/01-01-big-picture.ko.png)
 *pytest 101 1장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 테스트는 개발 속도를 늦추는 작업일까요, 아니면 오히려 속도를 높이는 투자일까요?
 - 단위 테스트, 통합 테스트, E2E 테스트는 무엇이 다를까요?
@@ -192,7 +192,7 @@ test_calculator.py::test_divide_by_zero PASSED
 
 실제로 많은 팀은 전체 개발 시간의 일부를 테스트 작성에 꾸준히 투자합니다. 그 비용은 디버깅 감소, 더 안전한 리팩터링, 더 빠른 리뷰로 돌아옵니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `pytest --version`으로 설치를 확인했다
 - [ ] `test_` 접두사 규칙을 이해했다

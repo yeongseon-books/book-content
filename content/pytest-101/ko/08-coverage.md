@@ -29,7 +29,7 @@ last_reviewed: '2026-05-12'
 ![pytest 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/08/08-01-big-picture.ko.png)
 *pytest 101 8장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 코드 커버리지는 정확히 무엇을 측정할까요?
 - 라인 커버리지와 브랜치 커버리지는 어떻게 다를까요?
@@ -214,7 +214,7 @@ pytest --cov=src/myapp --cov-report=term-missing
 
 그래서 실무에서는 전체를 한 번에 100%로 끌어올리기보다, 변경되는 코드의 커버리지를 지속적으로 높이는 전략이 더 현실적입니다. 중요한 것은 숫자 자체보다, 숫자가 보여 주는 빈 구간을 실제 테스트 개선으로 연결하는 일입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] pytest-cov를 설치하고 커버리지를 측정했다
 - [ ] `term-missing`으로 누락 라인을 확인했다

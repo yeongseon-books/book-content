@@ -36,7 +36,7 @@ DB-API의 모든 query 실행은 결국 cursor의 `execute()`, `executemany()`�
 
 > `fetchone` / `fetchmany` / `fetchall` 선택은 취향이 아니라 '결과 집합을 한 번에 메모리로 끌고 올 것인가, 스트리밍할 것인가'라는 결정입니다 — 100만 행 테이블에서 `fetchall`을 부르는 순간 같은 코드가 OOM으로 죽습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `execute`, `executemany`, `fetchone`, `fetchall`, `fetchmany`는 각각 언제 써야 할까요?
 - 큰 결과셋을 메모리를 터뜨리지 않고 처리하려면 어떤 패턴을 써야 할까요?
@@ -198,7 +198,7 @@ def export_notes(db_path, csv_path, chunk=500):
 4. **`arraysize`를 default 1로 두고 large fetch** - server-side cursor가 있는 driver에서 round-trip이 row 수만큼 발생합니다. ETL에서는 100~1000 사이로 조정합니다.
 5. **iteration 중에 같은 cursor로 다른 query 실행** - 진행 중인 결과셋이 invalidate됩니다. cursor를 두 개 만들거나 결과를 list로 받은 뒤 처리합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] executemany로 다중 INSERT를 단일 호출로 처리했다.
 - [ ] fetchmany로 chunk 단위로 결과를 받아 메모리 사용을 통제했다.

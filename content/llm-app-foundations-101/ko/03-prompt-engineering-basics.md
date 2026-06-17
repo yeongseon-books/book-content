@@ -36,7 +36,7 @@ last_reviewed: '2026-05-15'
 ![역할 기반 프롬프트 구성의 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.ko.png)
 *역할 기반 프롬프트 구성의 전체 그림*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - system, user, assistant 역할은 각각 어떤 책임을 맡을까요?
 - system message는 왜 단순한 첫 문장보다 강한 기준이 될까요?

@@ -28,7 +28,7 @@ last_reviewed: '2026-05-15'
 ![Data Structures with Python 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.ko.png)
 *Data Structures with Python 101 6장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 파일 시스템, DOM, 조직도는 왜 트리 구조로 모델링될까요?
 - 트리의 루트, 리프, 깊이, 높이는 각각 무엇을 뜻할까요?
@@ -41,8 +41,6 @@ last_reviewed: '2026-05-15'
 > 트리를 이해하면 재귀 사고가 자연스러워집니다. 대부분의 트리 알고리즘은 재귀로 가장 잘 표현됩니다.
 
 특히 이진 탐색 트리(BST)는 트리 위에 정렬 규칙을 얹은 구조입니다. 이 규칙 덕분에 선형 검색 O(n) 대신 O(log n)에 가까운 탐색이 가능해집니다. 물론 균형이 무너질 수 있다는 한계도 함께 배워야 합니다.
-
-## 핵심 개념 한눈에 보기
 
 > 트리 = 루트에서 시작해 자식 노드로 분기하는 계층 구조
 
@@ -235,8 +233,6 @@ print(f"height: {tree_height(bst.root)}")      # 2
 print(f"node count: {count_nodes(bst.root)}")   # 6
 ```
 
-## 이 코드에서 먼저 봐야 할 점
-
 - 트리 알고리즘은 `node is None`이라는 base case를 중심으로 재귀가 전개됩니다.
 - BST의 inorder 순회 결과가 정렬되는 이유는 왼쪽 < 부모 < 오른쪽 규칙 때문입니다.
 - level-order 순회는 큐를 사용하며, 트리에서 BFS 패턴을 가장 명확하게 보여 줍니다.
@@ -272,7 +268,7 @@ Python 코드에서는 재귀 깊이도 함께 봐야 합니다. 트리가 깊�
 
 또 하나 중요한 점은 트리가 재귀 사고를 훈련하는 최고의 재료라는 사실입니다. 트리 문제를 반복해서 풀다 보면, 복잡한 문제를 “현재 노드와 하위 문제”로 분해하는 감각이 자연스럽게 생깁니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 트리의 루트, 리프, 깊이, 높이를 설명할 수 있다
 - [ ] preorder, inorder, postorder, level-order 순회를 구현할 수 있다

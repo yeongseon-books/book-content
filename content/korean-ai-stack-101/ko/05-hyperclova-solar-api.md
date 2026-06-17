@@ -33,7 +33,7 @@ seo_description: 공급자를 바꾸는 일은 모델 이름 교체가 아니라
 ![Korean AI Stack 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-core-flow.ko.png)
 *Korean AI Stack 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 프롬프트 튜닝보다 먼저 고정해야 할 API 계약은 무엇일까요?
 - HyperCLOVA X나 Solar 같은 한국어 생성 API를 도입할 때는 무엇부터 검증해야 할까요?
@@ -234,8 +234,6 @@ response = solar.chat.completions.create(
 
 Solar는 `base_url`만 바꾸면 Groq 예제 대부분이 그대로 옮겨집니다. HyperCLOVA X는 NCP 전용 SDK나 REST 호출이 필요하지만, 메시지, 샘플링, 검증 층은 동일합니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - system 메시지 한 줄에 **언어, 역할, 길이**를 모두 담으면 user 메시지는 최소한으로 유지됩니다.
 - `temperature=0.3`은 설명형 한국어 답변에 좋은 출발점입니다. 창의적 글쓰기는 0.7 이상이 어울립니다.
 - JSON 강제는 `response_format`과 명시적 schema system 메시지 **둘 다** 필요합니다.
@@ -260,7 +258,7 @@ Solar는 `base_url`만 바꾸면 Groq 예제 대부분이 그대로 옮겨집니
 - **온도/길이 A/B 테스트**: 0.3 vs 0.5, max_tokens 200 vs 400을 사용자 만족도와 함께 비교하면 한국어 응답의 변동 폭을 더 빨리 읽을 수 있습니다.
 - **모니터링 지표**: TTFT, 종단 지연, refusal 비율, JSON 파싱 실패율, 평균 입력/출력 토큰은 기본 대시보드 항목입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] system 메시지에 대상 독자, 문체, 언어를 명시했습니다.
 - [ ] `temperature`와 토큰 한도를 출력 비교 전에 먼저 고정했습니다.

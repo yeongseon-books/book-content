@@ -32,23 +32,17 @@ last_reviewed: '2026-05-15'
 ![Distributed Systems 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/06/06-01-concept-at-a-glance.ko.png)
 *Distributed Systems 101 6장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 합의 문제란 무엇이며 어떤 안전성과 진행성 속성을 가질까요?
 - Raft의 세 역할인 leader, follower, candidate는 어떻게 나뉠까요?
 - term, log, index, commit은 각각 무엇을 뜻할까요?
 
-## 왜 중요한가
-
 합의 알고리즘은 etcd, ZooKeeper, Consul, CockroachDB 같은 시스템의 중심에 놓여 있습니다. Kubernetes control plane도 etcd 위에 서 있습니다. 합의를 이해하면 왜 시스템이 이런 식으로 동작하는지에 대한 질문 절반은 자연스럽게 풀립니다.
 
 > 합의는 분산 시스템에서 동의가 갖는 가치입니다.
 
-## 한눈에 보는 개념
-
 하나의 leader가 로그를 받고 follower에게 복제합니다. 다수에게 도달한 엔트리만 commit으로 인정됩니다.
-
-## 핵심 용어
 
 - **Consensus**: N개의 노드가 하나의 값에 동의하는 문제입니다.
 - **Term**: 단조 증가하는 epoch입니다. 새 리더가 뽑히면 새 term이 시작됩니다.
@@ -145,8 +139,6 @@ def maybe_commit(self, peers):
 
 다수를 잃은 쪽이 의도적으로 멈추는 설계가 split-brain을 막는 핵심입니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - term은 단조 증가합니다. 예전 term의 메시지는 거절됩니다.
 - 로그는 순서 자체가 본질이며, 일치는 index와 term 쌍으로 검증합니다.
 - commit은 모두가 받았다는 뜻이 아니라 다수가 받았다는 약속입니다.
@@ -160,8 +152,6 @@ def maybe_commit(self, peers):
 4. **로그 일치 검사를 생략합니다.** 잘못된 엔트리가 commit될 수 있습니다.
 5. **파티션된 쪽이 계속 써도 된다고 생각합니다.** 다수가 없으면 멈춰야 합니다.
 
-## 실무에서는 이렇게 드러납니다
-
 etcd, Consul, ZooKeeper의 ZAB, CockroachDB, TiKV는 모두 합의 알고리즘 위에 서 있습니다. 데이터베이스의 leader election, 분산 락, 설정 저장소는 전형적인 합의 사용 사례입니다.
 
 ## 시니어 엔지니어는 이렇게 생각합니다
@@ -172,7 +162,7 @@ etcd, Consul, ZooKeeper의 ZAB, CockroachDB, TiKV는 모두 합의 알고리즘 
 - 리더 교체 중에도 안전한 클라이언트 재시도를 설계합니다.
 - 읽기를 leader-only로 둘지 lease 기반으로 풀지 의도적으로 결정합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 합의를 한 줄로 정의할 수 있는가?
 - [ ] term, log, commit의 관계를 설명할 수 있는가?

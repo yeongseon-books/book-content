@@ -34,7 +34,7 @@ seo_description: 청킹은 텍스트를 작게 자르는 일이 아니라 검색
 *Chunking strategy selection flow*
 > 청킹은 텍스트를 작게 자르는 일이 아니라 검색이 아직 신뢰할 수 있는 최소 문맥 단위를 설계하는 일입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 모든 문서에 같은 chunk_size를 쓰면 왜 검색 품질이 흔들릴까요?
 - Recursive splitter는 어떤 순서로 경계를 포기하며 텍스트를 나눌까요?
@@ -167,8 +167,6 @@ def batch_review(items: Iterable[tuple[str, list[str]]]) -> None:
 
 이 출력이 보여 주는 문제는 간단합니다. FAQ에서는 질문과 답변이 나뉘고, 매뉴얼에서는 제목과 단계 목록이 여러 청크로 흩어집니다. 청크 수가 늘어난 사실보다 이런 구조 파손을 먼저 잡아야 합니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 ### 청크 겹침이 문맥을 이어 주는 방식
 
 ![Chunk boundaries with overlap flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-how-chunk-overlap-preserves-context.ko.png)
@@ -195,7 +193,7 @@ def batch_review(items: Iterable[tuple[str, list[str]]]) -> None:
 - 문서 유형별 프리셋은 시작점일 뿐입니다. 나중에는 검색 로그를 보고 다시 조정해야 합니다.
 - 문장 경계가 항상 최선은 아닙니다. 매뉴얼에서는 구조 보존이 더 중요할 수 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 최소 세 가지 문서 유형으로 프리셋을 나눴습니다.
 - [ ] 청크 수와 길이 분포를 숫자로 확인했습니다.

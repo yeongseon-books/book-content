@@ -30,13 +30,11 @@ seo_description: 데이터 마이그레이션은 "schema는 그대로 두고 row
 ![Alembic 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/06/06-01-diagram-the-three-stage-split-for-data-m.ko.png)
 *Alembic 101 6장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - data migration은 schema migration과 무엇이 다를까요?
 - `op.execute`는 raw SQL과 SQLAlchemy Core 중 어떤 스타일로 쓸 수 있을까요?
 - 큰 데이터셋은 어떤 batch 패턴으로 나누어 처리해야 할까요?
-
-## 왜 중요한가
 
 `ALTER TABLE`만 migration은 아닙니다. column rename, enum 값 변경, JSON 구조 변환처럼 schema와 함께 데이터도 바뀌는 작업이 많습니다. 문제는 이런 data migration을 schema revision 안에 그대로 섞으면 큰 데이터셋에서 lock과 timeout이 폭발하고, `downgrade`는 사실상 불가능해진다는 사실입니다.
 
@@ -248,7 +246,7 @@ sqlite3 app.db "SELECT COUNT(*) FROM users WHERE tier IS NULL;"
 - **마지막에 verification query를 넣습니다.** 단일 assertion 하나가 production 사고를 막습니다.
 - **CI에서 소규모 dry-run을 돌립니다.** batch loop가 종료되는지, 재실행이 안전한지 확인합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] schema migration과 data migration을 별도 revision으로 분리했다
 - [ ] 모델 import 없이 inline `table()` / `column()`을 사용했다

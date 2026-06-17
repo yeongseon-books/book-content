@@ -31,7 +31,7 @@ seo_description: 임베딩 비교는 높은 점수 하나보다 유사 문장과
 ![Korean AI Stack 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/01/01-01-core-flow.ko.png)
 *Korean AI Stack 101 1장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 영어 중심 임베딩 모델은 한국어 비중이 높은 데이터에서 어디서 자주 무너질까요?
 - 코사인 점수 하나보다 유사 쌍과 무관 쌍 사이의 간격이 왜 더 쓸모 있을까요?
@@ -330,8 +330,6 @@ gap(sim-unrel)= 0.801
 
 ---
 
-## 이 코드에서 먼저 봐야 할 점
-
 ![What to notice in this code](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/01/01-03-what-to-notice-in-this-code.ko.png)
 
 *What to notice in this code*
@@ -415,7 +413,7 @@ mixed min= 0.411 p50= 0.503 max= 0.588
 
 ---
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 코퍼스가 한국어 전용인지, 한국어+영어 혼합인지 먼저 적었습니다.
 - [ ] 비교에 유사 쌍과 무관 쌍과 혼합 쌍을 모두 넣었습니다.

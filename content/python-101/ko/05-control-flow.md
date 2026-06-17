@@ -33,7 +33,7 @@ seo_description: 제어 흐름을 짤 때는 "이 분기·반복이 무엇을 �
 *Python 101 5장 흐름 개요*
 > 제어 흐름: if, for, while, comprehension의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `if value:`와 `if value is None:`는 언제 완전히 다른 의미가 될까요?
 - `zip`, `enumerate`, comprehension을 쓰면 인덱스를 직접 돌리던 루프가 어떻게 더 읽기 쉬워질까요?
@@ -351,7 +351,7 @@ def fetch_users(ids):
 
 이 두 패턴은 다음 글의 함수 인자 설계, 그 다음 글의 파일 I/O와 예외 처리에서 다시 활용됩니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `if value:`와 `if value is None:`의 차이를 한 줄로 설명할 수 있다.
 - [ ] `for`와 `while` 중 어느 쪽을 쓸지 "이터러블이 있는가"로 판단할 수 있다.

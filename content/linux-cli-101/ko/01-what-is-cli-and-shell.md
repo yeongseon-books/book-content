@@ -30,7 +30,7 @@ seo_description: CLI와 Shell, Terminal의 차이와 첫 명령 실행 흐름을
 ![Linux CLI 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/01/01-01-big-picture.ko.png)
 *Linux CLI 101 1장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - GUI 없이 컴퓨터를 다룬다는 말은 실제로 무엇을 뜻할까요?
 - Terminal, Shell, CLI는 무엇이 다르고 어디서 헷갈릴까요?
@@ -177,7 +177,7 @@ cd My\ Documents    # Correct: backslash escapes the space
 
 반면 모든 것을 CLI로 해야 하는 것은 아닙니다. 코드 편집은 VS Code 같은 GUI 에디터가 생산성이 높고, 파일 비교는 GUI diff 도구가 직관적입니다. 도구 선택의 기준은 "이 작업을 100번 반복한다면?"입니다. 반복이 잦은 작업일수록 CLI의 가치가 올라갑니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] Terminal, Shell, CLI의 차이를 한 문장씩 설명할 수 있다
 - [ ] Terminal을 열고 `echo`, `ls` 명령어를 실행할 수 있다

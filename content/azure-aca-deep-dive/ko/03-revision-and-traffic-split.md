@@ -34,7 +34,7 @@ Azure Container Apps의 배포 경험은 생각보다 부드럽습니다. 이미
 *Azure Container Apps Deep Dive 3장 흐름 개요*
 > Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 어떤 변경은 새 Revision을 만들고, 어떤 변경은 만들지 않을까요?
 - single revision mode와 multiple revision mode는 운영상 무엇을 바꿀까요?

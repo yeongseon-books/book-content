@@ -34,7 +34,7 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 *Azure Functions Deep Dive 5장 흐름 개요*
 > 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Consumption, Premium, Dedicated 플랜은 같은 스케일 의사결정 트리를 공유할까요?
 - Scale Controller가 인스턴스를 더 늘리기로 결정하게 만드는 신호는 무엇일까요?

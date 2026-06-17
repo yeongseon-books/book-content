@@ -30,7 +30,7 @@ seo_description: wheel은 이미 빌드된 패키지 파일이고, sdist는 소�
 ![Python Package 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/04/04-01-mental-model.ko.png)
 *Python Package 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - wheel과 sdist는 무엇이 다를까요?
 - `python -m build`는 어떤 파일을 만들까요?
@@ -42,8 +42,6 @@ seo_description: wheel은 이미 빌드된 패키지 파일이고, sdist는 소�
 - `python -m build`로 두 가지 배포판을 생성하는 방법
 - `.whl` 파일의 내부 구조를 확인하는 방법
 - 어떤 파일이 빌드 결과물에 포함되는지 제어하는 방법
-
-## 왜 중요한가
 
 `pip install`은 PyPI에서 패키지를 내려받아 설치합니다. 이때 내려받는 파일이 wheel이거나 sdist입니다. 따라서 직접 패키지를 배포하려면 결국 이 두 가지 형식을 이해하고 생성할 수 있어야 합니다.
 
@@ -193,7 +191,7 @@ python -m build    # build from a clean state
 
 대부분의 애플리케이션 개발자는 순수 Python 패키지를 만들기 때문에 `py3-none-any` wheel로 충분합니다. 중요한 습관은 빌드 자체보다 **빌드 후 새 환경에 설치해 보는 검증**입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] sdist와 wheel의 차이를 설명할 수 있다
 - [ ] `python -m build`로 두 가지 배포판을 생성할 수 있다

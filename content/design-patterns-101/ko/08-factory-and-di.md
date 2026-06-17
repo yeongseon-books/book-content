@@ -36,7 +36,7 @@ last_reviewed: '2026-05-23'
 *조립 책임이 도메인 밖으로 빠져나가는 과정*
 > Factory와 DI는 둘 다 '누가 이 객체를 만드는가?'라는 같은 질문에 답하면서, 객체 생성을 객체를 쓰는 자리 바깥으로 옮겨 테스트성과 설정 가능성을 동시에 살립니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 객체가 자기 협력자를 직접 만들면 왜 테스트가 어려워질까요?
 - Constructor injection, setter injection, method injection 중 어떤 것을 기본으로 삼아야 할까요?
@@ -466,7 +466,7 @@ def bootstrap() -> OrderService:
 
 둘째, 디버거에서 `self.repo.__class__.__name__`을 watch에 추가합니다. 런타임에 어떤 구현체가 들어왔는지 즉시 확인할 수 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] Factory Method와 Abstract Factory의 차이를 설명할 수 있습니다.
 - [ ] 의존성 주입이 테스트를 쉽게 만드는 이유를 말할 수 있습니다.

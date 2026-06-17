@@ -28,7 +28,7 @@ last_reviewed: '2026-05-15'
 ![Data Structures with Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.ko.png)
 *Data Structures with Python 101 10장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - list, dict, set 중 무엇을 선택해야 할지 어떤 기준으로 판단할까요?
 - 자료구조 선택에서 가장 먼저 봐야 할 연산은 무엇일까요?
@@ -41,8 +41,6 @@ last_reviewed: '2026-05-15'
 > “어떤 자료구조를 써야 하나?”에 답하려면 먼저 “어떤 연산을 가장 자주 하는가?”를 물어야 합니다.
 
 면접에서도 구현 능력보다 선택 이유를 더 중요하게 보는 경우가 많습니다. 실무에서도 마찬가지입니다. 병목이 생긴 뒤에 구조를 바꾸는 것보다, 처음부터 핵심 연산을 기준으로 설계하는 편이 훨씬 싸게 먹힙니다.
-
-## 핵심 개념 한눈에 보기
 
 > 자료구조 선택 = 데이터 특성과 연산 빈도를 함께 보는 설계 판단
 
@@ -247,8 +245,6 @@ for scenario, choice in scenarios.items():
     print(f"  {scenario:45s} -> {choice}")
 ```
 
-## 이 코드에서 먼저 봐야 할 점
-
 - 자료구조 선택의 출발점은 “가장 자주 수행하는 연산”을 식별하는 것입니다.
 - dict + list, dict + set처럼 구조를 조합하면 요구사항을 더 정확히 만족시킬 수 있습니다.
 - 벤치마크는 이론을 검증하는 좋은 방법이지만, 실제 코드는 프로파일링으로 확인해야 합니다.
@@ -284,7 +280,7 @@ for scenario, choice in scenarios.items():
 
 또한 실무에서는 자료구조 하나만 단독으로 쓰는 경우보다, 여러 구조를 조합해 요구사항을 나누어 처리하는 경우가 많습니다. dict + set, dict + list, heapq + dict 같은 조합이 좋은 이유는 각 구조의 강점을 필요한 위치에만 가져오기 때문입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 주요 자료구조의 핵심 연산 시간 복잡도를 비교할 수 있다
 - [ ] 상황별 자료구조 선택 의사결정 흐름을 설명할 수 있다

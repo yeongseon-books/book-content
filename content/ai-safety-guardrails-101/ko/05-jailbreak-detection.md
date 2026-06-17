@@ -39,7 +39,7 @@ Jailbreak은 단순히 시스템 프롬프트를 무시하게 만드는 수준�
 *Jailbreak 탐지 계층*
 > Jailbreak은 특정 문구가 아니라 정렬 우회를 시도하는 의도 신호입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Jailbreak detection은 왜 키워드 차단만으로 부족할까요?
 - 정규화, 패턴, embedding, LLM judge는 어떤 층위로 조합해야 할까요?

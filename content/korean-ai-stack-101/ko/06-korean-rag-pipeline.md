@@ -33,7 +33,7 @@ RAG는 어느 단계에서 실패했는지 눈에 보이기 시작하면 갑자�
 ![Korean AI Stack 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-core-flow.ko.png)
 *Korean AI Stack 101 6장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 최소한의 한국어 RAG 파이프라인에서 빠질 수 없는 단계는 무엇일까요?
 - 품질 병목은 보통 청킹, 임베딩, 검색, 생성 중 어디에서 가장 자주 생길까요?
@@ -412,7 +412,7 @@ print(json.dumps(audit_log, ensure_ascii=False))
 
 ---
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] Ingest, Index, Retrieve, Generate를 별도 함수로 분리했습니다.
 - [ ] 청크 경계를 먼저 정하고, 검색된 청크를 직접 읽어 봤습니다. (200~500토큰 권장)

@@ -31,7 +31,7 @@ LoRA 어댑터는 모델 전체를 갈아엎는 장치가 아니라, 선택한 �
 
 > LoRA 어댑터는 선택된 linear 층 위가 아니라 그 옆에 좁은 보정 경로를 더하는 구조입니다 — rank·scaling·target_modules 선택은 본질적으로 배선 결정이고, 여기서의 오타 하나가 조용한 zero-gradient 학습으로 숨어 듭니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `LoraConfig`에서 실제로 이해해야 할 필드는 무엇일까요?
 - `target_modules`를 잘못 지정하면 어떤 문제가 생길까요?
@@ -186,7 +186,7 @@ for name, param in peft_model.named_parameters():
 - **필요하면 베이스에 병합합니다**: 추론 지연이 중요하면 `merge_and_unload()`로 어댑터를 베이스에 합친 뒤 단일 모델처럼 배포할 수 있습니다.
 - **어댑터만 따로 저장합니다**: `peft_model.save_pretrained("adapter/")`는 작은 산출물을 만들기 때문에 배포와 버전 관리가 쉽습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `LoraConfig` 핵심 필드의 의미를 설명할 수 있습니다.
 - [ ] `target_modules`가 모델마다 달라지는 이유를 이해했습니다.

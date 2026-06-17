@@ -29,13 +29,11 @@ last_reviewed: '2026-05-15'
 ![Computer Networks 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/02/02-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - IPv4와 IPv6는 어떤 차이를 가질까요?
 - subnet mask와 CIDR 표기는 무엇을 나눠서 보여 줄까요?
 - 네트워크 주소, 브로드캐스트 주소, 사용 가능한 호스트 수는 어떻게 계산할까요?
-
-## 왜 중요한가
 
 IP 주소를 그냥 "장비 하나의 번호"로만 외우면 라우팅, NAT, 방화벽 규칙이 모두 마법처럼 보입니다. 실제 네트워크 장비는 IP 주소에서 네트워크 부분과 호스트 부분을 나눠 보고, 네트워크 부분만으로 다음 홉을 결정합니다. subnet을 읽을 줄 모르면 클라우드 VPC, Kubernetes 네트워크 정책, 사내 방화벽 규칙이 전부 추측 게임이 됩니다.
 
@@ -44,8 +42,6 @@ IP 주소를 그냥 "장비 하나의 번호"로만 외우면 라우팅, NAT, �
 ## 핵심 그림
 
 > IP 주소는 IPv4에서는 32비트, IPv6에서는 128비트 숫자입니다. subnet mask는 어디까지가 네트워크이고 어디부터가 호스트인지 알려 주는 비트 기준선입니다. CIDR(`/24`, `/16`)은 그 기준선의 길이를 비트 수로 적는 방식입니다.
-
-## 핵심 용어
 
 | 용어 | 의미 |
 | --- | --- |
@@ -502,7 +498,7 @@ b = ipaddress.ip_network('10.0.2.0/24')
 print(f"겹침: {a.overlaps(b)}")  # True — b는 a의 부분집합
 ```
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] CIDR `/24`, `/16`, `/8`이 뜻하는 범위를 안다
 - [ ] subnet mask를 이진수로 변환해 AND 연산을 수행할 수 있다

@@ -37,7 +37,7 @@ seo_description: aiosqlite는 SQLite를 비동기로 바꾸지 않는다. connec
 ![Python DB-API 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-02-mental-model-aiosqlite-is-sqlite3-thread.ko.png)
 *Python DB-API 101 9장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `aiosqlite`는 SQLite를 진짜 비동기로 만드는 것이 아니라면 정확히 무엇을 비동기로 바꿔 주는 걸까요?
 - `async with aiosqlite.connect(...)`, `transactional()`, `SQLitePool`은 각각 어떤 경계를 맡고 왜 분리해야 할까요?
@@ -311,7 +311,7 @@ FastAPI는 핸들러가 `def`(동기)이면 자동으로 thread pool에서 실�
 
 위 조건이 없다면 `def` 핸들러 + 동기 `sqlite3`이 더 단순하고 빠릅니다. `aiosqlite`는 위 조건을 만족하는 진짜 async path에서만 도입하세요.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] async 핸들러에서 동기 sqlite3을 직접 호출하는 경로가 없는가?
 - [ ] 한 connection을 여러 코루틴이 동시에 쓰는 경로가 없는가?

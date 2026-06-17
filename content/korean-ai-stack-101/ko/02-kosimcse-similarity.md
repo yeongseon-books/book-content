@@ -33,7 +33,7 @@ seo_description: 첫 문장 유사도 시스템은 복잡한 오케스트레이�
 ![Korean AI Stack 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-01-core-flow.ko.png)
 *Korean AI Stack 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - KoSimCSE는 한국어 검색 작업에서 어디서 가장 먼저 효과를 냅니까?
 - FAQ 질문만 먼저 인덱싱하는 방식이 왜 깔끔한 첫 버전일까요?
@@ -175,8 +175,6 @@ for query, gold_idx in test_cases:
 print(f"Recall@1 = {hits / len(test_cases):.2f}")
 ```
 
-## 이 코드에서 먼저 봐야 할 점
-
 ![이 코드에서 주목할 점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-02-what-to-notice-in-this-code.ko.png)
 
 *이 코드에서 주목할 점*
@@ -208,7 +206,7 @@ print(f"Recall@1 = {hits / len(test_cases):.2f}")
 - **하이브리드 검색**: BM25(키워드)와 KoSimCSE(의미) 점수를 가중 결합하면 도메인 용어와 일반적인 의역을 함께 잡을 수 있습니다.
 - **Recall 모니터링**: 매주 새 사용자 질의 50개 정도를 뽑아 정답을 붙이고 Recall@5를 측정하면, 검색 품질 하락을 빨리 발견할 수 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 인덱스에 질문만 저장할지, 답변도 저장할지, 둘 다 넣을지 결정했습니다.
 - [ ] 같은 의도를 여러 표현으로 바꾼 질의를 시험했습니다.

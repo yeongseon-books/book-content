@@ -35,7 +35,7 @@ seo_description: 지난 글의 모델은 셰익스피어 리듬은 흉내 내도
 ![LLM from Scratch 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.ko.png)
 *LLM from Scratch 101 8장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - pre-training, fine-tuning, RLHF는 각각 무엇을 바꾸는 단계일까요?
 - instruction 데이터 한 줄은 어떤 필드 구조를 가지면 충분할까요?

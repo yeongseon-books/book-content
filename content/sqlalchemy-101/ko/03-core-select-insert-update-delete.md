@@ -37,13 +37,11 @@ SQLAlchemy Core를 쓸 때 진짜 생산성이 나오는 지점은 문자열 SQL
 *SQLAlchemy 101 3장 흐름 개요*
 > SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요?
 - `insert`, `update`, `delete`를 2.x 트랜잭션 모델과 함께 어떻게 써야 할까요?
 - `JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요?
-
-## 왜 중요한가
 
 raw SQL 문자열로만 작업하면 다음 세 가지 비용이 누적됩니다. 첫째, 컬럼 이름 변경이 발생할 때마다 application 전체 grep이 필요합니다. 둘째, 같은 SQL을 여러 곳에서 약간씩 다르게 적게 되어 동작이 미묘하게 달라집니다. 셋째, dialect 차이를 모두 손으로 처리해야 합니다.
 
@@ -474,7 +472,7 @@ with engine.connect().execution_options(stream_results=True) as conn:
         process(row)
 ```
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `select`, `insert`, `update`, `delete`를 모두 2.x style로 적을 수 있다
 - [ ] `Row`, `.scalar()`, `.scalars()`, `.mappings()`의 차이를 안다

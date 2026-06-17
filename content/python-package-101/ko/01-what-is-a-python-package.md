@@ -30,7 +30,7 @@ seo_description: Python 패키지는 재사용 가능한 코드를 묶어 다른
 ![Python Package 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/01/01-01-mental-model.ko.png)
 *Python Package 101 1장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 모듈과 패키지는 정확히 무엇이 다를까요?
 - `import requests`를 실행하면 내부에서는 어떤 일이 일어날까요?
@@ -42,8 +42,6 @@ seo_description: Python 패키지는 재사용 가능한 코드를 묶어 다른
 - Python이 `sys.path`를 따라 모듈을 찾는 방식
 - `pip install`이 패키지를 설치하는 위치와 동작 방식
 - 내 코드를 패키지로 묶어야 하는 시점
-
-## 왜 중요한가
 
 프로젝트가 커지면 파일을 여러 개로 나누고 서로 `import`하게 됩니다. 그것이 모듈이고, 모듈을 묶으면 패키지입니다. 문제는 공통 코드를 프로젝트마다 복사해서 쓰기 시작할 때 생깁니다. 버그 하나를 고치려면 모든 복사본을 다시 수정해야 하고, 한 군데라도 놓치면 운영에서 다른 결과가 나옵니다.
 
@@ -231,7 +229,7 @@ import my_package           # Import name: underscore
 
 처음에는 패키징이 과한 절차처럼 보일 수 있습니다. 하지만 실제로는 `pyproject.toml` 하나로 시작할 수 있고, 이후 빌드·배포 자동화까지 자연스럽게 확장됩니다. 이 시리즈는 그 흐름을 단계적으로 익히도록 구성되어 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 모듈, 패키지, 배포판의 차이를 설명할 수 있다
 - [ ] `__init__.py`의 역할을 이해한다

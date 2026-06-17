@@ -37,13 +37,11 @@ seo_description: SQLAlchemy 2.x의 Engine과 Connection, 트랜잭션 경계를 
 *SQLAlchemy 101 1장 흐름 개요*
 > SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `Engine`은 정확히 무엇이고, `Connection`과 어떻게 역할을 나눌까요?
 - SQLAlchemy 2.x가 트랜잭션을 더 명시적으로 다루는 이유는 무엇일까요?
 - `connect()`와 `begin()`은 언제 구분해서 써야 할까요?
-
-## 왜 중요한가
 
 많은 SQLAlchemy 입문 자료가 ORM의 `Base = declarative_base()`부터 시작합니다. 그 결과 ORM이 아닌 곳에서 문제가 발생했을 때, 예컨대 connection이 끊어졌거나 transaction이 의도와 다르게 commit되었을 때, 어디를 들여다봐야 할지 감을 잡기 어렵습니다. Engine과 Connection은 ORM의 Session을 받쳐주는 토대이고, Session 내부에서 문제가 생기면 결국 Connection 수준에서 디버깅해야 합니다.
 
@@ -363,7 +361,7 @@ def engine():
 
 `engine.dispose()`는 pool에 들어 있는 모든 connection을 닫습니다. 테스트 종료 시 leak을 막는 표준 정리 코드입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] SQLAlchemy 2.x를 설치했고 `sqlalchemy.__version__`이 2.0 이상인 것을 확인했다
 - [ ] `create_engine()`이 lazy factory라는 것을 이해했다

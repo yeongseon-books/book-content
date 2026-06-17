@@ -34,7 +34,7 @@ Test Harness는 이 조용한 품질 하락을 막는 층입니다. 무엇을 �
 *Test Harness - 완료 조건을 테스트로 고정하기*
 > Test Harness는 agent가 한 번 맞혔다는 사실보다, 다음 변경 뒤에도 같은 기준을 통과하는지 증명하는 구조입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Test Harness는 완료 조건을 자연어 약속에서 무엇으로 바꿔야 할까요?
 - unit, trajectory, end-to-end 테스트는 각각 어떤 agent 실패를 잡을까요?

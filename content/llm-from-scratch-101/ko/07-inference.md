@@ -35,7 +35,7 @@ seo_description: 지난 글에서 ckpt.pt를 저장하고 나면 바로 말을 �
 ![LLM from Scratch 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.ko.png)
 *LLM from Scratch 101 7장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 생성 루프는 정확히 무엇을 반복할까요?
 - greedy decoding은 왜 자주 지루하고 반복적인 출력을 만들까요?

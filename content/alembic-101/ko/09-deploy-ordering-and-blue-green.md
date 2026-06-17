@@ -30,13 +30,11 @@ seo_description: migration은 항상 "코드보다 먼저, 그리고 코드보�
 ![Alembic 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.ko.png)
 *Alembic 101 9장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - migration-first와 code-first deploy ordering은 어떻게 다를까요?
 - 왜 blue/green deploy는 두 앱 버전과 동시에 호환되는 schema를 요구할까요?
 - NOT NULL 강화는 왜 두 단계로 나눠야 할까요?
-
-## 왜 중요한가
 
 production schema 사고의 상당수는 코드와 schema가 잘못된 순서로 배포될 때 발생합니다. 새 컬럼이 코드보다 먼저 존재하면 안전하지만, 코드가 새 컬럼을 먼저 가정하고 schema가 뒤따라오면 즉시 500 에러가 납니다. blue/green에서는 v1과 v2가 동시에 같은 schema를 읽고 쓰므로, schema는 전환 구간 내내 양쪽을 모두 수용해야 합니다.
 
@@ -295,7 +293,7 @@ PY
 - **deploy 전 `alembic check`를 실행합니다.** model/schema drift를 자동 탐지합니다.
 - **PR 템플릿에 expand-contract phase를 적게 합니다.** 지금 이 변경이 어느 단계인지 항상 드러나게 만듭니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] schema add는 항상 code deploy보다 먼저 나간다
 - [ ] schema drop은 코드가 사용을 멈춘 다음 deploy cycle에 나간다

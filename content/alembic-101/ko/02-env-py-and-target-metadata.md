@@ -30,13 +30,11 @@ seo_description: Alembic의 부트 스크립트인 env.py 설정법과 target_me
 ![Alembic 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/02/02-01-diagram-where-env-py-assembles-metadata.ko.png)
 *Alembic 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `env.py`는 정확히 무엇이고 언제 실행될까요?
 - 왜 `target_metadata`는 선택 사항이 아니라 필수일까요?
 - DB URL을 환경 변수에서 안전하게 읽는 패턴은 어떻게 만들까요?
-
-## 왜 중요한가
 
 1편의 scaffold 상태에서 Alembic은 아직 모델 metadata의 위치를 모릅니다. 그래서 `alembic revision --autogenerate`를 실행해도 빈 파일이 나옵니다. `env.py`에 모델 metadata를 알려 주는 한 줄이 없으면, Alembic은 live DB schema와 무엇을 비교해야 하는지조차 알 수 없습니다.
 
@@ -243,7 +241,7 @@ PY
 - **`include_object` hook으로 특정 테이블을 제외합니다.** 외부 시스템이 관리하는 테이블이 있을 때 유용합니다.
 - **async 앱이어도 Alembic은 sync engine으로 돌리는 경우가 많습니다.** 정말 async가 필요할 때만 `connectable.run_sync(...)` 패턴을 검토하세요.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `from app.models import Base` 또는 동등한 import가 `env.py` 상단에서 실제로 동작한다
 - [ ] `target_metadata = Base.metadata`가 명시돼 있다

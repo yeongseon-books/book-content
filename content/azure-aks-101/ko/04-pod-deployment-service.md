@@ -36,7 +36,7 @@ AKS를 쓰더라도 이 구조는 Kubernetes 자체의 언어로 그대로 남�
 *Azure Kubernetes Service 101 4장 흐름 개요*
 > Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Pod와 컨테이너는 왜 같은 말이 아니며, 왜 Kubernetes는 Pod를 스케줄링 단위로 볼까요?
 - Deployment는 Pod를 직접 여러 개 만드는 것과 무엇이 다를까요?

@@ -38,7 +38,7 @@ Prompt injection은 프롬프트를 잘못 쓴 실수가 아니라 입력 경계
 *Prompt injection 방어 흐름*
 > Prompt injection은 나쁜 문장이 아니라, 비신뢰 데이터가 실행 지시로 승격되는 경계 실패입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Prompt injection은 언제 데이터가 지시로 바뀌면서 시작될까요?
 - 직접 injection과 간접 injection은 방어 위치가 어떻게 다를까요?

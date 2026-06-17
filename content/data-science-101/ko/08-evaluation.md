@@ -31,7 +31,7 @@ last_reviewed: '2026-05-15'
 ![Data Science 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/08/08-01-concept-at-a-glance.ko.png)
 *Data Science 101 8장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 정확도가 높으면 정말 좋은 모델이라고 말할 수 있을까요?
 - 분류 문제에서 precision, recall, F1, ROC AUC는 각각 무엇을 말해 줄까요?
@@ -45,15 +45,11 @@ last_reviewed: '2026-05-15'
 - 5단계 평가 실습 흐름
 - 평가 단계에서 흔한 함정 다섯 가지
 
-## 왜 중요한가
-
 지표가 문제와 어긋나면 모델은 잘못된 방향으로 최적화됩니다. 예를 들어 실제로는 놓치는 비용이 큰 문제인데 accuracy만 올리면, 팀은 좋은 모델이라고 믿지만 현업에서는 계속 불만이 나올 수 있습니다.
 
 평가 지표는 단순한 표시판이 아니라 최적화의 방향키입니다. 그래서 문제를 푸는 방식과 비용 구조를 지표 안에 반영해야 합니다.
 
 > 지표는 우리가 최적화하는 대상이므로 매우 신중하게 골라야 합니다.
-
-## 핵심 용어
 
 - **Confusion matrix**: TP, FP, FN, TN으로 예측 결과를 정리한 표입니다.
 - **Precision**: 양성이라고 예측한 것 중 실제 양성이 얼마나 되는지 보여 줍니다.
@@ -125,8 +121,6 @@ print("expected cost:", cost)
 
 **Expected output:** confusion matrix와 함께 precision, recall, F1, ROC AUC, 비용 기반 점수를 같은 평가 표에 적습니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - confusion matrix는 분류 지표의 뿌리입니다.
 - ROC AUC 같은 확률 기반 지표는 임계값 하나에 덜 묶입니다.
 - 비즈니스 비용도 직접 계산해서 하나의 지표로 다뤄야 합니다.
@@ -151,7 +145,7 @@ print("expected cost:", cost)
 - 임계값은 validation에서 조정하고 test에서는 건드리지 않습니다.
 - 지표 정의를 바꾸는 일도 PR 가치가 있는 변경입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] precision, recall, F1의 차이를 설명할 수 있습니다.
 - [ ] ROC AUC가 어떤 의미인지 알고 있습니다.

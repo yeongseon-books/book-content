@@ -31,13 +31,11 @@ seo_description: 'downgrade는 두 종류로 나뉩니다. (1) 가역 변경: �
 ![Alembic 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/08/08-01-diagram-deciding-between-reversible-and.ko.png)
 *Alembic 101 8장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - production에서 downgrade는 언제 가능하고 언제 사실상 불가능할까요?
 - 어떤 종류의 변경이 irreversible하며, 어떻게 다뤄야 할까요?
 - expand-contract는 downgrade 가능성을 어떻게 회복시킬까요?
-
-## 왜 중요한가
 
 Alembic을 처음 배울 때 downgrade는 당연한 내장 기능처럼 보입니다. 하지만 실제 production에서는 거의 쓰이지 않거나, 써도 매우 위험합니다. 그렇다고 빈 함수로 두는 것도 답이 아닙니다. downgrade를 어떻게 다룰지는 운영 정책이고, 그 정책은 코드에 명시적으로 드러나야 합니다.
 
@@ -224,7 +222,7 @@ alembic downgrade -1
 - **backup-and-restore를 진짜 rollback 수단으로 검증합니다.** Alembic downgrade는 백업 대체재가 아닙니다.
 - **forward-fix revision 메시지 템플릿을 정합니다.** 예: `fix <old_revision>`.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 모든 revision을 reversible / irreversible로 분류했다
 - [ ] irreversible revision의 `downgrade`는 `NotImplementedError`를 사용한다

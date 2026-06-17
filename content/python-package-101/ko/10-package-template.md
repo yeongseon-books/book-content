@@ -30,7 +30,7 @@ seo_description: 패키지 템플릿은 프로젝트를 시작할 때 반복되�
 ![Python Package 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/10/10-01-mental-model.ko.png)
 *Python Package 101 10장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 새 패키지마다 반복되는 설정을 어떻게 자동화할까요?
 - `cookiecutter`와 `copier`는 무엇이 다를까요?
@@ -42,8 +42,6 @@ seo_description: 패키지 템플릿은 프로젝트를 시작할 때 반복되�
 - GitHub Template Repository를 활용하는 방법
 - 시리즈 전체 내용을 통합한 프로덕션 템플릿 구조
 - CI/CD, 문서, 테스트까지 포함한 패키지 기본 골격
-
-## 왜 중요한가
 
 새 패키지를 만들 때마다 `pyproject.toml`, src layout, mypy 설정, CI/CD, README, `.gitignore`를 매번 손으로 쓰는 것은 반복 비용이 큽니다. 잘 만든 템플릿이 있으면 30초 안에 배포 가능한 수준의 프로젝트 골격을 만들고 바로 코드 작성으로 들어갈 수 있습니다.
 
@@ -301,7 +299,7 @@ GitHub Template Repository는 저장소를 복사할 뿐 파일 내용의 변수
 
 `cookiecutter`와 `copier` 사이의 선택도 비교적 단순합니다. 한 번 생성하고 끝나는 템플릿이면 `cookiecutter`도 충분하지만, 시간이 지나며 템플릿 개선을 기존 프로젝트에 되돌려 적용하고 싶다면 `copier`가 훨씬 유리합니다. 새 프로젝트 기준으로는 `copier`를 우선 검토할 만합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `copier` 또는 `cookiecutter`로 프로젝트 템플릿을 만들 수 있다
 - [ ] 템플릿에서 생성된 프로젝트가 즉시 테스트를 통과한다

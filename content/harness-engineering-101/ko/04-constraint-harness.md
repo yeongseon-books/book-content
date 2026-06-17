@@ -35,7 +35,7 @@ Constraint Harness는 프롬프트에 적힌 훈계문이 아니라 시스템이
 *Constraint Harness - 규칙, 경계, 금지 행동 정의하기*
 > Constraint Harness는 agent에게 “하지 마”라고 말하는 것이 아니라, 할 수 없는 경계를 시스템에 만드는 일입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Constraint Harness는 prompt 규칙과 무엇이 달라야 실제로 agent 행동을 제한할까요?
 - capability, resource, behavior, scope 제약은 각각 어떤 위험을 막을까요?

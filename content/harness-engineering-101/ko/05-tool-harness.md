@@ -34,7 +34,7 @@ Tool Harness는 단순히 함수 목록을 나열하는 작업이 아닙니다. 
 *Tool Harness - Agent가 사용할 도구를 안전하게 설계하기*
 > Tool Harness의 품질은 agent가 도구를 쓸 수 있는지가 아니라, 잘못 쓰기 어려운지에서 드러납니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Tool Harness는 agent가 도구를 올바르게 쓰기 쉽도록 어떤 표면을 만들어야 할까요?
 - schema, idempotency, actionable error는 각각 어떤 운영 문제를 줄일까요?

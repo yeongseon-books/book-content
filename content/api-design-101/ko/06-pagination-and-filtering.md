@@ -38,7 +38,7 @@ seo_description: 목록 API의 pagination, sorting, filtering 설계 원칙과 t
 
 > 페이지네이션은 '결과를 잘라 주는 기능'이 아니라 '서버가 한 번에 책임지는 데이터 양의 상한을 클라이언트와 합의하는 계약'입니다 — offset/cursor 선택은 취향이 아니라 일관성·성능·재현 가능성의 트레이드오프입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - offset / limit 방식은 어디까지 단순하고 어디서부터 한계가 드러날까요?
 - cursor 기반 pagination은 어떤 문제를 해결하며 어떤 것을 포기할까요?
@@ -370,7 +370,7 @@ Link: <https://api.example.com/orders?cursor=eyJ...&limit=20>; rel="next",
 - **First check:** `offset=100000` 같은 깊은 페이지가 호출되는 로그가 보이면, 해당 endpoint를 cursor로 전환할 시점입니다.
 - **Failure mode:** total count를 항상 계산하면서 cursor 구조를 그대로 노출하면, 성능과 보안 문제가 함께 터져 API를 뒤늦게 갈아엎게 됩니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `limit`에 상한(예: 100)이 있는가?
 - [ ] cursor가 불투명(base64 등)인가?

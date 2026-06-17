@@ -29,13 +29,11 @@ last_reviewed: '2026-05-15'
 ![Computer Networks 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/05/05-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - HTTP 메시지는 어떤 모양으로 구성될까요?
 - 메서드와 상태 코드는 왜 의미를 정확히 지켜야 할까요?
 - `Content-Type`, `Cache-Control`, `Authorization` 같은 헤더는 왜 중요할까요?
-
-## 왜 중요한가
 
 HTTP는 백엔드, 프론트엔드, 모바일, 데이터 서비스, ML 서빙까지 거의 모든 시스템의 공통 언어입니다. 메서드와 상태 코드를 잘못 쓰면 캐시, 재시도, 오류 처리 정책이 조용히 망가집니다. HTTPS가 기본값이 된 시대에도 왜 필요한지 설명하지 못하면 인증서 만료, mixed content, HSTS 같은 사고가 늘 낯설게 느껴집니다.
 
@@ -59,8 +57,6 @@ HTTP는 백엔드, 프론트엔드, 모바일, 데이터 서비스, ML 서빙까
 │ (본문 없음)              │ ← 본문   │ {"id":42,"name":"Kim"}  │
 └─────────────────────────┘          └─────────────────────────┘
 ```
-
-## 핵심 용어
 
 | 용어 | 의미 |
 | --- | --- |
@@ -523,7 +519,7 @@ curl -o /dev/null -s -w "DNS: %{time_namelookup}s\nTCP: %{time_connect}s\nTLS: %
 2. **Cache-Control 누락**: API 응답에 캐시 헤더가 없으면 CDN이 기본 정책(보통 캐시 안 함)을 적용해 원본 부하 폭증
 3. **502/504 원인 분리 실패**: 로드밸런서 → 앱 서버 구간에서 어디가 느린지 모르면 무작정 스케일업
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] HTTP 메시지의 네 부분을 설명할 수 있다
 - [ ] 자주 쓰는 메서드와 상태 코드의 의미를 안다

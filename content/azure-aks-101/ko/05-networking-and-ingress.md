@@ -37,7 +37,7 @@ AKS를 쓰다 막히는 지점은 대개 네트워크입니다. Pod끼리는 통
 *Azure Kubernetes Service 101 5장 흐름 개요*
 > 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Pod IP 할당 방식과 외부 HTTP 라우팅을 왜 별개의 문제로 봐야 할까요?
 - kubenet, Azure CNI, Azure CNI Overlay는 각각 어떤 운영 trade-off를 가질까요?

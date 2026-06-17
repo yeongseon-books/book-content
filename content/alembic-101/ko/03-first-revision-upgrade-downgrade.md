@@ -30,13 +30,11 @@ autogenerate가 편리하더라도, 한 번은 직접 써 봐야 자동 생성 �
 ![Alembic 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/03/03-01-diagram-the-two-way-contract-inside-a-re.ko.png)
 *Alembic 101 3장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `alembic revision`이 만들어 주는 파일 구조는 어떻게 생겼을까요?
 - `op.create_table`, `op.add_column`, `op.drop_column`, `op.execute`는 각각 언제 쓸까요?
 - `upgrade()`와 `downgrade()`를 어떻게 대칭으로 유지할 수 있을까요?
-
-## 왜 중요한가
 
 autogenerate가 아무리 좋아도 최종 산출물은 결국 같은 `op` 호출들의 조합입니다. 직접 한 번 작성해 본 사람과 그렇지 않은 사람의 차이는 명확합니다. 자동 생성된 파일을 읽고 “여기서 rename이 drop+add로 풀렸다” 같은 문제를 눈치챌 수 있는지가 달라집니다.
 
@@ -231,7 +229,7 @@ sqlite3 app.db ".schema orders"
 - **하나의 revision에는 하나의 논리 변경만 넣습니다.** 서로 무관한 모듈 변경을 묶으면 회복이 어려워집니다.
 - **drop은 보통 두 단계로 나눕니다.** 먼저 코드가 사용을 멈추고, 다음 배포에서 컬럼을 내립니다. 9편에서 자세히 다룹니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `upgrade()`와 `downgrade()`가 정확한 역연산이다
 - [ ] 외래키와 인덱스 의존성을 고려해 순서를 잡았다

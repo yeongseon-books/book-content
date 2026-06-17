@@ -32,7 +32,7 @@ last_reviewed: '2026-05-15'
 ![Operating Systems 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.ko.png)
 *Operating Systems 101 3장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 스케줄러는 어떤 목표들 사이에서 균형을 잡을까요?
 - 선점, 타임 슬라이스, 우선순위는 실제로 어떤 차이를 만들까요?
@@ -164,7 +164,7 @@ sudo chrt -r -p 50 $(pgrep -f my_workload.py)
 - 백그라운드 잡: ETL 워커를 `nice`로 낮춰 사용자 응답성 보호
 - 노트북 전력 관리: 스케줄러가 코어 주파수와 협력해 절전과 성능 균형
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 스케줄러의 네 가지 목표를 말할 수 있는가
 - [ ] 컨텍스트 스위치 비용의 대략적인 크기를 안다

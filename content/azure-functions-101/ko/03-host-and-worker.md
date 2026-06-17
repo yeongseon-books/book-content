@@ -39,7 +39,7 @@ seo_description: 여기까지 “Functions의 구조”를 설명했습니다. �
 *Azure Functions 101 3장 흐름 개요*
 > Host와 Worker — 함수는 누가 실행하는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Functions Host와 언어 Worker는 왜 같은 프로세스가 아니라 분리된 프로세스일까요?
 - Host와 Worker 사이의 gRPC 채널에서는 어떤 메시지 흐름이 오갈까요?

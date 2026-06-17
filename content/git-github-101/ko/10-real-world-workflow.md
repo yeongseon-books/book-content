@@ -32,13 +32,11 @@ seo_description: issue부터 PR, merge, release tag까지 이어지는 실전 �
 
 > 명령을 따로 아는 것과 팀이 실제로 출고하는 흐름을 아는 것은 다른 일입니다 — issue → branch → PR → merge → tag로 묶인 한 사이클을 반복 가능하게 만들 때, 앞 아홉 편의 명령들이 비로소 '도구'에서 '팀의 일하는 방식'으로 자리잡습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - GitHub Flow는 왜 작은 팀에서 특히 잘 맞을까요?
 - issue, branch, commit, PR, merge, tag는 어떤 순서로 연결될까요?
 - 흐름 중간에 잘못된 branch에 commit하거나, 잘못 push했을 때 어떤 명령으로 회복할까요?
-
-## 왜 중요한가
 
 같은 `git commit`도 어디에 찍느냐에 따라 의미가 달라집니다. feature branch의 중간 commit인지, squash merge 후 `main`에 남을 대표 기록인지, release 직전 태그와 함께 묶일 변경인지에 따라 읽는 방법이 달라집니다. workflow는 결국 팀의 약속입니다.
 
@@ -248,7 +246,7 @@ issue부터 tag까지 한 번에 가르친 글일수록 마지막 검증 순서�
 
 그리고 회복 명령은 문제를 만든 뒤 찾기보다, 팀 문서에 표로 미리 넣어 두는 편이 훨씬 낫습니다. 잘못된 branch commit, revert, safe force push, secret 회수 같은 항목을 runbook처럼 옆에 두면 실수한 뒤에도 더 침착하게 대응할 수 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] issue가 먼저 있고 PR 본문에 `Closes #N`이 들어갔습니까?
 - [ ] feature branch 이름이 `<type>/<slug>` 규칙을 따릅니까?

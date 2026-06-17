@@ -30,7 +30,7 @@ seo_description: SemVer는 버전 번호에 의미를 부여하는 규칙이고,
 ![Python Package 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/06/06-01-mental-model.ko.png)
 *Python Package 101 6장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - SemVer의 MAJOR.MINOR.PATCH는 언제 올려야 할까요?
 - 버전은 코드의 어디에 기록해야 할까요?
@@ -42,8 +42,6 @@ seo_description: SemVer는 버전 번호에 의미를 부여하는 규칙이고,
 - `pyproject.toml`과 `__version__`을 동기화하는 방법
 - Git 태그로 릴리스를 표시하고 관리하는 방법
 - CHANGELOG를 쓰고 자동화하는 방법
-
-## 왜 중요한가
 
 패키지를 업데이트할 때 사용자는 가장 먼저 “이 업데이트가 안전한가?”를 판단합니다. 그때 보는 신호가 버전 번호입니다. 의미 없이 버전을 올리면 신뢰를 잃고, 호환성을 깨는 변경을 PATCH로 배포하면 실제 사용자 코드를 망가뜨릴 수 있습니다.
 
@@ -200,7 +198,7 @@ Git 로그만으로는 사용자가 “이번 버전에서 무엇이 바뀌었�
 
 버전을 두 군데에서 관리하는 것이 번거롭다면 `setuptools-scm` 같은 동적 버전 관리 도구를 검토할 수 있습니다. 다만 자동화 여부와 관계없이 중요한 것은 릴리스 기준을 팀 안에서 명확히 합의하는 일입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] SemVer의 MAJOR.MINOR.PATCH 기준을 설명할 수 있다
 - [ ] `pyproject.toml`과 `__version__`을 동기화할 수 있다

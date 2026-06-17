@@ -32,7 +32,7 @@ last_reviewed: '2026-05-15'
 ![Operating Systems 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.ko.png)
 *Operating Systems 101 9장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 사용자 공간과 커널 공간은 무엇이 다를까요?
 - 시스템 콜 한 번에는 어떤 전환 비용이 들어갈까요?
@@ -163,7 +163,7 @@ docker info | grep -i seccomp
 - 디버깅: strace, ltrace, perf로 syscall 단위 분석
 - 모니터링: eBPF로 syscall 트레이스를 실시간 수집
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 사용자 공간과 커널 공간의 차이를 안다
 - [ ] strace로 syscall 카운트를 볼 수 있다

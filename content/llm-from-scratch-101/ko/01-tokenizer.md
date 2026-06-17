@@ -35,7 +35,7 @@ LLM을 처음 배울 때 가장 먼저 생기는 오해는 모델이 문장을 �
 ![LLM from Scratch 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/01/01-01-vs.ko.png)
 *LLM from Scratch 101 1장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 모델은 왜 문자열 대신 정수 시퀀스를 입력으로 받아야 할까요?
 - 문자 단위, 단어 단위, 서브워드 토큰화는 각각 무엇을 얻고 무엇을 잃을까요?

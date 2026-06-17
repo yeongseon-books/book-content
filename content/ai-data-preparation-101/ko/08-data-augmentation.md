@@ -43,7 +43,7 @@ seo_description: augmentation은 held-out 평가를 통과할 만큼 라벨 의�
 *AI 데이터 준비 8장 흐름 개요*
 > 데이터 증강 기법 — EDA부터 Back-Translation까지의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - augmentation은 synthetic generation과 무엇이 다른가요?
 - minority class와 typo robustness 문제를 어떤 decision path로 풀어야 하나요?

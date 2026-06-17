@@ -29,7 +29,7 @@ last_reviewed: '2026-05-12'
 ![pytest 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/06/06-01-big-picture.ko.png)
 *pytest 101 6장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - mock과 monkeypatch는 무엇이 다를까요?
 - `patch()`는 어디를 기준으로 적용해야 할까요?
@@ -274,7 +274,7 @@ mock은 강력하지만 남용하면 테스트가 구현을 지나치게 따라�
 
 대체로 환경변수나 단순 속성 교체는 `monkeypatch`가 더 읽기 좋고, 호출 횟수나 인자 검증이 중요하면 `unittest.mock` 계열이 더 강력합니다. 둘 중 무엇이 더 좋은가가 아니라, 어떤 계약을 검증하려는지가 선택 기준입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `unittest.mock.patch`로 외부 의존성을 대체했다
 - [ ] `monkeypatch.setattr`로 함수를 교체했다

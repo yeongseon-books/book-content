@@ -37,13 +37,11 @@ seo_description: AsyncSession과 aiosqlite를 써서 비동기 SQLAlchemy를 안
 *SQLAlchemy 101 9장 흐름 개요*
 > 비동기 SQLAlchemy: aiosqlite와 AsyncSession의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `create_async_engine`과 `AsyncSession`은 동기 버전과 무엇이 같고 무엇이 다를까요?
 - URL에 `sqlite+aiosqlite` 같은 비동기 드라이버 표기는 왜 중요할까요?
 - async 환경에서는 왜 암묵적 IO를 피해야 할까요?
-
-## 왜 중요한가
 
 FastAPI, Starlette, aiohttp 같은 async 프레임워크에서 동기 SQLAlchemy를 그대로 쓰면 이벤트 루프가 블록됩니다. SQLAlchemy 2.x의 async API는 1.4부터 정식 도입돼 안정화됐고, SQLite도 `aiosqlite` 드라이버로 같은 패턴을 쓸 수 있습니다.
 
@@ -245,7 +243,7 @@ async def list_users(session: AsyncSession = Depends(get_session)):
 - **SQLite 한정 주의사항.** SQLite는 단일 writer만 허용합니다. async라도 여러 코루틴이 동시에 write를 하면 `SQLITE_BUSY`가 납니다. write가 많은 워크로드라면 PostgreSQL + asyncpg가 더 자연스럽습니다.
 - **테스트.** `pytest-asyncio`를 쓰고, fixture에서 `engine` / `SessionLocal`을 만들고 fixture 끝에서 `await engine.dispose()`로 닫습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] URL에 async 드라이버를 명시했다(`sqlite+aiosqlite://`)
 - [ ] `async_sessionmaker(..., class_=AsyncSession, expire_on_commit=False)`로 팩토리를 만들었다

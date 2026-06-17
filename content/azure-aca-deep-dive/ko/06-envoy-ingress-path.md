@@ -34,7 +34,7 @@ Azure Container Apps의 Ingress 설명은 짧고 명확합니다. Ingress를 켜
 *Azure Container Apps Deep Dive 6장 흐름 개요*
 > Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - ACA의 public ingress 표면과 숨은 라우팅 계층은 어떻게 구분해 이해해야 할까요?
 - TLS는 어디서 종료되고, 앱은 원래 요청 정보를 어떤 header로 복구할까요?

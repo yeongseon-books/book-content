@@ -32,7 +32,7 @@ AI와 데이터사이언스는 갑자기 하늘에서 떨어진 별도 분야가
 ![Computer Science 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/10/10-01-concept-at-a-glance.ko.png)
 *Computer Science 101 10장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 지금까지 배운 CS 기초가 AI와 데이터사이언스에서 어디에 직접 쓰일까요?
 - 규칙 기반 시스템과 머신러닝 시스템은 무엇이 본질적으로 다를까요?
@@ -45,19 +45,13 @@ AI와 데이터사이언스는 갑자기 하늘에서 떨어진 별도 분야가
 - 앞선 아홉 편이 AI/DS와 연결되는 방식
 - 다음 학습 로드맵을 설계하는 기준
 
-## 왜 중요한가
-
 AI는 마법이 아닙니다. 모델은 데이터로 학습되고, 추론은 행렬 연산이며, 그 모든 것은 결국 CPU·메모리·디스크 위에서 돌아갑니다. CS 기초가 단단할수록 AI 코드를 디버깅하고, 비용을 추정하고, 문제를 정의하는 능력이 빠르게 성장합니다.
 
 > AI/DS = CS + 통계 + 도메인
 
 도구는 빨리 변해도 기초는 오래 유효합니다.
 
-## 한눈에 보는 개념
-
 > 규칙 기반은 사람이 규칙을 적고, 머신러닝은 데이터로부터 규칙을 추론합니다.
-
-## 핵심 용어
 
 | 용어 | 설명 |
 | --- | --- |
@@ -190,8 +184,6 @@ steps = [
 for i, step in enumerate(steps, 1):
     print(f"{i}. {step}")
 ```
-
-## 이 코드에서 먼저 봐야 할 점
 
 - 단순한 모델일수록 디버깅과 운영이 쉽습니다 — 항상 기준선(baseline)부터 시작합니다
 - 데이터를 학습/검증/평가로 분리하지 않으면 성능을 과대 평가하게 됩니다
@@ -447,7 +439,7 @@ detect_drift(train_distribution, production_normal)  # drift: False
 production_drifted = np.random.normal(loc=60, scale=15, size=1000)
 detect_drift(train_distribution, production_drifted)  # drift: True
 ```
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 머신러닝과 규칙 기반의 차이를 한 문장으로 설명할 수 있는가
 - [ ] 학습/검증/평가 데이터 분리가 왜 필요한지 아는가

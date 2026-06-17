@@ -43,7 +43,7 @@ seo_description: labeled data가 부족할수록 합성 데이터 생성보다 �
 *AI 데이터 준비 7장 흐름 개요*
 > 합성 데이터 생성 — Self-Instruct부터 Distillation까지의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 도메인 파인튜닝용 synthetic batch는 어떤 입력에서 시작해 어떤 산출물로 끝나야 할까요?
 - Self-Instruct, Evol-Instruct, RAG eval, distillation은 어느 시점에 선택해야 할까요?

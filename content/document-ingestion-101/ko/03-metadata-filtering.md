@@ -34,7 +34,7 @@ seo_description: 메타데이터는 장식이 아니라 검색 후보군을 먼�
 *Retrieval metadata schema flow*
 > 메타데이터는 본문 옆의 장식이 아니라 검색 후보군을 줄이는 첫 번째 인덱스입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 메타데이터 스키마는 왜 임베딩 후가 아니라 수집 단계에서 먼저 설계해야 할까요?
 - 필터는 벡터 유사도 검색 전에 후보군을 어떻게 바꿀까요?
@@ -159,8 +159,6 @@ Q4 marketing budget marketing - ...
 Q4 infrastructure cost engineering - ...
 ```
 
-## 이 코드에서 먼저 봐야 할 점
-
 ### 유사도와 필터가 결합되는 순서
 
 ![Similarity and filter processing flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-01-how-similarity-and-filters-combine.ko.png)
@@ -187,7 +185,7 @@ Q4 infrastructure cost engineering - ...
 - 검색 결과가 이상하면 임베딩 모델보다 후보군 설계가 먼저 문제일 수 있습니다.
 - FAISS는 관계형 데이터베이스가 아니므로, 더 복잡한 조건은 애플리케이션 레벨 설계가 함께 필요합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 청크 메타데이터에 최소한 `category`, `quarter`, `source`가 들어 있습니다.
 - [ ] 같은 질의에 대해 서로 다른 필터 결과를 비교했습니다.

@@ -32,23 +32,17 @@ last_reviewed: '2026-05-15'
 ![Distributed Systems 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/05/05-01-concept-at-a-glance.ko.png)
 *Distributed Systems 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 왜 데이터를 복제하며, 어떤 복제 모델이 있을까요?
 - leader-follower, multi-leader, leaderless는 어떻게 다를까요?
 - 동기 복제와 비동기 복제는 어떤 데이터 손실 위험을 만들까요?
 
-## 왜 중요한가
-
 복제는 모든 분산 데이터 시스템의 가장 밑바닥 층입니다. 이 층의 선택이 4편에서 본 일관성 모델을 만들고, 6편에서 볼 합의 비용도 규정합니다. 실무에서 데이터베이스가 왜 이런 식으로 동작하는지 묻는 질문의 답은 대개 복제 설정 안에 있습니다.
 
 > 복제 설정은 안전성과 속도 사이의 환율입니다.
 
-## 한눈에 보는 개념
-
 이 세 가지 토폴로지만 이해해도 현실 시스템의 대부분을 설명할 수 있습니다.
-
-## 핵심 용어
 
 - **Leader/follower**: 쓰기는 하나의 리더가 받고, 읽기는 팔로워로 분산할 수 있는 구조입니다.
 - **Multi-leader**: 여러 리더가 동시에 쓰기를 받고 서로를 동기화하는 구조입니다.
@@ -145,8 +139,6 @@ print("replication lag rows:", lag())
 
 대부분의 데이터베이스는 LSN, GTID, offset 같은 지표를 노출합니다. lag을 SLO로 관리하면 stale read를 사용자가 보기 전에 잡을 수 있습니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - 비동기 복제는 빠르지만 데이터 손실 위험을 남깁니다.
 - 동기 복제는 안전하지만 느립니다. 둘 중 하나가 절대적으로 옳은 것이 아니라 워크로드가 기준입니다.
 - quorum은 R과 W를 조절해 트레이드오프를 다이얼처럼 다루게 해 줍니다.
@@ -160,8 +152,6 @@ print("replication lag rows:", lag())
 4. **R+W>N 규칙을 깨뜨립니다.** 최신값을 읽는 보장이 사라집니다.
 5. **lag을 모니터링하지 않습니다.** 사용자가 stale read를 신고한 뒤에야 문제를 압니다.
 
-## 실무에서는 이렇게 드러납니다
-
 PostgreSQL과 MySQL은 기본적으로 leader-follower 복제를 사용합니다. Cassandra와 DynamoDB는 leaderless quorum에 가깝고, CRDT 기반 시스템은 multi-leader 성향이 강합니다. 클라우드의 multi-AZ 데이터베이스는 한 AZ에는 동기로, 다른 AZ에는 비동기로 보내는 혼합형 구성을 자주 씁니다.
 
 ## 시니어 엔지니어는 이렇게 생각합니다
@@ -172,7 +162,7 @@ PostgreSQL과 MySQL은 기본적으로 leader-follower 복제를 사용합니다
 - 단순 LWW에 기대지 않고 애플리케이션 수준의 merge 전략을 설계합니다.
 - lag을 SLO와 알람으로 관리합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 동기 복제와 비동기 복제의 차이를 한 줄로 말할 수 있는가?
 - [ ] R+W>N의 의미를 설명할 수 있는가?

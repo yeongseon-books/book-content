@@ -31,7 +31,7 @@ last_reviewed: '2026-05-17'
 ![Model Evaluation 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/05/05-01-concept-at-a-glance.ko.png)
 *Model Evaluation 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `micro 0.927`, `macro 0.881`, `weighted 0.925`가 같은 예측인데 왜 서로 다른 결론을 주나요?
 - 검증셋에서 최고 F1을 준 임계값 0.20을 테스트셋에 잠가 보는 절차가 왜 중요한가요?

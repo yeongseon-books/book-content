@@ -36,7 +36,7 @@ seo_description: REST의 여섯 제약과 리소스 중심 설계가 무엇인�
 ![클라이언트-리소스-서버 계층 구조](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/02/02-01-concept-at-a-glance.ko.png)
 *REST의 계층 구조: 클라이언트 → 캐시/LB → 서버 → 데이터*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - REST는 어디서 나왔고 무엇을 뜻할까요?
 - REST를 이루는 여섯 가지 아키텍처 제약은 무엇일까요?
@@ -340,7 +340,7 @@ REST가 기본 선택지가 된 현실적 이유는 다음과 같습니다.
 - **First check:** 엔드포인트 설명에 `/getUser`, `/deleteOrder` 같은 동사가 반복되면 RPC over HTTP로 기울고 있다는 신호입니다.
 - **Failure mode:** 인증 상태를 서버 세션에 묶거나 모든 응답을 `200 OK`로 보내기 시작하면 캐시, 재시도, 수평 확장 전략이 함께 약해집니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] URL에 동사가 없는가?
 - [ ] 같은 method가 리소스마다 비슷한 의미를 가지는가?

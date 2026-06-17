@@ -32,7 +32,7 @@ seo_description: 합성과 상속의 차이, 위임, 의존성 주입까지 실�
 ![Object-Oriented Programming 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/07/07-01-concept-overview.ko.png)
 *Object-Oriented Programming 101 7장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - is-a 관계와 has-a 관계는 실무 설계에서 어떻게 구분하면 좋을까요?
 - 왜 많은 경우 상속보다 합성이 더 안전한 기본 선택이 될까요?
@@ -312,7 +312,7 @@ except HttpError as e:
 | 런타임마다 다른 동작을 골라야 함 | 객체를 새로 상속하기보다 설정값 분기가 늘어납니다 | 생성자 주입 + 전략 패턴으로 전환합니다 |
 | 테스트에서 부모 초기화가 너무 무거움 | 자식 단위 테스트에도 부모 의존성을 모두 준비해야 합니다 | 조립 코드를 분리하고 필요한 협력 객체만 주입받게 만듭니다 |
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] is-a 관계와 has-a 관계를 구분할 수 있다
 - [ ] 합성과 위임 패턴을 구현할 수 있다

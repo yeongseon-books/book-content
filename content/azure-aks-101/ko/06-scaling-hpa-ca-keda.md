@@ -36,7 +36,7 @@ AKS에서 스케일링이 헷갈리는 이유는 “늘린다”는 말이 여�
 *Azure Kubernetes Service 101 6장 흐름 개요*
 > 스케일링 — HPA, Cluster Autoscaler, KEDA의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - HPA, Cluster Autoscaler, KEDA는 각각 어떤 신호를 보고 무엇을 바꿀까요?
 - CPU나 메모리 기반 HPA만으로 부족한 상황은 언제일까요?

@@ -31,7 +31,7 @@ last_reviewed: '2026-05-17'
 ![Model Evaluation 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/03/03-01-concept-at-a-glance.ko.png)
 *Model Evaluation 101 3장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 더미 기준선 95.36%와 모델 정확도 96.08%가 거의 비슷한데, 왜 이 모델을 바로 좋다고 말하면 안 될까요?
 - 혼동 행렬에서 양성 58개 중 47개를 놓쳤다는 사실이 정확도 96.08%보다 더 중요한 이유는 무엇일까요?

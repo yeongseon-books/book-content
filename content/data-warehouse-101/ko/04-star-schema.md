@@ -30,7 +30,7 @@ last_reviewed: '2026-05-15'
 *Data Warehouse 101 4장 흐름 개요*
 > Star Schema는 '정규화 vs 비정규화' 균형을 일관되게 유지해 쿼리 성능과 유지보수 비용 둘 다 낮춥니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Star Schema는 왜 분석에서 가장 자주 보일까요?
 - Snowflake Schema와는 어떤 점이 다를까요?
@@ -44,8 +44,6 @@ last_reviewed: '2026-05-15'
 - 설계 실습 5단계
 - 입문 단계에서 자주 나오는 실수 5가지
 
-## 왜 중요한가
-
 분석 쿼리는 조인이 줄어들수록 읽기 쉽고 빠르게 동작합니다. Star Schema는 하나의 fact와 그 주위를 감싼 dimension으로 필요한 조인만 남긴 형태입니다. 그래서 BI 도구도 이 모양을 전제로 drill-down을 만들기 쉽습니다.
 
 > 분석은 읽기의 게임입니다. 모양이 단순할수록 답도 빨리 나옵니다.
@@ -53,8 +51,6 @@ last_reviewed: '2026-05-15'
 ## 개념 한눈에 보기
 
 Star Schema는 중앙의 Fact 테이블과 그 주변의 Dimension 테이블들로 이루어집니다. 모든 분석이 Fact에서 시작하므로 조인 경로가 간단하고, 비즈니스 관점의 쿼리를 자연스럽게 구성할 수 있습니다.
-
-## 핵심 용어
 
 - **Star Schema**: 중앙 fact와 주변 dimension으로 이루어진 가장 단순한 분석 모델입니다.
 - **Snowflake Schema**: dimension을 더 정규화해서 여러 홉을 거치게 만든 형태입니다.
@@ -126,8 +122,6 @@ WHERE p.category = 'Coffee'
 GROUP BY p.brand;
 ```
 
-## 이 코드에서 먼저 봐야 할 점
-
 - 조인 경로가 모두 fact와 dimension 사이 한 단계로 정리됩니다.
 - category와 brand처럼 자주 함께 쓰는 속성은 같은 dimension에 두는 편이 실용적입니다.
 - BI에서 보던 drill-down 동작이 거의 그대로 SQL로 이어집니다.
@@ -152,7 +146,7 @@ Tableau, Looker, Power BI 같은 도구는 star schema를 전제로 가장 잘 �
 - BI 도구가 기대하는 가정을 데이터 모델에서 존중합니다.
 - Snowflake는 이유가 분명할 때만 씁니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] Star와 Snowflake의 차이를 설명할 수 있다.
 - [ ] Galaxy schema가 무엇인지 알고 있다.

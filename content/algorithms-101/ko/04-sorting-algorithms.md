@@ -30,19 +30,15 @@ Python의 `sorted`는 왜 그렇게 안정적으로 빠를까요? 그리고 교�
 ![Algorithms 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/04/04-01-big-picture.ko.png)
 *Algorithms 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 비교 기반 정렬은 왜 O(n log n)보다 더 좋아질 수 없을까요?
 - mergesort, quicksort, heapsort는 각각 무엇을 주고 무엇을 얻을까요?
 - 안정 정렬과 비안정 정렬의 차이는 왜 중요할까요?
 
-## 왜 중요한가
-
 정렬은 거의 모든 다른 알고리즘의 전처리 단계입니다. 인덱스 생성, 배치 처리, 조인, 윈도우 집계, 머신러닝 전처리까지 모두 정렬 위에서 돌아갑니다. 어떤 정렬이 앞에 오는지가 뒤쪽 파이프라인 전체 비용을 좌우합니다.
 
 > 정렬을 이해하는 일은 알고리즘 설계의 첫 번째 어휘를 익히는 일입니다.
-
-## 한눈에 보는 개념
 
 > 비교 기반 정렬의 결정 트리 깊이는 `log(n!) ≈ n log n`이므로 O(n log n)이 하한입니다. mergesort는 안정 정렬이고 O(n) 추가 메모리를 쓰며 O(n log n)을 보장합니다. quicksort는 제자리 정렬이고 평균 O(n log n)이지만 나쁜 pivot에서는 O(n²)로 무너집니다. heapsort는 제자리 정렬이며 O(n log n)을 보장하지만 안정적이지 않습니다. Timsort는 mergesort 위에 run 탐지를 얹은 적응형 정렬입니다.
 
@@ -54,8 +50,6 @@ quicksort   unstable, in-place,           average O(n log n) / worst O(n^2)
 heapsort    unstable, in-place,           guaranteed O(n log n)
 Timsort     stable,   adaptive,           best O(n) / worst O(n log n)
 ```
-
-## 핵심 용어
 
 | 용어 | 설명 |
 | --- | --- |
@@ -228,7 +222,7 @@ print(people)
 
 또한 "메모리에 들어가는가"를 빠르게 확인합니다. 데이터가 RAM을 넘는 순간부터는 외부 병합 정렬과 분산 셔플 비용이 알고리즘 자체보다 더 큰 문제가 되기 때문입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 비교 기반 정렬의 O(n log n) 하한을 설명할 수 있는가
 - [ ] mergesort, quicksort, heapsort의 트레이드오프를 말할 수 있는가

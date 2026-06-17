@@ -36,7 +36,7 @@ LLM 애플리케이션을 처음 만들 때 가장 먼저 흐려지는 지점은
 ![첫 번째 LLM API 호출의 최소 왕복 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.ko.png)
 *첫 번째 LLM API 호출의 최소 왕복 구조*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - LLM API 호출은 SDK 아래에서 어떤 요청-응답 구조로 움직일까요?
 - API 키와 모델 ID, 메시지 형식 중 첫 실패에서 어디부터 봐야 할까요?

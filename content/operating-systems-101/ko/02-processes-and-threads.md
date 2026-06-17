@@ -32,7 +32,7 @@ last_reviewed: '2026-05-15'
 ![Operating Systems 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.ko.png)
 *Operating Systems 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 프로세스는 어떤 자원을 자기 것으로 가지고 있을까요?
 - 스레드는 무엇을 공유하고 무엇은 따로 가질까요?
@@ -193,7 +193,7 @@ os.wait()
 - 백엔드 디버깅: `ps -ef`, `pstree`, `htop`로 프로세스/스레드 트리 확인
 - 데이터 과학: `joblib`이 백엔드(스레드/프로세스)를 골라서 병렬화
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 프로세스가 가진 자원 네 가지를 말할 수 있는가
 - [ ] 스레드와 프로세스가 공유하는 것과 안 하는 것을 안다

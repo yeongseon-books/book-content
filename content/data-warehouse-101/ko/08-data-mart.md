@@ -31,7 +31,7 @@ Warehouse는 전사 공통 데이터를 모으는 중심 저장소입니다. 하
 *Data Warehouse 101 8장 흐름 개요*
 > Data Mart는 '중앙 집중식 정의 + 분산식 적응'의 균형으로 설계합니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Data Mart는 Warehouse와 무엇이 다를까요?
 - 조직 공통 데이터와 팀 전용 분석 영역은 왜 분리할까요?
@@ -45,8 +45,6 @@ Warehouse는 전사 공통 데이터를 모으는 중심 저장소입니다. 하
 - Mart 설계 실습 5단계
 - 입문 단계에서 자주 나오는 실수 5가지
 
-## 왜 중요한가
-
 Warehouse는 조직 전체가 공유하는 공통 데이터를 담습니다. 하지만 영업, 재무, 운영은 서로 다른 용어와 질문으로 데이터를 읽습니다. Data Mart는 이 차이를 팀 언어로 다시 정리해 주는 얇은 계층입니다.
 
 > 공통성은 Warehouse에 두고, 도메인 언어는 Mart에 둡니다.
@@ -54,8 +52,6 @@ Warehouse는 조직 전체가 공유하는 공통 데이터를 담습니다. 하
 ## 개념 한눈에 보기
 
 Data Mart는 Warehouse의 중앙 저장소에서 특정 조직이나 용도로 준비한 작은 저장소입니다. 각 팀이 필요한 뷰를 자유롭게 만들되, 기초가 되는 Fact와 Dimension은 중앙에서 일관되게 관리합니다.
-
-## 핵심 용어
 
 - **Data Mart**: 특정 도메인이나 팀에 맞춰 좁힌 분석 구역입니다.
 - **Conformed Dimension**: 여러 mart가 함께 쓰는 공통 차원입니다.
@@ -175,8 +171,6 @@ GRANT SELECT ON SCHEMA sales_mart TO ROLE sales_readers;
 GRANT SELECT ON SCHEMA finance_mart TO ROLE finance_readers;
 ```
 
-## 이 코드에서 먼저 봐야 할 점
-
 - conformed dimension은 Warehouse의 공통 기준을 그대로 가져옵니다.
 - 팀이 실제로 쓰는 용어가 컬럼명과 모델 이름에 반영됩니다.
 - 권한을 도메인 단위로 나누면 데이터 노출 범위를 관리하기 쉽습니다.
@@ -233,7 +227,7 @@ dbt 프로젝트에서는 marts 폴더를 도메인별로 나누는 경우가 �
 - 권한은 도메인 경계를 따라 나눕니다.
 - Mart의 수명도 지표로 관리합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] Warehouse와 Mart의 차이를 설명할 수 있다.
 - [ ] Conformed dimension이 왜 중요한지 알고 있다.

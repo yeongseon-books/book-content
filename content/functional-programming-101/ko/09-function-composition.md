@@ -31,13 +31,11 @@ last_reviewed: '2026-05-12'
 ![Functional Programming 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.ko.png)
 *Functional Programming 101 9장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 함수 합성은 수학적으로 어떤 의미를 가지며 Python에서는 어떻게 구현할까요?
 - `compose`와 `pipe`는 무엇이 다르고, 왜 `pipe`가 더 읽기 쉬운 경우가 많을까요?
 - 데이터 처리와 텍스트 처리에서 파이프라인은 어떤 장점을 줄까요?
-
-## 왜 중요한가
 
 복잡한 데이터 처리 로직을 하나의 거대한 함수에 넣으면 테스트하기 어렵고 재사용도 힘들어집니다. 반대로 단일 목적 함수들을 조합하면 각 단계를 독립적으로 검증할 수 있고, 다른 파이프라인에서도 같은 함수를 다시 쓸 수 있습니다.
 
@@ -494,7 +492,7 @@ Pipeline report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
 
 Python에는 Haskell의 `.` 같은 내장 합성 연산자가 없지만, 그건 본질이 아닙니다. 프로젝트 안에서 읽기 좋은 방향으로 `pipe` 또는 `compose` 하나만 정해 두고 일관되게 쓰는 편이 훨씬 중요합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `compose`와 `pipe`의 차이를 설명할 수 있다
 - [ ] 작은 함수를 조합해 데이터 파이프라인을 만들 수 있다

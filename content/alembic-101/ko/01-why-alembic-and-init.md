@@ -30,13 +30,11 @@ Alembic을 처음 접하면 명령어보다 먼저 이런 의문이 생깁니다
 ![Alembic 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.ko.png)
 *Alembic 101 1장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 마이그레이션 도구가 실제로 해결하는 문제는 무엇일까요?
 - 왜 `Base.metadata.create_all`만으로는 운영 환경을 버틸 수 없을까요?
 - revision, head, `alembic_version` 테이블은 각각 어떤 역할을 할까요?
-
-## 왜 중요한가
 
 스키마 변경은 production 사고의 단골 원인입니다. 코드는 git으로, 인프라는 Terraform으로 관리하면서도 “누가 어떤 SQL을 어느 환경에 실행했는가”만 수작업으로 남기는 팀이 의외로 많습니다. 그러면 staging은 조용히 production과 어긋나고, 문제가 생겼을 때도 스키마를 어디까지 되돌려야 하는지 누구도 자신 있게 말하지 못합니다.
 
@@ -200,7 +198,7 @@ sqlite3 app.db "SELECT version_num FROM alembic_version;"
 - **가능하면 single head를 유지합니다.** 대부분 팀에는 branch보다 head 하나가 더 단순합니다.
 - **첫 revision은 baseline입니다.** 기존 DB에 Alembic을 도입한다면 `alembic revision --autogenerate -m "baseline"` 후 `alembic stamp head`로 현재 상태를 맞춥니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `alembic init` 뒤에 `alembic.ini`, `env.py`, `versions/`를 구분할 수 있다
 - [ ] `sqlalchemy.url`이 올바른 데이터베이스를 가리킨다 (이 시리즈에서는 SQLite)

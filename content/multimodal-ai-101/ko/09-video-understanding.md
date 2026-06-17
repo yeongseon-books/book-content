@@ -38,7 +38,7 @@ seo_description: 이미지는 단일 frame이지만, video는 시간 축이 추�
 *Multimodal AI 101 9장 흐름 개요*
 > Video 이해 - Frame Sampling에서 Video-LLaVA까지의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 왜 비디오 이해에서 frame sampling이 가장 먼저 결정해야 할 핵심 변수일까요?
 - PyAV와 scene change 기반 keyframe extraction은 각각 어떤 장면에서 유용할까요?

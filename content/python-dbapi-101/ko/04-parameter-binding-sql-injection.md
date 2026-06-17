@@ -35,7 +35,7 @@ seo_description: 핵심은 SQL 토큰화(tokenization)가 binding보다 먼저 �
 ![Python DB-API 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-02-mental-model-keep-query-string-and-value.ko.png)
 *Python DB-API 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 왜 `find_user_BAD("Alice' OR 1=1 --")`는 전체 행을 유출하지만 `WHERE name = ?`는 빈 결과를 돌려줄까요?
 - sqlite3에서 `?`, `:name`, `module.paramstyle`은 언제 구분해서 써야 하고 driver 이관 때 무엇을 먼저 확인해야 할까요?
@@ -310,7 +310,7 @@ sqlite3 → PostgreSQL로 옮길 때 가장 흔한 이슈가 paramstyle 차이�
 
 ---
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 모든 SQL은 `cursor.execute(sql, params)` 형태로 작성한다.
 - [ ] f-string·`%`·`+`로 값을 SQL에 합치는 코드는 코드 리뷰에서 무조건 막는다.

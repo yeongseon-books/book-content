@@ -35,7 +35,7 @@ Gradient는 바로 그때 필요한 표현입니다. 여러 편미분을 순서 
 ![Calculus for ML 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/04/04-01-concept-at-a-glance.ko.png)
 *Calculus for ML 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 여러 편미분을 하나의 gradient vector로 묶는다는 것은 정확히 무엇을 뜻할까요?
 - gradient의 방향과 크기는 각각 어떤 실무 의미를 가질까요?

@@ -38,7 +38,7 @@ seo_description: ReAct, 계획 실행, 반성 루프를 workflow 관점에서 �
 *워크플로 패턴 지도*
 > Workflow는 추론 스타일의 이름이 아니라, agent가 어떤 순서로 행동하고 언제 멈출지 정하는 제어 구조입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - agent workflow를 고를 때 prompt 튜닝보다 먼저 그려야 할 흐름은 무엇일까요?
 - ReAct, Plan-and-Execute, Reflexion은 각각 어떤 실패 조건에서 유리할까요?

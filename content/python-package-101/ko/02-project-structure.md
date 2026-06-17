@@ -30,7 +30,7 @@ seo_description: src layout과 pyproject.toml로 Python 프로젝트 구조를 �
 ![Python Package 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/02/02-01-mental-model.ko.png)
 *Python Package 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - flat layout과 src layout은 무엇이 다를까요?
 - `pyproject.toml`은 무엇이고 왜 `setup.py`를 대체할까요?
@@ -42,8 +42,6 @@ seo_description: src layout과 pyproject.toml로 Python 프로젝트 구조를 �
 - `pyproject.toml`에서 꼭 알아야 할 섹션
 - 최소 구성을 갖춘 `pyproject.toml` 작성법
 - 실무에서 많이 쓰는 프로젝트 디렉터리 구조
-
-## 왜 중요한가
 
 프로젝트 구조가 어긋나면 `import`가 꼬이고, 빌드 도구가 파일을 찾지 못하고, 로컬에서는 통과하던 테스트가 CI에서는 실패합니다. 이런 문제는 대개 로직보다 구조에서 먼저 시작합니다. 따라서 초기에 표준 구조를 잡아두는 편이 나중에 훨씬 저렴합니다.
 
@@ -243,7 +241,7 @@ where = ["src"]
 
 빌드 백엔드로는 `setuptools`가 여전히 가장 널리 쓰입니다. 다만 새 프로젝트라면 `hatchling`이나 `flit-core`도 충분히 검토할 만합니다. 중요한 점은 백엔드가 무엇이든 `[project]` 섹션이라는 공통 표준이 유지된다는 사실입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] flat layout과 src layout의 차이를 설명할 수 있다
 - [ ] 최소한의 `pyproject.toml`을 작성할 수 있다

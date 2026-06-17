@@ -29,7 +29,7 @@ last_reviewed: '2026-05-12'
 ![pytest 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/05/05-01-big-picture.ko.png)
 *pytest 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 같은 로직을 여러 입력으로 검증할 때 함수를 복사하지 않으려면 어떻게 해야 할까요?
 - `@pytest.mark.parametrize`의 기본 문법은 어떻게 읽어야 할까요?
@@ -229,7 +229,7 @@ parametrize는 “같은 검증 로직, 다른 데이터”라는 상황을 가�
 
 실무에서는 버그가 재현된 입력값을 parametrize 목록에 추가해 회귀 테스트로 남기는 경우가 많습니다. 이렇게 하면 같은 버그가 다시 들어와도 바로 잡을 수 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `@pytest.mark.parametrize`로 테스트를 작성했다
 - [ ] 정상 케이스와 예외 케이스를 분리했다

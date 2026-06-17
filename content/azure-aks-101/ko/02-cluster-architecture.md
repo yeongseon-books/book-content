@@ -36,7 +36,7 @@ AKS를 이해할 때 가장 먼저 분리해야 하는 것은 클러스터의 �
 *Azure Kubernetes Service 101 2장 흐름 개요*
 > 클러스터 아키텍처 — Control Plane과 Node Pool의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - API server, scheduler, controller manager, etcd는 각각 어떤 일을 할까요?
 - Node Pool은 단순한 VM 묶음 이상으로 왜 중요한 관리 단위일까요?

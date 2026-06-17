@@ -38,7 +38,7 @@ node affinity, taint와 toleration, topology spread, 볼륨 제약, 포트 충�
 *Azure Kubernetes Service Deep Dive 4장 흐름 개요*
 > Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - kube-scheduler는 하나의 Pod에 대해 어떤 단계로 노드 후보를 좁혀 갈까요?
 - `nodeSelector`, affinity, taint/toleration, topology spread는 서로 어떤 다른 의도를 표현할까요?

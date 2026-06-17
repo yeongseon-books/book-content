@@ -29,13 +29,11 @@ last_reviewed: '2026-05-12'
 ![Data Structures 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/02/02-01-big-picture.ko.png)
 *Data Structures 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 고정 배열은 왜 인덱싱이 O(1)일까요?
 - 동적 배열은 공간이 모자랄 때 어떻게 늘어나고, 왜 append가 평균적으로 빠를까요?
 - 파이썬의 `list`는 내부적으로 어떤 자료구조에 가까울까요?
-
-## 왜 중요한가
 
 배열은 가장 기본적이면서도 가장 빠른 자료구조 중 하나입니다. CPU 캐시와 궁합이 좋고, 인덱싱은 O(1)이며, 해시 테이블·힙·동적 배열 같은 구조도 내부적으로는 배열 위에 세워집니다.
 
@@ -59,8 +57,6 @@ val:  [10][20][30][ - ]   one slot free
 append(40) → [10][20][30][40]   capacity full
 append(50) → new block (capacity 8) → [10][20][30][40][50][ ][ ][ ]
 ```
-
-## 핵심 용어
 
 | 용어 | 의미 |
 | --- | --- |
@@ -248,7 +244,7 @@ print(f"dict iteration: {(time.perf_counter() - start) * 1000:.2f} ms")
 
 또한 최종 크기를 안다면 capacity를 미리 확보합니다. `[None] * n`처럼 한 번에 메모리를 잡으면 재할당 비용을 모두 제거할 수 있습니다. 작은 차이처럼 보여도 핫패스에서는 체감 성능 차이가 분명합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 배열 인덱싱이 왜 O(1)인지 메모리 배치로 설명할 수 있습니다
 - [ ] doubling과 분할 상환 비용의 관계를 이해했습니다

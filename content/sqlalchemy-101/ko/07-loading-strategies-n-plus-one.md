@@ -37,13 +37,11 @@ ORM이 가장 자주 비판받는 이유는 대개 쿼리 횟수가 눈에 보�
 *SQLAlchemy 101 7장 흐름 개요*
 > 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 기본 lazy 로딩은 어떤 상황에서 N+1을 만들까요?
 - `joinedload`와 `selectinload`는 각각 어떤 쿼리를 추가로 만들까요?
 - 컬렉션 관계에서는 왜 `selectinload`가 더 자주 권장될까요?
-
-## 왜 중요한가
 
 ORM의 lazy 로딩은 코드 가독성을 높여 줍니다. `user.orders`라고 적기만 하면 알아서 SELECT가 발사됩니다. 그러나 이 편리함이 종종 운영 환경에서 100배 가까운 SELECT 폭증을 만듭니다.
 
@@ -294,7 +292,7 @@ users = session.scalars(stmt, options=selectinload(User.orders)).all()   # 잘�
 - **로깅과 추적**: production에서는 `echo=True`가 비현실적이므로, slow query log 또는 OpenTelemetry SQL exporter로 N+1을 가시화합니다.
 - **DTO/Pydantic 분리**: ORM 객체를 그대로 반환하지 않고 DTO로 변환하는 단계를 두면, 어떤 자식이 필요한지 명시적으로 드러나서 eager 정책을 짜기 쉽습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 핸들러마다 필요한 자식 컬렉션이 정확히 무엇인지 정의했는가?
 - [ ] 컬렉션은 `selectinload`, 다대일/일대일은 `joinedload`로 결정했는가?

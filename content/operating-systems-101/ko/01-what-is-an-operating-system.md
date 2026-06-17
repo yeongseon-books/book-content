@@ -32,7 +32,7 @@ last_reviewed: '2026-05-15'
 ![Operating Systems 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/01/01-01-diagram.ko.png)
 *Operating Systems 101 1장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 운영체제는 정확히 어떤 문제를 해결하려고 존재할까요?
 - 커널 모드와 사용자 모드는 왜 굳이 분리되어 있을까요?
@@ -169,7 +169,7 @@ OS의 가치는 이 둘의 차이입니다. 우리가 평소 느끼는 "그냥 �
 - 성능 튜닝: epoll, io_uring 같은 OS 제공 비동기 I/O 메커니즘 활용
 - 임베디드/IoT: 작은 OS(FreeRTOS, Zephyr)를 직접 선택하고 설정
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 운영체제의 두 가지 역할(자원 관리, 추상화)을 설명할 수 있는가
 - [ ] 사용자 모드와 커널 모드의 차이를 설명할 수 있는가

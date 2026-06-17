@@ -35,7 +35,7 @@ last_reviewed: '2026-05-12'
 ![Calculus for ML 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.ko.png)
 *Calculus for ML 101 8장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - plain gradient descent는 실제 딥러닝 학습에서 어떤 약점을 드러낼까요?
 - momentum은 왜 관성이라는 비유로 설명하는 편이 가장 이해가 쉬울까요?

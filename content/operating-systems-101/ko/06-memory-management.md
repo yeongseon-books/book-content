@@ -32,7 +32,7 @@ last_reviewed: '2026-05-15'
 ![Operating Systems 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.ko.png)
 *Operating Systems 101 6장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 프로세스 메모리는 어떤 구역으로 나뉘어 있을까요?
 - `malloc`과 `free`, 가비지 컬렉션은 각각 무엇을 맡을까요?
@@ -180,7 +180,7 @@ cat /sys/fs/cgroup/memory.current 2>/dev/null || echo 'not in container'
 - 게임/임베디드: 풀 할당으로 단편화 회피
 - 컨테이너: cgroup 한도를 기준으로 capacity 계획
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 프로세스 메모리 영역(text/data/heap/stack)을 안다
 - [ ] 누수와 단편화의 차이를 안다

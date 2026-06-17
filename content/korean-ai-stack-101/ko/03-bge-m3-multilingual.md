@@ -33,7 +33,7 @@ seo_description: 다국어 dense 검색은 화려한 신호 결합보다 먼저,
 ![Korean AI Stack 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-01-core-flow.ko.png)
 *Korean AI Stack 101 3장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - BGE-M3는 한국어와 영어가 섞인 코퍼스에서 KoSimCSE보다 어디서 강합니까?
 - 하나의 모델이 dense, sparse, multi-vector 표현을 동시에 낸다는 말은 무엇을 뜻합니까?
@@ -194,8 +194,6 @@ for score, idx in zip(en_dist[0], en_idx[0]):
 
 같은 의미의 한국어 질의와 영어 질의에서 top-1이 유지된다면, 적어도 정성적으로는 모델이 언어 비대칭을 잘 흡수하고 있다고 볼 수 있습니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - 한국어 문서와 영어 문서는 **하나의 모델**로 인코딩해 하나의 인덱스에 넣습니다. BGE-M3에서는 언어별 인덱스를 따로 둘 필요가 거의 없습니다.
 - 테스트 케이스에 정답 문서 언어를 섞어 넣어야 진짜 다국어 성능이 드러납니다.
 - 1024차원은 KoSimCSE보다 메모리와 시간이 더 듭니다. 캐싱과 배치 인코딩의 중요성이 커집니다.
@@ -223,7 +221,7 @@ for score, idx in zip(en_dist[0], en_idx[0]):
 - **인덱스 선택**: 1만 개 이하 → `IndexFlatIP`, 10만 개 이상 → `IndexIVFFlat`(nlist≈√N), 100만 개 이상 → `IndexHNSWFlat`이 일반적입니다.
 - **언어별 모니터링**: 매주 Recall@5를 한국어 질의/영어 정답, 한국어 질의/한국어 정답으로 나눠 측정하면 어느 쪽에서 품질 압력이 생기는지 빨리 보입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 한국어 문서와 영어 문서를 같은 인덱스에 넣었습니다.
 - [ ] dense 기준선의 Recall@5를 최소 한 번 측정해 기록했습니다.

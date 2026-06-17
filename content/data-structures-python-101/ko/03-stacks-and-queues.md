@@ -28,7 +28,7 @@ last_reviewed: '2026-05-12'
 ![Data Structures with Python 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/03/03-01-big-picture.ko.png)
 *Data Structures with Python 101 3장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 스택과 큐는 각각 어떤 순서 규칙으로 동작할까요?
 - Python에서는 왜 스택에 list를, 큐에 deque를 주로 사용할까요?
@@ -41,8 +41,6 @@ last_reviewed: '2026-05-12'
 > 스택은 마지막에 넣은 값을 먼저 꺼내고, 큐는 먼저 넣은 값을 먼저 꺼냅니다.
 
 이 차이는 단순해 보이지만, 실제 코드의 동작 순서를 완전히 바꿉니다. 그래서 구현보다 먼저 순서를 머릿속에 고정하는 것이 중요합니다. 웹 서버의 요청 처리, 메시지 브로커의 작업 소비, undo/redo 기능도 결국 이 원리 위에 올라갑니다.
-
-## 핵심 개념 한눈에 보기
 
 > Stack = LIFO, Queue = FIFO
 
@@ -230,8 +228,6 @@ print(f"deque.popleft():  {deque_time:.4f}s")
 print(f"deque is {list_time / deque_time:.0f}x faster")
 ```
 
-## 이 코드에서 먼저 봐야 할 점
-
 - stack은 끝 append/pop만 필요하므로 list와 자연스럽게 맞습니다.
 - queue는 앞에서 꺼내는 연산이 핵심이므로 `popleft()`가 O(1)인 deque가 맞습니다.
 - 빈 스택이나 빈 큐에서 값을 꺼내면 예외가 발생하므로 방어 코드가 필요합니다.
@@ -263,7 +259,7 @@ print(f"deque is {list_time / deque_time:.0f}x faster")
 
 규모가 커지면 in-memory 큐 대신 Redis, RabbitMQ, Kafka 같은 외부 시스템으로 넘어갑니다. 그래도 기본 원리는 바뀌지 않습니다. deque로 FIFO를 이해해 두면 메시지 큐 시스템도 같은 눈으로 읽을 수 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 스택(LIFO)과 큐(FIFO)의 차이를 설명할 수 있다
 - [ ] list로 스택을 구현할 수 있다

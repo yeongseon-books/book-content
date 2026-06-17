@@ -34,7 +34,7 @@ seo_description: 다중 포맷 파이프라인의 본질은 서로 다른 입력
 *Loader routing by file format*
 > 다중 포맷 파이프라인의 본질은 서로 다른 입력을 하나의 공통 `Document` 계약으로 밀어 넣는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - PDF, Markdown, HTML을 한 파이프라인에 넣으려면 무엇을 먼저 공통 계약으로 맞춰야 할까요?
 - 파일 형식별 loader routing은 어디까지 분기하고 어디서 다시 합쳐져야 할까요?
@@ -199,8 +199,6 @@ source=diagram.docx format=docx status=unsupported reason=unsupported format: .d
 
 이런 로그 한 묶음만 있어도 현재 파이프라인이 무엇을 읽었고 무엇을 건너뛰었는지 빠르게 설명할 수 있습니다. 다중 포맷 수집의 운영 가치는 바로 이런 설명 가능성에서 나옵니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 ### 공통 Document 계약 스키마
 
 ![Shared Document contract schema](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-shared-document-contract-schema.ko.png)
@@ -227,7 +225,7 @@ source=diagram.docx format=docx status=unsupported reason=unsupported format: .d
 - Markdown은 일반 텍스트처럼 읽을 수 있지만, 헤더를 살린 청킹은 나중에 별도 정책이 필요할 수 있습니다.
 - PDF 로더와 텍스트 로더는 반환 단위가 다를 수 있으므로, 계약을 페이지 기준으로 할지 파일 기준으로 할지 먼저 정해야 합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] PDF, TXT, MD를 한 번의 실행에서 처리했습니다.
 - [ ] 모든 출력 문서에 `source`와 `format` 메타데이터가 있습니다.

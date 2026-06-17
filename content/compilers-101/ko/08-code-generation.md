@@ -29,19 +29,15 @@ IR에는 `t1`, `t2`, `t3`처럼 임시 값이 무한히 있는 것처럼 보이�
 ![Compilers 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/08/08-01-big-picture.ko.png)
 *Compilers 101 8장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 코드 생성이 해결해야 하는 두 핵심 문제는 무엇일까요?
 - instruction selection은 어떤 직관으로 동작할까요?
 - register allocation은 왜 그래프 색칠 문제로 보일까요?
 
-## 왜 중요한가
-
 앞 단계가 모두 잘 되어 있어도 마지막에 잘못 내리면 프로그램은 실행되지 않습니다. 같은 IR이라도 백엔드 품질이 낮으면 실행 속도가 몇 배씩 차이 날 수 있습니다. 그래서 코드 생성은 컴파일러의 최종 평판을 좌우합니다.
 
 > 이론은 IR에서 끝나지만, 실력은 백엔드에서 드러납니다.
-
-## 핵심 개념 한눈에 보기
 
 ```mermaid
 flowchart LR
@@ -52,8 +48,6 @@ flowchart LR
 ```
 
 이 세 단계가 거의 모든 백엔드의 뼈대입니다.
-
-## 핵심 용어
 
 - **instruction selection**: IR 노드마다 어떤 CPU 명령어를 쓸지 고르는 과정입니다.
 - **register allocation**: 가상 레지스터를 실제 물리 레지스터에 매핑하는 과정입니다.
@@ -184,8 +178,6 @@ print("\n".join(emit_call("printf", ["fmt", "x"])))
 
 여러분의 함수와 외부 라이브러리가 같은 약속을 따라야 호출이 성립합니다. 그것이 ABI의 핵심입니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - instruction selection은 패턴 매칭의 한 형태입니다.
 - register allocation의 본질은 그래프 색칠입니다.
 - spill은 패배가 아니라 정상적인 도구입니다.
@@ -211,7 +203,7 @@ LLVM 백엔드는 SelectionDAG와 GlobalISel처럼 서로 다른 선택 전략�
 - 백엔드 작업의 출발점을 liveness 분석으로 잡습니다.
 - flags, 예외, 원자성 같은 암묵 요소를 항상 의심합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 코드 생성이 해결하는 두 핵심 문제를 말할 수 있습니까?
 - [ ] register allocation을 그래프 색칠로 이해하고 있습니까?

@@ -31,7 +31,7 @@ Warehouse fact는 수십억 행까지 커지는 일이 흔합니다. 이때 중�
 *Data Warehouse 101 5장 흐름 개요*
 > Partition은 메타데이터 기반 스캔 범위 축소, Clustering은 물리적 배치 기반 I/O 축소로 각각 다른 방식으로 성능을 높입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Partition과 Clustering은 각각 어떤 문제를 해결할까요?
 - Pruning은 실제로 어떻게 비용을 줄일까요?
@@ -45,8 +45,6 @@ Warehouse fact는 수십억 행까지 커지는 일이 흔합니다. 이때 중�
 - 적용 실습 5단계
 - 입문 단계에서 자주 나오는 실수 5가지
 
-## 왜 중요한가
-
 Warehouse fact 테이블은 쉽게 수십억 행으로 커집니다. 날짜 기준 partition만 잘 잡아도 엔진은 읽지 않아도 될 데이터를 대부분 건너뜁니다. 이 절약이 곧 속도와 비용 둘 다에 바로 연결됩니다.
 
 > 읽지 않은 데이터에는 비용을 내지 않습니다.
@@ -54,8 +52,6 @@ Warehouse fact 테이블은 쉽게 수십억 행으로 커집니다. 날짜 기�
 ## 개념 한눈에 보기
 
 Partition은 큰 테이블을 범위(보통 날짜)로 나누어 필요한 부분만 스캔하고, Clustering은 같은 값을 물리적으로 가깝게 배치해 I/O를 줄입니다. 둘을 함께 쓰면 수억 행 테이블도 빠르게 조회할 수 있습니다.
-
-## 핵심 용어
 
 - **Partition**: 보통 날짜 컬럼을 기준으로 테이블을 물리적으로 나누는 방식입니다.
 - **Clustering**: partition 내부를 자주 조회하는 컬럼 순서로 정리하는 방식입니다.
@@ -125,8 +121,6 @@ WHERE order_date BETWEEN '2026-05-01' AND '2026-05-31'
   AND user_key = 100;
 ```
 
-## 이 코드에서 먼저 봐야 할 점
-
 - pruning은 조건이 partition key와 직접 비교될 때 가장 잘 동작합니다.
 - partition key에 함수를 씌우면 엔진이 건너뛸 범위를 찾기 어려워집니다.
 - clustering은 partition 내부에서 읽을 범위를 더 줄여 주는 보조 장치입니다.
@@ -151,7 +145,7 @@ BigQuery, Snowflake, Redshift 모두 partition과 clustering을 핵심 최적화
 - cluster key는 적고 자주 쓰는 컬럼만 둡니다.
 - 과거 partition은 update보다 append에 가깝게 다룹니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] Partition과 Clustering의 차이를 설명할 수 있다.
 - [ ] Pruning이 깨지는 대표 패턴을 알고 있다.

@@ -30,7 +30,7 @@ seo_description: Linux 권한과 소유자, chmod와 chown의 기본 감각을 �
 ![Linux CLI 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/03/03-01-big-picture.ko.png)
 *Linux CLI 101 3장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `r`, `w`, `x` 권한은 파일과 디렉터리에서 각각 어떻게 다르게 동작할까요?
 - 소유자, 그룹, 그 외 사용자 구분을 왜 알아야 할까요?
@@ -180,7 +180,7 @@ find project/ -type f -exec chmod 644 {} \;   # Files only
 
 한편 권한이 너무 엄격하면 팀 협업이 막힙니다. 개발 서버에서는 그룹 권한을 적절히 열어두고, production 서버에서는 최소화하는 것이 균형점입니다. 권한 문제로 삽질한 시간을 기록해두면, 어떤 설정이 적절한지 패턴이 보입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `rwxr-xr--`를 보고 owner/group/others 권한을 말할 수 있다
 - [ ] `chmod 755`가 어떤 권한인지 계산할 수 있다

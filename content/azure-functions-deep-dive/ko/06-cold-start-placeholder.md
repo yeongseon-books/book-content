@@ -34,7 +34,7 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 *Azure Functions Deep Dive 6장 흐름 개요*
 > 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 호스트 부팅, 워커 시작, JIT 중 어느 부분이 cold start에서 가장 비쌀까요?
 - Placeholder 인스턴스는 정확히 무엇을 미리 준비해 둘까요?

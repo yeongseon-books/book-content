@@ -32,7 +32,7 @@ seo_description: Python에서 캡슐화와 property를 활용해 안전한 객�
 ![Object-Oriented Programming 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/03/03-01-big-picture.ko.png)
 *Object-Oriented Programming 101 3장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Python에서 public, `_protected`, `__private` 관례는 각각 어떻게 받아들이면 될까요?
 - `property`는 단순 getter/setter 문법을 넘어 어떤 설계 이점을 줄까요?
@@ -292,7 +292,7 @@ Python에서 캡슐화는 "강제"가 아니라 "계약"입니다. 밑줄 관례
 
 실무에서 가장 흔한 패턴은 "처음에는 public 속성으로 시작하고, 검증이 필요해지면 property로 전환"하는 것입니다. Python의 property 덕분에 이 전환이 호출자 코드를 변경하지 않고 가능합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `_`와 `__` 관례의 차이를 설명할 수 있다
 - [ ] `@property` 데코레이터로 getter/setter를 구현할 수 있다

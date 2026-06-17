@@ -29,7 +29,7 @@ last_reviewed: '2026-05-12'
 ![pytest 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/03/03-01-big-picture.ko.png)
 *pytest 101 3장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - pytest의 `assert`는 왜 더 읽기 좋은 실패 메시지를 제공할까요?
 - 컬렉션, 문자열, 부동소수점은 어떤 방식으로 검증해야 할까요?
@@ -236,7 +236,7 @@ def test_complex_assertion():
 
 예외 테스트도 같은 관점으로 보면 됩니다. “이 함수는 이 입력에서 반드시 실패해야 한다”는 계약을 명시하는 일입니다. 예외가 사라지면 테스트가 바로 실패하므로, 에러 핸들링 회귀를 빨리 잡을 수 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] pytest의 assertion introspection 출력을 확인했다
 - [ ] `pytest.approx`로 부동소수점을 비교했다

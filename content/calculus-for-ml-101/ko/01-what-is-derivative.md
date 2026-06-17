@@ -35,7 +35,7 @@ last_reviewed: '2026-05-12'
 ![Calculus for ML 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.ko.png)
 *Calculus for ML 101 1장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 머신러닝에서 말하는 학습은 왜 미분과 직접 연결될까요?
 - 평균 변화율과 순간 변화율은 무엇이 다르고, 왜 둘을 구분해야 할까요?

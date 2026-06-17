@@ -38,7 +38,7 @@ Diffusion이 중요한 이유는 생성 품질만이 아닙니다. 텍스트 조
 *Multimodal AI 101 7장 흐름 개요*
 > Diffusion으로 Text-to-Image 생성의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 왜 diffusion이 GAN을 빠르게 밀어내고 시각 생성의 기본 구조가 되었을까요?
 - forward process와 reverse process를 어떤 멘탈 모델로 이해하면 가장 실용적일까요?

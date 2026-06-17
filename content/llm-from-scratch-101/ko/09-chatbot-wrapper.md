@@ -35,7 +35,7 @@ seo_description: generate.py까지 오면 모델은 돌아가지만 아직은 �
 ![LLM from Scratch 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/09/09-01-chatbot-model-history-streaming-ui.ko.png)
 *LLM from Scratch 101 9장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 챗봇은 모델 외에 어떤 구성 요소를 더 필요로 할까요?
 - multi-turn prompt format은 왜 직접 설계해야 할까요?

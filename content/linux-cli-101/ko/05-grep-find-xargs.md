@@ -30,7 +30,7 @@ seo_description: grep, find, xargs를 함께 써서 검색 작업을 이어 붙�
 ![Linux CLI 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/05/05-01-mental-model.ko.png)
 *Linux CLI 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 파일 내용 검색과 파일 위치 검색은 왜 다른 문제일까요?
 - `grep`, `find`, `xargs`는 어떤 순서로 연결하면 좋을까요?
@@ -210,7 +210,7 @@ find . -name "*.log" -print0 | xargs -0 rm
 - 공백이 들어간 파일 이름을 `xargs`에 넘길 때 명령이 깨지면 `-print0`과 `xargs -0` 조합부터 적용하세요. 삭제나 이동 작업은 이 단계가 빠지면 실수 비용이 큽니다.
 - `grep`이 바이너리 파일까지 뒤져서 출력이 지저분하면 `--include="*.py"`나 `--exclude-dir=.git`처럼 대상을 먼저 제한하세요. 실무에서는 속도보다 범위 제어가 먼저입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `grep -rn`으로 프로젝트 전체에서 문자열을 검색할 수 있다
 - [ ] `find -name -type -mtime`으로 파일을 조건부로 찾을 수 있다

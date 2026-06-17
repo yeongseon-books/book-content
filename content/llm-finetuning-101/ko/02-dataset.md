@@ -31,7 +31,7 @@ seo_description: 파인튜닝 데이터셋의 실패 원인인 형식 문제를 
 
 > 데이터셋 작업은 크기가 아니라 모양에서 무너집니다 — 원본 샘플·템플릿 텍스트·토큰 텐서의 세 층으로 나눠 각 층을 검증해야, 학습 중 손실 곡선이 거짓말할 여지를 줄일 수 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `instruction / input / output` 세 필드를 어떤 형태로 잡아야 할까요?
 - Hugging Face `datasets`로 작은 JSONL 파일을 어떻게 바로 읽을 수 있을까요?
@@ -205,7 +205,7 @@ print(len(tokenized[0]["input_ids"]))   # 64
 - **PII 마스킹과 중복 제거를 초기에 자동화합니다**: 뒤늦게 도입하면 기존 실험을 모두 다시 돌려야 합니다.
 - **길이 분포를 숫자로 확인합니다**: `tokenized.with_format("pandas")["input_ids"].apply(len).describe()` 같은 한 줄이면 `max_length` 논쟁이 빠르게 정리됩니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] JSONL 원본 샘플이 `instruction / input / output` 구조를 따릅니다.
 - [ ] `datasets.load_dataset()`으로 실제 파일을 읽어 봤습니다.

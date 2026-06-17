@@ -38,7 +38,7 @@ LLM 시스템의 audit log는 시끄러운 application log가 아닙니다. 나�
 *감사 로깅과 compliance 흐름*
 > 감사 로그는 많이 남기는 로그가 아니라, 나중에 누가 무엇을 왜 했는지 재구성할 수 있는 증거입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 감사 로그는 일반 디버그 로그와 무엇이 달라야 compliance에 쓸 수 있을까요?
 - PII masking, append-only storage, decision rationale은 각각 어떤 증거를 남길까요?

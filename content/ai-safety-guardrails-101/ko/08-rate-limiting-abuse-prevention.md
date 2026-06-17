@@ -38,7 +38,7 @@ seo_description: 전통적인 API 남용은 "초당 요청 수" 위주였습니�
 *Rate limiting과 abuse 방지 흐름*
 > LLM rate limiting의 단위는 요청 한 번이 아니라 토큰, 비용, 도구 호출처럼 실제로 고갈되는 자원입니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - LLM rate limiting은 왜 요청 수보다 리소스 소비를 기준으로 봐야 할까요?
 - 토큰, 비용, 사용자·키 단위 한도는 각각 어떤 abuse를 막을까요?

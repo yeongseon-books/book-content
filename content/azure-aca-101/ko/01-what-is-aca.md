@@ -31,7 +31,7 @@ seo_description: ACA는 "컨테이너용 App Service"라는 비유로 가장 빠
 *Azure Container Apps 101 1장 흐름 개요*
 > Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Azure Container Apps(ACA)는 다른 Azure 컨테이너 서비스(App Service, AKS, Functions)와 무엇이 다를까요?
 - ACA의 세 가지 핵심 구성 요소인 Environment, Container App, Revision은 각각 어떤 역할을 할까요?

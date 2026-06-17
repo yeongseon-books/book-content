@@ -31,13 +31,11 @@ last_reviewed: '2026-05-12'
 ![Functional Programming 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.ko.png)
 *Functional Programming 101 8장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - eager evaluation과 lazy evaluation은 무엇이 다를까요?
 - 제너레이터 함수와 제너레이터 표현식은 어떤 상황에서 유용할까요?
 - 무한 시퀀스와 큰 데이터를 Python에서는 어떻게 안전하게 다룰 수 있을까요?
-
-## 왜 중요한가
 
 10GB 로그 파일을 분석한다고 가정해 보겠습니다. 전체를 리스트로 올리는 접근은 바로 한계에 부딪힙니다. 반대로 한 줄씩 읽고, 필요한 줄만 통과시키고, 마지막 소비 단계에서만 처리하면 입력 크기와 무관하게 메모리를 안정적으로 유지할 수 있습니다.
 
@@ -321,7 +319,7 @@ Python의 제너레이터는 함수형 프로그래밍의 지연 평가를 아�
 
 운영 코드에서는 각 파이프라인 단계를 generator로 만들고, 마지막 소비자만 실제 계산을 밀어붙이게 하는 패턴이 가장 강합니다. `for` 루프, `sum()`, 파일 쓰기 같은 최종 소비자가 파이프 전체를 구동하는 구조는 UNIX 파이프와도 같은 철학을 가집니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 일반 함수와 제너레이터 함수의 차이를 설명할 수 있다
 - [ ] 제너레이터 표현식을 작성할 수 있다

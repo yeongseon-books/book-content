@@ -34,7 +34,7 @@ seo_description: Windows 샌드박스와 Linux 컨테이너 경계를 비교해 
 *Azure App Service Deep Dive 3장 흐름 개요*
 > Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - App Service의 worker는 실제로 어떤 실행 경계를 의미할까요?
 - Windows code app에서 App Service sandbox는 무엇을 허용하고 무엇을 제한할까요?

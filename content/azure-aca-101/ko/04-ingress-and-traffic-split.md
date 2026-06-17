@@ -31,7 +31,7 @@ Ingress와 트래픽 분할은 ACA에서 가장 중요한 운영 레버 두 개�
 *Azure Container Apps 101 4장 흐름 개요*
 > Ingress와 트래픽 분할 — revision 기반 배포 전략의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - ACA의 관리형 Ingress는 무엇을 책임지고(TLS, external/internal 노출, Revision 라우팅), 무엇은 책임지지 않을까요?
 - `external`, `internal`, `disabled` ingress mode의 차이는 정확히 무엇일까요?

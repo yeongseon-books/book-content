@@ -28,7 +28,7 @@ last_reviewed: '2026-05-17'
 ![Data Structures with Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/02/02-01-capacity.ko.png)
 *Data Structures with Python 101 2장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Python의 `list`는 배열일까요, 연결 리스트일까요?
 - `append()`는 list가 계속 커져도 왜 대체로 빠를까요?
@@ -41,8 +41,6 @@ Python에서 가장 자주 만나는 자료구조는 list입니다. 그런데 �
 > list를 깊이 이해한다는 것은 스택, 힙, 큐 같은 다른 구조의 기반을 이해한다는 뜻이기도 합니다.
 
 스택은 `append()`와 `pop()` 위에 자연스럽게 올라가고, `heapq`도 결국 list를 바탕으로 동작합니다. 그래서 list 내부 모델을 먼저 잡아 두면 뒤에서 만나는 자료구조를 훨씬 적은 비용으로 이해할 수 있습니다.
-
-## 핵심 개념 한눈에 보기
 
 > 동적 배열 = 논리 길이는 늘어나지만, 내부적으로는 앞으로의 append를 위해 spare capacity를 함께 예약하는 배열
 
@@ -196,8 +194,6 @@ print(mixed)
 
 `array`는 원소 타입이 하나로 고정되고 메모리 밀도가 중요할 때 의미가 있습니다. 일반적인 Python 애플리케이션 코드에서는 다양한 객체를 자연스럽게 담는 list가 여전히 기본 선택지입니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - Python list는 연결 리스트가 아니라 동적 배열입니다.
 - capacity 증가는 메모리 크기 plateau와 jump로 실제 관찰할 수 있습니다.
 - `append()`가 평균적으로 빠른 이유는 CPython이 spare slot을 미리 확보하기 때문입니다.
@@ -230,7 +226,7 @@ print(mixed)
 
 설계 질문은 단순합니다. “이 컬렉션에서 가장 자주 하는 연산이 무엇인가?” 끝 중심이면 list, 양쪽 끝이면 deque, 키 기반 membership이 핵심이면 set이나 dict로 넘어가야 합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] Python `list`가 동적 배열이라는 점을 설명할 수 있다
 - [ ] 논리 길이와 예약 capacity 차이를 설명할 수 있다

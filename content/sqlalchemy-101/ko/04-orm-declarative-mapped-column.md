@@ -37,13 +37,11 @@ Core에서 `Table`과 `Column`으로 스키마를 다뤘다면 이제 같은 구
 *SQLAlchemy 101 4장 흐름 개요*
 > ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `DeclarativeBase`는 어떤 역할을 하고 왜 `MetaData`와 함께 묶일까요?
 - `Mapped[T]`와 `mapped_column`은 타입 힌트, 컬럼 정의와 어떻게 연결될까요?
 - `__tablename__`, `__table_args__`, `repr`는 언제부터 필요해질까요?
-
-## 왜 중요한가
 
 Core만으로도 데이터베이스 작업은 충분히 가능합니다. 그러나 애플리케이션이 커지면 다음과 같은 부담이 빠르게 늘어납니다.
 
@@ -320,7 +318,7 @@ NULL을 허용하려면 `Mapped[str | None]`을 사용해야 합니다. 데이�
 - **테스트 격리**: 테스트마다 `Base.metadata.drop_all/create_all`을 반복하면 느립니다. SQLite는 in-memory 엔진(`sqlite:///:memory:`)을 활용해 fixture 단위로 빠르게 재생성하는 패턴이 흔히 쓰입니다.
 - **마이그레이션 시드**: ORM 모델로 만든 스키마를 기준으로 Alembic의 autogenerate를 돌리려면, Alembic env에서 `target_metadata = Base.metadata`로 연결해 줘야 합니다 (alembic-101 시리즈에서 다룹니다).
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `DeclarativeBase`를 상속한 `Base` 클래스를 정의했는가?
 - [ ] 모든 컬럼을 `Mapped[T]: mapped_column(...)` 형태로 선언했는가?

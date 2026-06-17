@@ -32,7 +32,7 @@ last_reviewed: '2026-05-15'
 ![Operating Systems 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.ko.png)
 *Operating Systems 101 8장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - inode와 디렉터리 엔트리는 파일을 어떻게 표현할까요?
 - 페이지 캐시와 `fsync`는 각각 어디까지를 보장할까요?
@@ -169,7 +169,7 @@ POSIX는 작은 append에 한해 원자성을 약속하지만, 레코드 분리�
 - 컨테이너: overlayfs로 layered filesystem 구성
 - 백업: hard link로 increment-only 스냅샷
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] inode와 디렉터리 항목의 관계를 안다
 - [ ] write와 fsync의 차이를 안다

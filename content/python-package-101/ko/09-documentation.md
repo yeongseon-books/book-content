@@ -30,7 +30,7 @@ seo_description: README는 패키지의 현관문이고, API Reference는 모든
 ![Python Package 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/09/09-01-mental-model.ko.png)
 *Python Package 101 9장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 좋은 README에는 무엇이 들어가야 할까요?
 - MkDocs와 Sphinx는 무엇이 다를까요?
@@ -42,8 +42,6 @@ seo_description: README는 패키지의 현관문이고, API Reference는 모든
 - MkDocs로 문서 사이트를 만드는 방법
 - docstring에서 API Reference를 자동 생성하는 방법
 - GitHub Pages에 문서를 배포하는 방법
-
-## 왜 중요한가
 
 아무리 좋은 패키지라도 사용법이 없으면 실제로는 쓰이지 않습니다. 사용자가 PyPI나 GitHub에서 패키지를 발견했을 때 가장 먼저 묻는 질문은 “내 문제를 이 패키지가 해결하나?”입니다. README는 그 질문에 30초 안에 답해야 합니다.
 
@@ -254,7 +252,7 @@ API Reference는 함수 목록을 알려 주지만, 사용자가 정말 알고 �
 
 현재 Python 생태계에서는 MkDocs + Material 조합이 사실상 기본 선택지에 가깝습니다. Sphinx는 더 강력하지만 진입 장벽이 높습니다. 새 프로젝트라면 일단 MkDocs로 시작하고, 이후 필요에 따라 확장하는 편이 보통 더 효율적입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] README에 설치, 빠른 시작, 라이선스가 포함되어 있다
 - [ ] 모든 public 함수에 docstring이 있다

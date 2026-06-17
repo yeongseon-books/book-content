@@ -35,7 +35,7 @@ last_reviewed: '2026-05-12'
 ![Calculus for ML 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.ko.png)
 *Calculus for ML 101 7장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - gradient의 반대 방향으로 이동하면 왜 손실이 줄어들까요?
 - learning rate는 단순한 배율 이상으로 어떤 역할을 할까요?

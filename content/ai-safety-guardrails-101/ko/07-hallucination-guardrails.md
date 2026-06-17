@@ -39,7 +39,7 @@ Hallucination이라는 말은 너무 넓게 쓰여서 운영 설계를 어렵게
 *Hallucination guardrail의 핵심: 답변을 주장 단위로 분해해 근거와 대조*
 > Hallucination을 줄이려면 답변을 문장 덩어리가 아니라 검증 가능한 주장 집합으로 봐야 합니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - Hallucination guardrail은 왜 답변 전체가 아니라 주장 단위로 봐야 할까요?
 - claim extraction, entailment check, citation format은 각각 무엇을 검증할까요?

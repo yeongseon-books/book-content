@@ -30,19 +30,15 @@ last_reviewed: '2026-05-12'
 ![Algorithms 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/05/05-01-big-picture.ko.png)
 *Algorithms 101 5장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 올바른 재귀가 되기 위한 세 가지 규칙은 무엇일까요?
 - 호출 스택은 어떻게 동작하며, `RecursionError`는 왜 생길까요?
 - 분할 정복 점화식은 어떻게 읽어야 할까요?
 
-## 왜 중요한가
-
 재귀가 익숙하지 않으면 트리, 그래프, 분할 정복, 동적 계획법, 백트래킹이 모두 더 어렵게 느껴집니다. 반대로 재귀 사고가 자리 잡으면 복잡한 문제를 "자기 자신과 같은 형태의 더 작은 문제"로 자연스럽게 분해할 수 있습니다.
 
 > 재귀는 알고리즘의 두 번째 모국어입니다.
-
-## 한눈에 보는 개념
 
 > 재귀 함수는 베이스 케이스, 진행 단계, 자기 호출을 가집니다. 분할 정복은 입력을 크기 `n/b`인 부분 문제 `a`개로 나누고, 결과를 `f(n)` 비용으로 결합합니다. 전체 비용은 `T(n) = a · T(n/b) + f(n)`으로 표현할 수 있고, 대표적으로 mergesort는 O(n log n), binary search는 O(log n)이 됩니다.
 
@@ -57,8 +53,6 @@ Divide-and-conquer recurrence
     e.g. mergesort     T(n) = 2T(n/2) + O(n) = O(n log n)
          binary search T(n) = T(n/2)   + O(1) = O(log n)
 ```
-
-## 핵심 용어
 
 | 용어 | 설명 |
 | --- | --- |
@@ -218,7 +212,7 @@ print(fib_memo(100))
 
 또한 분할 정복을 보면 머릿속에서 바로 점화식을 그립니다. `T(n)=2T(n/2)+O(n)`은 O(n log n), `T(n)=T(n/2)+O(1)`은 O(log n)이라는 감각만 있어도 실전 분석의 상당수를 커버할 수 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 재귀의 세 가지 규칙을 점검할 수 있는가
 - [ ] `RecursionError`가 무엇을 의미하는지 아는가

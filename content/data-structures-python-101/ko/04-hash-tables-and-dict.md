@@ -28,7 +28,7 @@ last_reviewed: '2026-05-17'
 ![Data Structures with Python 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/04/04-01-dict-probe-resize.ko.png)
 *Data Structures with Python 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - `dict`는 수많은 키 중에서 값을 어떻게 그렇게 빨리 찾을까요?
 - 해시, 충돌, probe, resize는 각각 어떤 역할을 할까요?
@@ -41,8 +41,6 @@ dict는 Python의 중심에 있는 자료구조입니다. JSON 파싱, 캐싱, �
 > 빠른 조회는 마법이 아니라, 안정적인 해시와 짧은 probe path를 유지하는 테이블 설계에서 나옵니다.
 
 그래서 충돌, resize, hashable 조건은 부차적인 주제가 아닙니다. dict가 왜 빠르고 왜 안전한지를 설명하는 핵심 자체입니다.
-
-## 핵심 개념 한눈에 보기
 
 > 해시 테이블 = 키를 해시해 후보 슬롯을 정하고, 비어 있지 않으면 다음 후보 슬롯들을 probe하며 찾는 구조
 
@@ -201,8 +199,6 @@ print(counter.most_common(2))
 
 `defaultdict`와 `Counter`는 여전히 매우 유용합니다. 다만 기본 dict의 내부 모델을 먼저 이해해야 이 도구들이 왜 자연스럽게 빠른지도 함께 이해됩니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - dict의 조회, 삽입, 삭제는 평균 O(1)이지 최악 O(1)을 보장하는 것은 아닙니다.
 - 충돌은 “키가 같은 출발점에서 시작한다”는 뜻이지 “dict가 틀린 결과를 낸다”는 뜻이 아닙니다.
 - CPython dict는 separate chaining보다 sparse open-addressed table로 상상하는 편이 더 정확합니다.
@@ -235,7 +231,7 @@ print(counter.most_common(2))
 
 또한 평균 O(1)은 건강한 테이블 모양을 유지할 때 성립한다는 점도 압니다. 그래서 키 설계, accidental mutation, 과도한 충돌 가능성을 함께 봐야 합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] dict가 왜 해시로 조회를 시작하는지 설명할 수 있다
 - [ ] 충돌을 “오류”가 아니라 “공유된 출발점”으로 설명할 수 있다

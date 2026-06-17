@@ -32,23 +32,17 @@ last_reviewed: '2026-05-15'
 ![Distributed Systems 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/10/10-01-concept-at-a-glance.ko.png)
 *Distributed Systems 101 10장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - bulkhead로 장애를 어떻게 격리할 수 있을까요?
 - circuit breaker는 연쇄 장애를 어떻게 끊어 줄까요?
 - backpressure는 언제 부하를 안전하게 거절해야 할까요?
 
-## 왜 중요한가
-
 지금까지 다룬 복제, 합의, 큐, 트랜잭션은 모두 건축 재료였습니다. 운영 패턴은 그 재료를 장애가 흔한 현실에서도 버티게 하는 도구함입니다. 실제 프로덕션에서 시스템을 오래 살려 두는 힘은 기능보다 운영 경계에서 나옵니다.
 
 > 좋은 운영 패턴은 예상된 장애를 일상적인 사건으로 바꿉니다.
 
-## 한눈에 보는 개념
-
 호출 경계마다 timeout, breaker, bulkhead, backpressure를 조합해야 한 곳의 실패가 옆 경계로 번지지 않습니다.
-
-## 핵심 용어
 
 - **Bulkhead**: 스레드, 연결 풀 같은 자원을 나눠 한 곳의 폭발이 다른 곳으로 퍼지지 않게 하는 경계입니다.
 - **Circuit breaker**: 연속 실패를 감지하면 잠시 호출 자체를 끊는 장치입니다.
@@ -160,8 +154,6 @@ def enqueue(msg):
 
 여기서 중요한 것은 순서입니다. timeout만 있고 retry budget이 없으면 부하 증폭을 못 막습니다. breaker만 있고 observability가 없으면 이유 없는 거절처럼 보입니다. queue만 있고 backpressure가 없으면 장애를 늦출 뿐 사라지게 하지는 못합니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - timeout < retry budget < user-facing latency라는 부등식이 깨지면 운영 전체가 무너집니다.
 - breaker는 차단뿐 아니라 자동 회복 경로도 가져야 합니다.
 - bulkhead는 코드 패턴이 아니라 자원 경계 설계입니다.
@@ -175,8 +167,6 @@ def enqueue(msg):
 4. **모든 의존성을 하나의 공유 풀로 처리합니다.** 한쪽 스파이크가 전부에 번집니다.
 5. **관측성 없이 패턴만 붙입니다.** 효과를 재지 못하면 다음 장애를 막을 수 없습니다.
 
-## 실무에서는 이렇게 드러납니다
-
 Hystrix의 역사적 패턴, resilience4j, Envoy와 Istio의 retry 및 circuit breaker, AWS App Mesh, Kubernetes의 HPA와 PDB, Kafka나 SQS 기반의 backpressure까지 본질은 같습니다. SRE 팀은 이런 패턴을 SLO와 연결해 자동 알람과 대응 절차로 바꿉니다.
 
 ## 시니어 엔지니어는 이렇게 생각합니다
@@ -187,7 +177,7 @@ Hystrix의 역사적 패턴, resilience4j, Envoy와 Istio의 retry 및 circuit b
 - 평상시에 chaos test로 장애를 연습합니다.
 - 사용자 지연 시간을 SLI로 두고 SLO 위반을 자동으로 페이지합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 모든 외부 호출에 명시적 타임아웃이 있는가?
 - [ ] 재시도에 jitter가 포함되어 있는가?

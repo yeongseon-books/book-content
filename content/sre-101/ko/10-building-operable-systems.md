@@ -31,7 +31,7 @@ title: "SRE 101 (10/10): 운영 가능한 시스템 만들기"
 ![SRE 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/10/10-01-concept-at-a-glance.ko.png)
 *SRE 101 10장 흐름 개요 — 관측성·자동화·안전한 변경·회복력이 한 시스템 안에서 어떻게 맞물리는지 보여 줍니다.*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - operability는 왜 기능 뒤에 붙이는 옵션이 아니라 설계 요소일까요?
 - 관측성, 자동화, 안전한 변경, 회복력은 왜 함께 봐야 할까요?

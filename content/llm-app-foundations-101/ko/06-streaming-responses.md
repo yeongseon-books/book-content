@@ -36,7 +36,7 @@ LLM 애플리케이션을 느리게 만드는 가장 쉬운 방법 중 하나는
 ![스트리밍 응답의 전체 이벤트 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.ko.png)
 *스트리밍 응답의 전체 이벤트 흐름*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - streaming은 응답을 더 빨리 끝내는 기술일까요, 생성 흐름을 먼저 보여주는 기술일까요?
 - chunk에서 텍스트, 종료 신호, 사용량을 어떻게 읽어야 할까요?

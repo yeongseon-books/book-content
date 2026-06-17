@@ -31,7 +31,7 @@ issue #772는 이 장이 다른 장들과 비슷한 리듬으로 반복된다고
 ![Model Evaluation 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/04/04-01-concept-at-a-glance.ko.png)
 *Model Evaluation 101 4장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 임계값을 0.20에서 0.70으로 올리면 리뷰 큐 118건과 42건 사이에서 무엇을 맞바꾸게 될까요?
 - 왜 이 글은 0.35를 운영 기본값 후보로 두고 0.20과 0.50을 함께 비교할까요?

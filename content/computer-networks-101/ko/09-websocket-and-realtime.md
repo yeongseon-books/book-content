@@ -29,13 +29,11 @@ last_reviewed: '2026-05-15'
 ![Computer Networks 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/09/09-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 9장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - WebSocket 연결은 HTTP에서 어떻게 업그레이드될까요?
 - WebSocket, SSE, long-polling 중 언제 무엇을 골라야 할까요?
 - ping/pong, 재연결, backpressure는 왜 운영의 핵심일까요?
-
-## 왜 중요한가
 
 대시보드, 채팅, 게임, 시세 화면, 협업 편집기는 모두 서버가 먼저 이벤트를 밀어 넣을 수 있어야 자연스럽게 동작합니다. 이걸 평범한 HTTP만으로 흉내 내려면 polling이나 long-polling으로 자원을 계속 태워야 합니다. WebSocket을 이해하면 언제 필요한지뿐 아니라, 언제 굳이 쓰지 않아도 되는지도 보이기 시작합니다.
 
@@ -68,8 +66,6 @@ last_reviewed: '2026-05-15'
 ```
 
 핵심 전환점은 `101 Switching Protocols`입니다. 응답 전까지는 HTTP였던 연결이, 그 뒤에는 WebSocket 프레임 스트림으로 동작합니다. 같은 TCP 소켓을 재사용하므로 추가 핸드셰이크가 없습니다.
-
-## 핵심 용어
 
 | 용어 | 의미 |
 | --- | --- |
@@ -477,7 +473,7 @@ async def handler(ws):
 - backpressure를 사용자가 느끼기 전에 시스템이 먼저 감지해야 한다고 봅니다.
 - 인증 토큰 만료와 권한 회수처럼, 긴 연결이 가지는 별도 보안 경계도 분명히 그립니다. WebSocket은 연결 시점에만 인증하므로, 토큰이 만료된 후에도 연결이 살아 있을 수 있습니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 정말 실시간이 필요한가, 아니면 짧은 polling이면 충분한가?
 - [ ] WebSocket, SSE, long-polling 중 가장 단순한 선택을 했는가?

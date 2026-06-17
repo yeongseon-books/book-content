@@ -32,7 +32,7 @@ seo_description: 온라인 서점 주문 시스템 예제로 OOP 설계와 리�
 ![Object-Oriented Programming 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/09/09-01-concept-overview.ko.png)
 *Object-Oriented Programming 101 9장 흐름 개요*
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 요구사항에서 어떤 클래스를 도출하고, 어떤 책임을 어디에 둘지 어떻게 판단할까요?
 - 값 객체, 엔티티, 서비스 클래스는 어떤 식으로 역할을 나누면 좋을까요?
@@ -347,7 +347,7 @@ print(f"Order complete: {order_id}")  # Order complete: ORD-0001
 3. 외부 I/O가 섞인 결제와 저장은 마지막에 Protocol 경계 뒤로 밀어냅니다.
 4. 마지막으로 조립 코드에서 어떤 구현을 넣을지 결정하게 만들어, 도메인 모델이 프레임워크나 인프라를 직접 모르도록 유지합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 요구사항에서 클래스를 도출할 수 있다
 - [ ] 값 객체와 엔티티를 구분하여 설계할 수 있다

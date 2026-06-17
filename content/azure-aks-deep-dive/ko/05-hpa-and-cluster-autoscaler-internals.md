@@ -38,7 +38,7 @@ HPA는 이미 replica를 올렸지만 scheduler가 새 Pod를 놓을 빈자리�
 *Azure Kubernetes Service Deep Dive 5장 흐름 개요*
 > HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - HPA는 어떤 메트릭을 어떤 주기로 읽고 desired replica를 계산할까요?
 - Cluster Autoscaler는 어떤 신호를 보고 “새 노드가 필요하다”고 판단할까요?

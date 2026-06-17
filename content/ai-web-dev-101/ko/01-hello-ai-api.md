@@ -38,7 +38,7 @@ ChatGPT를 브라우저에서 쓰는 경험과, 내 서비스 코드에서 모�
 
 > AI API 호출은 결국 HTTP 한 번의 왕복입니다 — 인증, 요청 형식, 응답 파싱이 한 번 명확해지면 이후 모든 AI 기능은 같은 계약의 변형으로 이해할 수 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - ChatGPT 웹사이트를 쓰는 것과 AI API를 붙이는 것은 무엇이 다를까요?
 - OpenAI API를 호출하려면 어떤 준비가 필요할까요?
@@ -345,7 +345,7 @@ Today, it is important to understand the API response structure first.
 
 *번역 요청을 만드는 System Prompt와 User Prompt 구성*
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] `OPENAI_API_KEY`를 코드에 하드코딩하지 않았다.
 - [ ] `model`, `messages`, `choices`, `usage`의 역할을 설명할 수 있다.

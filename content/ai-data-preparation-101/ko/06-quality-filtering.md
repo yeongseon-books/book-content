@@ -39,7 +39,7 @@ title: "AI Data Preparation 101 (6/10): 데이터 품질 필터링 — Heuristic
 *AI 데이터 준비 6장 흐름 개요*
 > 데이터 품질 필터링 — Heuristic과 Classifier의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 왜 수집된 데이터와 학습 가능한 데이터는 같은 집합이 아닐까요?
 - 길이, symbol ratio, digit ratio, repetition 같은 heuristic signal은 무엇을 빠르게 잡아낼까요?

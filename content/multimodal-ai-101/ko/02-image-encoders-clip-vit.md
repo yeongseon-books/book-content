@@ -39,7 +39,7 @@ seo_description: multimodal 시스템의 품질은 결국 image encoder가 만�
 *Multimodal AI 101 2장 흐름 개요*
 > Image Encoder: CLIP과 ViT의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 왜 멀티모달 입문에서 image encoder부터 이해하는 편이 전체 구조를 가장 빠르게 잡게 해 줄까요?
 - ViT는 이미지를 어떤 방식으로 token sequence로 바꾸고, CNN과 무엇이 다를까요?

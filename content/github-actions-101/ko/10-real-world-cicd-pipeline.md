@@ -31,13 +31,11 @@ last_reviewed: '2026-05-15'
 
 > 파이프라인은 부품의 개수가 아니라 부품들이 어떤 책임으로 연결돼 있는지를 설명하는 구조입니다 — PR·main·tag를 같은 워크플로의 다른 분기로 두지 말고 서로 다른 단계로 분리할 때, reusable workflow와 composite action도 비로소 자기 자리를 찾습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - PR, main, tag를 왜 서로 다른 책임으로 나눠야 할까요?
 - reusable workflow는 어떤 중복을 줄여 줄까요?
 - composite action은 어디까지 묶는 편이 좋을까요?
-
-## 왜 중요한가
 
 테스트 자동화, 린트, Docker 빌드, 배포 자동화, secret 관리가 각각 있어도 연결이 나쁘면 팀 속도는 기대만큼 올라가지 않습니다. PR마다 너무 무거운 검증이 돌아서 피드백이 늦고, main push에도 production과 같은 수준의 배포가 붙고, 저장소마다 비슷하지만 다른 YAML이 흩어져 있다면 유지비가 계속 올라갑니다.
 
@@ -182,8 +180,6 @@ reusable workflow가 잡 단위 재사용이라면, composite action은 스텝 �
 
 실전에서는 YAML 자체보다 branch protection과 environment protection이 더 중요할 때가 많습니다. PR에는 status check 강제, main에는 직접 push 제한, production에는 승인 게이트와 환경별 secret 분리를 함께 걸어야 합니다. 파이프라인 파일만 좋아 보여도 저장소 정책이 비어 있으면 운영 품질은 쉽게 무너집니다.
 
-## 이 코드에서 먼저 봐야 할 점
-
 - PR은 피드백, main은 통합, tag는 릴리스라는 책임 분리가 선명합니다.
 - reusable workflow는 버전 핀으로 호출해야 상위 변경이 갑자기 깨지지 않습니다.
 - production environment는 최종 게이트 역할을 합니다.
@@ -206,7 +202,7 @@ reusable workflow가 잡 단위 재사용이라면, composite action은 스텝 �
 
 또한 DORA 지표를 개선하려면 무조건 더 많은 단계를 넣는 것이 아니라, 어떤 트리거에 어떤 책임을 둘지 명확히 나누는 편이 더 중요합니다. 빠른 PR 피드백, 안정적인 main 통합, 추적 가능한 production 배포가 그 핵심입니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] PR, main, tag 단계가 분리돼 있다.
 - [ ] 공통 검증을 reusable workflow로 추출했다.

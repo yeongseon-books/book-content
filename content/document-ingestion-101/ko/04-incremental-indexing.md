@@ -34,7 +34,7 @@ seo_description: 증분 인덱싱은 벡터 저장소 기법이라기보다 무�
 *Incremental scan and change detection flow*
 > 증분 인덱싱은 벡터 저장소 트릭이라기보다 무엇을 기억할지 정하는 운영 문제에 더 가깝습니다.
 
-## 먼저 던지는 질문
+## 이 글에서 다룰 문제
 
 - 문서가 조금 바뀔 때마다 전체 인덱스를 다시 만들면 어떤 비용이 생길까요?
 - 변경 감지는 파일 시간보다 왜 content hash와 상태 저장소가 더 안전할까요?
@@ -156,8 +156,6 @@ python main.py
   beta.txt: updated
 ```
 
-## 이 코드에서 먼저 봐야 할 점
-
 ### 추가 수정 삭제 경로
 
 ![Added updated and deleted decision flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-01-added-updated-and-deleted-paths.ko.png)
@@ -184,7 +182,7 @@ python main.py
 - 증분 인덱싱에는 변경을 감지하는 단계와 변경을 반영하는 단계, 두 가지 관심사가 있습니다.
 - 삭제 처리는 현재 파일 목록과 저장된 상태를 비교하는 추가 패스를 필요로 합니다.
 
-## 체크리스트
+## 운영 체크리스트
 
 - [ ] 상태 저장소에 해시와 타임스탬프를 함께 기록합니다.
 - [ ] 수정 없는 두 번째 실행이 `unchanged`로 떨어집니다.
