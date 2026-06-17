@@ -461,7 +461,7 @@ git push
 - **좋은 commit message는 왜 코드만큼 중요한 자산일까요?**
   - 같은 변경도 문장에 따라 운영 난이도가 달라집니다.
 - **subject, body, footer는 각각 무엇을 담아야 할까요?**
-  - subject, body, footer는 각각 무엇을 담아야 할까요 — 본문에서 구체적으로 다룹니다.
+  - subject, body, footer는 각각 무엇을 담아야 할까요에 대해 본문에서 실무 예시와 함께 답합니다.
 - **Conventional Commits의 `feat`, `fix`, `docs` 같은 type은 무엇을 해결할까요?**
   - Conventional Commits 1.0.0은 복잡한 문법이 아니라 세 줄 규칙으로 요약할 수 있습니다.
 - **핵심 그림에서 가장 흔한 실수는 무엇일까요?**
