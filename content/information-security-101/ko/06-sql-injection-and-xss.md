@@ -27,7 +27,6 @@ seo_description: SQL 인젝션과 XSS의 원인, 방어 원칙, 실전 코드를
 
 이 글은 Information Security 101 시리즈의 6번째 글입니다.
 
-
 ![Information Security 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/06/06-01-big-picture.ko.png)
 *Information Security 101 6장 흐름 개요*
 > SQL 인젝션과 XSS 모두 신뢰할 수 없는 입력을 그 컨텍스트의 명령어로 해석하게 만드는 공격입니다. 방어는 입력 필터가 아니라 준비된 문과 컨텍스트 기반 이스케이핑입니다.
@@ -37,6 +36,9 @@ seo_description: SQL 인젝션과 XSS의 원인, 방어 원칙, 실전 코드를
 - SQL 인젝션은 정확히 어떤 메커니즘으로 발생할까요?
 - ORM을 쓰면 정말 안전해질까요?
 - Reflected, Stored, DOM 기반 XSS는 어디서 갈릴까요?
+- 전후 비교에서 가장 흔한 실수는 무엇일까요?
+- 주입 공격 유형 비교을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별 실습의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 이 두 취약점은 여러 해 동안 OWASP Top 10에 반복해서 등장했습니다. 한 번 원리를 이해하면 언어와 프레임워크가 바뀌어도 같은 방식으로 방어할 수 있습니다. 반대로 특정 라이브러리나 특정 프레임워크의 “자동 보호”만 믿으면 예외 경로에서 그대로 무너집니다.
 
@@ -288,7 +290,6 @@ class UserQuery(BaseModel):
 
 SQL 인젝션과 XSS는 모두 입력 처리 일관성이 무너질 때 생깁니다. 입력을 코드로 해석시키지 않는 원칙만 분명해도 새로운 프레임워크에서도 같은 방식으로 방어할 수 있습니다. 다음 글에서는 코드 밖의 설정 영역으로 넘어가 비밀 정보 관리를 다룹니다.
 
-
 ## OWASP Top 10과 SQLi/XSS의 위치
 
 SQL 인젝션과 XSS는 이름은 오래됐지만, OWASP Top 10 관점에서는 여전히 중심 축입니다. 특히 다음 항목과 강하게 연결됩니다.
@@ -312,16 +313,13 @@ from markupsafe import escape
 con = sqlite3.connect(":memory:")
 con.execute("CREATE TABLE users (id INTEGER, name TEXT)")
 
-
 def safe_lookup(name: str):
     # SQL 인젝션 방어: 바인딩 사용
     return con.execute("SELECT id, name FROM users WHERE name = ?", (name,)).fetchall()
 
-
 def safe_html(name: str) -> str:
     # XSS 방어: 출력 시점 이스케이프
     return f"<p>{escape(name)}</p>"
-
 
 def validate_limit(limit: int) -> int:
     # 입력 검증: 허용 범위 강제
@@ -379,7 +377,6 @@ WAF는 공격 노이즈를 줄이는 보조선입니다. 근본 방어는 애플
 
 코드 수준 방어가 없는 상태에서 WAF만 의존하면 정상 요청 오탐과 우회 공격이 반복됩니다. 따라서 방어 책임을 계층별로 분리해 문서화해야 합니다.
 
-
 ## 데이터베이스 계정 분리 전략
 
 SQL 인젝션 방어는 쿼리 작성법뿐 아니라 DB 권한 모델과 함께 봐야 합니다. 앱 계정이 과권한이면 우회 성공 시 피해가 커집니다.
@@ -398,7 +395,6 @@ SQL 인젝션 방어는 쿼리 작성법뿐 아니라 DB 권한 모델과 함께
 - 유입 경로(입력 폼, 관리자 화면, 외부 동기화)를 분류합니다.
 
 주입 취약점은 단일 패치로 끝나지 않습니다. 입력, 저장, 렌더링, 권한의 네 경계를 함께 보완해야 재발률이 내려갑니다.
-
 
 ## 보안 테스트 자동화 예시
 
@@ -431,7 +427,6 @@ def test_xss_payload_escaped():
 - A05 Security Misconfiguration: 디버그 템플릿에서 `innerHTML` 사용.
 
 시나리오를 OWASP 항목에 매핑해두면 경영진/제품팀과 우선순위 대화를 할 때 공통 언어를 만들 수 있습니다.
-
 
 ## 부록: 팀 보안 리뷰 워크시트
 
@@ -473,7 +468,6 @@ def test_xss_payload_escaped():
 
 워크시트의 목적은 문서를 늘리는 것이 아니라 의사결정 속도를 높이는 것입니다. 보안 검토가 반복될수록 질문과 답변이 짧아지고, 같은 사고가 재발할 가능성이 줄어듭니다.
 
-
 ## 부록: 주입 취약점 대응 우선순위
 
 | 우선순위 | 작업 | 완료 기준 |
@@ -485,12 +479,9 @@ def test_xss_payload_escaped():
 
 우선순위를 명시하면 사고 중 논쟁 시간을 줄이고 복구 속도를 올릴 수 있습니다.
 
-
 ## OWASP Top 10에서 인젝션 취약점의 위치
 
-
 OWASP Top 10 2021 기준으로 A03(Injection)은 SQL 인젝션과 XSS를 모두 포함합니다. 이 카테고리가 여전히 상위에 있는 이유는 단순합니다. 새 프레임워크가 나와도 입력값을 데이터로 취급하지 않는 코드는 계속 생기기 때문입니다.
-
 
 | OWASP A03 세부 | 대응 원칙 | 검증 수단 |
 
@@ -502,9 +493,7 @@ OWASP Top 10 2021 기준으로 A03(Injection)은 SQL 인젝션과 XSS를 모두 
 
 | Command Injection | 시스템 호출 회피, 허용 목록 | 코드 리뷰 체크리스트 |
 
-
 프레임워크의 기본 보호를 신뢰하되, 예외 경로에서 보호가 없는 코드가 생기지 않는지 CI에서 정적 분석을 돌려야 합니다.
-
 
 ## 처음 질문으로 돌아가기
 

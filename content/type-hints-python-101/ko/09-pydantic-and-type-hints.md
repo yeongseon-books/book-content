@@ -27,7 +27,6 @@ last_reviewed: '2026-05-17'
 
 이 글은 Type Hints (Python) 101 시리즈의 9번째 글입니다. 여기서는 하나의 `CreateUserRequest` → FastAPI 엔드포인트 → `UserResponse` 흐름을 기준으로, Pydantic이 타입 힌트를 런타임 검증으로 바꾸는 과정과 잘못된 요청이 422로 거절된 뒤 올바른 요청이 성공 응답으로 이어지는 전체 수명 주기를 살펴봅니다.
 
-
 ![Type Hints in Python 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/09/09-01-big-picture.ko.png)
 *Type Hints in Python 101 9장 흐름 개요*
 
@@ -38,6 +37,9 @@ last_reviewed: '2026-05-17'
 - 타입 힌트를 런타임 검증으로 어떻게 연결할 수 있을까요?
 - `Field`, `field_validator`, `model_validator`는 한 요청 흐름에서 각각 어디에 들어갈까요?
 - FastAPI는 잘못된 요청을 실제로 어떤 422 응답으로 돌려줄까요?
+- 왜 이 주제가 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 바꾸기 전과 후을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 하나의 요청 생명주기로 따라가기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 주제가 중요한가
 
@@ -386,7 +388,6 @@ Pydantic은 타입 힌트를 런타임 검증 계약으로 바꾸는 도구입�
 
 다음 글에서는 시리즈를 마무리하면서, 지금까지 본 정적 검사와 런타임 검증을 실제 팀 규칙으로 바꾸는 타입 힌트 운영 기준을 정리하겠습니다.
 
-
 ## 실전 보강: 적용 전후 + 오류 해결
 
 ```python
@@ -421,7 +422,6 @@ after 상태에서는 호출부 타입 불일치를 정확히 보고합니다.
 | CI 게이트 | 실패 시 병합 차단 |
 | 예외 관리 | `type: ignore`에 사유와 코드 기재 |
 
-
 ## mypy 오류를 읽는 순서
 
 실무에서는 오류 개수보다 읽는 순서가 더 중요합니다. 다음 순서를 고정하면 수정 시간이 크게 줄어듭니다.
@@ -455,7 +455,6 @@ Found 2 errors in 1 file (checked 1 source file)
 
 이 체크포인트를 팀 규칙으로 두면 신규 코드와 레거시 코드의 품질 편차를 줄일 수 있습니다.
 
-
 ## 실전 보강: 타입 힌트 + mypy 오류 해결 루프
 
 아래 예시는 타입 힌트가 문서가 아니라 검증 가능한 계약이라는 점을 분명하게 보여 줍니다.
@@ -468,14 +467,12 @@ class Payment(TypedDict):
     amount: int
     currency: str
 
-
 def normalize_amount(raw: int | str) -> int:
     if isinstance(raw, int):
         return raw
     if raw.isdigit():
         return int(raw)
     raise ValueError("amount must be int or numeric string")
-
 
 def build_payment(order_id: int, amount: int | str, currency: str | None) -> Payment:
     if currency is None:
@@ -551,14 +548,12 @@ Success: no issues found in N source files
 
 위 결과가 나오더라도 끝이 아닙니다. 새로운 기능을 추가할 때 같은 원칙을 반복해 계약을 유지해야 타입 힌트가 장기적으로 품질을 지켜 줍니다.
 
-
 ## 추가 사례: 주문 처리 모듈 타입 하드닝
 
 아래 코드는 실제로 자주 보는 레거시 패턴입니다.
 
 ```python
 from typing import Any
-
 
 def build_invoice(payload: dict[str, Any]) -> dict[str, Any]:
     user = payload.get("user")
@@ -585,14 +580,12 @@ class InvoiceResult(TypedDict):
     email: str
     total: int
 
-
 def parse_total(raw: int | str) -> int:
     if isinstance(raw, int):
         return raw
     if raw.isdigit():
         return int(raw)
     raise ValueError("total must be int or numeric string")
-
 
 def build_invoice(payload: InvoicePayload) -> InvoiceResult:
     return {
@@ -626,7 +619,6 @@ service.py:36: error: Missing key "user" for TypedDict "InvoicePayload"  [typedd
 - 외부 입력 파싱 함수에는 `Optional`/`Union` 처리 분기를 강제합니다.
 - 리뷰에서 `Any` 추가가 보이면 대체 타입 후보를 함께 요구합니다.
 - CI에서는 타입 검사 실패를 테스트 실패와 동등하게 취급합니다.
-
 
 ## Pydantic 응답 모델 고정 예시
 

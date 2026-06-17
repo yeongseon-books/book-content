@@ -25,7 +25,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 첫 번째 글입니다.
 
-
 ![Computer Networks 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/01/01-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 1장 흐름 개요*
 
@@ -34,6 +33,9 @@ last_reviewed: '2026-05-15'
 - 네트워크와 인터넷은 어떻게 다른가요?
 - 패킷은 왜 네트워크의 기본 단위로 취급될까요?
 - 계층 모델이 없으면 IP, TCP, DNS, HTTP를 왜 함께 이해하기 어려울까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 적용 전후 비교을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 계층 모델 비교: OSI 7계층 vs TCP/IP 4계층의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 네트워크 책을 처음 펼치면 IP, TCP, UDP, DNS, HTTP, TLS, BGP, NAT 같은 약어가 한꺼번에 쏟아집니다. 머릿속 그림 없이 이 단어들을 외우기만 하면 서로 어떻게 연결되는지 보이지 않고, 결국 오래 남지 않습니다. 계층 모델은 이 단어들을 꽂아 둘 책장입니다. 책장이 없으면 책이 바닥에 쌓이듯, 개념도 금세 뒤엉킵니다.
 

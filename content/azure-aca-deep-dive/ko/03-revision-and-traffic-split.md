@@ -39,6 +39,9 @@ Azure Container Apps의 배포 경험은 생각보다 부드럽습니다. 이미
 - 어떤 변경은 새 Revision을 만들고, 어떤 변경은 만들지 않을까요?
 - single revision mode와 multiple revision mode는 운영상 무엇을 바꿀까요?
 - label과 traffic weight는 각각 어떤 다른 라우팅 문제를 풀까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

@@ -39,6 +39,9 @@ autoscale은 다이어그램 안에서는 거의 즉시 반응하는 것처럼 �
 - scale-up과 scale-out은 App Service에서 실제로 무엇을 바꿀까요?
 - autoscale rule은 앱이 아니라 왜 App Service Plan에 붙는다고 봐야 할까요?
 - Azure Monitor autoscale은 어떤 cadence와 observation window로 규칙을 평가할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

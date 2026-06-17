@@ -28,7 +28,6 @@ Python 3에서 str은 Unicode 코드포인트의 불변 시퀀스이고, bytes�
 
 이 글은 Python 101 시리즈의 세 번째 글입니다.
 
-
 ![Python 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/03/03-01-mental-model.ko.png)
 *Python 101 3장 흐름 개요*
 > 문자열과 포매팅의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
@@ -38,6 +37,9 @@ Python 3에서 str은 Unicode 코드포인트의 불변 시퀀스이고, bytes�
 - 한국어가 들어 있는 파일을 읽다가 `UnicodeDecodeError`로 멈춥니다?
 - 큰 로그를 만드는 동안 `+` 연결을 반복해서 메모리와 시간을 낭비합니다?
 - 사용자 입력을 신뢰하고 그대로 SQL에 끼워 넣어 SQL 인젝션을 만듭니다?
+- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 멘탈 모델
 

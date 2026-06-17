@@ -35,6 +35,9 @@ seo_description: entry point와 click으로 pip install 후 바로 실행 가능
 - `pip install` 후 바로 실행되는 명령어는 어떻게 만들까요?
 - `[project.scripts]` entry point는 어떻게 동작할까요?
 - `argparse`와 `click`은 무엇이 다를까요?
+- 이 글에서 배우는 내용에서 가장 흔한 실수는 무엇일까요?
+- 멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 이 글에서 배우는 내용
 

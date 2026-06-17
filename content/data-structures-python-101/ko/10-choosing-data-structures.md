@@ -24,7 +24,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Data Structures with Python 101 시리즈의 마지막 글입니다.
 
-
 ![Data Structures with Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.ko.png)
 *Data Structures with Python 101 10장 흐름 개요*
 
@@ -33,6 +32,9 @@ last_reviewed: '2026-05-15'
 - list, dict, set 중 무엇을 선택해야 할지 어떤 기준으로 판단할까요?
 - 자료구조 선택에서 가장 먼저 봐야 할 연산은 무엇일까요?
 - 여러 구조를 조합해 요구사항을 동시에 만족시키는 방법은 무엇일까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 선택 흐름을 그림으로 보면을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -298,7 +300,6 @@ for scenario, choice in scenarios.items():
 
 이 시리즈에서는 list, dict, set, deque, 스택, 큐, 연결 리스트, 트리, 힙, 그래프를 차례로 살펴봤습니다. 결국 좋은 자료구조 선택의 기준은 하나로 모입니다. “내가 가장 자주 수행하는 연산은 무엇인가?” 이 질문에 답할 수 있으면, 코드 구조와 성능은 훨씬 예측 가능해집니다.
 
-
 ## 구조 선택 의사결정 트리
 
 자료구조 선택을 체계적으로 하기 위한 의사결정 프레임워크입니다.
@@ -326,7 +327,6 @@ from typing import Generic, TypeVar
 
 K = TypeVar("K")
 V = TypeVar("V")
-
 
 class IndexedDict(Generic[K, V]):
     """O(1) 키 조회 + 삽입 순서 유지 + 인덱스 접근을 동시 제공합니다."""
@@ -368,7 +368,6 @@ from collections import deque
 from dataclasses import dataclass
 from typing import Any, Callable
 
-
 @dataclass
 class BenchResult:
     structure: str
@@ -383,11 +382,9 @@ class BenchResult:
     def __repr__(self) -> str:
         return f"{self.structure:>15} | {self.operation:<20} | n={self.n:<8} | {self.time_sec:.6f}s | {self.ops_per_sec:,.0f} ops/s"
 
-
 def benchmark(structure: str, operation: str, func: Callable[[], None], n: int, trials: int = 5) -> BenchResult:
     total = timeit.timeit(func, number=trials)
     return BenchResult(structure=structure, operation=operation, n=n, time_sec=total / trials)
-
 
 def compare_membership(n: int = 100_000) -> list[BenchResult]:
     """list vs set vs dict의 membership test를 비교합니다."""
@@ -403,7 +400,6 @@ def compare_membership(n: int = 100_000) -> list[BenchResult]:
     results.append(benchmark("dict", "membership", lambda: [t in data_dict for t in targets], n))
     return results
 
-
 def compare_append(n: int = 100_000) -> list[BenchResult]:
     """list vs deque의 append/appendleft를 비교합니다."""
     results = []
@@ -412,18 +408,15 @@ def compare_append(n: int = 100_000) -> list[BenchResult]:
     results.append(benchmark("deque", "appendleft", lambda: _bench_appendleft(n), n))
     return results
 
-
 def _bench_insert0(n: int) -> None:
     data: list[int] = []
     for i in range(n):
         data.insert(0, i)
 
-
 def _bench_appendleft(n: int) -> None:
     data: deque[int] = deque()
     for i in range(n):
         data.appendleft(i)
-
 
 # 실행
 print("=" * 80)
@@ -448,7 +441,6 @@ for r in compare_append():
 import sys
 from collections import deque, OrderedDict
 
-
 def measure_all(n: int) -> None:
     structures = {
         "list": list(range(n)),
@@ -465,7 +457,6 @@ def measure_all(n: int) -> None:
     for name, obj in structures.items():
         size = sys.getsizeof(obj)
         print(f"{name:>15} | {size:>15,} | {size/n:>10.1f}")
-
 
 measure_all(1_000)
 measure_all(10_000)
@@ -489,7 +480,6 @@ measure_all(100_000)
 import random
 import timeit
 
-
 def scenario_list_dedupe(n: int = 50_000) -> None:
     logs = [f"event_{random.randint(0, n//2)}" for _ in range(n)]
     seen: set[str] = set()
@@ -499,11 +489,9 @@ def scenario_list_dedupe(n: int = 50_000) -> None:
             seen.add(log)
             unique.append(log)
 
-
 def scenario_dict_dedupe(n: int = 50_000) -> None:
     logs = [f"event_{random.randint(0, n//2)}" for _ in range(n)]
     unique = list(dict.fromkeys(logs))
-
 
 trials = 10
 t1 = timeit.timeit(scenario_list_dedupe, number=trials)
@@ -523,12 +511,10 @@ import random
 import timeit
 from collections import Counter
 
-
 def scenario_counter_topk(n: int = 100_000, k: int = 10) -> None:
     data = [random.randint(0, 1000) for _ in range(n)]
     counter = Counter(data)
     _ = counter.most_common(k)
-
 
 def scenario_manual_topk(n: int = 100_000, k: int = 10) -> None:
     data = [random.randint(0, 1000) for _ in range(n)]
@@ -536,7 +522,6 @@ def scenario_manual_topk(n: int = 100_000, k: int = 10) -> None:
     for x in data:
         freq[x] = freq.get(x, 0) + 1
     _ = heapq.nlargest(k, freq.items(), key=lambda x: x[1])
-
 
 trials = 10
 t1 = timeit.timeit(scenario_counter_topk, number=trials)
@@ -552,7 +537,6 @@ Counter는 내부적으로 dict이며 `most_common(k)`은 heapq.nlargest를 사�
 
 ```python
 import unittest
-
 
 class TestIndexedDict(unittest.TestCase):
     def setUp(self) -> None:
@@ -584,7 +568,6 @@ class TestIndexedDict(unittest.TestCase):
         self.d.put("present", 1)
         self.assertIn("present", self.d)
         self.assertNotIn("absent", self.d)
-
 
 if __name__ == "__main__":
     unittest.main()

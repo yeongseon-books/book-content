@@ -43,6 +43,9 @@ KEDA의 진짜 가치는 event source를 HPA가 읽을 수 있는 구조로 연�
 - KEDA는 ScaledObject를 어떻게 generated HPA로 바꾸고, 그 과정에서 무엇을 보장할까요?
 - metrics adapter는 external metrics 경로에서 어디까지를 책임질까요?
 - scaler 인터페이스는 이벤트 소스에 어떤 질문을 던질까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

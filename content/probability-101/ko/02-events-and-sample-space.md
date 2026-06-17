@@ -28,7 +28,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Probability 101 시리즈의 2번째 글입니다. 여기서는 표본공간과 사건을 집합 관점에서 정의하고, 합사건·곱사건·여사건·독립 같은 기본 연산을 코드와 함께 정리하겠습니다.
 
-
 ![Probability 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/02/02-01-diagram.ko.png)
 *Probability 101 2장 흐름 개요*
 > 확률 문제의 절반은 표본공간을 올바르게 정의하는 순간 풀립니다. 나머지 절반은 사건을 집합으로 번역하는 일입니다.

@@ -26,7 +26,6 @@ seo_description: 객체지향이 과한 상황과 함수, dataclass, 함수형 �
 
 Python이 함수, 모듈, `dataclass`, `NamedTuple`, `TypedDict`, 콜러블을 함께 주는 이유가 있습니다. 이번 글에서는 클래스가 과하게 많은 리포트 미니 앱을 단계적으로 단순화하고, 다시 클래스를 도입해야 하는 임계점까지 분명하게 잡아 보겠습니다.
 
-
 ![Object-Oriented Programming 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/10/10-01-concept-overview.ko.png)
 *Object-Oriented Programming 101 10장 흐름 개요*
 
@@ -37,6 +36,9 @@ Python이 함수, 모듈, `dataclass`, `NamedTuple`, `TypedDict`, 콜러블을 �
 - 어떤 신호가 보이면 클래스 기반 설계가 대부분 의식적인 장식에 가깝다고 판단할 수 있을까요?
 - 어떤 종류의 클래스가 함수, `dataclass`, `NamedTuple`, `TypedDict`로 더 잘 바뀔까요?
 - 전략 클래스 전체 대신 콜백 하나면 충분한 순간은 언제일까요?
+- 핵심 개념 잡기에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 핵심 개념 잡기
 
@@ -404,18 +406,14 @@ class InvalidFilter:
 # after
 from collections.abc import Iterable
 
-
 def read_csv(path: str) -> list[dict]:
     ...
-
 
 def normalize_row(row: dict) -> dict:
     ...
 
-
 def filter_invalid(rows: Iterable[dict]) -> list[dict]:
     return [r for r in rows if r.get('price', 0) > 0]
-
 
 def pipeline(path: str) -> list[dict]:
     rows = read_csv(path)
@@ -452,7 +450,6 @@ def pipeline(path: str) -> list[dict]:
 from dataclasses import dataclass
 from typing import Protocol
 
-
 @dataclass
 class LineItem:
     name: str
@@ -462,16 +459,13 @@ class LineItem:
     def subtotal(self) -> int:
         return self.quantity * self.unit_price
 
-
 class DiscountPolicy(Protocol):
     def apply(self, amount: int) -> int:
         ...
 
-
 class NoDiscount:
     def apply(self, amount: int) -> int:
         return amount
-
 
 class PercentDiscount:
     def __init__(self, percent: int) -> None:
@@ -481,7 +475,6 @@ class PercentDiscount:
 
     def apply(self, amount: int) -> int:
         return int(amount * (100 - self.percent) / 100)
-
 
 class Invoice:
     def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
@@ -550,7 +543,6 @@ class WeekendPolicy:
         if is_weekend:
             return int(amount * 0.95)
         return amount
-
 
 def estimate(amount: int, is_weekend: bool) -> int:
     policy = WeekendPolicy()

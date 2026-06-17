@@ -52,6 +52,9 @@ seo_description: Ep1~9에서 cleaning, dedup, PII redaction, tokenization, chunk
 - 여러 데이터 준비 단계를 실제 운영 가능한 하나의 파이프라인으로 묶으려면 어떤 시스템 속성이 필요할까요?
 - DVC와 stage fingerprint는 데이터 버전 관리와 idempotency를 어떻게 함께 해결할까요?
 - Airflow 같은 오케스트레이터는 단순 스케줄링 외에 어떤 운영 가치를 줄까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

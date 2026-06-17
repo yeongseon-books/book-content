@@ -26,7 +26,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Portfolio Project 101 시리즈의 5번째 글입니다. 여기서는 포트폴리오 배포를 거대한 인프라 설계가 아니라 공개 URL, 환경 변수 분리, 재배포 가능한 흐름, 상태 확인 경로를 갖추는 일로 보고 정리해 보겠습니다.
 
-
 ![Portfolio Project 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/05/05-01-diagram.ko.png)
 *Portfolio Project 101 5장 흐름 개요*
 > 로컬에서만 동작하는 코드는 증거가 아닙니다. 배포되어 모든 사람이 접근할 수 있을 때, 비로소 '끝까지 완성한 프로젝트'로 읽힙니다.
@@ -36,6 +35,9 @@ last_reviewed: '2026-05-15'
 - 포트폴리오 프로젝트에서 공개 URL이 왜 필수에 가까울까요?
 - 호스팅 플랫폼은 화려함보다 어떤 기준으로 골라야 할까요?
 - 시크릿과 환경 변수는 왜 코드가 아니라 배포 환경에서 관리해야 할까요?
+- 머릿속에 먼저 그릴 그림에서 가장 흔한 실수는 무엇일까요?
+- 바꾸기 전과 후을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별로 살펴보기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 배포는 작업 결과를 세상과 연결합니다. 채용 담당자나 동료 개발자는 로컬 환경을 상상하면서 평가하지 않습니다. 직접 접속하고, 눌러 보고, 상태를 확인할 수 있어야 프로젝트가 현실적인 결과물로 읽힙니다.
 
@@ -365,7 +367,6 @@ Dockerfile에서 주의할 점:
 from fastapi import APIRouter
 
 router = APIRouter()
-
 
 @router.get("/healthz")
 def health_check():

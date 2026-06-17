@@ -37,6 +37,9 @@ PyPDFLoader와 RecursiveCharacterTextSplitter는 문서를 청크로 나누는 �
 - 유사도 검색이 시작되기 전, 로더와 splitter 경계는 왜 검색 품질을 좌우할까요?
 - Character, Recursive, Token splitter는 같은 텍스트를 어떻게 다르게 자를까요?
 - `chunk_overlap`이 설정값만큼 정확히 겹치지 않는 것처럼 보일 때 어디를 봐야 할까요?
+- 최소 실행 예제에서 가장 흔한 실수는 무엇일까요?
+- Retry policy을 실무에 적용할 때 주의할 점은 무엇일까요?
+- Operator action의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 최소 실행 예제
 

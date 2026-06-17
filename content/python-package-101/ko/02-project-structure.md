@@ -35,6 +35,9 @@ seo_description: src layout과 pyproject.toml로 Python 프로젝트 구조를 �
 - flat layout과 src layout은 무엇이 다를까요?
 - `pyproject.toml`은 무엇이고 왜 `setup.py`를 대체할까요?
 - `[build-system]`과 `[project]`에는 무엇이 들어갈까요?
+- 이 글에서 배우는 내용에서 가장 흔한 실수는 무엇일까요?
+- 멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 이 글에서 배우는 내용
 

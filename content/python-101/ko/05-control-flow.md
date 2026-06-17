@@ -28,7 +28,6 @@ seo_description: 제어 흐름을 짤 때는 "이 분기·반복이 무엇을 �
 
 이 글은 Python 101 시리즈의 다섯 번째 글입니다.
 
-
 ![Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/05/05-01-mental-model.ko.png)
 *Python 101 5장 흐름 개요*
 > 제어 흐름: if, for, while, comprehension의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
@@ -38,6 +37,9 @@ seo_description: 제어 흐름을 짤 때는 "이 분기·반복이 무엇을 �
 - `if value:`와 `if value is None:`는 언제 완전히 다른 의미가 될까요?
 - `zip`, `enumerate`, comprehension을 쓰면 인덱스를 직접 돌리던 루프가 어떻게 더 읽기 쉬워질까요?
 - `while True`, `zip(..., strict=True)`, `continue`를 쓸 때 어떤 버그를 먼저 경계해야 할까요?
+- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 멘탈 모델
 

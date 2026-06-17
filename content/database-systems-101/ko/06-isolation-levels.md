@@ -37,6 +37,8 @@ last_reviewed: '2026-05-12'
 - 고전적인 동시성 이상 현상 네 가지는 무엇일까요?
 - READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, SERIALIZABLE은 무엇이 다를까요?
 - MVCC는 어떻게 일관된 읽기를 잠금 없이 제공할까요?
+- 이 글에서 배울 내용에서 가장 흔한 실수는 무엇일까요?
+- 변경 전/변경 후을 실무에 적용할 때 주의할 점은 무엇일까요?
 
 ## 이 글에서 배울 내용
 

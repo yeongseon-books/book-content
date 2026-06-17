@@ -27,7 +27,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 Type Hints (Python) 101 시리즈의 첫 번째 글입니다. 여기서는 타입 힌트가 무엇이고, Python의 동적 타이핑과 어떻게 공존하며, 왜 실무에서 빠르게 가치가 드러나는지부터 정리합니다.
 
-
 ![Type Hints in Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/01/01-01-big-picture.ko.png)
 *Type Hints in Python 101 1장 흐름 개요*
 
@@ -38,6 +37,9 @@ last_reviewed: '2026-05-12'
 - 타입 힌트는 정적 타입 언어의 타입 선언과 무엇이 다를까요?
 - PEP 484가 해결하려던 문제는 무엇이었을까요?
 - 변수, 매개변수, 반환값에 어떤 문법으로 타입을 붙일까요?
+- 왜 이 주제가 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 바꾸기 전과 후을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별로 익히기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 주제가 중요한가
 
@@ -221,11 +223,9 @@ from typing import Generic, Protocol, TypeVar
 T = TypeVar("T")
 K = TypeVar("K")
 
-
 class SupportsKey(Protocol[K]):
     def key(self) -> K:
         ...
-
 
 class Repository(Protocol[T]):
     def add(self, item: T) -> None:
@@ -234,7 +234,6 @@ class Repository(Protocol[T]):
     def all(self) -> list[T]:
         ...
 
-
 @dataclass
 class User:
     user_id: int
@@ -242,7 +241,6 @@ class User:
 
     def key(self) -> int:
         return self.user_id
-
 
 class InMemoryRepository(Generic[T]):
     def __init__(self) -> None:
@@ -253,7 +251,6 @@ class InMemoryRepository(Generic[T]):
 
     def all(self) -> list[T]:
         return self._items
-
 
 def index_by_key(items: list[SupportsKey[K]]) -> dict[K, SupportsKey[K]]:
     return {item.key(): item for item in items}
@@ -296,7 +293,6 @@ def first(items: list[T]) -> T:
 타입 힌트는 코드베이스가 커질수록 유지보수 비용을 낮추는 장치입니다. 특히 함수 경계가 많은 서비스에서는 호출 계약을 자동으로 검증할 수 있다는 점이 큰 차이를 만듭니다.
 
 또한 타입 정보를 기준으로 코드 검색과 리팩터링 범위를 좁힐 수 있어 팀 협업에서 의사결정 속도가 올라갑니다.
-
 
 ## 정적 검사 도입 전후 비교
 
@@ -345,7 +341,6 @@ Found 1 error in 1 file (checked 1 source file)
 | 구현 교체가 필요함 | 클래스 타입 고정 | Protocol, Generic |
 | 검증 시점이 늦음 | 수동 테스트 | mypy/pyright + CI |
 
-
 ## mypy 오류를 읽는 순서
 
 실무에서는 오류 개수보다 읽는 순서가 더 중요합니다. 다음 순서를 고정하면 수정 시간이 크게 줄어듭니다.
@@ -379,7 +374,6 @@ Found 2 errors in 1 file (checked 1 source file)
 
 이 체크포인트를 팀 규칙으로 두면 신규 코드와 레거시 코드의 품질 편차를 줄일 수 있습니다.
 
-
 ## 실전 보강: 타입 힌트 + mypy 오류 해결 루프
 
 아래 예시는 타입 힌트가 문서가 아니라 검증 가능한 계약이라는 점을 분명하게 보여 줍니다.
@@ -392,14 +386,12 @@ class Payment(TypedDict):
     amount: int
     currency: str
 
-
 def normalize_amount(raw: int | str) -> int:
     if isinstance(raw, int):
         return raw
     if raw.isdigit():
         return int(raw)
     raise ValueError("amount must be int or numeric string")
-
 
 def build_payment(order_id: int, amount: int | str, currency: str | None) -> Payment:
     if currency is None:
@@ -475,14 +467,12 @@ Success: no issues found in N source files
 
 위 결과가 나오더라도 끝이 아닙니다. 새로운 기능을 추가할 때 같은 원칙을 반복해 계약을 유지해야 타입 힌트가 장기적으로 품질을 지켜 줍니다.
 
-
 ## 추가 사례: 주문 처리 모듈 타입 하드닝
 
 아래 코드는 실제로 자주 보는 레거시 패턴입니다.
 
 ```python
 from typing import Any
-
 
 def build_invoice(payload: dict[str, Any]) -> dict[str, Any]:
     user = payload.get("user")
@@ -509,14 +499,12 @@ class InvoiceResult(TypedDict):
     email: str
     total: int
 
-
 def parse_total(raw: int | str) -> int:
     if isinstance(raw, int):
         return raw
     if raw.isdigit():
         return int(raw)
     raise ValueError("total must be int or numeric string")
-
 
 def build_invoice(payload: InvoicePayload) -> InvoiceResult:
     return {
@@ -550,7 +538,6 @@ service.py:36: error: Missing key "user" for TypedDict "InvoicePayload"  [typedd
 - 외부 입력 파싱 함수에는 `Optional`/`Union` 처리 분기를 강제합니다.
 - 리뷰에서 `Any` 추가가 보이면 대체 타입 후보를 함께 요구합니다.
 - CI에서는 타입 검사 실패를 테스트 실패와 동등하게 취급합니다.
-
 
 ## 실전 점검 로그: 타입 힌트를 계약으로 다루는 최소 루프
 

@@ -41,6 +41,9 @@ seo_description: GET부터 DELETE까지, 예측 가능한 API를 만드는 응�
 - GET, POST, PUT, PATCH, DELETE는 각각 무엇을 의미할까요?
 - safe와 idempotent는 어떻게 다를까요?
 - 2xx, 3xx, 4xx, 5xx 계열은 어떻게 읽어야 할까요?
+- 전후 비교에서 가장 흔한 실수는 무엇일까요?
+
+- 실용적인 status code 매핑표의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 method와 status code는 클라이언트의 분기 로직을 결정합니다. 잘못된 코드를 반환하면 클라이언트는 재시도가 안전한지조차 판단할 수 없습니다. 이 둘은 API의 예측 가능성을 만드는 핵심 쌍입니다.
 

@@ -39,6 +39,9 @@ Microsoft Learn이 Environment를 설명할 때 반복하는 문장이 있습니
 - Environment는 왜 단순한 부모 리소스가 아니라 실제 격리 경계일까요?
 - 네트워크 범위는 Revision이나 App이 아니라 왜 Environment에서 시작될까요?
 - Log Analytics workspace를 Environment 수준에서 공유한다는 말은 운영상 무엇을 뜻할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

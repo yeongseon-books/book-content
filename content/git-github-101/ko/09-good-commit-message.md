@@ -27,7 +27,6 @@ seo_description: 좋은 commit message 구조와 Conventional Commits 실무 규
 
 이 글은 Git/GitHub 101 시리즈의 아홉 번째 글입니다. 여기서는 subject, body, footer 구조와 Conventional Commits, 그리고 message 품질을 지키는 습관을 정리합니다.
 
-
 ![Git & GitHub 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.ko.png)
 *Git & GitHub 101 9장 흐름 개요*
 
@@ -38,6 +37,9 @@ seo_description: 좋은 commit message 구조와 Conventional Commits 실무 규
 - 좋은 commit message는 왜 코드만큼 중요한 자산일까요?
 - subject, body, footer는 각각 무엇을 담아야 할까요?
 - Conventional Commits의 `feat`, `fix`, `docs` 같은 type은 무엇을 해결할까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- Subject, Body, Footer를 더 정확히 쓰는 기준의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 `git log`는 미래의 자신과 동료에게 보내는 편지입니다. `git blame`으로 특정 줄에 도달했을 때 message가 선명하면 5초 만에 맥락이 살아나고, `fix`, `update`, `wip` 같은 제목만 있으면 원래 diff와 PR을 다시 읽어야 합니다.
 
@@ -394,7 +396,6 @@ Subject does not match the Conventional Commits format.
 좋은 commit message는 코드만 다시 읽지 않고도 변경 의도를 이해하게 해 주는 가장 값싼 문서입니다. subject, body, footer 구조와 Conventional Commits type을 익히면 `git log` 자체가 읽기 좋은 변경 이력이 됩니다. 아직 push하지 않은 commit은 `--amend`와 `rebase -i`로 다듬고, 형식은 hook과 CI로 강제하는 편이 안전합니다.
 
 다음 글에서는 지금까지 배운 도구를 하나의 실전 워크플로로 묶어 issue부터 release tag까지 한 흐름으로 연결해 보겠습니다.
-
 
 ## 실전 CLI 시나리오
 

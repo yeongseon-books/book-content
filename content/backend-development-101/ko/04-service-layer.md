@@ -38,6 +38,9 @@ controller에서 시작한 코드가 시간이 지나면서 gRPC 핸들러, CLI 
 - 비즈니스 로직은 왜 controller도 repository도 아닌 service가 맡아야 할까요?
 - controller, service, repository는 각각 어디까지 책임져야 할까요?
 - 트랜잭션 경계는 어느 층에서 시작하는 편이 자연스러울까요?
+- Service Layer를 두는 이유: 입구가 늘어나도 규칙은 하나여야 합니다에서 가장 흔한 실수는 무엇일까요?
+- 책임 경계: Controller vs Service vs Repository을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 운영 시나리오 1: 같은 validation이 컨트롤러 3곳에 흩어진 경우의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## Service Layer를 두는 이유: 입구가 늘어나도 규칙은 하나여야 합니다
 
@@ -88,16 +91,13 @@ controller에서 시작한 코드가 시간이 지나면서 gRPC 핸들러, CLI 
 ```python
 from dataclasses import dataclass
 
-
 class InvalidOrderAmountError(Exception):
     pass
-
 
 @dataclass(frozen=True)
 class CreateOrderInput:
     customer_id: str
     amount: int
-
 
 class OrderService:
     def __init__(self, order_repo):
@@ -143,11 +143,9 @@ from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter()
 
-
 def get_user_service(session=Depends(get_db_session)):
     repo = SqlAlchemyUserRepository(session)
     return UserService(user_repo=repo, password_hasher=BcryptHasher(), clock=SystemClock())
-
 
 @router.post("/users")
 def create_user(payload: CreateUserRequest, service: UserService = Depends(get_user_service)):
@@ -224,10 +222,8 @@ service가 `HTTPException`을 직접 던지기 시작하면 두 문제가 동시
 class OrderNotFoundError(Exception):
     pass
 
-
 class OrderAlreadyCanceledError(Exception):
     pass
-
 
 class CancelOrderService:
     def __init__(self, repo):

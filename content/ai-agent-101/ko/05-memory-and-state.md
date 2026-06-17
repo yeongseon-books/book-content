@@ -43,6 +43,9 @@ agent가 한두 번의 tool call로 끝나면 기억 문제는 크게 드러나�
 - agent memory와 state를 같은 저장소로 보면 어떤 설계 문제가 생길까요?
 - short-term memory, long-term memory, execution state는 각각 언제 필요할까요?
 - context window가 부족해질 때 무엇을 요약하고 무엇을 그대로 남겨야 할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

@@ -25,7 +25,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 7번째 글입니다.
 
-
 ![Computer Networks 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 7장 흐름 개요*
 
@@ -34,6 +33,9 @@ last_reviewed: '2026-05-15'
 - 라우팅 테이블은 어떻게 읽어야 할까요?
 - default gateway와 longest-prefix match는 어떻게 동작할까요?
 - NAT는 출발지 IP와 포트를 어떻게 바꿀까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 적용 전후 비교을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별로 따라하기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 라우팅을 모르면 "왜 회사 네트워크에서만 안 되지?"라는 질문에 답하기 어렵습니다. NAT를 모르면 "왜 집에서는 안 되고 사무실에서는 되지?", "왜 외부에서 우리 서버로 바로 못 들어오지?" 같은 문제가 설명되지 않습니다. VPN, 컨테이너 네트워크, 클라우드 VPC 역시 결국 라우팅과 NAT의 변형입니다.
 

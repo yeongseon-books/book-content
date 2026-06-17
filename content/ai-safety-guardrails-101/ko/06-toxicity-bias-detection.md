@@ -43,6 +43,9 @@ seo_description: 따라서 toxicity는 inline guardrail로, bias는 offline audi
 - 독성 차단과 편향 측정은 왜 같은 문제로 묶으면 안 될까요?
 - 실시간 moderation과 offline audit은 각각 어떤 신호를 담당해야 할까요?
 - false positive를 줄이면서 보호 기준을 유지하려면 무엇을 모니터링해야 할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

@@ -43,6 +43,9 @@ seo_description: 작은 research assistant agent를 직접 구현하며 핵심 �
 - 첫 agent를 만들 때 연구 도우미가 맡을 범위와 맡지 않을 범위는 어디서 정해야 할까요?
 - tool, memory, agent loop, eval은 어떤 순서로 붙여야 실패가 작게 보일까요?
 - raw code, LangGraph, CrewAI 중 무엇을 고를지는 어떤 기준으로 판단해야 할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

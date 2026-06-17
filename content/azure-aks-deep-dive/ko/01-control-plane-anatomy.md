@@ -43,6 +43,9 @@ self-managed Kubernetes라면 `etcd` 백업 전략, `kube-apiserver` 플래그, 
 - AKS control plane은 정확히 어떤 컴포넌트로 이루어져 있고, 사용자는 그중 무엇을 직접 볼 수 있을까요?
 - 관리형 control plane이라는 약속은 어디까지를 의미하고, 어디부터는 여전히 사용자의 운영 책임일까요?
 - API server SLA를 읽을 때 왜 `etcd`, scheduler, controller-manager의 내부 구현보다 API 표면을 먼저 봐야 할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

@@ -28,7 +28,6 @@ seo_description: 객체지향의 핵심 아이디어와 절차지향 코드와�
 
 이 글은 OOP 101 시리즈의 첫 번째 글입니다.
 
-
 ![Object-Oriented Programming 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/01/01-01-big-picture.ko.png)
 *Object-Oriented Programming 101 1장 흐름 개요*
 
@@ -37,6 +36,9 @@ seo_description: 객체지향의 핵심 아이디어와 절차지향 코드와�
 - 객체지향은 절차지향과 무엇이 다르고, 왜 등장했을까요?
 - 클래스, 인스턴스, 속성, 메서드는 어떤 관계로 이해하면 쉬울까요?
 - 작은 스크립트에서는 함수만으로 충분한데, 언제 객체가 더 자연스러울까요?
+- 핵심 개념 잡기에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 핵심 개념 잡기
 
@@ -281,27 +283,22 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-
 @dataclass
 class PaymentRequest:
     order_id: str
     amount: int
 
-
 class PaymentGateway(Protocol):
     def pay(self, req: PaymentRequest) -> str:
         ...
-
 
 class CardGateway:
     def pay(self, req: PaymentRequest) -> str:
         return f"card:{req.order_id}:{req.amount}"
 
-
 class BankGateway:
     def pay(self, req: PaymentRequest) -> str:
         return f"bank:{req.order_id}:{req.amount}"
-
 
 class PaymentService:
     def __init__(self, gateway: PaymentGateway) -> None:
@@ -370,11 +367,9 @@ def checkout(order_dict: dict, coupon: dict | None) -> dict:
 from dataclasses import dataclass
 from enum import Enum
 
-
 class OrderStatus(str, Enum):
     DRAFT = 'draft'
     PLACED = 'placed'
-
 
 @dataclass(frozen=True)
 class OrderLine:
@@ -384,7 +379,6 @@ class OrderLine:
 
     def amount(self) -> int:
         return self.quantity * self.unit_price
-
 
 class Order:
     def __init__(self, lines: list[OrderLine]) -> None:
@@ -442,7 +436,6 @@ class Order:
 from dataclasses import dataclass
 from typing import Protocol
 
-
 @dataclass
 class LineItem:
     name: str
@@ -452,16 +445,13 @@ class LineItem:
     def subtotal(self) -> int:
         return self.quantity * self.unit_price
 
-
 class DiscountPolicy(Protocol):
     def apply(self, amount: int) -> int:
         ...
 
-
 class NoDiscount:
     def apply(self, amount: int) -> int:
         return amount
-
 
 class PercentDiscount:
     def __init__(self, percent: int) -> None:
@@ -471,7 +461,6 @@ class PercentDiscount:
 
     def apply(self, amount: int) -> int:
         return int(amount * (100 - self.percent) / 100)
-
 
 class Invoice:
     def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
@@ -540,7 +529,6 @@ class WeekendPolicy:
         if is_weekend:
             return int(amount * 0.95)
         return amount
-
 
 def estimate(amount: int, is_weekend: bool) -> int:
     policy = WeekendPolicy()

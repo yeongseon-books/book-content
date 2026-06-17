@@ -28,7 +28,6 @@ title: "SRE 101 (5/10): Monitoring"
 
 이 글은 SRE 101 시리즈의 5번째 글입니다. 여기서는 monitoring을 행동으로 이어지는 측정으로 정의하고, 네 가지 핵심 운영 신호, 알림 설계 원칙, 대시보드 구성 방식, 알림 피로를 줄이는 관점을 정리합니다.
 
-
 ![SRE 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/05/05-01-concept-at-a-glance.ko.png)
 *SRE 101 5장 흐름 개요*
 > 메트릭은 현재 상태를 숫자로 보여 주고, 로그는 구체적인 사건을 기록하며, 알림은 기준 위반 시 즉시 행동을 요구합니다.
@@ -38,6 +37,9 @@ title: "SRE 101 (5/10): Monitoring"
 - monitoring은 단순 수집과 어떻게 다를까요?
 - latency, traffic, errors, saturation은 왜 함께 봐야 할까요?
 - 메트릭과 로그는 각각 어떤 질문에 답할까요?
+- 왜 이 주제가 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 한 문장으로 잡는 멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 한눈에 보는 구조의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 주제가 중요한가
 
@@ -208,7 +210,6 @@ start_http_server(9090)
 ```
 
 Counter는 traffic과 errors를, Gauge는 saturation을, Histogram은 latency를 측정하는 데 적합합니다. 이 세 타입만으로도 골든 시그널을 모두 커버할 수 있습니다.
-
 
 ## 골든 시그널 기반 대시보드 설계
 

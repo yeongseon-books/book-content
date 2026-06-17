@@ -41,6 +41,9 @@ sqlite3는 편의를 위해 트랜잭션을 암묵적으로 시작합니다. 이
 - sqlite3는 정확히 언제 암묵적 `BEGIN`을 시작하고 `con.in_transaction`은 그 경계를 어떻게 보여 줄까요?
 - `DEFERRED`, `IMMEDIATE`, `EXCLUSIVE`와 WAL mode를 함께 보면 write 충돌 시점이 어떻게 달라질까요?
 - commit 누락, 장시간 lock 대기, nested 작업은 이 글의 어떤 패턴으로 각각 다뤄야 할까요?
+- Mental Model — connection이 transaction 단위에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## Mental Model — connection이 transaction 단위
 

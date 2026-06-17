@@ -43,6 +43,9 @@ API를 오래 운영하다 보면 진짜 어려운 일은 바꾸는 것 자체�
 - breaking change와 non-breaking change는 어떻게 구분할까요?
 - URL versioning과 header versioning은 각각 어떤 장단점이 있을까요?
 - semver, calver 같은 호환성 정책은 어떻게 읽어야 할까요?
+- Breaking vs Non-breaking — 먼저 정의해야 운영할 수 있다에서 가장 흔한 실수는 무엇일까요?
+- Versioning 전략 비교을 실무에 적용할 때 주의할 점은 무엇일까요?
+- Deprecation과 Sunset — 버전 종료의 절차의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## Breaking vs Non-breaking — 먼저 정의해야 운영할 수 있다
 

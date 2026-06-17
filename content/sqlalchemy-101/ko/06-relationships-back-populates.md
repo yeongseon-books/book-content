@@ -42,6 +42,9 @@ seo_description: relationship과 back_populates로 양방향 ORM 관계를 안�
 - `ForeignKey`와 `relationship()`은 왜 항상 한 쌍처럼 이해해야 할까요?
 - `back_populates`와 `backref`는 어떤 기준으로 선택할까요?
 - 컬렉션 조작, flush, SQL 실행 시점은 어떻게 연결될까요?
+- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 관계 정의가 어긋나면 다음과 같은 문제가 자주 생깁니다.
 

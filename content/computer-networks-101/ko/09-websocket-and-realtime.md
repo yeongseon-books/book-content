@@ -25,7 +25,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 9번째 글입니다.
 
-
 ![Computer Networks 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/09/09-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 9장 흐름 개요*
 
@@ -34,6 +33,9 @@ last_reviewed: '2026-05-15'
 - WebSocket 연결은 HTTP에서 어떻게 업그레이드될까요?
 - WebSocket, SSE, long-polling 중 언제 무엇을 골라야 할까요?
 - ping/pong, 재연결, backpressure는 왜 운영의 핵심일까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 이 코드에서 먼저 볼 점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- Backpressure와 메시지 큐 관리의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 대시보드, 채팅, 게임, 시세 화면, 협업 편집기는 모두 서버가 먼저 이벤트를 밀어 넣을 수 있어야 자연스럽게 동작합니다. 이걸 평범한 HTTP만으로 흉내 내려면 polling이나 long-polling으로 자원을 계속 태워야 합니다. WebSocket을 이해하면 언제 필요한지뿐 아니라, 언제 굳이 쓰지 않아도 되는지도 보이기 시작합니다.
 

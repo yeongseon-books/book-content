@@ -44,6 +44,9 @@ title: "AI Data Preparation 101 (6/10): 데이터 품질 필터링 — Heuristic
 - 왜 수집된 데이터와 학습 가능한 데이터는 같은 집합이 아닐까요?
 - 길이, symbol ratio, digit ratio, repetition 같은 heuristic signal은 무엇을 빠르게 잡아낼까요?
 - 언어 감지와 perplexity filter는 각각 어떤 종류의 오염을 제거할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

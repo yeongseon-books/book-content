@@ -40,6 +40,9 @@ seo_description: 지난 글에서 CausalSelfAttention까지 만들고 나면 한
 - FeedForward는 왜 `Linear(C, 4C) -> GELU -> Linear(4C, C)` 형태를 많이 쓸까요?
 - residual connection은 학습을 어떻게 안정화할까요?
 - pre-norm과 post-norm은 실전에서 어떤 차이를 만들까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

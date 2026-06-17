@@ -41,6 +41,9 @@ seo_description: SQLite가 파일이라는 사실은 운영을 단순하게 만�
 - `busy_timeout`, `timeout`, 애플리케이션 retry는 서로 무엇이 다르고 왜 함께 써야 할까요?
 - slow query 로그, OpenTelemetry span, BUSY 발생률은 SQLite 운영 상태를 어떻게 드러내 줄까요?
 - `Connection.backup()`과 `restore_check()`까지 포함한 흐름이 왜 `cp app.db`보다 중요한가요?
+- Mental Model: SQLite도 "DB"다에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전과 후: production-ready 모듈 한 덩어리의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## Mental Model: SQLite도 "DB"다
 

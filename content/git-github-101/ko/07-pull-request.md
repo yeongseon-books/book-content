@@ -27,7 +27,6 @@ branch가 개인 작업 공간이라면 Pull Request는 그 작업을 팀에 설
 
 이 글은 Git/GitHub 101 시리즈의 일곱 번째 글입니다. 여기서는 feature branch에서 시작해 review를 거쳐 `main`으로 돌아오는 PR 한 사이클을 따라갑니다.
 
-
 ![Git & GitHub 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/07/07-01-mental-model.ko.png)
 *Git & GitHub 101 7장 흐름 개요*
 
@@ -38,6 +37,9 @@ branch가 개인 작업 공간이라면 Pull Request는 그 작업을 팀에 설
 - Pull Request는 plain `git merge`와 무엇이 다를까요?
 - branch를 만들고 commit한 뒤 PR을 열기까지의 순서는 어떻게 될까요?
 - review comment에는 왜 같은 branch에 commit을 더하는 방식으로 답할까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 혼자 작업할 때는 `git merge feature/x`로 끝낼 수 있습니다. 하지만 두 번째 사람이 들어오는 순간부터는 그 방식이 금방 한계를 드러냅니다. 무엇이 바뀌었는지, 왜 바뀌었는지, 어떤 기준으로 통과시켰는지, 누가 동의했는지를 남길 자리가 없기 때문입니다.
 
@@ -432,7 +434,6 @@ PR은 merge 도구라기보다 의사결정 기록 도구입니다. 왜 바꿨�
 PR은 branch를 합치자는 요청이며, 실제 merge는 그 요청의 마지막 단계입니다. branch에서 commit을 쌓고, GitHub에 push한 뒤, PR에서 review와 토론, CI 검증을 거쳐 `main`에 반영합니다. 이때 PR 템플릿, draft 전환, merge 방식 선택, branch protection을 함께 운용하면 협업 품질이 안정적으로 올라갑니다. merge 후에는 로컬 `main`을 pull하고 작업 branch를 정리하는 것까지가 한 사이클입니다.
 
 다음 글에서는 PR 본문에서 자주 보게 되는 `Closes #42`의 정체, 즉 GitHub Issue와 Project를 다룹니다.
-
 
 ## 실전 CLI 시나리오
 

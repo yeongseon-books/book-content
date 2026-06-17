@@ -43,6 +43,9 @@ seo_description: ToolNode와 tools_condition으로 도구 호출 루프를 명�
 - LangGraph tool-calling agent는 왜 LLM과 tool 실행 envelope를 분리해서 봐야 할까요?
 - 도구 호출을 반복할 때 state에는 어떤 실행 흔적이 남아야 할까요?
 - 안전한 dispatcher 없이 tool call을 실행하면 어떤 위험이 생길까요?
+- 왜 이 구조가 중요한가에서 가장 흔한 실수는 무엇일까요?
+- Tool-calling Agent를 실행 경계로 읽기을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 최소 실행 예제의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 구조가 중요한가
 

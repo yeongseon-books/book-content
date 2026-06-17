@@ -25,7 +25,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 마지막 글입니다.
 
-
 ![Computer Networks 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/10/10-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 10장 흐름 개요*
 
@@ -34,6 +33,9 @@ last_reviewed: '2026-05-15'
 - 네트워크 문제를 계층별로 어떻게 좁혀 가야 할까요?
 - `ping`, `dig`, `curl`, `ss`, `tcpdump`는 각각 무엇을 말해 줄까요?
 - timeout, reset, DNS 실패는 어떤 모양으로 구분할 수 있을까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 5단계로 한 요청을 끝까지 따라가기을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 6단계: 증상 모양으로 바로 층을 가늠하기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 장애가 나면 사람은 먼저 "방금 뭘 바꿨지"를 떠올립니다. 그 질문은 필요하지만 충분하지 않습니다. 경로가 어디서 끊겼는지 모르면 코드 변경도 결국 추측이 됩니다. "여기까지는 정상"을 한 층씩 확정하는 습관이 있어야 새벽 장애에서도 침착하게 원인을 좁힐 수 있습니다.
 

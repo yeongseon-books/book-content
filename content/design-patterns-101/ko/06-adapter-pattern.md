@@ -40,6 +40,9 @@ last_reviewed: '2026-05-23'
 - Adapter를 두면 정확히 어떤 의존성이 끊어질까요?
 - Anti-Corruption Layer와 Adapter는 같은 것일까요, 다른 것일까요?
 - Adapter가 많아지면 어떤 비용이 쌓일까요?
+- 외부 SDK를 도메인이 원하는 모양으로 바꾸기에서 가장 흔한 실수는 무엇일까요?
+- Python에서 다중상속 기반 Class Adapter를 피해야 하는 이유을 실무에 적용할 때 주의할 점은 무엇일까요?
+- API 버전 마이그레이션에서 Adapter가 자연스러운 이유의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 외부 SDK를 도메인이 원하는 모양으로 바꾸기
 
@@ -51,7 +54,6 @@ Stripe SDK를 감싸는 예시를 봅시다.
 from dataclasses import dataclass
 from typing import Protocol
 
-
 class PaymentGateway(Protocol):
     """도메인이 정의한 결제 계약."""
 
@@ -60,7 +62,6 @@ class PaymentGateway(Protocol):
         ...
 
     def refund(self, transaction_id: str) -> None: ...
-
 
 @dataclass
 class StripeAdapter:
@@ -162,7 +163,6 @@ external_response = {
 from dataclasses import dataclass
 from datetime import datetime
 
-
 @dataclass(frozen=True)
 class PaymentResult:
     """도메인이 이해하는 결제 결과."""
@@ -172,7 +172,6 @@ class PaymentResult:
     currency: str
     success: bool
     completed_at: datetime
-
 
 class ExternalPaymentAdapter:
     """외부 결제 API 응답을 도메인 모델로 번역합니다."""
@@ -249,10 +248,8 @@ class LegacyPrinter:
     def print_old(self, text: str) -> None:
         print(f"[LEGACY] {text}")
 
-
 class Printer(Protocol):
     def print_text(self, text: str) -> None: ...
-
 
 class PrinterClassAdapter(LegacyPrinter):
     """다중 상속으로 LegacyPrinter를 Printer 계약에 맞춤."""
@@ -289,7 +286,6 @@ API v1에서 v2로 마이그레이션할 때, 모든 클라이언트를 한 번�
 ```python
 from dataclasses import dataclass
 
-
 @dataclass
 class UserV1:
     """v1 API가 반환하던 사용자 모델."""
@@ -297,7 +293,6 @@ class UserV1:
     id: int
     name: str
     email: str
-
 
 @dataclass
 class UserV2:
@@ -307,10 +302,8 @@ class UserV2:
     display_name: str
     contact: dict  # {"email": ..., "phone": ...}
 
-
 class UserServiceV1Protocol(Protocol):
     def get_user(self, user_id: int) -> UserV1: ...
-
 
 class V1ToV2Adapter:
     """v1 계약을 유지하면서 내부적으로 v2 서비스를 호출합니다."""
@@ -357,18 +350,15 @@ def test_order_charges_correct_amount() -> None:
 ```python
 from dataclasses import dataclass
 
-
 @dataclass
 class LegacyEvent:
     event_type: str  # "ORDER_CREATED"
     payload: str  # JSON string
 
-
 @dataclass
 class DomainEvent:
     name: str  # "order.created"
     data: dict
-
 
 class BidirectionalEventAdapter:
     """레거시 이벤트 ↔ 도메인 이벤트 양방향 번역."""
@@ -433,7 +423,6 @@ class PaymentError(Exception):
         super().__init__(message)
         self.retriable = retriable
 
-
 @dataclass
 class StripeAdapterWithErrorTranslation:
     api_key: str
@@ -465,6 +454,10 @@ class StripeAdapterWithErrorTranslation:
 - [ ] Adapter 패턴이 필요한 상황을 예로 들 수 있습니다.
 - [ ] 클래스 어댑터와 객체 어댑터의 차이를 말할 수 있습니다.
 - [ ] Python에서 Adapter를 구현하는 방법을 보여줄 수 있습니다.
+
+## 정리
+
+이 글은 design-patterns-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
 
 ## 처음 질문으로 돌아가기
 

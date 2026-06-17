@@ -43,6 +43,9 @@ seo_description: Next.js와 Vercel AI SDK로 스트리밍 채팅 UI를 만들며
 - 터미널 예제를 브라우저 UI로 옮기려면 어떤 구성이 필요할까요?
 - 왜 Next.js와 Vercel AI SDK 조합이 입문에 잘 맞을까요?
 - `/api/chat` 경로는 어떤 역할을 맡아야 할까요?
+- 프로젝트 초기 설정에서 가장 흔한 실수는 무엇일까요?
+- Step 1: API Route 만들기을 실무에 적용할 때 주의할 점은 무엇일까요?
+- Step 2: 채팅 UI 만들기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 Next.js와 Vercel AI SDK인가
 

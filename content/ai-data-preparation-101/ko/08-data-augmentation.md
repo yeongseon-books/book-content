@@ -48,6 +48,9 @@ seo_description: augmentation은 held-out 평가를 통과할 만큼 라벨 의�
 - augmentation은 synthetic generation과 무엇이 다른가요?
 - minority class와 typo robustness 문제를 어떤 decision path로 풀어야 하나요?
 - EDA, back-translation, paraphrase, AST transform은 각각 언제 선택하고 언제 멈춰야 하나요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 하나의 데이터 문제로 시작해 보겠습니다을 실무에 적용할 때 주의할 점은 무엇일까요?
+- baseline과 held-out부터 고정합니다의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

@@ -26,7 +26,6 @@ SOLID가 진짜 와닿는 순간은 서비스 하나가 계속 커지면서 새�
 
 이번 글에서는 SOLID를 다섯 개의 슬로건으로 따로 외우지 않습니다. 하나의 주문 결제 워크플로를 단계적으로 리팩터링하면서, 각 원칙이 어떤 고장 신호에 대응하는지 연결해서 보겠습니다.
 
-
 ![Object-Oriented Programming 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/08/08-01-concept-overview.ko.png)
 *Object-Oriented Programming 101 8장 흐름 개요*
 
@@ -37,6 +36,9 @@ SOLID가 진짜 와닿는 순간은 서비스 하나가 계속 커지면서 새�
 - 지금 보이는 증상에 어떤 원칙이 연결되는지 어떻게 판단할까요?
 - SRP를 적용하면 무엇이 바뀌고, 무엇은 그대로여야 할까요?
 - OCP, LSP, ISP, DIP는 서로 경쟁하는 규칙이 아니라 어떻게 한 워크플로 위에서 이어질까요?
+- 핵심 개념 잡기에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 핵심 개념 잡기
 
@@ -557,7 +559,6 @@ class ShippingFeePolicy:
             return 3000 if weight < 3 else 5000
         return 12000
 
-
 class FreeShippingPolicy(ShippingFeePolicy):
     def fee(self, region: str, weight: float) -> int:
         return 0
@@ -582,7 +583,6 @@ class WeekendPolicy:
         if is_weekend:
             return int(amount * 0.95)
         return amount
-
 
 def estimate(amount: int, is_weekend: bool) -> int:
     policy = WeekendPolicy()

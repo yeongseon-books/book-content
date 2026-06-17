@@ -24,7 +24,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 Data Structures with Python 101 시리즈의 세 번째 글입니다.
 
-
 ![Data Structures with Python 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/03/03-01-big-picture.ko.png)
 *Data Structures with Python 101 3장 흐름 개요*
 
@@ -33,6 +32,9 @@ last_reviewed: '2026-05-12'
 - 스택과 큐는 각각 어떤 순서 규칙으로 동작할까요?
 - Python에서는 왜 스택에 list를, 큐에 deque를 주로 사용할까요?
 - `list.pop(0)`이 큐 구현에 부적절한 이유는 무엇일까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -277,7 +279,6 @@ print(f"deque is {list_time / deque_time:.0f}x faster")
 
 스택은 LIFO, 큐는 FIFO라는 단순한 규칙 위에서 동작합니다. Python에서는 스택은 list, 큐는 deque라는 관례가 사실상 표준이며, 이 선택은 내부 연산 비용과 정확히 맞닿아 있습니다. 다음 글에서는 빠른 키 기반 조회를 가능하게 만드는 해시 테이블과 dict를 봅니다.
 
-
 ## 타입 힌트 기반 스택 구현
 
 스택은 LIFO(Last In, First Out) 규칙을 따르는 가장 단순한 ADT입니다. Python list의 `append()`와 `pop()`이 이미 LIFO를 제공하지만, 명시적 Stack 클래스를 만들면 "이 컬렉션은 LIFO로만 접근한다"는 의도를 코드에 고정할 수 있습니다.
@@ -288,7 +289,6 @@ from __future__ import annotations
 from typing import Generic, Iterator, TypeVar
 
 T = TypeVar("T")
-
 
 class Stack(Generic[T]):
     """list 기반 LIFO 스택입니다."""
@@ -339,7 +339,6 @@ from collections import deque
 from typing import Generic, Iterator, TypeVar
 
 T = TypeVar("T")
-
 
 class Queue(Generic[T]):
     """deque 기반 FIFO 큐입니다."""
@@ -394,10 +393,8 @@ class Queue(Generic[T]):
 import sys
 from collections import deque
 
-
 def shallow_size(label: str, obj: object) -> None:
     print(f"{label:>25}: {sys.getsizeof(obj):>8} bytes")
-
 
 n = 10_000
 
@@ -431,7 +428,6 @@ import sys
 from collections import deque
 from typing import Any
 
-
 def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
     if seen is None:
         seen = set()
@@ -445,7 +441,6 @@ def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
     elif isinstance(obj, dict):
         size += sum(deep_getsizeof(k, seen) + deep_getsizeof(v, seen) for k, v in obj.items())
     return size
-
 
 n = 10_000
 stack_deep = deep_getsizeof(list(range(n)))
@@ -465,20 +460,17 @@ print(f"deque-queue deep: {queue_deep:>10} bytes")
 import timeit
 from collections import deque
 
-
 def bench_list_queue(n: int = 10_000) -> None:
     """list를 큐처럼 사용: pop(0)으로 dequeue"""
     q: list[int] = list(range(n))
     for _ in range(n):
         q.pop(0)
 
-
 def bench_deque_queue(n: int = 10_000) -> None:
     """deque를 큐로 사용: popleft()로 dequeue"""
     q: deque[int] = deque(range(n))
     for _ in range(n):
         q.popleft()
-
 
 trials = 10
 
@@ -508,7 +500,6 @@ list is 110.3x slower
 import timeit
 from collections import deque
 
-
 def bench_mixed_list(n: int = 10_000) -> None:
     q: list[int] = []
     for i in range(n):
@@ -516,14 +507,12 @@ def bench_mixed_list(n: int = 10_000) -> None:
         if i % 3 == 0 and q:
             q.pop(0)
 
-
 def bench_mixed_deque(n: int = 10_000) -> None:
     q: deque[int] = deque()
     for i in range(n):
         q.append(i)
         if i % 3 == 0 and q:
             q.popleft()
-
 
 trials = 10
 t1 = timeit.timeit(bench_mixed_list, number=trials)
@@ -540,7 +529,6 @@ print(f"ratio: {t1/t2:.1f}x")
 
 ```python
 import unittest
-
 
 class TestStack(unittest.TestCase):
     def setUp(self) -> None:
@@ -572,7 +560,6 @@ class TestStack(unittest.TestCase):
         for i in range(5):
             self.stack.push(i)
         self.assertEqual(list(self.stack), [4, 3, 2, 1, 0])
-
 
 class TestQueue(unittest.TestCase):
     def setUp(self) -> None:
@@ -610,7 +597,6 @@ class TestQueue(unittest.TestCase):
         bq.enqueue(2)
         self.assertTrue(bq.is_full)
 
-
 if __name__ == "__main__":
     unittest.main()
 ```
@@ -645,7 +631,6 @@ def is_balanced(expression: str) -> bool:
 
     return len(stack) == 0
 
-
 assert is_balanced("({[]})")
 assert not is_balanced("({[}])")
 assert is_balanced("")
@@ -656,7 +641,6 @@ assert is_balanced("")
 ```python
 from collections import deque
 from typing import Any
-
 
 def bfs_levels(graph: dict[str, list[str]], start: str) -> list[list[str]]:
     """그래프를 BFS로 순회하며 레벨별로 노드를 반환합니다."""
@@ -676,7 +660,6 @@ def bfs_levels(graph: dict[str, list[str]], start: str) -> list[list[str]]:
                 queue.append((neighbor, level + 1))
 
     return levels
-
 
 graph = {"A": ["B", "C"], "B": ["D"], "C": ["D", "E"], "D": [], "E": []}
 print(bfs_levels(graph, "A"))

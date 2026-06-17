@@ -26,7 +26,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Portfolio Project 101 시리즈의 4번째 글입니다. 여기서는 포트폴리오 데모를 기능 전시장처럼 만드는 대신, 처음 들어온 사람이 30초 안에 핵심 가치를 느낄 수 있게 구성하는 방법을 봅니다.
 
-
 ![Portfolio Project 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/04/04-01-diagram.ko.png)
 *Portfolio Project 101 4장 흐름 개요*
 > 코드 없이 말로만 설명하면 신뢰하지 않습니다. 실제로 동작하는 데모를 본 사용자는 '끝까지 마무리하는 사람'이라는 신호를 받습니다.
@@ -36,6 +35,9 @@ last_reviewed: '2026-05-15'
 - 데모 첫 화면은 왜 가장 중요한 평가 지점일까요?
 - 시드 데이터와 공유 계정은 무엇을 해결해 줄까요?
 - 라이브 데모와 백업 영상은 어떤 역할 차이가 있을까요?
+- 머릿속에 먼저 그릴 그림에서 가장 흔한 실수는 무엇일까요?
+- 바꾸기 전과 후을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별로 살펴보기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 데모가 살아 있으면 프로젝트도 살아 있습니다. 반대로 프로젝트 설명이 아무리 좋아도 실제로 열리지 않으면 신뢰가 크게 떨어집니다. 포트폴리오에서 데모는 구현을 과시하는 장치라기보다, 검토자가 스스로 확인할 수 있게 만드는 증거에 가깝습니다.
 
@@ -368,12 +370,10 @@ SEED_DATA = {
     ],
 }
 
-
 def seed(output_path: Path = Path("data/seed.json")) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(SEED_DATA, ensure_ascii=False, indent=2))
     print(f"Seed data written to {output_path}")
-
 
 if __name__ == "__main__":
     seed()

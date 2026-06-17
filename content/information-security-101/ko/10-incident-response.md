@@ -27,7 +27,6 @@ seo_description: NIST IR 사이클과 런북, 무비난 회고로 사고 대응�
 
 이 글은 Information Security 101 시리즈의 마지막 글입니다.
 
-
 ![Information Security 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/10/10-01-big-picture.ko.png)
 *Information Security 101 10장 흐름 개요*
 > 보안 사고는 '일어나지 않게 막는' 것도 중요하지만, '일어나는 중에' 신속하게 발견하고, '일어난 후에' 빠르게 복구하고, '그 다음에' 같은 실수를 반복하지 않게 만드는 것이 성숙한 대응입니다.
@@ -37,6 +36,9 @@ seo_description: NIST IR 사이클과 런북, 무비난 회고로 사고 대응�
 - 사고가 발생하면 첫 1분에 무엇을 해야 할까요?
 - NIST IR 사이클은 어떤 흐름으로 이어질까요?
 - 격리와 증거 보존은 어떻게 균형을 잡아야 할까요?
+- 전후 비교에서 가장 흔한 실수는 무엇일까요?
+- 보안 인시던트 대응 단계을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별 실습의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 사고는 피할 수 없지만 손실 규모는 줄일 수 있습니다. 두 시간의 차이가 회사를 구하기도 합니다. 반대로 누가 어떤 결정을 해야 하는지 정해져 있지 않으면, 기술적으로는 해결 가능한 사고도 혼선과 증거 훼손 때문에 훨씬 크게 번집니다.
 
@@ -344,7 +346,6 @@ PagerDuty나 Opsgenie가 사고 지휘관을 자동 지정하고, 슬랙 워크�
 
 보안 사고 대응은 준비가 눈에 보이는 형태로 드러나는 순간입니다. 이 글로 Information Security 101 시리즈를 마무리합니다. CIA에서 시작해 인증, 암호화, 웹 보안, 비밀 정보, 권한, 로그, 사고 대응까지 이어지는 기본 축을 한 번 훑었습니다. 다음 학습 주제로는 위협 모델링 심화, 클라우드 보안, SOC 2와 ISO 27001 같은 규정 프레임워크를 이어서 보면 좋습니다.
 
-
 ## 보안 성숙도 모델로 보는 사고 대응 수준
 
 사고 대응 체계는 문서 유무보다 반복 가능성으로 평가해야 합니다. 아래는 실무에서 자주 쓰는 4단계 성숙도 모델입니다.
@@ -396,7 +397,6 @@ lessons:
 # incident_automation.py
 from datetime import datetime, timezone
 
-
 def start_incident(severity: str, summary: str) -> dict:
     incident_id = datetime.now(timezone.utc).strftime("INC-%Y%m%d-%H%M%S")
     return {
@@ -406,7 +406,6 @@ def start_incident(severity: str, summary: str) -> dict:
         "channel": f"#inc-{incident_id.lower()}",
         "timeline_started": True,
     }
-
 
 def containment_actions(user_id: str) -> list[str]:
     actions = [
@@ -432,7 +431,6 @@ print(containment_actions("admin-42"))
 
 지표는 보고서용 숫자가 아니라, 다음 분기 통제 개선의 입력이어야 합니다.
 
-
 ## 운영 점검 루프와 문서화 기준
 
 보안 글에서 가장 자주 빠지는 부분은 "그래서 운영에서는 무엇을 주기적으로 확인할 것인가"입니다. 아래 루프를 기준으로 문서화하면 개념이 실무로 연결됩니다.
@@ -453,7 +451,6 @@ print(containment_actions("admin-42"))
 
 보안은 단발성 프로젝트가 아니라 운영 루프입니다. 같은 점검을 반복해도 기준이 유지될 때 품질이 올라갑니다.
 
-
 ## 사고 유형별 대응 플레이북 예시
 
 사고 대응은 추상 원칙보다 유형별 첫 동작이 중요합니다.
@@ -471,7 +468,6 @@ print(containment_actions("admin-42"))
 - 60분: 임시 완화 조치와 고객 영향 여부를 공지합니다.
 
 기술 대응과 커뮤니케이션이 분리되면 혼선이 커집니다. 지휘관이 한 채널에서 사실 기반 업데이트를 주기적으로 제공해야 대응 신뢰가 유지됩니다.
-
 
 ## 침해사고 테이블탑 훈련 시나리오
 
@@ -493,7 +489,6 @@ print(containment_actions("admin-42"))
 
 사고 대응의 완성은 복구가 아니라 학습 전환입니다. 액션 아이템이 구현으로 이어질 때 다음 사고의 비용이 실제로 줄어듭니다.
 
-
 ## 사고 후 48시간 내 완료해야 할 작업
 
 1. 타임라인 확정본 작성 및 공유.
@@ -503,7 +498,6 @@ print(containment_actions("admin-42"))
 5. 경영진 브리핑용 사실 기반 요약 작성.
 
 복구 직후 피로가 큰 시점에 이 작업이 가장 자주 누락됩니다. 체크리스트로 고정해 습관화해야 조직 학습이 남습니다.
-
 
 ## 처음 질문으로 돌아가기
 

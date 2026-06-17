@@ -28,7 +28,6 @@ seo_description: 합성과 상속의 차이, 위임, 의존성 주입까지 실�
 
 이 글은 OOP 101 시리즈의 7번째 글입니다.
 
-
 ![Object-Oriented Programming 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/07/07-01-concept-overview.ko.png)
 *Object-Oriented Programming 101 7장 흐름 개요*
 
@@ -37,6 +36,9 @@ seo_description: 합성과 상속의 차이, 위임, 의존성 주입까지 실�
 - is-a 관계와 has-a 관계는 실무 설계에서 어떻게 구분하면 좋을까요?
 - 왜 많은 경우 상속보다 합성이 더 안전한 기본 선택이 될까요?
 - 위임과 의존성 주입은 합성의 장점을 어떻게 극대화할까요?
+- 핵심 개념 잡기에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 핵심 개념 잡기
 
@@ -411,7 +413,6 @@ class Checkout:
 from dataclasses import dataclass
 from typing import Protocol
 
-
 @dataclass
 class LineItem:
     name: str
@@ -421,16 +422,13 @@ class LineItem:
     def subtotal(self) -> int:
         return self.quantity * self.unit_price
 
-
 class DiscountPolicy(Protocol):
     def apply(self, amount: int) -> int:
         ...
 
-
 class NoDiscount:
     def apply(self, amount: int) -> int:
         return amount
-
 
 class PercentDiscount:
     def __init__(self, percent: int) -> None:
@@ -440,7 +438,6 @@ class PercentDiscount:
 
     def apply(self, amount: int) -> int:
         return int(amount * (100 - self.percent) / 100)
-
 
 class Invoice:
     def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
@@ -510,7 +507,6 @@ class WeekendPolicy:
             return int(amount * 0.95)
         return amount
 
-
 def estimate(amount: int, is_weekend: bool) -> int:
     policy = WeekendPolicy()
     return policy.apply(amount, is_weekend)
@@ -523,7 +519,6 @@ def estimate(amount: int, is_weekend: bool) -> int:
 | 새 정책 추가 시 기존 함수 수정이 필요한가 | 아니오 |
 | 예외 정책이 기존 계약과 같은가 | 예 |
 | 테스트가 정책별로 분리되어 있는가 | 예 |
-
 
 ## 리팩터링 회고: 변경 비용을 수치로 보는 방법
 
@@ -581,7 +576,6 @@ def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
 ## 마지막 점검 문장
 
 이 글의 예제는 모두 변경 파급을 줄이는 경계 설계를 기준으로 구성했습니다.
-
 
 설계 의도와 테스트 계약을 함께 유지하는 것이 핵심입니다.
 

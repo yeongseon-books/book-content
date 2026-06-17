@@ -25,7 +25,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 4번째 글입니다.
 
-
 ![Computer Networks 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/04/04-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 4장 흐름 개요*
 
@@ -34,6 +33,9 @@ last_reviewed: '2026-05-15'
 - DNS 계층 구조는 어떻게 되어 있을까요?
 - recursive resolver와 캐시는 어떤 역할을 할까요?
 - A, AAAA, CNAME, MX, TXT 레코드는 각각 어디에 쓰일까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 적용 전후 비교을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별로 따라하기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 "인터넷이 안 된다"는 문제의 상당수는 DNS에서 시작되고, 그중 많은 경우가 TTL과 캐시를 잘못 이해한 탓입니다. DNS를 모르면 배포 후에도 왜 예전 IP로 붙는지 설명하기 어렵고, 서비스 이전이나 리전 failover도 예측하기 힘들어집니다. 게다가 모든 HTTP 요청은 DNS 조회로 시작하기 때문에 성능 분석에서도 빠지지 않습니다.
 

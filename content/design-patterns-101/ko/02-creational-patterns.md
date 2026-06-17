@@ -41,6 +41,9 @@ last_reviewed: '2026-05-23'
 - 객체 생성 코드를 분리하면 정확히 무엇이 좋아지고, 무엇이 나빠질까요?
 - Factory Method와 Builder는 둘 다 "만드는 일"을 하는데, 언제 어느 쪽을 고를까요?
 - Python에서 Singleton 클래스를 직접 구현해야 할 상황이 실제로 있을까요?
+- 객체 생성을 왜 분리해야 하는가에서 가장 흔한 실수는 무엇일까요?
+- Builder가 풀려는 문제와 다른 점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- Abstract Factory를 도입할 가치가 있는 드문 경우의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 객체 생성을 왜 분리해야 하는가
 
@@ -78,11 +81,9 @@ Factory Method의 핵심은 간단합니다. **어떤 구체 클래스를 만들
 from typing import Protocol
 import os
 
-
 class OrderRepository(Protocol):
     def save(self, order_id: str, data: dict) -> None: ...
     def find(self, order_id: str) -> dict | None: ...
-
 
 def create_repository() -> OrderRepository:
     """환경 변수를 보고 적절한 저장소를 반환합니다."""
@@ -91,7 +92,6 @@ def create_repository() -> OrderRepository:
         from app.infra.postgres import PostgresRepository
         return PostgresRepository(dsn=os.environ["DATABASE_URL"])
     return MemoryRepository()
-
 
 class OrderService:
     def __init__(self, repo: OrderRepository) -> None:
@@ -118,7 +118,6 @@ HTTP 요청 객체를 예로 들겠습니다.
 ```python
 from dataclasses import dataclass, field
 
-
 @dataclass(frozen=True)
 class HttpRequest:
     method: str
@@ -127,7 +126,6 @@ class HttpRequest:
     body: bytes | None = None
     timeout_seconds: float = 30.0
     retry_count: int = 0
-
 
 class HttpRequestBuilder:
     def __init__(self, method: str, url: str) -> None:
@@ -212,7 +210,6 @@ DEBUG: bool = os.environ.get("DEBUG", "false").lower() == "true"
 ```python
 import threading
 
-
 class ConnectionPool:
     _instance: "ConnectionPool | None" = None
     _lock = threading.Lock()
@@ -252,18 +249,15 @@ Abstract Factory는 **관련된 객체 묶음을 일관되게 생성**합니다.
 ```python
 from typing import Protocol
 
-
 class Button(Protocol):
     def render(self) -> str: ...
 
 class TextInput(Protocol):
     def render(self) -> str: ...
 
-
 class UIFactory(Protocol):
     def create_button(self, label: str) -> Button: ...
     def create_text_input(self, placeholder: str) -> TextInput: ...
-
 
 class WebUIFactory:
     def create_button(self, label: str) -> Button:
@@ -271,7 +265,6 @@ class WebUIFactory:
 
     def create_text_input(self, placeholder: str) -> TextInput:
         return HtmlTextInput(placeholder)
-
 
 class TerminalUIFactory:
     def create_button(self, label: str) -> Button:
@@ -296,14 +289,12 @@ Prototype은 기존 객체를 복제해서 새 객체를 만듭니다. Python에
 import copy
 from dataclasses import dataclass, field
 
-
 @dataclass
 class ReportConfig:
     title: str
     columns: list[str] = field(default_factory=list)
     filters: dict[str, str] = field(default_factory=dict)
     page_size: int = 50
-
 
 # 기본 템플릿
 monthly_template = ReportConfig(
@@ -312,7 +303,6 @@ monthly_template = ReportConfig(
     filters={"status": "completed"},
     page_size=100,
 )
-
 
 def create_monthly_report(month: str) -> ReportConfig:
     """템플릿을 복제한 뒤 월별 필터만 추가합니다."""
@@ -356,6 +346,10 @@ Prototype이 유용한 상황은 제한적입니다. 객체 초기화가 무겁�
 - [ ] Singleton, Factory Method, Abstract Factory의 차이를 설명할 수 있습니다.
 - [ ] Builder 패턴이 필요한 상황을 예로 들 수 있습니다.
 - [ ] 생성 패턴이 해결하는 공통 문제를 말할 수 있습니다.
+
+## 정리
+
+이 글은 design-patterns-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
 
 ## 처음 질문으로 돌아가기
 

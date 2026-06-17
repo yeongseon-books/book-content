@@ -42,6 +42,9 @@ seo_description: aiosqlite는 SQLite를 비동기로 바꾸지 않는다. connec
 - `aiosqlite`는 SQLite를 진짜 비동기로 만드는 것이 아니라면 정확히 무엇을 비동기로 바꿔 주는 걸까요?
 - `async with aiosqlite.connect(...)`, `transactional()`, `SQLitePool`은 각각 어떤 경계를 맡고 왜 분리해야 할까요?
 - async 핸들러에서 동기 `sqlite3`를 쓰거나, 한 `aiosqlite` connection을 여러 코루틴이 같이 잡으면 어떤 문제가 생길까요?
+- Mental Model: aiosqlite는 sqlite3 + thread + Future에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전과 후: FastAPI 핸들러의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## Mental Model: aiosqlite는 sqlite3 + thread + Future
 

@@ -28,7 +28,6 @@ seo_description: 함수 시그니처는 "호출자가 무엇을 줘야 하고, �
 
 이 글은 Python 101 시리즈의 여섯 번째 글입니다.
 
-
 ![Python 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/06/06-01-mental-model.ko.png)
 *Python 101 6장 흐름 개요*
 > 함수와 인자: def, args, kwargs, default, lambda의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
@@ -38,6 +37,9 @@ seo_description: 함수 시그니처는 "호출자가 무엇을 줘야 하고, �
 - 긴 positional 호출을 keyword-only 시그니처로 바꾸면 호출부가 어떻게 달라질까요?
 - `*args`, `**kwargs`, unpacking은 함수 호출과 wrapper에서 어떤 모양으로 묶이고 다시 펼쳐질까요?
 - mutable 기본값, 빠진 `return`, 과도한 `lambda`는 왜 함수 계약을 흐리게 만들까요?
+- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 멘탈 모델
 

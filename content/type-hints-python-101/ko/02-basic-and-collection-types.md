@@ -27,7 +27,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 Type Hints (Python) 101 시리즈의 2번째 글입니다. 여기서는 기본 스칼라 타입과 컬렉션 타입을 어떻게 표현하는지, 그리고 컨테이너 안쪽 타입까지 적어야 하는 이유를 정리합니다.
 
-
 ![Type Hints in Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/02/02-01-big-picture.ko.png)
 *Type Hints in Python 101 2장 흐름 개요*
 
@@ -38,6 +37,9 @@ last_reviewed: '2026-05-12'
 - `int`, `str`, `float`, `bool`, `bytes`, `None`은 어떻게 적을까요?
 - `list`, `dict`, `tuple`, `set`은 왜 원소 타입까지 붙여야 할까요?
 - 고정 길이 튜플과 가변 길이 튜플은 어떻게 다를까요?
+- 왜 이 주제가 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 바꾸기 전과 후을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별로 익히기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 주제가 중요한가
 
@@ -227,11 +229,9 @@ from typing import Generic, Protocol, TypeVar
 T = TypeVar("T")
 K = TypeVar("K")
 
-
 class SupportsKey(Protocol[K]):
     def key(self) -> K:
         ...
-
 
 class Repository(Protocol[T]):
     def add(self, item: T) -> None:
@@ -240,7 +240,6 @@ class Repository(Protocol[T]):
     def all(self) -> list[T]:
         ...
 
-
 @dataclass
 class User:
     user_id: int
@@ -248,7 +247,6 @@ class User:
 
     def key(self) -> int:
         return self.user_id
-
 
 class InMemoryRepository(Generic[T]):
     def __init__(self) -> None:
@@ -259,7 +257,6 @@ class InMemoryRepository(Generic[T]):
 
     def all(self) -> list[T]:
         return self._items
-
 
 def index_by_key(items: list[SupportsKey[K]]) -> dict[K, SupportsKey[K]]:
     return {item.key(): item for item in items}
@@ -291,7 +288,6 @@ def first(items: list[T]) -> T:
 
 위 시그니처는 `list[int]`를 넣으면 `int`, `list[str]`를 넣으면 `str`을 반환한다는 계약을 유지합니다.
 
-
 ## 컬렉션 타입에서 자주 나는 mypy 오류
 
 컬렉션 타입은 겉보기에는 단순하지만, 원소 타입이 섞이는 순간 오류가 빠르게 늘어납니다.
@@ -302,7 +298,6 @@ from typing import TypedDict
 class Item(TypedDict):
     name: str
     price: int
-
 
 def total_price(items: list[Item]) -> int:
     return sum(item["price"] for item in items)
@@ -348,7 +343,6 @@ def average(values: list[int] | None) -> float:
 | 임의 길이 숫자열 | `tuple[int, ...]` | 길이 가변 허용 |
 | 레코드 구조 | `TypedDict` 또는 dataclass | 필드 이름이 더 명확 |
 
-
 ## mypy 오류를 읽는 순서
 
 실무에서는 오류 개수보다 읽는 순서가 더 중요합니다. 다음 순서를 고정하면 수정 시간이 크게 줄어듭니다.
@@ -382,7 +376,6 @@ Found 2 errors in 1 file (checked 1 source file)
 
 이 체크포인트를 팀 규칙으로 두면 신규 코드와 레거시 코드의 품질 편차를 줄일 수 있습니다.
 
-
 ## 실전 보강: 타입 힌트 + mypy 오류 해결 루프
 
 아래 예시는 타입 힌트가 문서가 아니라 검증 가능한 계약이라는 점을 분명하게 보여 줍니다.
@@ -395,14 +388,12 @@ class Payment(TypedDict):
     amount: int
     currency: str
 
-
 def normalize_amount(raw: int | str) -> int:
     if isinstance(raw, int):
         return raw
     if raw.isdigit():
         return int(raw)
     raise ValueError("amount must be int or numeric string")
-
 
 def build_payment(order_id: int, amount: int | str, currency: str | None) -> Payment:
     if currency is None:
@@ -478,14 +469,12 @@ Success: no issues found in N source files
 
 위 결과가 나오더라도 끝이 아닙니다. 새로운 기능을 추가할 때 같은 원칙을 반복해 계약을 유지해야 타입 힌트가 장기적으로 품질을 지켜 줍니다.
 
-
 ## 추가 사례: 주문 처리 모듈 타입 하드닝
 
 아래 코드는 실제로 자주 보는 레거시 패턴입니다.
 
 ```python
 from typing import Any
-
 
 def build_invoice(payload: dict[str, Any]) -> dict[str, Any]:
     user = payload.get("user")
@@ -512,14 +501,12 @@ class InvoiceResult(TypedDict):
     email: str
     total: int
 
-
 def parse_total(raw: int | str) -> int:
     if isinstance(raw, int):
         return raw
     if raw.isdigit():
         return int(raw)
     raise ValueError("total must be int or numeric string")
-
 
 def build_invoice(payload: InvoicePayload) -> InvoiceResult:
     return {
@@ -553,7 +540,6 @@ service.py:36: error: Missing key "user" for TypedDict "InvoicePayload"  [typedd
 - 외부 입력 파싱 함수에는 `Optional`/`Union` 처리 분기를 강제합니다.
 - 리뷰에서 `Any` 추가가 보이면 대체 타입 후보를 함께 요구합니다.
 - CI에서는 타입 검사 실패를 테스트 실패와 동등하게 취급합니다.
-
 
 ## 보강 메모: 실전 리뷰에서 확인하는 타입 힌트 패턴
 
@@ -596,7 +582,6 @@ class NormalizedUser(TypedDict):
     id: int
     email: str
 
-
 def build_user(user_id: int, email: str) -> NormalizedUser:
     return {"id": user_id, "email": email.lower()}
 ```
@@ -609,7 +594,6 @@ def build_user(user_id: int, email: str) -> NormalizedUser:
 - `None` 가능성은 본문에서 실제로 처리되었는가?
 - `Any`가 도입되면 대체 가능한 구체 타입은 없는가?
 - mypy 오류를 숨기는 `type: ignore`가 정말 필요한가?
-
 
 ## 실전 표: TypedDict와 dataclass 경계 분리
 

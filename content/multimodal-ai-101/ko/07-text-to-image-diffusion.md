@@ -43,6 +43,9 @@ Diffusion이 중요한 이유는 생성 품질만이 아닙니다. 텍스트 조
 - 왜 diffusion이 GAN을 빠르게 밀어내고 시각 생성의 기본 구조가 되었을까요?
 - forward process와 reverse process를 어떤 멘탈 모델로 이해하면 가장 실용적일까요?
 - Stable Diffusion의 text encoder, UNet, VAE는 각각 어떤 역할을 맡을까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

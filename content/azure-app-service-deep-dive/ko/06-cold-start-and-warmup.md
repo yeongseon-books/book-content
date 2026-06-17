@@ -39,6 +39,9 @@ seo_description: Always On, warm-up path, health check로 App Service 첫 요청
 - App Service에서 cold start 비용은 실제로 어떤 준비 단계들의 합일까요?
 - Always On은 어떤 종류의 coldness를 줄이고, 어떤 종류의 startup cost에는 거의 도움을 주지 못할까요?
 - Windows와 Linux는 warm-up readiness를 어떤 다른 도구와 설정으로 표현할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

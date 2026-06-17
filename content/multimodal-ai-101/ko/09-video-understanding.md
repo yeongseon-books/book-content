@@ -43,6 +43,9 @@ seo_description: 이미지는 단일 frame이지만, video는 시간 축이 추�
 - 왜 비디오 이해에서 frame sampling이 가장 먼저 결정해야 할 핵심 변수일까요?
 - PyAV와 scene change 기반 keyframe extraction은 각각 어떤 장면에서 유용할까요?
 - VideoMAE, TimeSformer, X-CLIP 같은 video encoder는 어떤 trade-off를 보여 줄까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

@@ -43,6 +43,9 @@ seo_description: 2편에서 본 CLIP은 image와 text를 같은 공간에 정렬
 - VLM은 어떤 경로로 image encoder의 출력을 LLM 입력으로 연결할까요?
 - Vision Encoder + Adapter + LLM이라는 공통 뼈대는 왜 대부분의 모델에서 반복될까요?
 - LLaVA, BLIP-2, Flamingo는 각각 어떤 trade-off를 선택한 설계일까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

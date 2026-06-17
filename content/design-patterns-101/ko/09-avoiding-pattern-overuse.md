@@ -41,6 +41,9 @@ last_reviewed: '2026-05-23'
 - 패턴을 적용했는데 오히려 코드가 나빠지는 순간은 어떤 신호로 알 수 있을까요?
 - "나중에 필요할 것 같아서" 미리 넣은 추상화는 왜 거의 항상 짐이 될까요?
 - 이미 과하게 적용된 패턴을 되돌리려면 어디서부터 시작해야 할까요?
+- 패턴이 문제를 부르기 시작하는 신호에서 가장 흔한 실수는 무엇일까요?
+- Rule of Three — 추상화는 세 번째 케이스에서 올립니다을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단일 구현체 뒤에 숨어 있는 Protocol을 발견하는 법의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 패턴이 문제를 부르기 시작하는 신호
 
@@ -71,13 +74,11 @@ def send_welcome_email(user: User) -> None:
     body = render_template("welcome.html", user=user)
     smtp_client.send(user.email, subject, body)
 
-
 # 두 번째: 비슷하지만 아직 참습니다
 def send_password_reset_email(user: User, token: str) -> None:
     subject = "비밀번호 재설정"
     body = render_template("reset.html", user=user, token=token)
     smtp_client.send(user.email, subject, body)
-
 
 # 세 번째: 이제 패턴이 보입니다
 def send_invoice_email(user: User, invoice: Invoice) -> None:
@@ -96,7 +97,6 @@ class EmailSpec:
     template: str
     context: dict[str, Any]
 
-
 def send_email(spec: EmailSpec) -> None:
     body = render_template(spec.template, **spec.context)
     smtp_client.send(spec.to, spec.subject, body)
@@ -113,10 +113,8 @@ def send_email(spec: EmailSpec) -> None:
 ```python
 from typing import Protocol
 
-
 class NotificationSender(Protocol):
     def send(self, user_id: str, message: str) -> None: ...
-
 
 class SlackNotificationSender:
     def __init__(self, webhook_url: str) -> None:
@@ -124,7 +122,6 @@ class SlackNotificationSender:
 
     def send(self, user_id: str, message: str) -> None:
         requests.post(self.webhook_url, json={"text": f"<@{user_id}> {message}"})
-
 
 class AlertService:
     def __init__(self, sender: NotificationSender) -> None:
@@ -161,7 +158,6 @@ class DatabaseConnectionFactory:
             dbname=config["dbname"],
         )
 
-
 # 사용처
 conn = DatabaseConnectionFactory.create(settings)
 ```
@@ -196,7 +192,6 @@ Decorator 패턴은 강력하지만, 겹겹이 쌓이면 실행 순서를 머릿
 class Handler(Protocol):
     def handle(self, request: Request) -> Response: ...
 
-
 class LoggingDecorator:
     def __init__(self, inner: Handler) -> None:
         self.inner = inner
@@ -207,7 +202,6 @@ class LoggingDecorator:
         log.info("end: %s status=%d", request.path, response.status)
         return response
 
-
 class AuthDecorator:
     def __init__(self, inner: Handler) -> None:
         self.inner = inner
@@ -216,7 +210,6 @@ class AuthDecorator:
         if not request.headers.get("Authorization"):
             return Response(status=401)
         return self.inner.handle(request)
-
 
 class RateLimitDecorator:
     def __init__(self, inner: Handler, max_rps: int) -> None:
@@ -229,7 +222,6 @@ class RateLimitDecorator:
         return self.inner.handle(request)
 
     def is_over_limit(self, request: Request) -> bool: ...
-
 
 class CacheDecorator:
     def __init__(self, inner: Handler, ttl: int) -> None:
@@ -246,7 +238,6 @@ class CacheDecorator:
 
     def cache_get(self, request: Request) -> Response | None: ...
     def cache_set(self, request: Request, response: Response) -> None: ...
-
 
 # 조립
 handler = CacheDecorator(
@@ -311,7 +302,6 @@ class AppConfig:
         self.db_url = os.getenv("DATABASE_URL", "")
         self.secret_key = os.getenv("SECRET_KEY", "")
 
-
 # 사용처
 config = AppConfig()
 ```
@@ -325,13 +315,11 @@ config = AppConfig()
 import os
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class AppConfig:
     debug: bool
     db_url: str
     secret_key: str
-
 
 def load_config() -> AppConfig:
     return AppConfig(
@@ -339,7 +327,6 @@ def load_config() -> AppConfig:
         db_url=os.getenv("DATABASE_URL", ""),
         secret_key=os.getenv("SECRET_KEY", ""),
     )
-
 
 config = load_config()
 ```
@@ -354,7 +341,6 @@ config = load_config()
 
 ```python
 from dependency_injector import containers, providers
-
 
 class Container(containers.DeclarativeContainer):
     config = providers.Configuration()
@@ -503,6 +489,10 @@ Factory 클래스를 지우고 생성 코드를 사용처에 인라인합니다.
 - [ ] 패턴 남용의 징후를 세 가지 이상 말할 수 있습니다.
 - [ ] 패턴 적용 전 확인할 기준을 설명할 수 있습니다.
 - [ ] 단순한 해결책이 패턴보다 나은 경우를 예로 들 수 있습니다.
+
+## 정리
+
+이 글은 design-patterns-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
 
 ## 처음 질문으로 돌아가기
 

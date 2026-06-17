@@ -41,6 +41,9 @@ seo_description: ChatPromptTemplate과 OutputParser를 이어 첫 LLM Chain을 �
 - ChatPromptTemplate는 단순 문자열 포맷팅과 무엇이 다를까요?
 - 여러 입력 변수와 parser를 붙이면 체인의 입출력 모양은 어떻게 바뀔까요?
 - fallback은 어떤 실패를 숨기고 어떤 실패는 여전히 드러내야 할까요?
+- 최소 실행 예제에서 가장 흔한 실수는 무엇일까요?
+- 여러 변수를 받는 프롬프트을 실무에 적용할 때 주의할 점은 무엇일까요?
+- StrOutputParser vs JsonOutputParser의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 최소 실행 예제
 

@@ -24,7 +24,6 @@ last_reviewed: '2026-05-17'
 
 이 글은 Data Structures with Python 101 시리즈의 네 번째 글입니다.
 
-
 ![Data Structures with Python 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/04/04-01-dict-probe-resize.ko.png)
 *Data Structures with Python 101 4장 흐름 개요*
 
@@ -33,6 +32,9 @@ last_reviewed: '2026-05-17'
 - `dict`는 수많은 키 중에서 값을 어떻게 그렇게 빨리 찾을까요?
 - 해시, 충돌, probe, resize는 각각 어떤 역할을 할까요?
 - 어떤 객체는 dict 키가 될 수 있고, 어떤 객체는 왜 안 될까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -249,7 +251,6 @@ print(counter.most_common(2))
 
 Python dict는 안정적인 해시, 짧은 probe path, 주기적인 resize가 함께 작동할 때 빠른 성능을 내는 해시 테이블 기반 매핑입니다. 이 모델이 잡히면 충돌과 삽입 순서 유지가 더 이상 모순처럼 보이지 않습니다. 다음 글에서는 배열·해시 테이블과는 전혀 다른 방식으로 데이터를 잇는 연결 리스트를 봅니다.
 
-
 ## 타입 힌트 기반 해시 테이블 구현
 
 Python dict의 핵심 원리를 이해하는 가장 좋은 방법은 간소화된 해시 테이블을 직접 만들어 보는 것입니다. 아래 구현은 open addressing(linear probing)을 사용합니다.
@@ -264,7 +265,6 @@ V = TypeVar("V")
 
 _EMPTY = object()
 _DELETED = object()
-
 
 class HashTable(Generic[K, V]):
     """Open addressing(linear probing) 기반 해시 테이블입니다."""
@@ -367,14 +367,12 @@ class HashTable(Generic[K, V]):
 ```python
 import sys
 
-
 def measure_dict_memory(n: int) -> None:
     d = {i: i * 2 for i in range(n)}
     shallow = sys.getsizeof(d)
     # 깊은 크기: 키(int) + 값(int) 포함
     # CPython은 작은 int(-5~256)를 캐싱하므로 정확한 측정이 어려움
     print(f"dict (n={n:>7}): shallow={shallow:>10} bytes, per-entry≈{shallow/n:.1f} bytes")
-
 
 for n in [100, 1_000, 10_000, 100_000]:
     measure_dict_memory(n)
@@ -419,18 +417,15 @@ print(f"plain dict:  {sys.getsizeof(plain)} bytes")
 ```python
 import timeit
 
-
 def bench_dict_lookup(n: int = 100_000) -> None:
     d = {i: None for i in range(n)}
     for i in range(0, n, 10):
         _ = i in d
 
-
 def bench_list_lookup(n: int = 100_000) -> None:
     lst = list(range(n))
     for i in range(0, n, 10):
         _ = i in lst
-
 
 trials = 5
 t_dict = timeit.timeit(bench_dict_lookup, number=trials)
@@ -456,7 +451,6 @@ list/dict = 912x slower
 ```python
 import timeit
 
-
 class BadHash:
     """모든 인스턴스가 같은 해시를 반환하는 의도적으로 나쁜 클래스입니다."""
     def __init__(self, value: int) -> None:
@@ -466,18 +460,15 @@ class BadHash:
     def __eq__(self, other: object) -> bool:
         return isinstance(other, BadHash) and self.value == other.value
 
-
 def bench_good_hash(n: int = 10_000) -> None:
     d = {i: None for i in range(n)}
     for i in range(n):
         _ = i in d
 
-
 def bench_bad_hash(n: int = 1_000) -> None:
     d = {BadHash(i): None for i in range(n)}
     for i in range(n):
         _ = BadHash(i) in d
-
 
 t_good = timeit.timeit(bench_good_hash, number=3)
 t_bad = timeit.timeit(bench_bad_hash, number=3)
@@ -492,7 +483,6 @@ print(f"bad hash (1k lookups):   {t_bad:.4f}s")
 
 ```python
 import unittest
-
 
 class TestHashTable(unittest.TestCase):
     def setUp(self) -> None:
@@ -538,7 +528,6 @@ class TestHashTable(unittest.TestCase):
         self.ht["a"] = 2
         self.assertEqual(self.ht["a"], 2)
 
-
 if __name__ == "__main__":
     unittest.main()
 ```
@@ -562,12 +551,10 @@ dict 키가 되려면 두 가지 조건을 만족해야 합니다.
 ```python
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class Coordinate:
     x: float
     y: float
-
 
 # frozen=True → __hash__와 __eq__가 자동 생성됨
 locations: dict[Coordinate, str] = {

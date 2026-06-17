@@ -28,7 +28,6 @@ seo_description: Python 클래스의 생성자, 메서드, dunder 메서드 설�
 
 이 글은 OOP 101 시리즈의 2번째 글입니다.
 
-
 ![Object-Oriented Programming 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/02/02-01-big-picture.ko.png)
 *Object-Oriented Programming 101 2장 흐름 개요*
 
@@ -37,6 +36,9 @@ seo_description: Python 클래스의 생성자, 메서드, dunder 메서드 설�
 - 생성자(`__init__`)는 어디까지 책임져야 하고, 어디서부터 과해질까요?
 - 인스턴스 메서드, 클래스 메서드, 정적 메서드는 어떤 기준으로 나눠야 할까요?
 - Python의 dunder 메서드는 왜 디버깅과 비교 연산에 중요할까요?
+- 핵심 개념 잡기에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 핵심 개념 잡기
 
@@ -281,27 +283,22 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-
 @dataclass
 class PaymentRequest:
     order_id: str
     amount: int
 
-
 class PaymentGateway(Protocol):
     def pay(self, req: PaymentRequest) -> str:
         ...
-
 
 class CardGateway:
     def pay(self, req: PaymentRequest) -> str:
         return f"card:{req.order_id}:{req.amount}"
 
-
 class BankGateway:
     def pay(self, req: PaymentRequest) -> str:
         return f"bank:{req.order_id}:{req.amount}"
-
 
 class PaymentService:
     def __init__(self, gateway: PaymentGateway) -> None:
@@ -401,7 +398,6 @@ class InventoryItem:
 ```python
 import pytest
 
-
 def test_inventory_item_invariants() -> None:
     item = InventoryItem('A-100', 10, 3000)
     item.decrease(4)
@@ -421,7 +417,6 @@ def test_inventory_item_invariants() -> None:
 from dataclasses import dataclass
 from typing import Protocol
 
-
 @dataclass
 class LineItem:
     name: str
@@ -431,16 +426,13 @@ class LineItem:
     def subtotal(self) -> int:
         return self.quantity * self.unit_price
 
-
 class DiscountPolicy(Protocol):
     def apply(self, amount: int) -> int:
         ...
 
-
 class NoDiscount:
     def apply(self, amount: int) -> int:
         return amount
-
 
 class PercentDiscount:
     def __init__(self, percent: int) -> None:
@@ -450,7 +442,6 @@ class PercentDiscount:
 
     def apply(self, amount: int) -> int:
         return int(amount * (100 - self.percent) / 100)
-
 
 class Invoice:
     def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
@@ -520,7 +511,6 @@ class WeekendPolicy:
             return int(amount * 0.95)
         return amount
 
-
 def estimate(amount: int, is_weekend: bool) -> int:
     policy = WeekendPolicy()
     return policy.apply(amount, is_weekend)
@@ -533,7 +523,6 @@ def estimate(amount: int, is_weekend: bool) -> int:
 | 새 정책 추가 시 기존 함수 수정이 필요한가 | 아니오 |
 | 예외 정책이 기존 계약과 같은가 | 예 |
 | 테스트가 정책별로 분리되어 있는가 | 예 |
-
 
 ## 리팩터링 회고: 변경 비용을 수치로 보는 방법
 

@@ -39,6 +39,9 @@ Microsoft 문서가 ACA scaling을 KEDA-powered라고 명시하는 이유도 여
 - ACA의 scale rule은 KEDA에서 어떤 형태의 제어 루프로 읽는 편이 가장 정확할까요?
 - 왜 scale rule은 app-scope가 아니라 revision-scope에 속할까요?
 - `minReplicas: 0`이 가능하다는 사실은 스케일 모델을 어떻게 바꿀까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

@@ -26,7 +26,6 @@ last_reviewed: '2026-05-15'
 
 Warehouse는 읽은 데이터 양에 따라 비용이 커지는 경우가 많습니다. 같은 답을 더 적은 바이트로 구하면 비용과 시간 둘 다 줄일 수 있습니다. 그래서 성능 최적화는 감으로 시작하지 않고, 어떤 계획으로 얼마나 읽었는지 먼저 확인하는 데서 출발합니다.
 
-
 ![Data Warehouse 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/09/09-01-concept-at-a-glance.ko.png)
 *Data Warehouse 101 9장 흐름 개요*
 > Slow query log와 쿼리 실행 계획은 성능 최적화의 출발점입니다.
@@ -36,6 +35,9 @@ Warehouse는 읽은 데이터 양에 따라 비용이 커지는 경우가 많습
 - Warehouse 성능은 어떤 패턴에서 가장 크게 갈릴까요?
 - 같은 결과를 더 적은 비용으로 읽는 방법은 무엇일까요?
 - bytes scanned와 shuffle, spill은 왜 먼저 확인할까요?
+- 이 글에서 배울 것에서 가장 흔한 실수는 무엇일까요?
+- 개념 한눈에 보기을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 이 글에서 배울 것
 
@@ -92,7 +94,6 @@ WHERE order_date = '2026-05-04';
 | 쿼리 리라이트 (Query Rewrite) | 보통 | 높음 | 쿼리 패턴이 복잡한 경우 | 유지보수 비용 증가 |
 
 파티셔닝과 정렬키는 DDL만 수정하면 되므로 비용이 낮지만, 물리화된 뷰는 저장 공간과 갱신 비용이 추가됩니다. 쿼리 리라이트는 효과가 크지만 로직이 복잡해지며 유지보수가 어려워집니다.
-
 
 ### 2단계 — partition pruning 유지하기
 
@@ -151,7 +152,6 @@ GROUP BY p.category;
 ```
 
 개선 후 bytes scanned가 줄었는지, pruning이 적용됐는지 다시 확인합니다.
-
 
 ### 5단계 — 큰 조인의 작은 쪽을 broadcast하기
 
@@ -215,7 +215,6 @@ ORDER BY size_gb DESC;
 
 크기가 고르지 않은 파티션은 재분배하거나 clustering을 추가합니다.
 
-
 ## 자주 하는 실수 5가지
 
 1. **`SELECT *`를 습관적으로 사용합니다.** 읽는 컬럼이 늘수록 비용도 함께 커집니다.
@@ -252,7 +251,6 @@ ORDER BY size_gb DESC;
 ## 마무리와 다음 글
 
 성능 최적화는 작은 요령 몇 개를 외우는 일이 아니라, 어떤 쿼리가 무엇을 얼마나 읽는지 이해하는 일입니다. 컬럼 수를 줄이고, pruning을 살리고, 자주 쓰는 결과를 미리 계산하는 세 가지 원칙만 지켜도 큰 차이가 납니다. 다음 글에서는 지금까지 배운 내용을 묶어 처음부터 끝까지 Warehouse를 설계하는 예제를 봅니다.
-
 
 ## 인덱스 전략보다 먼저 보는 최적화 우선순위
 
@@ -316,7 +314,6 @@ query_guardrails:
 
 OLTP에서의 인덱스 사고를 Warehouse에 그대로 옮기면 오해가 생깁니다. Warehouse에서는 인덱스보다 파티션, 클러스터링, 물질화 계층의 영향이 크다는 점을 기준으로 설계해야 합니다.
 
-
 ## 비용 중심 쿼리 리뷰 루틴
 
 성능 개선을 이벤트성 작업으로 두지 않으려면 정기 리뷰 루틴이 필요합니다.
@@ -362,7 +359,6 @@ LIMIT 20;
 
 운영 데이터에 기반한 리뷰가 있어야 최적화 우선순위를 합리적으로 정할 수 있습니다.
 
-
 ## 실무 적용 메모
 
 아래 메모는 해당 장의 개념을 실제 운영 환경에 옮길 때 반복적으로 확인하는 항목을 정리한 것입니다. 단순히 지식을 아는 것과 운영에서 안정적으로 반복하는 것은 다르기 때문에, 팀 단위 규칙으로 문서화해 두는 편이 좋습니다.
@@ -401,7 +397,6 @@ operating_baseline:
 이 기준을 프로젝트 초기에 합의하면, 시리즈에서 다룬 개념이 문서 지식으로 끝나지 않고 운영 습관으로 정착됩니다. 특히 신규 팀원이 합류했을 때 학습 속도가 빨라지고, 장애나 지표 충돌 같은 사건이 생겨도 공통된 기준으로 빠르게 의사결정을 내릴 수 있습니다.
 
 또한 분기 단위 회고에서는 기술 성능 지표뿐 아니라 의사결정 지표도 함께 보는 것이 좋습니다. 예를 들어 "대시보드 숫자 논쟁으로 소모된 회의 시간", "지표 정의 변경 후 영향 범위 확인 시간", "재처리 요청 처리 리드타임" 같은 운영 지표를 추적하면 데이터 조직의 성숙도를 더 현실적으로 파악할 수 있습니다.
-
 
 ## 실전 앵커: 모델, 파이프라인, 성능 검증
 
@@ -505,6 +500,40 @@ WHEN NOT MATCHED THEN INSERT (
 
 이 패턴을 기준선으로 두면, 모델 변경이나 파이프라인 장애가 생겨도 영향을 계층별로 좁혀 복구할 수 있습니다. 데이터 웨어하우스 운영은 쿼리 한두 개의 튜닝보다, 반복 가능한 설계 계약을 지키는 과정에 더 가깝습니다.
 
+### 운영 확장 메모
+
+데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
+
+```sql
+-- 파티션 필터 누락 탐지용 예시
+EXPLAIN
+SELECT category, SUM(amount) AS revenue
+FROM fact_sales
+WHERE date_key BETWEEN 20260101 AND 20260131
+GROUP BY category;
+```
+
+```yaml
+review_policy:
+  query_rules:
+    - require_partition_filter: true
+    - block_select_star_on_fact: true
+    - require_owner_for_metric_change: true
+  incident_rules:
+    - classify: [schema_change, pipeline_lag, quality_failure]
+    - first_response_minutes: 15
+```
+
+```mermaid
+flowchart LR
+    A["모델 변경 요청"] --> B["영향 범위 분석"]
+    B --> C["샘플 검증 쿼리"]
+    C --> D["배치 재실행"]
+    D --> E["지표 대조"]
+    E --> F["배포 승인"]
+```
+
+아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
 
 ### 운영 확장 메모
 
@@ -541,41 +570,9 @@ flowchart LR
 
 아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
 
+## 정리
 
-### 운영 확장 메모
-
-데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
-
-```sql
--- 파티션 필터 누락 탐지용 예시
-EXPLAIN
-SELECT category, SUM(amount) AS revenue
-FROM fact_sales
-WHERE date_key BETWEEN 20260101 AND 20260131
-GROUP BY category;
-```
-
-```yaml
-review_policy:
-  query_rules:
-    - require_partition_filter: true
-    - block_select_star_on_fact: true
-    - require_owner_for_metric_change: true
-  incident_rules:
-    - classify: [schema_change, pipeline_lag, quality_failure]
-    - first_response_minutes: 15
-```
-
-```mermaid
-flowchart LR
-    A["모델 변경 요청"] --> B["영향 범위 분석"]
-    B --> C["샘플 검증 쿼리"]
-    C --> D["배치 재실행"]
-    D --> E["지표 대조"]
-    E --> F["배포 승인"]
-```
-
-아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
+이 글은 data-warehouse-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
 
 ## 처음 질문으로 돌아가기
 

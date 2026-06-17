@@ -25,7 +25,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 8번째 글입니다.
 
-
 ![Computer Networks 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 8장 흐름 개요*
 
@@ -34,6 +33,9 @@ last_reviewed: '2026-05-15'
 - L4 로드밸런서와 L7 로드밸런서는 어떻게 다를까요?
 - round-robin, least connections, hash 같은 분산 알고리즘은 언제 쓰일까요?
 - 헬스체크와 graceful drain은 왜 신뢰성의 핵심일까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 적용 전후 비교을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별로 따라하기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 로드밸런서는 단순한 분배기가 아닙니다. 실제로는 시스템의 신뢰성과 배포 전략을 결정하는 장치입니다. blue-green 배포, canary 릴리스, 리전 failover, 자동 스케일링은 모두 로드밸런서 위에서 성립합니다. 헬스체크 하나를 잘못 만들면 죽은 서버에 트래픽이 가거나, 멀쩡한 서버가 풀에서 빠질 수 있습니다.
 

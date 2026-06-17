@@ -43,6 +43,9 @@ seo_description: 목록 API의 pagination, sorting, filtering 설계 원칙과 t
 - offset / limit 방식은 어디까지 단순하고 어디서부터 한계가 드러날까요?
 - cursor 기반 pagination은 어떤 문제를 해결하며 어떤 것을 포기할까요?
 - sorting, filtering, searching은 어떤 규칙으로 분리해야 할까요?
+- 왜 pagination이 API에서 가장 먼저 흔들리는가에서 가장 흔한 실수는 무엇일까요?
+- Offset 방식 — 장점과 한계을 실무에 적용할 때 주의할 점은 무엇일까요?
+- Cursor 방식 — 원리와 trade-off의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 pagination이 API에서 가장 먼저 흔들리는가
 

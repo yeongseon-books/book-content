@@ -24,7 +24,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 Data Structures with Python 101 시리즈의 첫 번째 글입니다.
 
-
 ![Data Structures with Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/01/01-01-big-picture.ko.png)
 *Data Structures with Python 101 1장 흐름 개요*
 
@@ -33,6 +32,9 @@ last_reviewed: '2026-05-12'
 - 자료구조는 정확히 무엇이고 왜 따로 배워야 할까요?
 - 같은 데이터를 저장해도 자료구조에 따라 성능이 왜 크게 달라질까요?
 - Python이 기본으로 제공하는 list, dict, set, tuple은 각각 어떤 역할에 맞을까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -208,7 +210,6 @@ from typing import Protocol, TypeVar
 
 T = TypeVar("T")
 
-
 class StackADT(Protocol[T]):
     """Stack 추상 자료형의 프로토콜 정의입니다."""
 
@@ -216,7 +217,6 @@ class StackADT(Protocol[T]):
     def pop(self) -> T: ...
     def peek(self) -> T: ...
     def __len__(self) -> int: ...
-
 
 class ListStack:
     """list 기반 Stack 구현입니다."""
@@ -245,7 +245,6 @@ class ListStack:
 
 ADT 사고방식은 이 시리즈 전체의 골격입니다. 각 글에서 새로운 자료구조를 만날 때마다 "이 구조는 어떤 ADT를 구현하는가? 어떤 연산을 O(1)로 보장하는가?"를 먼저 확인하는 습관을 들이면, 단순 암기가 아니라 체계적 이해로 이어집니다.
 
-
 ## 타입 힌트 기반 자료구조 인터페이스 설계
 
 Python에서 자료구조를 학습할 때는 동작만 확인하고 끝내면 안 됩니다. 타입 힌트와 `Protocol`을 활용하면 자료구조가 어떤 연산 계약을 제공하는지 코드 수준에서 드러낼 수 있습니다. 이 시리즈 전체에 걸쳐 반복되는 패턴이므로 첫 글에서 기본 뼈대를 먼저 잡겠습니다.
@@ -257,7 +256,6 @@ from typing import Generic, Iterator, Protocol, TypeVar, runtime_checkable
 
 T = TypeVar("T")
 
-
 @runtime_checkable
 class Container(Protocol[T]):
     """자료구조가 공통으로 지원할 수 있는 최소 인터페이스입니다."""
@@ -265,7 +263,6 @@ class Container(Protocol[T]):
     def __len__(self) -> int: ...
     def __contains__(self, item: object) -> bool: ...
     def __iter__(self) -> Iterator[T]: ...
-
 
 class SearchableCollection(Generic[T]):
     """list, set, dict를 감싸서 동일한 인터페이스로 비교하는 예시 구현입니다."""
@@ -306,7 +303,6 @@ class SearchableCollection(Generic[T]):
 import sys
 from collections import deque
 
-
 def deep_getsizeof(obj: object, seen: set[int] | None = None) -> int:
     """객체와 그 내용물의 전체 메모리 사용량을 재귀적으로 측정합니다."""
     if seen is None:
@@ -321,7 +317,6 @@ def deep_getsizeof(obj: object, seen: set[int] | None = None) -> int:
     elif isinstance(obj, (list, tuple, set, frozenset, deque)):
         size += sum(deep_getsizeof(item, seen) for item in obj)
     return size
-
 
 # 10만 개 정수를 각 구조에 넣고 메모리 비교
 n = 100_000
@@ -360,14 +355,12 @@ tuple:    4,248,024 bytes
 ```python
 import timeit
 
-
 def benchmark_membership(structure_name: str, setup: str, stmt: str, number: int = 1000) -> float:
     """주어진 구조에서 membership test를 number회 반복해 평균 시간을 반환합니다."""
     elapsed = timeit.timeit(stmt, setup=setup, number=number)
     avg_us = (elapsed / number) * 1_000_000  # microseconds
     print(f"{structure_name:12s}: {avg_us:>8.2f} µs/op")
     return avg_us
-
 
 n = 1_000_000
 target = n - 1  # worst case for list
@@ -401,7 +394,6 @@ benchmark_membership(
 ```python
 import unittest
 
-
 class TestSearchableCollection(unittest.TestCase):
     def test_add_and_contains(self) -> None:
         sc: SearchableCollection[str] = SearchableCollection()
@@ -426,7 +418,6 @@ class TestSearchableCollection(unittest.TestCase):
         self.assertEqual(len(sc), 0)
         self.assertNotIn("anything", sc)
         self.assertEqual(list(sc), [])
-
 
 if __name__ == "__main__":
     unittest.main()

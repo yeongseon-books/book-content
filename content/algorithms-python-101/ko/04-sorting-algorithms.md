@@ -26,7 +26,6 @@ last_reviewed: '2026-05-12'
 
 이번 글에서는 "실무에서는 왜 대부분 `sorted()`를 쓰는가?"라는 질문을 중심축으로 잡고, 고전 정렬 알고리즘을 비교 재료로 활용하겠습니다. 즉, 구현 자체보다도 언제 내장 정렬이 기본 선택이고, 언제 안정성과 `key` 설계가 진짜 핵심인지까지 연결해 보겠습니다.
 
-
 ![Algorithms with Python 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/04/04-01-big-picture.ko.png)
 *Algorithms with Python 101 4장 흐름 개요*
 
@@ -35,6 +34,9 @@ last_reviewed: '2026-05-12'
 - 실무에서 직접 정렬 알고리즘을 구현하는 대신 `sorted()`를 우선해야 하는 이유는 무엇일까요?
 - 세 가지 `O(n^2)` 정렬 알고리즘은 어떤 원리로 동작하며 어디까지 학습용으로 봐야 할까요?
 - 병합 정렬과 퀵 정렬은 분할 정복을 어떻게 활용할까요?
+- 개념 한눈에 보기에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 정렬은 컴퓨팅에서 가장 기본적인 작업 가운데 하나입니다. 이진 탐색, 중복 제거, 순위 계산은 모두 정렬된 데이터를 전제로 하거나 정렬의 도움을 크게 받습니다. 1만 개를 넘어가면 `O(n^2)`와 `O(n log n)`의 차이는 금방 체감 가능한 수준으로 벌어집니다.
 
@@ -366,14 +368,12 @@ def verify_stability(sort_func, records):
         groups.setdefault(rec["score"], []).append(rec["id"])
     return groups
 
-
 records = [
     {"id": "A", "score": 90},
     {"id": "B", "score": 80},
     {"id": "C", "score": 90},
     {"id": "D", "score": 80},
 ]
-
 
 def python_sort(rs):
     return sorted(rs, key=lambda x: x["score"])
@@ -431,7 +431,6 @@ left=[(80,B),(90,A)] right=[(80,D),(90,C)]
 
 ```python
 import time
-
 
 def benchmark(func, *args, repeat: int = 5) -> float:
     best = float("inf")

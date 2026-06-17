@@ -26,7 +26,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Portfolio Project 101 시리즈의 6번째 글입니다. 여기서는 포트폴리오 프로젝트에서 어떤 수준의 테스트와 문서화가 있으면 충분히 믿을 만한 프로젝트로 읽히는지, 그리고 그 흔적이 왜 채용과 협업 관점에서 중요한지 봅니다.
 
-
 ![Portfolio Project 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/06/06-01-diagram.ko.png)
 *Portfolio Project 101 6장 흐름 개요*
 > 테스트는 당신이 해 본 모든 검증을 자동으로 반복 실행하는 기록입니다. 문서는 다음 개발자(또는 당신)이 다시 이해할 수 있길 남기는 지도입니다.
@@ -36,6 +35,9 @@ last_reviewed: '2026-05-15'
 - 단위 테스트, 통합 테스트, 전체 흐름 테스트는 각각 무엇을 증명할까요?
 - 자동 검증은 왜 작은 포트폴리오에서도 중요한 기준이 될까요?
 - API 문서나 변경 기록은 어떤 신뢰를 더해 줄까요?
+- 머릿속에 먼저 그릴 그림에서 가장 흔한 실수는 무엇일까요?
+- 바꾸기 전과 후을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별로 살펴보기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 테스트와 문서는 전문성을 보여 주는 가장 빠른 증거입니다. 특히 포트폴리오에서는 프로젝트가 우연히 한 번 돌아간 코드가 아니라 반복 검증된 결과물이어야 합니다. 테스트는 기능이 깨졌는지 알려 주고, 문서는 다른 사람이 프로젝트에 진입하도록 돕습니다.
 
@@ -365,11 +367,9 @@ from httpx import AsyncClient, ASGITransport
 from src.main import app
 from src.database import get_test_db, reset_db
 
-
 @pytest.fixture(scope="session")
 def anyio_backend():
     return "asyncio"
-
 
 @pytest.fixture
 async def client():
@@ -377,7 +377,6 @@ async def client():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
-
 
 @pytest.fixture(autouse=True)
 def reset_database():

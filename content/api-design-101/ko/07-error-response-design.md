@@ -43,6 +43,9 @@ seo_description: 일관된 error response를 만드는 envelope, code, validatio
 - 좋은 error response는 어떤 요소로 이루어질까요?
 - RFC 7807 `application/problem+json`은 왜 유용할까요?
 - validation error는 어떤 모양으로 표현해야 할까요?
+- 에러 응답이 API의 두 번째 얼굴인 이유에서 가장 흔한 실수는 무엇일까요?
+- 전후 비교을 실무에 적용할 때 주의할 점은 무엇일까요?
+- Error code 네이밍 규칙의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 에러 응답이 API의 두 번째 얼굴인 이유
 

@@ -42,6 +42,9 @@ seo_description: AsyncSession과 aiosqlite를 써서 비동기 SQLAlchemy를 안
 - `create_async_engine`과 `AsyncSession`은 동기 버전과 무엇이 같고 무엇이 다를까요?
 - URL에 `sqlite+aiosqlite` 같은 비동기 드라이버 표기는 왜 중요할까요?
 - async 환경에서는 왜 암묵적 IO를 피해야 할까요?
+- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 FastAPI, Starlette, aiohttp 같은 async 프레임워크에서 동기 SQLAlchemy를 그대로 쓰면 이벤트 루프가 블록됩니다. SQLAlchemy 2.x의 async API는 1.4부터 정식 도입돼 안정화됐고, SQLite도 `aiosqlite` 드라이버로 같은 패턴을 쓸 수 있습니다.
 

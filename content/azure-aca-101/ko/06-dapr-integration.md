@@ -35,6 +35,9 @@ Dapr는 마이크로서비스에서 반복되는 배관 작업을 많이 줄여 
 - Dapr가 무엇이며, 그 사이드카는 ACA 안에서 정확히 어디에 붙을까요?
 - App 수준 설정과 Environment 수준 component는 왜 분리해서 봐야 할까요?
 - Service invocation, Pub/Sub, State store, Secret store 네 가지 핵심 구성요소는 각각 어떤 문제를 해결할까요?
+- 이 글이 답할 질문에서 가장 흔한 실수는 무엇일까요?
+- 왜 이 글이 중요한가을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 멘탈 모델의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 이 글이 답할 질문
 
@@ -356,6 +359,25 @@ az containerapp logs show --name api-app --resource-group $RG --follow
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
 
 - [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aca-101/ko/06-dapr-integration)
+
+## 정리
+
+이 글은 azure-aca-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
+
+## 처음 질문으로 돌아가기
+
+- **Dapr가 무엇이며, 그 사이드카는 ACA 안에서 정확히 어디에 붙을까요?**
+  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+- **App 수준 설정과 Environment 수준 component는 왜 분리해서 봐야 할까요?**
+  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+- **Service invocation, Pub/Sub, State store, Secret store 네 가지 핵심 구성요소는 각각 어떤 문제를 해결할까요?**
+  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+- **이 글이 답할 질문에서 가장 흔한 실수는 무엇일까요?**
+  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+- **왜 이 글이 중요한가을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+- **멘탈 모델의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

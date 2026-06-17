@@ -41,6 +41,9 @@ last_reviewed: '2026-05-23'
 - 상속 대신 합성을 쓰면 구체적으로 무엇이 달라질까요?
 - Decorator와 Proxy는 둘 다 "감싸는" 패턴인데, 언제 어느 쪽을 골라야 할까요?
 - Structural 패턴을 도입했을 때 잃는 것은 무엇일까요?
+- 객체를 묶을 때 생기는 두 가지 문제에서 가장 흔한 실수는 무엇일까요?
+- Adapter와 Facade는 같은 문제를 다른 거리에서 푼다을 실무에 적용할 때 주의할 점은 무엇일까요?
+- Decorator가 Python에서 자연스러운 이유의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 객체를 묶을 때 생기는 두 가지 문제
 
@@ -64,17 +67,14 @@ Adapter는 **하나의 인터페이스**를 다른 인터페이스로 번역합�
 from typing import Protocol
 from dataclasses import dataclass
 
-
 @dataclass
 class Order:
     merchant: str
     amount_cents: int
     currency: str
 
-
 class PaymentGateway(Protocol):
     def charge(self, order: Order) -> str: ...
-
 
 class LegacySDKAdapter:
     """레거시 SDK를 도메인 인터페이스에 맞추는 얇은 번역 층."""
@@ -122,10 +122,8 @@ Python에는 `@decorator` 문법이 언어에 내장되어 있습니다. 그래�
 from typing import Protocol
 import time
 
-
 class HttpClient(Protocol):
     def get(self, url: str) -> bytes: ...
-
 
 class LoggingClient:
     def __init__(self, inner: HttpClient) -> None:
@@ -136,7 +134,6 @@ class LoggingClient:
         result = self._inner.get(url)
         print(f"[RES] {len(result)} bytes")
         return result
-
 
 class RetryClient:
     def __init__(self, inner: HttpClient, max_retries: int = 3) -> None:
@@ -152,7 +149,6 @@ class RetryClient:
                     raise
                 time.sleep(2 ** attempt)
         raise RuntimeError("unreachable")
-
 
 class TimingClient:
     def __init__(self, inner: HttpClient) -> None:
@@ -185,10 +181,8 @@ Proxy를 도입할 때 따져야 할 단 한 가지는 **투명성**입니다. �
 ```python
 from typing import Protocol
 
-
 class UserRepository(Protocol):
     def find(self, user_id: str) -> dict: ...
-
 
 class CachedUserRepository:
     """지연 로딩 + 캐시 Proxy."""
@@ -213,7 +207,6 @@ Composite는 단일 객체와 객체 집합을 **같은 인터페이스**로 다
 from __future__ import annotations
 from dataclasses import dataclass, field
 
-
 @dataclass
 class MenuItem:
     name: str
@@ -224,7 +217,6 @@ class MenuItem:
 
     def display(self, indent: int = 0) -> str:
         return f"{'  ' * indent}{self.name}: {self.price}원"
-
 
 @dataclass
 class Menu:
@@ -328,6 +320,10 @@ Python에서는 `__slots__`, 문자열 인터닝(`sys.intern`), `functools.lru_c
 - [ ] Adapter와 Facade의 차이를 설명할 수 있습니다.
 - [ ] Composite 패턴이 적합한 상황을 말할 수 있습니다.
 - [ ] 구조 패턴이 해결하는 공통 문제를 설명할 수 있습니다.
+
+## 정리
+
+이 글은 design-patterns-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
 
 ## 처음 질문으로 돌아가기
 

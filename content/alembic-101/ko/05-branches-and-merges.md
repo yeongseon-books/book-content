@@ -35,6 +35,9 @@ seo_description: alembic revision graph는 git 브랜치와 똑같이 DAG(direct
 - 언제 Alembic revision graph가 branch로 갈라질까요?
 - `branch_labels`와 `depends_on`은 각각 정확히 무슨 역할일까요?
 - 두 개의 head를 `alembic merge`로 어떻게 합칠까요?
+- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 여러 사람이 병렬로 PR을 여는 팀에서는 Alembic branch가 거의 매주 생깁니다. branch 자체는 자연스러운 현상이지만, deploy 직전에 `Multiple head revisions are present`가 튀어나오면 공포감이 커집니다. 이 글은 그 순간을 차분하게 정리하는 가이드입니다.
 

@@ -40,6 +40,9 @@ last_reviewed: '2026-05-23'
 - Command가 단순한 함수 호출과 다른 점은 무엇일까요?
 - State와 Strategy는 코드 모양이 거의 같은데, 왜 별도 패턴으로 분류될까요?
 - Python에서 Iterator 패턴을 명시적으로 구현할 일이 거의 없는 이유는 무엇일까요?
+- 객체 간 책임 분배가 어려운 이유에서 가장 흔한 실수는 무엇일까요?
+- Strategy와 Observer — 개요을 실무에 적용할 때 주의할 점은 무엇일까요?
+- Iterator는 왜 Python에서 거의 등장하지 않는가의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 객체 간 책임 분배가 어려운 이유
 
@@ -91,11 +94,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Protocol
 
-
 class Command(Protocol):
     def execute(self) -> None: ...
     def undo(self) -> None: ...
-
 
 @dataclass
 class InsertText:
@@ -108,7 +109,6 @@ class InsertText:
 
     def undo(self) -> None:
         self.document.pop(self.position)
-
 
 @dataclass
 class Editor:
@@ -157,12 +157,10 @@ Command를 도입하면 단순한 메서드 호출 하나가 클래스 하나로
 from __future__ import annotations
 from typing import Protocol
 
-
 class ConnectionState(Protocol):
     def open(self, ctx: Connection) -> None: ...
     def close(self, ctx: Connection) -> None: ...
     def send(self, ctx: Connection, data: bytes) -> None: ...
-
 
 class Closed:
     def open(self, ctx: Connection) -> None:
@@ -175,7 +173,6 @@ class Closed:
     def send(self, ctx: Connection, data: bytes) -> None:
         raise RuntimeError("Cannot send on closed connection")
 
-
 class Established:
     def open(self, ctx: Connection) -> None:
         print("Already open.")
@@ -186,7 +183,6 @@ class Established:
 
     def send(self, ctx: Connection, data: bytes) -> None:
         print(f"Sending {len(data)} bytes")
-
 
 class Connection:
     def __init__(self) -> None:
@@ -241,7 +237,6 @@ class SensorReadings:
 from pathlib import Path
 from typing import Iterator
 
-
 def walk_python_files(root: Path) -> Iterator[Path]:
     """디렉터리를 재귀 순회하되 .py 파일만 yield합니다."""
     for child in sorted(root.iterdir()):
@@ -267,7 +262,6 @@ Template Method는 알고리즘의 뼈대를 부모 클래스에 고정하고, �
 from abc import ABC, abstractmethod
 from typing import Any
 
-
 class ETLPipeline(ABC):
     """뼈대: extract → transform → load 순서는 고정."""
 
@@ -284,7 +278,6 @@ class ETLPipeline(ABC):
 
     @abstractmethod
     def load(self, data: list[dict[str, Any]]) -> None: ...
-
 
 class CsvToPostgres(ETLPipeline):
     def extract(self) -> list[dict[str, Any]]:
@@ -307,7 +300,6 @@ ExtractFn = Callable[[], list[dict[str, Any]]]
 TransformFn = Callable[[list[dict[str, Any]]], list[dict[str, Any]]]
 LoadFn = Callable[[list[dict[str, Any]]], None]
 
-
 def run_etl(extract: ExtractFn, transform: TransformFn, load: LoadFn) -> None:
     load(transform(extract()))
 ```
@@ -329,17 +321,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-
 @dataclass
 class Request:
     path: str
     headers: dict[str, str]
     user: str | None = None
 
-
 class Handler(Protocol):
     def handle(self, request: Request) -> str | None: ...
-
 
 @dataclass
 class AuthHandler:
@@ -354,7 +343,6 @@ class AuthHandler:
             return self.next_handler.handle(request)
         return None
 
-
 @dataclass
 class RateLimitHandler:
     next_handler: Handler | None = None
@@ -367,7 +355,6 @@ class RateLimitHandler:
         if self.next_handler:
             return self.next_handler.handle(request)
         return None
-
 
 @dataclass
 class RouteHandler:
@@ -420,6 +407,10 @@ Visitor는 객체 구조(예: AST, 파일 트리)를 순회하면서 각 노드 
 - [ ] Strategy와 State 패턴의 차이를 설명할 수 있습니다.
 - [ ] Observer 패턴의 작동 원리를 말할 수 있습니다.
 - [ ] 행위 패턴이 해결하는 공통 문제를 설명할 수 있습니다.
+
+## 정리
+
+이 글은 design-patterns-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
 
 ## 처음 질문으로 돌아가기
 

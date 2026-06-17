@@ -36,6 +36,9 @@ production에서 migration은 일반 application code보다 훨씬 비가역적�
 - one-revision-per-PR 원칙은 왜 중요할까요?
 - Alembic-aware PR template과 CI checks는 어떻게 구성할까요?
 - dev=SQLite, staging+prod=PostgreSQL 같은 multi-environment 전략은 어떻게 가져갈까요?
+- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 앞선 아홉 편은 한 명의 엔지니어가 자신의 환경에서 migration을 안전하게 적용하는 방법을 설명했습니다. 하지만 팀이 동시에 schema를 바꾸기 시작하면 문제가 달라집니다. 두 사람이 동시에 revision을 만들면 multi-head가 생기고, downgrade 검증이 없으면 rollback이 깨지며, production schema가 drift하기 시작하면 어디부터 손대야 할지도 모르게 됩니다. 운영 안정성은 코드 품질이 아니라 workflow 품질에서 나옵니다.
 

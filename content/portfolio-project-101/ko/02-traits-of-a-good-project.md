@@ -26,7 +26,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Portfolio Project 101 시리즈의 2번째 글입니다. 여기서는 채용 관점에서 좋은 프로젝트를 가르는 조건이 무엇인지, 왜 완성도와 문제 선명도가 기능 개수보다 더 중요하게 읽히는지 봅니다.
 
-
 ![Portfolio Project 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/02/02-01-diagram.ko.png)
 *Portfolio Project 101 2장 흐름 개요*
 > 좋은 포트폴리오 프로젝트는 스택의 최신성으로 만들어지지 않습니다. 문제의 명확함과 설명의 정돈 정도로 만들어집니다.
@@ -36,6 +35,9 @@ last_reviewed: '2026-05-15'
 - 왜 큰 프로젝트가 항상 더 좋은 포트폴리오가 되지는 않을까요?
 - 문제 정의, 결과 지표, 유지보수성, 재현성은 각각 어떻게 드러날까요?
 - 기능이 적어도 강한 프로젝트로 읽히게 만드는 기준은 무엇일까요?
+- 머릿속에 먼저 그릴 그림에서 가장 흔한 실수는 무엇일까요?
+- 바꾸기 전과 후을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별로 살펴보기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 좋은 프로젝트의 조건을 알면 어디에 시간을 써야 하는지가 분명해집니다. 초보 개발자는 종종 기능 추가에 대부분의 시간을 쓰고, README나 테스트, 배포 안정성은 뒤로 미룹니다. 하지만 리뷰어는 기능 개수보다 문제의 선명함, 마무리 수준, 반복 가능성을 더 빨리 확인합니다.
 
@@ -296,7 +298,6 @@ Docker, 시드 데이터, 실행 명령은 모두 재현성을 높이는 장치�
 import time
 import httpx
 
-
 def benchmark_api(url: str, iterations: int = 100) -> dict:
     """API 응답 시간을 측정합니다."""
     latencies = []
@@ -313,7 +314,6 @@ def benchmark_api(url: str, iterations: int = 100) -> dict:
         "p99_ms": latencies[int(len(latencies) * 0.99)],
         "success_rate": sum(1 for l in latencies if l < 500) / len(latencies),
     }
-
 
 if __name__ == "__main__":
     result = benchmark_api("https://demo.example.com/api/schedules")

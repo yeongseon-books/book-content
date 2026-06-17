@@ -27,7 +27,6 @@ branch를 나누는 일보다 더 중요한 것은 다시 합치는 일입니다
 
 이 글은 Git/GitHub 101 시리즈의 다섯 번째 글입니다. 여기서는 fast-forward, three-way merge, conflict 해결 흐름을 한 번에 정리합니다.
 
-
 ![Git & GitHub 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/05/05-01-mental-model.ko.png)
 *Git & GitHub 101 5장 흐름 개요*
 
@@ -38,6 +37,9 @@ branch를 나누는 일보다 더 중요한 것은 다시 합치는 일입니다
 - fast-forward merge는 언제 일어날까요?
 - three-way merge는 왜 부모가 두 개인 commit을 만들까요?
 - conflict marker의 `HEAD` 쪽과 incoming branch 쪽은 어떻게 읽을까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 branch를 나눠 작업했다면 결국 언젠가는 다시 합쳐야 합니다. PR이 merge될 때도, 동료의 변경을 내 branch에 가져올 때도, 장시간 작업한 기능을 `main`에 올릴 때도 merge가 일어납니다.
 
@@ -391,7 +393,6 @@ merge 전에는 가능한 한 `main`을 최신으로 맞추는 편이 좋습니�
 merge에는 크게 두 가지가 있습니다. 직선 이력이면 fast-forward로 포인터만 이동하고, 갈라진 이력이면 three-way merge로 새 commit을 만듭니다. conflict가 나면 Git은 멈추고 marker를 남기며, 사람은 파일을 고친 뒤 `git add`, `git commit`으로 마무리합니다. 어렵게 느껴지면 `git merge --abort`가 중간 탈출구가 됩니다.
 
 다음 글에서는 로컬 저장소를 GitHub remote에 연결하고 `git remote`, `git push`, `git pull`을 순서대로 다룹니다.
-
 
 ## 실전 CLI 시나리오
 

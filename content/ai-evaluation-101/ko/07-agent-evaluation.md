@@ -43,6 +43,9 @@ seo_description: 에이전트는 여러 단계를 거쳐 답을 만듭니다. �
 - agent 평가는 왜 단일 응답보다 trajectory를 함께 봐야 할까요?
 - tool selection, step count, recovery metric은 각각 어떤 운영 리스크를 잡을까요?
 - agent eval dashboard에는 어떤 step-level 신호가 반드시 들어가야 할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

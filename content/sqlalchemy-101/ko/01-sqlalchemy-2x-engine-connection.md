@@ -42,6 +42,9 @@ seo_description: SQLAlchemy 2.x의 Engine과 Connection, 트랜잭션 경계를 
 - `Engine`은 정확히 무엇이고, `Connection`과 어떻게 역할을 나눌까요?
 - SQLAlchemy 2.x가 트랜잭션을 더 명시적으로 다루는 이유는 무엇일까요?
 - `connect()`와 `begin()`은 언제 구분해서 써야 할까요?
+- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 많은 SQLAlchemy 입문 자료가 ORM의 `Base = declarative_base()`부터 시작합니다. 그 결과 ORM이 아닌 곳에서 문제가 발생했을 때, 예컨대 connection이 끊어졌거나 transaction이 의도와 다르게 commit되었을 때, 어디를 들여다봐야 할지 감을 잡기 어렵습니다. Engine과 Connection은 ORM의 Session을 받쳐주는 토대이고, Session 내부에서 문제가 생기면 결국 Connection 수준에서 디버깅해야 합니다.
 

@@ -42,6 +42,9 @@ seo_description: MetaData, Table, Column으로 스키마를 Python 객체로 모
 - `MetaData`는 어떤 역할을 하고 왜 스키마 카탈로그라고 부를까요?
 - `Table`과 `Column`을 Python 객체로 두면 어떤 실수가 줄어들까요?
 - SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요?
+- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 raw SQL로 schema를 관리하면 한 가지 큰 문제가 생깁니다. application code 안의 INSERT/SELECT 문에 적힌 컬럼 이름이 실제 schema와 어긋나도 컴파일 시점에 알 수 없습니다. 운영 중에 갑자기 `no such column` 같은 오류가 발생하고, IDE는 컬럼 이름 자동완성도 해주지 못합니다.
 

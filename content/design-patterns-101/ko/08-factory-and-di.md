@@ -41,6 +41,9 @@ last_reviewed: '2026-05-23'
 - 객체가 자기 협력자를 직접 만들면 왜 테스트가 어려워질까요?
 - Constructor injection, setter injection, method injection 중 어떤 것을 기본으로 삼아야 할까요?
 - DI 컨테이너를 도입하면 정확히 무엇을 얻고 무엇을 잃을까요?
+- 왜 조립과 사용을 한 곳에서 하면 안 되는가에서 가장 흔한 실수는 무엇일까요?
+- Composition Root — 그래프가 한 번만 그려지는 지점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- Factory가 Composition Root 안에서 하는 역할의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 조립과 사용을 한 곳에서 하면 안 되는가
 
@@ -100,7 +103,6 @@ class OrderService:
         self.repo = repo
         self.mailer = mailer
 
-
 # Setter injection — 생성 후 나중에 주입
 class OrderService:
     def __init__(self) -> None:
@@ -109,7 +111,6 @@ class OrderService:
 
     def set_repo(self, repo: OrderRepository) -> None:
         self.repo = repo
-
 
 # Method injection — 호출마다 의존성 전달
 class OrderService:
@@ -138,7 +139,6 @@ from order.service import OrderService
 from order.repo import PostgresOrderRepo
 from order.mailer import SmtpMailer, LogMailer
 from order.events import RabbitEventBus, InMemoryEventBus
-
 
 def bootstrap() -> OrderService:
     env = os.environ.get("APP_ENV", "dev")
@@ -186,10 +186,8 @@ Composition Root의 규칙은 단순합니다.
 from typing import Protocol
 from order.mailer import SmtpMailer, LogMailer, SesMailer
 
-
 class Mailer(Protocol):
     def send_confirmation(self, to: str, order_id: str) -> None: ...
-
 
 def create_mailer(env: str) -> Mailer:
     match env:
@@ -213,7 +211,6 @@ from typing import Annotated
 
 app = FastAPI()
 
-
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
@@ -221,16 +218,13 @@ def get_db() -> Generator[Session, None, None]:
     finally:
         db.close()
 
-
 def get_order_repo(db: Annotated[Session, Depends(get_db)]) -> PostgresOrderRepo:
     return PostgresOrderRepo(db)
-
 
 def get_order_service(
     repo: Annotated[OrderRepository, Depends(get_order_repo)],
 ) -> OrderService:
     return OrderService(repo=repo, mailer=LogMailer(), event_bus=InMemoryEventBus())
-
 
 @app.post("/orders")
 def create_order(
@@ -246,14 +240,12 @@ def create_order(
 ```python
 from fastapi.testclient import TestClient
 
-
 def get_fake_order_service() -> OrderService:
     return OrderService(
         repo=InMemoryOrderRepo(),
         mailer=LogMailer(),
         event_bus=InMemoryEventBus(),
     )
-
 
 app.dependency_overrides[get_order_service] = get_fake_order_service
 client = TestClient(app)
@@ -271,7 +263,6 @@ assert response.status_code == 200
 ```python
 # dependency-injector 예시
 from dependency_injector import containers, providers
-
 
 class Container(containers.DeclarativeContainer):
     config = providers.Configuration()
@@ -333,7 +324,6 @@ class ServiceLocator:
     def get(cls, interface: type) -> object:
         return cls._services[interface]
 
-
 class OrderService:
     def place_order(self, order: Order) -> None:
         repo = ServiceLocator.get(OrderRepository)  # 여기가 문제
@@ -374,7 +364,6 @@ def create_sender() -> MessageSender:
         return SlackSender(webhook_url=os.environ["SLACK_WEBHOOK"])
     return ConsoleSender()
 
-
 class NotificationService:
     def notify(self, user_id: str, message: str) -> None:
         sender = create_sender()  # 여전히 서비스가 생성 시점을 결정
@@ -412,14 +401,12 @@ Constructor injection의 가장 직접적인 보상은 테스트입니다.
 ```python
 from dataclasses import dataclass, field
 
-
 @dataclass
 class FakeSender:
     sent: list[str] = field(default_factory=list)
 
     def send(self, message: str) -> None:
         self.sent.append(message)
-
 
 def test_notify_sends_formatted_message() -> None:
     sender = FakeSender()
@@ -471,6 +458,10 @@ def bootstrap() -> OrderService:
 - [ ] Factory Method와 Abstract Factory의 차이를 설명할 수 있습니다.
 - [ ] 의존성 주입이 테스트를 쉽게 만드는 이유를 말할 수 있습니다.
 - [ ] Python에서 DI를 구현하는 방법을 보여줄 수 있습니다.
+
+## 정리
+
+이 글은 design-patterns-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
 
 ## 처음 질문으로 돌아가기
 

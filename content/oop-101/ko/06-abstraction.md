@@ -26,7 +26,6 @@ seo_description: ABC와 abstractmethod로 공통 인터페이스를 강제하는
 
 Python에서 추상화는 이론 용어로 끝나지 않습니다. 어떤 메서드를 반드시 구현해야 하는지, 어떤 단계는 부모가 공통으로 가져가야 하는지, 어디까지를 팀의 계약으로 강제할지를 정하는 실무 설계 문제에 더 가깝습니다.
 
-
 ![Object-Oriented Programming 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/06/06-01-concept-overview.ko.png)
 *Object-Oriented Programming 101 6장 흐름 개요*
 
@@ -37,6 +36,9 @@ Python에서 추상화는 이론 용어로 끝나지 않습니다. 어떤 메서
 - 덕 타이핑 관례만으로는 언제부터 부족해질까요?
 - 추상 클래스는 어떤 메서드와 프로퍼티를 반드시 강제해야 할까요?
 - 템플릿 메서드 패턴은 부모가 흐름을 지키고 자식이 세부 구현을 맡게 만드는 데 어떻게 도움이 될까요?
+- 핵심 개념 잡기에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 핵심 개념 잡기
 
@@ -452,7 +454,6 @@ class OrderUseCase:
 from dataclasses import dataclass
 from typing import Protocol
 
-
 @dataclass
 class LineItem:
     name: str
@@ -462,16 +463,13 @@ class LineItem:
     def subtotal(self) -> int:
         return self.quantity * self.unit_price
 
-
 class DiscountPolicy(Protocol):
     def apply(self, amount: int) -> int:
         ...
 
-
 class NoDiscount:
     def apply(self, amount: int) -> int:
         return amount
-
 
 class PercentDiscount:
     def __init__(self, percent: int) -> None:
@@ -481,7 +479,6 @@ class PercentDiscount:
 
     def apply(self, amount: int) -> int:
         return int(amount * (100 - self.percent) / 100)
-
 
 class Invoice:
     def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
@@ -550,7 +547,6 @@ class WeekendPolicy:
         if is_weekend:
             return int(amount * 0.95)
         return amount
-
 
 def estimate(amount: int, is_weekend: bool) -> int:
     policy = WeekendPolicy()

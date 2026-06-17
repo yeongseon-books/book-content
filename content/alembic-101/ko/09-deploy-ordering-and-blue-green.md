@@ -35,6 +35,9 @@ seo_description: migration은 항상 "코드보다 먼저, 그리고 코드보�
 - migration-first와 code-first deploy ordering은 어떻게 다를까요?
 - 왜 blue/green deploy는 두 앱 버전과 동시에 호환되는 schema를 요구할까요?
 - NOT NULL 강화는 왜 두 단계로 나눠야 할까요?
+- 멘탈 모델에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 production schema 사고의 상당수는 코드와 schema가 잘못된 순서로 배포될 때 발생합니다. 새 컬럼이 코드보다 먼저 존재하면 안전하지만, 코드가 새 컬럼을 먼저 가정하고 schema가 뒤따라오면 즉시 500 에러가 납니다. blue/green에서는 v1과 v2가 동시에 같은 schema를 읽고 쓰므로, schema는 전환 구간 내내 양쪽을 모두 수용해야 합니다.
 

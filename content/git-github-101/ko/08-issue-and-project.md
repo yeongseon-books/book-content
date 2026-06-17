@@ -27,7 +27,6 @@ seo_description: GitHub Issue와 Project로 일감 흐름을 추적하는 방법
 
 이 글은 Git/GitHub 101 시리즈의 여덟 번째 글입니다. 여기서는 Issue, Pull Request, Project board를 하나의 작업 추적 흐름으로 연결해 봅니다.
 
-
 ![Git & GitHub 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-mental-model.ko.png)
 *Git & GitHub 101 8장 흐름 개요*
 
@@ -38,6 +37,9 @@ seo_description: GitHub Issue와 Project로 일감 흐름을 추적하는 방법
 - GitHub Issue는 commit이나 PR과 어떻게 다를까요?
 - label, assignee, milestone은 언제 유용할까요?
 - PR 본문의 `Closes #42`는 왜 중요한 자동화일까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 지금까지의 시리즈는 코드 변경 자체를 기록하는 법에 집중했습니다. 하지만 실무에서는 그보다 먼저 "무엇을 해야 하지?"라는 질문이 더 자주 나옵니다. Issue와 Project는 이 질문을 코드 저장소 바로 옆에서 다루게 해 줍니다.
 
@@ -267,7 +269,6 @@ issue 템플릿, milestone, `good first issue`, Project 자동화는 팀 규모�
 issue는 할 일, PR은 그 일을 끝내는 변경, Project는 현재 상태를 보여 주는 보드입니다. PR 본문에 `Closes #N`을 적으면 merge 시 issue가 자동으로 닫히고, label, milestone, assignee는 작업을 분류하고 맡기고 묶는 데 쓰입니다.
 
 다음 글에서는 PR 본문보다 더 짧지만 훨씬 자주 읽히는 commit message를 다룹니다.
-
 
 ## 이슈 템플릿으로 입력 품질 고정하기
 

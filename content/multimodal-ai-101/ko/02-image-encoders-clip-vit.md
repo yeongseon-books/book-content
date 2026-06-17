@@ -44,6 +44,9 @@ seo_description: multimodal 시스템의 품질은 결국 image encoder가 만�
 - 왜 멀티모달 입문에서 image encoder부터 이해하는 편이 전체 구조를 가장 빠르게 잡게 해 줄까요?
 - ViT는 이미지를 어떤 방식으로 token sequence로 바꾸고, CNN과 무엇이 다를까요?
 - CLIP은 어떻게 텍스트와 이미지를 같은 embedding space에 맞추고 zero-shot을 가능하게 할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

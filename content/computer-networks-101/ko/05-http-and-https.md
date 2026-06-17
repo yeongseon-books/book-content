@@ -25,7 +25,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 5번째 글입니다.
 
-
 ![Computer Networks 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/05/05-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 5장 흐름 개요*
 
@@ -34,6 +33,9 @@ last_reviewed: '2026-05-15'
 - HTTP 메시지는 어떤 모양으로 구성될까요?
 - 메서드와 상태 코드는 왜 의미를 정확히 지켜야 할까요?
 - `Content-Type`, `Cache-Control`, `Authorization` 같은 헤더는 왜 중요할까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 적용 전후 비교을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별로 따라하기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 HTTP는 백엔드, 프론트엔드, 모바일, 데이터 서비스, ML 서빙까지 거의 모든 시스템의 공통 언어입니다. 메서드와 상태 코드를 잘못 쓰면 캐시, 재시도, 오류 처리 정책이 조용히 망가집니다. HTTPS가 기본값이 된 시대에도 왜 필요한지 설명하지 못하면 인증서 만료, mixed content, HSTS 같은 사고가 늘 낯설게 느껴집니다.
 

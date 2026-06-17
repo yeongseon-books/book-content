@@ -28,7 +28,6 @@ seo_description: Python 상속, 오버라이딩, super(), MRO를 실무 기준�
 
 이 글은 OOP 101 시리즈의 4번째 글입니다.
 
-
 ![Object-Oriented Programming 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/04/04-01-concept-overview.ko.png)
 *Object-Oriented Programming 101 4장 흐름 개요*
 
@@ -37,6 +36,9 @@ seo_description: Python 상속, 오버라이딩, super(), MRO를 실무 기준�
 - 상속이 코드 중복을 줄일 수는 있지만, 왜 동시에 강한 결합도 만들까요?
 - 오버라이딩과 `super()`는 어떤 식으로 함께 써야 안전할까요?
 - `isinstance()`와 `issubclass()`는 상속 관계를 읽을 때 왜 중요할까요?
+- 핵심 개념 잡기에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 핵심 개념 잡기
 
@@ -395,7 +397,6 @@ class Flyable(Protocol):
 from dataclasses import dataclass
 from typing import Protocol
 
-
 @dataclass
 class LineItem:
     name: str
@@ -405,16 +406,13 @@ class LineItem:
     def subtotal(self) -> int:
         return self.quantity * self.unit_price
 
-
 class DiscountPolicy(Protocol):
     def apply(self, amount: int) -> int:
         ...
 
-
 class NoDiscount:
     def apply(self, amount: int) -> int:
         return amount
-
 
 class PercentDiscount:
     def __init__(self, percent: int) -> None:
@@ -424,7 +422,6 @@ class PercentDiscount:
 
     def apply(self, amount: int) -> int:
         return int(amount * (100 - self.percent) / 100)
-
 
 class Invoice:
     def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
@@ -494,7 +491,6 @@ class WeekendPolicy:
             return int(amount * 0.95)
         return amount
 
-
 def estimate(amount: int, is_weekend: bool) -> int:
     policy = WeekendPolicy()
     return policy.apply(amount, is_weekend)
@@ -507,7 +503,6 @@ def estimate(amount: int, is_weekend: bool) -> int:
 | 새 정책 추가 시 기존 함수 수정이 필요한가 | 아니오 |
 | 예외 정책이 기존 계약과 같은가 | 예 |
 | 테스트가 정책별로 분리되어 있는가 | 예 |
-
 
 ## 리팩터링 회고: 변경 비용을 수치로 보는 방법
 
@@ -523,7 +518,6 @@ def complexity_signal(changed_files: int, branch_count: int) -> str:
 ```
 
 위 방식은 엄밀한 메트릭은 아니지만, 팀이 감각이 아니라 기준으로 논의하게 만드는 데 유용합니다.
-
 
 ## 추가 비교표: 설계 결정 매트릭스
 
@@ -566,7 +560,6 @@ def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
 
 이 비교는 성능 수치가 아니라 유지보수 리드타임을 줄이는 관점에서 중요합니다.
 
-
 ## 추가 코드 예시: 규칙 변경을 메서드로 고립
 
 ```python
@@ -580,7 +573,6 @@ class Membership:
         if self.level == 'silver':
             return 10
         return 0
-
 
 class PriceCalculator:
     def __init__(self, membership: Membership) -> None:

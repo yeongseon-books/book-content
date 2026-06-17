@@ -27,7 +27,6 @@ last_reviewed: '2026-05-12'
 
 클럭 속도 상승이 멈춘 뒤 성능 향상의 대부분은 코어를 더하는 방향으로 왔습니다. 하지만 코어를 더하는 것과 코드를 빠르게 만드는 것은 전혀 같은 일이 아닙니다.
 
-
 ![Computer Architecture 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/09/09-01-big-picture.ko.png)
 *Computer Architecture 101 9장 흐름 개요*
 
@@ -38,6 +37,9 @@ last_reviewed: '2026-05-12'
 - 동시성과 병렬성은 무엇이 다를까요?
 - 멀티코어에서는 어떤 비용이 새로 생길까요?
 - 락 경합과 false sharing은 왜 위험할까요?
+- 단계별로 따라가기에서 가장 흔한 실수는 무엇일까요?
+- 자주 하는 실수 5가지을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 시니어 엔지니어는 이렇게 생각합니다의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 오늘날의 서버, 노트북, 휴대폰은 모두 멀티코어입니다. 한 코어만 더 빠르게 돌아가던 시대는 끝났고, 성능을 끌어내려면 일을 여러 코어에 나누는 감각이 필요합니다.
 
@@ -536,7 +538,6 @@ class GoodLayout:
 print(f"BadLayout 크기 추정: counter 간 거리 < {CACHE_LINE_SIZE}B → false sharing 위험")
 print(f"GoodLayout 크기 추정: counter 간 거리 >= {CACHE_LINE_SIZE}B → 안전")
 ```
-
 
 ### 이종 코어(Heterogeneous) 아키텍처
 

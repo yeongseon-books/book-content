@@ -43,6 +43,9 @@ kubelet이 무엇을 결정하고, CRI가 어떤 계약을 제공하고, contain
 - kubelet은 정확히 무엇을 감시하고 어떤 시점에 CRI를 호출할까요?
 - dockershim이 사라진 뒤 AKS 노드 디버깅 방식은 왜 달라졌을까요?
 - `RunPodSandbox`, `PullImage`, `CreateContainer`, `StartContainer`는 왜 이 순서로 호출될까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

@@ -37,6 +37,9 @@ seo_description: issue부터 PR, merge, release tag까지 이어지는 실전 �
 - GitHub Flow는 왜 작은 팀에서 특히 잘 맞을까요?
 - issue, branch, commit, PR, merge, tag는 어떤 순서로 연결될까요?
 - 흐름 중간에 잘못된 branch에 commit하거나, 잘못 push했을 때 어떤 명령으로 회복할까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별 실습의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 같은 `git commit`도 어디에 찍느냐에 따라 의미가 달라집니다. feature branch의 중간 commit인지, squash merge 후 `main`에 남을 대표 기록인지, release 직전 태그와 함께 묶일 변경인지에 따라 읽는 방법이 달라집니다. workflow는 결국 팀의 약속입니다.
 

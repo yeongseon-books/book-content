@@ -43,6 +43,9 @@ HPA는 이미 replica를 올렸지만 scheduler가 새 Pod를 놓을 빈자리�
 - HPA는 어떤 메트릭을 어떤 주기로 읽고 desired replica를 계산할까요?
 - Cluster Autoscaler는 어떤 신호를 보고 “새 노드가 필요하다”고 판단할까요?
 - HPA와 Cluster Autoscaler가 동시에 움직일 때 race window는 왜 생길까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

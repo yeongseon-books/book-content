@@ -40,6 +40,9 @@ last_reviewed: '2026-05-23'
 - 모든 `if/elif` 분기가 Strategy 후보일까요, 아니면 특정 조건을 만족해야 할까요?
 - Python에서 Strategy를 클래스로 만드는 것과 함수로 만드는 것은 언제 갈라질까요?
 - Strategy를 런타임에 교체하면 어떤 운영상 이점이 생길까요?
+- 분기 폭발이 정말 Strategy 후보인지 가려내는 방법에서 가장 흔한 실수는 무엇일까요?
+- Strategy와 OCP — 변경의 모양을 바꾸는 리팩토링을 실무에 적용할 때 주의할 점은 무엇일까요?
+- Strategy가 테스트를 단순하게 만드는 구조의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 분기 폭발이 정말 Strategy 후보인지 가려내는 방법
 
@@ -61,16 +64,13 @@ last_reviewed: '2026-05-23'
 from typing import Protocol
 from dataclasses import dataclass
 
-
 class PricingStrategy(Protocol):
     def calculate(self, base_price: int, quantity: int) -> int: ...
-
 
 @dataclass
 class StandardPricing:
     def calculate(self, base_price: int, quantity: int) -> int:
         return base_price * quantity
-
 
 @dataclass
 class BulkPricing:
@@ -81,7 +81,6 @@ class BulkPricing:
         if quantity >= self.threshold:
             return int(base_price * quantity * (1 - self.discount_rate))
         return base_price * quantity
-
 
 @dataclass
 class TieredPricing:
@@ -105,21 +104,17 @@ from typing import Callable
 
 PricingFn = Callable[[int, int], int]
 
-
 def standard_pricing(base_price: int, quantity: int) -> int:
     return base_price * quantity
 
-
 def vip_pricing(base_price: int, quantity: int) -> int:
     return int(base_price * quantity * 0.7)
-
 
 def seasonal_pricing(discount: float) -> PricingFn:
     """클로저로 설정을 캡처하는 함수 Strategy."""
     def _calculate(base_price: int, quantity: int) -> int:
         return int(base_price * quantity * (1 - discount))
     return _calculate
-
 
 class Order:
     def __init__(self, pricing: PricingFn = standard_pricing):
@@ -139,7 +134,6 @@ PRICING_STRATEGIES: dict[str, PricingFn] = {
     "vip": vip_pricing,
     "summer_sale": seasonal_pricing(0.2),
 }
-
 
 def calculate_price(tier: str, base_price: int, quantity: int) -> int:
     strategy = PRICING_STRATEGIES.get(tier)
@@ -187,25 +181,20 @@ class ShippingCalculator:
 ```python
 from typing import Protocol
 
-
 class ShippingStrategy(Protocol):
     def cost(self, weight_kg: float) -> int: ...
-
 
 class StandardShipping:
     def cost(self, weight_kg: float) -> int:
         return int(3000 + 500 * weight_kg)
 
-
 class ExpressShipping:
     def cost(self, weight_kg: float) -> int:
         return int(6000 + 800 * weight_kg)
 
-
 class SameDayShipping:
     def cost(self, weight_kg: float) -> int:
         return int(15000 + 1200 * weight_kg)
-
 
 class ShippingCalculator:
     def __init__(self, strategy: ShippingStrategy):
@@ -228,7 +217,6 @@ class RetryPolicy(Protocol):
     def should_retry(self, attempt: int, error: Exception) -> bool: ...
     def delay_seconds(self, attempt: int) -> float: ...
 
-
 class NoRetry:
     """아무것도 재시도하지 않는 Null Object Strategy."""
     def should_retry(self, attempt: int, error: Exception) -> bool:
@@ -236,7 +224,6 @@ class NoRetry:
 
     def delay_seconds(self, attempt: int) -> float:
         return 0.0
-
 
 class ExponentialBackoff:
     def __init__(self, base: float = 1.0, max_attempts: int = 5):
@@ -248,7 +235,6 @@ class ExponentialBackoff:
 
     def delay_seconds(self, attempt: int) -> float:
         return self._base * (2 ** attempt)
-
 
 class HttpClient:
     def __init__(self, retry: RetryPolicy | None = None):
@@ -296,19 +282,16 @@ from typing import Callable, Any
 
 _REGISTRY: dict[str, Any] = {}
 
-
 def register_strategy(name: str) -> Callable:
     def decorator(cls: type) -> type:
         _REGISTRY[name] = cls()
         return cls
     return decorator
 
-
 def get_strategy(name: str) -> ShippingStrategy:
     if name not in _REGISTRY:
         raise ValueError(f"No strategy registered for: {name}")
     return _REGISTRY[name]
-
 
 @register_strategy("overnight")
 class OvernightShipping:
@@ -329,7 +312,6 @@ overnight = "myapp.shipping.overnight:OvernightShipping"
 ```python
 from importlib.metadata import entry_points
 
-
 def load_shipping_strategies() -> dict[str, ShippingStrategy]:
     eps = entry_points(group="myapp.shipping")
     return {ep.name: ep.load()() for ep in eps}
@@ -345,7 +327,6 @@ Strategy의 핵심 특성은 컨텍스트가 알고리즘 내부를 모른다는
 
 ```python
 import random
-
 
 class ABTestPricingSelector:
     """Feature flag 기반으로 Strategy를 선택하는 팩토리."""
@@ -366,7 +347,6 @@ class ABTestPricingSelector:
         if bucket < self._ratio * 100:
             return self._experiment
         return self._control
-
 
 # 사용
 selector = ABTestPricingSelector(
@@ -393,7 +373,6 @@ def test_order_total_uses_injected_strategy():
 
     order = Order(pricing=fixed_pricing)
     assert order.total(base_price=10000, quantity=3) == 999
-
 
 def test_exponential_backoff_delay():
     """Strategy 자체를 독립적으로 단위 테스트."""
@@ -438,12 +417,10 @@ Strategy가 Context의 상태를 직접 바꾸면 Strategy 간 교체가 안전�
 # 좋은 예 — Strategy는 결과만 반환
 from dataclasses import dataclass
 
-
 @dataclass
 class PricingResult:
     final_price: int
     applied_label: str
-
 
 class AggressiveDiscount:
     def calculate(self, base_price: int, quantity: int) -> PricingResult:
@@ -458,6 +435,10 @@ class AggressiveDiscount:
 - [ ] Strategy 패턴의 구성 요소를 나열할 수 있습니다.
 - [ ] if/else 분기를 Strategy로 바꾸는 기준을 설명할 수 있습니다.
 - [ ] Python에서 Strategy를 구현하는 방법을 보여줄 수 있습니다.
+
+## 정리
+
+이 글은 design-patterns-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
 
 ## 처음 질문으로 돌아가기
 

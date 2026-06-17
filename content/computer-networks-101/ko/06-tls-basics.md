@@ -25,7 +25,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 6번째 글입니다.
 
-
 ![Computer Networks 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/06/06-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 6장 흐름 개요*
 
@@ -34,6 +33,9 @@ last_reviewed: '2026-05-15'
 - TLS가 보장하는 세 가지는 무엇일까요?
 - 핸드셰이크는 어떤 순서로 진행될까요?
 - 인증서, CA, 체인, trust store는 어떤 관계일까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 적용 전후 비교을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별로 따라하기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 TLS를 머릿속에 그리지 못하면 인증서 만료 사고가 생겼을 때 손을 대기 어렵고, self-signed 인증서를 그냥 무시하는 위험한 코드도 쉽게 들어갑니다. mTLS, 서비스 메시, zero-trust 같은 현대 인프라는 TLS를 기본 전제로 삼습니다. "왜 안전한가"를 자기 언어로 설명하지 못하면 보안 설계는 금세 관성에 휩쓸립니다.
 

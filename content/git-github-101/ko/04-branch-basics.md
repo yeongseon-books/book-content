@@ -27,7 +27,6 @@ branch를 이해하는 순간 Git은 백업 도구에서 병렬 작업 도구로
 
 이 글은 Git/GitHub 101 시리즈의 네 번째 글입니다. 여기서는 branch를 만들고, 옮기고, 비교하는 흐름까지만 다루고, branch 사이를 합치는 merge는 별도 글에서 다룹니다.
 
-
 ![Git & GitHub 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/04/04-01-mental-model.ko.png)
 *Git & GitHub 101 4장 흐름 개요*
 
@@ -38,6 +37,9 @@ branch를 이해하는 순간 Git은 백업 도구에서 병렬 작업 도구로
 - branch는 왜 파일 복사본이 아니라 포인터라고 할까요?
 - `git branch`와 `git switch`는 역할이 어떻게 다를까요?
 - `HEAD`는 branch와 어떤 관계를 가질까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 작업이 하나뿐일 때는 `main`만으로도 버틸 수 있습니다. 하지만 기능 개발과 버그 수정이 동시에 진행되는 순간부터는 같은 폴더 안에 여러 작업 줄기를 갖고 싶어집니다. 폴더 복사로도 흉내는 낼 수 있지만, 어느 폴더가 최신인지 기억해야 하고 변경을 다시 합치는 표준 절차도 없습니다.
 
@@ -501,7 +503,6 @@ branch는 작업 단위마다 짧게 만들고 빨리 닫는 편이 좋습니다
 branch는 commit을 가리키는 가벼운 포인터이고, `HEAD`는 현재 작업 branch를 가리키는 또 다른 포인터입니다. `git branch`는 만들기, `git switch`는 이동, `git switch -c`는 두 동작을 한 번에 처리합니다. branch끼리의 차이는 `git log A..B`와 `git diff A B`로 읽습니다.
 
 다음 글에서는 갈라진 branch를 다시 합치는 `git merge`와 conflict 해결 흐름을 다룹니다.
-
 
 ## 실전 CLI 시나리오
 

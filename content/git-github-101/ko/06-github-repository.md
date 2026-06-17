@@ -27,7 +27,6 @@ seo_description: GitHub remote를 연결하고 push, fetch, pull, clone을 익�
 
 이 글은 Git/GitHub 101 시리즈의 여섯 번째 글입니다. 여기서는 로컬 저장소를 GitHub에 연결하고 첫 push, fetch, pull, clone 흐름을 순서대로 살펴봅니다.
 
-
 ![Git & GitHub 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/06/06-01-mental-model.ko.png)
 *Git & GitHub 101 6장 흐름 개요*
 
@@ -38,6 +37,9 @@ seo_description: GitHub remote를 연결하고 push, fetch, pull, clone을 익�
 - remote는 정확히 무엇이고 왜 첫 이름이 보통 `origin`일까요?
 - 빈 GitHub 저장소를 로컬 저장소에 연결하는 순서는 어떻게 될까요?
 - `git push -u origin main`은 한 번에 무엇을 두 가지나 설정할까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 노트북 안에만 있는 저장소는 협업 관점에서 개인 노트와 크게 다르지 않습니다. 다른 사람과 코드를 공유하거나, 기기를 잃어버려도 history를 잃지 않으려면 저장소가 다른 위치에도 있어야 합니다. GitHub가 그 대표적인 위치입니다.
 
@@ -501,7 +503,6 @@ HTTPS와 SSH 중 무엇을 쓸지는 네트워크 환경과 인증 습관이 결
 remote는 다른 위치의 저장소를 가리키는 별칭이고, 첫 이름은 보통 `origin`입니다. `git push`는 로컬 commit을 올리고, `git fetch`는 가져오기만 하며, `git pull`은 가져온 뒤 합칩니다. `git push -u origin main`은 upstream까지 설정해 이후 명령을 짧게 만들어 줍니다. `git clone`은 새 로컬 사본을 만들고 `origin`도 자동으로 등록합니다.
 
 다음 글에서는 GitHub 협업의 핵심 단위인 Pull Request를 다룹니다. branch에서 작업한 변경이 리뷰를 거쳐 `main`으로 들어가는 과정을 따라가 보겠습니다.
-
 
 ## 실전 CLI 시나리오
 

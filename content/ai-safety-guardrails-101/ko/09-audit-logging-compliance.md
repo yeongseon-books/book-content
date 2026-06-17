@@ -43,6 +43,9 @@ LLM 시스템의 audit log는 시끄러운 application log가 아닙니다. 나�
 - 감사 로그는 일반 디버그 로그와 무엇이 달라야 compliance에 쓸 수 있을까요?
 - PII masking, append-only storage, decision rationale은 각각 어떤 증거를 남길까요?
 - 자동 compliance report를 만들려면 로그 schema에 무엇이 고정되어야 할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

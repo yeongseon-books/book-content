@@ -40,6 +40,9 @@ seo_description: 핵심은 SQL 토큰화(tokenization)가 binding보다 먼저 �
 - 왜 `find_user_BAD("Alice' OR 1=1 --")`는 전체 행을 유출하지만 `WHERE name = ?`는 빈 결과를 돌려줄까요?
 - sqlite3에서 `?`, `:name`, `module.paramstyle`은 언제 구분해서 써야 하고 driver 이관 때 무엇을 먼저 확인해야 할까요?
 - `IN (...)`, `ORDER BY`, table name처럼 placeholder가 못 들어가는 자리는 어떻게 안전하게 처리해야 할까요?
+- Mental Model — query string과 값을 끝까지 분리에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## Mental Model — query string과 값을 끝까지 분리
 

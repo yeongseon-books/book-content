@@ -27,7 +27,6 @@ last_reviewed: '2026-05-12'
 
 이 주제는 단순히 하드웨어 교양에 머물지 않습니다. `select`, `epoll`, `async/await`, 이벤트 루프, 시스템 콜 같은 운영체제와 애플리케이션 설계의 핵심이 모두 여기서 출발하기 때문입니다.
 
-
 ![Computer Architecture 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/08/08-01-big-picture.ko.png)
 *Computer Architecture 101 8장 흐름 개요*
 
@@ -38,6 +37,9 @@ last_reviewed: '2026-05-12'
 - CPU와 장치의 속도 차이는 얼마나 클까요?
 - 폴링과 인터럽트는 어떻게 다를까요?
 - DMA는 왜 CPU를 더 자유롭게 만들까요?
+- 단계별로 따라가기에서 가장 흔한 실수는 무엇일까요?
+- 자주 하는 실수 5가지을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 시니어 엔지니어는 이렇게 생각합니다의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 모든 비동기 프로그램은 결국 느린 장치를 효율적으로 다루는 문제를 추상화한 것입니다. 인터럽트와 DMA가 없다면 키 입력 하나, 디스크 읽기 하나가 CPU 전체를 묶어 버릴 것입니다.
 
@@ -516,7 +518,6 @@ dev = PCIeDevice(bar_base=0xFE000000)
 vendor = dev.mmio_read(0x00)
 print(f"Vendor ID: 0x{vendor:04X}")  # Intel
 ```
-
 
 ### I/O 스케줄링: 디스크 접근 최적화
 

@@ -44,6 +44,9 @@ seo_description: 지금까지 9편에 걸쳐 image encoder, VLM 아키텍처, ca
 - production 멀티모달 앱은 어떤 end-to-end 구성 요소를 반드시 분리해서 설계해야 할까요?
 - FastAPI 입구, inference worker, cache, object storage, observability는 어떤 순서로 연결되는 편이 안정적일까요?
 - 동기 처리와 비동기 처리 경계는 어떤 기준으로 나누는 것이 현실적일까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

@@ -37,6 +37,9 @@ RetrievalQA는 편하지만 많은 단계를 감춥니다. 여기서는 LCEL 파
 - `RetrievalQA` 같은 고전 API와 LCEL 조립은 각각 어떤 경계를 숨기고 드러낼까요?
 - retriever, prompt, llm, parser를 직접 이으면 디버깅에서 무엇이 쉬워질까요?
 - 체인 조립 후 source document를 잃지 않으려면 어디서 결과 형태를 고정해야 할까요?
+- 최소 실행 예제에서 가장 흔한 실수는 무엇일까요?
+- 소스 버전을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 3. LCEL로 RAG 체인 조립하기: dict literal은 왜 `RunnableParallel`이 되는가의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 최소 실행 예제
 

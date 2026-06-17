@@ -24,7 +24,6 @@ title: "Data Structures with Python 101 (7/10): 힙과 우선순위 큐"
 
 이 글은 Data Structures with Python 101 시리즈의 일곱 번째 글입니다.
 
-
 ![Data Structures with Python 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/07/07-01-big-picture.ko.png)
 *Data Structures with Python 101 7장 흐름 개요*
 
@@ -33,6 +32,9 @@ title: "Data Structures with Python 101 (7/10): 힙과 우선순위 큐"
 - 가장 작은 값이나 가장 큰 값을 빠르게 꺼내려면 어떤 구조가 필요할까요?
 - 힙은 왜 정렬보다 우선순위 처리에 유리할까요?
 - Python의 `heapq`는 왜 최소 힙만 제공할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -239,7 +241,6 @@ print(merged)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
 힙은 최솟값과 최댓값을 효율적으로 관리하기 위한 구조이고, Python에서는 `heapq`가 그 기능을 간결하게 제공합니다. 핵심은 전체 정렬이 아니라, 우선순위가 가장 높은 하나를 계속 빠르게 꺼내는 데 있습니다. 다음 글에서는 노드와 간선으로 관계를 표현하는 그래프를 봅니다.
 
-
 ## 타입 힌트 기반 우선순위 큐 구현
 
 `heapq`는 모듈 수준 함수로 list를 힙처럼 다룹니다. 여기서는 이를 감싸서 ADT 인터페이스를 제공하는 우선순위 큐를 구현합니다.
@@ -253,14 +254,12 @@ from typing import Generic, Iterator, TypeVar
 
 T = TypeVar("T")
 
-
 @dataclass(order=True)
 class PriorityItem(Generic[T]):
     """우선순위와 데이터를 함께 저장하는 래퍼입니다."""
     priority: float
     sequence: int = field(compare=True)  # 같은 우선순위일 때 삽입 순서 유지
     data: T = field(compare=False)
-
 
 class PriorityQueue(Generic[T]):
     """heapq 기반 우선순위 큐입니다. 낮은 priority가 먼저 나옵니다."""
@@ -322,10 +321,8 @@ print(f"최고 점수: {top_score}")
 import heapq
 import sys
 
-
 def measure(label: str, obj: object) -> None:
     print(f"{label:>30}: {sys.getsizeof(obj):>8} bytes")
-
 
 n = 10_000
 data = list(range(n))
@@ -349,16 +346,13 @@ measure("sorted list (10k)", sorted_data)
 import heapq
 import timeit
 
-
 def bench_heapify(n: int = 100_000) -> None:
     data = list(range(n, 0, -1))
     heapq.heapify(data)
 
-
 def bench_sort(n: int = 100_000) -> None:
     data = list(range(n, 0, -1))
     data.sort()
-
 
 trials = 20
 t_heap = timeit.timeit(bench_heapify, number=trials)
@@ -380,14 +374,11 @@ import heapq
 import random
 import timeit
 
-
 def bench_nlargest_heap(data: list[int], k: int) -> None:
     heapq.nlargest(k, data)
 
-
 def bench_nlargest_sort(data: list[int], k: int) -> None:
     sorted(data, reverse=True)[:k]
-
 
 n = 100_000
 k = 10
@@ -408,7 +399,6 @@ k가 작을 때 `heapq.nlargest`는 O(n log k)로 동작해 O(n log n) 정렬보
 ```python
 import heapq
 
-
 class MedianFinder:
     """스트리밍 데이터에서 중앙값을 O(log n)에 유지합니다."""
 
@@ -427,7 +417,6 @@ class MedianFinder:
         if len(self._lo) > len(self._hi):
             return -self._lo[0]
         return (-self._lo[0] + self._hi[0]) / 2.0
-
 
 mf = MedianFinder()
 for x in [5, 2, 8, 1, 9]:
@@ -500,13 +489,11 @@ from enum import IntEnum
 import heapq
 from typing import Callable
 
-
 class Urgency(IntEnum):
     CRITICAL = 0
     HIGH = 1
     MEDIUM = 2
     LOW = 3
-
 
 @dataclass(order=True)
 class Task:
@@ -514,7 +501,6 @@ class Task:
     sequence: int = field(compare=True)
     name: str = field(compare=False)
     action: Callable[[], None] = field(compare=False, repr=False)
-
 
 class TaskScheduler:
     def __init__(self) -> None:
@@ -536,7 +522,6 @@ class TaskScheduler:
     def __len__(self) -> int:
         return len(self._heap)
 
-
 # 사용 예시
 scheduler = TaskScheduler()
 scheduler.add_task("배포", Urgency.CRITICAL, lambda: print("배포 실행"))
@@ -554,7 +539,6 @@ IntEnum을 사용하면 urgency 값이 자연스럽게 비교 가능하고, CRIT
 
 ```python
 import unittest
-
 
 class TestPriorityQueue(unittest.TestCase):
     def setUp(self) -> None:
@@ -598,7 +582,6 @@ class TestPriorityQueue(unittest.TestCase):
         for priority, _ in sorted(items):
             result = self.pq.pop()
             # 정확한 순서 확인은 priority 기준
-
 
 if __name__ == "__main__":
     unittest.main()

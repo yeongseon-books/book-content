@@ -39,6 +39,9 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 - Consumption, Premium, Dedicated 플랜은 같은 스케일 의사결정 트리를 공유할까요?
 - Scale Controller가 인스턴스를 더 늘리기로 결정하게 만드는 신호는 무엇일까요?
 - burst 트래픽에서 scale-out 지연은 어디에 가장 많이 쌓일까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

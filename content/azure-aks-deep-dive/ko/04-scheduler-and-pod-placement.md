@@ -43,6 +43,9 @@ node affinity, taint와 toleration, topology spread, 볼륨 제약, 포트 충�
 - kube-scheduler는 하나의 Pod에 대해 어떤 단계로 노드 후보를 좁혀 갈까요?
 - `nodeSelector`, affinity, taint/toleration, topology spread는 서로 어떤 다른 의도를 표현할까요?
 - Filter에서 모두 탈락한 경우와 feasible node는 있었지만 Binding이 실패한 경우는 어떻게 구분할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

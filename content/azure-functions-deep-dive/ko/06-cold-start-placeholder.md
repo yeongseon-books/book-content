@@ -39,6 +39,9 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 - 호스트 부팅, 워커 시작, JIT 중 어느 부분이 cold start에서 가장 비쌀까요?
 - Placeholder 인스턴스는 정확히 무엇을 미리 준비해 둘까요?
 - Premium의 always-ready 인스턴스는 placeholder와 무엇이 다를까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

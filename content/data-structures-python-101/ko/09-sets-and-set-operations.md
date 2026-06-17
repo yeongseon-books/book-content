@@ -24,7 +24,6 @@ last_reviewed: '2026-05-17'
 
 이 글은 Data Structures with Python 101 시리즈의 아홉 번째 글입니다.
 
-
 ![Data Structures with Python 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/09/09-01-set.ko.png)
 *Data Structures with Python 101 9장 흐름 개요*
 
@@ -33,6 +32,9 @@ last_reviewed: '2026-05-17'
 - `set`은 왜 중복 제거와 membership test에 강할까요?
 - 충돌과 hashability는 set에서 어떤 의미를 가질까요?
 - 왜 `frozenset`은 set 원소나 dict 키가 될 수 있고 plain `set`은 안 될까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -243,7 +245,6 @@ print([article["title"] for article in matches])
 
 Python `set`은 key-only hash table입니다. 그래서 빠른 membership test, 자동 dedup, 간결한 집합 연산이 모두 같은 저장 모델에서 나옵니다. 그리고 그 정확성은 안정적인 해시와 equality에 달려 있습니다. 다음 글에서는 시리즈를 마무리하며 상황별로 어떤 자료구조를 선택해야 하는지 기준을 정리하겠습니다.
 
-
 ## 타입 힌트 기반 집합 구현
 
 Python set의 내부 원리를 이해하기 위해 해시 테이블 기반의 간소화된 집합을 구현합니다.
@@ -257,7 +258,6 @@ T = TypeVar("T")
 
 _EMPTY = object()
 _DELETED = object()
-
 
 class HashSet(Generic[T]):
     """Open addressing 기반 집합입니다."""
@@ -362,7 +362,6 @@ class HashSet(Generic[T]):
 ```python
 import sys
 
-
 def compare_memory(n: int) -> None:
     data_list = list(range(n))
     data_set = set(range(n))
@@ -372,7 +371,6 @@ def compare_memory(n: int) -> None:
     print(f"  list:      {sys.getsizeof(data_list):>10} bytes")
     print(f"  set:       {sys.getsizeof(data_set):>10} bytes")
     print(f"  frozenset: {sys.getsizeof(data_frozenset):>10} bytes")
-
 
 for n in [100, 1_000, 10_000]:
     compare_memory(n)
@@ -386,7 +384,6 @@ set은 해시 테이블을 유지해야 하므로 같은 원소 수에서 list�
 ```python
 import sys
 from typing import Any
-
 
 def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
     if seen is None:
@@ -402,7 +399,6 @@ def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
         size += sum(deep_getsizeof(k, seen) + deep_getsizeof(v, seen) for k, v in obj.items())
     return size
 
-
 n = 10_000
 list_deep = deep_getsizeof(list(range(n)))
 set_deep = deep_getsizeof(set(range(n)))
@@ -417,16 +413,13 @@ print(f"set deep (10k):  {set_deep:>10} bytes ({set_deep/n:.1f} per elem)")
 import random
 import timeit
 
-
 def bench_membership_list(data: list[int], targets: list[int]) -> None:
     for t in targets:
         _ = t in data
 
-
 def bench_membership_set(data: set[int], targets: list[int]) -> None:
     for t in targets:
         _ = t in data
-
 
 n = 100_000
 k = 10_000
@@ -451,7 +444,6 @@ print(f"list/set = {t_list/t_set:.0f}x")
 import random
 import timeit
 
-
 def bench_set_ops(n: int = 50_000) -> None:
     a = set(random.sample(range(n * 2), n))
     b = set(random.sample(range(n * 2), n))
@@ -461,7 +453,6 @@ def bench_set_ops(n: int = 50_000) -> None:
     _ = a - b   # difference
     _ = a ^ b   # symmetric difference
 
-
 def bench_list_ops(n: int = 50_000) -> None:
     a = random.sample(range(n * 2), n)
     b = random.sample(range(n * 2), n)
@@ -470,7 +461,6 @@ def bench_list_ops(n: int = 50_000) -> None:
     _ = list(set(a) | set(b))
     _ = [x for x in a if x in set(b)]
     _ = [x for x in a if x not in set(b)]
-
 
 trials = 5
 t_set = timeit.timeit(bench_set_ops, number=trials)
@@ -486,7 +476,6 @@ set의 집합 연산(`|`, `&`, `-`, `^`)은 C 레벨에서 구현되어 있어, 
 
 ```python
 import unittest
-
 
 class TestHashSet(unittest.TestCase):
     def setUp(self) -> None:
@@ -552,7 +541,6 @@ class TestHashSet(unittest.TestCase):
         for i in range(50):
             self.assertIn(i, self.hs)
 
-
 if __name__ == "__main__":
     unittest.main()
 ```
@@ -603,7 +591,6 @@ def deduplicate_ordered(items: list[str]) -> list[str]:
             result.append(item)
     return result
 
-
 # 패턴 2: 두 데이터 소스의 차이 분석
 def analyze_changes(old_ids: set[str], new_ids: set[str]) -> dict[str, set[str]]:
     """이전/현재 상태를 비교해 추가/삭제/유지를 구분합니다."""
@@ -612,7 +599,6 @@ def analyze_changes(old_ids: set[str], new_ids: set[str]) -> dict[str, set[str]]
         "removed": old_ids - new_ids,
         "unchanged": old_ids & new_ids,
     }
-
 
 # 패턴 3: 태그 기반 필터링
 articles = {

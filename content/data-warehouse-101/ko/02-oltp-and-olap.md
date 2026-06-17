@@ -26,7 +26,6 @@ last_reviewed: '2026-05-15'
 
 OLTP는 지금 이 순간의 한 건을 빠르게 처리하고, OLAP는 과거 전체를 한 번에 훑습니다. 최적화 방향이 정반대라서 같은 엔진으로 두 요구를 모두 잘 만족시키기 어렵습니다.
 
-
 ![Data Warehouse 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/02/02-01-concept-at-a-glance.ko.png)
 *Data Warehouse 101 2장 흐름 개요*
 > OLTP와 OLAP는 입력 패턴이 반대입니다: OLTP는 한 행씩 빠르게, OLAP는 여러 행을 한 번에 처리합니다.
@@ -36,6 +35,9 @@ OLTP는 지금 이 순간의 한 건을 빠르게 처리하고, OLAP는 과거 �
 - OLTP와 OLAP는 어떤 워크로드를 다르게 처리할까요?
 - 행 저장과 열 저장은 어느 쿼리에서 차이가 커질까요?
 - 하나의 엔진으로 두 요구를 함께 처리하면 왜 곤란할까요?
+- 이 글에서 배울 것에서 가장 흔한 실수는 무엇일까요?
+- 개념 한눈에 보기을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 이 글에서 배울 것
 
@@ -145,7 +147,6 @@ SELECT date_trunc('day', created_at), COUNT(*) FROM fact_orders GROUP BY 1;
 
 OLTP와 OLAP는 최적화 방향이 다릅니다. 다음 글에서는 OLAP의 핵심 개념인 Fact와 Dimension을 살펴봅니다.
 
-
 ## 워크로드 차이를 표로 고정하기
 
 OLTP와 OLAP를 설명할 때 자주 생기는 오해는 "OLTP는 작은 DB, OLAP는 큰 DB"라는 식의 단순화입니다. 핵심은 크기가 아니라 워크로드 모양입니다. 아래 비교표는 같은 조직 안에서 두 시스템이 왜 공존해야 하는지를 명확히 보여 줍니다.
@@ -220,7 +221,6 @@ separation_policy:
 
 이 신호는 단순 성능 문제가 아니라 아키텍처 경계 문제입니다. 즉, 쿼리 하나를 고치는 수준이 아니라 워크로드 분리를 설계해야 해결됩니다.
 
-
 ## 시스템 분리 시나리오 예시
 
 가상의 커머스 서비스를 기준으로 보면, OLTP는 주문 생성, 결제 승인, 재고 차감 같은 경로를 처리합니다. OLAP는 캠페인 효과 분석, 월간 손익 집계, 채널별 전환율 비교를 처리합니다. 두 경로가 같은 스토리지와 캐시를 공유하면 피크 시간대에 상호 간섭이 커집니다.
@@ -253,7 +253,6 @@ risk_if_shared:
 - 분리 이후 데이터 지연을 사용자 커뮤니케이션에 반영했는가
 
 이 질문에 답할 수 있으면 분리 의사결정이 기술 취향이 아니라 운영 근거로 전환됩니다.
-
 
 ## 실무 적용 메모
 
@@ -294,11 +293,9 @@ operating_baseline:
 
 또한 분기 단위 회고에서는 기술 성능 지표뿐 아니라 의사결정 지표도 함께 보는 것이 좋습니다. 예를 들어 "대시보드 숫자 논쟁으로 소모된 회의 시간", "지표 정의 변경 후 영향 범위 확인 시간", "재처리 요청 처리 리드타임" 같은 운영 지표를 추적하면 데이터 조직의 성숙도를 더 현실적으로 파악할 수 있습니다.
 
-
 ### 운영 체크 포인트 추가
 
 OLTP와 OLAP를 분리한 뒤에는 정기적으로 동기화 지연, 운영 DB 부하, 분석 쿼리 비용을 함께 점검해야 합니다. 특히 지연 허용치가 팀 합의 없이 커지면 분석 신뢰가 빠르게 떨어질 수 있으므로, 지연 임계값과 경고 채널을 문서로 고정하는 것이 좋습니다.
-
 
 ## 실전 앵커: 모델, 파이프라인, 성능 검증
 
@@ -402,6 +399,40 @@ WHEN NOT MATCHED THEN INSERT (
 
 이 패턴을 기준선으로 두면, 모델 변경이나 파이프라인 장애가 생겨도 영향을 계층별로 좁혀 복구할 수 있습니다. 데이터 웨어하우스 운영은 쿼리 한두 개의 튜닝보다, 반복 가능한 설계 계약을 지키는 과정에 더 가깝습니다.
 
+### 운영 확장 메모
+
+데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
+
+```sql
+-- 파티션 필터 누락 탐지용 예시
+EXPLAIN
+SELECT category, SUM(amount) AS revenue
+FROM fact_sales
+WHERE date_key BETWEEN 20260101 AND 20260131
+GROUP BY category;
+```
+
+```yaml
+review_policy:
+  query_rules:
+    - require_partition_filter: true
+    - block_select_star_on_fact: true
+    - require_owner_for_metric_change: true
+  incident_rules:
+    - classify: [schema_change, pipeline_lag, quality_failure]
+    - first_response_minutes: 15
+```
+
+```mermaid
+flowchart LR
+    A["모델 변경 요청"] --> B["영향 범위 분석"]
+    B --> C["샘플 검증 쿼리"]
+    C --> D["배치 재실행"]
+    D --> E["지표 대조"]
+    E --> F["배포 승인"]
+```
+
+아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
 
 ### 운영 확장 메모
 
@@ -438,6 +469,40 @@ flowchart LR
 
 아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
 
+### 운영 확장 메모
+
+데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
+
+```sql
+-- 파티션 필터 누락 탐지용 예시
+EXPLAIN
+SELECT category, SUM(amount) AS revenue
+FROM fact_sales
+WHERE date_key BETWEEN 20260101 AND 20260131
+GROUP BY category;
+```
+
+```yaml
+review_policy:
+  query_rules:
+    - require_partition_filter: true
+    - block_select_star_on_fact: true
+    - require_owner_for_metric_change: true
+  incident_rules:
+    - classify: [schema_change, pipeline_lag, quality_failure]
+    - first_response_minutes: 15
+```
+
+```mermaid
+flowchart LR
+    A["모델 변경 요청"] --> B["영향 범위 분석"]
+    B --> C["샘플 검증 쿼리"]
+    C --> D["배치 재실행"]
+    D --> E["지표 대조"]
+    E --> F["배포 승인"]
+```
+
+아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
 
 ### 운영 확장 메모
 
@@ -474,7 +539,6 @@ flowchart LR
 
 아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
 
-
 ### 운영 확장 메모
 
 데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
@@ -510,77 +574,9 @@ flowchart LR
 
 아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
 
+## 정리
 
-### 운영 확장 메모
-
-데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
-
-```sql
--- 파티션 필터 누락 탐지용 예시
-EXPLAIN
-SELECT category, SUM(amount) AS revenue
-FROM fact_sales
-WHERE date_key BETWEEN 20260101 AND 20260131
-GROUP BY category;
-```
-
-```yaml
-review_policy:
-  query_rules:
-    - require_partition_filter: true
-    - block_select_star_on_fact: true
-    - require_owner_for_metric_change: true
-  incident_rules:
-    - classify: [schema_change, pipeline_lag, quality_failure]
-    - first_response_minutes: 15
-```
-
-```mermaid
-flowchart LR
-    A["모델 변경 요청"] --> B["영향 범위 분석"]
-    B --> C["샘플 검증 쿼리"]
-    C --> D["배치 재실행"]
-    D --> E["지표 대조"]
-    E --> F["배포 승인"]
-```
-
-아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
-
-
-### 운영 확장 메모
-
-데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
-
-```sql
--- 파티션 필터 누락 탐지용 예시
-EXPLAIN
-SELECT category, SUM(amount) AS revenue
-FROM fact_sales
-WHERE date_key BETWEEN 20260101 AND 20260131
-GROUP BY category;
-```
-
-```yaml
-review_policy:
-  query_rules:
-    - require_partition_filter: true
-    - block_select_star_on_fact: true
-    - require_owner_for_metric_change: true
-  incident_rules:
-    - classify: [schema_change, pipeline_lag, quality_failure]
-    - first_response_minutes: 15
-```
-
-```mermaid
-flowchart LR
-    A["모델 변경 요청"] --> B["영향 범위 분석"]
-    B --> C["샘플 검증 쿼리"]
-    C --> D["배치 재실행"]
-    D --> E["지표 대조"]
-    E --> F["배포 승인"]
-```
-
-아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
+이 글은 data-warehouse-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
 
 ## 처음 질문으로 돌아가기
 

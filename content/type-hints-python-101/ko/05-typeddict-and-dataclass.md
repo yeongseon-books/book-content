@@ -27,7 +27,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 Type Hints (Python) 101 시리즈의 5번째 글입니다. 여기서는 딕셔너리 형태를 유지하면서 키 구조를 고정하는 `TypedDict`와, 보일러플레이트를 줄인 구조화 클래스를 만드는 `dataclass`를 비교합니다.
 
-
 ![Type Hints in Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/05/05-01-big-picture.ko.png)
 *Type Hints in Python 101 5장 흐름 개요*
 
@@ -38,6 +37,9 @@ last_reviewed: '2026-05-12'
 - 이름 있는 키와 값 타입을 가진 딕셔너리는 어떻게 표현할까요?
 - 자동 생성된 `__init__`, `__repr__`, `__eq__`가 필요한 가벼운 데이터 객체는 어떻게 만들까요?
 - 선택 키, 상속, 불변 객체 같은 패턴은 어디서 쓸까요?
+- 왜 이 주제가 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 바꾸기 전과 후을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 단계별로 익히기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 주제가 중요한가
 
@@ -250,11 +252,9 @@ from typing import Generic, Protocol, TypeVar
 T = TypeVar("T")
 K = TypeVar("K")
 
-
 class SupportsKey(Protocol[K]):
     def key(self) -> K:
         ...
-
 
 class Repository(Protocol[T]):
     def add(self, item: T) -> None:
@@ -263,7 +263,6 @@ class Repository(Protocol[T]):
     def all(self) -> list[T]:
         ...
 
-
 @dataclass
 class User:
     user_id: int
@@ -271,7 +270,6 @@ class User:
 
     def key(self) -> int:
         return self.user_id
-
 
 class InMemoryRepository(Generic[T]):
     def __init__(self) -> None:
@@ -282,7 +280,6 @@ class InMemoryRepository(Generic[T]):
 
     def all(self) -> list[T]:
         return self._items
-
 
 def index_by_key(items: list[SupportsKey[K]]) -> dict[K, SupportsKey[K]]:
     return {item.key(): item for item in items}
@@ -296,7 +293,6 @@ indexed = index_by_key(repo.all())
 ```
 
 이 패턴의 장점은 구현 교체 비용이 낮다는 사실입니다. `Repository[User]` 계약만 지키면 메모리 저장소를 DB 저장소로 바꿔도 상위 서비스 타입 시그니처를 유지할 수 있습니다. 또한 Protocol 기반 설계는 상속 계층 없이도 구조적 타이핑으로 계약을 검사할 수 있어, 기존 코드에 점진적으로 타입 안전성을 도입할 때 특히 유리합니다.
-
 
 ## TypedDict와 dataclass 선택 실전표
 
@@ -350,7 +346,6 @@ class Point:
 
 코드량이 줄고 비교/표현 계약이 명확해집니다.
 
-
 ## mypy 오류를 읽는 순서
 
 실무에서는 오류 개수보다 읽는 순서가 더 중요합니다. 다음 순서를 고정하면 수정 시간이 크게 줄어듭니다.
@@ -384,7 +379,6 @@ Found 2 errors in 1 file (checked 1 source file)
 
 이 체크포인트를 팀 규칙으로 두면 신규 코드와 레거시 코드의 품질 편차를 줄일 수 있습니다.
 
-
 ## 실전 보강: 타입 힌트 + mypy 오류 해결 루프
 
 아래 예시는 타입 힌트가 문서가 아니라 검증 가능한 계약이라는 점을 분명하게 보여 줍니다.
@@ -397,14 +391,12 @@ class Payment(TypedDict):
     amount: int
     currency: str
 
-
 def normalize_amount(raw: int | str) -> int:
     if isinstance(raw, int):
         return raw
     if raw.isdigit():
         return int(raw)
     raise ValueError("amount must be int or numeric string")
-
 
 def build_payment(order_id: int, amount: int | str, currency: str | None) -> Payment:
     if currency is None:
@@ -480,14 +472,12 @@ Success: no issues found in N source files
 
 위 결과가 나오더라도 끝이 아닙니다. 새로운 기능을 추가할 때 같은 원칙을 반복해 계약을 유지해야 타입 힌트가 장기적으로 품질을 지켜 줍니다.
 
-
 ## 추가 사례: 주문 처리 모듈 타입 하드닝
 
 아래 코드는 실제로 자주 보는 레거시 패턴입니다.
 
 ```python
 from typing import Any
-
 
 def build_invoice(payload: dict[str, Any]) -> dict[str, Any]:
     user = payload.get("user")
@@ -514,14 +504,12 @@ class InvoiceResult(TypedDict):
     email: str
     total: int
 
-
 def parse_total(raw: int | str) -> int:
     if isinstance(raw, int):
         return raw
     if raw.isdigit():
         return int(raw)
     raise ValueError("total must be int or numeric string")
-
 
 def build_invoice(payload: InvoicePayload) -> InvoiceResult:
     return {
@@ -555,7 +543,6 @@ service.py:36: error: Missing key "user" for TypedDict "InvoicePayload"  [typedd
 - 외부 입력 파싱 함수에는 `Optional`/`Union` 처리 분기를 강제합니다.
 - 리뷰에서 `Any` 추가가 보이면 대체 타입 후보를 함께 요구합니다.
 - CI에서는 타입 검사 실패를 테스트 실패와 동등하게 취급합니다.
-
 
 ## 보강 메모: 실전 리뷰에서 확인하는 타입 힌트 패턴
 
@@ -598,7 +585,6 @@ class NormalizedUser(TypedDict):
     id: int
     email: str
 
-
 def build_user(user_id: int, email: str) -> NormalizedUser:
     return {"id": user_id, "email": email.lower()}
 ```
@@ -612,7 +598,6 @@ def build_user(user_id: int, email: str) -> NormalizedUser:
 - `Any`가 도입되면 대체 가능한 구체 타입은 없는가?
 - mypy 오류를 숨기는 `type: ignore`가 정말 필요한가?
 
-
 ## 짧은 실전 확인
 
 아래 명령으로 수정 직후 타입 검사를 바로 확인합니다.
@@ -623,9 +608,7 @@ mypy path/to/example.py
 
 검사 결과가 통과해도 `Optional` 분기와 예외 메시지 품질까지 함께 점검해야 실제 운영에서 디버깅 비용을 줄일 수 있습니다.
 
-
 TypedDict와 dataclass를 함께 쓰는 팀에서는 보통 외부 입출력 경계는 TypedDict로, 내부 계산 모델은 dataclass로 분리합니다. 이렇게 두 계층을 나누면 직렬화 형식 변화와 도메인 로직 변경을 독립적으로 다룰 수 있어 유지보수성이 높아집니다.
-
 
 ## 비교 기준 보강: TypedDict vs dataclass
 

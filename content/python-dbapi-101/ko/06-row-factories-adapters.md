@@ -41,6 +41,9 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 - `sqlite3.Row`, dict, dataclass, Pydantic row factory는 어떤 상황에서 각각 선택해야 할까요?
 - `Decimal`, `Enum`, JSON 값을 SQLite와 안전하게 왕복하려면 adapter, converter, `detect_types`를 어떻게 묶어야 할까요?
 - 컬럼 순서 변경, `REAL` 금액 저장, view/join 결과 타입 유실 같은 문제를 이 글의 패턴으로 어떻게 줄일 수 있을까요?
+- Mental Model — 두 단계 변환에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## Mental Model — 두 단계 변환
 

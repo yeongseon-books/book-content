@@ -28,7 +28,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Probability 101 시리즈의 첫 번째 글입니다. 여기서는 확률의 정의, 빈도주의와 베이지안의 두 관점, 그리고 간단한 코드 실험을 통해 확률이 왜 데이터와 ML의 바닥 문법이 되는지 정리하겠습니다.
 
-
 ![Probability 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/01/01-01-diagram.ko.png)
 *Probability 101 1장 흐름 개요*
 > 확률의 기초는 가정과 해석을 함께 드러내는 데 있습니다. 같은 문장이라도 어떤 표본공간 위에서 정의되는지에 따라 다른 의미가 됩니다.

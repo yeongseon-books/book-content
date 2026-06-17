@@ -41,6 +41,9 @@ DB-API의 모든 query 실행은 결국 cursor의 `execute()`, `executemany()`�
 - `execute`, `executemany`, `fetchone`, `fetchall`, `fetchmany`는 각각 언제 써야 할까요?
 - 큰 결과셋을 메모리를 터뜨리지 않고 처리하려면 어떤 패턴을 써야 할까요?
 - `cursor.description`은 어떤 메타데이터를 제공할까요?
+- 6. 어떤 메서드를 언제 쓰나에서 가장 흔한 실수는 무엇일까요?
+- 7. 결과 메타데이터을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 8. Streaming + transformation 실전 예제의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 1. execute - 한 번의 query
 

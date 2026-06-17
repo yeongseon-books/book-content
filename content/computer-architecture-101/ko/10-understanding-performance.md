@@ -27,7 +27,6 @@ last_reviewed: '2026-05-12'
 
 성능 문제는 거의 항상 추측에서 시작됩니다. 하지만 시니어 엔지니어는 측정 없이 코드를 바꾸지 않습니다. 최적화는 신념이 아니라 증거 위에서만 성립하기 때문입니다.
 
-
 ![Computer Architecture 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/10/10-01-big-picture.ko.png)
 *Computer Architecture 101 10장 흐름 개요*
 
@@ -38,6 +37,9 @@ last_reviewed: '2026-05-12'
 - 지연시간과 처리량은 어떻게 다를까요?
 - USE 방법론은 병목을 어떻게 찾을까요?
 - 샘플링 프로파일링과 계측은 무엇이 다를까요?
+- 단계별로 따라가기에서 가장 흔한 실수는 무엇일까요?
+- 자주 하는 실수 5가지을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 시니어 엔지니어는 이렇게 생각합니다의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 성능은 모든 시스템의 기능입니다. 더 빠른 페이지는 더 많은 사용자를 붙잡고, 더 효율적인 배치는 더 적은 서버 비용으로 돌아가며, 더 낮은 지연은 더 좋은 사용자 경험을 만듭니다.
 
@@ -533,7 +535,6 @@ results = diagnose_from_counters(
 for d in results:
     print(f"  → {d}")
 ```
-
 
 ### Little의 법칙: 시스템 용량 계산
 

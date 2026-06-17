@@ -24,7 +24,6 @@ last_reviewed: '2026-05-17'
 
 이 글은 Data Structures with Python 101 시리즈의 두 번째 글입니다.
 
-
 ![Data Structures with Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/02/02-01-capacity.ko.png)
 *Data Structures with Python 101 2장 흐름 개요*
 
@@ -33,6 +32,9 @@ last_reviewed: '2026-05-17'
 - Python의 `list`는 배열일까요, 연결 리스트일까요?
 - `append()`는 list가 계속 커져도 왜 대체로 빠를까요?
 - `insert(0, x)`와 중간 삭제는 왜 비쌀까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -244,7 +246,6 @@ print(mixed)
 
 Python `list`는 논리 길이와 예약 capacity를 분리해 관리하는 동적 배열입니다. 그래서 인덱스 접근은 O(1), `append()`는 평균적으로 O(1), 앞 삽입은 원소 이동 때문에 비쌉니다. 다음 글에서는 이 저장 모델 위에 자주 구현되는 스택과 큐를 봅니다.
 
-
 ## 타입 힌트 기반 동적 배열 구현
 
 Python의 list 내부를 이해하는 가장 좋은 방법은 직접 간소화된 동적 배열을 만들어 보는 것입니다. 아래 구현은 CPython의 overallocation 전략을 흉내 내면서, 타입 힌트로 API 계약을 드러냅니다.
@@ -256,7 +257,6 @@ import ctypes
 from typing import Generic, Iterator, TypeVar
 
 T = TypeVar("T")
-
 
 class DynamicArray(Generic[T]):
     """CPython list의 핵심 동작을 흉내 낸 동적 배열입니다."""
@@ -351,11 +351,9 @@ class DynamicArray(Generic[T]):
 import sys
 from array import array
 
-
 def measure_memory(label: str, obj: object) -> None:
     size = sys.getsizeof(obj)
     print(f"{label:>20}: {size:>8} bytes")
-
 
 n = 10_000
 py_list = list(range(n))
@@ -382,7 +380,6 @@ list는 각 원소에 대한 포인터(8바이트)를 저장하고, 원소 자�
 import sys
 from typing import Any
 
-
 def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
     """객체와 그 참조 대상의 총 메모리 사용량을 재귀 측정합니다."""
     if seen is None:
@@ -397,7 +394,6 @@ def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
     elif isinstance(obj, (list, tuple, set, frozenset)):
         size += sum(deep_getsizeof(item, seen) for item in obj)
     return size
-
 
 n = 10_000
 py_list = list(range(n))
@@ -419,30 +415,25 @@ print(f"overhead per element: {(deep - shallow) / n:.1f} bytes")
 import timeit
 from collections import deque
 
-
 def bench_append_list(n: int = 100_000) -> None:
     data: list[int] = []
     for i in range(n):
         data.append(i)
-
 
 def bench_append_deque(n: int = 100_000) -> None:
     data: deque[int] = deque()
     for i in range(n):
         data.append(i)
 
-
 def bench_front_insert_list(n: int = 10_000) -> None:
     data: list[int] = []
     for i in range(n):
         data.insert(0, i)
 
-
 def bench_front_insert_deque(n: int = 10_000) -> None:
     data: deque[int] = deque()
     for i in range(n):
         data.appendleft(i)
-
 
 trials = 5
 
@@ -476,7 +467,6 @@ front insert: list/deque = 256.5x
 
 ```python
 import unittest
-
 
 class TestDynamicArray(unittest.TestCase):
     def setUp(self) -> None:
@@ -531,7 +521,6 @@ class TestDynamicArray(unittest.TestCase):
             _ = self.arr[0]
         with self.assertRaises(IndexError):
             self.arr.pop()
-
 
 if __name__ == "__main__":
     unittest.main()

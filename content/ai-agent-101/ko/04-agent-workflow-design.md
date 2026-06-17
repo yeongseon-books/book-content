@@ -43,6 +43,9 @@ seo_description: ReAct, 계획 실행, 반성 루프를 workflow 관점에서 �
 - agent workflow를 고를 때 prompt 튜닝보다 먼저 그려야 할 흐름은 무엇일까요?
 - ReAct, Plan-and-Execute, Reflexion은 각각 어떤 실패 조건에서 유리할까요?
 - workflow 안에서 state와 검증 단계를 어디에 두어야 운영이 쉬워질까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

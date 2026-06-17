@@ -44,6 +44,9 @@ seo_description: 5편에서 multimodal RAG의 큰 그림을 살펴봤다면, 이
 - Multimodal embedding은 텍스트 임베딩과 무엇이 다르고, 왜 cross-modal search의 핵심일까요?
 - CLIP, SigLIP, ImageBind는 어떤 공통점과 차이를 가지며 무엇을 기준으로 선택해야 할까요?
 - OpenCLIP으로 벡터를 추출할 때 preprocessing과 normalization은 왜 계약 수준으로 중요할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

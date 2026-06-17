@@ -24,7 +24,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Data Structures with Python 101 시리즈의 다섯 번째 글입니다.
 
-
 ![Data Structures with Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.ko.png)
 *Data Structures with Python 101 5장 흐름 개요*
 
@@ -33,6 +32,9 @@ last_reviewed: '2026-05-15'
 - Python에 이미 list가 있는데 왜 연결 리스트를 따로 배워야 할까요?
 - 단일 연결 리스트와 이중 연결 리스트는 어떻게 다를까요?
 - 연결 리스트는 왜 삽입·삭제에는 강하고, 인덱스 접근에는 약할까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 연결 구조를 그림으로 보면을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -304,7 +306,6 @@ Python에서는 연결 리스트를 직접 구현할 일이 많지 않습니다.
 
 연결 리스트는 노드를 참조로 연결해 삽입과 삭제를 유연하게 처리하는 구조입니다. 배열처럼 연속 메모리를 요구하지 않지만, 인덱스 기반 임의 접근은 느립니다. 즉, 연결 리스트는 “위치로 찾는 구조”보다 “연결을 바꾸는 구조”에 가깝습니다. 다음 글에서는 계층 구조를 표현하는 트리와 이진 트리를 봅니다.
 
-
 ## 타입 힌트 기반 이중 연결 리스트 구현
 
 단일 연결 리스트는 앞서 Step에서 다뤘으므로, 여기서는 실무에서 더 유용한 이중 연결 리스트(Doubly Linked List)를 타입 힌트와 함께 구현합니다.
@@ -317,14 +318,12 @@ from typing import Generic, Iterator, Optional, TypeVar
 
 T = TypeVar("T")
 
-
 @dataclass
 class DNode(Generic[T]):
     """이중 연결 리스트의 노드입니다."""
     value: T
     prev: Optional[DNode[T]] = None
     next: Optional[DNode[T]] = None
-
 
 class DoublyLinkedList(Generic[T]):
     """sentinel 노드 기반 이중 연결 리스트입니다."""
@@ -414,7 +413,6 @@ class DoublyLinkedList(Generic[T]):
 import sys
 from typing import Any
 
-
 def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
     if seen is None:
         seen = set()
@@ -432,7 +430,6 @@ def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
     elif isinstance(obj, dict):
         size += sum(deep_getsizeof(k, seen) + deep_getsizeof(v, seen) for k, v in obj.items())
     return size
-
 
 n = 1_000
 
@@ -461,7 +458,6 @@ from typing import Generic, Optional, TypeVar
 
 T = TypeVar("T")
 
-
 class SlotNode(Generic[T]):
     __slots__ = ("value", "prev", "next")
 
@@ -481,13 +477,11 @@ class SlotNode(Generic[T]):
 import timeit
 from collections import deque
 
-
 def bench_list_middle_insert(n: int = 10_000) -> None:
     data = list(range(n))
     mid = n // 2
     for i in range(1_000):
         data.insert(mid, i)
-
 
 def bench_deque_rotate_insert(n: int = 10_000) -> None:
     """deque는 중간 삽입을 직접 지원하지 않으므로 rotate로 흉내냅니다."""
@@ -497,7 +491,6 @@ def bench_deque_rotate_insert(n: int = 10_000) -> None:
         data.rotate(-mid)
         data.appendleft(i)
         data.rotate(mid)
-
 
 trials = 5
 t_list = timeit.timeit(bench_list_middle_insert, number=trials)
@@ -513,7 +506,6 @@ Python에서는 list의 중간 삽입이 deque rotate보다 빠른 경우가 많
 
 ```python
 import unittest
-
 
 class TestDoublyLinkedList(unittest.TestCase):
     def setUp(self) -> None:
@@ -559,7 +551,6 @@ class TestDoublyLinkedList(unittest.TestCase):
         self.dll.pop_front()
         self.assertEqual(list(self.dll), [1, 2])
 
-
 if __name__ == "__main__":
     unittest.main()
 ```
@@ -574,7 +565,6 @@ from typing import Generic, TypeVar
 
 K = TypeVar("K")
 V = TypeVar("V")
-
 
 class LRUCache(Generic[K, V]):
     """OrderedDict 기반 LRU 캐시입니다."""
@@ -598,7 +588,6 @@ class LRUCache(Generic[K, V]):
 
     def __len__(self) -> int:
         return len(self._cache)
-
 
 cache: LRUCache[str, int] = LRUCache(capacity=3)
 cache.put("a", 1)

@@ -41,6 +41,9 @@ seo_description: SQLite connection은 다른 DB의 client/server connection과 �
 - `sqlite3.threadsafety`와 `check_same_thread`는 각각 무엇을 보장하고, 어떤 조합에서 connection 공유를 피해야 할까요?
 - 요청별 connection, 스레드별 connection, 단일 shared connection, 단일 writer 큐 중에서 SQLite에 맞는 선택 기준은 무엇일까요?
 - FastAPI에서 전역 connection 대신 `Depends(get_db)`와 `BEGIN IMMEDIATE` 패턴을 쓰면 어떤 사고를 줄일 수 있을까요?
+- Mental Model: connection은 "파일을 연 핸들"이다에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## Mental Model: connection은 "파일을 연 핸들"이다
 

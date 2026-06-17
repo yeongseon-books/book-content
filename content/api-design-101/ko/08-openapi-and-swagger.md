@@ -43,6 +43,9 @@ seo_description: OpenAPI 3와 Swagger UI로 계약을 문서, 검증, SDK로 연
 - OpenAPI 3 문서는 어떤 구조로 이루어질까요?
 - Swagger UI와 Redoc은 각각 어떤 역할을 할까요?
 - code-first와 schema-first는 어떤 차이가 있을까요?
+- OpenAPI란 무엇인가에서 가장 흔한 실수는 무엇일까요?
+- Code-first 대 Schema-first을 실무에 적용할 때 주의할 점은 무엇일까요?
+- Spec 파일 구성 팁의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## OpenAPI란 무엇인가
 

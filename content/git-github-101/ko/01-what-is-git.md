@@ -27,7 +27,6 @@ seo_description: Git의 스냅샷 모델과 세 가지 작업 영역을 이해�
 
 이 글은 Git/GitHub 101 시리즈의 첫 번째 글입니다. 여기서는 Git 자체를 어떤 멘탈 모델로 이해해야 이후의 `add`, `commit`, `push`가 자연스럽게 읽히는지 정리합니다.
 
-
 ![Git & GitHub 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/01/01-01-mental-model.ko.png)
 *Git & GitHub 101 1장 흐름 개요*
 
@@ -38,6 +37,9 @@ seo_description: Git의 스냅샷 모델과 세 가지 작업 영역을 이해�
 - 버전 관리 도구는 정확히 어떤 문제를 해결할까요?
 - Git이 분산 버전 관리 도구라고 부르는 이유는 무엇일까요?
 - Git의 스냅샷 모델은 "변경된 줄만 저장하는 도구"와 무엇이 다를까요?
+- 핵심 관점에서 가장 흔한 실수는 무엇일까요?
+- 핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 혼자 코드를 짜더라도 시간이 지나면 비슷한 질문을 반복하게 됩니다. 어제는 되던 코드가 왜 오늘은 안 되는지, 한 달 전 이 함수가 어떤 모양이었는지, 여러 파일을 동시에 바꾸다가 어디서부터 꼬였는지 알고 싶어집니다.
 
@@ -319,7 +321,6 @@ Git은 개인 프로젝트의 안전망이면서 팀 협업의 공통어입니�
 Git은 파일의 스냅샷을 시간 순서대로 저장하는 분산 버전 관리 도구입니다. 변경은 Working Directory에서 시작해 Staging Area를 거쳐 Repository에 commit으로 남습니다. 처음 사용할 때는 `user.name`, `user.email`, `init.defaultBranch`를 먼저 설정해 두면 이후 실습이 부드럽습니다.
 
 다음 글에서는 빈 디렉터리에서 출발해 첫 commit을 직접 만듭니다. `git init`, `git status`, `git add`, `git commit`이 어떤 순서로 연결되는지 손으로 따라가 보겠습니다.
-
 
 ## 실전 CLI 시나리오
 

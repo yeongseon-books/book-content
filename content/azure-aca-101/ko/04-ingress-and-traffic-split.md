@@ -36,6 +36,9 @@ Ingress와 트래픽 분할은 ACA에서 가장 중요한 운영 레버 두 개�
 - ACA의 관리형 Ingress는 무엇을 책임지고(TLS, external/internal 노출, Revision 라우팅), 무엇은 책임지지 않을까요?
 - `external`, `internal`, `disabled` ingress mode의 차이는 정확히 무엇일까요?
 - Single mode와 Multiple mode는 트래픽 분배 동작을 어떻게 바꿀까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 요청 경로의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -345,6 +348,25 @@ az containerapp ingress traffic show --name myapi --resource-group $RG -o json
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
 
 - [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aca-101/ko/04-ingress-and-traffic-split)
+
+## 정리
+
+이 글은 azure-aca-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
+
+## 처음 질문으로 돌아가기
+
+- **ACA의 관리형 Ingress는 무엇을 책임지고(TLS, external/internal 노출, Revision 라우팅), 무엇은 책임지지 않을까요?**
+  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+- **`external`, `internal`, `disabled` ingress mode의 차이는 정확히 무엇일까요?**
+  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+- **Single mode와 Multiple mode는 트래픽 분배 동작을 어떻게 바꿀까요?**
+  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+- **멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+- **요청 경로의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

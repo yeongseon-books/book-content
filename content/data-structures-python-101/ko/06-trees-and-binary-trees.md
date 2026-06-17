@@ -24,7 +24,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Data Structures with Python 101 시리즈의 여섯 번째 글입니다.
 
-
 ![Data Structures with Python 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.ko.png)
 *Data Structures with Python 101 6장 흐름 개요*
 
@@ -33,6 +32,9 @@ last_reviewed: '2026-05-15'
 - 파일 시스템, DOM, 조직도는 왜 트리 구조로 모델링될까요?
 - 트리의 루트, 리프, 깊이, 높이는 각각 무엇을 뜻할까요?
 - 이진 트리 순회는 왜 재귀와 잘 맞을까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 트리 구조를 그림으로 보면을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 왜 이 글이 중요한가
 
@@ -286,7 +288,6 @@ Python 코드에서는 재귀 깊이도 함께 봐야 합니다. 트리가 깊�
 
 트리는 계층 관계를 표현하는 가장 중요한 자료구조 중 하나이고, BST는 그 위에 정렬 규칙을 얹어 탐색 효율을 높인 구조입니다. 순회와 높이 계산처럼 많은 트리 연산은 재귀로 자연스럽게 풀립니다. 다음 글에서는 트리의 특수한 형태이면서 우선순위 처리에 강한 힙과 우선순위 큐를 봅니다.
 
-
 ## 타입 힌트 기반 이진 탐색 트리 구현
 
 이진 트리의 가장 실용적인 형태인 이진 탐색 트리(BST)를 타입 힌트와 함께 구현합니다. BST는 왼쪽 자식 < 부모 < 오른쪽 자식이라는 불변식을 유지합니다.
@@ -299,14 +300,12 @@ from typing import Generic, Iterator, Optional, TypeVar
 
 T = TypeVar("T")
 
-
 @dataclass
 class TreeNode(Generic[T]):
     """이진 트리의 노드입니다."""
     value: T
     left: Optional[TreeNode[T]] = None
     right: Optional[TreeNode[T]] = None
-
 
 class BST(Generic[T]):
     """이진 탐색 트리입니다. 중복 키는 무시합니다."""
@@ -399,7 +398,6 @@ class BST(Generic[T]):
 import sys
 from typing import Any
 
-
 def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
     if seen is None:
         seen = set()
@@ -417,7 +415,6 @@ def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
     elif isinstance(obj, dict):
         size += sum(deep_getsizeof(k, seen) + deep_getsizeof(v, seen) for k, v in obj.items())
     return size
-
 
 import random
 
@@ -447,17 +444,14 @@ import bisect
 import random
 import timeit
 
-
 def bench_bst_search(bst: BST[int], targets: list[int]) -> None:
     for t in targets:
         _ = t in bst
-
 
 def bench_bisect_search(sorted_list: list[int], targets: list[int]) -> None:
     for t in targets:
         idx = bisect.bisect_left(sorted_list, t)
         _ = idx < len(sorted_list) and sorted_list[idx] == t
-
 
 n = 10_000
 values = random.sample(range(n * 10), n)
@@ -484,7 +478,6 @@ print(f"bisect search (1k lookups, n=10k): {t_bisect:.4f}s")
 from collections import deque
 from typing import Optional
 
-
 def inorder_iterative(root: Optional[TreeNode[int]]) -> list[int]:
     """스택을 사용한 반복 중위 순회입니다."""
     result: list[int] = []
@@ -500,7 +493,6 @@ def inorder_iterative(root: Optional[TreeNode[int]]) -> list[int]:
         current = current.right
 
     return result
-
 
 def level_order(root: Optional[TreeNode[int]]) -> list[list[int]]:
     """BFS 레벨 순회입니다."""
@@ -554,7 +546,6 @@ print(f"height of shuffled BST (10 nodes): {balanced.height()}")  # 3~4
 ```python
 import unittest
 
-
 class TestBST(unittest.TestCase):
     def setUp(self) -> None:
         self.bst: BST[int] = BST()
@@ -592,7 +583,6 @@ class TestBST(unittest.TestCase):
         self.assertEqual(len(empty), 0)
         with self.assertRaises(ValueError):
             empty.min_value()
-
 
 if __name__ == "__main__":
     unittest.main()

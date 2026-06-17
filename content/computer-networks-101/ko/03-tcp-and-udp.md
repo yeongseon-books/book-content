@@ -25,7 +25,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 3번째 글입니다.
 
-
 ![Computer Networks 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.ko.png)
 *Computer Networks 101 3장 흐름 개요*
 
@@ -34,6 +33,9 @@ last_reviewed: '2026-05-15'
 - TCP가 맡는 책임은 정확히 무엇일까요?
 - UDP는 왜 일부 책임을 의도적으로 하지 않을까요?
 - 3-way handshake와 연결 종료는 어떤 흐름으로 일어날까요?
+- 핵심 그림에서 가장 흔한 실수는 무엇일까요?
+- TCP의 네 가지 책임을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 전송 프로토콜 선택은 시스템 성능과 사용자 경험을 직접 좌우합니다. 게임이나 화상 통화에 TCP를 쓰면 한 프레임 손실이 전체 흐름을 멈춰 세울 수 있고, 결제 처리에 UDP를 쓰면 중요한 데이터가 조용히 사라질 수 있습니다. "왜 이 프로토콜을 골랐는가"에 답하지 못하면 설계는 금세 관성에 끌려갑니다.
 
@@ -283,7 +285,6 @@ def send_reliable(sock, data: bytes, addr, retries=3, timeout=0.5):
 
 QUIC, RTP, 게임 프로토콜은 모두 이런 패턴을 훨씬 정교하게 확장한 형태입니다. 선택적 ACK(SACK), 적응형 타임아웃, FEC(Forward Error Correction) 등을 조합합니다. 예를 들어 RTP(Real-time Transport Protocol)는 타임스탬프와 시퀀스 번호를 제공하되 재전송은 하지 않고, 대신 jitter buffer로 네트워크 변동을 흡수합니다. 게임에서는 서버 권위(server authority) 모델과 클라이언트 예측(client prediction)을 결합해 UDP 손실을 보상합니다.
 
-
 ## TCP 재전송 관찰 실습
 
 TCP 재전송을 실제로 볼 수 있는 방법:
@@ -363,7 +364,6 @@ TCP + TLS 1.3:         QUIC:
 TCP: 하나의 스트림         QUIC: 독립된 여러 스트림
   → HOL blocking 발생        → 스트림 간 영향 없음
 ```
-
 
 ## TCP 메시지 프레이밍
 

@@ -42,6 +42,8 @@ last_reviewed: '2026-05-15'
 - 멀티스테이지 빌드는 왜 build와 runtime을 분리할까요?
 - BuildKit cache mount는 어떤 식으로 재빌드를 빠르게 만들까요?
 - slim, alpine, distroless는 각각 어떤 trade-off가 있을까요?
+- 왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?
+- 전과 후을 실무에 적용할 때 주의할 점은 무엇일까요?
 
 ## 왜 이 글이 중요한가
 

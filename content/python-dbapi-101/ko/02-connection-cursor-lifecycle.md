@@ -41,6 +41,9 @@ DB-API의 두 핵심 객체는 connection과 cursor입니다. 이름은 평범�
 - Connection과 cursor는 각각 어떤 책임을 가질까요?
 - `with` context manager는 connection과 cursor 자원을 어떻게 보호할까요?
 - 호출마다 새 connection을 여는 방식과 재사용하는 방식은 어떤 차이를 만들까요?
+- 1. Connection이란에서 가장 흔한 실수는 무엇일까요?
+- 2. Cursor란을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 3. Context manager로 안전하게의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 1. Connection이란
 

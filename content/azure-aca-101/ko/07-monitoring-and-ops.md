@@ -35,6 +35,9 @@ seo_description: ACA 관측성은 플랫폼, 애플리케이션, 사이드카라
 - ACA 관측성은 어떤 계층 구조로 나뉠까요?
 - `ContainerAppConsoleLogs_CL`와 `ContainerAppSystemLogs_CL`는 무엇이 다를까요?
 - Log Analytics에서 Revision 기준으로 로그를 묶는 KQL 쿼리는 어떻게 작성할까요?
+- 이 글이 답할 질문에서 가장 흔한 실수는 무엇일까요?
+- 왜 이 글이 중요한가을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 멘탈 모델의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 ## 이 글이 답할 질문
 

@@ -27,7 +27,6 @@ last_reviewed: '2026-05-12'
 
 메모리 모델이 머릿속에 없으면 스택 오버플로, 메모리 누수, 정렬 문제, 페이지 폴트가 전부 제각각의 현상처럼 보입니다. 하지만 주소 공간, 페이지, 스택, 힙이라는 그림을 잡아 두면 이 문제들은 같은 지도 위에서 읽히기 시작합니다.
 
-
 ![Computer Architecture 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/05/05-01-big-picture.ko.png)
 *Computer Architecture 101 5장 흐름 개요*
 
@@ -38,6 +37,9 @@ last_reviewed: '2026-05-12'
 - RAM은 어떤 주소 모델로 보일까요?
 - 가상 주소와 물리 주소는 어떻게 다를까요?
 - 한 프로세스의 text, data, heap, stack은 어떻게 배치될까요?
+- 단계별로 따라가기에서 가장 흔한 실수는 무엇일까요?
+- 자주 하는 실수 5가지을 실무에 적용할 때 주의할 점은 무엇일까요?
+- 시니어 엔지니어는 이렇게 생각합니다의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 메모리 구조를 이해하지 못하면 같은 버그를 반복해서 만납니다. 깊은 재귀 때문에 스택이 터지고, 힙 객체를 정리하지 않아 누수가 나고, 정렬이 맞지 않아 공간을 낭비하고, 페이지 폴트 하나 때문에 코드가 갑자기 매우 느려집니다.
 
@@ -403,7 +405,6 @@ Linux의 실제 구현(Multi-generational LRU):
 - Active list: 최근 2회 이상 접근된 페이지
 - Inactive list: 1회만 접근되거나 오래된 페이지
 - 메모리 압박 시 inactive list 끝에서 회수
-
 
 ### DRAM 내부 구조: Bank, Row, Column
 

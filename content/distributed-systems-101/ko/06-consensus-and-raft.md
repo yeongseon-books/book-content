@@ -37,6 +37,9 @@ last_reviewed: '2026-05-15'
 - 합의 문제란 무엇이며 어떤 안전성과 진행성 속성을 가질까요?
 - Raft의 세 역할인 leader, follower, candidate는 어떻게 나뉠까요?
 - term, log, index, commit은 각각 무엇을 뜻할까요?
+- 적용 전후 비교에서 가장 흔한 실수는 무엇일까요?
+
+- 자주 하는 실수 5가지의 핵심 원리를 한 문장으로 설명하면 무엇일까요?
 
 합의 알고리즘은 etcd, ZooKeeper, Consul, CockroachDB 같은 시스템의 중심에 놓여 있습니다. Kubernetes control plane도 etcd 위에 서 있습니다. 합의를 이해하면 왜 시스템이 이런 식으로 동작하는지에 대한 질문 절반은 자연스럽게 풀립니다.
 
