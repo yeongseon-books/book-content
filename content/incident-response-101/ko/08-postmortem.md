@@ -411,25 +411,17 @@ postmortem 품질은 문서 작성보다 회의 운영에서 크게 갈립니다
 ## 처음 질문으로 돌아가기
 
 - **postmortem은 왜 incident 종료 뒤에 꼭 필요할까요?**
-  - 본문에서 강조했듯이 incident 한 번에 큰 비용을 이미 치렀기 때문에, 그 경험에서 배우지 않으면 같은 비용이 그대로 반복됩니다. postmortem은 발생-감지-완화-회복으로 흩어진 정보를 한 문서에 모아 timeline, root cause, action item을 명시화해 조직 자산으로 바꾸는 유일한 단계입니다.
+  - 1. 사실 오류가 모두 수정되었다.
 - **비난 없는 원칙은 책임 없음과 어떻게 다를까요?**
-  - 본문에서 본 것처럼 blameless는 "사람을 탓하지 않는다"는 뜻이지 "책임이 없다"는 뜻이 아닙니다. 개인을 처벌 대상으로 만들면 다음 incident 때 정보가 숨겨져 같은 사고가 더 자주 일어나기 때문에, 원인은 시스템·프로세스 수준에서 찾되 후속 조치와 책임자는 명확히 남기는 것이 두 원칙을 동시에 지키는 방법입니다.
+  - blameless postmortem의 핵심은 개인의 실수를 원인으로 끝내지 않는 것입니다. "누가 잘못했는가"로 끝나면 다음 사건에서도 같은 구조가 반복됩니다. 대신 "어떤 시스템 조건이 그 실수를 가능하게 만들었는가"를 물어야 합니다.
 - **매번 새 양식을 만드는 대신 템플릿을 고정해야 하는 이유는 무엇일까요?**
-  - 본문 예시처럼 incident마다 양식이 달라지면 timeline·impact·root cause·action item 같은 필수 칸이 누락되기 쉽고, 사후에 incident 간 비교도 어려워집니다. 고정 템플릿은 작성자의 인지 부담을 줄여 사실 수집과 분석에 더 많은 시간을 쓰게 해 주고, 누적된 postmortem을 패턴 분석 가능한 데이터셋으로 만들어 줍니다.
-  - 대응이 끝나고 며칠 안에 열어야 기억이 생생합니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [Incident Response 101 (1/10): Incident란 무엇인가?](./01-what-is-incident.md)
-- [Incident Response 101 (2/10): Severity 분류](./02-severity.md)
-- [Incident Response 101 (3/10): 초기 대응](./03-initial-response.md)
-- [Incident Response 101 (4/10): Communication](./04-communication.md)
-- [Incident Response 101 (5/10): Timeline 작성](./05-timeline.md)
-- [Incident Response 101 (6/10): Root Cause Analysis](./06-root-cause-analysis.md)
-- [Incident Response 101 (7/10): Mitigation과 Resolution](./07-mitigation-and-resolution.md)
-- **Incident Response 101 (8/10): Postmortem (현재 글)**
-- [Incident Response 101 (9/10): 재발 방지](./09-prevention.md)
-- [Incident Runbook 만들기](./10-incident-runbook.md)
+  - 포스트모템 템플릿은 간결해야 하지만, 필수 요소는 빠지면 안 됩니다. 각 섹션의 역할과 작성 팁을 미리 정리해 두면 incident 마다 일관된 품질의 문서를 남길 수 있습니다.
+- **왜 이 주제가 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 같은 incident가 반복된다는 말은 대개 시스템보다 학습 루프가 끊겼다는 신호입니다. 사건은 끝났는데 원인이 구조로 정리되지 않았고, 후속 조치가 추적되지 않았으며, 다음 사람에게 전달되지 않았기 때문입니다.
+- **한눈에 보는 구조을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - postmortem은 publish로 끝나면 안 됩니다. 공유 뒤에 action item 등록과 추적이 이어져야 학습이 행동으로 바뀝니다.
+- **전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이전: 내부에서만 돌고 비난과 방어가 섞인 문서를 남깁니다.
 
 <!-- toc:end -->
 

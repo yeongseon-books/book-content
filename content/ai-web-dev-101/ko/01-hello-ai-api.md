@@ -510,11 +510,17 @@ def emit_metric(metric: AiCallMetric) -> None:
 ## 처음 질문으로 돌아가기
 
 - **ChatGPT 웹사이트를 쓰는 것과 AI API를 붙이는 것은 무엇이 다를까요?**
-  - ChatGPT 웹사이트는 완성된 제품을 사용하는 일이고, 이 글의 API 호출은 우리 코드가 `Authorization: Bearer $OPENAI_API_KEY` 헤더와 JSON 본문을 직접 보내는 개발 작업입니다. 그래서 `401`, `404`, `429`를 각각 인증, 모델 이름, 호출 한도 문제로 나눠 봐야 한다고 본문에서 정리했습니다. `response.usage`, `response.model`, `finish_reason`까지 읽어야 운영 가능한 호출이 되는 이유도 바로 이 차이 때문입니다.
+  - 준비 단계는 길지 않습니다. 계정을 만들고, API 키를 발급하고, 로컬 환경변수에 넣고, SDK를 설치하면 됩니다. 중요한 습관은 비밀 키를 코드에 박아 넣지 않는 것입니다.
 - **OpenAI API를 호출하려면 어떤 준비가 필요할까요?**
-  - 최소 준비는 `OPENAI_API_KEY` 주입, `pip install "openai>=2.0"`, 그리고 Billing 설정 확인입니다. 본문에서는 `python3 - <<'PY' ... print("key loaded:", bool(...))`로 환경 변수가 실제로 잡혔는지 먼저 검증했고, 서비스 코드에서는 `timeout=20.0`과 `RateLimitError`, `APIConnectionError`, `APIStatusError` 분기까지 넣었습니다. 즉 첫 호출 전 준비는 계정 생성보다 실행 경계와 실패 경계를 먼저 고정하는 일입니다.
+  - 준비 단계는 길지 않습니다. 계정을 만들고, API 키를 발급하고, 로컬 환경변수에 넣고, SDK를 설치하면 됩니다. 중요한 습관은 비밀 키를 코드에 박아 넣지 않는 것입니다.
 - **첫 번째 요청은 어떤 형식으로 보내고, 어디서 응답을 읽어야 할까요?**
-  - 요청은 `model="gpt-4o-mini"`와 `messages` 배열을 담은 JSON으로 보내고, 응답은 `response.choices[0].message.content`에서 텍스트를 읽습니다. 동시에 `response.model`과 `response.usage.prompt_tokens`, `completion_tokens`, `total_tokens`를 같이 남겨야 이후 비용과 지연 시간을 설명할 수 있습니다. `curl https://api.openai.com/v1/chat/completions` 예시를 함께 본 이유도 결국 이 계약이 HTTP + JSON이라는 사실을 눈으로 확인하기 위해서입니다.
+  - 입문 단계에서 가장 자주 하는 실수는 응답을 “그냥 문자열”로만 생각하는 것입니다. 하지만 실제 서비스에서는 아래 필드를 함께 읽어야 합니다.
+- **왜 첫 호출을 제대로 이해해야 할까에서 가장 흔한 실수는 무엇일까요?**
+  - 입문 단계에서는 모델 성능보다 서비스 경계가 더 먼저 헷갈립니다. 채팅 UI는 이 경계를 감춰 주지만, 런타임에서 실제로 일어나는 일은 단순합니다. 애플리케이션이 인증 헤더와 JSON 본문을 담아 HTTP 요청을 보내고, 모델 서비스가 JSON 응답을 돌려줍니다.
+- **SDK 메서드보다 먼저 봐야 할 것: JSON 요청과 JSON 응답을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - OpenAI Python SDK는 편리하지만, 실제 계약을 바꾸지는 않습니다. `client.chat.completions.create()`는 결국 JSON 요청을 만들고 JSON 응답을 Python 객체로 감싼 결과를 돌려줍니다.
+- **가장 작은 성공 경로: SDK 설치와 첫 호출의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 먼저 Python 가상환경과 SDK를 준비합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

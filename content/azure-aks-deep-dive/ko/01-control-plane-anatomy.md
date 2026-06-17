@@ -326,11 +326,17 @@ data plane은 실제 실행을 담당합니다.
 ## 처음 질문으로 돌아가기
 
 - **AKS control plane은 정확히 어떤 컴포넌트로 이루어져 있고, 사용자는 그중 무엇을 직접 볼 수 있을까요?**
-  - 본문에서 정리했듯이 AKS control plane의 핵심 컴포넌트는 `kube-apiserver`, `etcd`, `kube-controller-manager`, `kube-scheduler`입니다. 다만 AKS 사용자가 직접 만나는 표면은 대개 control plane 호스트가 아니라 API endpoint, 객체 상태, `readyz` 같은 API 신호, 그리고 diagnostic settings로 수집한 로그입니다. 즉 내부 프로세스를 직접 다루기보다 API 표면을 통해 뒤의 상태 저장과 수렴 루프를 읽는 구조입니다.
+  - control plane을 추상 개념으로만 이해하면 장애 시점마다 같은 질문을 다시 하게 됩니다.
 - **관리형 control plane이라는 약속은 어디까지를 의미하고, 어디부터는 여전히 사용자의 운영 책임일까요?**
-  - 관리형이라는 약속은 control plane 패치, 고가용성 구성, 핵심 컴포넌트 수명주기를 Microsoft가 맡는다는 뜻입니다. 반대로 사용자는 private API 접근 경로, RBAC와 admission 정책, audit log와 diagnostic settings 보존, 그리고 control plane 문제와 node 문제를 가르는 런북을 여전히 책임져야 합니다. 그래서 AKS에서는 “내가 직접 프로세스를 운영하지 않는다”와 “운영 책임이 없다”를 같은 말로 보면 안 됩니다.
+  - control plane을 추상 개념으로만 이해하면 장애 시점마다 같은 질문을 다시 하게 됩니다.
 - **API server SLA를 읽을 때 왜 `etcd`, scheduler, controller-manager의 내부 구현보다 API 표면을 먼저 봐야 할까요?**
-  - 사용자가 `kubectl`, GitOps controller, Terraform으로 실제로 대화하는 경로가 모두 API server이기 때문에, 체감되는 control plane 품질도 먼저 API 요청 성공률과 지연 시간으로 드러납니다. `etcd` 지연이나 scheduler 수렴 문제도 결국 객체 상태 변화, watch 지연, `readyz` 결과 같은 API 표면의 이상으로 간접 반영됩니다. 그래서 장애 초기에 내부 구현을 상상하기보다 API가 죽었는지, 느린지, 아니면 뒤쪽 루프가 밀리는지를 먼저 가르는 편이 더 정확합니다.
+  - control plane을 추상 개념으로만 이해하면 장애 시점마다 같은 질문을 다시 하게 됩니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - AKS 운영에서 가장 비싼 실수 중 하나는 control plane 문제와 node 문제를 같은 범주로 다루는 것입니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - AKS control plane을 볼 때 가장 먼저 고정해야 할 문장은 이것입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - AKS control plane을 볼 때 가장 먼저 고정해야 할 문장은 이것입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

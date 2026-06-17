@@ -453,11 +453,17 @@ for step, batch in enumerate(loader):
 ## 처음 질문으로 돌아가기
 
 - **plain gradient descent는 실제 딥러닝 학습에서 어떤 약점을 드러낼까요?**
-  - 본문에서 확인했듯이 plain GD는 좌표별 gradient 스케일 차이를 직접 보정하지 못하고, 좁은 골짜기에서 진동이 커지며, 학습 단계별로 필요한 step 크기 변화를 반영하기 어렵습니다. 그래서 실무에서는 momentum, adaptive scaling, scheduler를 결합한 recipe가 필요합니다.
+  - plain gradient descent는 실제 딥러닝 학습에서 어떤 약점을 드러낼까요 — 본문에서 구체적으로 다룹니다.
 - **momentum은 왜 관성이라는 비유로 설명하는 편이 가장 이해가 쉬울까요?**
-  - momentum은 과거 gradient를 지수평균으로 누적해 현재 업데이트 방향에 반영합니다. 즉 한 번의 noisy gradient보다 "최근 진행 방향"을 더 신뢰해 지그재그를 줄이고 주된 하강 방향을 유지하므로, 물리적 관성 비유가 동작 원리를 가장 정확하게 전달합니다.
+  - momentum은 왜 관성이라는 비유로 설명하는 편이 가장 이해가 쉬울까요 — 본문에서 구체적으로 다룹니다.
 - **RMSProp과 Adam은 좌표별 gradient scale 차이를 어떻게 완화할까요?**
-  - RMSProp은 좌표별 `g^2` 이동평균으로 분모를 만들어 큰 gradient 좌표의 step을 줄입니다. Adam은 여기에 1차 모멘트까지 결합하고 bias correction을 적용해 초반 단계 왜곡을 줄입니다. 결과적으로 스케일이 다른 파라미터를 동일 lr로도 안정적으로 학습시키는 효과를 얻습니다.
+  - RMSProp과 Adam은 좌표별 gradient scale 차이를 어떻게 완화할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 실무에서 optimizer는 training recipe의 중심입니다. 같은 모델과 데이터라도 optimizer, learning-rate schedule, weight decay 설정이 바뀌면 수렴 속도와 최종 성능이 크게 달라집니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 최적화를 가장 실용적으로 이해하는 방법은 plain GD가 어디서 힘들어하는지 먼저 보는 것입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 최적화를 가장 실용적으로 이해하는 방법은 plain GD가 어디서 힘들어하는지 먼저 보는 것입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

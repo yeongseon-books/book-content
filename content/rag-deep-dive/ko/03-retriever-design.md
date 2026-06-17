@@ -478,13 +478,17 @@ if __name__ == "__main__":
 ## 처음 질문으로 돌아가기
 
 - **`BaseRetriever`는 검색 구현마다 무엇을 같은 호출 계약으로 묶어 줄까요?**
-  `BaseRetriever`는 질의 입력을 받아 Document 목록을 반환하는 호출 규약과 callback 경계를 표준화합니다.
-
+  - LangChain 0.2.17에서 retriever의 기준 인터페이스는 `langchain_core.retrievers.BaseRetriever`입니다.
 - **`similarity`, `similarity_score_threshold`, `mmr`는 각각 어떤 검색 실패를 줄이려는 선택일까요?**
-  `similarity`는 가까운 순위, threshold는 약한 근거 차단, MMR은 비슷한 결과 반복을 줄여 다양성을 확보하는 선택입니다.
-
+  - LangChain 0.2.17에서 retriever의 기준 인터페이스는 `langchain_core.retrievers.BaseRetriever`입니다.
 - **검색 결과가 이상할 때 callback과 파라미터 로그는 어떤 단서를 줄까요?**
-  callback, search_type, k, score threshold, fetch_k 같은 로그를 보면 검색 전략 문제인지 입력 질의 문제인지 더 빨리 분리할 수 있습니다.
+  - LangChain 0.2.17에서 retriever의 기준 인터페이스는 `langchain_core.retrievers.BaseRetriever`입니다.
+- **최소 실행 예제에서 가장 흔한 실수는 무엇일까요?**
+  - 예제 파일: `en/03-retriever-design/main.py`
+- **소스 버전을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 글의 모든 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다.
+- **2. `VectorStoreRetriever`는 어디에서 분기하는가의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - `VectorStoreRetriever`는 이름 그대로 vector store 위에 얹힌 기본 retriever입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

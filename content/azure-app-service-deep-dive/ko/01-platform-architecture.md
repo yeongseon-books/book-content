@@ -256,11 +256,17 @@ DNS/TLS 구간이 길면 네트워크 경계 이슈를 먼저 보고, TTFB만 �
 ## 처음 질문으로 돌아가기
 
 - **App Service의 "플랫폼"은 실제로 어떤 박스들로 나눠서 이해해야 할까요?**
-  - App Service는 "웹앱 하나를 올리는 곳"이 아니라 Front-End, ARR, Worker, shared storage, Kudu가 이어진 플랫폼으로 보는 편이 정확합니다. 이 다섯 박스를 분리해 두어야 일부 사용자만 실패하는 문제를 라우팅에서 읽을지, 배포 성공 뒤 startup 실패를 Kudu와 runtime 경계에서 읽을지 바로 판단할 수 있습니다.
+  - App Service의 "플랫폼"은 실제로 어떤 박스들로 나눠서 이해해야 할까요 — 본문에서 구체적으로 다룹니다.
 - **App Service Plan은 단순한 과금 단위가 아니라 어떤 격리와 용량의 의미를 가질까요?**
-  - App Service Plan은 비용 태그보다 먼저 worker capacity와 격리 경계를 들고 있는 실행 단위입니다. `numberOfWorkers`, `serverFarmId`, per-site scaling을 보면 앱이 각자 VM을 하나씩 갖는 구조가 아니라, 같은 plan 위에서 용량을 소비하고 필요하면 같은 substrate를 공유한다는 점이 드러납니다.
+  - App Service Plan은 단순한 과금 단위가 아니라 어떤 격리와 용량의 의미를 가질까요 — 본문에서 구체적으로 다룹니다.
 - **Front-End, Worker, shared storage는 각자 어떤 책임을 맡고 어디서 서로 연결될까요?**
-  - Front-End는 host와 affinity를 바탕으로 요청을 어느 worker로 보낼지 결정하고, Worker는 그 요청을 실제 프로세스나 컨테이너에서 실행합니다. shared storage는 여러 worker가 같은 `/home/site/wwwroot`를 보게 만드는 파일 기준점이며, Kudu가 여기에 artifact를 배치하므로 요청 경로와 배포 경로가 바로 이 지점에서 만납니다.
+  - Front-End, Worker, shared storage는 각자 어떤 책임을 맡고 어디서 서로 연결될까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - App Service를 잘못 이해하면 거의 모든 운영 증상이 "플랫폼 문제"라는 한 단어로 뭉개집니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - App Service를 깊게 이해할 때 가장 도움이 되는 문장은 이것입니다. **App Service는 단일 서버도, 단일 프로세스도, 단일 배포 엔드포인트도 아닙니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - App Service를 깊게 이해할 때 가장 도움이 되는 문장은 이것입니다. **App Service는 단일 서버도, 단일 프로세스도, 단일 배포 엔드포인트도 아닙니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

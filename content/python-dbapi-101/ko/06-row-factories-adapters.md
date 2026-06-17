@@ -350,11 +350,17 @@ row factory는 **shape**, adapter/converter는 **value**를 다룬다는 두 축
 ## 처음 질문으로 돌아가기
 
 - **`sqlite3.Row`, dict, dataclass, Pydantic row factory는 어떤 상황에서 각각 선택해야 할까요?**
-  - 글은 `sqlite3.Row`를 가장 가벼운 기본값으로 두고, 이름 접근이 필요하지만 성능도 챙겨야 할 때 적합하다고 설명했습니다. 반면 dict는 단순 직렬화, dataclass와 Pydantic은 타입 검증과 IDE 지원이 중요한 API·도메인 계층에 맞는 선택지로 정리했습니다.
+  - `sqlite3.Row`, dict, dataclass, Pydantic row factory는 어떤 상황에서 각각 선택해야 할까요 — 본문에서 구체적으로 다룹니다.
 - **`Decimal`, `Enum`, JSON 값을 SQLite와 안전하게 왕복하려면 adapter, converter, `detect_types`를 어떻게 묶어야 할까요?**
-  - 본문은 `sqlite3.register_adapter()`와 `sqlite3.register_converter()`를 connection 팩토리 수준에서 한 번 등록하고, `detect_types=PARSE_DECLTYPES | PARSE_COLNAMES`로 실제 변환을 켜는 패턴을 제시했습니다. 그래서 `Decimal`은 정밀도를 잃지 않고, `Enum`과 JSON도 repository 밖에서 문자열이나 bytes로 새지 않게 만들 수 있습니다.
+  - `Decimal`, `Enum`, JSON 값을 SQLite와 안전하게 왕복하려면 adapter, converter, `detect_types`를 어떻게 묶어야 할까요 — 본문에서 구체적으로 다룹니다.
 - **컬럼 순서 변경, `REAL` 금액 저장, view/join 결과 타입 유실 같은 문제를 이 글의 패턴으로 어떻게 줄일 수 있을까요?**
-  - 컬럼 순서 문제는 `row[0]` 대신 이름 기반 row factory로 줄이고, 금액은 `REAL` 대신 `Decimal` adapter와 `TEXT` 또는 `INTEGER` 저장 전략으로 다뤄야 한다고 설명했습니다. 또 선언 타입이 사라지는 view나 join 결과는 `AS "x [type]"` 별칭과 `PARSE_COLNAMES`를 써서 converter를 다시 강제하라고 정리했습니다.
+  - row factory와 converter를 파일마다 다르게 두면 데이터 모양이 흔들립니다. connection 팩토리에서 한 번에 등록하는 방식이 유지보수에 유리합니다.
+- **Mental Model — 두 단계 변환에서 가장 흔한 실수는 무엇일까요?**
+  - > SQLite에서 Python으로 값이 넘어올 때는 먼저 **값 단위 타입 변환**이 일어나고, 그다음에 **행 단위 shape 변환**이 일어납니다. 이 순서를 분리해서 보면 adapter/converter와 row factory를 어디에 둘지 명확해집니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 가장 가벼운 row factory. tuple처럼 인덱스로도, dict처럼 이름으로도 접근됩니다.
+- **적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - `SELECT` 컬럼 순서가 바뀌면 가격이 갑자기 name으로 곱해집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

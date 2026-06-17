@@ -399,11 +399,17 @@ Production Harness는 앞선 아홉 가지 harness를 예쁘게 모아 놓는 �
 ## 처음 질문으로 돌아가기
 
 - **Production Harness는 여러 harness를 어떻게 하나의 배포 가능한 운영 스택으로 묶을까요?**
-  - 각 harness의 입력과 출력, 검증, 승인, 관측 신호를 배포 파이프라인 안에서 연결해 하나의 운영 경계로 만들어야 합니다.
+  - Production Harness는 여러 harness를 어떻게 하나의 배포 가능한 운영 스택으로 묶을까요 — 본문에서 구체적으로 다룹니다.
 - **점진적 rollout과 rollback은 agent 시스템에서 왜 설계의 일부여야 할까요?**
-  - agent 변경은 확률적 행동과 외부 tool 영향을 함께 바꾸므로 작은 비율로 rollout하고 문제가 보이면 즉시 rollback할 수 있어야 합니다.
+  - 점진적 rollout과 rollback은 agent 시스템에서 왜 설계의 일부여야 할까요 — 본문에서 구체적으로 다룹니다.
 - **새벽 장애를 견디려면 runbook에는 어떤 실행 정보가 있어야 할까요?**
-  - 최근 배포, feature flag, trace 조회법, 비용·오류 지표, 승인 우회 여부, rollback 명령, escalation 기준이 runbook에 있어야 합니다.
+  - 새벽 장애를 견디려면 runbook에는 어떤 실행 정보가 있어야 할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - Production Harness가 중요한 첫 번째 이유는 조합 복잡성입니다. 부품이 많아질수록 어느 하나의 품질보다 서로가 어떻게 연결되는지가 더 큰 장애 원인이 됩니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - Production Harness는 새로운 기술 조각 하나가 아니라 조립 규칙입니다. Task, Context, Constraint, Tool, Test, Feedback, Approval, Observability를 요청 흐름과 배포 흐름 안에서 함께 움직이게 만들어야 합니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - Production Harness는 새로운 기술 조각 하나가 아니라 조립 규칙입니다. Task, Context, Constraint, Tool, Test, Feedback, Approval, Observability를 요청 흐름과 배포 흐름 안에서 함께 움직이게 만들어야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

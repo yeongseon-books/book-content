@@ -367,11 +367,17 @@ CLIP, SigLIP, ImageBind는 비슷해 보여도 지원 modality와 학습 목표�
 ## 처음 질문으로 돌아가기
 
 - **Multimodal embedding은 텍스트 임베딩과 무엇이 다르고, 왜 cross-modal search의 핵심일까요?**
-  - 텍스트 임베딩은 문장끼리만 비교 가능한 반면, 멀티모달 임베딩은 이미지와 텍스트 같은 다른 입력을 같은 좌표계로 정렬합니다. 본문 도식의 `a sleeping cat` 문장과 고양이 사진처럼 shared space가 있어야 텍스트로 이미지를 찾고, 이미지로 다시 설명이나 오디오 자산을 찾는 cross-modal 검색이 성립합니다.
+  - CLIP 단독 검색은 빠르지만 도메인 제약을 반영하기 어렵습니다. 예를 들어 전자상거래에서는 카테고리, 가격대, 재고 상태 같은 메타데이터를 함께 써야 실사용 품질이 올라갑니다.
 - **CLIP, SigLIP, ImageBind는 어떤 공통점과 차이를 가지며 무엇을 기준으로 선택해야 할까요?**
-  - 세 모델 모두 modality 간 거리를 정렬하지만, CLIP은 사실상의 baseline, SigLIP은 sigmoid loss로 학습 안정성을 높인 text-image 모델, ImageBind는 text·image·audio까지 6개 modality를 하나의 공간으로 묶는 모델입니다. 그래서 영어 중심 검색은 CLIP, 오픈 가중치 고품질은 OpenCLIP·SigLIP, 오디오까지 같은 인덱스로 검색해야 하면 ImageBind를 고르는 식으로 목적에 따라 선택하면 됩니다.
+  - CLIP, SigLIP, ImageBind는 어떤 공통점과 차이를 가지며 무엇을 기준으로 선택해야 할까요 — 본문에서 구체적으로 다룹니다.
 - **OpenCLIP으로 벡터를 추출할 때 preprocessing과 normalization은 왜 계약 수준으로 중요할까요?**
-  - 본문 `embed_image()`와 `embed_text()` 코드가 마지막에 모두 `feats / feats.norm(...)`을 수행하는 이유는 FAISS `IndexFlatIP`가 정규화된 벡터를 전제로 코사인 유사도를 계산하기 때문입니다. 여기에 `create_model_and_transforms()`가 준 `preprocess`까지 일치해야 같은 좌표계가 유지되므로, resize·crop·정규화가 어긋나면 검색 점수 해석 자체가 무너집니다.
+  - OpenCLIP으로 벡터를 추출할 때 preprocessing과 normalization은 왜 계약 수준으로 중요할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 멀티모달 embedding은 retrieval 품질을 확장하는 가장 현실적인 방법 중 하나입니다. 거대한 생성 모델을 매번 호출하지 않아도, 검색과 추천의 초기 후보군을 훨씬 정확하게 만들 수 있기 때문입니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이미지, 텍스트, 오디오를 각각 좋은 벡터로 만드는 것만으로는 충분하지 않습니다. 중요한 것은 그 벡터들이 같은 좌표계 안에서 비교 가능한가입니다. multimodal embedding 모델의 가치는 바로 이 비교 가능성을 만들어 준다는 데 있습니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이미지, 텍스트, 오디오를 각각 좋은 벡터로 만드는 것만으로는 충분하지 않습니다. 중요한 것은 그 벡터들이 같은 좌표계 안에서 비교 가능한가입니다. multimodal embedding 모델의 가치는 바로 이 비교 가능성을 만들어 준다는 데 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

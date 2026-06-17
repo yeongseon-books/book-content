@@ -409,11 +409,17 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **production에서 downgrade는 언제 가능하고 언제 사실상 불가능할까요?**
-  - `sa.Column("nickname", ..., nullable=True)`를 추가하는 정도의 가역 변경은 실제 `downgrade()`를 써 둘 수 있지만, `op.drop_column("users", "legacy_token")`처럼 데이터를 지우는 순간은 사실상 비가역입니다. 그래서 본문도 production 사고의 기본값을 downgrade보다 forward-fix에 두었습니다.
+  - 팀 정책은 문장보다 표로 고정하는 편이 운영에 유리합니다.
 - **어떤 종류의 변경이 irreversible하며, 어떻게 다뤄야 할까요?**
-  - 컬럼 drop, 의미 있는 데이터 backfill, 길이 축소 같은 변경은 되돌려도 원래 값을 복원할 수 없으므로 `raise NotImplementedError(...)`로 명시하는 편이 안전합니다. `pass`로 비워 두는 것보다 훨씬 낫다고 한 이유도 잘못된 성공을 막기 위해서입니다.
+  - 어떤 종류의 변경이 irreversible하며, 어떻게 다뤄야 할까요 — 본문에서 구체적으로 다룹니다.
 - **expand-contract는 downgrade 가능성을 어떻게 회복시킬까요?**
-  - `display_name`을 먼저 추가하고, 그다음 backfill하고, 마지막에 `name`을 지우는 식으로 쪼개면 phase 4 전까지는 충분한 안전 구간이 생깁니다. 즉, 한 revision에 rename을 몰아넣지 않고 reversible한 구간을 길게 유지하는 것이 이 패턴의 가치입니다.
+  - 팀 정책은 문장보다 표로 고정하는 편이 운영에 유리합니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - > downgrade는 두 종류로 나뉩니다. **(1) 가역 변경: 정확한 역연산이 가능하고 데이터 손실이 없다. (2) 비가역 변경: 역연산 자체가 데이터 손실을 뜻한다.** 첫 번째는 진심으로 작성하고, 두 번째는 명시적으로 차단하는 편이 더 정직합니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 비가역 변경에는 정직한 downgrade를 쓸 수 없습니다. 막는 편이 오히려 안전합니다.
+- **변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 비가역 변경에는 정직한 downgrade를 쓸 수 없습니다. 막는 편이 오히려 안전합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

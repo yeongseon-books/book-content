@@ -580,11 +580,17 @@ tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
 ## 처음 질문으로 돌아가기
 
 - **pytest는 테스트 파일과 함수를 어떤 규칙으로 자동 탐색할까요?**
-  - pytest는 `test_*.py`, `*_test.py`, `test_*` 함수, `Test*` 클래스 규칙을 따라 테스트를 수집합니다. `pytest --collect-only -q`와 `tests/test_string_utils.py::TestReverseString::test_basic` 같은 노드 ID 예시가 보여 주듯, 이름 규칙이 맞아야 원하는 테스트를 정확히 발견하고 선택 실행할 수 있습니다.
+  - 다음 구조는 입문 단계에서 가장 실수가 적은 형태입니다.
 - **프로덕션 코드와 테스트 코드는 어떤 디렉터리 구조로 나누는 편이 좋을까요?**
-  - 이 글에서는 `src/myapp/` 아래에 프로덕션 코드를 두고 `tests/` 아래에 `test_string_utils.py`, `conftest.py`를 분리하는 `src/` 레이아웃을 기준으로 설명했습니다. 이렇게 나누면 배포 패키지 경계가 선명해지고, 공통 fixture는 `conftest.py`에 모아도 import 경로와 테스트 위치가 흔들리지 않습니다.
+  - 다음 구조는 입문 단계에서 가장 실수가 적은 형태입니다.
 - **`pyproject.toml`은 왜 필요한가요?**
-  - `pyproject.toml`의 `testpaths = ["tests"]`, `pythonpath = ["src"]`, `addopts = "-ra -q"` 같은 설정이 있으면 로컬과 CI가 같은 기준으로 테스트를 찾고 실행합니다. 특히 `from myapp.service import build_query`처럼 패키지 기준 import를 안정적으로 유지하려면 `pythonpath` 설정이 사실상 구조의 일부입니다.
+  - `pyproject.toml`은 왜 필요한가요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 테스트 구조를 초기에 제대로 잡아 두면 프로젝트가 커질수록 이점이 더 커집니다. 새 팀원도 코드를 열기 전에 테스트가 어디 있는지 알 수 있고, CI 환경에서도 같은 명령으로 안정적으로 테스트를 실행할 수 있습니다.
+- **핵심 개념 잡기을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - > test discovery = pytest가 파일명, 클래스명, 함수명 규칙으로 테스트를 자동으로 찾는 메커니즘
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - > test discovery = pytest가 파일명, 클래스명, 함수명 규칙으로 테스트를 자동으로 찾는 메커니즘
 
 <!-- toc:begin -->
 ## 시리즈 목차

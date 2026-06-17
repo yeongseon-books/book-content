@@ -384,11 +384,17 @@ HPA가 먼저 움직이고, scheduler가 빈자리를 못 찾고, CA가 나중�
 ## 처음 질문으로 돌아가기
 
 - **HPA는 어떤 메트릭을 어떤 주기로 읽고 desired replica를 계산할까요?**
-  - 본문 기준으로 HPA는 기본 15초 sync period에서 CPU·메모리 같은 메트릭을 읽고, `desiredReplicas = ceil(currentReplicas * (currentMetric / targetMetric))`에 가까운 비율 계산으로 replica 수를 정합니다. 실제 구현에서는 tolerance, missing metric, stabilization window가 더해지지만, 운영 감각으로는 “메트릭 비율을 replica 수로 바꾸는 빠른 루프”로 보면 됩니다. 그래서 부하가 오르면 node 증설보다 먼저 replica 증가 결정이 보이기 쉽습니다.
+  - autoscaling 논의가 추상적으로 흐르지 않으려면 HPA 객체 자체를 명확히 보여 주는 편이 좋습니다.
 - **Cluster Autoscaler는 어떤 신호를 보고 “새 노드가 필요하다”고 판단할까요?**
-  - Cluster Autoscaler는 HPA처럼 메트릭 비율을 직접 읽지 않고, scheduler가 배치하지 못한 unschedulable Pod를 핵심 입력으로 봅니다. 그리고 각 node pool의 template node를 기준으로 binpacking estimator를 돌려 “새 node가 생기면 이 Pod들이 실제로 올라갈 수 있는가”를 판단한 뒤 node 수 조정을 요청합니다. 본문이 CA를 느리고 보수적인 루프로 설명한 이유가 바로 이 중간 시뮬레이션과 provisioning 대기 시간 때문입니다.
+  - AKS에서 CA는 관리형이지만 동작 성향은 프로필로 조정할 수 있습니다.
 - **HPA와 Cluster Autoscaler가 동시에 움직일 때 race window는 왜 생길까요?**
-  - race window는 HPA와 CA가 서로 다른 입력과 시간축으로 움직이기 때문에 생깁니다. HPA가 먼저 replica를 늘리고, 빈 node 자원이 없으면 scheduler가 새 Pod를 Pending으로 남기고, 그 뒤에야 CA가 그 unschedulable Pod를 보고 node provisioning을 시작합니다. 따라서 잠시 Pending Pod가 늘어나는 구간은 설계 버그라기보다 두 제어 루프가 순차적으로 만나는 정상적인 중간 상태입니다.
+  - 같은 현상을 사람마다 다르게 부르면 대응이 느려집니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - autoscaling은 단순한 비용 최적화 기능이 아닙니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 주제에서 가장 먼저 잡아야 할 문장은 이것입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이 주제에서 가장 먼저 잡아야 할 문장은 이것입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

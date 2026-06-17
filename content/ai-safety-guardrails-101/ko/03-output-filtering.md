@@ -457,24 +457,17 @@ def guarded_fallback(domain: str) -> str:
 ## 처음 질문으로 돌아가기
 
 - **모델 응답을 사용자에게 보내기 전에 왜 다시 데이터로 검증해야 할까요?**
-  - 모델은 정책과 개인정보 기준을 보장하지 않으므로 응답도 외부 입력처럼 검사해야 합니다.
+  - 의료, 금융, 법률 같은 고위험 도메인은 차단만으로 충분하지 않습니다. 안전한 대체 템플릿을 같이 설계해야 사용자가 반복 우회를 시도하지 않습니다.
 - **정책 위반, 민감 정보, streaming 응답은 각각 어디서 필터링해야 할까요?**
-  - 정책 위반은 moderation 또는 judge 경계에서, 민감 정보는 redaction 경계에서, streaming은 chunk 단위의 지연 없는 검사 경계에서 다룹니다.
+  - 출력 필터링이 흔들리는 가장 큰 이유는 정책이 코드와 문서 사이에 분산되기 때문입니다. 운영에서는 카테고리와 조치(action)를 함께 버전 관리해야 합니다.
 - **차단된 응답을 사용자 경험으로 바꿀 때 어떤 fallback이 필요할까요?**
-  - 무엇이 차단됐는지 과도하게 노출하지 않으면서 안전한 재작성, 범위 축소, 사람 연결, 재요청 안내를 제공해야 합니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Safety & Guardrails 101 (1/10): AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
-- [AI Safety & Guardrails 101 (2/10): Prompt Injection 방어](./02-prompt-injection-defense.md)
-- **AI Safety & Guardrails 101 (3/10): 출력 필터링과 콘텐츠 모더레이션 (현재 글)**
-- [AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹](./04-pii-detection-redaction.md)
-- [AI Safety & Guardrails 101 (5/10): Jailbreak 탐지](./05-jailbreak-detection.md)
-- [AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지](./06-toxicity-bias-detection.md)
-- [AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증](./07-hallucination-guardrails.md)
-- [AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지](./08-rate-limiting-abuse-prevention.md)
-- [AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스](./09-audit-logging-compliance.md)
-- [AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
+  - 이 기준을 미리 정해두면 운영자 판단 편차를 줄일 수 있습니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 출력 필터링을 별도 계층으로 두면 팀은 모델 품질과 정책 집행을 분리해 운영할 수 있습니다. 모델을 교체하더라도 후단 모더레이션 기준은 유지할 수 있고, 차단 비율과 false positive를 데이터로 튜닝할 수 있습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 많은 시스템이 출력 모더레이션을 단순한 욕설 필터쯤으로 축소합니다. 하지만 실제로는 훨씬 넓습니다. 폭력, 자해, 성적 콘텐츠, 혐오, 불법 행위, 규제 조언, 사내 정책 위반을 모두 다뤄야 하고, 각각은 다른 risk tolerance를 가집니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 많은 시스템이 출력 모더레이션을 단순한 욕설 필터쯤으로 축소합니다. 하지만 실제로는 훨씬 넓습니다. 폭력, 자해, 성적 콘텐츠, 혐오, 불법 행위, 규제 조언, 사내 정책 위반을 모두 다뤄야 하고, 각각은 다른 risk tolerance를 가집니다.
 
 <!-- toc:end -->
 

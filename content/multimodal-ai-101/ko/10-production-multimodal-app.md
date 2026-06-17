@@ -407,11 +407,17 @@ weekly_health = {
 ## 처음 질문으로 돌아가기
 
 - **production 멀티모달 앱은 어떤 end-to-end 구성 요소를 반드시 분리해서 설계해야 할까요?**
-  - API 입구, 이미지 전처리, caption/OCR/embedding 추출, VLM 추론 worker, 벡터 검색, 캐시, object storage, 관측성을 분리해야 장애와 비용을 제어할 수 있습니다. 본문 시스템 그림처럼 FastAPI는 orchestration을 맡고 GPU 추론은 별도 worker로 분리해야 모델 교체, 큐 제어, fallback 설계가 쉬워집니다.
+  - 프로덕션 멀티모달 앱은 정상 경로보다 실패 경로 설계가 더 중요합니다. 이미지 디코딩 실패, OCR 타임아웃, VLM 과부하, 벡터 DB 지연처럼 modality별 실패가 동시에 생길 수 있으므로 각 단계의 fallback을 명시적으로 두어야 합니다.
 - **FastAPI 입구, inference worker, cache, object storage, observability는 어떤 순서로 연결되는 편이 안정적일까요?**
-  - 글의 기본 흐름은 업로드 수신과 검증 후 object storage 저장, L1/L2/L3 cache 확인, `asyncio.gather`로 caption·OCR·embedding 병렬 추출, 검색과 VLM 호출, 마지막으로 streaming 응답과 metric 기록입니다. 이렇게 순서를 고정하면 `image_hash`, feature cache, Prometheus metric을 같은 요청 경로에 묶어 지연과 비용의 원인을 단계별로 추적할 수 있습니다.
+  - FastAPI 입구, inference worker, cache, object storage, observability는 어떤 순서로 연결되는 편이 안정적일까요 — 본문에서 구체적으로 다룹니다.
 - **동기 처리와 비동기 처리 경계는 어떤 기준으로 나누는 것이 현실적일까요?**
-  - 인증, 입력 검증, 예산 검사처럼 짧고 실패가 명확한 단계는 동기로 끝내고, OCR·caption·VLM처럼 오래 걸리거나 병렬 이득이 큰 작업은 비동기 worker로 넘기는 편이 현실적입니다. 본문이 제시한 backpressure, 단계별 timeout, degraded response 정책까지 함께 두면 요청 취소나 worker 과부하 상황에서도 전체 서비스를 축소 응답으로 유지할 수 있습니다.
+  - 멀티모달 서비스는 파일 업로드가 기본이므로 보안 경계 설계가 필수입니다. MIME 타입만 믿지 말고 매직 바이트 검증을 수행하고, 원본 파일은 격리된 버킷에 저장한 뒤 서명 URL로만 접근하게 해야 합니다. 이 단계를 생략하면 악성 파일 업로드 위험이 커집니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 대부분의 멀티모달 기능은 결국 애플리케이션 안에 들어가야 의미가 있습니다. 따라서 모델을 이해하는 것만큼, 업로드부터 응답까지의 시스템 경로를 설계하는 감각이 중요합니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - production 아키텍처를 볼 때 가장 먼저 분리해야 할 것은 요청 입구와 추론 실행 계층입니다. FastAPI 같은 API 레이어는 인증, 요청 검증, 업로드 관리, 응답 스트리밍을 담당하고, 실제 모델 추론은 별도 worker가 맡는 편이 훨씬 안정적입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - production 아키텍처를 볼 때 가장 먼저 분리해야 할 것은 요청 입구와 추론 실행 계층입니다. FastAPI 같은 API 레이어는 인증, 요청 검증, 업로드 관리, 응답 스트리밍을 담당하고, 실제 모델 추론은 별도 worker가 맡는 편이 훨씬 안정적입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

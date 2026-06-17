@@ -425,24 +425,17 @@ LLM rate limiting은 더 이상 초당 요청 수 제한이 아닙니다. 토큰
 ## 처음 질문으로 돌아가기
 
 - **LLM rate limiting은 왜 요청 수보다 리소스 소비를 기준으로 봐야 할까요?**
-  - 짧은 요청과 긴 요청의 비용이 크게 다르고, 출력 토큰 폭주나 tool loop가 요청 수만으로는 보이지 않기 때문입니다.
+  - LLM rate limiting은 왜 요청 수보다 리소스 소비를 기준으로 봐야 할까요 — 본문에서 구체적으로 다룹니다.
 - **토큰, 비용, 사용자·키 단위 한도는 각각 어떤 abuse를 막을까요?**
-  - 토큰 한도는 context·출력 폭주, 비용 한도는 예산 남용, 사용자·키 한도는 credential sharing과 automated scraping을 막습니다.
+  - 토큰, 비용, 사용자·키 단위 한도는 각각 어떤 abuse를 막을까요 — 본문에서 구체적으로 다룹니다.
 - **한도 초과 시 차단과 완화 응답은 어떻게 나눠야 할까요?**
-  - 악성·반복 abuse는 차단하고, 정상 사용자의 일시 초과는 짧은 답변, 대기, 하위 모델, 재시도 안내로 완화할 수 있습니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Safety & Guardrails 101 (1/10): AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
-- [AI Safety & Guardrails 101 (2/10): Prompt Injection 방어](./02-prompt-injection-defense.md)
-- [AI Safety & Guardrails 101 (3/10): 출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
-- [AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹](./04-pii-detection-redaction.md)
-- [AI Safety & Guardrails 101 (5/10): Jailbreak 탐지](./05-jailbreak-detection.md)
-- [AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지](./06-toxicity-bias-detection.md)
-- [AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증](./07-hallucination-guardrails.md)
-- **AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지 (현재 글)**
-- [AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스](./09-audit-logging-compliance.md)
-- [AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
+  - 한도 초과 시 차단과 완화 응답은 어떻게 나눠야 할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 다차원 rate limiting을 잘 설계하면 비용 폭주와 서비스 남용을 같은 구조 안에서 통제할 수 있습니다. 사용자 경험을 과도하게 해치지 않으면서도, 비정상적인 burst와 자동화 공격을 조기에 감지할 수 있습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - LLM 시스템에서 중요한 것은 “몇 번 호출했는가”보다 “얼마나 많은 리소스를 썼는가”입니다. 토큰 수, 응답 길이, 모델 단가, 스트리밍 지속 시간이 각각 비용과 장애에 직접 연결됩니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - LLM 시스템에서 중요한 것은 “몇 번 호출했는가”보다 “얼마나 많은 리소스를 썼는가”입니다. 토큰 수, 응답 길이, 모델 단가, 스트리밍 지속 시간이 각각 비용과 장애에 직접 연결됩니다.
 
 <!-- toc:end -->
 

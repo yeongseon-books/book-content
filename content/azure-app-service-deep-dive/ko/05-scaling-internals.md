@@ -232,11 +232,17 @@ autoscale 규칙은 한 번 만들고 끝나지 않습니다. 트래픽 계절�
 ## 처음 질문으로 돌아가기
 
 - **scale-up과 scale-out은 App Service에서 실제로 무엇을 바꿀까요?**
-  - scale-up은 worker 한 대의 CPU·메모리·SKU 체급을 키우는 일이고, scale-out은 App Service Plan이 쓸 worker 수를 늘리는 일입니다. 그래서 메모리 압박과 worker concurrency 부족을 같은 확장 버튼으로 보지 말고, 어떤 자원이 먼저 막혔는지에 따라 축을 나눠 판단해야 합니다.
+  - scale-up과 scale-out은 App Service에서 실제로 무엇을 바꿀까요 — 본문에서 구체적으로 다룹니다.
 - **autoscale rule은 앱이 아니라 왜 App Service Plan에 붙는다고 봐야 할까요?**
-  - autoscale의 대상 리소스가 plan이기 때문에, 실제로 바뀌는 것은 앱 하나의 전용 서버가 아니라 shared worker capacity입니다. 그래서 한 앱의 burst가 같은 plan 안의 다른 앱이 쓰는 capacity까지 흔들 수 있고, scale event도 앱 로그 하나보다 plan-level metrics와 activity log로 읽어야 정확합니다.
+  - autoscale rule은 앱이 아니라 왜 App Service Plan에 붙는다고 봐야 할까요 — 본문에서 구체적으로 다룹니다.
 - **Azure Monitor autoscale은 어떤 cadence와 observation window로 규칙을 평가할까요?**
-  - Azure Monitor autoscale은 메트릭을 한 번 보고 즉시 반응하는 기능이 아니라, 주기적으로 rule을 평가하는 engine입니다. `timeGrain`, `timeWindow`, `statistic`, `cooldown`이 함께 반응 속도를 만들기 때문에, 실제 체감 확장 시간은 threshold crossing 하나가 아니라 관찰 창과 평가 주기, cooldown, readiness가 누적된 결과로 봐야 합니다.
+  - Azure Monitor autoscale은 어떤 cadence와 observation window로 규칙을 평가할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 스케일링을 한 줄 버튼으로 이해하면 사용자 체감 지연을 설명할 수 없게 됩니다. CPU가 높아졌는데 왜 바로 capacity가 늘지 않았는지, metrics는 이미 올라갔는데 왜 요청 큐가 여전히 길었는지, 인스턴스 수가 늘었는데 왜 첫 요청 지연은 남았는지를 설명하려면 scale-out을 제어 루프로 읽어야 합니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 주제를 이해할 때 가장 중요한 문장은 이것입니다. **App Service scale-out은 앱이 서버를 직접 띄우는 과정이 아니라, autoscale 또는 수동 조작이 App Service Plan의 desired instance count를 바꾸고, 플랫폼이 그 desired state를 worker capacity로 반영한 뒤, 새 worker가 readiness를 통과해야 비로소 라우팅 대상이 되는 과정입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이 주제를 이해할 때 가장 중요한 문장은 이것입니다. **App Service scale-out은 앱이 서버를 직접 띄우는 과정이 아니라, autoscale 또는 수동 조작이 App Service Plan의 desired instance count를 바꾸고, 플랫폼이 그 desired state를 worker capacity로 반영한 뒤, 새 worker가 readiness를 통과해야 비로소 라우팅 대상이 되는 과정입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

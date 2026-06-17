@@ -270,11 +270,17 @@ az webapp config appsettings list -n my-app -g my-rg   --query "[?name=='WEBSITE
 ## 처음 질문으로 돌아가기
 
 - **App Service의 worker는 실제로 어떤 실행 경계를 의미할까요?**
-  - worker는 포털에 보이는 인스턴스 숫자의 다른 이름이 아니라, 사용자 코드가 실제로 실행되고 제한을 받는 경계입니다. Windows에서는 IIS와 App Service sandbox 안의 프로세스가 그 경계이고, Linux에서는 포트 바인딩과 startup contract를 지키는 컨테이너가 그 경계입니다.
+  - App Service의 worker는 실제로 어떤 실행 경계를 의미할까요 — 본문에서 구체적으로 다룹니다.
 - **Windows code app에서 App Service sandbox는 무엇을 허용하고 무엇을 제한할까요?**
-  - sandbox는 일반적인 웹앱 실행은 허용하지만, 다중 테넌트 품질을 지키기 위해 OS 기능 접근을 의도적으로 좁혀 둡니다. 그래서 IIS 위에서 앱은 정상적으로 돌 수 있어도 registry write, graphics subsystem, 일부 local communication을 전제로 한 라이브러리는 같은 방식으로 들여오면 바로 경계에 막힐 수 있습니다.
+  - Windows code app에서 App Service sandbox는 무엇을 허용하고 무엇을 제한할까요 — 본문에서 구체적으로 다룹니다.
 - **왜 registry write와 GDI/User32 계열 제약이 Windows App Service에서 자주 문제를 만들까요?**
-  - 많은 Windows 라이브러리가 로컬 서버에서는 registry, GDI, User32를 자연스러운 전제로 삼고 있기 때문입니다. 하지만 App Service sandbox는 그 전제를 유지해 주지 않으므로 HTML-to-PDF, 폰트 렌더링, `System.Drawing`, 브라우저 자동화 계열 코드가 특히 자주 실행 경계와 충돌합니다.
+  - 왜 registry write와 GDI/User32 계열 제약이 Windows App Service에서 자주 문제를 만들까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 운영에서 worker를 제대로 이해하지 못하면 런타임 문제와 플랫폼 계약 문제를 계속 섞게 됩니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 글에서 가장 먼저 고정해야 할 문장은 이것입니다. **App Service의 worker는 하나의 용어이지만, Windows에서는 sandbox 안의 IIS-hosted process이고, Linux에서는 container contract 안의 프로세스입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이 글에서 가장 먼저 고정해야 할 문장은 이것입니다. **App Service의 worker는 하나의 용어이지만, Windows에서는 sandbox 안의 IIS-hosted process이고, Linux에서는 container contract 안의 프로세스입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -270,11 +270,17 @@ az functionapp plan create \
 ## 처음 질문으로 돌아가기
 
 - **각 플랜은 정확히 무엇을 기준으로 과금하고 무엇을 제약할까요?**
-  - `Consumption`과 `Flex Consumption`은 실행 기반 종량제가 중심이지만, Flex는 `Always Ready`를 켜면 그 warm 용량에도 비용이 붙습니다. `Premium`은 최소 인스턴스 비용을 내고 warm capacity를 확보하는 모델이고, `Dedicated`는 App Service Plan SKU 기준으로 과금되므로, 플랜마다 scale to zero 가능 여부와 고정비 구조가 함께 달라집니다.
+  - 각 플랜은 정확히 무엇을 기준으로 과금하고 무엇을 제약할까요 — 본문에서 구체적으로 다룹니다.
 - **플랜 선택에서 가격보다 콜드 스타트 허용 범위가 먼저 중요해지는 경우는 언제일까요?**
-  - 첫 요청 지연이 비즈니스적으로 허용되지 않는 HTTP 경로라면 가격표보다 warm baseline이 더 먼저 중요합니다. 이럴 때는 `Premium`의 최소 인스턴스나 `Flex Consumption`의 `Always Ready`처럼 cold start를 줄이는 레버가 있는지부터 봐야 하고, 그다음 비용을 비교하는 편이 맞습니다.
+  - 플랜 선택에서 가격보다 콜드 스타트 허용 범위가 먼저 중요해지는 경우는 언제일까요 — 본문에서 구체적으로 다룹니다.
 - **VNet 통합, Always Ready 같은 플랫폼 기능은 어떤 플랜 선택을 사실상 강제할까요?**
-  - `VNet` 통합이 필수면 classic `Consumption`은 바로 후보에서 빠지고 `Flex`, `Premium`, `Dedicated` 쪽으로 좁혀집니다. 여기에 Windows 요구나 배포 슬롯까지 필요하면 `Premium` 또는 `Dedicated`가 더 자연스럽고, Linux 기반 새 서버리스 앱에서 `Always Ready`와 per-function scaling이 핵심이면 `Flex Consumption`이 기본 후보가 됩니다.
+  - VNet 통합, Always Ready 같은 플랫폼 기능은 어떤 플랜 선택을 사실상 강제할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 플랜 선택은 Azure Functions에서 가장 과소평가되기 쉬운 초기 결정입니다. 코드는 나중에도 바꿀 수 있지만, 플랜이 잘못 맞춰져 있으면 콜드 스타트, 네트워크 제약, 기능 지원 범위, 비용 구조가 전부 뒤에서 문제로 돌아옵니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - Azure Functions 플랜은 “더 싸다/더 비싸다”로만 보면 거의 항상 틀립니다. 더 정확한 질문은 세 가지입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - Azure Functions 플랜은 “더 싸다/더 비싸다”로만 보면 거의 항상 틀립니다. 더 정확한 질문은 세 가지입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

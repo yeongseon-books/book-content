@@ -210,11 +210,15 @@ Python 컨테이너화의 진짜 어려움은 단순 실행이 아니라 신호�
 ## 처음 질문으로 돌아가기
 
 - **FastAPI와 uvicorn을 어떤 방식으로 컨테이너에 담아야 할까요?**
-  - 본문 예시처럼 베이스로 `python:3.x-slim`을 쓰고 `requirements.txt`를 먼저 `COPY` 후 `pip install`로 의존성 layer를 분리한 뒤 앱 소스를 복사하고, `CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]`처럼 uvicorn을 PID 1로 실행하는 형태가 표준입니다. 의존성 캐시와 신호 처리를 동시에 챙기는 구조입니다.
+  - FastAPI와 uvicorn을 어떤 방식으로 컨테이너에 담아야 할까요 — 본문에서 구체적으로 다룹니다.
 - **PID 1과 SIGTERM은 왜 컨테이너 운영에서 중요할까요?**
-  - 본문에서 강조했듯이 컨테이너의 첫 프로세스가 PID 1이 되고, `docker stop`은 그 프로세스에 SIGTERM을 보냅니다. uvicorn을 직접 실행하지 않고 `sh -c "..."` 같은 셸 래퍼로 띄우면 SIGTERM이 셸에서 멈춰 앱이 graceful shutdown 신호를 못 받기 때문에, 본문에서 본 exec form `CMD`를 써야 신호가 그대로 앱으로 전달됩니다.
+  - health 엔드포인트를 먼저 두는 이유는 단순합니다. 컨테이너가 떴는지보다 요청을 받을 준비가 되었는지를 분리해 관찰해야 하기 때문입니다.
 - **healthcheck는 어떻게 구성해야 할까요?**
-  - 본문에서 본 것처럼 앱에 `/healthz`나 `/livez` 같은 가벼운 엔드포인트를 두고, Dockerfile에 `HEALTHCHECK CMD curl -fs http://localhost:8000/healthz`나 Compose의 `healthcheck` 블록으로 주기·timeout·retry를 함께 명시해야 합니다. healthcheck가 있어야 오케스트레이터가 "기동했지만 실제로 동작 안 함"을 자동으로 감지해 트래픽을 끊거나 재시작할 수 있습니다.
+  - healthcheck는 어떻게 구성해야 할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - Python을 컨테이너에 넣고 `python app.py`만 실행해도 일단은 동작해 보일 수 있습니다.
+- **전과 후을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 차이는 운영 중 배포 품질을 크게 바꿉니다. 애플리케이션이 요청을 받는 순간뿐 아니라 내려가는 순간까지 설계해야 신뢰할 수 있는 컨테이너가 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

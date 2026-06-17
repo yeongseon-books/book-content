@@ -434,11 +434,17 @@ N+1은 ORM 지식 문제가 아니라 운영 비용 문제입니다. 같은 기�
 ## 처음 질문으로 돌아가기
 
 - **기본 lazy 로딩은 어떤 상황에서 N+1을 만들까요?**
-  - `users = session.scalars(select(User)).all()` 뒤에 반복문 안에서 `u.orders`에 접근하면, 사용자 목록 1번 조회 뒤 사용자 수만큼 `SELECT orders WHERE user_id = ?`가 추가됩니다. 본문이 보여 준 DTO 직렬화 예시처럼, 서비스 함수는 멀쩡해 보여도 응답 조립 단계에서 N+1이 터지는 경우가 특히 흔합니다.
+  - 같은 요구사항(사용자와 주문 목록 조회)에서 전략별 SQL 차이를 한 번에 비교해 보겠습니다.
 - **`joinedload`와 `selectinload`는 각각 어떤 쿼리를 추가로 만들까요?**
-  - `joinedload(User.orders)`는 부모 SELECT에 `LEFT OUTER JOIN orders`를 붙여 한 번에 가져오고, 그래서 `unique()`로 중복 부모를 정리해야 합니다. 반대로 `selectinload(User.orders)`는 먼저 `SELECT users`, 그다음 `WHERE user_id IN (...)` 형태의 두 번째 SELECT를 만들어 자식 컬렉션을 한 번에 묶어 옵니다.
+  - `joinedload`와 `selectinload`는 각각 어떤 쿼리를 추가로 만들까요 — 본문에서 구체적으로 다룹니다.
 - **컬렉션 관계에서는 왜 `selectinload`가 더 자주 권장될까요?**
-  - 일대다나 다대다 컬렉션은 `joinedload`를 쓰면 부모×자식 조합만큼 row가 불어나 전송량이 커지기 쉬워서, `selectinload`가 쿼리 수와 row 수의 균형이 더 좋습니다. 본문에서도 목록 API, 페이지네이션, query budget 테스트를 모두 `selectinload` 중심으로 설명한 이유가 바로 이 특성입니다.
+  - `joinedload(User.orders)`는 한 번의 SELECT로 끝나지만, 사용자 50명에 평균 100개의 주문이 있으면 5,000개의 row가 만들어져 네트워크로 흘러갑니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - > "관계 속성에 처음 접근하면 SELECT가 한 번 발사된다." 이 한 문장이 lazy 로딩의 전부입니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - `u.orders`에 처음 접근하는 순간마다 SELECT가 발사됩니다. 이것이 정확히 N+1 패턴입니다.
+- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - `options(selectinload(...))` 한 줄로 51 → 2 SELECT가 됩니다. 이 차이가 운영 환경에서 응답시간 5배~50배 개선으로 이어집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

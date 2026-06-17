@@ -415,11 +415,17 @@ PEP 249의 parameter binding은 SQL injection을 차단하는 가장 단순하�
 ## 처음 질문으로 돌아가기
 
 - **왜 `find_user_BAD("Alice' OR 1=1 --")`는 전체 행을 유출하지만 `WHERE name = ?`는 빈 결과를 돌려줄까요?**
-  - 본문은 SQL parser가 먼저 `?`를 값 자리로만 해석하고, 그 뒤 value binder가 사용자 입력을 문자열 값으로 넣는 흐름을 그림과 함께 보여 줬습니다. 그래서 `find_user_BAD()`에서는 공격 문자열이 SQL 문법으로 합쳐졌지만, `find_user_OK()`에서는 같은 문자열이 단순 값으로만 처리되어 결과가 비어 있습니다.
+  - 왜 `find_user_BAD("Alice' OR 1=1 --")`는 전체 행을 유출하지만 `WHERE name = ?`는 빈 결과를 돌려줄까요 — 본문에서 구체적으로 다룹니다.
 - **sqlite3에서 `?`, `:name`, `module.paramstyle`은 언제 구분해서 써야 하고 driver 이관 때 무엇을 먼저 확인해야 할까요?**
-  - 글에서는 sqlite3가 `qmark`와 `named`를 모두 지원하지만, 다른 driver는 `format`이나 `pyformat`을 쓸 수 있다고 표로 정리했습니다. 그래서 현재 코드가 `?` 기반인지 `:name` 기반인지 명확히 하고, 이관 전에는 `module.paramstyle`을 먼저 확인해 placeholder 문법을 안전하게 맞춰야 합니다.
+  - sqlite3에서 `?`, `:name`, `module.paramstyle`은 언제 구분해서 써야 하고 driver 이관 때 무엇을 먼저 확인해야 할까요 — 본문에서 구체적으로 다룹니다.
 - **`IN (...)`, `ORDER BY`, table name처럼 placeholder가 못 들어가는 자리는 어떻게 안전하게 처리해야 할까요?**
-  - `IN (...)`은 placeholder 개수를 동적으로 만들어도 실제 값은 `execute(sql, ids)`로 분리해 넘겨야 안전하다고 설명했습니다. 반면 `ORDER BY` 방향, table name, column name은 바인딩 대상이 아니므로 `ALLOWED`, `ALLOWED_DIR` 같은 whitelist 검증을 통과한 값만 문자열로 넣어야 합니다.
+  - `IN (...)`, `ORDER BY`, table name처럼 placeholder가 못 들어가는 자리는 어떻게 안전하게 처리해야 할까요 — 본문에서 구체적으로 다룹니다.
+- **Mental Model — query string과 값을 끝까지 분리에서 가장 흔한 실수는 무엇일까요?**
+  - > SQL injection은 query string과 사용자 입력이 하나의 문자열로 합쳐지는 순간 시작됩니다. parameter binding은 이 둘을 끝까지 분리해서, 값이 SQL 문법으로 다시 해석되지 못하게 막습니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - sqlite3 default. 위치 기반 binding이라 순서가 중요합니다.
+- **적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 차이는 한 줄입니다. 그러나 보안 결과는 정반대입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -472,11 +472,17 @@ augmentation의 핵심은 기술 이름이 아니라 의사결정 흐름입니�
 ## 처음 질문으로 돌아가기
 
 - **augmentation은 synthetic generation과 무엇이 다른가요?**
-  - 이 글의 augmentation은 기존 라벨 데이터를 `source_id`, `aug_method`, `similarity`와 함께 변형해 train에 보강하는 작업입니다. 새 업무를 처음부터 만드는 synthetic generation과 달리, 원본 샘플과의 의미 보존 여부를 계속 확인해야 한다는 점이 핵심입니다.
+  - augmentation은 synthetic generation과 무엇이 다른가요 — 본문에서 구체적으로 다룹니다.
 - **minority class와 typo robustness 문제를 어떤 decision path로 풀어야 하나요?**
-  - 본문은 `refund_delay`처럼 부족한 class는 paraphrase로 늘리고, 오탈자 강건성은 `inject_typo()`를 쓰는 별도 slice로 분리했습니다. 두 문제를 한 배치에 섞지 않고 `refund_delay_recall`과 `typo_slice_f1`을 따로 보는 이유가 바로 그 경로 차이입니다.
+  - 오탈자 강건성까지 함께 보고 싶다면, minority class augmentation과 같은 배치에 섞기보다 slice를 분리하는 편이 좋습니다.
 - **EDA, back-translation, paraphrase, AST transform은 각각 언제 선택하고 언제 멈춰야 하나요?**
-  - 한국어 텍스트 분류라면 이 글처럼 paraphrase와 형태소 guardrail을 먼저 쓰고, aggressive EDA로 `macro_f1`이 0.804까지 떨어지면 멈춰야 합니다. AST transform은 본문이 말했듯 코드 데이터일 때만 의미가 있고, 최종 stop/go는 held-out 표의 delta로 결정해야 합니다.
+  - issue #779가 지적한 깨진 AST rename 예시는 실제 출력 주석과 코드가 맞지 않는 문제가 있었습니다. 아래처럼 `ast.arg`와 `ast.Name`을 함께 바꾸면 주석과 출력이 일치합니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 증강은 라벨링 예산이 부족할 때 특히 유용합니다. minority class recall을 끌어올리거나, 오탈자와 패러프레이즈에 대한 강건성을 높일 수 있기 때문입니다.
+- **하나의 데이터 문제로 시작해 보겠습니다을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 시나리오는 다음과 같습니다.
+- **baseline과 held-out부터 고정합니다의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 증강은 baseline이 없으면 판단할 수 없습니다. 아래처럼 baseline metric을 먼저 기록합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

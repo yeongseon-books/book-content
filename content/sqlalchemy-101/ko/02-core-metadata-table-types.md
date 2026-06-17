@@ -456,11 +456,17 @@ Production에서는 `metadata.create_all`을 직접 부르지 않고 Alembic mig
 ## 처음 질문으로 돌아가기
 
 - **`MetaData`는 어떤 역할을 하고 왜 스키마 카탈로그라고 부를까요?**
-  - `MetaData`는 `users`, `posts`, `memberships` 같은 `Table` 정의를 한곳에 모아 두는 in-memory 카탈로그이기 때문에 그렇게 부릅니다. 그래서 `metadata.create_all(engine)` 한 번으로 전체 스키마를 만들 수 있고, Alembic에서는 같은 객체가 `target_metadata`가 되어 마이그레이션 기준선 역할까지 맡습니다.
+  - `MetaData`는 어떤 역할을 하고 왜 스키마 카탈로그라고 부를까요 — 본문에서 구체적으로 다룹니다.
 - **`Table`과 `Column`을 Python 객체로 두면 어떤 실수가 줄어들까요?**
-  - 문자열 SQL만 쓸 때는 `emai` 같은 오타를 운영 중 `OperationalError`로 늦게 발견하지만, `users.c.email`처럼 객체로 접근하면 IDE 자동완성과 `AttributeError`로 더 빨리 잡힙니다. `UniqueConstraint`, `Index`, `ForeignKey("users.id")` 같은 제약도 같은 정의 안에 모이므로 스키마 의도가 흩어지지 않습니다.
+  - `Table`과 `Column`을 Python 객체로 두면 어떤 실수가 줄어들까요 — 본문에서 구체적으로 다룹니다.
 - **SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요?**
-  - `String(100)`, `DateTime`, `JSON` 같은 generic type을 SQLAlchemy가 dialect별 DDL로 풀어 주기 때문에 같은 모델을 SQLite와 다른 DB에서 같은 방식으로 다룰 수 있습니다. 다만 본문이 짚었듯이 SQLite는 affinity 모델이라 `String(100)`도 길이를 강제하지 않으므로, 길이 검증은 애플리케이션이나 `CHECK` 제약으로 별도로 보강해야 합니다.
+  - SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요 — 본문에서 구체적으로 다룹니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - `MetaData`는 schema의 **카탈로그**입니다. application이 알고 있는 모든 `Table` 정의를 담아 두는 컨테이너이고, 그 컨테이너를 통째로 Engine에 던지면 schema가 만들어지거나 비교됩니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - `MetaData()`는 빈 카탈로그를 만듭니다. application 전체에 하나만 두는 것이 일반적이며, 보통 `db.py` 같은 모듈에 module-level 변수로 둡니다.
+- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이제 컬럼 이름 typo는 schema 정의 시점이나 IDE 자동완성에서 잡힙니다. `users.c.name`을 통해 컬럼을 참조할 수 있고, 같은 schema 객체를 select/insert/update에 모두 재사용합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

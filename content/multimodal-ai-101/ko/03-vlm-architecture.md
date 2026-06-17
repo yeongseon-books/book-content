@@ -366,11 +366,17 @@ LLaVA는 단순함, BLIP-2는 압축 효율, Flamingo는 깊은 상호작용이�
 ## 처음 질문으로 돌아가기
 
 - **VLM은 어떤 경로로 image encoder의 출력을 LLM 입력으로 연결할까요?**
-  - 공통 구조는 `Vision Encoder -> Adapter -> LLM`이며, image encoder가 만든 visual features를 LLM이 읽을 수 있는 token 계약으로 바꾸는 단계가 핵심입니다. 본문 코드의 `LLaVAProjector`, `QFormer`, `GatedCrossAttention`이 바로 그 연결 방식을 각각 구현한 예입니다.
+  - VLM은 어떤 경로로 image encoder의 출력을 LLM 입력으로 연결할까요 — 본문에서 구체적으로 다룹니다.
 - **Vision Encoder + Adapter + LLM이라는 공통 뼈대는 왜 대부분의 모델에서 반복될까요?**
-  - 이미지를 잘 읽는 인코더와 텍스트 추론에 강한 LLM을 그대로 활용하면서, 중간의 adapter만 바꿔 비용과 길이 제약을 조절할 수 있기 때문입니다. 이 분리가 있어야 visual token 수, frozen 범위, fine-tuning 비용을 따로 제어할 수 있고 새 모델이 나와도 병목을 같은 층위에서 비교할 수 있습니다.
+  - VLM 아키텍처를 비교할 때는 "정답률" 하나로 끝내면 안 됩니다. Adapter는 토큰 길이, 추론 지연, GPU 메모리에 직접 영향을 주므로 최소한 네 가지 지표를 함께 봐야 합니다.
 - **LLaVA, BLIP-2, Flamingo는 각각 어떤 trade-off를 선택한 설계일까요?**
-  - LLaVA는 MLP projection으로 단순하고 빠르지만 256~576 visual token이 그대로 context를 차지합니다. BLIP-2는 Q-Former로 32개 token으로 압축해 효율을 얻고, Flamingo는 LLM 내부 cross-attention을 추가해 multi-image와 video에 자연스럽지만 구조 수정과 학습 난도가 더 큽니다.
+  - LLaVA, BLIP-2, Flamingo는 각각 어떤 trade-off를 선택한 설계일까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - VLM 아키텍처를 이해하면 모델 선택이 훨씬 덜 감에 의존하게 됩니다. “요즘 많이 쓰니까”가 아니라, visual token 길이와 adapter 복잡도, base LLM 호환성 같은 실제 변수로 판단할 수 있기 때문입니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - VLM을 설명할 때 흔히 “LLM에 눈을 달았다”는 표현을 씁니다. 직관에는 도움이 되지만, 실제 구현을 이해하기에는 너무 모호합니다. 더 정확한 설명은 image encoder가 만든 시각 토큰을 LLM이 이해할 수 있는 계약으로 재매핑한다는 사실입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - VLM을 설명할 때 흔히 “LLM에 눈을 달았다”는 표현을 씁니다. 직관에는 도움이 되지만, 실제 구현을 이해하기에는 너무 모호합니다. 더 정확한 설명은 image encoder가 만든 시각 토큰을 LLM이 이해할 수 있는 계약으로 재매핑한다는 사실입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

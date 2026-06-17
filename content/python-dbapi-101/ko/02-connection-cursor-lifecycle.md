@@ -376,11 +376,17 @@ cursor를 외부로 반환하는 함수가 있다면 lifecycle 책임자가 모�
 ## 처음 질문으로 돌아가기
 
 - **Connection과 cursor는 각각 어떤 책임을 가질까요?**
-  - connection은 데이터베이스와의 통신 채널이자 transaction context이고, cursor는 그 안에서 단일 query와 result set을 다루는 실행 단위입니다. 본문에서도 `conn.in_transaction`, `cur.description`, `cur.rowcount`를 나눠 보면서 두 객체가 상태를 들고 있는 위치가 다르다는 점을 확인했습니다.
+  - lifecycle 문제는 코드 리뷰보다 관측 지표에서 먼저 드러납니다. 아래 템플릿은 커밋/롤백/종료를 메트릭으로 남기는 최소 구조입니다.
 - **`with` context manager는 connection과 cursor 자원을 어떻게 보호할까요?**
-  - `with sqlite3.connect(...) as conn:`는 예외가 나면 rollback, 정상 종료면 commit을 보장해 트랜잭션 경계를 안전하게 닫아 줍니다. 다만 SQLite에서는 connection 자체를 닫지 않으므로, 글에서 만든 `open_db()`처럼 `finally: conn.close()`까지 감싼 래퍼를 써야 자원 누수까지 막을 수 있습니다.
+  - 수동 close는 빠뜨리기 쉽습니다. Python의 `with` 문이 가장 안전합니다.
 - **호출마다 새 connection을 여는 방식과 재사용하는 방식은 어떤 차이를 만들까요?**
-  - `get_note()`처럼 호출마다 새 connection을 여는 코드는 단순하지만, PostgreSQL처럼 handshake 비용이 큰 환경에서는 요청마다 수십 ms가 추가될 수 있습니다. 반대로 `NoteRepo`처럼 재사용하면 비용은 줄지만 lifecycle 책임이 생기므로, close 누락 시 `Too many open files`나 `pg_stat_activity`의 좀비 connection 같은 증상으로 이어질 수 있습니다.
+  - lifecycle 문제는 코드 리뷰보다 관측 지표에서 먼저 드러납니다. 아래 템플릿은 커밋/롤백/종료를 메트릭으로 남기는 최소 구조입니다.
+- **1. Connection이란에서 가장 흔한 실수는 무엇일까요?**
+  - Connection은 application과 database 사이의 단일 통신 채널입니다. TCP socket(PostgreSQL, MySQL) 또는 file handle(SQLite)을 감싼 객체이고, 한 connection은 한 transaction context를 가집니다.
+- **2. Cursor란을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - Cursor는 single query 실행 단위입니다. connection 안에 cursor를 여러 개 만들 수 있고, 각 cursor는 자기 result set을 들고 있습니다.
+- **3. Context manager로 안전하게의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 수동 close는 빠뜨리기 쉽습니다. Python의 `with` 문이 가장 안전합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

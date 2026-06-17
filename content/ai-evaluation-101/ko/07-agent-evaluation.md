@@ -451,24 +451,17 @@ Production에서는 API 실패가 빈번합니다. Recovery 평가 없이 출시
 ## 처음 질문으로 돌아가기
 
 - **agent 평가는 왜 단일 응답보다 trajectory를 함께 봐야 할까요?**
-  - agent는 틀린 경로를 거쳐도 우연히 맞는 답을 낼 수 있고, 맞는 답을 과도한 비용과 위험한 tool 호출로 만들 수도 있습니다.
+  - 다음 글에서는 이런 평가를 CI에 연결해 매 PR마다 회귀를 자동으로 막는 방법을 다룹니다. 에이전트든 일반 LLM 기능이든, 평가가 반복 실행되어야 비로소 운영 도구가 됩니다.
 - **tool selection, step count, recovery metric은 각각 어떤 운영 리스크를 잡을까요?**
-  - tool selection은 잘못된 도구 선택, step count는 비효율과 loop, recovery는 실패 후 복구 가능성을 잡습니다.
+  - 다음 글에서는 이런 평가를 CI에 연결해 매 PR마다 회귀를 자동으로 막는 방법을 다룹니다. 에이전트든 일반 LLM 기능이든, 평가가 반복 실행되어야 비로소 운영 도구가 됩니다.
 - **agent eval dashboard에는 어떤 step-level 신호가 반드시 들어가야 할까요?**
-  - 요청별 step 목록, tool call, 인자, 오류, retry, 비용, latency, 최종 성공 여부가 dashboard에 있어야 합니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
-- [AI Evaluation 101 (2/10): 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
-- [AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- [AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기](./04-llm-as-judge.md)
-- [AI Evaluation 101 (5/10): Rubric 기반 채점 설계](./05-rubric-based-scoring.md)
-- [AI Evaluation 101 (6/10): RAG 시스템 평가하기](./06-rag-evaluation.md)
-- **AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory (현재 글)**
-- [AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게](./08-regression-testing.md)
-- [AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가](./09-ab-testing-llms.md)
-- [AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가](./10-production-evaluation.md)
+  - agent eval dashboard에는 어떤 step-level 신호가 반드시 들어가야 할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 에이전트는 정답 품질뿐 아니라 실행 비용과 실패 복원력까지 함께 관리해야 합니다. 최종 답이 맞아도 잘못된 메일을 다섯 번 보내고 여섯 번째에 맞춘 시스템은 운영 불가능합니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다.
 
 <!-- toc:end -->
 

@@ -507,11 +507,17 @@ async 환경에서도 원칙은 동일합니다. 트랜잭션을 짧게 유지�
 ## 처음 질문으로 돌아가기
 
 - **`create_async_engine`과 `AsyncSession`은 동기 버전과 무엇이 같고 무엇이 다를까요?**
-  - 기본 구조는 동기 버전과 거의 같아서 엔진, 세션 팩토리, `select(User)` 같은 ORM 패턴을 그대로 가져갑니다. 대신 `async with SessionLocal()`과 `await session.execute(...)`가 필수이고, DDL은 `await conn.run_sync(Base.metadata.create_all)`처럼 동기 함수를 비동기 경계에서 감싸야 하며 `expire_on_commit=False`도 사실상 기본값으로 둡니다.
+  - async 프로젝트에서는 관계 접근 계약을 문서로 못 박아 두는 편이 좋습니다.
 - **URL에 `sqlite+aiosqlite` 같은 비동기 드라이버 표기는 왜 중요할까요?**
-  - `sqlite:///`가 아니라 `sqlite+aiosqlite:///./app.db`처럼 드라이버를 명시해야 SQLAlchemy가 async DBAPI 어댑터를 선택하고 `AsyncEngine` 경로를 구성할 수 있습니다. 본문이 PostgreSQL의 `postgresql+asyncpg`까지 함께 보여 준 이유도, 비동기 전환의 첫 단추가 URL dialect+driver 문자열이기 때문입니다.
+  - async 프로젝트에서는 관계 접근 계약을 문서로 못 박아 두는 편이 좋습니다.
 - **async 환경에서는 왜 암묵적 IO를 피해야 할까요?**
-  - 동기 코드에서는 lazy 관계 접근이 추가 SELECT 한 번으로 끝나지만, async에서는 그 숨은 IO가 `MissingGreenlet` 오류로 바로 드러납니다. 그래서 `selectinload(User.posts)` 같은 eager loading, `await session.flush()`, 요청 단위 세션 종료처럼 IO 경계를 모두 코드에 명시해야 예측 가능한 동작을 유지할 수 있습니다.
+  - async ORM에서 가장 많이 만나는 오류를 먼저 재현해 보겠습니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - > async SQLAlchemy는 **기존 ORM의 얇은 awaitable wrapper**입니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - `from sqlalchemy.ext.asyncio import create_async_engine`로 만든 엔진은 `AsyncEngine`입니다. 동기 `Engine`과 거의 같지만, `connect`/`begin`이 async context manager입니다.
+- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 동기 코드를 async로 옮기는 1대1 매핑입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -593,11 +593,17 @@ pytest를 잘 쓰는 것과 테스트하기 쉬운 코드를 만드는 일은 �
 ## 처음 질문으로 돌아가기
 
 - **왜 어떤 함수는 테스트 하나에 patch와 mock이 여러 개씩 필요할까요?**
-  - `before_checkout.checkout()`처럼 한 함수 안에서 `requests.post`, `datetime.now()`, `save_order_to_db`, `send_email`을 모두 호출하면 테스트도 그만큼 많은 patch를 준비해야 합니다. 이 글이 보여 준 네 개 patch 예시는 테스트 기술 부족이 아니라, 비즈니스 규칙과 부작용 경계가 한 덩어리로 뭉친 설계 신호입니다.
+  - 왜 어떤 함수는 테스트 하나에 patch와 mock이 여러 개씩 필요할까요 — 본문에서 구체적으로 다룹니다.
 - **의존성 주입은 어떤 지점에 적용해야 실제로 테스트가 단순해질까요?**
-  - 시간은 `now_iso`, ID는 `order_id_factory`, 외부 연동은 `gateway`, `repository`, `notifier`처럼 경계 지점에서 인자나 생성자로 주입해야 테스트가 짧아집니다. 그래서 `create_checkout_payload()`나 `plan_checkout()`는 순수한 dict 입력과 출력만 검증하면 되고, 현재 시각 patch나 네트워크 mock 없이도 핵심 규칙을 고정할 수 있습니다.
+  - 의존성 주입은 어떤 지점에 적용해야 실제로 테스트가 단순해질까요 — 본문에서 구체적으로 다룹니다.
 - **순수 함수, Protocol, Fake 객체는 각각 어떤 역할을 맡으면 좋을까요?**
-  - 순수 함수는 `calculate_order_totals`, `build_charge_request`, `present_checkout_result`처럼 계산과 조립 규칙을 담당하고, Protocol은 `PaymentGateway`, `OrderRepository`, `Notifier`처럼 협력 객체 계약을 드러냅니다. FakeGateway, FakeRepository, FakeNotifier는 그 계약을 테스트 안에서 가볍게 흉내 내며, mock 호출 검증보다 저장된 상태와 결과값 확인에 집중하게 해 줍니다.
+  - 순수 함수, Protocol, Fake 객체는 각각 어떤 역할을 맡으면 좋을까요 — 본문에서 구체적으로 다룹니다.
+- **핵심 개념 잡기에서 가장 흔한 실수는 무엇일까요?**
+  - > 테스트하기 쉬운 코드는 “안쪽에는 순수 규칙, 바깥쪽에는 교체 가능한 부작용”이라는 경계를 분명히 둔 코드입니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - > 테스트하기 쉬운 코드는 “안쪽에는 순수 규칙, 바깥쪽에는 교체 가능한 부작용”이라는 경계를 분명히 둔 코드입니다.
+- **적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - After 버전의 핵심은 “무엇을 계산할지”와 “어디에 요청을 보낼지”를 분리했다는 사실입니다. 이제 테스트는 대부분 `dict` 입력과 출력만 검증하면 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

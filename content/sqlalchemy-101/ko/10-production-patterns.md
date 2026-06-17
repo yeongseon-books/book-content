@@ -459,11 +459,17 @@ SessionLocal = sessionmaker(bind=engine, expire_on_commit=False, autoflush=True)
 ## 처음 질문으로 돌아가기
 
 - **connection pool은 어떤 기준으로 크기와 재사용 정책을 정해야 할까요?**
-  - 글에서는 평균 동시 요청 수, 요청당 DB 보유 시간, 워커 수, DB의 `max_connections`를 같이 보고 `pool_size`와 `max_overflow`를 정하라고 정리했습니다. 또한 SQLite는 단일 writer 제약이 강하므로 큰 `QueuePool`보다 `StaticPool`이나 더 작은 풀 설정이 현실적이라는 점까지 함께 짚었습니다.
+  - connection pool은 어떤 기준으로 크기와 재사용 정책을 정해야 할까요 — 본문에서 구체적으로 다룹니다.
 - **`pool_pre_ping`, `pool_recycle`은 어떤 장애를 줄여 줄까요?**
-  - `pool_pre_ping=True`는 풀에서 꺼낸 연결이 이미 죽었는지 `SELECT 1`로 확인해 새벽 stale connection 5xx를 줄이고, `pool_recycle=1800`은 오래 idle 상태였던 연결을 재사용 전에 교체해 DB나 로드밸런서 timeout과 부딪히는 문제를 완화합니다. 본문의 운영 기본 설정 스니펫이 바로 이 두 옵션을 항상 포함하는 이유입니다.
+  - `pool_pre_ping`, `pool_recycle`은 어떤 장애를 줄여 줄까요 — 본문에서 구체적으로 다룹니다.
 - **N+1 회귀나 느린 쿼리를 운영에서 어떻게 관측할 수 있을까요?**
-  - 엔진 이벤트로 `before_cursor_execute`와 `after_cursor_execute`를 걸어 쿼리 수와 지연 시간을 구조화 로그로 남기고, 테스트에서는 query budget assertion으로 N+1을 CI에서 먼저 막을 수 있습니다. 운영 단계에서는 여기에 OpenTelemetry trace, 풀 대기 시간, P95/P99 SQL latency 대시보드를 붙여 어떤 릴리스가 병목을 만들었는지 추적하는 것이 핵심입니다.
+  - 7편에서 다룬 N+1은 운영 이전 CI에서 막아야 합니다. 다음 두 단계를 파이프라인에 넣으면 회귀율이 크게 줄어듭니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - > 프로덕션 SQLAlchemy는 세 개의 손잡이로 조율합니다. 풀은 동시성과 지연 시간을, 관측은 병목 지점을, 마이그레이션 정책은 배포의 안전선을 결정합니다. 셋 중 하나라도 비면 다른 둘의 효과가 크게 줄어듭니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - SQLite는 단일 writer DB입니다. file lock으로 직렬화되며, 큰 풀은 의미가 없습니다. 보통 `StaticPool` + `check_same_thread=False`로 쓰거나, async에서는 `aiosqlite` 기본 풀을 그대로 사용합니다.
+- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - After는 (1) connection이 죽어도 다음 요청에서 자동 회복(`pool_pre_ping`), (2) idle 30분 넘으면 재사용 안 함(`pool_recycle`), (3) 200ms 이상 쿼리는 별도 로거에 남깁니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

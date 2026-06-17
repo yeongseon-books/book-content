@@ -354,11 +354,17 @@ ACA의 Dapr는 API 문법이 아니라 런타임 구조의 변화입니다. 앱�
 ## 처음 질문으로 돌아가기
 
 - **ACA에서 Dapr를 켠다는 것은 런타임에 정확히 무엇이 추가된다는 뜻일까요?**
-  - 앱 설정에 이름만 하나 더 붙는 것이 아니라, 사용자 컨테이너 옆에 실제 `daprd` 계열 sidecar 프로세스가 추가됩니다. 그 결과 localhost 3500·50001 포트, sidecar health endpoint, 별도 로그 흐름, component loading, mTLS와 trust material까지 포함한 두 번째 런타임이 함께 생깁니다.
+  - ACA에서 Dapr를 켠다는 것은 런타임에 정확히 무엇이 추가된다는 뜻일까요 — 본문에서 구체적으로 다룹니다.
 - **sidecar injection은 어떤 upstream 모델로 이해하는 편이 가장 정확할까요?**
-  - 가장 방어 가능한 기준점은 upstream Dapr의 pod mutation 모델입니다. mutating admission webhook 계열 injector가 app ID, app port, protocol, probe, trust anchor, control plane address 같은 값을 계산해 `daprd` 컨테이너와 인자를 붙인다고 보면, ACA가 노출하지 않는 내부 주입 과정을 과장 없이 설명할 수 있습니다.
+  - sidecar injection은 어떤 upstream 모델로 이해하는 편이 가장 정확할까요 — 본문에서 구체적으로 다룹니다.
 - **localhost 포트 3500, 50001은 왜 중요한 운영 계약일까요?**
-  - 이 포트들은 앱과 sidecar 사이의 실제 local contract라서, 앱은 service invocation·state·pub/sub 요청을 여기로 보내고 운영자는 `/v1.0/healthz`, `/v1.0/metadata`로 sidecar 상태를 바로 확인할 수 있습니다. 동시에 localhost 호출 성공은 sidecar까지 도달했다는 뜻일 뿐이므로, component scope 누락이나 backing service timeout 같은 바깥 실패와 반드시 구분해서 봐야 합니다.
+  - Dapr는 자주 “개발 편의 API”처럼 소개되지만, 운영 현실에서는 별도 런타임입니다. sidecar가 정상적으로 뜨지 않으면 앱 코드가 멀쩡해도 서비스 invocation, state access, pub/sub가 모두 실패할 수 있습니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - Dapr는 자주 “개발 편의 API”처럼 소개되지만, 운영 현실에서는 별도 런타임입니다. sidecar가 정상적으로 뜨지 않으면 앱 코드가 멀쩡해도 서비스 invocation, state access, pub/sub가 모두 실패할 수 있습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - ACA의 Dapr를 가장 정확하게 설명하는 문장은 이것입니다. **ACA Dapr는 Container Apps 제품 표면에 통합된 upstream Dapr runtime이며, 런타임에서는 사용자 컨테이너 옆에 실제 sidecar 프로세스가 붙습니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - ACA의 Dapr를 가장 정확하게 설명하는 문장은 이것입니다. **ACA Dapr는 Container Apps 제품 표면에 통합된 upstream Dapr runtime이며, 런타임에서는 사용자 컨테이너 옆에 실제 sidecar 프로세스가 붙습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

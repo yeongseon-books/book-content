@@ -456,11 +456,17 @@ def test_jsontext_roundtrip(session: Session):
 ## 처음 질문으로 돌아가기
 
 - **이벤트, 속성, 타입 확장점은 각각 어떤 책임을 맡아야 할까요?**
-  - 이 글은 확장점을 타입 층, 속성 층, 이벤트 층으로 나눴습니다. `TypeDecorator`는 `LowerString`과 `JSONText`처럼 DB에 쓰고 읽을 때 값을 바꾸고, `hybrid_property`는 `full_name`·`net_amount`처럼 Python 속성과 SQL 표현을 같이 제공하며, 이벤트는 `before_insert`, `before_flush`, `before_cursor_execute`처럼 특정 라이프사이클 순간에 개입합니다.
+  - 이벤트, 속성, 타입 확장점은 각각 어떤 책임을 맡아야 할까요 — 본문에서 구체적으로 다룹니다.
 - **`@validates`와 mapper 이벤트는 언제 선택이 갈릴까요?**
-  - `@validates`는 `email`, `score`처럼 setter 시점에 바로 검증·정규화해야 하는 값에 적합하고, 잘못된 데이터가 세션에 들어오기 전에 막아 줍니다. 반면 mapper 이벤트는 `before_insert`에서 timestamp를 채우거나 `before_update`에서 audit 값을 계산하는 식으로 flush 직전 공통 후처리를 걸 때 더 자연스럽습니다.
+  - 이벤트를 안전하게 쓰려면 실행 순서를 아는 것이 먼저입니다. 아래 예시를 실행하면 한 트랜잭션에서 어떤 훅이 언제 불리는지 명확하게 볼 수 있습니다.
 - **`hybrid_property`는 왜 Python 속성과 SQL 표현을 함께 제공할까요?**
-  - 같은 도메인 규칙을 객체와 쿼리에서 따로 다시 쓰지 않게 하려는 것이 핵심입니다. 본문에서 `Person.full_name`과 `Invoice.net_amount`를 예로 든 것처럼, 인스턴스에서는 속성처럼 읽고 `select(...).where(...)`에서는 SQL 식으로 재사용해야 검색과 필터 조건이 같은 의미를 유지합니다.
+  - `hybrid_property`는 읽기 좋은 API를 만들지만, SQL 표현이 인덱스를 타지 못하면 성능이 떨어질 수 있습니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - > SQLAlchemy 확장점은 세 층으로 나눠 생각합니다. **타입 층**은 컬럼 값을 DB로 들고 날 때 변환하고, **속성 층**은 Python 객체와 SQL 표현을 동시에 정의하며, **이벤트 층**은 객체·세션·엔진 라이프사이클의 특정 시점에 끼어듭니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - SQLAlchemy는 거의 모든 객체에 `event.listen` / `@event.listens_for`로 핸들러를 붙일 수 있게 열어 둡니다. 자주 쓰는 대상은 세 종류입니다.
+- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이메일 정규화와 audit timestamp를 핸들러에서 처리하던 코드와, 모델 쪽으로 옮긴 코드를 비교합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

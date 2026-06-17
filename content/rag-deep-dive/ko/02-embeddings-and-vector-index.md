@@ -411,13 +411,17 @@ if __name__ == "__main__":
 ## 처음 질문으로 돌아가기
 
 - **문서 임베딩과 질의 임베딩은 왜 같은 모델을 쓰면서도 호출 경로를 분리해서 봐야 할까요?**
-  문서 임베딩은 ingest 시점에 대량으로 만들고, 질의 임베딩은 요청 시점에 만들기 때문에 캐시, 모델 버전, 정규화 실패 지점이 다릅니다.
-
+  - 검색 결과가 나쁘다고 해서 곧바로 인덱스 문제라고 보면 순서를 잘못 잡기 쉽습니다. 실제로는 최소 네 층이 서로 다른 실패를 만들 수 있습니다.
 - **FAISS `IndexFlatL2`는 검색할 때 실제로 어떤 계산을 반복할까요?**
-  `IndexFlatL2`는 쿼리 벡터와 저장된 모든 벡터의 L2 거리를 계산해 가까운 순서로 정렬합니다. Flat 인덱스라 근사 생략 없이 전체를 봅니다.
-
+  - FAISS의 `IndexFlatL2`는 자주 “기본 인덱스”, “brute-force 인덱스” 정도로 설명됩니다.
 - **인덱스가 빠르게 답해도 메타데이터 매핑이 틀리면 어떤 문제가 생길까요?**
-  반환된 row id가 원문 메타데이터와 어긋나면 빠른 검색 결과도 잘못된 문서나 출처로 연결되어 답변 전체를 망칩니다.
+  - LangChain 0.2.17에서 우리가 흔히 쓰는 `OpenAIEmbeddings`는 `langchain_community.embeddings.openai`에 있습니다.
+- **최소 실행 예제에서 가장 흔한 실수는 무엇일까요?**
+  - 예제 파일: `en/02-embeddings-and-vector-index/main.py`
+- **소스 버전을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 글의 LangChain 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17), FAISS C++ 코드 인용은 [`facebookresearch/faiss @ c72ef8a`](https://github.com/facebookresearch/faiss/tree/c72ef8a) 기준입니다.
+- **1. `OpenAIEmbeddings`는 어떤 벡터를 만들고 무엇을 분리하는가의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - LangChain 0.2.17에서 우리가 흔히 쓰는 `OpenAIEmbeddings`는 `langchain_community.embeddings.openai`에 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

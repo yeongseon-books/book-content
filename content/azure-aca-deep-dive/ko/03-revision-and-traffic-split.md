@@ -363,11 +363,17 @@ ACA의 Revision 모델을 제대로 이해하려면 배포 단위와 노출 단�
 ## 처음 질문으로 돌아가기
 
 - **어떤 변경은 새 Revision을 만들고, 어떤 변경은 만들지 않을까요?**
-  - 이미지, 컨테이너 설정, scale rule처럼 `template`에 속한 revision-scope 변경은 새 불변 Revision을 만듭니다. 반대로 ingress, traffic split, labels, secrets처럼 `configuration`에 가까운 application-scope 변경은 기존 Revision 집합을 유지한 채 노출 정책만 바꿉니다.
+  - 어떤 변경은 새 Revision을 만들고, 어떤 변경은 만들지 않을까요 — 본문에서 구체적으로 다룹니다.
 - **single revision mode와 multiple revision mode는 운영상 무엇을 바꿀까요?**
-  - single revision mode에서는 readiness가 확인된 새 Revision으로 메인 URL이 단순하게 넘어가고 이전 Revision은 자동으로 정리됩니다. multiple revision mode에서는 여러 Revision이 동시에 active로 남고, 메인 URL 가중치 조정, 0% active Revision 유지, canary·blue-green 운영처럼 라우팅 정책을 직접 다루게 됩니다.
+  - single revision mode와 multiple revision mode는 운영상 무엇을 바꿀까요 — 본문에서 구체적으로 다룹니다.
 - **label과 traffic weight는 각각 어떤 다른 라우팅 문제를 풀까요?**
-  - traffic weight는 메인 앱 URL에서 `orders-api--blue=90`, `orders-api--green=10`처럼 요청을 확률적으로 분산하는 장치입니다. label은 특정 Revision에 붙는 안정적인 direct URL이어서 QA, smoke test, 운영자 확인 경로를 고객 트래픽과 분리할 때 쓰며, active Revision이더라도 메인 URL에서 0%일 수 있다는 점을 분명히 보여 줍니다.
+  - label과 traffic weight는 각각 어떤 다른 라우팅 문제를 풀까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - ACA를 운영하는 팀이 가장 자주 체감하는 기능 중 하나가 Revision입니다. 그런데 Revision을 단순한 배포 이력으로 이해하면 rollout이 자꾸 설명되지 않습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - ACA의 Revision 모델을 한 문장으로 압축하면 이렇습니다. **Revision은 불변 런타임 스냅샷이고, 트래픽 분할은 앱 범위의 Ingress 라우팅 정책**입니다. 즉 배포 단위와 노출 정책이 분리되어 있습니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - ACA의 Revision 모델을 한 문장으로 압축하면 이렇습니다. **Revision은 불변 런타임 스냅샷이고, 트래픽 분할은 앱 범위의 Ingress 라우팅 정책**입니다. 즉 배포 단위와 노출 정책이 분리되어 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

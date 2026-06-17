@@ -372,11 +372,17 @@ class Pool:
 ## 처음 질문으로 돌아가기
 
 - **`sqlite3.threadsafety`와 `check_same_thread`는 각각 무엇을 보장하고, 어떤 조합에서 connection 공유를 피해야 할까요?**
-  - 글은 `sqlite3.threadsafety`가 SQLite C 라이브러리의 동시성 능력을 DB-API 숫자로 보여 주고, `check_same_thread`는 Python 레벨에서 같은 스레드 사용만 허용하는 별도 가드라고 구분했습니다. 그래서 `check_same_thread=False`만 켠 채 공유하는 것은 위험하며, 최소한 `threadsafety == 3` 여부를 확인하지 못했다면 connection 공유를 피하는 쪽이 안전합니다.
+  - > SQLite connection은 다른 DB의 client/server connection과 다르다. 별도 프로세스가 없고, 락은 파일 시스템 락이며, connection 객체는 본질적으로 파일 핸들 + 캐시 + 트랜잭션 상태다.
 - **요청별 connection, 스레드별 connection, 단일 shared connection, 단일 writer 큐 중에서 SQLite에 맞는 선택 기준은 무엇일까요?**
-  - 본문 표는 요청별 open/close를 기본값으로 두고, 전통적인 WSGI에서는 `threading.local`, 임베디드 단일 워커에서는 shared connection, 쓰기 병목 경로에서는 단일 writer 큐를 선택지로 놓았습니다. 핵심 기준은 connection 생성 비용이 아니라 writer 1명 제약과 트랜잭션 경계를 얼마나 명확하게 유지할 수 있느냐입니다.
+  - 쓰기 처리량이 병목이라면, 다음 패턴을 고려할 수 있습니다.
 - **FastAPI에서 전역 connection 대신 `Depends(get_db)`와 `BEGIN IMMEDIATE` 패턴을 쓰면 어떤 사고를 줄일 수 있을까요?**
-  - 글의 FastAPI 예제는 요청마다 `get_db()`가 새 connection을 열고 닫게 해서 트랜잭션 경계가 요청 단위와 정확히 맞도록 만들었습니다. 여기에 write 경로에서 `BEGIN IMMEDIATE`를 명시하면 전역 connection 공유 때문에 다른 요청이 남의 transaction을 `commit()`하거나, 여러 writer가 뒤엉켜 BUSY를 늦게 맞는 문제를 줄일 수 있습니다.
+  - > SQLite connection은 다른 DB의 client/server connection과 다르다. 별도 프로세스가 없고, 락은 파일 시스템 락이며, connection 객체는 본질적으로 파일 핸들 + 캐시 + 트랜잭션 상태다.
+- **Mental Model: connection은 "파일을 연 핸들"이다에서 가장 흔한 실수는 무엇일까요?**
+  - > SQLite connection은 다른 DB의 client/server connection과 다르다. 별도 프로세스가 없고, 락은 파일 시스템 락이며, connection 객체는 본질적으로 파일 핸들 + 캐시 + 트랜잭션 상태다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - SQLite C 라이브러리는 컴파일 시 세 가지 native 모드 중 하나를 가집니다.
+- **적용 전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 문제는 두 스레드가 동시에 `execute()`를 호출하면, `serialized` 모드라도 cursor 상태와 트랜잭션 경계가 뒤섞입니다. 한 스레드가 `BEGIN`한 트랜잭션을 다른 스레드가 무심코 `commit()`해 버릴 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

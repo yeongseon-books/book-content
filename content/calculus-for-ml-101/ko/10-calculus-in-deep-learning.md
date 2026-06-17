@@ -437,11 +437,17 @@ def set_seed(seed=42):
 ## 처음 질문으로 돌아가기
 
 - **딥러닝 학습 루프는 어떤 단계로 구성되고 각 단계에서 미분은 어디에 등장할까요?**
-  - 학습 루프는 `forward -> loss -> backward -> update` 순서로 구성됩니다. 미분은 backward에서만 나타나는 것이 아니라, forward에서 저장한 중간값과 loss의 스칼라화가 있어야 reverse-mode가 성립합니다. 즉 미분은 루프 전체의 연결 규칙입니다.
+  - 아래는 실제 학습 루프를 단계별로 해부한 표입니다.
 - **forward pass와 loss computation은 backward를 위해 무엇을 준비할까요?**
-  - forward는 각 연산 노드의 값과 그래프 연결을 만들고, loss는 최종 스칼라 목적을 정의합니다. 이 두 단계가 준비되어야 backward가 local gradient를 연쇄적으로 곱해 각 파라미터 gradient를 계산할 수 있습니다.
+  - forward pass와 loss computation은 backward를 위해 무엇을 준비할까요 — 본문에서 구체적으로 다룹니다.
 - **gradient 계산과 optimizer update는 어떻게 연결될까요?**
-  - backward가 만든 `dL/dtheta`는 optimizer의 입력입니다. optimizer는 lr, 모멘트, 분산 추정, weight decay 같은 정책을 적용해 gradient를 실제 파라미터 이동으로 바꿉니다. 따라서 gradient 품질과 optimizer 정책은 분리된 문제가 아니라 같은 학습 경로의 연속 단계입니다.
+  - gradient 계산과 optimizer update는 어떻게 연결될까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 딥러닝 프레임워크는 training loop를 매우 간결하게 감춰 줍니다. 그래서 코드는 짧아지지만, 각 단계의 의미가 흐려지기 쉽습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 딥러닝 학습을 가장 실용적으로 이해하는 방법은 하나의 루프를 떠올리는 것입니다. 모델이 입력으로부터 예측을 만들고, 손실 함수가 오차를 계산하고, 역전파가 gradient를 만들고, optimizer가 파라미터를 갱신합니다. 그리고 이 과정이 반복됩니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 딥러닝 학습을 가장 실용적으로 이해하는 방법은 하나의 루프를 떠올리는 것입니다. 모델이 입력으로부터 예측을 만들고, 손실 함수가 오차를 계산하고, 역전파가 gradient를 만들고, optimizer가 파라미터를 갱신합니다. 그리고 이 과정이 반복됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

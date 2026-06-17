@@ -274,11 +274,17 @@ Flex Consumption은 사실상 Consumption의 후속 플랫폼입니다. 호스�
 ## 처음 질문으로 돌아가기
 
 - **Consumption, Premium, Dedicated 플랜은 같은 스케일 의사결정 트리를 공유할까요?**
-  - 같은 호스트 코드를 쓰더라도 플랜은 같은 의사결정 트리를 그대로 공유하지 않습니다. Consumption과 Flex Consumption, Premium은 외부 Scale Controller 계층 위에서 동작하지만 Dedicated는 App Service Auto-Scale이나 수동 확장을 쓰므로, 같은 scale signal이라도 실제 인스턴스 증감 경로와 운영 의미가 달라집니다.
+  - Consumption, Premium, Dedicated 플랜은 같은 스케일 의사결정 트리를 공유할까요 — 본문에서 구체적으로 다룹니다.
 - **Scale Controller가 인스턴스를 더 늘리기로 결정하게 만드는 신호는 무엇일까요?**
-  - 호스트가 직접 내보내는 신호는 크게 두 가지입니다. `HostPerformanceManager.TryHandleHealthPingAsync`가 현재 인스턴스가 더 받을 수 있는지 `200` 또는 `429`로 답하고, trigger extension 쪽 `ScaleMonitor`와 `TargetScaler`가 큐 길이·배치 크기 같은 적체 메트릭을 저장소에 남겨 외부 결정 계층이 읽게 합니다.
+  - Scale Controller가 인스턴스를 더 늘리기로 결정하게 만드는 신호는 무엇일까요 — 본문에서 구체적으로 다룹니다.
 - **burst 트래픽에서 scale-out 지연은 어디에 가장 많이 쌓일까요?**
-  - burst 지연은 인스턴스 내부 워커 포화와 외부 인스턴스 증설 지연이 겹치는 지점에 가장 많이 쌓입니다. 특히 호스트는 신호만 내보내고 실제 새 인스턴스를 만드는 주체가 아니므로, health ping과 trigger 메트릭이 나간 뒤 바깥 결정 계층이 반응하고 새 인스턴스가 준비될 때까지의 시간이 scale-out 지연으로 체감됩니다.
+  - burst 트래픽에서 scale-out 지연은 어디에 가장 많이 쌓일까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - Functions를 운영하면서 가장 자주 만나는 오해 중 하나는 “호스트가 바쁘면 스스로 인스턴스를 더 띄운다”는 상상입니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 스케일링 경계를 선명하게 보려면 먼저 결정 단위를 둘로 나눠야 합니다. 첫째는 **인스턴스 수**입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 스케일링 경계를 선명하게 보려면 먼저 결정 단위를 둘로 나눠야 합니다. 첫째는 **인스턴스 수**입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

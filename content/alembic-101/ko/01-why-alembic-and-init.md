@@ -428,11 +428,17 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **마이그레이션 도구가 실제로 해결하는 문제는 무엇일까요?**
-  - `alembic revision -m "add users.tier"`와 `alembic upgrade head`가 해결하는 것은 SQL 한 줄 실행 자체가 아니라 변경 이력, 코드 리뷰, 환경 동기화입니다. revision 파일이 곧 변경 로그가 되므로 누가 언제 어떤 schema를 올렸는지 다시 구성할 수 있습니다.
+  - 마이그레이션 도구가 실제로 해결하는 문제는 무엇일까요 — 본문에서 구체적으로 다룹니다.
 - **왜 `Base.metadata.create_all`만으로는 운영 환경을 버틸 수 없을까요?**
-  - `create_all`은 지금 필요한 테이블을 만들 수는 있어도 `ALTER TABLE`의 순서와 rollback 경로를 남기지 못합니다. 운영에서는 이미 존재하는 DB를 조금씩 바꿔야 하므로 upgrade/downgrade 체인이 없는 상태가 바로 한계가 됩니다.
+  - Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
 - **revision, head, `alembic_version` 테이블은 각각 어떤 역할을 할까요?**
-  - revision은 개별 변경 단위이고, head는 현재 그래프의 끝이며, `alembic_version`은 DB가 지금 어느 revision까지 적용됐는지 기록합니다. `upgrade head`가 가능한 이유도 코드 쪽 head와 DB 안의 version row를 서로 맞추기 때문입니다.
+  - revision, head, `alembic_version` 테이블은 각각 어떤 역할을 할까요 — 본문에서 구체적으로 다룹니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - > Alembic은 **DB 스키마를 위한 git**입니다. 각 마이그레이션 파일은 commit이고, `alembic_version` 테이블은 현재 HEAD 포인터이며, `upgrade head`는 fast-forward이고, `downgrade -1`은 한 단계 reset에 가깝습니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 각 마이그레이션 파일은 고유한 `revision` ID와 부모를 가리키는 `down_revision`을 가집니다.
+- **변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 각 마이그레이션 파일은 고유한 `revision` ID와 부모를 가리키는 `down_revision`을 가집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

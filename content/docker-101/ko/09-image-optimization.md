@@ -195,11 +195,15 @@ docker history myapp:opt
 ## 처음 질문으로 돌아가기
 
 - **멀티스테이지 빌드는 왜 build와 runtime을 분리할까요?**
-  - 본문 예시처럼 첫 stage(`AS builder`)에서 컴파일러·dev 패키지·소스 코드를 모두 두고 빌드한 다음, 두 번째 stage에서 결과물(binary, wheels, dist 폴더)만 가벼운 베이스로 `COPY --from=builder` 합니다. 이렇게 하면 빌드 도구들이 최종 이미지에 남지 않아 용량이 수백 MB 줄고 공격 표면도 크게 좁아집니다.
+  - 멀티스테이지 빌드는 왜 build와 runtime을 분리할까요 — 본문에서 구체적으로 다룹니다.
 - **BuildKit cache mount는 어떤 식으로 재빌드를 빠르게 만들까요?**
-  - 본문에서 강조했듯이 `RUN --mount=type=cache,target=/root/.cache/pip pip install ...`처럼 캐시 디렉터리를 layer 바깥에 마운트하면, layer 캐시가 깨지더라도 pip·apt·go mod 다운로드 결과가 재사용됩니다. 이미지에는 캐시가 안 남으면서 빌드 속도만 빨라지는 게 이 기능의 핵심입니다.
+  - BuildKit cache mount는 어떤 식으로 재빌드를 빠르게 만들까요 — 본문에서 구체적으로 다룹니다.
 - **slim, alpine, distroless는 각각 어떤 trade-off가 있을까요?**
-  - 본문 비교에서 본 것처럼 `python:slim`은 글리브 기반이라 호환성이 가장 좋고, `alpine`은 musl libc·apk라 가장 작지만 일부 wheel 호환 문제가 있으며, `distroless`는 셸·패키지 매니저까지 없어 보안은 최강이지만 디버깅이 까다롭습니다. "용량 감소 vs 호환성 vs 디버깅 편의" 사이의 선택입니다.
+  - slim, alpine, distroless는 각각 어떤 trade-off가 있을까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 이미지가 작아지면 pull 시간이 줄고, pull 시간이 줄면 배포 시간이 줄어듭니다. 동시에 이미지 안에 불필요한 패키지와 도구가 적어질수록 공격 표면도 함께 줄어듭니다. 즉, 이미지 최적화는 성능과 보안을 동시에 다루는 주제입니다.
+- **전과 후을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 차이는 단일 숫자 비교를 넘어 팀의 피드백 루프 전체를 바꿉니다. PR 하나당 몇 분씩 아끼면, 하루와 일주일 단위에서는 꽤 큰 차이가 납니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

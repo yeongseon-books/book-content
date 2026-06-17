@@ -459,24 +459,17 @@ Context Recall은 reference 답변이 필요합니다. Reference 없이는 측�
 ## 처음 질문으로 돌아가기
 
 - **RAG 평가는 왜 답변 하나가 아니라 retrieval과 generation을 나눠 봐야 할까요?**
-  - 최종 답변만 보면 검색이 틀렸는지, context가 부족했는지, 모델이 근거를 무시했는지 구분할 수 없습니다.
+  - 다음 글에서는 단일 응답이 아닌 **agent의 trajectory**를 평가하는 법을 다룹니다.
 - **context precision, context recall, faithfulness, answer relevance는 각각 무엇을 진단할까요?**
-  - precision은 가져온 context의 관련성, recall은 필요한 근거를 찾았는지, faithfulness는 답이 근거에 붙어 있는지, relevance는 질문에 답했는지를 봅니다.
+  - context precision, context recall, faithfulness, answer relevance는 각각 무엇을 진단할까요 — 본문에서 구체적으로 다룹니다.
 - **검색과 생성 중 어디가 망가졌는지 어떻게 좁혀야 할까요?**
-  - retrieved document, selected context, generated answer를 함께 저장하고 지표를 단계별로 비교해 가장 먼저 무너진 경계를 찾습니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
-- [AI Evaluation 101 (2/10): 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
-- [AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- [AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기](./04-llm-as-judge.md)
-- [AI Evaluation 101 (5/10): Rubric 기반 채점 설계](./05-rubric-based-scoring.md)
-- **AI Evaluation 101 (6/10): RAG 시스템 평가하기 (현재 글)**
-- [AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory](./07-agent-evaluation.md)
-- [AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게](./08-regression-testing.md)
-- [AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가](./09-ab-testing-llms.md)
-- [AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가](./10-production-evaluation.md)
+  - 다음 글에서는 단일 응답이 아닌 **agent의 trajectory**를 평가하는 법을 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - RAG는 검색과 생성이 분리되어 있기 때문에, 점검도 두 층으로 나뉘어야 합니다. 검색이 잘못되면 생성은 성실하게도 잘못된 근거를 바탕으로 답을 만듭니다. 반대로 검색은 맞았는데 생성이 컨텍스트를 무시해도 결과는 비슷하게 나빠 보입니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다.
 
 <!-- toc:end -->
 

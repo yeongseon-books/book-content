@@ -414,25 +414,17 @@ oncall_rotation:
 ## 처음 질문으로 돌아가기
 
 - **사후 분석 뒤에 왜 같은 incident가 다시 반복될까요?**
-  - 본문에서 강조했듯이 postmortem 문서가 잘 쓰여도 거기서 도출된 action item이 누군가의 백로그에 안 들어가거나, 들어가도 우선순위에서 계속 밀리면 다음 분기 같은 trigger에서 같은 사고가 그대로 재현됩니다. 분석은 "이해"까지만 만들고 "변화"는 후속 조치 실행에서만 만들어지기 때문입니다.
+  - 사후 분석 뒤에 왜 같은 incident가 다시 반복될까요 — 본문에서 구체적으로 다룹니다.
 - **후속 조치 추적이 없으면 어떤 문제가 생길까요?**
-  - 본문에서 본 것처럼 추적 없는 action item은 시간이 지나면 누가 무엇을 맡았는지, 어디까지 했는지 아무도 모릅니다. 결과적으로 같은 종류 incident가 또 났을 때 새 postmortem에 "이전에도 같은 항목이 있었다"는 흔적조차 사라지고, 조직이 학습하지 못하는 상태가 누적됩니다. 그래서 모든 action item은 owner와 due date를 가진 티켓으로 환원돼야 합니다.
+  - 후속 조치 추적이 없으면 어떤 문제가 생길까요 — 본문에서 구체적으로 다룹니다.
 - **회귀 테스트는 왜 재발 방지의 핵심일까요?**
-  - 본문 예시처럼 한 번 incident를 일으킨 시나리오를 자동화된 회귀 테스트(또는 monitoring synthetic, chaos test)로 굳혀 두면, 같은 결함이 다시 들어오는 순간 사람이 알아채기 전에 CI나 알람이 먼저 막아 줍니다. 인적 기억과 문서에만 의존하는 방어선은 시간에 약하지만, 자동화된 검증은 시간이 지나도 같은 강도로 작동하기 때문입니다.
-  - 완료 기준을 명확히 하고, 다음 postmortem 전에 확인합니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [Incident Response 101 (1/10): Incident란 무엇인가?](./01-what-is-incident.md)
-- [Incident Response 101 (2/10): Severity 분류](./02-severity.md)
-- [Incident Response 101 (3/10): 초기 대응](./03-initial-response.md)
-- [Incident Response 101 (4/10): Communication](./04-communication.md)
-- [Incident Response 101 (5/10): Timeline 작성](./05-timeline.md)
-- [Incident Response 101 (6/10): Root Cause Analysis](./06-root-cause-analysis.md)
-- [Incident Response 101 (7/10): Mitigation과 Resolution](./07-mitigation-and-resolution.md)
-- [Incident Response 101 (8/10): Postmortem](./08-postmortem.md)
-- **Incident Response 101 (9/10): 재발 방지 (현재 글)**
-- [Incident Runbook 만들기](./10-incident-runbook.md)
+  - 먼저 사후 분석에서 나온 후속 조치를 열린 상태로 등록합니다. 추적의 시작점은 무엇을 할지를 명시하는 일입니다.
+- **왜 이 주제가 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - incident는 한 번 해결했다고 사라지지 않습니다. 같은 조건이 남아 있으면 언젠가 같은 방식으로 다시 드러납니다. 그래서 재발 방지는 “다음엔 조심하자”가 아니라, 다음에 같은 실수를 해도 시스템이 막아 주도록 바꾸는 과정이어야 합니다.
+- **한눈에 보는 구조을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 흐름은 선형이 아니라 반복 루프입니다. action item이 테스트로 바뀌고, 테스트가 guardrail로 이어지며, chaos 실험이 실제로 잘 막히는지 확인합니다. 그 결과를 다시 학습으로 돌려 다음 action item을 만듭니다.
+- **전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이전: 사후 분석 뒤에 문서만 남고 코드와 테스트는 그대로입니다.
 
 <!-- toc:end -->
 

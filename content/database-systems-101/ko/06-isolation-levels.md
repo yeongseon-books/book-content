@@ -362,11 +362,15 @@ SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **고전적인 동시성 이상 현상 네 가지는 무엇일까요?**
-  - 이 글은 Dirty Read, Non-repeatable Read, Phantom Read, Lost Update를 고전적인 네 가지 이상 현상으로 정리했습니다. 특히 `counter` 예시에서 두 세션이 모두 0을 읽고 1을 써서 최종 값이 2가 아니라 1이 되는 장면이 Lost Update를 가장 직접적으로 보여 줍니다.
+  - 두 세션이 같은 데이터를 동시에 만지는 상황을 의도적으로 만들기 위한 준비입니다.
 - **READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, SERIALIZABLE은 무엇이 다를까요?**
-  - 왼쪽에서 오른쪽으로 갈수록 더 많은 이상 현상을 막지만 처리량 비용도 커집니다. READ COMMITTED는 보통 기본값으로 쓰이고, REPEATABLE READ는 같은 트랜잭션 안에서 같은 스냅샷을 유지하며, SERIALIZABLE은 가장 안전한 대신 충돌 시 `SQLSTATE 40001` 재시도를 애플리케이션이 감당해야 합니다.
+  - READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, SERIALIZABLE은 무엇이 다를까요 — 본문에서 구체적으로 다룹니다.
 - **MVCC는 어떻게 일관된 읽기를 잠금 없이 제공할까요?**
-  - MVCC는 한 행의 여러 버전을 유지해 읽기 트랜잭션이 시작 시점의 스냅샷을 계속 보게 만듭니다. 그래서 PostgreSQL의 REPEATABLE READ 예시처럼 다른 세션이 `INSERT`를 커밋해도 현재 트랜잭션은 기존 결과를 유지할 수 있고, 대신 오래 열린 트랜잭션은 정리되지 못한 버전을 붙잡는 비용을 남깁니다.
+  - MVCC는 어떻게 일관된 읽기를 잠금 없이 제공할까요 — 본문에서 구체적으로 다룹니다.
+- **이 글에서 배울 내용에서 가장 흔한 실수는 무엇일까요?**
+  - 격리 수준을 모르면 “재현되지 않는 버그”의 절반은 설명되지 않습니다. 결제가 두 번 청구되거나, 잔액이 음수가 되거나, 같은 주문이 중복 생성되는 문제는 대개 단위 테스트만으로는 드러나지 않습니다.
+- **변경 전/변경 후을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 읽는 순간 행 잠금을 잡아 두면, 다른 트랜잭션이 같은 행을 건드리지 못하게 할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

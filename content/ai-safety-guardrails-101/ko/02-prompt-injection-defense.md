@@ -431,24 +431,17 @@ Prompt injection은 결국 텍스트 분류 문제가 아니라 시스템 경계
 ## 처음 질문으로 돌아가기
 
 - **Prompt injection은 언제 데이터가 지시로 바뀌면서 시작될까요?**
-  - 사용자나 외부 문서의 텍스트를 모델이 시스템 지시와 같은 층위의 명령으로 해석하는 순간 시작됩니다.
+  - Prompt injection은 언제 데이터가 지시로 바뀌면서 시작될까요 — 본문에서 구체적으로 다룹니다.
 - **직접 injection과 간접 injection은 방어 위치가 어떻게 다를까요?**
-  - 직접 injection은 사용자 입력 앞단에서, 간접 injection은 검색·메일·문서 같은 외부 데이터가 context로 들어오는 경계에서 막아야 합니다.
+  - RAG 문서를 가져온 뒤 바로 컨텍스트에 붙이지 말고, "문서 데이터"와 "실행 지시"를 구조적으로 분리해야 합니다.
 - **Red team 사례를 regression set으로 남기려면 무엇을 기록해야 할까요?**
-  - 공격 원문, 정규화된 payload, 탐지 신호, 기대 차단 결과, 우회 여부를 남겨 재발 방지 테스트로 돌립니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Safety & Guardrails 101 (1/10): AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
-- **AI Safety & Guardrails 101 (2/10): Prompt Injection 방어 (현재 글)**
-- [AI Safety & Guardrails 101 (3/10): 출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
-- [AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹](./04-pii-detection-redaction.md)
-- [AI Safety & Guardrails 101 (5/10): Jailbreak 탐지](./05-jailbreak-detection.md)
-- [AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지](./06-toxicity-bias-detection.md)
-- [AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증](./07-hallucination-guardrails.md)
-- [AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지](./08-rate-limiting-abuse-prevention.md)
-- [AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스](./09-audit-logging-compliance.md)
-- [AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
+  - Red team 사례를 regression set으로 남기려면 무엇을 기록해야 할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - Prompt injection 방어를 제대로 설계하면 팀은 입력 경계에 대한 명확한 규칙을 갖게 됩니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 모델은 시스템 메시지와 사용자 메시지를 운영체제 권한처럼 구분하지 않습니다. 강한 우선순위 힌트는 있지만, 결국 모두 같은 컨텍스트 안에서 다음 토큰을 예측합니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 모델은 시스템 메시지와 사용자 메시지를 운영체제 권한처럼 구분하지 않습니다. 강한 우선순위 힌트는 있지만, 결국 모두 같은 컨텍스트 안에서 다음 토큰을 예측합니다.
 
 <!-- toc:end -->
 

@@ -394,11 +394,17 @@ Pod sandbox에 네트워크가 어떻게 연결되고, Azure CNI Pod Subnet, Nod
 ## 처음 질문으로 돌아가기
 
 - **kubelet은 정확히 무엇을 감시하고 어떤 시점에 CRI를 호출할까요?**
-  - kubelet은 API server를 watch하면서 자기 노드에 배정된 Pod를 보고, 볼륨·Secret·Config를 준비한 뒤 node의 desired state를 실제 상태로 수렴시킵니다. 그다음 로컬 Unix socket 경로로 CRI를 호출해 `RunPodSandbox`, `PullImage`, `CreateContainer`, `StartContainer` 순서의 실행 사슬을 시작합니다. 즉 Binding이 끝나고 “이 노드에서 이 Pod가 떠야 한다”는 사실이 확정된 시점부터 kubelet이 런타임 계층에 실행을 위임합니다.
+  - kubelet은 정확히 무엇을 감시하고 어떤 시점에 CRI를 호출할까요 — 본문에서 구체적으로 다룹니다.
 - **dockershim이 사라진 뒤 AKS 노드 디버깅 방식은 왜 달라졌을까요?**
-  - 본문에서 강조했듯이 지금 AKS Linux 노드의 기본 실행 경로는 Docker가 아니라 kubelet → CRI → containerd입니다. 그래서 `docker ps` 감각으로 한 번에 보려 하기보다 `journalctl -u kubelet`, `crictl ps`, `crictl inspectp`, `crictl inspect`처럼 kubelet 로그와 CRI 상태를 같이 보는 편이 맞습니다. dockershim이 빠진 뒤에는 “어느 엔진이 보이느냐”보다 “kubelet이 runtime에 무엇을 요청했고 어느 단계에서 멈췄느냐”가 디버깅의 중심이 됩니다.
+  - node-local 문제를 빠르게 줄이려면 kubelet 이벤트와 CRI 상태를 같은 타임라인으로 묶어 보는 습관이 필요합니다.
 - **`RunPodSandbox`, `PullImage`, `CreateContainer`, `StartContainer`는 왜 이 순서로 호출될까요?**
-  - Pod는 단일 컨테이너보다 먼저 공유 네트워크와 namespace 문맥을 가져야 하므로 `RunPodSandbox`가 앞에 옵니다. 그 위에서 이미지를 내려받고, 컨테이너 설정을 만들고, 마지막에 프로세스를 실제로 시작해야 `PullImage` 실패와 `StartContainer` 실패를 서로 다른 구간으로 분리할 수 있습니다. 본문이 이 순서를 강조한 이유도 registry 인증 문제, sandbox 네트워크 문제, entrypoint 문제를 같은 “Pod가 안 뜬다”로 뭉개지 않기 위해서입니다.
+  - `RunPodSandbox`, `PullImage`, `CreateContainer`, `StartContainer`는 왜 이 순서로 호출될까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 노드 실행 경로를 모르면 Pending 이후의 모든 문제를 비슷한 범주로 오해하게 됩니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 경로를 읽을 때 가장 유용한 문장은 이것입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이 경로를 읽을 때 가장 유용한 문장은 이것입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

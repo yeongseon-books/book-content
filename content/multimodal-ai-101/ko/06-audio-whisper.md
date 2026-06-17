@@ -411,11 +411,17 @@ Whisper는 음성을 텍스트 파이프라인으로 연결하는 가장 실용�
 ## 처음 질문으로 돌아가기
 
 - **왜 Whisper가 오픈소스 STT의 사실상 기본값처럼 자리 잡았을까요?**
-  - 99개 언어를 같은 모델로 처리하고 open weight라 self-hosting이 가능하며, 한국어 WER도 cloud API와 경쟁 가능한 수준이기 때문입니다. 본문이 비교한 것처럼 `faster-whisper`로 가속하면 분당 비용과 처리량이 현실적인 수준으로 내려가 소규모 팀도 기본 STT 계층으로 채택하기 좋습니다.
+  - 왜 Whisper가 오픈소스 STT의 사실상 기본값처럼 자리 잡았을까요 — 본문에서 구체적으로 다룹니다.
 - **Whisper 아키텍처는 어떤 방식으로 30초 오디오를 텍스트와 timestamp로 바꿀까요?**
-  - Whisper는 30초 오디오를 80채널 log-Mel spectrogram으로 바꾼 뒤 encoder-decoder 트랜스포머가 `<|transcribe|>`, `<|ko|>` 같은 task token과 함께 전사를 생성합니다. `word_timestamps=True` 옵션이나 segment 출력으로 시작·종료 시간을 붙일 수 있어서 SRT 자막, 검색 인덱스, diarization 정렬까지 같은 시간축 위에 올릴 수 있습니다.
+  - Whisper를 운영에 붙이면 "대체로 잘 된다"는 표현은 거의 의미가 없습니다. 최소한 WER(Word Error Rate), CER(Character Error Rate), segment latency, 무음 구간 hallucination 비율을 동시에 기록해야 품질 추이를 해석할 수 있습니다.
 - **로컬 추론, faster-whisper, OpenAI API 호출은 각각 어떤 상황에서 유리할까요?**
-  - 기본 `openai-whisper`는 구조 이해와 실험에 좋고, production에서는 `vad_filter=True`를 포함한 `faster-whisper`가 throughput과 비용 면에서 가장 실용적입니다. 반대로 인프라 운영 부담이 크거나 짧은 요청 위주라면 `client.audio.transcriptions.create(...)` 같은 OpenAI API 경로가 빠른 시작점이며, 글의 `choose_stt_route()`처럼 길이와 큐 깊이로 두 경로를 나누는 방식도 유효합니다.
+  - OpenAI API, self-hosted faster-whisper, 하이브리드 라우팅을 함께 운영하는 팀이 늘고 있습니다. 긴 파일은 self-host로, 짧은 실시간 요청은 API로 보내는 식의 비용 최적화가 가능합니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 음성은 멀티모달 제품에서 가장 빠르게 사용량이 커지는 입력입니다. 사용자는 말하는 편이 타이핑보다 빠르고, 기업 데이터도 콜센터·회의·현장 녹취처럼 음성 형태로 쌓이는 경우가 많기 때문입니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - Whisper가 특별한 이유는 단순히 음성을 받아 적기 때문이 아닙니다. 오디오를 일정 길이로 쪼개고, 그 위에서 언어·내용·시간 정보를 함께 복원하는 구조를 제공하기 때문입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - Whisper가 특별한 이유는 단순히 음성을 받아 적기 때문이 아닙니다. 오디오를 일정 길이로 쪼개고, 그 위에서 언어·내용·시간 정보를 함께 복원하는 구조를 제공하기 때문입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

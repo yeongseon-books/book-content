@@ -436,24 +436,17 @@ def log_audit_access(actor: str, reason: str, query_scope: str):
 ## 처음 질문으로 돌아가기
 
 - **감사 로그는 일반 디버그 로그와 무엇이 달라야 compliance에 쓸 수 있을까요?**
-  - 임의 수정이 어렵고, 필요한 필드가 고정되어 있으며, 개인정보와 원본 접근이 통제되고, 보존·삭제 정책이 분명해야 합니다.
+  - 컴플라이언스 보고 자동화를 하려면 스키마가 흔들리면 안 됩니다. 아래는 운영에서 자주 쓰는 필수 필드 집합입니다.
 - **PII masking, append-only storage, decision rationale은 각각 어떤 증거를 남길까요?**
-  - PII masking은 노출 범위를 줄이고, append-only storage는 변조 가능성을 낮추며, decision rationale은 승인·차단 판단 근거를 남깁니다.
+  - PII masking, append-only storage, decision rationale은 각각 어떤 증거를 남길까요 — 본문에서 구체적으로 다룹니다.
 - **자동 compliance report를 만들려면 로그 schema에 무엇이 고정되어야 할까요?**
-  - request id, actor, action, policy decision, tool call, masked fields, timestamps, retention class, rationale 필드가 고정되어야 합니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Safety & Guardrails 101 (1/10): AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
-- [AI Safety & Guardrails 101 (2/10): Prompt Injection 방어](./02-prompt-injection-defense.md)
-- [AI Safety & Guardrails 101 (3/10): 출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
-- [AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹](./04-pii-detection-redaction.md)
-- [AI Safety & Guardrails 101 (5/10): Jailbreak 탐지](./05-jailbreak-detection.md)
-- [AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지](./06-toxicity-bias-detection.md)
-- [AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증](./07-hallucination-guardrails.md)
-- [AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지](./08-rate-limiting-abuse-prevention.md)
-- **AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스 (현재 글)**
-- [AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
+  - 컴플라이언스 보고 자동화를 하려면 스키마가 흔들리면 안 됩니다. 아래는 운영에서 자주 쓰는 필수 필드 집합입니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 감사 로깅이 잘 되어 있으면 규제 대응과 사고 조사가 훨씬 쉬워집니다. 어떤 요청이 어떤 모델을 거쳐 어떤 guardrail 결정을 받았는지 추적할 수 있고, 사용자 삭제 요청과 보존 만료도 체계적으로 관리할 수 있습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - application log는 빠른 디버깅을 위한 도구입니다. 반면 audit log는 나중에 재현과 소명에 쓰일 수 있어야 하므로 더 엄격해야 합니다. 자유 텍스트보다 구조화된 필드가 필요하고, 수정 가능성은 최소화해야 하며, 보관 기간도 훨씬 길어집니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - application log는 빠른 디버깅을 위한 도구입니다. 반면 audit log는 나중에 재현과 소명에 쓰일 수 있어야 하므로 더 엄격해야 합니다. 자유 텍스트보다 구조화된 필드가 필요하고, 수정 가능성은 최소화해야 하며, 보관 기간도 훨씬 길어집니다.
 
 <!-- toc:end -->
 

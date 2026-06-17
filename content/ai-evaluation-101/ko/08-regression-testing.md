@@ -495,24 +495,17 @@ baseline 업데이트 PR에는 반드시 하락 케이스와 개선 케이스를
 ## 처음 질문으로 돌아가기
 
 - **회귀 테스트는 왜 LLM 평가를 배포 전 행사가 아니라 PR 방어선으로 옮겨야 할까요?**
-  - prompt, 모델, retrieval, tool 변경이 작은 PR에서도 품질을 무너뜨릴 수 있으므로 배포 전 한 번이 아니라 변경마다 막아야 합니다.
+  - 이제 방어선이 생겼다면, 다음 글에서는 두 모델이나 두 프롬프트 가운데 무엇이 더 나은지를 통계적으로 비교하는 A/B 테스트로 넘어갑니다.
 - **golden dataset과 threshold는 어떤 변경을 막아야 할까요?**
-  - 핵심 사용자 흐름, 과거 장애, safety 기준, 비용·latency 한도를 깨는 변경을 막아야 합니다.
+  - golden dataset과 threshold는 어떤 변경을 막아야 할까요 — 본문에서 구체적으로 다룹니다.
 - **non-determinism 때문에 eval이 흔들릴 때 어떤 tolerance와 fail policy가 필요할까요?**
-  - seed 고정, 반복 실행, confidence interval, 차원별 tolerance를 두고 critical case 실패는 평균과 무관하게 fail하도록 정책을 둡니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
-- [AI Evaluation 101 (2/10): 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
-- [AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- [AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기](./04-llm-as-judge.md)
-- [AI Evaluation 101 (5/10): Rubric 기반 채점 설계](./05-rubric-based-scoring.md)
-- [AI Evaluation 101 (6/10): RAG 시스템 평가하기](./06-rag-evaluation.md)
-- [AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory](./07-agent-evaluation.md)
-- **AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게 (현재 글)**
-- [AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가](./09-ab-testing-llms.md)
-- [AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가](./10-production-evaluation.md)
+  - non-determinism 때문에 eval이 흔들릴 때 어떤 tolerance와 fail policy가 필요할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 회귀 테스트가 없으면 팀은 개선과 파손을 구분하지 못합니다. 프롬프트를 고쳐 한 사례가 나아졌더라도 다른 핵심 사례가 조용히 나빠질 수 있고, 그 사실은 사용자 불만이 쌓인 뒤에야 드러납니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다.
 
 <!-- toc:end -->
 

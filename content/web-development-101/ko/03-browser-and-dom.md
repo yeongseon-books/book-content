@@ -350,11 +350,17 @@ Cache-Control: public, max-age=31536000, immutable
 ## 처음 질문으로 돌아가기
 
 - **DOM은 정확히 무엇이며 어떻게 만들어질까요?**
-  - DOM은 HTML을 브라우저가 객체 트리로 바꿔 놓은 결과물이며, 글의 예시에서는 `ul#list` 아래에 두 개의 `li`가 달린 구조로 만들어집니다. 그래서 JavaScript가 `getElementById("list")`나 `querySelectorAll("li")`로 노드를 읽고 조작할 수 있습니다.
+  - DOM은 정확히 무엇이며 어떻게 만들어질까요 — 본문에서 구체적으로 다룹니다.
 - **브라우저 렌더링 파이프라인은 어떤 단계로 이어질까요?**
-  - 브라우저는 DOM을 만든 뒤 계산된 스타일을 합쳐 render tree를 만들고, 이어서 layout으로 위치와 크기를 계산한 뒤 paint로 픽셀을 그립니다. `appendChild`처럼 DOM을 바꾸면 일부 layout과 paint가 다시 일어나므로 Performance 탭에서 재렌더링 비용을 확인할 수 있습니다.
+  - 브라우저는 이 HTML을 읽고 `ul` 아래에 두 개의 `li`가 있는 트리를 만듭니다.
 - **JavaScript는 DOM을 어떻게 읽고 바꿀까요?**
-  - JavaScript는 `createElement`, `textContent`, `appendChild` 같은 DOM API로 새 노드를 만들고 붙이며, `addEventListener`로 이벤트 위임도 처리합니다. `console.log("1")`, `setTimeout(..., 0)`, `console.log("3")` 예시처럼 비동기 콜백은 이벤트 루프를 거쳐 나중에 실행되므로 DOM 변경 시점도 그 순서 안에서 읽어야 합니다.
+  - DOM API는 문자열을 이어 붙이는 방식보다 안전하고 예측 가능하며, 기본적으로 XSS 위험도 줄여 줍니다.
+- **왜 이 모델이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - DOM에 대한 감각이 없으면 페이지가 왜 느린지 설명하기 어렵습니다. HTML, CSS, JavaScript가 모두 정상처럼 보여도 실제 병목은 layout이나 paint에서 생길 수 있기 때문입니다.
+- **한눈에 보는 개념 지도을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 브라우저는 텍스트를 곧바로 픽셀로 그리지 않습니다. DOM과 스타일 계산, layout, paint가 순서대로 이어지고, 그 사이에 JavaScript가 DOM을 바꾸면 일부 단계가 다시 실행됩니다.
+- **먼저 알아둘 용어의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 먼저 알아둘 용어의 핵심 원리를 한 문장으로 설명하면 무엇일까요 — 본문에서 구체적으로 다룹니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -251,11 +251,17 @@ Environment는 ACA에서 가장 과소평가되기 쉬운 리소스이지만, �
 ## 처음 질문으로 돌아가기
 
 - **Environment는 왜 단순한 부모 리소스가 아니라 실제 격리 경계일까요?**
-  - Environment는 앱을 담는 폴더가 아니라, 같은 VNet perimeter, DNS suffix, Log Analytics workspace, Dapr component registry를 공유할지 결정하는 secure boundary입니다. 그래서 한 번 같은 Environment에 넣는 순간, 개별 앱 설정보다 바깥의 플랫폼 경계를 먼저 함께 쓰게 됩니다.
+  - Environment는 왜 단순한 부모 리소스가 아니라 실제 격리 경계일까요 — 본문에서 구체적으로 다룹니다.
 - **네트워크 범위는 Revision이나 App이 아니라 왜 Environment에서 시작될까요?**
-  - Revision은 불변 런타임 스냅샷일 뿐 네트워크 섬이 아니고, 앱별 external/internal ingress 선택도 결국 Environment가 가진 subnet, internal 여부, static IP, outbound type 위에 올라갑니다. 그래서 앱을 다른 Environment로 옮기는 일은 placement 변경이 아니라 네트워크 정체성과 도달성 계약을 바꾸는 일에 가깝습니다.
+  - 네트워크 범위는 Revision이나 App이 아니라 왜 Environment에서 시작될까요 — 본문에서 구체적으로 다룹니다.
 - **Log Analytics workspace를 Environment 수준에서 공유한다는 말은 운영상 무엇을 뜻할까요?**
-  - cross-app troubleshooting을 한 workspace에서 이어 갈 수 있다는 뜻이지만, 동시에 retention, access control, 비용 귀속도 함께 묶인다는 뜻입니다. 신호를 실제로 만드는 쪽은 App·Revision·Dapr sidecar이므로, 운영에서는 공유 collector boundary와 개별 producer를 분리해서 읽어야 합니다.
+  - Log Analytics workspace를 Environment 수준에서 공유한다는 말은 운영상 무엇을 뜻할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - Environment를 잘못 이해하면 ACA의 여러 기능을 제각각 따로 보게 됩니다. Ingress는 네트워크 기능, Dapr는 미들웨어 기능, 로그는 관측 기능, Revision은 배포 기능처럼 흩어져 보입니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - Environment를 볼 때 가장 먼저 머리에 남겨야 할 문장은 이것입니다. **Environment는 ACA가 플랫폼처럼 동작하기 시작하는 지점이며, 네트워크·로그·Dapr 범위를 함께 묶는 격리 단위**입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - Environment를 볼 때 가장 먼저 머리에 남겨야 할 문장은 이것입니다. **Environment는 ACA가 플랫폼처럼 동작하기 시작하는 지점이며, 네트워크·로그·Dapr 범위를 함께 묶는 격리 단위**입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

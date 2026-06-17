@@ -401,11 +401,17 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **`alembic revision`이 만들어 주는 파일 구조는 어떻게 생겼을까요?**
-  - 본문 예시처럼 revision 파일은 `revision`, `down_revision`, 그리고 `upgrade()`·`downgrade()` 함수 네 축으로 읽으면 됩니다. 즉, 이 파일은 “누구의 다음 변경인가”와 “올릴 때/내릴 때 무엇을 할까”를 같이 담는 단위입니다.
+  - `alembic revision`이 만들어 주는 파일 구조는 어떻게 생겼을까요 — 본문에서 구체적으로 다룹니다.
 - **`op.create_table`, `op.add_column`, `op.drop_column`, `op.execute`는 각각 언제 쓸까요?**
-  - 새 구조를 만들면 `op.create_table`, 기존 테이블에 필드를 더하면 `op.add_column`, 되돌릴 때 없애면 `op.drop_column`, helper로 표현하기 어려운 SQL은 `op.execute`를 씁니다. 이 글은 DDL helper를 먼저 쓰고, 정말 필요한 부분만 raw SQL로 내려가라는 감각을 보여 줍니다.
+  - `op.create_table`, `op.add_column`, `op.drop_column`, `op.execute`는 각각 언제 쓸까요 — 본문에서 구체적으로 다룹니다.
 - **`upgrade()`와 `downgrade()`를 어떻게 대칭으로 유지할 수 있을까요?**
-  - `upgrade(): N → N+1`, `downgrade(): N+1 → N`이라는 본문 표현 그대로, 올릴 때 추가한 것을 내릴 때 제거하는 식으로 짝을 맞추면 됩니다. `users.tier` 예시에서 `op.add_column(...)`과 `op.drop_column(...)`이 서로 거울처럼 배치된 이유가 바로 그 대칭성입니다.
+  - `upgrade()`와 `downgrade()`를 어떻게 대칭으로 유지할 수 있을까요 — 본문에서 구체적으로 다룹니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - > revision 파일은 **`upgrade(): N → N+1`과 `downgrade(): N+1 → N`이라는 함수 쌍**입니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 위에서부터 읽으면 (1) revision 자신의 ID와 부모 ID, (2) `upgrade`/`downgrade` 쌍이 전부입니다. `branch_labels`와 `depends_on`은 5편에서 다룹니다.
+- **변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 위에서부터 읽으면 (1) revision 자신의 ID와 부모 ID, (2) `upgrade`/`downgrade` 쌍이 전부입니다. `branch_labels`와 `depends_on`은 5편에서 다룹니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

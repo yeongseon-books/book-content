@@ -365,11 +365,17 @@ host code를 따라가고 나면 어떤 레버가 어느 단계를 줄이는지 
 ## 처음 질문으로 돌아가기
 
 - **호스트 부팅, 워커 시작, JIT 중 어느 부분이 cold start에서 가장 비쌀까요?**
-  - 이 글의 기준에서는 cold start를 한 항목으로 뭉뚱그리지 않고 placeholder 공통 준비와 specialization 이후 비용으로 나눠 봐야 합니다. 실제로 사용자가 크게 체감하는 구간은 `SpecializeHostCoreAsync` 안에서 환경을 다시 읽고 워커를 specialize한 뒤 `RestartHostAsync`와 `DelayUntilHostReadyAsync`를 기다리는 단계입니다.
+  - 호스트 부팅, 워커 시작, JIT 중 어느 부분이 cold start에서 가장 비쌀까요 — 본문에서 구체적으로 다룹니다.
 - **Placeholder 인스턴스는 정확히 무엇을 미리 준비해 둘까요?**
-  - Placeholder 인스턴스는 빈 껍데기가 아니라 `InitializedFromPlaceholder` 표시, `WarmUp` 함수 파일 생성, specialization 감지 타이머, JIT warmup 경로까지 미리 갖춘 호스트입니다. 즉 VM 할당 뒤 공통 bootstrap과 warmup 준비를 먼저 끝내 두고, 사용자 앱이 배정되면 그 위에 specialization만 올리는 구조입니다.
+  - Placeholder 인스턴스는 정확히 무엇을 미리 준비해 둘까요 — 본문에서 구체적으로 다룹니다.
 - **Premium의 always-ready 인스턴스는 placeholder와 무엇이 다를까요?**
-  - placeholder는 공통 준비만 끝낸 뒤 나중에 specialization을 수행할 인스턴스이고, Flex Consumption의 Always Ready나 Premium pre-warmed는 specialization까지 끝난 인스턴스를 더 오래 유지하는 쪽에 가깝습니다. 그래서 Consumption에서는 placeholder → specialization 비용을 자주 맞고, Always Ready나 pre-warmed를 쓰면 그 경로 자체를 덜 타게 됩니다.
+  - Premium의 always-ready 인스턴스는 placeholder와 무엇이 다를까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 콜드 스타트는 비용과 지연 시간을 동시에 흔드는 주제입니다. 잘못 이해하면 “함수가 느리다”는 감각적인 표현만 남고, 실제로는 플랫폼이 미리 해 둘 수 있는 일과 사용자 코드 때문에 뒤로 밀리는 일을 구분하지 못하게 됩니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 콜드 스타트 비용은 하나의 거대한 지연이 아닙니다. VM 할당부터 DI 컨테이너 준비까지는 사용자 코드와 무관한 공통 비용이고, 코드 주입 이후는 사용자별 비용입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 콜드 스타트 비용은 하나의 거대한 지연이 아닙니다. VM 할당부터 DI 컨테이너 준비까지는 사용자 코드와 무관한 공통 비용이고, 코드 주입 이후는 사용자별 비용입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

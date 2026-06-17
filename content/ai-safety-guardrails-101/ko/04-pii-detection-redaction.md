@@ -405,24 +405,17 @@ PII 보호는 단일 마스킹 함수로 끝나지 않습니다. 무엇을 모�
 ## 처음 질문으로 돌아가기
 
 - **PII 보호는 왜 모델에 보내는 정보와 내부에 보관하는 정보를 분리해야 할까요?**
-  - 모델에는 최소화된 token이나 masked value만 보내고, 원본은 접근 통제된 저장소에 둬야 유출 범위를 줄일 수 있습니다.
+  - 실무에서는 regex와 NER를 결합해도 누락이 남습니다. 그래서 형식 검증과 문맥 검증을 추가해 false positive를 줄입니다.
 - **regex, Presidio, reversible tokenization은 각각 어떤 단계에서 유용할까요?**
-  - regex는 빠른 시작점, Presidio는 다국어·복합 엔터티 탐지, reversible tokenization은 나중에 원본 복원이 필요한 업무에 유용합니다.
+  - regex, Presidio, reversible tokenization은 각각 어떤 단계에서 유용할까요 — 본문에서 구체적으로 다룹니다.
 - **응답 outbound 단계에서 다시 검사하지 않으면 어떤 유출이 생길까요?**
-  - 모델이 학습된 패턴이나 context 조각에서 개인정보를 재구성해 응답할 수 있으므로 outbound 재검사가 없으면 사용자에게 PII가 나갈 수 있습니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Safety & Guardrails 101 (1/10): AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
-- [AI Safety & Guardrails 101 (2/10): Prompt Injection 방어](./02-prompt-injection-defense.md)
-- [AI Safety & Guardrails 101 (3/10): 출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
-- **AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹 (현재 글)**
-- [AI Safety & Guardrails 101 (5/10): Jailbreak 탐지](./05-jailbreak-detection.md)
-- [AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지](./06-toxicity-bias-detection.md)
-- [AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증](./07-hallucination-guardrails.md)
-- [AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지](./08-rate-limiting-abuse-prevention.md)
-- [AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스](./09-audit-logging-compliance.md)
-- [AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
+  - 응답 outbound 단계에서 다시 검사하지 않으면 어떤 유출이 생길까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - PII 보호를 초기에 구조로 넣어 두면 개인정보 처리 범위가 명확해집니다. 무엇을 모델에 보내고, 무엇을 마스킹하고, 무엇을 별도 저장소에 두는지를 정하면 법무 검토와 보안 감사도 훨씬 수월해집니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 많은 팀이 개인정보 보호를 “마스킹 함수 하나”로 생각합니다. 하지만 운영에서는 그보다 더 큰 질문이 먼저입니다. 이 데이터를 정말 모델에 보내야 하는가, 로그에 남겨도 되는가, 사용자 삭제 요청이 왔을 때 어느 저장소에서 지워야 하는가입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 많은 팀이 개인정보 보호를 “마스킹 함수 하나”로 생각합니다. 하지만 운영에서는 그보다 더 큰 질문이 먼저입니다. 이 데이터를 정말 모델에 보내야 하는가, 로그에 남겨도 되는가, 사용자 삭제 요청이 왔을 때 어느 저장소에서 지워야 하는가입니다.
 
 <!-- toc:end -->
 

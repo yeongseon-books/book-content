@@ -461,24 +461,17 @@ Tie 비율이 50%면 두 모델은 사실상 같습니다. Win rate만 보면 �
 ## 처음 질문으로 돌아가기
 
 - **LLM A/B 테스트는 왜 “더 좋아 보인다”는 감상이 아니라 통계적 의사결정이어야 할까요?**
-  - LLM 출력은 분산이 크고 사람 인상은 편향되기 쉬워, 표본과 효과 크기 없이 판단하면 우연을 개선으로 착각합니다.
+  - 다음 글에서는 배포 후 운영 환경에서 평가를 계속 돌리는 방법을 다룹니다. 실험에서 이긴 변형도 운영에서 분포가 바뀌면 다시 확인해야 합니다.
 - **win rate, sample size, statistical significance는 각각 어떤 판단을 도와줄까요?**
-  - win rate는 어느 후보가 더 자주 이기는지, sample size는 판단에 필요한 관측량, significance는 우연일 가능성을 판단하게 해 줍니다.
+  - 다음 글에서는 배포 후 운영 환경에서 평가를 계속 돌리는 방법을 다룹니다. 실험에서 이긴 변형도 운영에서 분포가 바뀌면 다시 확인해야 합니다.
 - **온라인 A/B에서 사용자 위험을 줄이려면 어떤 guardrail metric이 필요할까요?**
-  - 불만률, latency, 비용, safety violation, fallback rate 같은 guardrail을 함께 봐야 품질 win이 사용자 위험으로 바뀌지 않습니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
-- [AI Evaluation 101 (2/10): 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
-- [AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- [AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기](./04-llm-as-judge.md)
-- [AI Evaluation 101 (5/10): Rubric 기반 채점 설계](./05-rubric-based-scoring.md)
-- [AI Evaluation 101 (6/10): RAG 시스템 평가하기](./06-rag-evaluation.md)
-- [AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory](./07-agent-evaluation.md)
-- [AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게](./08-regression-testing.md)
-- **AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가 (현재 글)**
-- [AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가](./10-production-evaluation.md)
+  - 온라인 A/B에서 사용자 위험을 줄이려면 어떤 guardrail metric이 필요할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - A/B 테스트는 좋은 느낌을 증거로 바꾸는 과정입니다. 같은 입력에서 어떤 변형이 더 자주 이기는지 기록하면, 팀의 논의가 취향이 아니라 데이터 위에서 진행됩니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다.
 
 <!-- toc:end -->
 

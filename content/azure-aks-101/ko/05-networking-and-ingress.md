@@ -358,11 +358,17 @@ az network lb list -g <node-rg> -o table
 ## 처음 질문으로 돌아가기
 
 - **Pod IP 할당 방식과 외부 HTTP 라우팅을 왜 별개의 문제로 봐야 할까요?**
-  - `--pod-cidr 10.244.0.0/16`, `--service-cidr 10.0.0.0/16`, `--dns-service-ip 10.0.0.10`은 Pod와 Service 주소 체계를 정하는 문제입니다. 반면 `ingressClassName: webapprouting.kubernetes.azure.com`, `host: api.example.com`, `service.name: fastapi-hello`는 외부 HTTP 요청을 어디로 라우팅할지 정하는 문제이므로 같은 네트워크라도 계층이 다릅니다.
+  - Pod IP 할당 방식과 외부 HTTP 라우팅을 왜 별개의 문제로 봐야 할까요 — 본문에서 구체적으로 다룹니다.
 - **kubenet, Azure CNI, Azure CNI Overlay는 각각 어떤 운영 trade-off를 가질까요?**
-  - `kubenet`은 IP를 아끼기 쉬웠지만 신규 기본값으로 보기 어렵고, flat `Azure CNI`는 Pod가 VNet 주소를 직접 써서 IPAM 압박이 커집니다. `Azure CNI Overlay`는 Pod CIDR을 VNet과 분리해 두어 Azure 통합은 유지하면서도 VNet IP 소비를 줄이는 쪽에 가깝습니다.
+  - kubenet, Azure CNI, Azure CNI Overlay는 각각 어떤 운영 trade-off를 가질까요 — 본문에서 구체적으로 다룹니다.
 - **새 AKS 클러스터에서 Azure CNI Overlay를 먼저 검토하는 이유는 무엇일까요?**
-  - 본문 예시처럼 `az aks create --network-plugin azure --network-plugin-mode overlay`로 가면 새 클러스터에서 가장 자주 걸리는 VNet 주소 부족 문제를 완화하기 쉽습니다. 그래서 greenfield 기준에서는 Pod를 VNet 일급 주소로 직접 보여야 하는 강한 요구가 없는 한 Overlay를 먼저 보는 흐름이 자연스럽습니다.
+  - 새 AKS 클러스터에서 Azure CNI Overlay를 먼저 검토하는 이유는 무엇일까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 네트워크는 AKS에서 가장 늦게까지 모호하게 남는 층입니다. 배포는 성공했고 Pod도 Running인데 외부 요청이 실패하면, 사람들은 곧바로 “네트워크가 문제다”라고 말합니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - AKS 네트워킹을 한 번에 이해하려 하면 오히려 더 헷갈립니다. 저는 먼저 아래 두 질문을 따로 둡니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - AKS 네트워킹을 한 번에 이해하려 하면 오히려 더 헷갈립니다. 저는 먼저 아래 두 질문을 따로 둡니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

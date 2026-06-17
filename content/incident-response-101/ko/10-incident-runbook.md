@@ -499,25 +499,17 @@ next_review_date:
 ## 처음 질문으로 돌아가기
 
 - **incident 대응 지식을 왜 한 runbook으로 묶어야 할까요?**
-  - 본문에서 강조했듯이 incident 시점에는 사람이 평소처럼 사고할 수 없고, 정보가 채팅·위키·코드·티켓 여러 곳에 흩어져 있으면 첫 30분이 전부 정보 사냥에 소진됩니다. severity 표, 온콜 일정, 커뮤니케이션 템플릿, 단계별 체크리스트를 한 곳에 묶은 runbook이 있어야 인지 부하가 줄고 대응 속도가 결정적으로 빨라집니다.
+  - runbook을 만든 뒤 진짜 차이는 "문서가 있는가"가 아니라 "문서가 현장에서 작동하는가"에서 생깁니다. 이를 점검하려면 성숙도 모델과 정기 훈련 시나리오가 필요합니다.
 - **severity 표와 온콜 일정은 runbook 안에서 어떻게 연결될까요?**
-  - 본문 예시처럼 severity 표는 "어떤 신호가 보이면 어떤 등급인지"를 정해 누구를 얼마나 빨리 깨울지를 결정하고, 온콜 일정은 "지금 그 등급에서 깨울 사람이 누구인지"를 알려 줍니다. 두 항목이 같은 runbook에 있어야 알람 → 등급 판정 → 호출 대상 결정의 흐름이 한 번도 끊기지 않고 자동으로 이어집니다.
+  - runbook의 시작점은 severity별 대응 규칙입니다. 누가 호출되는지와 공지 간격이 먼저 보여야 incident 초반 판단이 빨라집니다.
 - **커뮤니케이션 템플릿과 대응 단계는 어떤 식으로 함께 관리해야 할까요?**
-  - 본문에서 본 것처럼 대응 단계(감지·완화·회복·종료) 각각에 대응되는 사내 공지·status page·고객 공지 템플릿을 같은 runbook에 짝지어 두면, 엔지니어가 mitigation 도중에도 "지금 단계에서 어떤 채널에 무엇을 알려야 하는지"를 매번 새로 고민하지 않아도 됩니다. 단계와 템플릿을 분리해 두면 한쪽은 업데이트되고 다른 쪽은 낡아 결국 사고 중에 어긋난 메시지가 나가는 사고가 반복됩니다.
-  - Git에 관리하고, 정기적으로 검토하고 업데이트합니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [Incident Response 101 (1/10): Incident란 무엇인가?](./01-what-is-incident.md)
-- [Incident Response 101 (2/10): Severity 분류](./02-severity.md)
-- [Incident Response 101 (3/10): 초기 대응](./03-initial-response.md)
-- [Incident Response 101 (4/10): Communication](./04-communication.md)
-- [Incident Response 101 (5/10): Timeline 작성](./05-timeline.md)
-- [Incident Response 101 (6/10): Root Cause Analysis](./06-root-cause-analysis.md)
-- [Incident Response 101 (7/10): Mitigation과 Resolution](./07-mitigation-and-resolution.md)
-- [Incident Response 101 (8/10): Postmortem](./08-postmortem.md)
-- [Incident Response 101 (9/10): 재발 방지](./09-prevention.md)
-- **Incident Runbook 만들기 (현재 글)**
+  - runbook의 시작점은 severity별 대응 규칙입니다. 누가 호출되는지와 공지 간격이 먼저 보여야 incident 초반 판단이 빨라집니다.
+- **왜 이 주제가 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - incident 대응에서 가장 비싼 시간은 초반 몇 분입니다. 이때 문서를 찾느라 헤매면 복구보다 탐색에 더 많은 시간을 씁니다.
+- **한눈에 보는 구조을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 그림은 runbook이 한 문서가 아니라 연결 구조라는 점을 보여 줍니다. severity에서 시작해 호출, 공지, 대응 순서, 사후 기록까지 한 흐름으로 이어져야 현장에서 바로 쓸 수 있습니다.
+- **전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이전: 위키, 채팅 핀, 개인 메모, 외부 도구에 정보가 흩어져 있습니다.
 
 <!-- toc:end -->
 

@@ -556,11 +556,17 @@ DNS는 인터넷의 전화번호부이자, 운영 사고의 상당수를 설명�
 ## 처음 질문으로 돌아가기
 
 - **DNS 계층 구조는 어떻게 되어 있을까요?**
-  - root(`.`) → TLD(`.com`) → authoritative(`example.com`)의 트리 구조이며, recursive resolver가 이 위임 체인을 따라 답을 찾습니다. `dig +trace`로 직접 관찰할 수 있습니다.
+  - 실제 서비스를 운영할 때 DNS 레코드를 어떻게 구성하는지 구체적 사례를 보겠습니다.
 - **recursive resolver와 캐시는 어떤 역할을 할까요?**
-  - recursive resolver는 클라이언트 대신 root부터 authoritative까지 따라가며 답을 구하고, 그 결과를 TTL 동안 캐시합니다. 덕분에 대부분의 질의는 authoritative 서버까지 가지 않고 끝나지만, TTL 만료 전에는 변경이 반영되지 않는 트레이드오프가 있습니다.
+  - recursive resolver와 캐시는 어떤 역할을 할까요 — 본문에서 구체적으로 다룹니다.
 - **A, AAAA, CNAME, MX, TXT 레코드는 각각 어디에 쓰일까요?**
-  - A/AAAA는 도메인→IP 매핑, CNAME은 도메인→도메인 별칭, MX는 메일 라우팅, TXT는 SPF/DKIM/DMARC 같은 도메인 검증과 메일 보안에 쓰입니다. 하나의 도메인에 여러 타입이 동시에 존재할 수 있습니다.
+  - 실제 서비스를 운영할 때 DNS 레코드를 어떻게 구성하는지 구체적 사례를 보겠습니다.
+- **핵심 그림에서 가장 흔한 실수는 무엇일까요?**
+  - > 클라이언트는 운영 체제의 stub resolver에 물어보고, stub resolver는 보통 ISP나 회사의 recursive resolver에 질의를 넘깁니다.
+- **적용 전후 비교을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - Pod에서 `curl http://my-service:8080`을 호출하면 CoreDNS가 `my-service.default.svc.cluster.local`을 `10.96.45.12`로 변환합니다.
+- **단계별로 따라하기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - > 클라이언트는 운영 체제의 stub resolver에 물어보고, stub resolver는 보통 ISP나 회사의 recursive resolver에 질의를 넘깁니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

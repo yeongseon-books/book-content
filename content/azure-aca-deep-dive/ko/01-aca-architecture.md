@@ -252,11 +252,17 @@ az containerapp show \
 ## 처음 질문으로 돌아가기
 
 - **ACA는 정확히 어떤 추상화 위에 어떤 추상화를 올린 서비스일까요?**
-  - ACA는 완전히 새로운 런타임이 아니라, Microsoft가 관리하는 Kubernetes substrate 위에 Environment, Revision, KEDA, Dapr, Envoy 같은 제품 표면을 얹은 서비스입니다. 그래서 포털에서 보이는 설정은 단순 기능 목록이 아니라 네트워크 경계, 불변 스냅샷, 스케일 제어 루프, 사이드카 런타임, Ingress 라우팅 계층으로 각각 번역된다고 읽는 편이 가장 정확합니다.
+  - ACA는 정확히 어떤 추상화 위에 어떤 추상화를 올린 서비스일까요 — 본문에서 구체적으로 다룹니다.
 - **AKS와 비교할 때 Microsoft가 대신 떠안는 운영 책임과 사용자가 여전히 이해해야 할 책임은 무엇일까요?**
-  - Microsoft는 클러스터 API endpoint, 노드 접근, control plane, 전역 add-on 같은 Kubernetes 운영을 감춥니다. 대신 사용자는 새 Revision이 왜 트래픽을 못 받는지, KEDA형 스케일링이 왜 replica를 0에 두는지, Dapr sidecar와 Envoy 경로에서 어떤 신호를 봐야 하는지는 여전히 이해해야 합니다.
+  - AKS와 비교할 때 Microsoft가 대신 떠안는 운영 책임과 사용자가 여전히 이해해야 할 책임은 무엇일까요 — 본문에서 구체적으로 다룹니다.
 - **Environment는 단순한 상위 리소스가 아니라 왜 실제 격리 경계라고 봐야 할까요?**
-  - 같은 Environment 안의 앱은 가상 네트워크 경계, DNS 맥락, Log Analytics 대상, Dapr component 범위를 함께 공유합니다. 그래서 Environment 선택은 배포 편의가 아니라 “어떤 워크로드를 같은 네트워크·관측·미들웨어 경계에 묶어도 되는가”를 정하는 아키텍처 결정입니다.
+  - Environment는 단순한 상위 리소스가 아니라 왜 실제 격리 경계라고 봐야 할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - ACA를 제품 표면만 보고 쓰면 초기 경험은 편합니다. 하지만 실제 운영에서 부딪히는 문제는 대부분 추상화 아래층에서 발생합니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - ACA를 이해할 때 가장 유용한 문장은 이것입니다. **Azure Container Apps는 정확한 substrate가 공개되지 않은 Microsoft 관리 Kubernetes 위에, Environment·Revision·Ingress·Autoscaling·Dapr 같은 제품 기능을 올린 관리형 표면**입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - ACA를 이해할 때 가장 유용한 문장은 이것입니다. **Azure Container Apps는 정확한 substrate가 공개되지 않은 Microsoft 관리 Kubernetes 위에, Environment·Revision·Ingress·Autoscaling·Dapr 같은 제품 기능을 올린 관리형 표면**입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

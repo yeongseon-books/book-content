@@ -365,11 +365,17 @@ ViT는 이미지를 patch token의 시퀀스로 바꾸고, CLIP은 그 시퀀스
 ## 처음 질문으로 돌아가기
 
 - **왜 멀티모달 입문에서 image encoder부터 이해하는 편이 전체 구조를 가장 빠르게 잡게 해 줄까요?**
-  - retrieval, zero-shot 분류, VLM adapter 입력이 모두 image encoder가 만든 표현 위에서 시작되기 때문입니다. 본문에서 본 `cls_vec = out.last_hidden_state[:, 0, :]`나 CLIP의 `get_image_features()`처럼 이미지를 어떤 벡터로 바꾸는지 이해해야 이후 검색 품질과 adapter 설계를 같은 기준으로 볼 수 있습니다.
+  - 왜 멀티모달 입문에서 image encoder부터 이해하는 편이 전체 구조를 가장 빠르게 잡게 해 줄까요 — 본문에서 구체적으로 다룹니다.
 - **ViT는 이미지를 어떤 방식으로 token sequence로 바꾸고, CNN과 무엇이 다를까요?**
-  - ViT는 224x224 이미지를 16x16 patch로 잘라 196개 token과 CLS token으로 만든 뒤 트랜스포머에 넣습니다. CNN이 receptive field를 점진적으로 키우는 것과 달리, ViT는 patch embedding과 positional embedding으로 처음부터 시퀀스처럼 다루고 최종 CLS 벡터를 이미지 표현으로 씁니다.
+  - ViT는 이미지를 어떤 방식으로 token sequence로 바꾸고, CNN과 무엇이 다를까요 — 본문에서 구체적으로 다룹니다.
 - **CLIP은 어떻게 텍스트와 이미지를 같은 embedding space에 맞추고 zero-shot을 가능하게 할까요?**
-  - CLIP은 본문 `clip_loss()` 코드처럼 image/text embedding을 정규화한 뒤 NxN similarity matrix에 InfoNCE loss를 걸어 맞는 쌍은 가깝게, 틀린 쌍은 멀게 학습합니다. 그래서 `a photo of a cat` 같은 prompt를 class vector로 써서 zero-shot 분류를 하거나, 정규화된 벡터를 FAISS `IndexFlatIP`에 넣어 텍스트로 이미지를 검색할 수 있습니다.
+  - CLIP은 어떻게 텍스트와 이미지를 같은 embedding space에 맞추고 zero-shot을 가능하게 할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 이미지 encoder를 이해하면 멀티모달 시스템의 절반이 정리됩니다. 이미지가 어떤 형태의 벡터가 되는지 알아야 그 벡터를 검색에 쓸지, 분류에 쓸지, VLM adapter의 입력으로 넣을지 설계할 수 있기 때문입니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - ViT와 CLIP을 볼 때 가장 먼저 가져가야 할 관점은 “이미지를 읽는다”가 아닙니다. 더 정확한 표현은 이미지를 토큰 또는 임베딩으로 재표현한다는 사실입니다. 이 재표현 덕분에 트랜스포머는 이미지를 텍스트와 비슷한 계산 틀 안에서 다룰 수 있습니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - ViT와 CLIP을 볼 때 가장 먼저 가져가야 할 관점은 “이미지를 읽는다”가 아닙니다. 더 정확한 표현은 이미지를 토큰 또는 임베딩으로 재표현한다는 사실입니다. 이 재표현 덕분에 트랜스포머는 이미지를 텍스트와 비슷한 계산 틀 안에서 다룰 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

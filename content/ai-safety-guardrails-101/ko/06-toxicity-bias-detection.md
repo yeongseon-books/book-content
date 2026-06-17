@@ -436,24 +436,17 @@ def false_positive_rate_by_group(y_true, y_pred, groups):
 ## 처음 질문으로 돌아가기
 
 - **독성 차단과 편향 측정은 왜 같은 문제로 묶으면 안 될까요?**
-  - 독성은 개별 응답의 즉시 피해를 다루고, 편향은 집단별 품질·노출·판정 차이를 장기적으로 다룹니다.
+  - 편향 평가는 이름 교체만으로 끝나지 않습니다. 실제 업무 문맥을 반영한 시나리오를 만들어야 의미가 있습니다.
 - **실시간 moderation과 offline audit은 각각 어떤 신호를 담당해야 할까요?**
-  - 실시간 moderation은 차단과 사용자 보호, offline audit은 demographic parity, 대표성, false positive 분포를 담당합니다.
+  - 실시간 moderation과 offline audit은 각각 어떤 신호를 담당해야 할까요 — 본문에서 구체적으로 다룹니다.
 - **false positive를 줄이면서 보호 기준을 유지하려면 무엇을 모니터링해야 할까요?**
-  - 차단율, 이의 제기, 집단별 false positive, edge case 샘플, 정책 변경 전후의 지표 변화를 함께 봐야 합니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Safety & Guardrails 101 (1/10): AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
-- [AI Safety & Guardrails 101 (2/10): Prompt Injection 방어](./02-prompt-injection-defense.md)
-- [AI Safety & Guardrails 101 (3/10): 출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
-- [AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹](./04-pii-detection-redaction.md)
-- [AI Safety & Guardrails 101 (5/10): Jailbreak 탐지](./05-jailbreak-detection.md)
-- **AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지 (현재 글)**
-- [AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증](./07-hallucination-guardrails.md)
-- [AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지](./08-rate-limiting-abuse-prevention.md)
-- [AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스](./09-audit-logging-compliance.md)
-- [AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
+  - false positive를 줄이면서 보호 기준을 유지하려면 무엇을 모니터링해야 할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 독성과 편향을 분리해 설계하면 실시간 운영 비용을 통제하면서도 평가 체계를 명확히 만들 수 있습니다. 사용자를 즉시 보호해야 하는 독성은 빠르게 막고, 장기적으로 모델 동작을 바꿔야 하는 편향은 별도 평가 파이프라인으로 측정할 수 있습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 독성은 한 번의 응답으로도 바로 피해를 만듭니다. 욕설, 위협, 혐오 표현은 사용자에게 즉시 전달되므로 inline guardrail이 필요합니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 독성은 한 번의 응답으로도 바로 피해를 만듭니다. 욕설, 위협, 혐오 표현은 사용자에게 즉시 전달되므로 inline guardrail이 필요합니다.
 
 <!-- toc:end -->
 

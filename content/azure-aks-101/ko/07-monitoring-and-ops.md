@@ -375,11 +375,17 @@ kubectl get pods -n default -o wide
 ## 처음 질문으로 돌아가기
 
 - **Container Insights는 AKS 운영에서 무엇을 가장 빠르게 보여 줄까요?**
-  - Container Insights는 노드, Pod, 컨테이너 상태를 한 화면에서 보여 주므로 “지금 클러스터가 어디서 흔들리는가”를 가장 빨리 파악하게 해 줍니다. 특히 restart 패턴이나 특정 Deployment의 불안정 징후를 본 뒤 `kubectl describe pod`나 KQL로 바로 내려가는 출발점 역할을 합니다.
+  - Container Insights는 AKS 운영에서 무엇을 가장 빠르게 보여 줄까요 — 본문에서 구체적으로 다룹니다.
 - **로그와 메트릭은 왜 같은 관측 데이터가 아니라 서로 다른 질문에 답할까요?**
-  - `ContainerLogV2`와 `KubeEvents`는 왜 실패했는지, 어느 시점에 어떤 예외가 있었는지 같은 문맥을 줍니다. 반면 `kube-state-metrics`가 보여 주는 `desired replicas`와 `available replicas`, HPA 상태, Node condition은 문제가 얼마나 오래, 얼마나 넓게 이어지는지 같은 추세를 읽게 해 줍니다.
+  - 로그와 메트릭은 왜 같은 관측 데이터가 아니라 서로 다른 질문에 답할까요 — 본문에서 구체적으로 다룹니다.
 - **Log Analytics에서 어떤 KQL 테이블과 쿼리부터 익히는 편이 좋을까요?**
-  - 입문 단계에서는 `ContainerLogV2`, `KubeEvents`, `KubePodInventory`, `KubeNodeInventory` 네 테이블부터 익히는 편이 가장 실용적입니다. 본문에 나온 `PodNamespace == "default"` 로그 조회, `PodStatus == "Failed"` 조회, 최근 이벤트 `take 50` 같은 기본 쿼리만 있어도 첫 번째 triage 루프를 충분히 돌릴 수 있습니다.
+  - Log Analytics에서 어떤 KQL 테이블과 쿼리부터 익히는 편이 좋을까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 운영 문제의 상당수는 이미 발생한 뒤에 찾는 것이 아니라, 징후를 먼저 읽는 능력에서 갈립니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - AKS 운영을 처음 정리할 때 가장 실용적인 기준은 텔레메트리 경로를 둘로 나누는 것입니다. 하나는 로그 경로이고, 다른 하나는 메트릭 경로입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - AKS 운영을 처음 정리할 때 가장 실용적인 기준은 텔레메트리 경로를 둘로 나누는 것입니다. 하나는 로그 경로이고, 다른 하나는 메트릭 경로입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

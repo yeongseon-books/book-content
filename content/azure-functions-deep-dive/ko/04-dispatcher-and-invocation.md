@@ -253,11 +253,17 @@ TotalMs=425
 ## 처음 질문으로 돌아가기
 
 - **dispatcher는 한 번의 invocation을 어떤 단계로 나눠 처리할까요?**
-  - 한 번의 invocation은 트리거 감지 뒤 `WorkerFunctionInvoker`가 `ScriptInvocationContext`를 만들고, dispatcher가 그것을 `InvocationRequest`로 직렬화해 워커별 outbound 채널로 보내는 단계로 나뉩니다. 이후 워커 응답은 inbound 채널로 돌아와 `invocation_id`로 원래 `TaskCompletionSource`를 깨우고, 마지막에 SDK가 큐 삭제나 HTTP 응답 같은 후속 처리를 마칩니다.
+  - dispatcher는 한 번의 invocation을 어떤 단계로 나눠 처리할까요 — 본문에서 구체적으로 다룹니다.
 - **invocation context는 어디서 만들어지고 누가 해제할까요?**
-  - invocation context는 out-of-proc 경로에서 `WorkerFunctionInvoker`가 만들고, 그 안에 함수 메타데이터, 입력 데이터, trace context, 취소 토큰, 결과를 기다릴 `TaskCompletionSource`까지 담깁니다. 해제도 별도 마법이 아니라 워커 응답이 `invocation_id`로 매칭되어 해당 `TaskCompletionSource`가 완료될 때 자연스럽게 호출 수명주기가 닫히는 방식입니다.
+  - invocation context는 어디서 만들어지고 누가 해제할까요 — 본문에서 구체적으로 다룹니다.
 - **`maxConcurrentRequests`, `batchSize` 같은 동시성 제어는 어디에서 실제로 영향을 줄까요?**
-  - `batchSize`는 트리거 listener 앞단에서 한 번에 읽어오는 작업량을 바꾸고, `maxConcurrentRequests`는 HTTP 요청 동시 처리 상한에 걸립니다. 반면 워커 수와 `WorkerChannelThrottleProvider`는 invocation이 워커 채널로 밀려나기 직전 병렬성을 조절하므로, 같은 동시성 설정처럼 보여도 실제 영향을 주는 계층이 서로 다릅니다.
+  - `maxConcurrentRequests`, `batchSize` 같은 동시성 제어는 어디에서 실제로 영향을 줄까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - Azure Functions는 다양한 트리거를 지원하지만, 워커로 넘어가는 순간에는 모두 같은 invocation 파이프라인으로 정규화됩니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - Azure Functions invocation은 “트리거가 함수를 호출한다”는 한 문장보다 더 구체적인 경로를 가집니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - Azure Functions invocation은 “트리거가 함수를 호출한다”는 한 문장보다 더 구체적인 경로를 가집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

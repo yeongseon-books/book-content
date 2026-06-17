@@ -437,11 +437,17 @@ def test_relationship_contract(session: Session):
 ## 처음 질문으로 돌아가기
 
 - **`ForeignKey`와 `relationship()`은 왜 항상 한 쌍처럼 이해해야 할까요?**
-  - `ForeignKey("users.id")`는 SQL 레벨에서 어떤 컬럼이 부모를 가리키는지 알려 주고, `relationship()`은 그 위에 `user.orders`와 `order.user` 같은 객체 탐색 통로를 만듭니다. 두 정의가 함께 있어야 ORM이 JOIN 경로를 이해하고, `user.orders.append(order)`와 `order.user = user`가 같은 관계로 동기화됩니다.
+  - `ForeignKey`와 `relationship()`은 왜 항상 한 쌍처럼 이해해야 할까요 — 본문에서 구체적으로 다룹니다.
 - **`back_populates`와 `backref`는 어떤 기준으로 선택할까요?**
-  - 이 글의 기준에서는 양쪽 속성을 모두 코드에 드러내고 타입 힌트와 옵션을 명시할 수 있는 `back_populates`가 기본 선택입니다. `backref`는 짧지만 반대편 정의가 숨어 버려 `order_by`, `cascade`, `lazy` 같은 옵션이 복잡해질수록 유지보수성이 떨어집니다.
+  - `back_populates`와 `backref`는 어떤 기준으로 선택할까요 — 본문에서 구체적으로 다룹니다.
 - **컬렉션 조작, flush, SQL 실행 시점은 어떻게 연결될까요?**
-  - `alice.orders.append(Order(amount=100))` 같은 컬렉션 조작은 즉시 SQL을 보내지 않고 세션에 변경만 기록해 두었다가 commit 직전에 부모와 자식 INSERT 순서를 맞춰 발사합니다. 또한 `cascade="all, delete-orphan"`를 켜 두면 컬렉션에서 제거된 주문이 실제 DELETE로 이어져, 본문의 orphan 삭제 테스트처럼 관계 계약을 코드와 데이터 양쪽에서 지킬 수 있습니다.
+  - 컬렉션 조작, flush, SQL 실행 시점은 어떻게 연결될까요 — 본문에서 구체적으로 다룹니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - > `ForeignKey`는 SQL 레벨의 참조이고, `relationship()`은 객체 레벨의 탐색 통로입니다. `back_populates`는 양방향 통로의 두 끝을 연결해 "한쪽에서 바뀐 컬렉션이 다른 쪽에서도 즉시 반영"되게 만드는 장치입니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 먼저 SQL 레벨의 외래키를 정의해야 객체 레벨의 관계가 의미를 갖습니다.
+- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 매번 새 SELECT를 작성해야 하고, 부모-자식 관계가 코드에 드러나지 않습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

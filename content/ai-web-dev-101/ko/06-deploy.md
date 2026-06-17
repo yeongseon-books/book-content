@@ -457,11 +457,17 @@ AI 앱은 정상 동작 중에도 비용이 급증할 수 있으므로 일일 �
 ## 처음 질문으로 돌아가기
 
 - **배포는 단순 업로드가 아니라 무엇을 준비하는 과정일까요?**
-  - 배포는 코드 파일을 올리는 일이 아니라 `requirements.txt`와 `package.json`, 시작 명령, 포트, 환경 변수, 검증 시나리오를 실행 환경 기준으로 고정하는 과정입니다. 본문에서 `python3 -m pytest tests`, `npm run lint`, `npm run build`, `python3 scripts/check_env_required.py --env-file .env.production.example`를 배포 전 공통 점검으로 둔 이유가 여기에 있습니다. 즉 업로드보다 중요한 것은 "서버가 무엇을 어떻게 실행해야 하는지"를 미리 결정하는 일입니다.
+  - 내 컴퓨터에서는 `python app.py`나 `npm run dev`만으로 쉽게 실행되던 코드가, 서버에서는 그대로 되지 않는 경우가 많습니다.
 - **Next.js 앱과 Python 백엔드는 어떤 플랫폼에 먼저 올리는 편이 좋을까요?**
-  - 화면 중심 Next.js 앱은 Vercel에, `gunicorn app.main:app -k uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000 --timeout 120`처럼 런타임 제어가 필요한 Python API는 Azure App Service에 두는 구성이 가장 자연스럽다고 정리했습니다. 그래서 `NEXT_PUBLIC_API_BASE_URL`, `AI_MODEL`은 Vercel 쪽 예시로, `OPENAI_API_KEY`, `LOG_LEVEL`, startup command는 Azure 쪽 예시로 나눠 설명했습니다. 둘을 같이 쓰는 구조도 프론트와 백엔드의 운영 성격이 다르기 때문에 나온 선택입니다.
+  - 입문 단계에서 자주 만나는 선택지는 Vercel과 Azure App Service입니다. 어느 쪽이 절대적으로 낫다기보다, 앱의 성격에 따라 맞는 쪽이 다릅니다.
 - **Vercel에서는 무엇을 가장 먼저 확인해야 할까요?**
-  - 가장 먼저 볼 것은 `OPENAI_API_KEY` 같은 환경 변수가 실제 배포 환경에 들어갔는지와 빌드 로그에서 의존성·타입 오류가 없는지입니다. 배포 후에는 `[프로젝트명].vercel.app`이 뜨는지만 보지 말고, `Functions > app/api/chat/route.ts > maxDuration=30`, `vercel env add OPENAI_API_KEY production`, 그리고 실제 사용자 경로의 첫 요청·긴 요청·실패 요청까지 확인해야 합니다. 이 글이 Vercel 배포 직후 24시간 점검 시나리오를 따로 둔 이유도 바로 그 검증 순서를 고정하기 위해서였습니다.
+  - Vercel에서는 무엇을 가장 먼저 확인해야 할까요 — 본문에서 구체적으로 다룹니다.
+- **배포를 왜 따로 생각해야 하나에서 가장 흔한 실수는 무엇일까요?**
+  - 내 컴퓨터에서는 `python app.py`나 `npm run dev`만으로 쉽게 실행되던 코드가, 서버에서는 그대로 되지 않는 경우가 많습니다.
+- **어떤 플랫폼을 고를까을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 입문 단계에서 자주 만나는 선택지는 Vercel과 Azure App Service입니다. 어느 쪽이 절대적으로 낫다기보다, 앱의 성격에 따라 맞는 쪽이 다릅니다.
+- **Azure App Service에 Python 앱 배포하기의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - Python Flask나 FastAPI 앱이라면 Azure App Service가 좋은 선택입니다. 다만 Vercel보다 자동 추론이 적기 때문에, 시작 명령과 앱 설정을 더 명시적으로 잡아 줄 필요가 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

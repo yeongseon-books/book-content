@@ -247,11 +247,17 @@ DB 커넥션 풀, 외부 API rate limit, Redis 연결 수는 Functions 인스턴
 ## 처음 질문으로 돌아가기
 
 - **Functions scale controller는 어떤 신호를 보고 인스턴스를 추가할까요?**
-  - scale controller는 트리거 종류에 맞는 수요 신호를 보고 인스턴스를 늘립니다. HTTP에서는 요청 압력과 인스턴스당 concurrency가 중요하고, 큐 계열에서는 backlog·batch·prefetch 같은 값이 더 직접적인 신호가 되므로, 같은 앱이라도 어떤 트리거가 병목을 만들었는지 먼저 봐야 합니다.
+  - Functions scale controller는 어떤 신호를 보고 인스턴스를 추가할까요 — 본문에서 구체적으로 다룹니다.
 - **콜드 스타트는 정확히 어느 단계에서 발생하고, 무엇을 측정해야 볼 수 있을까요?**
-  - cold start는 새 인스턴스 할당, Host 초기화, Worker 시작, import와 전역 초기화, 첫 호출 처리까지의 합입니다. 그래서 `InstanceCount`, `FunctionExecutionUnits`, App Insights 지연 분포와 함께 `create_cosmos_client()` 같은 초기화 경로가 첫 요청 시간을 얼마나 키우는지도 같이 봐야 정확합니다.
+  - 콜드 스타트는 정확히 어느 단계에서 발생하고, 무엇을 측정해야 볼 수 있을까요 — 본문에서 구체적으로 다룹니다.
 - **Premium의 Always Ready나 Flex의 always-ready 인스턴스는 콜드 스타트를 어디까지 줄여 줄까요?**
-  - 이 설정들은 새 인스턴스와 Host 준비 비용을 앞당겨 두어 첫 호출 지연을 줄여 줍니다. 다만 `Always Ready`나 always-ready 인스턴스가 있어도 큰 import, 느린 전역 초기화, 첫 DB 연결 생성까지 대신 없애 주는 것은 아니므로, 플랜 설정과 코드 초기화를 같이 다뤄야 합니다.
+  - Premium의 Always Ready나 Flex의 always-ready 인스턴스는 콜드 스타트를 어디까지 줄여 줄까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 스케일링과 콜드 스타트는 Azure Functions에서 가장 많이 회자되지만, 동시에 가장 자주 단순화되는 주제입니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - Azure Functions의 스케일링은 한 단어가 아닙니다. **수평 스케일링(scale out)** 과 **인스턴스 내부 동시성(in-instance concurrency)** 이라는 두 축을 함께 봐야 합니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - Azure Functions의 스케일링은 한 단어가 아닙니다. **수평 스케일링(scale out)** 과 **인스턴스 내부 동시성(in-instance concurrency)** 이라는 두 축을 함께 봐야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -431,11 +431,17 @@ print(engine.pool.status())
 ## 처음 질문으로 돌아가기
 
 - **`Engine`은 정확히 무엇이고, `Connection`과 어떻게 역할을 나눌까요?**
-  - `Engine`은 dialect, URL, pool 설정을 들고 있는 lazy factory이고, 실제 SQL이 흐르는 통로는 `Connection`입니다. 글의 예시처럼 `create_engine("sqlite:///app.db")` 시점에는 아직 연결이 열리지 않고, `engine.connect()`나 `engine.begin()`에 들어갈 때 DBAPI `sqlite3.Connection`이 실제로 만들어집니다.
+  - `Engine`은 정확히 무엇이고, `Connection`과 어떻게 역할을 나눌까요 — 본문에서 구체적으로 다룹니다.
 - **SQLAlchemy 2.x가 트랜잭션을 더 명시적으로 다루는 이유는 무엇일까요?**
-  - 2.x는 `engine.execute(...)`를 없애고 모든 실행을 `Connection`과 트랜잭션 경계 안으로 밀어 넣어, INSERT 후 `commit()` 누락 같은 실수를 드러내도록 바꿨습니다. 본문에서 본 `BEGIN (implicit)`와 `COMMIT` 로그를 읽을 수 있어야 데이터가 왜 반영되거나 롤백됐는지 바로 설명할 수 있습니다.
+  - Engine과 Connection을 이해했다는 말은 결국 로그 한 줄만 보고 현재 상태를 설명할 수 있다는 뜻입니다. 아래 예시는 `echo=True`에서 실제로 자주 보게 되는 출력이며, 각 줄이 무엇을 의미하는지 짚어 둡니다.
 - **`connect()`와 `begin()`은 언제 구분해서 써야 할까요?**
-  - 순수 조회처럼 commit이 필요 없는 흐름은 `engine.connect()`가 맞고, `INSERT`, `CREATE TABLE`, PRAGMA 적용처럼 쓰기가 섞인 작업은 `engine.begin()`이 기본값입니다. 본문의 `users` 테이블 생성과 다건 INSERT 예제처럼 예외 시 자동 rollback까지 원하면 `begin()`이 더 안전합니다.
+  - `connect()`와 `begin()`은 언제 구분해서 써야 할까요 — 본문에서 구체적으로 다룹니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - SQLAlchemy의 Engine은 "데이터베이스와 통신할 수 있는 능력 그 자체를 객체화한 것"입니다. Connection 객체가 실제 통신 채널이고, Engine은 그 채널을 만들 수 있는 권한과 설정을 들고 있는 factory입니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - SQLAlchemy는 두 개의 큰 계층으로 이루어져 있습니다. **Core**는 SQL을 Python 표현식으로 빌드하고 Engine/Connection으로 실행하는 계층입니다.
+- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 문제: connection lifecycle을 사람이 관리해야 하고, transaction 경계가 모호하며, parameter binding 형식이 driver마다 다릅니다(`?`, `%s`, `:name` 등).
 
 <!-- toc:begin -->
 ## 시리즈 목차

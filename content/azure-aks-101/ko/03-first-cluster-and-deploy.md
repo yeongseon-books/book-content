@@ -489,11 +489,17 @@ kubectl get events -A --sort-by=.lastTimestamp
 ## 처음 질문으로 돌아가기
 
 - **실습용 AKS 클러스터를 만들 때 최소한 무엇을 결정해야 할까요?**
-  - 최소한 `RESOURCE_GROUP`, `LOCATION`, `CLUSTER_NAME`, `USER_POOL`과 `az aks create --node-count 1`로 시작할 노드 규모는 정해야 합니다. 이후 `--generate-ssh-keys`, 레지스트리 위치, 그리고 `LoadBalancer`로 공개할지 `ClusterIP + Ingress`로 갈지도 같이 잡아야 배포 흐름이 흔들리지 않습니다.
+  - 실습용 AKS 클러스터를 만들 때 최소한 무엇을 결정해야 할까요 — 본문에서 구체적으로 다룹니다.
 - **기본 system pool 외에 user node pool을 왜 별도로 추가하는 편이 좋을까요?**
-  - 본문 예시의 `nodeSelector: kubernetes.azure.com/mode: user`처럼 앱 Pod를 user pool에 올리면 system pool과 역할이 분리됩니다. `az aks nodepool add --mode User`를 먼저 밟아 두면 이후 `fastapi-hello` Deployment가 어디에 배치되어야 하는지와 운영 기준이 함께 선명해집니다.
+  - 기본 system pool 외에 user node pool을 왜 별도로 추가하는 편이 좋을까요 — 본문에서 구체적으로 다룹니다.
 - **`az aks get-credentials` 이후 `kubectl`이 실제로 어떤 계층과 대화하게 될까요?**
-  - `az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME` 이후의 `kubectl`은 Azure CLI가 아니라 Kubernetes API와 대화합니다. 그래서 `kubectl apply -f fastapi-hello.yaml`, `kubectl get deployments`, `kubectl get service fastapi-hello`는 클러스터 안 원하는 상태와 실제 배치 결과를 확인하는 단계입니다.
+  - `az aks get-credentials` 이후 `kubectl`이 실제로 어떤 계층과 대화하게 될까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - AKS를 배울 때 가장 위험한 상태는 용어만 아는 상태입니다. Deployment가 무엇인지, Service가 무엇인지, node pool이 무엇인지는 설명할 수 있지만, 실제로는 어떤 순서로 만들고 어떤 명령으로 확인하며 어디에서 문제가 나는지 감이 없는 상태입니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - AKS 첫 배포에서 가장 먼저 잡아야 할 기준은 도구 구분입니다. `az`는 Azure Resource Manager 쪽에서 클러스터와 노드 풀 같은 리소스를 만듭니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - AKS 첫 배포에서 가장 먼저 잡아야 할 기준은 도구 구분입니다. `az`는 Azure Resource Manager 쪽에서 클러스터와 노드 풀 같은 리소스를 만듭니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

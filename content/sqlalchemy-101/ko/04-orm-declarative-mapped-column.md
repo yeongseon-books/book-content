@@ -425,11 +425,17 @@ target_metadata = Base.metadata
 ## 처음 질문으로 돌아가기
 
 - **`DeclarativeBase`는 어떤 역할을 하고 왜 `MetaData`와 함께 묶일까요?**
-  - `DeclarativeBase`는 ORM 모델들의 공통 부모이면서 `Base.metadata`를 품은 그릇이라서, 모델 클래스를 선언하는 순간 내부 `Table`이 같은 카탈로그에 등록됩니다. 그래서 ORM으로 정의한 `User`와 `Order`도 결국 `Base.metadata.create_all(engine)` 한 번으로 생성되며, naming convention도 이 지점에서 함께 통일됩니다.
+  - `DeclarativeBase`는 어떤 역할을 하고 왜 `MetaData`와 함께 묶일까요 — 본문에서 구체적으로 다룹니다.
 - **`Mapped[T]`와 `mapped_column`은 타입 힌트, 컬럼 정의와 어떻게 연결될까요?**
-  - `Mapped[int] = mapped_column(primary_key=True)`는 파이썬 타입 힌트와 SQL 컬럼 정의를 한 줄에 묶어 주고, `Mapped[str | None]`처럼 `None`이 포함되면 nullable 의도도 함께 드러납니다. 본문에서 `email`, `nickname`, `String(255)` 예시로 보여 준 것처럼, ORM 모델 정의가 사실상 Core `Column(...)`을 더 읽기 좋게 감싼 형태입니다.
+  - `Mapped[T]`와 `mapped_column`은 타입 힌트, 컬럼 정의와 어떻게 연결될까요 — 본문에서 구체적으로 다룹니다.
 - **`__tablename__`, `__table_args__`, `repr`는 언제부터 필요해질까요?**
-  - `__tablename__`은 자동 추론에 맡기지 않고 테이블 이름을 고정할 때 바로 필요하고, `__table_args__`는 `UniqueConstraint`, `Index`, `sqlite_autoincrement` 같은 제약을 모델 옆에 명시할 때 중요해집니다. `__repr__`은 `User(id=..., email=...)`처럼 객체 로그를 바로 읽게 해 주므로, Session과 디버깅이 많아지는 순간부터 비용 대비 효과가 큽니다.
+  - `__tablename__`, `__table_args__`, `repr`는 언제부터 필요해질까요 — 본문에서 구체적으로 다룹니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - > ORM 모델 클래스는 "파이썬 클래스 + Core `Table`"의 결합입니다. `DeclarativeBase`는 그 바인딩의 그릇(`MetaData`)이고, `mapped_column`은 그 안에 들어갈 `Column`을 타입 힌트로부터 만들어 주는 헬퍼입니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 2.x에서 ORM 베이스 클래스는 다음 한 줄로 충분합니다.
+- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 차이는 두 가지입니다. 첫째, `users_list`의 원소가 dict-like Row가 아니라 `User` 인스턴스입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

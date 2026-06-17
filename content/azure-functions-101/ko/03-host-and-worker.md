@@ -248,11 +248,17 @@ python ... azure_functions_worker ...
 ## 처음 질문으로 돌아가기
 
 - **Functions Host와 언어 Worker는 왜 같은 프로세스가 아니라 분리된 프로세스일까요?**
-  - Host가 `CPython`, `V8`, `JVM`을 한 프로세스 안에 직접 품는 대신, Azure Functions는 Host와 언어 Worker를 분리해 언어별 런타임 충돌을 줄입니다. 그래서 Host는 트리거와 바인딩, 스케일 신호를 맡고 실제 사용자 코드는 `azure_functions_worker` 같은 별도 프로세스에서 실행됩니다.
+  - Functions Host와 언어 Worker는 왜 같은 프로세스가 아니라 분리된 프로세스일까요 — 본문에서 구체적으로 다룹니다.
 - **Host와 Worker 사이의 gRPC 채널에서는 어떤 메시지 흐름이 오갈까요?**
-  - Host는 트리거를 감지한 뒤 함수 이름, 입력 페이로드, 바인딩 해석 결과를 gRPC로 Worker에 넘깁니다. Worker는 그 호출을 실행한 뒤 반환값과 예외, 로그 신호를 다시 Host로 돌려주므로, `func start --verbose`에서 보이는 초기화 메시지와 실제 함수 호출은 이 채널 위에서 이어집니다.
+  - Host와 Worker 사이의 gRPC 채널에서는 어떤 메시지 흐름이 오갈까요 — 본문에서 구체적으로 다룹니다.
 - **한 Worker 프로세스는 동시에 몇 개의 함수 호출을 처리할 수 있을까요?**
-  - Python Worker는 단순히 “항상 한 번에 하나”로 끝나지 않습니다. 동기 `def`는 thread pool에서 겹칠 수 있고, `async def`는 하나의 event loop를 공유하며, 필요하면 `FUNCTIONS_WORKER_PROCESS_COUNT`와 `host.json`의 `maxConcurrentRequests` 같은 설정으로 인스턴스 내부 동시성을 더 조절할 수 있습니다.
+  - 한 Worker 프로세스는 동시에 몇 개의 함수 호출을 처리할 수 있을까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - Azure Functions를 처음 배울 때는 Host와 Worker를 몰라도 로컬에서 코드를 실행하는 데 큰 어려움이 없습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - Azure Functions의 핵심 실행 모델은 단순합니다. **Host는 함수를 언제 실행할지, 어떤 입력을 줄지, 어떤 바인딩을 적용할지를 책임지고, Worker는 실제 사용자 함수를 해당 언어 런타임에서 실행합니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - Azure Functions의 핵심 실행 모델은 단순합니다. **Host는 함수를 언제 실행할지, 어떤 입력을 줄지, 어떤 바인딩을 적용할지를 책임지고, Worker는 실제 사용자 함수를 해당 언어 런타임에서 실행합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

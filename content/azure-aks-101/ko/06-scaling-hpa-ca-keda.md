@@ -374,11 +374,17 @@ az aks nodepool update \
 ## 처음 질문으로 돌아가기
 
 - **HPA, Cluster Autoscaler, KEDA는 각각 어떤 신호를 보고 무엇을 바꿀까요?**
-  - `HorizontalPodAutoscaler`는 `averageUtilization: 60` 같은 메트릭을 보고 `fastapi-hello`의 replica 수를 바꿉니다. Cluster Autoscaler는 `az aks nodepool update --min-count 2 --max-count 10`처럼 Node Pool 범위를 조절하고, KEDA는 `ScaledObject`의 `queueName: orders`, `messageCount: "5"` 같은 외부 이벤트를 HPA 경로로 번역합니다.
+  - HPA, Cluster Autoscaler, KEDA는 각각 어떤 신호를 보고 무엇을 바꿀까요 — 본문에서 구체적으로 다룹니다.
 - **CPU나 메모리 기반 HPA만으로 부족한 상황은 언제일까요?**
-  - 수요의 진짜 신호가 CPU가 아니라 큐 backlog일 때는 HPA만으로 부족합니다. 본문처럼 `azure-servicebus` 트리거와 `minReplicaCount: 0`, `maxReplicaCount: 20`을 둔 `ScaledObject`가 필요한 이유가 바로 주문 큐 `orders`의 길이가 HTTP CPU 사용률보다 더 정확한 압력이기 때문입니다.
+  - CPU나 메모리 기반 HPA만으로 부족한 상황은 언제일까요 — 본문에서 구체적으로 다룹니다.
 - **Pod는 늘어났는데 응답이 바로 좋아지지 않는 이유는 어디에 있을까요?**
-  - HPA가 replica를 올려도 새 Pod가 바로 `Ready`가 되는 것은 아닙니다. `kubectl get hpa -w` 뒤에 `0/2 nodes are available`, `Insufficient cpu`, Pending Pod, node expansion, probe 통과가 차례로 이어질 수 있어서, Pod 증가와 응답 개선 사이에는 항상 시간차가 생깁니다.
+  - Pod는 늘어났는데 응답이 바로 좋아지지 않는 이유는 어디에 있을까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 스케일링은 AKS에서 가장 쉽게 오해되는 운영 주제 중 하나입니다. CPU가 높으니 HPA만 켜면 된다고 생각하기 쉽지만, 실제로는 새 Pod를 놓을 노드 자리가 없어서 Pending이 쌓일 수 있습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 세 스케일러를 한 번에 외우기보다, 먼저 세 가지 질문으로 나누는 편이 좋습니다. 어떤 신호를 보는가, 무엇을 늘리거나 줄이는가, 어느 계층에서 동작하는가. 이 세 질문을 붙이면 HPA는 Pod 레벨, Cluster Autoscaler는 Node Pool 레벨, KEDA는 외부 이벤트를 Pod autoscaling 경로로 번역하는 레벨이라는 구조가 자연스럽게 드러납니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 세 스케일러를 한 번에 외우기보다, 먼저 세 가지 질문으로 나누는 편이 좋습니다. 어떤 신호를 보는가, 무엇을 늘리거나 줄이는가, 어느 계층에서 동작하는가. 이 세 질문을 붙이면 HPA는 Pod 레벨, Cluster Autoscaler는 Node Pool 레벨, KEDA는 외부 이벤트를 Pod autoscaling 경로로 번역하는 레벨이라는 구조가 자연스럽게 드러납니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

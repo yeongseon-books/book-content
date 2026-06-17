@@ -425,13 +425,17 @@ LangChain의 `EvaluatorType`과 `load_evaluator()`는 QA, criteria, exact match 
 ## 처음 질문으로 돌아가기
 
 - **RAGAS 평가는 왜 데이터셋 열 설계가 곧 평가 가능 범위를 결정할까요?**
-  질문, 답변, contexts, ground truth 같은 열이 있어야 특정 메트릭을 계산할 수 있으므로, 열 설계가 곧 평가 가능한 품질 범위를 정합니다.
-
+  - RAGAS를 처음 볼 때 가장 중요한 오해 하나를 먼저 걷어내야 합니다. RAGAS는 “답변 문자열 하나를 받아 좋은지 나쁜지 말해 주는 채점기”가 아닙니다.
 - **Faithfulness는 답변이 그럴듯한지가 아니라 무엇을 근거와 대조할까요?**
-  Faithfulness는 답변을 주장 단위로 쪼개고 각 주장이 제공된 근거에서 지지되는지 확인합니다. 문장이 자연스러운지는 별도 문제가 아닙니다.
-
+  - RAGAS에서 RAG다운 메트릭을 하나만 꼽으라면 많은 팀이 faithfulness를 먼저 봅니다.
 - **품질 게이트를 CI나 운영에 넣을 때 어떤 실패를 차단해야 할까요?**
-  근거 없는 답변, 낮은 faithfulness, 회귀된 retrieval 품질, 기준 이하 점수 변동은 CI나 운영 배포 게이트에서 막아야 합니다.
+  - 이제 중요한 마지막 질문이 남습니다. 점수를 계산하는 것과, 그 점수로 시스템 변화를 막아 세우는 것은 다릅니다.
+- **최소 실행 예제에서 가장 흔한 실수는 무엇일까요?**
+  - 예제 파일: `en/06-evaluation-and-quality-gates/main.py`
+- **소스 버전을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 글의 RAGAS 코드는 설치 가능한 [`ragas==0.1.22`](https://pypi.org/project/ragas/0.1.22/) 기준이고, LangChain 코드는 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다.
+- **3. Answer Relevancy: 역질문 생성은 정확도가 아니라 초점도를 잰다의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - faithfulness가 “근거 안에서만 말했는가”를 본다면, answer relevancy는 다른 질문을 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

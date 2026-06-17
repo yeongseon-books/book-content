@@ -439,11 +439,17 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **언제 Alembic revision graph가 branch로 갈라질까요?**
-  - 같은 `down_revision`을 부모로 두고 Alice의 `D`와 Bob의 `E`처럼 두 revision이 동시에 생기면 graph가 갈라지고 `alembic heads`에 head가 두 개 보입니다. 본문에서 `Multiple head revisions are present` 오류가 나는 이유도 그 동시 생성 때문입니다.
+  - `alembic merge`로 생성된 파일은 변경이 없어 보여서 대충 넘어가기 쉽습니다. 그래도 다음은 반드시 확인해야 합니다.
 - **`branch_labels`와 `depends_on`은 각각 정확히 무슨 역할일까요?**
-  - `branch_labels = ("billing",)`는 이 revision이 어느 branch에 속하는지 이름을 붙이고, `depends_on = ("e7f8...")`는 다른 branch의 특정 revision이 먼저 필요하다는 뜻입니다. 둘 다 일반적인 팀 개발에서는 자주 쓰지 않지만, cross-branch 의존성을 문서화해야 할 때는 분명한 표식이 됩니다.
+  - `branch_labels`와 `depends_on`은 각각 정확히 무슨 역할일까요 — 본문에서 구체적으로 다룹니다.
 - **두 개의 head를 `alembic merge`로 어떻게 합칠까요?**
-  - `alembic merge -m "merge billing and audit branches" d1e2... e7f8...`를 실행하면 `down_revision`이 튜플인 merge revision이 하나 생성됩니다. 그 revision의 `upgrade()`와 `downgrade()`가 `pass`여도 graph는 다시 단일 head로 닫힙니다.
+  - 두 개의 head를 `alembic merge`로 어떻게 합칠까요 — 본문에서 구체적으로 다룹니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - > alembic revision graph는 git과 같은 **DAG(directed acyclic graph)**입니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 상태에서 `alembic heads`를 실행하면 두 개의 head가 보입니다.
+- **변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이 상태에서 `alembic heads`를 실행하면 두 개의 head가 보입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

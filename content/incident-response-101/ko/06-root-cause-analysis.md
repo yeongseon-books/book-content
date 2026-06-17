@@ -408,25 +408,17 @@ RCA 품질은 원인 문장보다 검증 문장에서 더 잘 드러납니다.
 ## 처음 질문으로 돌아가기
 
 - **incident의 진짜 원인은 어떻게 찾아야 할까요?**
-  - 본문에서 강조했듯이 "장애가 난 컴포넌트"에서 멈추지 말고, 그 컴포넌트가 그 시점에 그렇게 동작한 이유를 묻는 식으로 한 단계씩 거슬러 올라가야 합니다. 보통은 코드 한 줄이 아니라 검증되지 않은 가정, 빠진 알람, 누락된 운영 절차 같은 시스템 수준의 약점에 도달했을 때 더 이상 새로운 답이 나오지 않는 지점이 진짜 root cause입니다.
+  - incident의 진짜 원인은 어떻게 찾아야 할까요 — 본문에서 구체적으로 다룹니다.
 - **왜 5 Whys가 여전히 유용할까요?**
-  - 본문에서 본 것처럼 5 Whys는 도구가 단순해서 누구나 즉시 쓸 수 있고, "왜?"를 반복하는 동안 책임을 사람에서 시스템·프로세스로 자연스럽게 옮겨 줍니다. 다섯 번이 절대 숫자는 아니지만, 두세 번에서 멈추면 표면 원인에 머물고, 너무 깊게 가면 답이 추상화되기 때문에 약 다섯 번이 실무에서 합리적인 깊이라는 경험적 지점입니다.
+  - 왜 5 Whys가 여전히 유용할까요 — 본문에서 구체적으로 다룹니다.
 - **trigger와 root cause는 어디서 갈릴까요?**
-  - 본문 구분처럼 trigger는 "사건을 그 순간 터뜨린 직접적인 자극"(특정 배포, 트래픽 스파이크, 특정 입력)이고, root cause는 "그 trigger가 들어왔을 때 시스템이 견디지 못하게 만든 구조적 약점"입니다. 같은 trigger라도 다른 시스템에서는 incident가 안 되기 때문에, trigger만 막는 대응은 같은 종류의 다른 trigger에 그대로 다시 터집니다.
-  - 근본 원인 하나가 아니라 여러 원인이 함께 작용한 경우가 대부분입니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [Incident Response 101 (1/10): Incident란 무엇인가?](./01-what-is-incident.md)
-- [Incident Response 101 (2/10): Severity 분류](./02-severity.md)
-- [Incident Response 101 (3/10): 초기 대응](./03-initial-response.md)
-- [Incident Response 101 (4/10): Communication](./04-communication.md)
-- [Incident Response 101 (5/10): Timeline 작성](./05-timeline.md)
-- **Incident Response 101 (6/10): Root Cause Analysis (현재 글)**
-- [Incident Response 101 (7/10): Mitigation과 Resolution](./07-mitigation-and-resolution.md)
-- [Incident Response 101 (8/10): Postmortem](./08-postmortem.md)
-- [Incident Response 101 (9/10): 재발 방지](./09-prevention.md)
-- [Incident Runbook 만들기](./10-incident-runbook.md)
+  - 예를 들어 새 배포 직후 결제 장애가 났다고 가정해 보겠습니다. 이때 “배포가 원인”이라고 적는 것은 trigger 수준 설명에 가깝습니다. 조금 더 내려가 보면 이렇게 정리할 수 있습니다.
+- **왜 이 주제가 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - trigger만 고치면 같은 root cause는 다음 incident에서 다시 터집니다. 예를 들어 특정 배포가 장애를 일으켰다고 해도, 실제 root cause는 보호 장치 없는 배포 프로세스, 부족한 검증, 취약한 기본값일 수 있습니다.
+- **한눈에 보는 구조을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 흐름에서 핵심은 한 번 더 묻는 습관입니다. 처음 눈에 보이는 설명에서 멈추지 않고, 왜 그 설명이 가능했는지 계속 내려가야 root cause에 가까워집니다.
+- **전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이전: trigger를 곧바로 root cause로 적습니다.
 
 <!-- toc:end -->
 

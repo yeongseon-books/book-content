@@ -457,18 +457,22 @@ class StripeAdapterWithErrorTranslation:
 
 ## 정리
 
-이 글은 design-patterns-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
+이 글에서 다룬 핵심은 세 가지입니다. 첫째 Adapter를 두면 정확히 어떤 의존성이 끊어질, 둘째 Anti-Corruption Layer와 Adapter는 같은 것일까요, 다른 것일, 셋째 Adapter가 많아지면 어떤 비용이 쌓일입니다. 외부 SDK를 도메인이 원하는 모양으로 바꾸기에서 시작해 실무 적용까지 이어지는 흐름을 따라가면 이 주제의 전체 그림이 잡힙니다.
 
 ## 처음 질문으로 돌아가기
 
 - **Adapter를 두면 정확히 어떤 의존성이 끊어질까요?**
-  - 도메인 모듈이 외부 SDK 패키지를 직접 import하는 의존성이 끊어집니다. 본문의 의존 그래프에서 본 것처럼, Adapter 도입 전에는 세 모듈이 모두 `stripe`에 의존했지만 도입 후에는 Adapter 한 파일만 의존합니다. 변경 영향 범위가 수렴하고, 테스트에서 Fake를 주입할 이음새가 생깁니다.
-
+  - Adapter가 없을 때 의존 그래프는 이렇습니다.
 - **Anti-Corruption Layer와 Adapter는 같은 것일까요, 다른 것일까요?**
-  - ACL은 DDD의 전략적 개념이고, Adapter는 그 개념을 구현하는 전술적 수단입니다. 단순 Adapter는 시그니처만 맞추지만, ACL로서의 Adapter는 외부 모델의 개념 자체가 내부로 침투하지 못하게 막습니다. 본문의 `ExternalPaymentAdapter`가 `sts`를 `success: bool`로 재해석한 것이 그 차이입니다.
-
+  - Domain-Driven Design에서 Anti-Corruption Layer(ACL)는 외부 바운디드 컨텍스트의 모델이 내부 도메인을 오염시키지 못하게 막는 번역 계층입니다. Adapter는 이 ACL을 구현하는 가장 흔한 수단입니다.
 - **Adapter가 많아지면 어떤 비용이 쌓일까요?**
-  - 호출 경로가 길어져 디버깅 시간이 늘고, 프로토콜 불일치를 감출 위험이 생기며, Adapter 자체가 비대해지면 경계의 의미가 사라집니다. 저는 메서드 5개 초과, 내부 조건 분기, Adapter 간 호출을 경고 신호로 삼아 관리합니다.
+  - Adapter는 공짜가 아닙니다. 프로젝트에 Adapter가 쌓이면 다음 비용이 누적됩니다.
+- **외부 SDK를 도메인이 원하는 모양으로 바꾸기에서 가장 흔한 실수는 무엇일까요?**
+  - Adapter의 핵심은 한 문장입니다. **도메인이 외부 SDK의 언어를 배우지 않게 만드는 것.** 도메인은 자기가 정의한 Protocol만 알면 되고, 외부 SDK의 메서드 이름, 예외 타입, 응답 구조는 Adapter 안에 갇힙니다.
+- **Python에서 다중상속 기반 Class Adapter를 피해야 하는 이유을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - GoF 책은 Adapter를 두 가지로 나눕니다. Object Adapter(합성)와 Class Adapter(다중 상속). C++에서는 Class Adapter가 자연스러운 선택지였지만, Python에서는 거의 항상 Object Adapter가 낫습니다.
+- **API 버전 마이그레이션에서 Adapter가 자연스러운 이유의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - API v1에서 v2로 마이그레이션할 때, 모든 클라이언트를 한 번에 전환하는 것은 현실적으로 불가능합니다. 이때 Adapter는 v1 인터페이스를 유지하면서 내부적으로 v2를 호출하는 호환 계층 역할을 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -439,11 +439,17 @@ Session 계층을 운영에서 다룰 때는 "어느 요청이 어떤 트랜잭�
 ## 처음 질문으로 돌아가기
 
 - **`Session`은 단순한 connection 래퍼가 아니라 무엇을 관리할까요?**
-  - `Session`은 트랜잭션 컨텍스트뿐 아니라 pending/dirty/deleted 객체 상태와 Identity Map을 함께 관리합니다. 그래서 같은 세션에서 `session.get(User, 1)`을 두 번 호출하면 같은 PK를 같은 파이썬 객체 하나로 유지하고, 요청 단위 세션을 권장하는 이유도 여기서 나옵니다.
+  - 운영에서 Session 계층은 다음 지표로 감시하면 효과가 큽니다.
 - **Unit of Work는 변경을 어떻게 모으고, 언제 SQL로 내보낼까요?**
-  - `session.add()`나 속성 변경은 즉시 INSERT·UPDATE를 날리지 않고 세션 안에 모였다가 `flush()`, autoflush, `commit()` 직전에 한꺼번에 SQL로 정리됩니다. 본문의 `a`, `b` 두 객체 INSERT와 `user.email` 변경 예시처럼, 이 묶음 실행이 Unit of Work의 핵심입니다.
+  - Unit of Work는 변경을 어떻게 모으고, 언제 SQL로 내보낼까요 — 본문에서 구체적으로 다룹니다.
 - **`flush()`와 `commit()`은 어떤 순서와 의미 차이가 있을까요?**
-  - `flush()`는 트랜잭션을 끝내지 않은 채 SQL만 먼저 보내 PK를 채우는 단계이고, `commit()`은 필요 시 flush 후 실제 `COMMIT`으로 트랜잭션을 종료합니다. 글에서 `Order`를 만든 뒤 `order.id`가 바로 필요할 때 `flush()`를 먼저 쓰고, `expire_on_commit=True`이면 commit 뒤 속성 접근이 추가 SELECT를 부른다는 점까지 함께 확인했습니다.
+  - `flush()`와 `commit()`은 어떤 순서와 의미 차이가 있을까요 — 본문에서 구체적으로 다룹니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - > `Session`은 작업 메모지(Unit of Work)와 캐시 노트(Identity Map)를 한 권의 노트로 묶어 둔 것입니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - `Session`은 내부적으로 하나의 트랜잭션을 들고 있고, `commit()` 또는 `rollback()`이 그 트랜잭션을 종료합니다.
+- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 변경이 있는지 직접 비교하고, UPDATE 문을 직접 만들어야 합니다. 컬럼이 늘어날수록 코드가 복잡해집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

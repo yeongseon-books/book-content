@@ -370,11 +370,17 @@ weekly_health = {
 ## 처음 질문으로 돌아가기
 
 - **왜 비디오 이해에서 frame sampling이 가장 먼저 결정해야 할 핵심 변수일까요?**
-  - 10분 30fps 영상은 약 18,000 frame이라 그대로 넣으면 수백만 token으로 불어나기 때문에, 어떤 순간을 남길지 먼저 정하지 않으면 어떤 큰 모델도 감당하기 어렵습니다. 글이 강조한 것처럼 uniform 8~32 frame, keyframe, dense sampling은 단순 최적화가 아니라 어떤 사건을 보존하고 어떤 사건을 버릴지 정하는 제품 정책입니다.
+  - 이미지 모델은 한 장면의 의미를 읽습니다. 비디오 모델은 어떤 장면들이 언제 어떤 순서로 나타났는지까지 읽어야 합니다. 그래서 frame sampling은 단순한 속도 최적화가 아니라, 어떤 증거를 남기고 어떤 증거를 버릴지 결정하는 핵심 정책입니다.
 - **PyAV와 scene change 기반 keyframe extraction은 각각 어떤 장면에서 유용할까요?**
-  - `sample_uniform_frames()`처럼 PyAV로 균등 간격 샘플을 뽑는 방식은 영상 전체 개요를 빠르게 훑는 Q&A와 요약에 적합합니다. 반면 `extract_keyframes()`처럼 히스토그램 차이로 scene change를 잡는 방식은 장면 전환이 분명한 영상에서 더 효율적이지만, 임계값과 최대 frame cap을 잘못 잡으면 중요한 순간을 놓치거나 과도한 frame이 생길 수 있습니다.
+  - PyAV와 scene change 기반 keyframe extraction은 각각 어떤 장면에서 유용할까요 — 본문에서 구체적으로 다룹니다.
 - **VideoMAE, TimeSformer, X-CLIP 같은 video encoder는 어떤 trade-off를 보여 줄까요?**
-  - TimeSformer는 space-time attention으로 동작 인식에 강하고, VideoMAE는 16 frame 기반 feature extractor로 fine-tuning 출발점이 좋으며, X-CLIP은 CLIP을 확장해 zero-shot action 인식에 유리합니다. 여기에 Video-LLaVA는 8 frame을 비디오 토큰으로 압축해 Q&A까지 가능하게 하지만, 긴 영상은 본문이 설명한 것처럼 청크 분할과 요약 병합을 별도로 설계해야 합니다.
+  - VideoMAE, TimeSformer, X-CLIP 같은 video encoder는 어떤 trade-off를 보여 줄까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 비디오는 고객 지원, 보안, 교육, 스포츠, 제조 현장 등 수많은 업무에서 이미 핵심 데이터가 되었습니다. 따라서 멀티모달 시스템이 문서와 이미지를 넘어서려면 결국 비디오 처리 감각이 필요합니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이미지 모델은 한 장면의 의미를 읽습니다. 비디오 모델은 어떤 장면들이 언제 어떤 순서로 나타났는지까지 읽어야 합니다. 그래서 frame sampling은 단순한 속도 최적화가 아니라, 어떤 증거를 남기고 어떤 증거를 버릴지 결정하는 핵심 정책입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이미지 모델은 한 장면의 의미를 읽습니다. 비디오 모델은 어떤 장면들이 언제 어떤 순서로 나타났는지까지 읽어야 합니다. 그래서 frame sampling은 단순한 속도 최적화가 아니라, 어떤 증거를 남기고 어떤 증거를 버릴지 결정하는 핵심 정책입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

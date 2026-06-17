@@ -407,11 +407,17 @@ Self-Instruct는 coverage를 넓히고, Evol-Instruct는 난도를 높이고, RA
 ## 처음 질문으로 돌아가기
 
 - **도메인 파인튜닝용 synthetic batch는 어떤 입력에서 시작해 어떤 산출물로 끝나야 할까요?**
-  - 이 글의 흐름에서는 `SEED_TASKS`와 `FAQ_CHUNKS`에서 시작해 `generate_batch()`를 거친 뒤, `validate_batch()`를 통과한 `accepted.jsonl`로 끝나야 합니다. 즉, 모델 출력 텍스트가 아니라 검증 가능한 JSON artifact가 최종 산출물입니다.
+  - 아래 예시는 seed task 입력, generation contract, validation, rejection, dataset write path를 하나로 묶은 최소 운영 골격입니다.
 - **Self-Instruct, Evol-Instruct, RAG eval, distillation은 어느 시점에 선택해야 할까요?**
-  - coverage를 넓히면 `self_instruct`, 난도를 올리면 `evol_instruct`, 근거 일치성을 따로 재면 `rag_eval`, teacher 출력 재사용 정책이 통과된 뒤에만 `distillation`을 고릅니다. 본문에서 `BRANCH_GUIDE`와 `require_policy_review()`를 따로 둔 이유가 그 분기 기준을 코드로 고정하기 위해서입니다.
+  - Self-Instruct, Evol-Instruct, RAG eval, distillation은 어느 시점에 선택해야 할까요 — 본문에서 구체적으로 다룹니다.
 - **생성된 JSON 산출물은 어떤 검증 게이트를 통과해야 실제 데이터셋에 편입할 수 있을까요?**
-  - `validate_item()`이 필수 키, `evidence`, refusal 문구, 길이를 검사하고, `validate_batch()`가 `accept_ratio`, `unique_ratio`, `refusal_ratio`까지 닫아 줍니다. 이 숫자를 넘지 못하면 배치는 많아 보여도 `reject_batch`로 끝나야 합니다.
+  - 생성된 JSON 산출물은 어떤 검증 게이트를 통과해야 실제 데이터셋에 편입할 수 있을까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 합성 데이터는 사람 라벨링을 완전히 대체하지는 못해도, seed task가 적은 도메인에서 instruction tuning 데이터와 평가용 QA pair를 빠르게 늘리는 데 매우 유용합니다.
+- **하나의 운영 시나리오로 이해할 때 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 가정은 다음과 같습니다.
+- **먼저 branch를 고릅니다의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 같은 synthetic generation이라도 어떤 감독 신호를 늘리고 싶은지에 따라 선택이 달라집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

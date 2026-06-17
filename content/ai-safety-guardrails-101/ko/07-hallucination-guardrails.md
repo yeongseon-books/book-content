@@ -436,24 +436,17 @@ Hallucination guardrail의 핵심은 모델을 더 똑똑하게 만드는 것이
 ## 처음 질문으로 돌아가기
 
 - **Hallucination guardrail은 왜 답변 전체가 아니라 주장 단위로 봐야 할까요?**
-  - 하나의 답변 안에서도 어떤 주장은 근거가 있고 어떤 주장은 없을 수 있어 claim 단위로 나눠야 정확히 고칠 수 있습니다.
+  - Hallucination guardrail은 왜 답변 전체가 아니라 주장 단위로 봐야 할까요 — 본문에서 구체적으로 다룹니다.
 - **claim extraction, entailment check, citation format은 각각 무엇을 검증할까요?**
-  - claim extraction은 검증할 문장을 뽑고, entailment는 근거가 주장을 지지하는지 보며, citation format은 사용자가 근거를 추적할 수 있게 합니다.
+  - grounding 검증은 코드가 돌아가는 것과 지표가 신뢰되는 것이 다릅니다. 아래 세 가지를 반드시 분리해서 기록해야 합니다.
 - **근거가 부족한 답변은 차단, 수정, 보류 중 어디로 보내야 할까요?**
-  - 안전·법적 위험이 크면 차단하고, 근거는 있으나 표현이 과하면 수정하며, 근거가 애매하면 보류하거나 사람 검토로 보냅니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Safety & Guardrails 101 (1/10): AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
-- [AI Safety & Guardrails 101 (2/10): Prompt Injection 방어](./02-prompt-injection-defense.md)
-- [AI Safety & Guardrails 101 (3/10): 출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
-- [AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹](./04-pii-detection-redaction.md)
-- [AI Safety & Guardrails 101 (5/10): Jailbreak 탐지](./05-jailbreak-detection.md)
-- [AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지](./06-toxicity-bias-detection.md)
-- **AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증 (현재 글)**
-- [AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지](./08-rate-limiting-abuse-prevention.md)
-- [AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스](./09-audit-logging-compliance.md)
-- [AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
+  - 근거가 부족한 답변은 차단, 수정, 보류 중 어디로 보내야 할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - grounding 검증을 별도 레이어로 두면 팀은 “모델이 틀릴 수 있다”는 추상적 두려움을 구체적 체크리스트로 바꿀 수 있습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - RAG 응답 한 문장에는 둘 이상의 사실 주장이 섞여 있는 경우가 많습니다. 문장 전체를 한 번에 참·거짓으로 판단하면 부분 오류를 놓치기 쉽습니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - RAG 응답 한 문장에는 둘 이상의 사실 주장이 섞여 있는 경우가 많습니다. 문장 전체를 한 번에 참·거짓으로 판단하면 부분 오류를 놓치기 쉽습니다.
 
 <!-- toc:end -->
 

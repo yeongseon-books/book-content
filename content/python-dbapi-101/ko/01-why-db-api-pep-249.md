@@ -367,11 +367,17 @@ def timed(fn, *args, **kwargs):
 ## 처음 질문으로 돌아가기
 
 - **PEP 249 이전에는 Python의 데이터베이스 접근 코드가 왜 그렇게 제각각이었을까요?**
-  - 표준이 없던 시절에는 `oracle.open()`, `oracle.run_sql()`, `mysql.connect()`, `db.send()`처럼 driver마다 함수 이름, 인자 순서, 반환 타입이 모두 달랐습니다. 그래서 같은 `SELECT * FROM users`라도 Oracle 코드와 MySQL 코드를 따로 써야 했고, DB 교체는 사실상 애플리케이션 재작성에 가까웠습니다.
+  - DB-API 2.0은 모든 driver가 지켜야 할 최소 contract를 정의합니다.
 - **DB-API 2.0은 정확히 어떤 다섯 가지를 표준화했을까요?**
-  - 이 글에서 정리한 다섯 축은 module-level constants, connection 객체, cursor 객체, type objects, exception hierarchy입니다. 덕분에 `connect()`, `cursor()`, `execute()`, `fetchall()`, `commit()` 같은 핵심 흐름과 `OperationalError`·`IntegrityError` 같은 예외 분류를 driver를 바꿔도 같은 틀로 다룰 수 있습니다.
+  - 표준이 없던 시절, 각 데이터베이스 라이브러리는 자기만의 API를 가졌습니다.
 - **driver마다 `paramstyle`이 다른데도 왜 애플리케이션 코드는 대부분 그대로 옮겨질까요?**
-  - SQLite 예제를 psycopg로 옮길 때 바뀐 것은 `import`, `connect()` 인자, 그리고 `?`를 `%s`로 바꾸는 자리뿐이었습니다. `execute → fetchall → commit` 같은 애플리케이션 로직은 그대로 유지되므로, `paramstyle` 차이만 흡수하면 대부분의 코드를 재사용할 수 있습니다.
+  - 이 시리즈는 모든 예제를 SQLite로 진행합니다. SQLite는 Python 표준 라이브러리(`sqlite3`)에 포함되어 있어서 별도 설치가 없고, 파일 하나가 곧 데이터베이스라 환경 셋업이 사실상 0초입니다.
+- **3. SQLite로 첫 DB-API 코드 작성하기에서 가장 흔한 실수는 무엇일까요?**
+  - 이 시리즈는 모든 예제를 SQLite로 진행합니다. SQLite는 Python 표준 라이브러리(`sqlite3`)에 포함되어 있어서 별도 설치가 없고, 파일 하나가 곧 데이터베이스라 환경 셋업이 사실상 0초입니다.
+- **5. 같은 코드를 PostgreSQL로 옮기기을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 위 SQLite 예제를 psycopg(PostgreSQL driver)로 옮기면 거의 변화가 없습니다.
+- **6. DB-API가 안 다루는 것의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 표준이라고 해서 모든 걸 표준화하지는 않습니다. PEP 249가 의도적으로 비워둔 영역이 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -353,11 +353,17 @@ kubectl get nodes -L kubernetes.azure.com/mode,kubernetes.azure.com/agentpool
 ## 처음 질문으로 돌아가기
 
 - **API server, scheduler, controller manager, etcd는 각각 어떤 일을 할까요?**
-  - `API server`는 선언과 조회의 출입구이고, `etcd`는 그 상태를 저장하며, `scheduler`는 `Pod -> Node` 배치를 기록합니다. `controller loops`는 Deployment와 Endpoint 같은 객체를 원하는 상태로 계속 수렴시키므로, 네 컴포넌트는 모두 Control Plane 안에서 서로 다른 결정을 맡습니다.
+  - API server, scheduler, controller manager, etcd는 각각 어떤 일을 할까요 — 본문에서 구체적으로 다룹니다.
 - **Node Pool은 단순한 VM 묶음 이상으로 왜 중요한 관리 단위일까요?**
-  - Node Pool은 `vmSize`, `count`, `osType`, autoscaler 범위를 같이 묶어 관리하는 실행 계층입니다. 그래서 `az aks nodepool list --query "[].{name:name, mode:mode, count:count, vmSize:vmSize, osType:osType}"` 출력이 곧 비용, 용량, 배치 전략을 읽는 표가 됩니다.
+  - AKS 운영에서 많은 문제는 “클러스터가 이상하다”는 막연한 문장으로 시작합니다. 하지만 실제 원인은 매우 다릅니다.
 - **system node pool과 user node pool을 분리해야 하는 실무적 이유는 무엇일까요?**
-  - `CoreDNS`, `metrics-server` 같은 시스템 Pod가 올라가는 system pool과 애플리케이션 Pod가 올라가는 user pool을 나누면 blast radius가 작아집니다. `CriticalAddonsOnly=true:NoSchedule` taint나 `kubernetes.azure.com/mode: user` 같은 기준을 두면 user workload 폭주가 클러스터 기반 계층까지 같이 흔드는 일을 줄일 수 있습니다.
+  - system node pool과 user node pool을 분리해야 하는 실무적 이유는 무엇일까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - AKS 운영에서 많은 문제는 “클러스터가 이상하다”는 막연한 문장으로 시작합니다. 하지만 실제 원인은 매우 다릅니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - AKS를 읽을 때 가장 좋은 멘탈 모델은 클러스터를 둘로 가르는 것입니다. 왼쪽에는 원하는 상태를 저장하고 배치 결정을 내리는 계층이 있고, 오른쪽에는 실제로 컨테이너가 돌아가는 실행 계층이 있습니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - AKS를 읽을 때 가장 좋은 멘탈 모델은 클러스터를 둘로 가르는 것입니다. 왼쪽에는 원하는 상태를 저장하고 배치 결정을 내리는 계층이 있고, 오른쪽에는 실제로 컨테이너가 돌아가는 실행 계층이 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -445,24 +445,17 @@ def release_gate(snapshot: dict) -> tuple[bool, str]:
 ## 처음 질문으로 돌아가기
 
 - **운영 평가는 배포 전 평가를 어떤 지속 루프로 닫아야 할까요?**
-  - eval dataset, CI regression, production sampling, incident review, dataset update가 반복되는 루프로 닫혀야 합니다.
+  - 평가는 배포 전 한 번이 아니라 운영 중 계속되는 활동입니다. AI Evaluation 101 시리즈를 마칩니다.
 - **production trace sampling, drift detection, shadow mode는 각각 어떤 신호를 잡을까요?**
-  - trace sampling은 실제 요청 품질, drift detection은 입력과 출력 분포 변화, shadow mode는 새 후보의 위험을 사용자 영향 없이 잡습니다.
+  - production trace sampling, drift detection, shadow mode는 각각 어떤 신호를 잡을까요 — 본문에서 구체적으로 다룹니다.
 - **운영 평가 비용을 통제하면서 실패를 regression set으로 되돌리는 기준은 무엇일까요?**
-  - 고위험·대표 요청을 우선 샘플링하고, 실패 원인이 재현 가능하고 다시 막아야 할 때 regression case로 승격합니다. 비용은 샘플링률과 judge 호출 budget으로 통제합니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
-- [AI Evaluation 101 (2/10): 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
-- [AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- [AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기](./04-llm-as-judge.md)
-- [AI Evaluation 101 (5/10): Rubric 기반 채점 설계](./05-rubric-based-scoring.md)
-- [AI Evaluation 101 (6/10): RAG 시스템 평가하기](./06-rag-evaluation.md)
-- [AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory](./07-agent-evaluation.md)
-- [AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게](./08-regression-testing.md)
-- [AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가](./09-ab-testing-llms.md)
-- **AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가 (현재 글)**
+  - 평가는 배포 전 한 번이 아니라 운영 중 계속되는 활동입니다. AI Evaluation 101 시리즈를 마칩니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 운영 평가는 배포 후 품질을 추적하는 유일한 현실적 방법입니다. 오프라인 데이터셋이 아무리 좋아도 실제 사용자 분포가 달라지면 기준선은 금방 낡습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다. 운영 평가는 배포 후 품질을 추적하는 유일한 현실적 방법입니다. 오프라인 데이터셋이 아무리 좋아도 실제 사용자 분포가 달라지면 기준선은 금방 낡습니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다. 운영 평가는 배포 후 품질을 추적하는 유일한 현실적 방법입니다. 오프라인 데이터셋이 아무리 좋아도 실제 사용자 분포가 달라지면 기준선은 금방 낡습니다.
 
 <!-- toc:end -->
 

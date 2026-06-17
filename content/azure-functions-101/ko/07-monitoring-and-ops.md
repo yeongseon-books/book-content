@@ -339,11 +339,17 @@ az monitor app-insights events show \
 ## 처음 질문으로 돌아가기
 
 - **Application Insights와 Log Analytics는 Azure Functions 운영에서 어떤 역할로 나뉠까요?**
-  - Application Insights는 `requests`, `exceptions`, `dependencies`, `traces`를 중심으로 함수 호출과 예외 흐름을 바로 읽게 해 주는 1차 운영 표면입니다. 여기서 본 이상 징후를 더 긴 시간축의 쿼리와 메트릭으로 이어 붙일 때 Log Analytics와 KQL이 실질적인 분석 도구가 됩니다.
+  - Application Insights와 Log Analytics는 Azure Functions 운영에서 어떤 역할로 나뉠까요 — 본문에서 구체적으로 다룹니다.
 - **함수별 지연, 실패율, 의존성 호출을 보려면 어떤 쿼리를 먼저 갖고 있어야 할까요?**
-  - 본문에 나온 기본형이면 충분합니다. `requests`에서 `Failed=countif(success == false)`와 `percentile(duration, 95)`를 보고, `dependencies`에서 `target`, `resultCode`, `FailureRate`를 함께 보면 어느 함수가 느린지와 어떤 외부 시스템이 실패를 만드는지 빠르게 좁힐 수 있습니다.
+  - 함수별 지연, 실패율, 의존성 호출을 보려면 어떤 쿼리를 먼저 갖고 있어야 할까요 — 본문에서 구체적으로 다룹니다.
 - **Live Metrics와 stream logs는 언제 각각 더 유리할까요?**
-  - Live Metrics는 인스턴스 수, 실패율, 응답 시간처럼 “지금 무슨 일이 벌어지는가”를 30초 안에 보는 데 가장 좋습니다. 반대로 `az webapp log tail --name $APP --resource-group $RG` 같은 stream logs나 `traces` 조회는 배포 직후 인덱싱 실패, Host 시작 문제, 특정 함수 예외처럼 원인 문맥을 바로 확인할 때 더 유리합니다.
+  - Live Metrics와 stream logs는 언제 각각 더 유리할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 운영의 대부분은 새로운 기술보다 **이상 징후를 기준선과 비교해 빨리 읽는 능력**에 달려 있습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - Azure Functions 운영을 잘한다는 것은 결국 “지금 무엇이 평소와 다른가”를 아주 빠르게 찾는 능력에 가깝습니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - Azure Functions 운영을 잘한다는 것은 결국 “지금 무엇이 평소와 다른가”를 아주 빠르게 찾는 능력에 가깝습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

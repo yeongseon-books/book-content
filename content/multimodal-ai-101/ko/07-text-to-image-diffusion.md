@@ -387,11 +387,17 @@ Stable Diffusion 계열을 이해하면 text-to-image뿐 아니라 inpainting, i
 ## 처음 질문으로 돌아가기
 
 - **왜 diffusion이 GAN을 빠르게 밀어내고 시각 생성의 기본 구조가 되었을까요?**
-  - GAN의 mode collapse와 프롬프트 제어 한계를 넘어서, 안정적인 학습과 자유 텍스트 조건부 생성을 함께 제공했기 때문입니다. 본문이 정리한 Stable Diffusion과 SDXL 흐름처럼 open weight 생태계, CFG, ControlNet, inpainting이 붙으면서 생성 품질뿐 아니라 제어 가능성까지 표준이 됐습니다.
+  - 왜 diffusion이 GAN을 빠르게 밀어내고 시각 생성의 기본 구조가 되었을까요 — 본문에서 구체적으로 다룹니다.
 - **forward process와 reverse process를 어떤 멘탈 모델로 이해하면 가장 실용적일까요?**
-  - 학습에서는 `x_0`에 가우시안 노이즈를 점점 더해 `x_T`로 보내고, 추론에서는 모델이 `eps_theta(x_t, t, text)`를 예측해 그 노이즈를 단계적으로 걷어 내는 제어 루프로 이해하면 됩니다. 이 관점이 있어야 `num_inference_steps`, `guidance_scale`, `negative_prompt`, scheduler가 왜 최종 품질과 스타일에 큰 영향을 주는지 자연스럽게 연결됩니다.
+  - forward process와 reverse process를 어떤 멘탈 모델로 이해하면 가장 실용적일까요 — 본문에서 구체적으로 다룹니다.
 - **Stable Diffusion의 text encoder, UNet, VAE는 각각 어떤 역할을 맡을까요?**
-  - text encoder는 프롬프트를 임베딩으로 만들고, UNet은 latent 공간에서 각 step의 노이즈를 예측하며, VAE는 픽셀 이미지를 더 작은 latent와 다시 픽셀로 변환합니다. 본문 표처럼 이 latent diffusion 구조 덕분에 512x512 픽셀 대신 64x64x4 latent에서 계산해 VRAM과 속도를 크게 줄이면서도 ControlNet과 inpainting 같은 확장 기능을 같은 뼈대 위에 얹을 수 있습니다.
+  - Stable Diffusion의 text encoder, UNet, VAE는 각각 어떤 역할을 맡을까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 텍스트-이미지 생성은 이미 콘텐츠 제작과 프로토타이핑의 표준 도구가 되었습니다. 디자인 시안, 마케팅 소재, 게임 아트, 데이터 증강처럼 쓰임새가 넓기 때문에 멀티모달을 다루는 엔지니어라면 구조를 이해할 필요가 있습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - Diffusion 모델의 직관은 surprisingly 단순합니다. 학습 단계에서는 이미지를 조금씩 망가뜨리는 법을 배우고, 추론 단계에서는 그 망가짐을 역방향으로 되돌리는 법을 배웁니다. 그래서 생성 과정 전체가 여러 step의 반복 제어 문제로 보입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - Diffusion 모델의 직관은 surprisingly 단순합니다. 학습 단계에서는 이미지를 조금씩 망가뜨리는 법을 배우고, 추론 단계에서는 그 망가짐을 역방향으로 되돌리는 법을 배웁니다. 그래서 생성 과정 전체가 여러 step의 반복 제어 문제로 보입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

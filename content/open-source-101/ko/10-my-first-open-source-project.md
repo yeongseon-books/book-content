@@ -243,88 +243,18 @@ Git 워크플로는 단순하게 시작하세요. `main` 보호, 기능 브랜�
 
 ## 처음 질문으로 돌아가기
 
-- **이미 비슷한 프로젝트가 있어서 새로 시작할 필요가 없다면?** 같은 것을 다시 만드는 것도 가치 있습니다. **새로운 접근법, 더 나은 문서, 더 살기 좋은 커뮤니티**를 목표로 하면, 차별성이 생기고 배울 점도 많습니다.
-
-- **첫 오픈소스 프로젝트 운영에서 가장 중요한 것은?** **PR과 이슈에 대한 응답 시간**입니다. 늦어도 1주일 내에 피드백을 주면 기여자들은 계속 돌아옵니다.
-
-- **프로젝트가 더 이상 관리할 수 없으면 어떻게 해야 할까요?** Archived 상태로 변경하고, 다른 메인테이너를 찾거나 포크를 권장하는 공지를 남기는 것이 정직하고 책임감 있는 대응입니다.
-## 장기 유지보수 자동화
-
-첫 프로젝트를 오래 유지하려면 자동화를 최대한 활용해야 합니다. 특히 라이브러리 의존성을 정기적으로 업데이트하는 일은 Dependabot과 GitHub Actions로 완전히 자동화할 수 있습니다.
-
-**Dependabot 설정**
-
-```yaml
-# .github/dependabot.yml
-version: 2
-updates:
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-```
-
-Dependabot은 의존성 업데이트 PR을 자동으로 생성합니다. 테스트가 통과하면 병합하기만 하면 됩니다.
-
-**자동 병합 설정 (선택)**
-
-```yaml
-# .github/workflows/auto-merge.yml
-name: Auto Merge Dependabot
-
-on:
-  pull_request:
-    types: [opened, synchronize]
-
-jobs:
-  auto-merge:
-    if: github.actor == 'dependabot[bot]'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Wait for CI
-      run: sleep 60
-    - name: Merge if tests pass
-      run: gh pr merge --auto --squash "${{ github.event.pull_request.number }}"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
-
-**Security Advisory 자동 모니터링**
-
-GitHub Security Advisory는 의존성 취약점을 자동 감지합니다. 이를 활성화하면 Dependabot이 보안 업데이트를 우선적으로 제안합니다.
-
-```markdown
-# Repository Settings → Security & analysis
-- Dependabot alerts: Enabled
-- Dependabot security updates: Enabled
-```
-
-**자동화 결합 예시**
-
-```yaml
-# .github/workflows/ci.yml
-name: CI
-
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    - run: pip install -r requirements.txt
-    - run: pytest
-    - run: ruff check
-```
-
-이런 자동화가 갖춰지면 메인테이너는 의존성 업데이트를 수동으로 할 필요가 없습니다. Dependabot이 PR을 만들고, CI가 테스트하고, 모든 검사가 통과하면 자동 병합됩니다. 메인테이너는 큰 결정만 하면 되므로 번아웃을 크게 줄일 수 있습니다.
+- **첫 오픈소스 프로젝트는 어느 정도 크기여야 할까요?**
+  - 처음에는 무엇을 만들지보다 무엇을 이번 버전에 넣지 않을지 먼저 정하는 편이 좋습니다. 범위가 작아야 끝낼 수 있습니다.
+- **아이디어, 범위, MVP, 문서, 릴리스는 어떤 순서로 준비하면 좋을까요?**
+  - 아이디어, 범위, MVP, 문서, 릴리스는 어떤 순서로 준비하면 좋을까요 — 본문에서 구체적으로 다룹니다.
+- **코드보다 문서와 라이선스가 왜 공개 직전에 더 중요해질까요?**
+  - 이 순서에서 중요한 점은 공개가 맨 마지막에 한 번 일어나는 이벤트가 아니라는 사실입니다. 문서를 정리하는 순간부터 이미 외부 사용자를 상정하게 되고, 릴리스와 공지는 그 준비의 자연스러운 결과가 됩니다.
+- **공개까지 가는 최소 경로에서 가장 흔한 실수는 무엇일까요?**
+  - 이 순서에서 중요한 점은 공개가 맨 마지막에 한 번 일어나는 이벤트가 아니라는 사실입니다. 문서를 정리하는 순간부터 이미 외부 사용자를 상정하게 되고, 릴리스와 공지는 그 준비의 자연스러운 결과가 됩니다.
+- **꼭 알아야 할 다섯 가지 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - MVP는 가장 작은 유효 제품입니다. scope는 이번 릴리스에 들어갈 것과 넣지 않을 것을 가르는 선입니다.
+- **메인테이너 번아웃 신호의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 첫 프로젝트를 공개하면 흥분되지만, 시간이 지나면서 유지보수 부담이 느껴집니다. 메인테이너 번아웃은 갑자기 오는 것이 아니라 신호가 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

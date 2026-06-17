@@ -444,24 +444,17 @@ Judge가 90점을 줬다고 좋은 응답이 아닙니다. **production 출시 �
 ## 처음 질문으로 돌아가기
 
 - **LLM-as-Judge는 언제 사람이 매번 평가하기 어려운 품질 판단을 도와줄까요?**
-  - 대량의 주관적 품질 판단, 답변 유용성, 근거 충실도, tone 적합성처럼 deterministic metric으로 어려운 영역에서 도움이 됩니다.
+  - LLM-as-Judge는 언제 사람이 매번 평가하기 어려운 품질 판단을 도와줄까요 — 본문에서 구체적으로 다룹니다.
 - **judge prompt와 rubric이 없으면 자동 채점기는 어떤 편향에 흔들릴까요?**
-  - 위치 편향, 장황한 답 선호, 자기 모델 선호, rubric 누락에 따른 임의 판단에 흔들릴 수 있습니다.
+  - 이제 단일 점수의 한계를 넘어 차원별 채점으로 가 보겠습니다. 다음 글에서는 rubric을 설계해 무엇이 실제로 망가졌는지를 더 또렷하게 드러내는 방법을 다룹니다.
 - **사람 기준선과 agreement를 어떻게 붙여야 judge 결과를 믿을 수 있을까요?**
-  - 사람이 채점한 표본과 judge 결과를 비교하고, agreement metric과 disagreement review를 운영 루프에 넣어야 합니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
-- [AI Evaluation 101 (2/10): 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
-- [AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- **AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기 (현재 글)**
-- [AI Evaluation 101 (5/10): Rubric 기반 채점 설계](./05-rubric-based-scoring.md)
-- [AI Evaluation 101 (6/10): RAG 시스템 평가하기](./06-rag-evaluation.md)
-- [AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory](./07-agent-evaluation.md)
-- [AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게](./08-regression-testing.md)
-- [AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가](./09-ab-testing-llms.md)
-- [AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가](./10-production-evaluation.md)
+  - 이제 단일 점수의 한계를 넘어 차원별 채점으로 가 보겠습니다. 다음 글에서는 rubric을 설계해 무엇이 실제로 망가졌는지를 더 또렷하게 드러내는 방법을 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - LLM judge를 제대로 설계하면 수천 건 규모의 자유 형식 응답도 실무 속도로 채점할 수 있습니다. 특히 모델 비교나 프롬프트 A/B 실험처럼 상대 평가가 필요한 상황에서는 사람보다 훨씬 빠른 피드백 루프를 만들 수 있습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다.
 
 <!-- toc:end -->
 

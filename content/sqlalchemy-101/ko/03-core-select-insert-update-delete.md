@@ -523,11 +523,17 @@ INFO sqlalchemy.engine.Engine COMMIT
 ## 처음 질문으로 돌아가기
 
 - **`select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요?**
-  - `select(users.c.id, users.c.name).where(...).order_by(...).limit(...)`처럼 절을 체이닝할 때마다 새로운 immutable statement가 만들어지고, 마지막에 `conn.execute(stmt)`가 `Result`를 돌려줍니다. 이후에는 `Row`, `.scalar_one()`, `.scalars().all()`, `.mappings().all()` 가운데 무엇이 필요한지 선택해 읽어야 하며, `Result`가 일회용이라는 점도 함께 기억해야 합니다.
+  - `select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요 — 본문에서 구체적으로 다룹니다.
 - **`insert`, `update`, `delete`를 2.x 트랜잭션 모델과 함께 어떻게 써야 할까요?**
-  - 쓰기 작업은 본문 예시처럼 `with engine.begin() as conn:` 안에서 실행하는 것이 기본이고, 필요하면 `insert(...).returning(...)`, `update(...).rowcount`처럼 결과도 바로 확인할 수 있습니다. 특히 WHERE 없는 `delete(users)`가 전체 삭제로 이어진다는 점 때문에, 글에서는 `safe_delete` 헬퍼처럼 애플리케이션 레벨 안전장치까지 같이 제안했습니다.
+  - `insert`, `update`, `delete`를 2.x 트랜잭션 모델과 함께 어떻게 써야 할까요 — 본문에서 구체적으로 다룹니다.
 - **`JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요?**
-  - Core에서는 `join`, `subquery()`, `cte("recent")`, `func.count(...).label("post_count")`를 조합해 복잡한 SQL도 같은 표현식 체계 안에서 만들 수 있습니다. 예시의 `users`와 `posts` JOIN, `%news%` 서브쿼리, 사용자별 게시글 수 집계가 바로 그 패턴을 보여 줍니다.
+  - `JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요 — 본문에서 구체적으로 다룹니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다. `select(...)`로 시작해서 `where`, `order_by`, `limit` 같은 메서드를 호출하면 새로운 statement 객체가 반환되고, 마지막에 Connection이 그것을 실행해 `Result`를 돌려줍니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - `select(*cols_or_tables)`는 SELECT 대상이 될 컬럼이나 테이블을 받습니다.
+- **이전 방식과 개선 방식의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 문제: 문자열 조립이 깨지기 쉽고, `LIMIT`처럼 binding되지 않는 부분에서 type 오류·SQL injection 위험이 생깁니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

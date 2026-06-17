@@ -535,11 +535,17 @@ tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
 ## 처음 질문으로 돌아가기
 
 - **같은 로직을 여러 입력으로 검증할 때 함수를 복사하지 않으려면 어떻게 해야 할까요?**
-  - `test_is_palindrome_radar`, `test_is_palindrome_hello`처럼 함수를 늘리는 대신 `@pytest.mark.parametrize`에 입력과 기대값을 데이터로 추가하면 됩니다. 이 글의 `validate_username`, `discount`, `parse_port` 예시처럼 검증 로직은 하나로 유지하고 케이스만 확장하면 테스트가 훨씬 짧고 일관되게 남습니다.
+  - parametrize의 장점은 테스트 함수 수를 늘리지 않고 입력 공간을 넓히는 점입니다.
 - **`@pytest.mark.parametrize`의 기본 문법은 어떻게 읽어야 할까요?**
-  - `@pytest.mark.parametrize("a,b,expected", [(1, 2, 3), (0, 0, 0)])`는 테스트 함수 한 개를 각 튜플마다 독립 실행하겠다는 뜻입니다. 정상 케이스와 `with pytest.raises(ValueError, match="out of range")` 같은 오류 케이스를 별도 함수로 나누면, 어떤 조합이 어떤 계약을 검증하는지도 출력에서 바로 읽힙니다.
+  - `@pytest.mark.parametrize`의 기본 문법은 어떻게 읽어야 할까요 — 본문에서 구체적으로 다룹니다.
 - **각 테스트 케이스에 읽기 좋은 이름을 붙이려면 어떻게 해야 할까요?**
-  - `pytest.param(..., id="min-length")`나 `ids=["alice", "bob_01"]`를 쓰면 실패 로그가 데이터 덩어리 대신 의미 있는 이름으로 찍힙니다. 그래서 `FAILED test_username_invalid[space]`처럼 어떤 입력이 문제였는지 즉시 보이고, 회귀 입력을 목록에 추가해도 추적이 쉬워집니다.
+  - 이 템플릿은 버그 이슈를 테스트 코드로 영구 보존하는 가장 단순한 형태입니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 입력 조합이 늘어날수록 테스트 품질은 두 방향으로 갈립니다. 하나는 복사-붙여넣기로 테스트 파일이 비대해지는 방향이고, 다른 하나는 같은 로직을 유지한 채 데이터만 늘리는 방향입니다. parametrization은 두 번째 방향을 가능하게 합니다.
+- **핵심 개념 잡기을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - > parametrize = 하나의 테스트 함수 + 여러 데이터 세트 → N개의 독립 테스트
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - > parametrize = 하나의 테스트 함수 + 여러 데이터 세트 → N개의 독립 테스트
 
 <!-- toc:begin -->
 ## 시리즈 목차

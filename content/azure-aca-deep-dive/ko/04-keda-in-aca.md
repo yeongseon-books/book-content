@@ -262,11 +262,17 @@ ACA의 스케일링은 단순한 제품 편의 기능이 아닙니다. 사용자
 ## 처음 질문으로 돌아가기
 
 - **ACA의 scale rule은 KEDA에서 어떤 형태의 제어 루프로 읽는 편이 가장 정확할까요?**
-  - ACA의 scale rule은 scaler object 그 자체가 아니라, `minReplicas`, `maxReplicas`, trigger metadata, auth를 KEDA형 autoscaling loop로 번역하라는 제품 설정입니다. 그래서 실제 replica 변화는 polling, activation, cooldown, HPA류 결정과 metrics answer path를 거친 결과로 읽는 편이 가장 정확합니다.
+  - ACA의 scale rule은 KEDA에서 어떤 형태의 제어 루프로 읽는 편이 가장 정확할까요 — 본문에서 구체적으로 다룹니다.
 - **왜 scale rule은 app-scope가 아니라 revision-scope에 속할까요?**
-  - scale은 메인 URL 정책이 아니라 특정 불변 Revision 뒤의 런타임 행동이기 때문에 revision-scope에 붙습니다. canary Revision이 stable Revision과 다른 concurrency threshold나 max replica를 가질 수 있어야 하므로, scale rule 변경이 새 Revision 생성으로 이어지는 구조가 자연스럽습니다.
+  - 왜 scale rule은 app-scope가 아니라 revision-scope에 속할까요 — 본문에서 구체적으로 다룹니다.
 - **`minReplicas: 0`이 가능하다는 사실은 스케일 모델을 어떻게 바꿀까요?**
-  - `minReplicas: 0`이 허용되면 스케일링은 단순 비율 조정이 아니라 wake-from-zero activation 모델이 됩니다. 이때는 1→0으로 내려가는 cooldown과 0→1 첫 기동 지연이 별도 운영 의미를 가지므로, steady-state HPA보다 KEDA형 event-driven mental model이 더 잘 맞습니다.
+  - `minReplicas: 0`이 가능하다는 사실은 스케일 모델을 어떻게 바꿀까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - ACA 운영에서 트래픽 분할과 스케일링은 자주 같은 이야기처럼 섞입니다. 둘 다 Revision 주변에서 일어나기 때문입니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - ACA의 스케일링을 한 문장으로 요약하면 이렇습니다. **scale rule은 scaler 그 자체가 아니라, 플랫폼이 KEDA형 autoscaling 동작으로 번역해야 하는 제품 설정**입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - ACA의 스케일링을 한 문장으로 요약하면 이렇습니다. **scale rule은 scaler 그 자체가 아니라, 플랫폼이 KEDA형 autoscaling 동작으로 번역해야 하는 제품 설정**입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -324,11 +324,17 @@ rollout:
 ## 처음 질문으로 돌아가기
 
 - **breaking change와 non-breaking change는 어떻게 구분할까요?**
-  - "클라이언트가 코드를 수정하지 않고도 계속 동작할 수 있는가"가 기준입니다. 응답 필드 제거, 필수 파라미터 추가, 타입 변경은 breaking이고, 새 필드·새 endpoint·선택적 파라미터 추가는 non-breaking입니다. 팀 전체가 동일하게 판단할 수 있도록 호환성 정책 문서를 만들어야 합니다.
+  - versioning에서 가장 중요한 첫 단계는 "무엇이 breaking인가"를 팀 전체가 동일하게 판단하는 것입니다.
 - **URL versioning과 header versioning은 각각 어떤 장단점이 있을까요?**
-  - URL(`/v1/`)은 직관적이고 캐시·로그 분리가 쉽지만 URL이 오염됩니다. Header는 URL이 깨끗하고 content negotiation과 일관되지만 디버깅이 어렵고 CDN 설정이 추가됩니다. 외부 공개 API는 URL, 내부 API나 빈번한 변경이 필요한 경우는 header가 많이 쓰입니다.
+  - URL versioning과 header versioning은 각각 어떤 장단점이 있을까요 — 본문에서 구체적으로 다룹니다.
 - **semver, calver 같은 호환성 정책은 어떻게 읽어야 할까요?**
-  - Semver의 MAJOR는 breaking, MINOR는 기능 추가, PATCH는 수정입니다. API에서는 보통 MAJOR만 외부에 노출합니다. Calver는 날짜가 버전이며, Stripe처럼 변경 빈도가 높고 연속적 이력 관리가 필요한 환경에서 유리합니다.
+  - 문서에서 맞아 보이던 선택이 운영에서 실패하는 이유는 대부분 관측 지점이 없기 때문입니다. 그래서 설계 단계에서 아래 세 가지를 같이 준비해야 합니다.
+- **Breaking vs Non-breaking — 먼저 정의해야 운영할 수 있다에서 가장 흔한 실수는 무엇일까요?**
+  - versioning에서 가장 중요한 첫 단계는 "무엇이 breaking인가"를 팀 전체가 동일하게 판단하는 것입니다.
+- **Versioning 전략 비교을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - URL path보다는 덜 침습적이지만, 캐시 키 관리와 라우팅이 복잡해집니다. 실무에서는 비교적 드뭅니다.
+- **Deprecation과 Sunset — 버전 종료의 절차의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 버전을 만드는 것보다 없애는 것이 더 어렵습니다. 클라이언트에게 충분한 시간과 정보를 주지 않으면 sunset 당일이 장애 당일이 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

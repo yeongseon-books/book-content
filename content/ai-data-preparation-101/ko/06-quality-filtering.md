@@ -440,11 +440,17 @@ classifier 기반 필터는 분기마다 최소 한 번 재학습 후보를 검�
 ## 처음 질문으로 돌아가기
 
 - **왜 수집된 데이터와 학습 가능한 데이터는 같은 집합이 아닐까요?**
-  - 수집 데이터는 출발점일 뿐이고, 실제 학습셋은 `passes_heuristic()`, `keep_languages()`, `PerplexityFilter.passes()`, `quality_score()`를 모두 통과한 샘플만 남은 결과입니다. 그래서 본문도 raw crawl 양보다 stage별 survivors와 drop reason을 더 중요하게 다뤘습니다.
+  - 왜 수집된 데이터와 학습 가능한 데이터는 같은 집합이 아닐까요 — 본문에서 구체적으로 다룹니다.
 - **길이, symbol ratio, digit ratio, repetition 같은 heuristic signal은 무엇을 빠르게 잡아낼까요?**
-  - 이런 신호는 `too_short`, `symbol_heavy`, `digit_heavy`, `repetitive`처럼 명백한 정크를 앞단에서 싸게 걷어내는 데 강합니다. classifier나 perplexity보다 먼저 두는 이유도 obvious junk를 CPU 몇 줄 계산으로 줄이기 위해서입니다.
+  - 길이, symbol ratio, digit ratio, repetition 같은 heuristic signal은 무엇을 빠르게 잡아낼까요 — 본문에서 구체적으로 다룹니다.
 - **언어 감지와 perplexity filter는 각각 어떤 종류의 오염을 제거할까요?**
-  - `keep_languages(..., allowed={"ko", "en"})`는 도메인 밖 언어 혼입을 제거하고, `PerplexityFilter("wiki-en.binary")`는 깨진 인코딩이나 비정상 boilerplate를 걸러냅니다. 하나는 “무슨 언어인가”, 다른 하나는 “정상적인 텍스트처럼 보이는가”를 보는 셈입니다.
+  - 언어 감지와 perplexity filter는 각각 어떤 종류의 오염을 제거할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 품질 필터링을 잘하면 모델이 실제로 학습할 가치가 있는 샘플에 더 많은 예산을 쓰게 됩니다. 같은 양의 데이터라도 학습 곡선이 더 안정적이고, 분포 drift 감지도 더 빨라집니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 품질 필터는 한 번의 점수로 좋은 문서와 나쁜 문서를 완전히 나누는 문제가 아닙니다. 길이, 기호 비율, 반복률처럼 거의 공짜인 signal이 있고, 언어 감지와 perplexity처럼 조금 더 비싼 signal이 있고, classifier처럼 학습된 판정기가 있습니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 품질 필터는 한 번의 점수로 좋은 문서와 나쁜 문서를 완전히 나누는 문제가 아닙니다. 길이, 기호 비율, 반복률처럼 거의 공짜인 signal이 있고, 언어 감지와 perplexity처럼 조금 더 비싼 signal이 있고, classifier처럼 학습된 판정기가 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

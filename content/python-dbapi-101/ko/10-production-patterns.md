@@ -372,11 +372,17 @@ def open_prod_conn(path: str) -> sqlite3.Connection:
 ## 처음 질문으로 돌아가기
 
 - **`busy_timeout`, `timeout`, 애플리케이션 retry는 서로 무엇이 다르고 왜 함께 써야 할까요?**
-  - 글은 `sqlite3.connect(timeout=5.0)`와 `PRAGMA busy_timeout=5000`이 한 SQL 호출 안에서 락을 얼마나 기다릴지 정하는 장치이고, 애플리케이션 retry는 호출 자체를 몇 번 다시 시도할지 정하는 정책이라고 구분했습니다. 그래서 production 기본값은 둘 중 하나만 길게 두는 것이 아니라 `busy_timeout=2000~5000ms`와 `max_attempts=3~5`를 함께 잡아 지연 상한과 성공 확률을 같이 관리하는 방식입니다.
+  - `busy_timeout`, `timeout`, 애플리케이션 retry는 서로 무엇이 다르고 왜 함께 써야 할까요 — 본문에서 구체적으로 다룹니다.
 - **slow query 로그, OpenTelemetry span, BUSY 발생률은 SQLite 운영 상태를 어떻게 드러내 줄까요?**
-  - 본문은 `timed_query()`가 `SLOW_QUERY_THRESHOLD_MS`를 넘긴 호출을 로그로 남기고, `trace_query()`가 `db.system=sqlite`와 duration을 span에 기록하며, retry 데코레이터의 attempt 증가가 BUSY 비율을 보여 주도록 구성했습니다. 이 세 신호를 함께 보면 성능 회귀, 락 경합, 추적 누락을 각각 다른 층에서 바로 식별할 수 있습니다.
+  - > SQLite가 파일이라는 사실은 운영을 단순하게 만들지만, "그냥 파일"이라는 생각은 위험하다. 트랜잭션 중인 파일을 cp로 복사하면 손상된 사본이 생긴다. SQLite는 가볍지만, DBMS다.
 - **`Connection.backup()`과 `restore_check()`까지 포함한 흐름이 왜 `cp app.db`보다 중요한가요?**
-  - 글은 `cp`가 트랜잭션 중인 파일의 일관성을 보장하지 못하므로 운영 백업으로는 금지라고 못 박았습니다. 대신 `Connection.backup()`으로 온라인 일관성을 지키고, `restore_check()`에서 `PRAGMA integrity_check`와 핵심 테이블 row count까지 확인해야 비로소 복구 가능한 백업인지 검증할 수 있습니다.
+  - `Connection.backup()`과 `restore_check()`까지 포함한 흐름이 왜 `cp app.db`보다 중요한가요 — 본문에서 구체적으로 다룹니다.
+- **Mental Model: SQLite도 "DB"다에서 가장 흔한 실수는 무엇일까요?**
+  - > SQLite가 파일이라는 사실은 운영을 단순하게 만들지만, "그냥 파일"이라는 생각은 위험하다. 트랜잭션 중인 파일을 cp로 복사하면 손상된 사본이 생긴다. SQLite는 가볍지만, DBMS다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 세 개념이 비슷해 보여도 다른 층에서 동작합니다.
+- **적용 전과 후: production-ready 모듈 한 덩어리의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - retry 없음, timeout 없음, slow query 측정 없음, 트레이스 없음. 운영 중 BUSY가 한 번 발생하면 그 요청은 그냥 실패합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

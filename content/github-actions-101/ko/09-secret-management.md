@@ -588,11 +588,17 @@ GitHub Actions에서 secret 관리는 저장, 노출, 권한, 회전을 함께 �
 ## 처음 질문으로 돌아가기
 
 - **repository, environment, organization secret은 어떻게 구분할까요?**
-  - Repository secret은 해당 저장소 전체에서 접근 가능하고, environment secret은 특정 environment가 설정된 잡에서만 접근 가능하며, organization secret은 조직 내 여러 저장소에서 공유됩니다. 우선순위는 environment > repository > organization 순입니다. staging과 production의 DB 인증이 다르면 environment secret으로 분리하고, 조직 공통 Slack webhook은 organization secret으로 두는 것이 일반적입니다.
+  - repository, environment, organization secret은 어떻게 구분할까요 — 본문에서 구체적으로 다룹니다.
 - **`GITHUB_TOKEN` 권한은 왜 가능한 한 좁혀야 할까요?**
-  - 기본 권한이 넓으면 린트 잡이 탈취되었을 때 패키지 push, PR 승인, 코드 수정까지 가능해집니다. 저장소 기본 권한을 `read`로 설정하고 잡마다 필요한 권한만 명시하면, 한 잡의 보안 사고가 다른 잡의 권한으로 확대되지 않습니다. YAML에 권한이 명시되므로 코드 리뷰에서도 "이 잡에 이 권한이 왜 필요한가"를 자연스럽게 검토하게 됩니다.
+  - `GITHUB_TOKEN` 권한은 왜 가능한 한 좁혀야 할까요 — 본문에서 구체적으로 다룹니다.
 - **OIDC는 장기 키 문제를 어떻게 줄여 줄까요?**
-  - OIDC는 워크플로우 실행 시점에 임시 토큰을 발급받으므로 GitHub Secrets에 장기 키를 저장할 필요가 없습니다. 토큰은 15분-1시간만 유효하고, 재사용이 불가능합니다. IAM 정책으로 특정 저장소/브랜치/환경에서만 토큰이 유효하도록 제한할 수 있어, "키가 유출되면 무엇이 위험한가"라는 질문 자체가 사라집니다.
+  - OIDC는 장기 키 문제를 어떻게 줄여 줄까요 — 본문에서 구체적으로 다룹니다.
+- **한눈에 보는 secret 흐름에서 가장 흔한 실수는 무엇일까요?**
+  - 이 그림은 secret이 한 군데에만 존재하는 값이 아니라는 점을 보여 줍니다. 어디서 저장하고, 어느 환경에서만 열어 주고, 런타임에 어떻게 가리는지가 모두 별도 결정입니다.
+- **핵심 용어를 먼저 정리하겠습니다을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 성숙한 팀은 secret의 단일 출처를 Vault, Doppler, 1Password 같은 외부 시스템으로 두고, GitHub Actions는 그 값을 오래 저장하기보다 짧게 빌려 오는 방향으로 갑니다. 이때 OIDC가 핵심 역할을 합니다.
+- **자동화 전과 후를 비교해 보겠습니다의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - secret 관리가 약한 팀은 `.env` 파일을 커밋하거나, 메신저로 액세스 키를 전달하거나, 퇴사한 사람이 알던 키를 몇 년째 그대로 쓰기도 합니다. 이 구조는 평소에는 조용하지만 사고가 났을 때 피해가 큽니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

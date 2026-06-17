@@ -410,25 +410,17 @@ incident 중에는 명령 위치를 찾는 시간도 비용입니다. 서비스�
 ## 처음 질문으로 돌아가기
 
 - **불을 끄는 일과 원인을 없애는 일은 어떻게 다를까요?**
-  - 본문에서 강조했듯이 mitigation은 "지금 사용자 피해를 멈춘다"는 단기 목표, resolution은 "같은 원인이 다시 일어나지 않게 한다"는 영구 목표입니다. 두 작업을 같은 자리에서 동시에 끝내려 하면 mitigation이 늦어져 피해가 커지므로, 먼저 잠시라도 피를 멎게 하고 그 다음에 정확한 치료에 시간을 쓰는 순서가 원칙입니다.
+  - 불을 끄는 일과 원인을 없애는 일은 어떻게 다를까요 — 본문에서 구체적으로 다룹니다.
 - **롤백은 왜 가장 강력한 mitigation 수단일까요?**
-  - 본문에서 본 것처럼 대부분의 incident는 직전 변경(배포·설정·기능 플래그)으로 시작되고, 롤백은 그 변경을 통째로 되돌려 "최소한 어제는 잘 됐다"는 알려진 안전 상태로 즉시 복귀하는 가장 단순한 액션이기 때문입니다. 진단을 마치기 전에도 쓸 수 있다는 점에서, "원인을 다 이해할 때까지 기다리지 않아도 되는" 거의 유일한 1차 대응 수단입니다.
+  - 가장 빠른 완화 수단은 대개 이전 정상 상태로 돌아가는 것입니다. 그래서 롤백 절차는 incident 전에 준비돼 있어야 합니다.
 - **스케일 아웃, 스로틀, 킬 스위치는 언제 써야 할까요?**
-  - 본문 사용처처럼 스케일 아웃은 트래픽이 한계 용량을 초과해 정상 코드가 단지 자원이 부족해 실패할 때, 스로틀은 일부 사용자/엔드포인트의 과도한 호출이 다른 사용자까지 무너뜨릴 때, 킬 스위치는 특정 기능 자체가 사고의 원인이라 그 기능만 즉시 꺼야 할 때 씁니다. 셋 다 mitigation 도구이지 resolution은 아니므로, 적용 후에는 반드시 원인 제거 작업이 별도로 따라붙어야 합니다.
-  - 먼저 고객을 정상 상태로 돌리는 게 우선입니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [Incident Response 101 (1/10): Incident란 무엇인가?](./01-what-is-incident.md)
-- [Incident Response 101 (2/10): Severity 분류](./02-severity.md)
-- [Incident Response 101 (3/10): 초기 대응](./03-initial-response.md)
-- [Incident Response 101 (4/10): Communication](./04-communication.md)
-- [Incident Response 101 (5/10): Timeline 작성](./05-timeline.md)
-- [Incident Response 101 (6/10): Root Cause Analysis](./06-root-cause-analysis.md)
-- **Incident Response 101 (7/10): Mitigation과 Resolution (현재 글)**
-- [Incident Response 101 (8/10): Postmortem](./08-postmortem.md)
-- [Incident Response 101 (9/10): 재발 방지](./09-prevention.md)
-- [Incident Runbook 만들기](./10-incident-runbook.md)
+  - 스케일 아웃, 스로틀, 킬 스위치는 언제 써야 할까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 주제가 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - mitigation과 resolution을 혼동하면 같은 incident가 밤에 다시 열릴 수 있습니다.
+- **한눈에 보는 구조을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - incident 대응은 보통 이 순서를 따릅니다. 먼저 서비스를 안정화하고, 그 뒤에 근본 조치를 적용합니다. 두 단계를 섞으면 판단과 공지가 함께 흔들립니다.
+- **전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이전: 완전히 고친 뒤에만 공지합니다.
 
 <!-- toc:end -->
 

@@ -370,11 +370,17 @@ def timed(fn, *args, **kwargs):
 ## 처음 질문으로 돌아가기
 
 - **`execute`, `executemany`, `fetchone`, `fetchall`, `fetchmany`는 각각 언제 써야 할까요?**
-  - 단일 SQL 한 번은 `execute()`, 같은 INSERT/UPDATE를 여러 파라미터로 반복할 때는 `executemany()`가 기준입니다. 조회는 PK lookup이면 `fetchone()`, 작은 결과셋이면 `fetchall()`, 배치 처리면 `fetchmany()`나 `for row in cur`를 선택해야 메모리와 왕복 횟수를 함께 통제할 수 있습니다.
+  - `execute`, `executemany`, `fetchone`, `fetchall`, `fetchmany`는 각각 언제 써야 할까요 — 본문에서 구체적으로 다룹니다.
 - **큰 결과셋을 메모리를 터뜨리지 않고 처리하려면 어떤 패턴을 써야 할까요?**
-  - 이 글의 기본 답은 `fetchall()` 대신 cursor iteration이나 `fetchmany(chunk)`를 쓰는 것입니다. `export_notes()` 예제처럼 `cur.arraysize = chunk`를 두고 `while True: rows = cur.fetchmany(chunk)`로 흘리면 row 수와 무관하게 일정한 메모리만 사용합니다.
+  - DB-API 코드는 SQL 문장보다 경계 관리가 더 중요합니다. 연결 수명, 커서 재사용 범위, 커밋/롤백 시점을 코드로 드러내야 장애 시 복구가 쉬워집니다.
 - **`cursor.description`은 어떤 메타데이터를 제공할까요?**
-  - `cursor.description`은 마지막 SELECT 결과의 컬럼 메타데이터를 7-tuple 목록으로 제공하며, 예제에서는 `col[0]`과 `col[1]`로 name과 type_code를 확인했습니다. 그래서 dict 변환이나 row factory를 도입하기 전에도 결과 컬럼 이름을 코드로 안전하게 읽어 낼 수 있습니다.
+  - `cursor.description`은 어떤 메타데이터를 제공할까요 — 본문에서 구체적으로 다룹니다.
+- **6. 어떤 메서드를 언제 쓰나에서 가장 흔한 실수는 무엇일까요?**
+  - 1. **결과셋이 큰 query에 `fetchall()` 호출** - 100만 row가 나오면 그대로 OOM. 항상 결과 크기를 가정하지 않고 streaming pattern을 default로 둡니다.
+- **7. 결과 메타데이터을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - `cursor.description`은 마지막 SELECT의 column metadata를 7-tuple list로 반환합니다.
+- **8. Streaming + transformation 실전 예제의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - CSV로 export하는 ETL을 streaming + chunk로 작성합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

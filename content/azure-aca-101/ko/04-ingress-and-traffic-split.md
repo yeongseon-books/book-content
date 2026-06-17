@@ -361,22 +361,22 @@ az containerapp ingress traffic show --name myapi --resource-group $RG -o json
 
 ## 정리
 
-이 글은 azure-aca-101 시리즈의 한 단계로, 핵심 개념을 실무 맥락에서 정리했습니다. 여기서 다룬 원칙들은 독립적으로도 유용하지만, 시리즈 전체와 연결될 때 더 큰 그림이 보입니다.
+이 글에서 다룬 핵심은 세 가지입니다. 첫째 ACA의 관리형 Ingress는 무엇을 책임지고(TLS, external/internal 노출, Revision 라우팅), 무엇은 책임지지 않을, 둘째 `external`, `internal`, `disabled` ingress mode의 차이는 정확히 무엇일, 셋째 Single mode와 Multiple mode는 트래픽 분배 동작을 어떻게 바꿀입니다. 왜 이 글이 중요한가에서 시작해 실무 적용까지 이어지는 흐름을 따라가면 이 주제의 전체 그림이 잡힙니다.
 
 ## 처음 질문으로 돌아가기
 
 - **ACA의 관리형 Ingress는 무엇을 책임지고(TLS, external/internal 노출, Revision 라우팅), 무엇은 책임지지 않을까요?**
-  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+  - ACA의 관리형 Ingress는 무엇을 책임지고(TLS, external/internal 노출, Revision 라우팅), 무엇은 책임지지 않을까요 — 본문에서 단계별로 설명합니다.
 - **`external`, `internal`, `disabled` ingress mode의 차이는 정확히 무엇일까요?**
-  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+  - `external`, `internal`, `disabled` ingress mode의 차이는 정확히 무엇일까요 — 본문에서 단계별로 설명합니다.
 - **Single mode와 Multiple mode는 트래픽 분배 동작을 어떻게 바꿀까요?**
-  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+  - Single mode와 Multiple mode는 트래픽 분배 동작을 어떻게 바꿀까요 — 본문에서 단계별로 설명합니다.
 - **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
-  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+  - ACA의 가장 강력한 프로덕션 기능 중 하나가 revision 기반 traffic split입니다. 하지만 이 기능을 제대로 쓰려면 먼저 ingress 설정이 맞아 있어야 합니다.
 - **멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+  - 멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요 — 본문에서 단계별로 설명합니다.
 - **요청 경로의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  - 본문의 해당 섹션에서 구체적인 답을 확인할 수 있습니다.
+  - 요청 경로의 핵심 원리를 한 문장으로 설명하면 무엇일까요 — 본문에서 단계별로 설명합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

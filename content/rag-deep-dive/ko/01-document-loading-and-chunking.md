@@ -462,13 +462,17 @@ RAG 파이프라인의 앞단은 생각보다 단순한 코드로 이루어져 �
 ## 처음 질문으로 돌아가기
 
 - **유사도 검색이 시작되기 전, 로더와 splitter 경계는 왜 검색 품질을 좌우할까요?**
-  로더와 splitter가 만든 문서 단위가 그대로 임베딩되고 검색되므로, 경계가 무너지면 retriever는 좋은 근거를 회수하기 어렵습니다.
-
+  - 유사도 검색이 시작되기 전, 로더와 splitter 경계는 왜 검색 품질을 좌우할까요 — 본문에서 구체적으로 다룹니다.
 - **Character, Recursive, Token splitter는 같은 텍스트를 어떻게 다르게 자를까요?**
-  Character splitter는 구분자와 문자 수, Recursive splitter는 우선순위 구분자, Token splitter는 토큰 창을 기준으로 잘라 같은 텍스트도 다른 청크를 만듭니다.
-
+  - 정답 숫자는 없습니다. 대신 틀린 접근은 분명합니다. 문서 종류가 다른데도 모든 코퍼스에 `chunk_size=1000, chunk_overlap=200`을 일괄 적용하는 방식입니다.
 - **`chunk_overlap`이 설정값만큼 정확히 겹치지 않는 것처럼 보일 때 어디를 봐야 할까요?**
-  실제 생성된 청크 출력과 병합 로직, separator, 토큰 길이를 먼저 확인해야 합니다. overlap은 “항상 정확히 N자 반복”이 아니라 분할·병합 결과에 따라 달라집니다.
+  - `chunk_overlap`이 설정값만큼 정확히 겹치지 않는 것처럼 보일 때 어디를 봐야 할까요 — 본문에서 구체적으로 다룹니다.
+- **최소 실행 예제에서 가장 흔한 실수는 무엇일까요?**
+  - 예제 파일: `en/01-document-loading-and-chunking/main.py`
+- **Retry policy을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - The worker retries a failed message three times.
+- **Operator action의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - The on-call engineer checks the exception chain and the original payload.
 
 <!-- toc:begin -->
 ## 시리즈 목차

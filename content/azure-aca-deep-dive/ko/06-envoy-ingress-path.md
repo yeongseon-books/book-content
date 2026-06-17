@@ -347,11 +347,17 @@ ACA의 Ingress를 정확하게 이해하려면 제품이 문서화한 ingress �
 ## 처음 질문으로 돌아가기
 
 - **ACA의 public ingress 표면과 숨은 라우팅 계층은 어떻게 구분해 이해해야 할까요?**
-  - FQDN, TLS termination, forwarded header, traffic split, session affinity처럼 Microsoft가 문서화한 부분은 ACA-managed ingress surface로 읽어야 합니다. 그 뒤에서 weighted upstream selection과 service-style fan-out이 ready replica 집합으로 이어진다고 보는 쪽이 Envoy·Kubernetes 패턴에 기대는 가장 방어 가능한 내부 모델입니다.
+  - ACA의 public ingress 표면과 숨은 라우팅 계층은 어떻게 구분해 이해해야 할까요 — 본문에서 구체적으로 다룹니다.
 - **TLS는 어디서 종료되고, 앱은 원래 요청 정보를 어떤 header로 복구할까요?**
-  - TLS는 기본적으로 사용자 컨테이너가 아니라 ingress point에서 종료되고, 앱은 내부 HTTP 요청과 함께 `X-Forwarded-Proto`, `X-Forwarded-For`, 경우에 따라 `X-Forwarded-Client-Cert`를 받습니다. 그래서 absolute URL 생성, scheme-aware redirect, client IP 로깅은 프레임워크가 이 프록시 header를 신뢰하도록 맞춰야 올바르게 동작합니다.
+  - TLS는 어디서 종료되고, 앱은 원래 요청 정보를 어떤 header로 복구할까요 — 본문에서 구체적으로 다룹니다.
 - **Revision traffic split은 요청 경로의 어느 지점에서 실제가 될까요?**
-  - Revision traffic split은 사용자 컨테이너에 들어간 뒤가 아니라, TLS 종료 다음 단계의 ingress routing에서 실제가 됩니다. 즉 Envoy형 weighted destination이 먼저 `rev-blue`와 `rev-green` 같은 upstream을 고르고, 그 뒤에야 선택된 Revision의 ready replica 집합으로 service-style hop이 이어집니다.
+  - Revision traffic split은 요청 경로의 어느 지점에서 실제가 될까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - Ingress 문제를 앱부터 의심하는 습관은 ACA에서 특히 비효율적입니다. 사용자가 컨테이너 코드에 도달하기 전에 이미 public edge, TLS termination, host 처리, forwarded header, revision selection, ready replica 선택 같은 여러 층을 통과하기 때문입니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - ACA Ingress를 가장 정확하게 설명하는 방법은 두 층으로 나누는 것입니다. **문서화된 부분은 ACA-managed ingress surface이고, 그 뒤의 런타임 라우팅은 Envoy형 proxy behavior와 Kubernetes형 service pattern으로 제한적으로 추론**하는 것입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - ACA Ingress를 가장 정확하게 설명하는 방법은 두 층으로 나누는 것입니다. **문서화된 부분은 ACA-managed ingress surface이고, 그 뒤의 런타임 라우팅은 Envoy형 proxy behavior와 Kubernetes형 service pattern으로 제한적으로 추론**하는 것입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

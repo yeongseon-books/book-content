@@ -756,13 +756,17 @@ ACME_API_URL=https://staging.acme.dev acme deploy
 ## 처음 질문으로 돌아가기
 
 - **`pip install` 후 바로 실행되는 명령어는 어떻게 만들까요?**
-  - `pyproject.toml`의 `[project.scripts]`에 `명령이름 = "패키지.모듈:함수"` 형식으로 entry point를 등록합니다. `pip install` 시 해당 함수를 호출하는 래퍼 스크립트가 `bin/` 디렉터리에 자동 생성되어 터미널에서 바로 실행할 수 있게 됩니다.
-
+  - Click은 Python CLI 프레임워크 중 가장 널리 사용됩니다. 데코레이터 기반으로 명령, 옵션, 인자를 선언합니다.
 - **`[project.scripts]` entry point는 어떻게 동작할까요?**
-  - pip은 설치 시 `site-packages`의 `.dist-info/entry_points.txt`에 매핑을 기록하고, `bin/` 디렉터리에 Python 래퍼 스크립트를 생성합니다. 이 스크립트는 지정된 모듈을 import하고 지정된 함수를 호출하며, 함수의 반환값을 `sys.exit()`에 전달합니다.
-
-- **CLI 프레임워크는 어떤 것을 선택해야 할까요?**
-  - 외부 의존성을 원하지 않으면 `argparse`, 풍부한 생태계와 플러그인이 필요하면 `click`, 타입 힌트 기반 간결한 코드를 원하면 `typer`를 선택합니다. `typer`는 내부적으로 `click`을 사용하므로 click의 기능을 그대로 쓸 수 있습니다.
+  - `[project.scripts]` entry point는 어떻게 동작할까요 — 본문에서 구체적으로 다룹니다.
+- **`argparse`와 `click`은 무엇이 다를까요?**
+  - `argparse`와 `click`은 무엇이 다를까요 — 본문에서 구체적으로 다룹니다.
+- **이 글에서 배우는 내용에서 가장 흔한 실수는 무엇일까요?**
+  - 사용자는 `python my_script.py`보다 `mytool`처럼 바로 실행되는 명령어를 더 편하게 받아들입니다. 패키지에 entry point를 등록해 두면 설치 직후 터미널에서 명령어를 바로 사용할 수 있어 배포 경험이 크게 좋아집니다.
+- **멘탈 모델을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - entry point는 앱스토어에서 앱을 설치하면 홈 화면에 아이콘이 생기는 것과 비슷합니다. `pip install`이 설치 과정이고, entry point는 생성된 아이콘입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요 — 본문에서 구체적으로 다룹니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -563,13 +563,17 @@ if __name__ == "__main__":
 ## 처음 질문으로 돌아가기
 
 - **`RetrievalQA` 같은 고전 API와 LCEL 조립은 각각 어떤 경계를 숨기고 드러낼까요?**
-  고전 API는 빠르게 조립해 주지만 내부 prompt와 combine 전략을 숨길 수 있고, LCEL은 단계가 길어지는 대신 각 경계를 코드에서 볼 수 있게 합니다.
-
+  - `langchain/chains/retrieval_qa/base.py`를 먼저 보면 `BaseRetrievalQA`가 눈에 들어옵니다.
 - **retriever, prompt, llm, parser를 직접 이으면 디버깅에서 무엇이 쉬워질까요?**
-  각 단계를 직접 이으면 검색 결과, 프롬프트 입력, 모델 출력, parser 결과를 따로 찍어 실패 위치를 좁히기 쉽습니다.
-
+  - retriever, prompt, llm, parser를 직접 이으면 디버깅에서 무엇이 쉬워질까요 — 본문에서 구체적으로 다룹니다.
 - **체인 조립 후 source document를 잃지 않으려면 어디서 결과 형태를 고정해야 할까요?**
-  최종 출력 dict나 Pydantic 모델처럼 answer와 source_documents를 함께 담는 형태를 체인 끝에서 고정해야 출처가 사라지지 않습니다.
+  - LCEL에서 가장 자주 보게 되는 RAG 기본형은 다음과 같습니다.
+- **최소 실행 예제에서 가장 흔한 실수는 무엇일까요?**
+  - 예제 파일: `en/05-rag-chain-assembly/main.py`
+- **소스 버전을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 글의 모든 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다.
+- **3. LCEL로 RAG 체인 조립하기: dict literal은 왜 `RunnableParallel`이 되는가의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - LCEL에서 가장 자주 보게 되는 RAG 기본형은 다음과 같습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

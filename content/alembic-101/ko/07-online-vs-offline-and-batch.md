@@ -406,11 +406,17 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **Alembic이 제공하는 두 실행 모드, online과 offline은 어떻게 다를까요?**
-  - online은 `alembic upgrade head`처럼 DB에 직접 연결해 SQL을 실행하고, offline은 `alembic upgrade head --sql`처럼 SQL 텍스트만 출력합니다. 하나는 적용용이고 다른 하나는 리뷰용이라는 역할 구분이 이 글의 핵심입니다.
+  - Alembic이 제공하는 두 실행 모드, online과 offline은 어떻게 다를까요 — 본문에서 구체적으로 다룹니다.
 - **`--sql`로 실제 SQL을 어떻게 미리 볼 수 있을까요?**
-  - `alembic upgrade <from>:<to> --sql > review.sql`처럼 구간을 명시해 출력하면 됩니다. 본문이 `<from>:<to>` 문법을 강조한 이유는 `head`만 쓰면 이미 적용된 구간까지 전부 뽑혀 리뷰 대상이 흐려지기 때문입니다.
+  - `--sql` 출력은 길어서 대충 넘기기 쉽습니다. 아래 항목을 고정해서 읽으면 리뷰 품질이 올라갑니다.
 - **DBA 리뷰용 SQL 스크립트는 어떤 흐름으로 만들까요?**
-  - PR 단계에서 `review.sql`을 붙여 DBA가 실제 DDL을 읽고, 배포 시점에는 여전히 online 모드로 `alembic upgrade head`를 실행하는 흐름이 이 글의 답입니다. 이렇게 해야 SQL preview와 `alembic_version` 갱신이 같은 배포 단위로 이어집니다.
+  - `--sql` 출력은 길어서 대충 넘기기 쉽습니다. 아래 항목을 고정해서 읽으면 리뷰 품질이 올라갑니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - > Alembic은 두 모드로 실행됩니다. **online은 DB에 연결해 SQL을 직접 실행하고, offline은 DB 연결 없이 SQL 텍스트를 표준 출력으로 보냅니다.** offline은 dry-run, 리뷰, 스크립트화용이고, online은 실제 적용용입니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 여기서 반드시 기억할 문법은 `<from>:<to>`입니다. `head`만 쓰면 `None:head`로 해석되어 처음부터 head까지의 SQL이 모두 출력됩니다. 이미 적용된 구간을 빼고 싶다면 `<current>:<target>`을 명시해야 합니다.
+- **변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 여기서 반드시 기억할 문법은 `<from>:<to>`입니다. `head`만 쓰면 `None:head`로 해석되어 처음부터 head까지의 SQL이 모두 출력됩니다. 이미 적용된 구간을 빼고 싶다면 `<current>:<target>`을 명시해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

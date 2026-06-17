@@ -400,11 +400,17 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **`alembic revision --autogenerate`는 내부에서 무엇을 비교할까요?**
-  - 이 명령은 `env.py`가 만든 connection으로 현재 DB를 `Inspector`로 읽고, 그 결과를 `target_metadata`와 비교한 뒤 `MigrationOps`를 `op` 호출로 렌더링합니다. 즉, 본문 표현대로 ground truth와 desired state의 diff를 파일로 직렬화하는 과정입니다.
+  - `alembic revision --autogenerate`는 내부에서 무엇을 비교할까요 — 본문에서 구체적으로 다룹니다.
 - **어떤 변경은 잘 잡고, 어떤 변경은 놓치거나 옵션이 필요할까요?**
-  - 새 테이블·새 컬럼·`nullable` 변경은 잘 잡지만, rename은 `drop_column` + `add_column`으로 잘못 읽고 데이터 변경은 아예 보지 못합니다. 그래서 `display_name` 예시처럼 generated file을 그대로 커밋하면 안 되고 사람이 마지막에 의도를 복원해야 합니다.
+  - 어떤 변경은 잘 잡고, 어떤 변경은 놓치거나 옵션이 필요할까요 — 본문에서 구체적으로 다룹니다.
 - **`compare_type`, `compare_server_default`, `include_object`, `include_name`은 언제 필요할까요?**
-  - `String(50)`에서 `String(100)`으로 바뀌거나 `server_default`가 바뀌는 변경을 잡으려면 앞의 두 옵션이 필요합니다. 반대로 `legacy_` 같은 외부 소유 테이블이 diff를 오염시키면 `include_object`나 `include_name`으로 비교 대상에서 빼는 것이 이 글의 실무 답안입니다.
+  - `compare_type`, `compare_server_default`, `include_object`, `include_name`은 언제 필요할까요 — 본문에서 구체적으로 다룹니다.
+- **멘탈 모델에서 가장 흔한 실수는 무엇일까요?**
+  - > Autogenerate는 **현재 DB(ground truth)와 `target_metadata`(desired state)의 diff를 만들고, 그 차이를 `op` 호출로 직렬화하는 도구**입니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - `alembic revision --autogenerate -m "..."`는 다음 순서로 동작합니다.
+- **변경 전후의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - `alembic revision --autogenerate -m "..."`는 다음 순서로 동작합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

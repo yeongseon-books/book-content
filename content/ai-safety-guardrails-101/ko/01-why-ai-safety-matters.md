@@ -360,24 +360,17 @@ AI Safety가 중요한 이유는 모델이 특별히 위험해서가 아니라, 
 ## 처음 질문으로 돌아가기
 
 - **LLM 호출을 신뢰 경계 안쪽으로 두면 어떤 위험을 놓치게 될까요?**
-  - 모델 출력이 정책, 권한, 사실성, 개인정보 기준을 자동으로 지킬 것이라는 가정을 하게 되어 위험한 행동을 뒤늦게 발견합니다.
+  - 처음부터 거대한 정책 엔진이 필요한 것은 아닙니다. 오히려 가장 먼저 필요한 것은 세 가지 경계를 코드로 분리하는 일입니다.
 - **Guardrail은 prompt 규칙과 무엇이 달라야 실제 안전장치가 될까요?**
-  - prompt 규칙은 요청이지만 guardrail은 코드, 정책 검사, 로깅, 차단처럼 실행 경로에서 강제되어야 합니다.
+  - Guardrail은 prompt 규칙과 무엇이 달라야 실제 안전장치가 될까요 — 본문에서 구체적으로 다룹니다.
 - **처음 운영에 넣을 최소 guardrail은 어디에 두어야 할까요?**
-  - 입력 전처리와 출력 검증 사이, 특히 사용자에게 응답하거나 tool을 실행하기 직전에 최소 guardrail을 둬야 합니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- **AI Safety & Guardrails 101 (1/10): AI Safety가 왜 중요한가 (현재 글)**
-- [AI Safety & Guardrails 101 (2/10): Prompt Injection 방어](./02-prompt-injection-defense.md)
-- [AI Safety & Guardrails 101 (3/10): 출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
-- [AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹](./04-pii-detection-redaction.md)
-- [AI Safety & Guardrails 101 (5/10): Jailbreak 탐지](./05-jailbreak-detection.md)
-- [AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지](./06-toxicity-bias-detection.md)
-- [AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증](./07-hallucination-guardrails.md)
-- [AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지](./08-rate-limiting-abuse-prevention.md)
-- [AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스](./09-audit-logging-compliance.md)
-- [AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
+  - 처음부터 거대한 정책 엔진이 필요한 것은 아닙니다. 오히려 가장 먼저 필요한 것은 세 가지 경계를 코드로 분리하는 일입니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - AI Safety를 초반에 구조로 넣어 두면 팀이 나중에 고쳐야 할 문제가 줄어듭니다. 입력 검증, 출력 검증, 감사 추적을 분리해 두면 기능 추가가 생겨도 정책을 한 곳에서 조정할 수 있고, 사고 대응도 훨씬 빨라집니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - AI Safety를 막연한 윤리 담론으로 이해하면 구현 우선순위가 흐려집니다. 프로덕션에서 더 실용적인 접근은 LLM 호출을 네트워크 요청이나 사용자 업로드와 비슷한 비신뢰 경계로 보는 것입니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - AI Safety를 막연한 윤리 담론으로 이해하면 구현 우선순위가 흐려집니다. 프로덕션에서 더 실용적인 접근은 LLM 호출을 네트워크 요청이나 사용자 업로드와 비슷한 비신뢰 경계로 보는 것입니다.
 
 <!-- toc:end -->
 

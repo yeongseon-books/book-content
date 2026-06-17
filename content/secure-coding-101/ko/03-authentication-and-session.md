@@ -477,24 +477,15 @@ def complete_password_reset(token: str, new_password: str) -> None:
 ## 처음 질문으로 돌아가기
 
 - **인증과 인가는 무엇이 다를까요?**
-  - 인증(AuthN)은 "너는 누구인가"를 확인하는 절차이고, 인가(AuthZ)는 "너는 무엇을 할 수 있는가"를 판단하는 절차입니다. 본문에서 비밀번호 해시와 세션은 인증에 해당하고, 4장에서 다룰 정책 함수와 자원 소유권 검사가 인가에 해당합니다.
+  - 인증과 인가는 무엇이 다를까요 — 본문에서 구체적으로 다룹니다.
 - **비밀번호 해시는 왜 의도적으로 느린 알고리즘을 써야 할까요?**
-  - bcrypt vs Argon2 비교표에서 보았듯이 빠른 해시는 GPU로 초당 수십억 개를 시도할 수 있습니다. 의도적으로 느린 해시(memory-hard 포함)를 쓰면 대량 추측 비용이 실질적으로 커져서 유출 시에도 복구가 어려워집니다.
+  - 비밀번호 해시는 왜 의도적으로 느린 알고리즘을 써야 할까요 — 본문에서 구체적으로 다룹니다.
 - **세션 쿠키와 JWT는 어떤 장단점이 있을까요?**
-  - 세션 쿠키는 서버가 상태를 보관해 즉시 폐기가 가능하지만 저장소 부담이 있습니다. JWT는 무상태라 수평 확장이 쉽지만, 탈취 후 만료 전까지 폐기가 어렵습니다. 토큰 갱신 흐름에서 보았듯이 짧은 수명 + refresh token 조합으로 양쪽 장점을 취하는 방식이 실무 표준입니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [Secure Coding 101 (1/10): Secure Coding이란 무엇인가?](./01-what-is-secure-coding.md)
-- [Secure Coding 101 (2/10): 입력값 검증](./02-input-validation.md)
-- **Secure Coding 101 (3/10): 인증과 세션 (현재 글)**
-- [Secure Coding 101 (4/10): 인가와 권한](./04-authorization-and-permissions.md)
-- [Secure Coding 101 (5/10): 안전한 데이터 저장](./05-safe-data-storage.md)
-- [Secure Coding 101 (6/10): Secret과 키 관리](./06-secret-and-key-management.md)
-- [Secure Coding 101 (7/10): SQL Injection과 ORM 안전 사용](./07-sql-injection-and-orm.md)
-- [Secure Coding 101 (8/10): XSS와 CSRF 방어](./08-xss-and-csrf.md)
-- [Secure Coding 101 (9/10): Dependency 취약점 관리](./09-dependency-vulnerabilities.md)
-- [안전한 로깅과 감사](./10-safe-logging-and-audit.md)
+  - 인증과 세션은 원칙만 알아서는 안전해지지 않습니다. 공격자가 실제로 어떤 경로를 타는지, 어디서 구현 실수가 가장 자주 나는지를 재현해야 방어가 구체화됩니다.
+- **한눈에 보는 구조에서 가장 흔한 실수는 무엇일까요?**
+  - 로그인 요청은 먼저 비밀번호 검증을 거치고, 검증이 끝나면 서버가 세션을 발급합니다. 이후 요청은 쿠키나 토큰으로 그 세션을 다시 증명합니다.
+- **바꾸기 전과 후을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 1. **MD5나 SHA1로 비밀번호를 해시하는 경우**: 너무 빠르고 이미 안전하지 않습니다.
 
 <!-- toc:end -->
 

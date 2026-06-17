@@ -386,24 +386,17 @@ def metric_distribution_report(rows: list[dict]) -> pd.DataFrame:
 ## 처음 질문으로 돌아가기
 
 - **Exact Match, BLEU, ROUGE 같은 결정적 지표는 언제 빠른 필터로 유용할까요?**
-  - 정답 문자열이 고정된 extraction, format compliance, keyword presence, 요약의 rough recall처럼 빠른 회귀 감시에 유용합니다.
+  - 다음 글에서는 자유 형식 답변을 다루기 위해 강한 LLM에게 채점을 맡기는 방법을 다룹니다. 결정적 지표가 어디서 멈추는지 알아야 LLM-as-Judge를 왜 써야 하는지도 분명해집니다.
 - **결정적 지표가 의미 판단까지 대신한다고 보면 어떤 오판이 생길까요?**
-  - 표현이 다른 정답을 틀렸다고 하거나, 단어가 겹치는 틀린 답을 높게 평가하는 오판이 생깁니다.
+  - 다음 글에서는 자유 형식 답변을 다루기 위해 강한 LLM에게 채점을 맡기는 방법을 다룹니다. 결정적 지표가 어디서 멈추는지 알아야 LLM-as-Judge를 왜 써야 하는지도 분명해집니다.
 - **속도와 해석 가능성을 얻는 대신 어떤 보완 평가를 붙여야 할까요?**
-  - rubric, LLM-as-judge, human review, task-specific checks를 함께 붙여 의미 품질과 사용자 관점의 성공 여부를 보완해야 합니다.
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
-- [AI Evaluation 101 (2/10): 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
-- **AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE (현재 글)**
-- [AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기](./04-llm-as-judge.md)
-- [AI Evaluation 101 (5/10): Rubric 기반 채점 설계](./05-rubric-based-scoring.md)
-- [AI Evaluation 101 (6/10): RAG 시스템 평가하기](./06-rag-evaluation.md)
-- [AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory](./07-agent-evaluation.md)
-- [AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게](./08-regression-testing.md)
-- [AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가](./09-ab-testing-llms.md)
-- [AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가](./10-production-evaluation.md)
+  - 다음 글에서는 자유 형식 답변을 다루기 위해 강한 LLM에게 채점을 맡기는 방법을 다룹니다. 결정적 지표가 어디서 멈추는지 알아야 LLM-as-Judge를 왜 써야 하는지도 분명해집니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 결정적 지표는 평가 비용을 크게 낮춰 줍니다. 같은 입력에 같은 점수를 주기 때문에 CI에 넣기도 쉽고, 분산이나 편차를 따로 설명하지 않아도 됩니다. 그래서 첫 자동화 단계에서 매우 매력적으로 보입니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다.
 
 <!-- toc:end -->
 

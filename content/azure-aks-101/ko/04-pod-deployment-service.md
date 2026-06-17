@@ -382,11 +382,17 @@ kubectl get pods -l app=fastapi-hello -w
 ## 처음 질문으로 돌아가기
 
 - **Pod와 컨테이너는 왜 같은 말이 아니며, 왜 Kubernetes는 Pod를 스케줄링 단위로 볼까요?**
-  - Kubernetes는 `containerPort: 8000` 같은 컨테이너 설정을 담더라도 실제 배치는 Pod 단위로 합니다. Pod는 네트워크 네임스페이스와 볼륨, 수명주기를 함께 공유하므로, 컨테이너 하나 예제라도 스케줄링과 복구의 최소 단위는 컨테이너가 아니라 Pod입니다.
+  - Pod와 컨테이너는 왜 같은 말이 아니며, 왜 Kubernetes는 Pod를 스케줄링 단위로 볼까요 — 본문에서 구체적으로 다룹니다.
 - **Deployment는 Pod를 직접 여러 개 만드는 것과 무엇이 다를까요?**
-  - `replicas: 3`, `strategy.rollingUpdate.maxSurge: 1`, `maxUnavailable: 0`처럼 원하는 개수와 업데이트 방식을 선언하는 것이 Deployment의 역할입니다. Pod를 손으로 여러 개 띄우는 방식과 달리 Deployment는 죽은 Pod 복구, 롤링 업데이트, `kubectl rollout status deployment/fastapi-hello` 같은 운영 경로를 함께 제공합니다.
+  - Deployment는 Pod를 직접 여러 개 만드는 것과 무엇이 다를까요 — 본문에서 구체적으로 다룹니다.
 - **Service는 왜 Pod IP를 직접 쓰지 않게 만드는 걸까요?**
-  - Pod IP는 교체될 수 있지만 `Service`는 `selector: app: fastapi-hello`와 `targetPort: 8000`으로 안정적인 접근 지점을 남깁니다. 그래서 `kubectl get endpoints fastapi-hello`를 보면 현재 Ready Pod 집합이 바뀌어도 클라이언트는 `fastapi-hello`라는 이름으로 계속 붙을 수 있습니다.
+  - Service는 왜 Pod IP를 직접 쓰지 않게 만드는 걸까요 — 본문에서 구체적으로 다룹니다.
+- **왜 이 글이 중요한가에서 가장 흔한 실수는 무엇일까요?**
+  - 많은 Kubernetes 장애는 생각보다 아래층에서 시작합니다. 외부 요청이 실패해도 Ingress 문제가 아니라 Service selector 오타일 수 있고, Pod가 재생성되는 이유는 애플리케이션 코드가 아니라 Deployment 전략이나 probe 설정 때문일 수 있습니다.
+- **핵심 관점을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - Pod, Deployment, Service는 같은 일을 세 번 표현하는 중복 개념이 아닙니다.
+- **핵심 개념의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - Pod, Deployment, Service는 같은 일을 세 번 표현하는 중복 개념이 아닙니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

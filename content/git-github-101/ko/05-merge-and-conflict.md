@@ -512,11 +512,17 @@ index 2cb2a7f..2ee5ac1 100644
 ## 처음 질문으로 돌아가기
 
 - **fast-forward merge는 언제 일어날까요?**
-  - 현재 branch가 대상 branch의 조상일 때 일어납니다. 이때 Git은 새 merge commit 없이 포인터만 앞으로 이동하고, CLI에 `Fast-forward` 문구를 출력합니다.
+  - Git 2.34 이후 일반적인 두 branch 병합 기본 전략은 `ort`입니다. 출력에서 `Merge made by the 'ort' strategy.` 문구가 보이면 이 경로로 병합된 것입니다.
 - **three-way merge는 왜 부모가 두 개인 commit을 만들까요?**
-  - 이미 갈라진 두 줄기를 공통 조상 기준으로 다시 결합하기 때문입니다. 그래서 merge commit은 "현재 branch 끝"과 "합쳐진 branch 끝" 두 부모를 가집니다.
+  - Git 2.34 이후 일반적인 두 branch 병합 기본 전략은 `ort`입니다. 출력에서 `Merge made by the 'ort' strategy.` 문구가 보이면 이 경로로 병합된 것입니다.
 - **conflict marker의 `HEAD` 쪽과 incoming branch 쪽은 어떻게 읽을까요?**
-  - `<<<<<<< HEAD`와 `=======` 사이는 현재 branch 내용이고, `=======`와 `>>>>>>> <branch>` 사이는 incoming branch 내용입니다. marker를 제거한 뒤 `git add`로 해결 표시하고 테스트 후 commit해야 병합이 끝납니다.
+  - 둘 다 branch 통합 도구이지만 남는 이력이 다릅니다.
+- **핵심 그림에서 가장 흔한 실수는 무엇일까요?**
+  - 세 가지만 기억하면 됩니다.
+- **핵심 개념을 실무에 적용할 때 주의할 점은 무엇일까요?**
+  - 여기서 특히 많이 헷갈리는 지점은 `--no-ff`와 merge 전략(strategy)입니다. `--no-ff`는 **history 모양을 어떻게 남길지**에 대한 선택이고, 전략은 **Git이 실제 병합 계산을 어떤 알고리즘으로 수행할지**에 대한 선택입니다.
+- **전후 비교의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
+  - 세 가지만 기억하면 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
