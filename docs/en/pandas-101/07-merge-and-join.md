@@ -1,10 +1,10 @@
 ---
 series: pandas-101
 episode: 7
-title: Merge and Join
-status: content-ready
+title: "Pandas 101 (7/10): Merge and Join"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,31 @@ tags:
   - SQL
   - Beginner
 seo_description: Master inner, left, right, outer, and cross joins, and learn the difference between merge and join with hands-on code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Merge and Join
+# Pandas 101 (7/10): Merge and Join
 
-> Pandas 101 series (7/10)
+Production data rarely lives in one perfect table. Customer attributes sit in one dataset, orders in another, and campaign or event data somewhere else. That means the skill of combining tables safely is not optional. It is one of the most important parts of analysis work.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Pandas 101 series.
 
-**Core question**: Why are there *both merge and join*?
+Here we will treat `merge` and `join` as tools for validating relationships between key systems, not just for gluing columns together. Row counts and key assumptions matter as much as the output table itself.
 
-> *merge keys on *columns*; join keys on *indexes*. They do the same thing, but *the key location differs*.*
 
-<!-- a-grade-intro:end -->
+![pandas 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/07/07-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 7 flow overview*
+> *Merge is not just combining tables — it's validating relationships. Duplicate keys, unmatched rows, row explosion — most of this is *preventable by checking your keys first.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- *inner / left / right / outer / cross* joins
-- The difference between *merge* and *join*
-- Options *suffixes / indicator / validate*
-- A 5-step join hands-on
-- Five common mistakes
+- inner / left / right / outer / cross* joins?
+- The difference between *merge* and *join?
+- Options *suffixes / indicator / validate?
 
 ## Why It Matters
 
 Real data is *spread across many tables*. *Joining ability* equals *analysis ability*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Left["Left DF"] --> M["merge / join"]
-    Right["Right DF"] --> M
-    M --> Result["combined DF"]
-```
 
 ## Key Terms
 
@@ -90,6 +80,18 @@ print(users.merge(orders, on="uid", how="left"))
 print(users.merge(orders, on="uid", how="outer", indicator=True))
 ```
 
+When you review a join, the `_merge` column is often more valuable than the payload columns. It tells you immediately whether your assumptions about overlap and coverage were actually true.
+
+**Expected output:**
+
+```text
+   uid name  amount     _merge
+0    1    a   100.0       both
+1    1    a   200.0       both
+2    2    b    50.0       both
+3    3    c     NaN  left_only
+```
+
 ### Step 4 — suffixes
 
 ```python
@@ -105,6 +107,14 @@ try:
     users.merge(orders, on="uid", validate="one_to_one")
 except Exception as e:
     print("expected:", type(e).__name__)
+```
+
+`validate` is the difference between a quiet data bug and an explicit contract check. If your join cardinality assumption is wrong, you want the failure right here.
+
+**Expected output:**
+
+```text
+expected: MergeError
 ```
 
 ## What to Notice in This Code
@@ -146,21 +156,33 @@ CRM x orders, ads x conversions, users x events — *80% of analysis is joins*. 
 2. Construct data where *validate='one_to_one'* fails and inspect the *exception message*.
 3. Use the *indicator column* to find *right-only rows*.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 Joining is *half of analysis*. Next we cover *time series*.
 
+## Answering the Opening Questions
+
+- **inner / left / right / outer / cross* joins?**
+  - The article treats Merge and Join as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The difference between *merge* and *join?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Options *suffixes / indicator / validate?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
-- [Reading CSV and Excel](./03-read-csv-and-excel.md)
-- [Filtering and Selection](./04-filtering-and-selection.md)
-- [Handling Missing Values](./05-missing-values.md)
-- [groupby](./06-groupby.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
+- [Pandas 101 (3/10): Reading CSV and Excel](./03-read-csv-and-excel.md)
+- [Pandas 101 (4/10): Filtering and Selection](./04-filtering-and-selection.md)
+- [Pandas 101 (5/10): Handling Missing Values](./05-missing-values.md)
+- [Pandas 101 (6/10): Groupby and Aggregation](./06-groupby.md)
 - **Merge and Join (current)**
 - Time Series (upcoming)
-- apply and Vectorization (upcoming)
-- Real-world Data Analysis (upcoming)
+- Apply and Vectorization (upcoming)
+- Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

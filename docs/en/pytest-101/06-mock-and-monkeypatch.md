@@ -1,10 +1,10 @@
 ---
 series: pytest-101
 episode: 6
-title: Mock and Monkeypatch
+title: "pytest 101 (6/10): Mock and Monkeypatch"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,21 +16,29 @@ tags:
   - mock
   - monkeypatch
   - Test Doubles
-seo_description: Isolate external dependencies with mock and monkeypatch in pytest.
+seo_description: Isolate dependencies with mock and monkeypatch in pytest. Master function replacement, exception simulation, and call verification with assert.
 last_reviewed: '2026-05-04'
 ---
 
-# Mock and Monkeypatch
+# pytest 101 (6/10): Mock and Monkeypatch
+
+This is post 6 in the pytest 101 series.
 
 > pytest 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: How do you test a function without actually calling the database or an external API?
 
 > A mock replaces real dependencies with fake objects to isolate the code under test. Monkeypatch temporarily swaps functions, attributes, and environment variables within the test scope. This article covers the differences between the two tools and their usage patterns.
 
-<!-- a-grade-intro:end -->
+
+![pytest 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/06/06-01-big-picture.en.png)
+*pytest 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Mock and Monkeypatch?
+- Which signal should the example or diagram make visible for Mock and Monkeypatch?
+- What failure should be prevented first when Mock and Monkeypatch reaches a real system?
 
 ## What You Will Learn
 
@@ -51,7 +59,7 @@ In production, mocks prevent test failures caused by external service outages.
 
 > mock = swap the real thing with a fake to isolate the test
 
-```
+```text
 [Production]                    [Test]
 function → DB query → result    function → Mock(DB) → fake result
 function → HTTP call → response function → Mock(HTTP) → fake response
@@ -299,17 +307,29 @@ Monkeypatch fits simple substitutions like environment variables and config valu
 
 Mock and monkeypatch remove external dependencies to make tests fast and stable. Next, we'll explore concrete patterns for testing files, environment variables, and time-dependent code.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Mock and Monkeypatch?**
+  - The article treats Mock and Monkeypatch as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Mock and Monkeypatch?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Mock and Monkeypatch reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Write Tests?](./01-why-write-tests.md)
-- [Writing Your First pytest Test](./02-first-pytest-test.md)
-- [Assert and Exception Testing](./03-assert-and-exceptions.md)
-- [Understanding Fixtures](./04-fixtures.md)
-- [Parametrization](./05-parametrization.md)
+## In this series
+
+- [pytest 101 (1/10): Why Write Tests?](./01-why-write-tests.md)
+- [pytest 101 (2/10): Writing Your First pytest Test](./02-first-pytest-test.md)
+- [pytest 101 (3/10): Assert and Exception Testing](./03-assert-and-exceptions.md)
+- [pytest 101 (4/10): Understanding Fixtures](./04-fixtures.md)
+- [pytest 101 (5/10): Parametrization](./05-parametrization.md)
 - **Mock and Monkeypatch (current)**
 - Testing Files, Environment Variables, and Time (upcoming)
 - Coverage and Test Quality (upcoming)
 - Test Automation with GitHub Actions (upcoming)
 - Writing Testable Code (upcoming)
+
 <!-- toc:end -->
 
 ## References

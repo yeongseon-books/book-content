@@ -1,10 +1,10 @@
 ---
 series: clean-code-101
 episode: 7
-title: Comments and Documentation
-status: content-ready
+title: "Clean Code 101 (7/10): Comments and Documentation"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,44 +18,43 @@ tags:
   - Docstring
   - Readability
 seo_description: Learn when not to comment, how to write intent comments and docstrings, and how to manage TODO discipline well.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Comments and Documentation
+# Clean Code 101 (7/10): Comments and Documentation
 
-> Clean Code 101 series (7/10)
+Comments feel helpful precisely when the code is hardest to read. That is why comments become risky so quickly: they often preserve a bad structure instead of forcing it to improve.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Clean Code 101 series.
 
-**Core question**: What does a good comment look like?
+Here we will separate the explanations that belong in naming and structure from the few that belong in intent comments, warnings, docstrings, and contributor-facing docs.
 
-> One that explains the "why" the code cannot. The "what" should be visible in the code itself.
 
-<!-- a-grade-intro:end -->
+![clean code 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 7 flow overview*
+> If you need explanation, try fixing code first. Only then add comments.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- When not to write a comment
-- Intent comments and warning comments
-- Docstring conventions in Python
-- Documenting public APIs
-- Managing TODO and FIXME
+- What boundary should you inspect first when applying Comments and Documentation?
+- Which signal should the example or diagram make visible for Comments and Documentation?
+- What failure should be prevented first when Comments and Documentation reaches a real system?
+
+## Questions this article answers
+
+- When is it better not to write a comment at all?
+- What is the difference between an intent comment and a warning comment?
+- What rules make Python docstrings effective?
+- How much of a public API should you document?
+- How should TODO and FIXME items be managed so they stay traceable?
+
+> Good comments explain only the "why" that code cannot show on its own. The "what" should stay visible in the code.
 
 ## Why It Matters
 
 Comments tend to lie. Code changes; comments rarely follow.
 
 > The best comment is the one you no longer need.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Q["Need explanation?"] -->|"Code can do it"| C["Improve naming/structure"]
-    Q -->|"Why is missing"| W["Intent comment"]
-    Q -->|"Hazard"| A["Warning comment"]
-    Q -->|"Public API"| D["Docstring"]
-```
 
 If something needs explaining, fix the code first.
 
@@ -160,6 +159,23 @@ def retry_simple(): ...
 
 Every TODO needs a person and a date.
 
+## How to Verify This in a Real Codebase
+
+```bash
+ruff check app/
+python -m pytest -q tests/test_public_api_docs.py
+```
+
+**Expected output**
+
+- Names and structure should carry the main explanation without comment noise.
+- Public API contracts should match both tests and docs.
+
+## Failure Modes to Watch
+
+- Comments merely restate the code.
+- TODOs have no owner or tracking link and turn into permanent debt.
+
 ## What to Notice in This Code
 
 - Code expresses "what"; comments express "why".
@@ -204,17 +220,29 @@ Strong teams require docstrings on public APIs and allow only intent comments in
 
 Good comments are few and accurate. Next we tackle what truly decides a codebase's fate: testable code.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Comments and Documentation?**
+  - The article treats Comments and Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Comments and Documentation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Comments and Documentation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
-- [Naming](./02-naming.md)
-- [Small Functions](./03-small-functions.md)
-- [Simplifying Conditionals](./04-simplifying-conditionals.md)
-- [Removing Duplication](./05-removing-duplication.md)
-- [Error Handling](./06-error-handling.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
+- [Clean Code 101 (2/10): Naming](./02-naming.md)
+- [Clean Code 101 (3/10): Small Functions](./03-small-functions.md)
+- [Clean Code 101 (4/10): Simplifying Conditionals](./04-simplifying-conditionals.md)
+- [Clean Code 101 (5/10): Removing Duplication](./05-removing-duplication.md)
+- [Clean Code 101 (6/10): Error Handling](./06-error-handling.md)
 - **Comments and Documentation (current)**
 - Testable Code (upcoming)
 - Refactoring Basics (upcoming)
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References

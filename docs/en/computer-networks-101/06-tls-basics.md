@@ -1,10 +1,10 @@
 ---
 series: computer-networks-101
 episode: 6
-title: TLS Basics
-status: content-ready
+title: "Computer Networks 101 (6/10): TLS Basics"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,28 @@ tags:
   - Encryption
   - PKI
 seo_description: How the TLS handshake delivers confidentiality, integrity, and identity at the same time, and what role certificates and PKI play in production.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# TLS Basics
+# Computer Networks 101 (6/10): TLS Basics
 
 > Computer Networks 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: How does the "S" in HTTPS stop eavesdropping, tampering, and impersonation all at once?
 
 > TLS combines three techniques in one beat. Asymmetric crypto handles identity and key agreement, symmetric crypto handles fast bulk encryption, and AEAD handles integrity. Certificates and PKI prove "this key really belongs to this domain". With that picture in your head, expired certificates, self-signed servers, and MITM all fit on the same diagram.
 
-<!-- a-grade-intro:end -->
+This is post 6 in the Computer Networks 101 series.
+
+
+![computer networks 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/06/06-01-concept-at-a-glance.en.png)
+*computer networks 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying TLS Basics?
+- Which signal should the example or diagram make visible for TLS Basics?
+- What failure should be prevented first when TLS Basics reaches a real system?
 
 ## What You Will Learn
 
@@ -45,17 +53,6 @@ last_reviewed: '2026-05-04'
 Without TLS in your head, certificate-expiry incidents are paralyzing and dangerous code that "ignores self-signed" sneaks in. Modern infrastructure — mTLS, service mesh, zero-trust — all assumes TLS by default. If you cannot explain "why is it safe?" in your own words, security design drifts unconsciously.
 
 > TLS is not "this channel is safe". It is the combination "this key really belongs to this domain, and only that key can decrypt".
-
-## Concept at a Glance
-
-```text
-Client                          Server
-  --- ClientHello (cipher list) -->
-  <-- ServerHello + Certificate ---
-  --- key share / Finished ------->
-  <-- Finished --------------------
-  ===== application data encrypted with the symmetric key =====
-```
 
 A symmetric session key is derived from the asymmetric agreement, and from that point all data is encrypted fast with that key.
 
@@ -206,17 +203,29 @@ TLS combines asymmetric crypto for identity and key agreement, symmetric crypto 
 
 Next we follow how the TLS-protected packet actually moves across the Internet — routing and NAT.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying TLS Basics?**
+  - The article treats TLS Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for TLS Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when TLS Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Network?](./01-what-is-a-network.md)
-- [IP and Subnet](./02-ip-and-subnet.md)
-- [TCP and UDP](./03-tcp-and-udp.md)
-- [DNS](./04-dns.md)
-- [HTTP and HTTPS](./05-http-and-https.md)
+## In this series
+
+- [Computer Networks 101 (1/10): What Is a Network?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP and Subnet](./02-ip-and-subnet.md)
+- [Computer Networks 101 (3/10): TCP and UDP](./03-tcp-and-udp.md)
+- [Computer Networks 101 (4/10): DNS](./04-dns.md)
+- [Computer Networks 101 (5/10): HTTP and HTTPS](./05-http-and-https.md)
 - **TLS Basics (current)**
 - Routing and NAT (upcoming)
 - Load Balancer (upcoming)
-- WebSocket and real-time (upcoming)
-- Debugging network problems (upcoming)
+- WebSocket and Real-Time Communication (upcoming)
+- Debugging Network Problems (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -225,3 +234,4 @@ Next we follow how the TLS-protected packet actually moves across the Internet �
 - [Mozilla SSL Configuration Generator](https://ssl-config.mozilla.org/)
 - [Let's Encrypt](https://letsencrypt.org/)
 - [Bulletproof TLS — Ivan Ristic](https://www.feistyduck.com/books/bulletproof-tls-and-pki/)
+- [RFC 5280 — PKIX Certificate and CRL Profile](https://www.rfc-editor.org/rfc/rfc5280)

@@ -1,10 +1,10 @@
 ---
 series: frontend-development-101
 episode: 4
-title: Components and State
+title: "Frontend Development 101 (4/10): Components and State"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,21 +20,26 @@ seo_description: Components, props, state, unidirectional data flow — the core
 last_reviewed: '2026-05-04'
 ---
 
-# Components and State
+# Frontend Development 101 (4/10): Components and State
 
-> Frontend Development 101 series (4/10)
+A small screen can survive on a few lines of JavaScript and direct DOM manipulation. As the screen grows, that approach collapses under its own weight. Logic piles into one file, every change feels risky, and reading the code becomes harder than writing the next feature.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Frontend Development 101 series. Here we introduce components and state as the basic structure that keeps growing screens readable. The goal is simple: split the UI into small functions, and let each function own only the input and state it is responsible for.
 
-**Core question**: How do you manage a screen once it grows past *a thousand lines*?
 
-> The answer is *components*. Split the screen into small functions; each function owns *only its props and state*.
+![frontend development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/04/04-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 4 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Components and State?
+- Which signal should the example or diagram make visible for Components and State?
+- What failure should be prevented first when Components and State reaches a real system?
 
 ## What You Will Learn
 
 - The *component mindset*
+
 - The *clear distinction* between props and state
 - Unidirectional data flow
 - *When to split* a component
@@ -45,16 +50,6 @@ last_reviewed: '2026-05-04'
 The component mindset is not exclusive to React. The same pattern works in Vue, Svelte, Angular, and even *plain JS*. Once you internalize it, *every framework reads like a familiar language*.
 
 > Well-split components exist for *readability*, not for *reuse*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart TD
-    App["App (state)"] --> Header["Header"]
-    App --> List["List (props)"]
-    List --> Item["Item (props)"]
-    Item -->|event| App
-```
 
 State flows *down*, events flow *up*.
 
@@ -140,6 +135,16 @@ function App() {
 }
 ```
 
+## Verification
+
+- Render two counters and confirm that each instance increments independently before you try a lifted-state version.
+- After lifting state up, verify that the shared total updates consistently everywhere the parent renders it.
+
+## If It Fails, Check This First
+
+- If state never changes, confirm the `useState` import and make sure the setter runs inside the click handler.
+- If parent and child fall out of sync, re-check where the state lives and whether the prop names still match.
+
 ## What to Notice in This Code
 
 - `props` are *input*; `state` is *internal memory*.
@@ -184,10 +189,21 @@ Most companies maintain a *design system* as a component library. New screens ar
 
 Components and state make screens *composable*. Next, we connect multiple screens via *URLs and routers*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Components and State?**
+  - The article treats Components and State as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Components and State?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Components and State reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
-- [HTML and CSS Basics](./02-html-and-css-basics.md)
-- [JavaScript Basics](./03-javascript-basics.md)
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML and CSS Basics](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript Basics](./03-javascript-basics.md)
 - **Components and State (current)**
 - Routing and Pages (upcoming)
 - API Calls and Async (upcoming)
@@ -195,11 +211,16 @@ Components and state make screens *composable*. Next, we connect multiple screen
 - Styling and Design Systems (upcoming)
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [React docs](https://react.dev/)
-- [Thinking in React](https://react.dev/learn/thinking-in-react)
-- [Vue Components](https://vuejs.org/guide/essentials/component-basics.html)
+### Official Docs
+- [React: Thinking in React](https://react.dev/learn/thinking-in-react)
+- [React: Sharing state between components](https://react.dev/learn/sharing-state-between-components)
+- [Vue: Component basics](https://vuejs.org/guide/essentials/component-basics.html)
+
+### Verification and Further Reading
 - [Svelte tutorial](https://svelte.dev/tutorial)
+- [React: State as a snapshot](https://react.dev/learn/state-as-a-snapshot)

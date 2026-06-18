@@ -1,11 +1,11 @@
 ---
-title: Understanding RAG evaluation metrics
+title: "RAG Evaluation and Benchmarking 101 (1/6): Understanding RAG evaluation metrics"
 series: rag-benchmark-101
 episode: 1
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -16,32 +16,25 @@ tags:
 - Precision
 - Recall
 - MRR
-last_reviewed: '2026-05-01'
-seo_description: 'Retrieval metrics compare two sets:'
+last_reviewed: '2026-05-15'
+seo_description: "Master RAG metrics: Precision@k, Recall@k, and MRR. Learn why isolating retrieval from generation is key to building reliable RAG pipelines."
 ---
 
-# Understanding RAG evaluation metrics
+# RAG Evaluation and Benchmarking 101 (1/6): Understanding RAG evaluation metrics
 
-> RAG Benchmark 101 series (1/6)
+Retrieval metrics compare a gold document set with a ranked result list. Once you separate those two objects, it becomes much easier to see what Precision@k, Recall@k, and MRR each reveal.
 
-## What you'll learn
+This is the first post in the RAG Evaluation and Benchmarking 101 series.
 
-- Compute Precision@k, Recall@k, and MRR — the three most common retrieval metrics — by hand.
-- Build the habit of reading per-query scores separately from benchmark averages.
-- Understand why retrieval quality must be measured independently before adding LLM evaluation on top.
-- Run a one-file Python example that calculates the metrics end-to-end.
+![Top-k overlap and metric calculation flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-02-top-k-overlap-and-metric-calculation-flo.en.png)
+*Top-k overlap and metric calculation flow*
+> The core mental model for retrieval metrics is to separate the gold set from the ranked result list. Even on the same data, Precision@k, Recall@k, and MRR expose different kinds of failure.
 
-![Questions this post answers](../../assets/rag-benchmark-101/01/01-01-questions-this-post-answers.en.png)
+## Questions to Keep in Mind
 
-*Questions this post answers*
-
-## Questions this post answers
-
-- What does Precision@k, Recall@k, and MRR each measure, and what question does each answer?
-- Why must retrieval quality be measured independently before adding LLM evaluation on top?
-- Why is it dangerous to look only at average scores instead of per-query scores?
-- How should you choose k, and how do the three metrics shift as k changes?
-- What is the minimal Python file that computes all three metrics end to end?
+- When a RAG answer is wrong, how can retrieval failure be separated from generation failure?
+- What different failures do Precision@k, Recall@k, and MRR reveal from the same ranked list?
+- Why can average scores hide per-query failure patterns?
 
 ## Why this matters
 
@@ -81,10 +74,6 @@ Each metric is computed per query; the system score is the mean across queries.
 Q2 has **low precision but perfect recall** — there is only one relevant doc, but the slot for top-3 must be filled.
 Q3 has **perfect precision but low recall** — three of five relevant docs found.
 Looking at one without the other leads you to the wrong conclusion.
-
-![Top-k overlap and metric calculation flow](../../assets/rag-benchmark-101/01/01-02-top-k-overlap-and-metric-calculation-flo.en.png)
-
-*Top-k overlap and metric calculation flow*
 
 ### 2. MRR (Mean Reciprocal Rank)
 
@@ -155,6 +144,13 @@ def reciprocal_rank(case: QueryCase) -> float:
         if doc_id in case.relevant_ids:
             return 1.0 / i
     return 0.0
+
+def evaluate_case(case: QueryCase, k: int) -> dict[str, float]:
+    return {
+        f"precision@{k}": round(precision_at_k(case, k), 2),
+        f"recall@{k}": round(recall_at_k(case, k), 2),
+        "mrr": round(reciprocal_rank(case), 2),
+    }
 ```
 
 ### Step 2: Apply across queries
@@ -180,11 +176,58 @@ print(f"AVG: P@3={avg_p:.2f}, R@3={avg_r:.2f}, MRR={avg_mrr:.2f}")
 ### Step 3: Run
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/01-evaluation-metrics
+cd en/01-evaluation-metrics
 python3 main.py
 ```
 
-![Precision@k versus Recall@k decision axes](../../assets/rag-benchmark-101/01/01-03-precision-k-versus-recall-k-decision-axe.en.png)
+```text
+Q1: P@3=0.67, R@3=0.67, MRR=1.00
+Q2: P@3=0.33, R@3=1.00, MRR=1.00
+Q3: P@3=1.00, R@3=0.60, MRR=1.00
+AVG: P@3=0.67, R@3=0.76, MRR=1.00
+```
+
+That output exposes a pattern the average alone hides. Q2 found the relevant document but still wastes two slots on noise. Q3 keeps the top slots clean but still misses part of the gold set. The same average Precision can imply very different next steps.
+
+### Step 4: Persist the per-query rows
+
+As soon as the benchmark grows beyond a toy example, a single aggregate print line is not enough. Store the per-query rows so you can answer "which query regressed?" without rerunning everything interactively.
+
+```python
+report_rows = []
+for case in cases:
+    metrics = evaluate_case(case, k=3)
+    report_rows.append({
+        "question": case.question,
+        "retrieved_ids": case.retrieved_ids,
+        "relevant_ids": sorted(case.relevant_ids),
+        **metrics,
+    })
+
+for row in report_rows:
+    print(row)
+```
+
+```text
+{'question': 'Q1', 'retrieved_ids': ['A', 'X', 'B'], 'relevant_ids': ['A', 'B', 'C'], 'precision@3': 0.67, 'recall@3': 0.67, 'mrr': 1.0}
+{'question': 'Q2', 'retrieved_ids': ['A', 'X', 'Y'], 'relevant_ids': ['A'], 'precision@3': 0.33, 'recall@3': 1.0, 'mrr': 1.0}
+{'question': 'Q3', 'retrieved_ids': ['A', 'B', 'C'], 'relevant_ids': ['A', 'B', 'C', 'D', 'E'], 'precision@3': 1.0, 'recall@3': 0.6, 'mrr': 1.0}
+```
+
+With that row-level report, you can immediately tell whether the next hypothesis is reranking, chunking, embedding choice, or gold-set cleanup.
+
+### Step 5: Map metric patterns to actions
+
+| Pattern | Interpretation | First thing to inspect |
+| --- | --- | --- |
+| Low precision, high recall | The retriever found the right docs but pulled in too much noise | reranker, filtering, lower k |
+| High precision, low recall | Top slots are clean, but some relevant evidence is still missing | chunking, embeddings, query expansion |
+| Low MRR | The first relevant hit is too far down | ranking quality, hybrid retrieval |
+| Recall@k = 0 | The retriever missed the answer space entirely | retrieval pipeline fundamentals |
+
+That table turns scores into an operating workflow. The benchmark is not just there to grade the system. It should shorten the path to the next experiment.
+
+![Precision@k versus Recall@k decision axes](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-03-precision-k-versus-recall-k-decision-axe.en.png)
 
 *Precision@k versus Recall@k decision axes*
 
@@ -196,7 +239,7 @@ python3 main.py
 - **Using a different k from production** — if RAG passes 5 chunks but you measure k=10, scores are inflated.
 - **Defining the gold set too narrowly** — labeling "only this exact doc is relevant" punishes the retriever for finding semantically equivalent ones.
 
-![Rank position changes the MRR signal](../../assets/rag-benchmark-101/01/01-04-rank-position-changes-the-mrr-signal.en.png)
+![Rank position changes the MRR signal](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-04-rank-position-changes-the-mrr-signal.en.png)
 
 *Rank position changes the MRR signal*
 
@@ -209,6 +252,8 @@ Practical guidance for production RAG evaluation:
 - **Analyze failure cases** — queries with Recall@10 = 0 are the most valuable. If the relevant doc is not in top-10, the retriever is fundamentally wrong; change embeddings or chunking.
 - **Wire it into CI** — embedding model or chunking changes should run the benchmark and flag regressions.
 - **Next-level metrics** — nDCG measures ranking quality more precisely but needs graded relevance instead of binary labels, raising data-construction cost.
+
+Also persist the report as JSON, not just a Markdown table or console output. Human-readable summaries are useful in reviews, but regression automation needs a structured artifact it can diff and trend over time.
 
 ## Checklist
 
@@ -225,7 +270,7 @@ Practical guidance for production RAG evaluation:
 2. Two retrievers A and B share the same average Recall@5 but differ in average MRR. Which one is better for production UX, and why?
 3. RAG passes exactly 3 chunks to the LLM. Which two metrics matter most? Why?
 
-![Per-query and average report reading flow](../../assets/rag-benchmark-101/01/01-05-per-query-and-average-report-reading-flo.en.png)
+![Per-query and average report reading flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-05-per-query-and-average-report-reading-flo.en.png)
 
 *Per-query and average report reading flow*
 
@@ -239,11 +284,38 @@ Key takeaways:
 - The benchmark `k` must match your production RAG context window.
 
 The next post moves to **measuring retrieval performance** — wrapping a real retriever in a benchmark loop that captures latency, hit rate, and ranking quality together.
+
+---
+
+## Answering the Opening Questions
+
+- **When a RAG answer is wrong, how can retrieval failure be separated from generation failure?**
+  Compare the gold document set with the retrieved list first; that tells you whether the retriever supplied evidence before the LLM is judged.
+
+- **What different failures do Precision@k, Recall@k, and MRR reveal from the same ranked list?**
+  Precision@k exposes noise in the top results, Recall@k exposes missed relevant documents, and MRR exposes how early the first relevant result appears.
+
+- **Why can average scores hide per-query failure patterns?**
+  Averages can hide queries that failed completely, so per-query scores must be read alongside the mean.
+
+<!-- toc:begin -->
+## In this series
+
+- **RAG Evaluation and Benchmarking 101 (1/6): Understanding RAG evaluation metrics (current)**
+- RAG Evaluation and Benchmarking 101 (2/6): Measuring retrieval performance (upcoming)
+- RAG Evaluation and Benchmarking 101 (3/6): Comparing embedding models (upcoming)
+- RAG Evaluation and Benchmarking 101 (4/6): VectorDB selection criteria (upcoming)
+- RAG Evaluation and Benchmarking 101 (5/6): End-to-end RAG pipeline evaluation (upcoming)
+- RAG Evaluation and Benchmarking 101 (6/6): Completing the RAG benchmark (upcoming)
+
+<!-- toc:end -->
+
 ---
 
 ## References
 
-- [Wikipedia: Mean reciprocal rank](https://en.wikipedia.org/wiki/Mean_reciprocal_rank)
-- [Stanford IR book: Evaluation in information retrieval](https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html)
+- [Stanford IR Book — Evaluation of ranked retrieval results](https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html)
+- [PyTerrier documentation — Evaluation and experiment analysis](https://pyterrier.readthedocs.io/en/latest/experiments.html)
+- [ranx documentation — Metrics reference](https://amenra.github.io/ranx/metrics/)
 - [BEIR: A heterogeneous benchmark for zero-shot evaluation of IR models](https://arxiv.org/abs/2104.08663)
-- [MTEB: Massive Text Embedding Benchmark](https://arxiv.org/abs/2210.07316)
+- [MTEB Leaderboard](https://huggingface.co/spaces/mteb/leaderboard)

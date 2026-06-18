@@ -1,10 +1,10 @@
 ---
 series: devops-101
 episode: 4
-title: Environments and Configuration
-status: content-ready
+title: "DevOps 101 (4/10): Environments and Configuration"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,28 +17,35 @@ tags:
   - Environment
   - TwelveFactor
 seo_description: Safe patterns for separating dev, stage, and prod environments and managing config and secrets across them.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Environments and Configuration
+# DevOps 101 (4/10): Environments and Configuration
 
-> DevOps 101 series (4/10)
+Teams usually notice configuration discipline only after it breaks. The application works in development, then stage uses a different secret, production needs a different domain, and suddenly the same code requires a different build for every environment.
 
-<!-- a-grade-intro:begin -->
+Good configuration management prevents that drift. The code stays the same, the build artifact stays the same, and only environment-specific values change. That is what makes deployments repeatable instead of fragile.
 
-**Core question**: If your *environment variables* are *hardcoded into the code*, do you not have to *rebuild for every deploy*?
+This is post 4 in the DevOps 101 series. Here we look at how to separate code from configuration, treat secrets differently from ordinary settings, and keep environment changes reviewable.
 
-> Good config management makes *one codebase / N environments* possible.
 
-<!-- a-grade-intro:end -->
+![devops 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/04/04-01-concept-at-a-glance.en.png)
+*devops 101 chapter 4 flow overview*
+> Environment drift kills confidence. *Code-defined environments* make failures *repeatable* and *fixable*.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The meaning of *dev / stage / prod* environments
-- The *Twelve-Factor* *Config* principle
-- The difference between *environment variables* and *secrets*
-- A comparison of *.env*, *Vault*, and *AWS Secrets Manager*
-- Five common pitfalls
+- What boundary should you inspect first when applying Environments and Configuration?
+- Which signal should the example or diagram make visible for Environments and Configuration?
+- What failure should be prevented first when Environments and Configuration reaches a real system?
+
+## Questions this article answers
+
+- Why should *dev*, *stage*, and *prod* be separated?
+- To deploy the same *codebase* to multiple environments, what needs to live *outside the code*?
+- How are *environment variables* different from *secrets*, and why should they be managed separately?
+- When is *.env*, *Vault*, or *AWS Secrets Manager* the right fit?
+- What mistakes do teams make most often in *configuration management*?
 
 ## Why It Matters
 
@@ -46,15 +53,7 @@ last_reviewed: '2026-05-04'
 
 > *Build once, run anywhere*.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Code["app code (1)"] --> Build["build artifact (1)"]
-    Build --> Dev["dev (config A)"]
-    Build --> Stage["stage (config B)"]
-    Build --> Prod["prod (config C)"]
-```
+Environments (dev, staging, prod) exist to *test safety before production*. Configuration management ensures all three are *defined once* and *deployed identically*, not clicked by hand.
 
 ## Key Terms
 
@@ -176,10 +175,21 @@ Large teams keep secrets in *Vault* or *AWS Secrets Manager* and use the *Extern
 
 Config management is the start of *environment independence*. In the next post we treat *infrastructure itself as code* with *IaC*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Environments and Configuration?**
+  - The article treats Environments and Configuration as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Environments and Configuration?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Environments and Configuration reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is DevOps?](./01-what-is-devops.md)
-- [CI Pipeline](./02-ci-pipeline.md)
-- [CD and Deployment Strategies](./03-cd-and-deployment.md)
+## In this series
+
+- [DevOps 101 (1/10): What Is DevOps?](./01-what-is-devops.md)
+- [DevOps 101 (2/10): CI Pipeline](./02-ci-pipeline.md)
+- [DevOps 101 (3/10): CD and Deployment Strategies](./03-cd-and-deployment.md)
 - **Environments and Configuration (current)**
 - Infrastructure as Code (upcoming)
 - Containers and Build (upcoming)
@@ -187,6 +197,7 @@ Config management is the start of *environment independence*. In the next post w
 - Logging and Analysis (upcoming)
 - Incident Response and On-Call (upcoming)
 - An Operable DevOps Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

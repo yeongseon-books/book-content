@@ -1,10 +1,10 @@
 ---
 series: cloud-computing-101
 episode: 4
-title: Compute
-status: content-ready
+title: "Cloud Computing 101 (4/10): Compute"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,33 @@ tags:
   - AutoScaling
   - DevOps
 seo_description: VMs, containers, and serverless — when to pick which, plus Auto Scaling and pricing tradeoffs, with practical EC2 boto3 examples.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Compute
+# Cloud Computing 101 (4/10): Compute
 
-> Cloud Computing 101 series (4/10)
+Compute is where cloud architecture becomes tangible. The same application can run on a VM, inside a container platform, or in a serverless runtime, but those choices produce very different bills, scaling behavior, and operational load.
 
-<!-- a-grade-intro:begin -->
+VMs, containers, serverless, and bare metal sit on a spectrum. More control on one end, more abstraction on the other. The best choice for you depends on your workload, team, and constraints — not on what is trendy.
 
-**Core question**: Among VMs, containers, and Lambda, *when do you pick which*?
+This is post 4 in the Cloud Computing 101 series.
 
-> *Compute is anything that runs your code — VM vs container vs serverless trades control for automation.*
+In this post, we'll compare VMs, containers, serverless, and bare metal, then connect those choices to Auto Scaling and pricing models.
 
-<!-- a-grade-intro:end -->
+> Compute choices trade control for automation. The right answer depends less on fashion and more on the failure modes and operating rhythm of the workload.
 
-## What You Will Learn
+
+![cloud computing 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/04/04-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 4 flow overview*
+> The compute choice you make cascades through cost, operational complexity, and what kinds of problems you can solve.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Compute?
+- Which signal should the example or diagram make visible for Compute?
+- What failure should be prevented first when Compute reaches a real system?
+
+## Questions This Chapter Answers
 
 - The four compute styles (VM / container / serverless / bare metal)
 - What Auto Scaling actually does
@@ -43,16 +54,6 @@ last_reviewed: '2026-05-04'
 ## Why It Matters
 
 Compute choice drives roughly 60% of your bill and most of your operational pain.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Bare["bare metal"] --> VM["vm"]
-    VM --> Container["container"]
-    Container --> Serverless["serverless"]
-    Serverless --> Code["code"]
-```
 
 ## Key Terms
 
@@ -119,6 +120,26 @@ print(parse_type("m5.large"))
 - `terminate` is irreversible.
 - Instance type is `family.size`.
 
+## How to Verify This Example
+
+With compute resources, the useful thing to observe is state transition. Launch, inspect, and terminate are different operating events, and understanding their sequence makes later Auto Scaling and cost discussions much easier to follow.
+
+```bash
+aws ec2 describe-instances --instance-ids i-xxxxxxxx --query 'Reservations[0].Instances[0].State.Name'
+```
+
+**Expected output:**
+
+- Right after launch you should see `pending`, then later `running`.
+- After termination you should see `shutting-down` followed by `terminated`.
+- If you cannot read these transitions, Auto Scaling events will stay mysterious and troubleshooting will stay slow.
+
+### Where teams usually get stuck
+
+- Stopped and terminated are not the same operational state or cost profile.
+- Spot capacity belongs on interruption-tolerant work, not on stateful data tiers.
+- Instance types are starting hypotheses. Metrics have to confirm whether the fit is still real.
+
 ## Five Common Mistakes
 
 1. **Using Spot for the database.**
@@ -156,10 +177,21 @@ Web tier runs On-Demand inside an ASG, batch jobs ride Spot, the database lives 
 
 Compute moves data — and data has to live somewhere. The next post covers Storage.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Compute?**
+  - The article treats Compute as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Compute?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Compute reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region and Availability Zone](./03-region-and-availability-zone.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region and Availability Zone](./03-region-and-availability-zone.md)
 - **Compute (current)**
 - Storage (upcoming)
 - Network (upcoming)
@@ -167,6 +199,7 @@ Compute moves data — and data has to live somewhere. The next post covers Stor
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

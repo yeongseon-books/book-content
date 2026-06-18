@@ -1,10 +1,10 @@
 ---
 series: data-science-101
 episode: 5
-title: Exploratory Data Analysis
-status: content-ready
+title: "Data Science 101 (5/10): Exploratory Data Analysis"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,36 @@ tags:
   - Statistics
   - Beginner
 seo_description: A 5-step EDA workflow that quickly reveals shape, distribution, missingness, correlation, and outliers before any modeling
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Exploratory Data Analysis
+# Data Science 101 (5/10): Exploratory Data Analysis
 
-> Data Science 101 series (5/10)
+Exploratory data analysis is the stage where the dataset stops being an abstraction and starts behaving like evidence. Before EDA, you mostly have assumptions: which variables matter, what “typical” looks like, and whether the data is even shaped the way the problem statement implied.
 
-<!-- a-grade-intro:begin -->
+EDA is how you replace those assumptions with observations. If you skip it, you often build a model that is technically correct for the wrong picture of the data. If you do it well, you discover the distributions, gaps, and relationships that should shape every later decision.
 
-**Core question**: Before you build any model, how do you read the *shape of the data* — *quickly* and *correctly*?
+This is post 5 in the Data Science 101 series. Here we walk through a compact but production-friendly EDA loop that helps you read the dataset before you try to optimize it.
 
-> *EDA is the *data's self-introduction* you must read before any model.*
 
-<!-- a-grade-intro:end -->
+![data science 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/05/05-01-concept-at-a-glance.en.png)
+*data science 101 chapter 5 flow overview*
+> At its core, Exploratory Data Analysis is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Exploratory Data Analysis?
+- Which signal should the example or diagram make visible for Exploratory Data Analysis?
+- What failure should be prevented first when Exploratory Data Analysis reaches a real system?
+
+## Questions This Post Answers
+
+- What should you inspect before building any model or dashboard?
+- Why are distribution shape and missingness often more important than the mean?
+- How do cardinality and pairwise relationships shape later modeling choices?
+- What does correlation tell you, and what can it never prove?
+
+> EDA is the fastest way to replace assumptions about the dataset with observations you can verify.
 
 ## What You Will Learn
 
@@ -46,15 +62,7 @@ Weak EDA produces *the wrong model*. Skipping the *data's self-introduction* and
 
 > *A model only *imitates* the data it was given.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Shape["Shape & dtypes"] --> Dist["1D Distribution"]
-    Dist --> Pair["2D Relations"]
-    Pair --> Miss["Missing Patterns"]
-    Miss --> Corr["Correlation"]
-```
+The key boundary in this episode is between the concept itself and how it operates in a real system. You need to know where the data comes in, where the decision happens, and what signal must be recorded.
 
 ## Key Terms
 
@@ -110,6 +118,8 @@ print(df.isna().mean().sort_values(ascending=False).head())
 print(df.select_dtypes("number").corr().round(2))
 ```
 
+**Expected output:** an EDA note that lists the core distribution summary, high-cardinality columns, and the top missingness signals.
+
 ## What to Notice in This Code
 
 - `describe` is a *starting point*, not the answer — always pair with a *distribution plot*.
@@ -153,17 +163,29 @@ Teams keep an *EDA notebook* next to the model code. Key distributions live in *
 
 EDA is *time spent listening to the data*. Next we will look at *visualization* — showing what we heard.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Exploratory Data Analysis?**
+  - The article treats Exploratory Data Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Exploratory Data Analysis?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Exploratory Data Analysis reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Data Science?](./01-what-is-data-science.md)
-- [Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
-- [Data Collection](./03-data-collection.md)
-- [Data Cleaning](./04-data-cleaning.md)
+## In this series
+
+- [Data Science 101 (1/10): What Is Data Science?](./01-what-is-data-science.md)
+- [Data Science 101 (2/10): Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
+- [Data Science 101 (3/10): Data Collection](./03-data-collection.md)
+- [Data Science 101 (4/10): Data Cleaning](./04-data-cleaning.md)
 - **Exploratory Data Analysis (current)**
 - Visualization (upcoming)
 - Modeling (upcoming)
 - Evaluation (upcoming)
 - Result Interpretation (upcoming)
 - End-to-End Data Project Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

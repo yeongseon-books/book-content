@@ -1,0 +1,11 @@
+flowchart TD
+  T["Unstructured text\njob posting or report"] --> S["Extraction schema\nfields required by downstream systems"]
+  S --> P["LLM prompt\nreturn JSON only"]
+  P --> J["JSON output\ncompany, role, skills, salary"]
+  J --> O["JsonOutputParser\nvalidated structured object"]
+
+  style T fill:#e3f2fd,stroke:#1976d2
+  style S fill:#fff3e0,stroke:#f57c00
+  style P fill:#fffde7,stroke:#f9a825
+  style J fill:#f3e5f5,stroke:#7b1fa2
+  style O fill:#e8f5e9,stroke:#388e3c

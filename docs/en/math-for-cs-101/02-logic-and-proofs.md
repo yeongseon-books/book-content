@@ -1,10 +1,10 @@
 ---
 series: math-for-cs-101
 episode: 2
-title: Logic and Proofs
-status: content-ready
+title: "Math for CS 101 (2/10): Logic and Proofs"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,40 +20,40 @@ seo_description: A beginner-friendly tour of propositions, truth tables, implica
 last_reviewed: '2026-05-04'
 ---
 
-# Logic and Proofs
+# Math for CS 101 (2/10): Logic and Proofs
 
-> Math for CS 101 series (2/10)
+Developers make logical claims all the time: this condition is sufficient, that state transition is safe, and this algorithm stays correct for every valid input. At first you can test a few examples and move on, but important logic eventually demands a stronger explanation.
 
-<!-- a-grade-intro:begin -->
+As the number of branches and state transitions grows, writing more tests alone is not enough. You also need a clean way to separate the claim itself, the assumptions behind it, and the counterexamples that would invalidate it.
 
-**Core question**: How do you *prove* a *program* is *correct*?
+This is post 2 in the Math for CS 101 series.
 
-> *Logic* gives us *propositions* and *implication*; *proof* uses *direct*, *contradiction*, and *induction*.
+Here we treat logic and proof as a practical grammar for explaining correctness in code, not as an isolated math ritual.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![math for cs 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/02/02-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 2 flow overview*
+> Logic is about making the relationship between assumptions and conclusions explicit; proof is about guaranteeing that relationship holds in every case.
 
-- *Propositions* and *truth tables*
-- *Implication* and *equivalence*
-- *Direct proof*
-- *Proof by contradiction*
-- *Mathematical induction*
+## Questions to Keep in Mind
+
+- How is a proof different from running a handful of examples?
+- How do propositions, implication, and equivalence map to real code?
+- When is a direct proof clearer than proof by contradiction?
 
 ## Why It Matters
 
-A *test* checks a *few* cases. A *proof* covers *all* of them.
+A test checks specific cases. A proof targets the whole claim. Those two tools are complementary, but they are not interchangeable. Three passing examples do not establish correctness for every `n`, every input ordering, or every edge case.
 
-## Concept at a Glance
+That distinction matters far beyond textbook exercises. Type systems encode logical constraints on values. Consensus algorithms try to preserve safety under specific failure assumptions. Authentication and authorization flows become fragile when the logic between conditions is vague.
 
-```mermaid
-flowchart LR
-    Prop["proposition"] --> Truth["truth table"]
-    Prop --> Imply["implication"]
-    Imply --> Direct["direct proof"]
-    Imply --> Contra["contradiction"]
-    Imply --> Induct["induction"]
-```
+Logic distinguishes between a *true proposition*, an *implication* (`p → q`), proof methods (direct, contradiction, induction), and the power of *one counterexample* to invalidate a universal claim.
+
+## Before/After
+
+**Before**: Test passes on three examples → assume the code is correct.
+
+**After**: Prove correctness for *all* valid inputs.
 
 ## Key Terms
 
@@ -148,10 +148,23 @@ def sum_to(n):
 
 ## Wrap-up and Next Steps
 
-Next, we cover *sets and functions*.
+Logic and proofs give you a way to explain correctness instead of only hoping repeated examples are representative. Once you can separate assumptions, implications, and counterexamples, design reviews become far more precise.
+
+Next, we move into sets and functions, where that logical precision starts shaping data boundaries and transformation rules.
+
+## Answering the Opening Questions
+
+- **How is a proof different from running a handful of examples?**
+  - The article treats Logic and Proofs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do propositions, implication, and equivalence map to real code?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When is a direct proof clearer than proof by contradiction?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
 - **Logic and Proofs (current)**
 - Sets and Functions (upcoming)
 - Graphs (upcoming)
@@ -161,6 +174,7 @@ Next, we cover *sets and functions*.
 - Calculus (upcoming)
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -169,3 +183,4 @@ Next, we cover *sets and functions*.
 - [How to Prove It - Velleman](https://www.cambridge.org/core/books/how-to-prove-it/)
 - [Mathematical Induction - Khan Academy](https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:series/x9e81a4f98389efdf:induction/v/proof-by-induction)
 - [Logic in Computer Science - Huth, Ryan](https://www.cambridge.org/core/books/logic-in-computer-science/)
+- [Z3 Theorem Prover GitHub repository](https://github.com/Z3Prover/z3)

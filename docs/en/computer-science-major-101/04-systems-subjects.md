@@ -1,10 +1,10 @@
 ---
 series: computer-science-major-101
 episode: 4
-title: Understanding Systems Subjects
-status: content-ready
+title: "Computer Science Major 101 (4/10): Understanding Systems Subjects"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,30 @@ tags:
   - Architecture
   - Beginner
 seo_description: A beginner-friendly tour of systems courses covering OS, computer architecture, compilers, and systems programming.
-last_reviewed: '2026-05-04'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
-# Understanding Systems Subjects
+# Computer Science Major 101 (4/10): Understanding Systems Subjects
 
 > Computer Science Major 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Do *systems* courses really explain *why* a single line of code *behaves* the way it does?
 
 > Yes. *OS*, *architecture*, and *compilers* are the *stage* on which your code runs.
 
-<!-- a-grade-intro:end -->
+This is post 4 in the Computer Science Major 101 series.
+
+
+![computer science major 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/04/04-01-systems-stack-map.en.png)
+*computer science major 101 chapter 4 flow overview*
+> Systems courses are not just theory—they bridge the gap between what you code and how the hardware actually runs it. That gap is where debugging happens.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Understanding Systems Subjects?
+- Which signal should the example or diagram make visible for Understanding Systems Subjects?
+- What failure should be prevented first when Understanding Systems Subjects reaches a real system?
 
 ## What You Will Learn
 
@@ -45,15 +55,7 @@ last_reviewed: '2026-05-04'
 *Performance* and *incident analysis* are only possible on top of *systems knowledge*.
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    H[Hardware] --> A[Architecture]
-    A --> O[OS]
-    O --> C[Compiler]
-    C --> P[Program]
-```
-
+Processes, memory hierarchies, caching, and instruction pipelines are not abstractions—they explain why your code runs at the speed it does.
 ## Key Terms
 
 - **OS**: *resource manager*.
@@ -149,10 +151,21 @@ Root cause in incident reports is *usually* an *OS resource* limit.
 
 Next post: *Database and Network*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Understanding Systems Subjects?**
+  - The article treats Understanding Systems Subjects as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Understanding Systems Subjects?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Understanding Systems Subjects reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
-- [Understanding First Year Subjects](./02-first-year-subjects.md)
-- [Data Structures and Algorithms](./03-data-structures-and-algorithms.md)
+## In this series
+
+- [Computer Science Major 101 (1/10): What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
+- [Computer Science Major 101 (2/10): Understanding First Year Subjects](./02-first-year-subjects.md)
+- [Computer Science Major 101 (3/10): Data Structures and Algorithms](./03-data-structures-and-algorithms.md)
 - **Understanding Systems Subjects (current)**
 - Database and Network (upcoming)
 - AI and Data Science (upcoming)
@@ -160,6 +173,7 @@ Next post: *Database and Network*.
 - How to Study Computer Science (upcoming)
 - Build Your Portfolio (upcoming)
 - Skills to Have Before Graduation (upcoming)
+
 <!-- toc:end -->
 
 ## References

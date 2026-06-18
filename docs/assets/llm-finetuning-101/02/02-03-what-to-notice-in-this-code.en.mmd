@@ -1,0 +1,22 @@
+flowchart TB
+    JSONL["Raw JSONL"] --> Load["datasets.load_dataset()"]
+    Load --> Columns["Check column_names\ninstruction, input, output"]
+    Columns --> Render["Apply the template\ncreate one text column"]
+    Render --> Tokenize["tokenizer()\ntruncation, padding, max_length"]
+
+    Tokenize --> Pad["If there is no pad_token,\nreuse eos_token"]
+    Tokenize --> Lengths["Inspect input_ids length\nand distribution first"]
+    Tokenize --> Boundary["Tokens before Response become\nfuture -100 masking candidates"]
+
+    Pad --> Stability["Prevents training crashes"]
+    Lengths --> Tuning["Decide max_length, dynamic padding,\nand train/eval split"]
+    Boundary --> Extension["Prepare for a collator and\nmodel-specific templates"]
+
+    Stability --> NextStep["Separate format checks from length checks\nbefore the next experiment"]
+    Tuning --> NextStep
+    Extension --> NextStep
+
+    style JSONL fill:#e3f2fd,stroke:#1976d2
+    style Render fill:#f3e5f5,stroke:#7b1fa2
+    style Tokenize fill:#e8f5e9,stroke:#388e3c
+    style NextStep fill:#fff8e1,stroke:#f9a825

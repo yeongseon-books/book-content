@@ -1,11 +1,11 @@
 ---
-title: LLM Fine-tuning Primer
+title: "LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer"
 series: llm-finetuning-101
 episode: 1
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -21,22 +21,22 @@ seo_description: 'A fine-tuning experiment is a decision about how to slice thre
   variables:'
 ---
 
-# LLM Fine-tuning Primer
+# LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer
 
-## Questions this post answers
+Fine-tuning looks like a training task, but the real first step is deciding what changes, what stays fixed, and how those choices interact.
 
-![Questions this post answers](../../assets/llm-finetuning-101/01/01-01-questions-this-post-answers.en.png)
+This is the first post in the LLM Fine-tuning 101 series.
 
-*Questions this post answers*
+This article frames that decision around three variables so the rest of the series has a stable mental model. If you skip this framing and jump straight into GPUs and loss curves, learning rate, dataset format, and adapter rank all start wobbling at once.
+
+![LLM Fine-tuning 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
+*LLM Fine-tuning 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
 
 - How can we calculate why LoRA is so much lighter than full fine-tuning?
 - How do we tell apart problems that need fine-tuning from those a prompt can solve?
 - What can we verify in post 1 without a GPU?
-- Does LoRA shrink model size, or does it shrink trainable parameter count?
-
-> If full fine-tuning is rebuilding an entire building, LoRA is bolting reinforcement onto a few load-bearing columns.
-
-Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/01-intro)
 
 ## Why this matters
 
@@ -48,7 +48,7 @@ Understanding numerically why LoRA is cheap and fast, how few parameters it real
 
 A fine-tuning experiment is a decision about how to slice three variables:
 
-```
+```text
                   ┌───────────────────────────────────────┐
                   │ ① What are we changing? (target params)│
                   ├───────────────────────────────────────┤
@@ -56,7 +56,7 @@ one fine-tune  =  │ ② With what? (dataset)                 │
                   ├───────────────────────────────────────┤
                   │ ③ How? (optimizer)                     │
                   └───────────────────────────────────────┘
-```
+```text
 
 Full fine-tuning sets ① to "everything," which inflates ② and ③. LoRA narrows ① to "small adapters strapped onto a few linear layers," which simultaneously lightens ② (small datasets work) and ③ (tiny optimizer state). For the same dataset and learning rate, the GPU memory requirement can differ by 10× depending only on how ① is defined.
 
@@ -76,7 +76,7 @@ Full fine-tuning sets ① to "everything," which inflates ② and ③. LoRA narr
 
 **After** — After post 1 you can put the following on the table:
 
-```
+```text
 Model size                       124M params (GPT-2 small class)
 Full fine-tuning trainable        ≈ 124M (100%)
 LoRA(r=8) trainable               ≈ 1.8M (≈ 1.5%)
@@ -88,13 +88,9 @@ With this table in hand, "we just want to nudge the response tone" branches natu
 
 ## What to understand first
 
-![base weights vs trainable boundary in fine-tuning](../../assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
-
-*base weights vs trainable boundary in fine-tuning*
-
 The point most easily missed in fine-tuning is **what we choose as the training target**. Full fine-tuning updates every existing weight, so memory and optimizer state both balloon. LoRA freezes the existing weights and adds two low-rank matrices instead. So when discussing cost, look at the **trainable parameter count** separately from the total model parameters.
 
-![What to understand first](../../assets/llm-finetuning-101/01/01-01-what-to-understand-first.en.png)
+![What to understand first](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-01-what-to-understand-first.en.png)
 
 *What to understand first*
 
@@ -150,9 +146,84 @@ print(f"ratio = {lora_params / base_linear_params:.4%}")
 
 You will see a ratio around 1.5%. Try `rank` 16 and 32 to feel how the number scales — that intuition pays off when estimating training time in post 4.
 
+## Runnable verification script
+
+If you want one copy-paste check instead of reading the math in pieces, run the whole calculation as a tiny standalone script.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class TransformerShape:
+    hidden_size: int
+    intermediate_size: int
+    num_layers: int
+
+def total_linear_params(shape: TransformerShape) -> int:
+    return shape.num_layers * (
+        4 * shape.hidden_size * shape.hidden_size
+        + 2 * shape.hidden_size * shape.intermediate_size
+    )
+
+def lora_params_per_layer(hidden_size: int, intermediate_size: int, rank: int) -> int:
+    attention = 4 * rank * (hidden_size + hidden_size)
+    mlp = rank * (hidden_size + intermediate_size) + rank * (intermediate_size + hidden_size)
+    return attention + mlp
+
+shape = TransformerShape(hidden_size=768, intermediate_size=3072, num_layers=12)
+base_linear_params = total_linear_params(shape)
+
+for rank in [4, 8, 16, 32]:
+    trainable = shape.num_layers * lora_params_per_layer(
+        shape.hidden_size,
+        shape.intermediate_size,
+        rank,
+    )
+    ratio = trainable / base_linear_params
+    print(
+        f"rank={rank:<2} trainable={trainable:,} "
+        f"ratio={ratio:.4%}"
+    )
+```
+
+Run it with:
+
+```bash
+python main.py
+```
+
+**Expected output:**
+
+```text
+rank=4  trainable=884,736   ratio=0.7812%
+rank=8  trainable=1,769,472 ratio=1.5625%
+rank=16 trainable=3,538,944 ratio=3.1250%
+rank=32 trainable=7,077,888 ratio=6.2500%
+```
+
+The exact commas and spacing can vary, but the slope should not: doubling rank should almost double the trainable parameter count. That is the operational point to retain before you even open PEFT.
+
+## Failure modes to catch before post 2
+
+- **The ratio is much larger than expected** — you probably counted embeddings or every model weight instead of the linear layers LoRA actually targets.
+- **The ratio looks tiny but the base model still does not fit** — LoRA reduces trainable parameters, not the inference footprint of the frozen base model.
+- **You conclude that LoRA solves knowledge gaps** — it helps style, format, and domain behavior, but it is a poor substitute for retrieval when the missing problem is fresh facts.
+- **You compare ranks without fixing everything else** — change one variable at a time. Rank, dataset shape, and learning rate all move quality in different ways.
+
+## Decision frame: prompt, LoRA, RAG, or full fine-tuning?
+
+Use post 1 to make the first branching decision before you spend GPU time.
+
+| Situation | Default move | Why |
+| --- | --- | --- |
+| Tone, format, response style drift | LoRA | Small behavior shift with cheap trainable state |
+| Missing product facts or frequently changing data | RAG | The issue is knowledge freshness, not model behavior |
+| Narrow domain wording + stable output schema | LoRA + curated dataset | The model needs repeated examples, not a whole new base |
+| Deep capability shift across many tasks | Full fine-tuning or a stronger base model | The requested change exceeds what a small adapter usually carries |
+
 ## What to notice in this code
 
-![LoRA's surface area per linear layer measured by the script](../../assets/llm-finetuning-101/01/01-03-what-to-notice-in-this-code.en.png)
+![LoRA's surface area per linear layer measured by the script](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-03-what-to-notice-in-this-code.en.png)
 
 *LoRA's surface area per linear layer measured by the script*
 
@@ -162,7 +233,7 @@ You will see a ratio around 1.5%. Try `rank` 16 and 32 to feel how the number sc
 
 ## Common mistakes
 
-![picking a base model by problem type](../../assets/llm-finetuning-101/01/01-04-where-engineers-get-confused.en.png)
+![picking a base model by problem type](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-04-where-engineers-get-confused.en.png)
 
 *picking a base model by problem type*
 
@@ -199,15 +270,24 @@ The point of post 1 is to stop treating fine-tuning as a mystical GPU ritual. Ju
 
 Post 2 covers dataset preparation. We compare three formats — instruction, chat, completion — and verify in code why label masking and `eos_token` handling are decisive for training stability.
 
+## Answering the Opening Questions
+
+- **How can we calculate why LoRA is so much lighter than full fine-tuning?**
+  - The article treats LLM Fine-tuning Primer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do we tell apart problems that need fine-tuning from those a prompt can solve?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What can we verify in post 1 without a GPU?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- **LLM Fine-tuning Primer (current)**
-- Dataset Preparation and Preprocessing (upcoming)
-- Configuring LoRA Adapters (upcoming)
-- Training Loop and Hyperparameters (upcoming)
-- Model Evaluation (upcoming)
-- Model Serving (upcoming)
+- **LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer (current)**
+- LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing (upcoming)
+- LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters (upcoming)
+- LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters (upcoming)
+- LLM Fine-tuning 101 (5/6): Model Evaluation (upcoming)
+- LLM Fine-tuning 101 (6/6): Model Serving (upcoming)
 
 <!-- toc:end -->
 

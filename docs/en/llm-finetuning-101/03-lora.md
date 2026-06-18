@@ -1,11 +1,11 @@
 ---
-title: Configuring LoRA Adapters
+title: "LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters"
 series: llm-finetuning-101
 episode: 3
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -17,25 +17,23 @@ tags:
 - Transformers
 - Python
 last_reviewed: '2026-05-01'
-seo_description: 'A LoRA adapter is summarized by:'
+seo_description: Master LoRA adapter configuration by understanding rank, scaling, and target modules while verifying proper wiring using real model objects.
 ---
 
-# Configuring LoRA Adapters
+# LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters
 
-## Questions this post answers
+A LoRA adapter does not replace the model; it adds a narrow correction path beside selected linear layers. This article uses that structure to explain how to choose rank, scaling, and target modules without guessing.
 
-![Questions this post answers](../../assets/llm-finetuning-101/03/03-01-questions-this-post-answers.en.png)
+This is the third post in the LLM Fine-tuning 101 series.
 
-*Questions this post answers*
+![LLM Fine-tuning 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-02-the-fields-with-real-operational-impact.en.png)
+*LLM Fine-tuning 101 chapter 3 flow overview*
+
+## Questions to Keep in Mind
 
 - Which `LoraConfig` fields actually need to be understood?
 - What goes wrong when `target_modules` is mis-specified?
 - For a tiny GPT-2 class model, how low does the trainable parameter ratio go?
-- How does the `lora_alpha / r` ratio (scaling) interact with learning rate?
-
-> A LoRA adapter is not a device for rewriting an entire model — it is a small correction patch attached beside specific linear transformations.
-
-Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/03-lora)
 
 ## Why this matters
 
@@ -47,7 +45,7 @@ Once the adapter wiring is verified in post 3, when training fails to converge i
 
 A LoRA adapter is summarized by:
 
-```
+```text
 Original forward:  y = W · x
 
 LoRA forward:      y = W · x + (alpha / r) · B · A · x
@@ -81,7 +79,7 @@ This structure means inserting an adapter does not change model behavior at the 
 
 **After** — You inspect GPT-2 and see attention modules are named `c_attn` (Q, K, V fused) and `c_proj`, then change to:
 
-```
+```text
 trainable params: 1,478,656 || all params: 125,917,184 || trainable%: 1.1745
 ```
 
@@ -89,13 +87,9 @@ That single line confirms attachment. It also lines up with the 1.5% you compute
 
 ## What to fix first about the config
 
-![Low-rank decomposition and scaling structure](../../assets/llm-finetuning-101/03/03-02-the-fields-with-real-operational-impact.en.png)
-
-*Low-rank decomposition and scaling structure*
-
 `r` is the low-rank dimension, `lora_alpha` is the scale, and `lora_dropout` is dropout on the adapter path only. The most accident-prone field in practice is `target_modules`. Get this list wrong and either nothing attaches, or you attach to layers you did not mean to.
 
-![Fields with real operational impact](../../assets/llm-finetuning-101/03/03-01-the-fields-with-real-operational-impact.en.png)
+![Fields with real operational impact](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-01-the-fields-with-real-operational-impact.en.png)
 
 *Fields with real operational impact*
 
@@ -158,7 +152,7 @@ Only parameters ending in `lora_A` and `lora_B` should be trainable. Anything el
 
 ## What to notice in this code
 
-![Choosing target modules for GPT-style models](../../assets/llm-finetuning-101/03/03-03-what-to-notice-in-this-code.en.png)
+![Choosing target modules for GPT-style models](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-03-what-to-notice-in-this-code.en.png)
 
 *Choosing target modules for GPT-style models*
 
@@ -169,7 +163,7 @@ Only parameters ending in `lora_A` and `lora_B` should be trainable. Anything el
 
 ## Common mistakes
 
-![Full fine-tuning vs. LoRA parameter scale](../../assets/llm-finetuning-101/03/03-04-where-engineers-get-confused.en.png)
+![Full fine-tuning vs. LoRA parameter scale](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-04-where-engineers-get-confused.en.png)
 
 *Full fine-tuning vs. LoRA parameter scale*
 
@@ -207,15 +201,24 @@ The point of LoRA configuration is **wiring verification**, not performance tuni
 
 Post 4 covers the training loop. We push real gradients through this adapter and watch how learning rate / batch size / gradient accumulation reshape the loss curve.
 
+## Answering the Opening Questions
+
+- **Which `LoraConfig` fields actually need to be understood?**
+  - The article treats Configuring LoRA Adapters as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What goes wrong when `target_modules` is mis-specified?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **For a tiny GPT-2 class model, how low does the trainable parameter ratio go?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LLM Fine-tuning Primer](./01-intro.md)
-- [Dataset Preparation and Preprocessing](./02-dataset.md)
-- **Configuring LoRA Adapters (current)**
-- Training Loop and Hyperparameters (upcoming)
-- Model Evaluation (upcoming)
-- Model Serving (upcoming)
+- [LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer](./01-intro.md)
+- [LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing](./02-dataset.md)
+- **LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters (current)**
+- LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters (upcoming)
+- LLM Fine-tuning 101 (5/6): Model Evaluation (upcoming)
+- LLM Fine-tuning 101 (6/6): Model Serving (upcoming)
 
 <!-- toc:end -->
 

@@ -1,7 +1,7 @@
 ---
 episode: 10
 language: ko
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 series: python-dbapi-101
 status: publish-ready
 tags:
@@ -13,35 +13,37 @@ tags:
 - Retry
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
-title: 'SQLite Production 패턴: retry, timeout, 관측성, 백업'
+title: "Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업"
 seo_description: SQLite가 파일이라는 사실은 운영을 단순하게 만들지만, "그냥 파일"이라는 생각은 위험하다.
 ---
 
-# SQLite Production 패턴: retry, timeout, 관측성, 백업
+# Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업
 
 지난 9개의 글에서 SQLite와 PEP 249의 거의 모든 동작을 다뤘습니다. 마지막 글은 이 모든 것을 production 환경에서 어떻게 묶을지에 대한 글입니다. SQLite는 가볍지만, 가벼움을 핑계로 운영 가시성을 낮춰서는 안 됩니다. retry는 측정되어야 하고, slow query는 자동으로 잡혀야 하고, 트레이스는 SQL까지 따라가야 하고, 백업은 정기적으로 검증되어야 합니다.
 
 이 글은 새 패턴을 소개하기보다 앞에서 다룬 패턴들을 production-ready 형태로 합치는 데 초점을 둡니다. 코드 한 덩어리를 그대로 가져다 써도 동작하도록 구성했습니다.
 
-![SQLite Production 패턴: retry, timeout, 관측성, 백업](../../assets/python-dbapi-101/10/10-01-sqlite-production-patterns-retry-timeout.ko.png)
+이 글은 Python DB-API 101 시리즈의 마지막 글입니다.
+
+![SQLite Production 패턴: retry, timeout, 관측성, 백업](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-01-sqlite-production-patterns-retry-timeout.ko.png)
 
 *SQLite Production 패턴: retry, timeout, 관측성, 백업*
 
-## 이 글에서 다룰 문제
+![Python DB-API 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-02-mental-model-sqlite-is-still-a-dbms.ko.png)
+*Python DB-API 101 10장 흐름 개요*
 
-운영 중 SQLite 기반 서비스가 문제를 일으킬 때, 가장 흔한 반응은 두 가지입니다. (1) "잘 모르겠어서 일단 재시작", (2) "DB 파일을 통째로 그냥 복사". 둘 다 운이 좋으면 통하지만, 데이터 손상 가능성과 SLO 위반의 책임을 운에 맡기는 셈입니다.
+## 먼저 던지는 질문
 
-이 글의 목표는 운에 의존하지 않는 운영 기본기를 만드는 것입니다. retry는 백오프와 jitter로 측정 가능해야 하고, timeout은 의도적으로 설정되어야 하고, 관측성은 코드 한 줄짜리 데코레이터로도 충분해야 하며, 백업은 트랜잭션 일관성을 보장해야 합니다.
+- `busy_timeout`, `timeout`, 애플리케이션 retry는 서로 무엇이 다르고 왜 함께 써야 할까요?
+- slow query 로그, OpenTelemetry span, BUSY 발생률은 SQLite 운영 상태를 어떻게 드러내 줄까요?
+- `Connection.backup()`과 `restore_check()`까지 포함한 흐름이 왜 `cp app.db`보다 중요한가요?
 
 ## Mental Model: SQLite도 "DB"다
 
-![Mental Model: SQLite도 "DB"다](../../assets/python-dbapi-101/10/10-02-mental-model-sqlite-is-still-a-dbms.ko.png)
-
-*Mental Model: SQLite도 "DB"다*
 > SQLite가 파일이라는 사실은 운영을 단순하게 만들지만, "그냥 파일"이라는 생각은 위험하다. 트랜잭션 중인 파일을 cp로 복사하면 손상된 사본이 생긴다. SQLite는 가볍지만, DBMS다.
 
 production에서 지켜야 할 네 가지 축:
@@ -53,7 +55,7 @@ production에서 지켜야 할 네 가지 축:
 
 ## 핵심 개념
 
-![핵심 개념](../../assets/python-dbapi-101/10/10-03-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-03-core-concepts.ko.png)
 
 *핵심 개념*
 ### timeout vs busy_timeout vs retry
@@ -85,7 +87,7 @@ production에서 지켜야 할 네 가지 축:
 
 `Connection.backup()`은 SQLite의 online backup API를 호출하며, 트랜잭션이 진행 중이어도 안전합니다. WAL 모드와도 호환됩니다.
 
-## Before / After: production-ready 모듈 한 덩어리
+## 적용 전과 후: production-ready 모듈 한 덩어리
 
 ### Before: 흩어진 처리
 
@@ -114,7 +116,8 @@ import random
 import logging
 import functools
 from contextlib import contextmanager
-from typing import Callable, Iterator, ParamSpec, TypeVar
+from collections.abc import Callable
+from typing import Iterator, ParamSpec, TypeVar
 
 log = logging.getLogger("db")
 SLOW_QUERY_THRESHOLD_MS = 200.0
@@ -171,7 +174,7 @@ def timed_query(label: str) -> Iterator[None]:
 
 ## 단계별 실습
 
-![단계별 실습](../../assets/python-dbapi-101/10/10-04-step-by-step.ko.png)
+![단계별 실습](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-04-step-by-step.ko.png)
 
 *단계별 실습*
 ### 1단계: OpenTelemetry로 SQL span 만들기
@@ -238,7 +241,6 @@ def backup_db(src_path: str, dst_path: str, *, pages: int = 1000) -> None:
 # scripts/backup.py
 import sys, time, gzip, shutil
 from pathlib import Path
-from app.db import open_conn
 from app.backup import backup_db
 
 def main():
@@ -247,7 +249,6 @@ def main():
     dst = Path(f"backups/app-{today}.db")
     dst.parent.mkdir(parents=True, exist_ok=True)
     backup_db(str(src), str(dst))
-    # 압축 보관
     with open(dst, "rb") as f, gzip.open(f"{dst}.gz", "wb") as gz:
         shutil.copyfileobj(f, gz)
     dst.unlink()
@@ -323,8 +324,32 @@ production에서 흔히 쓰는 SLO 항목과 측정 방법:
 - [ ] BUSY 발생률/slow query 비율이 메트릭으로 노출되는가?
 - [ ] WAL 파일을 포함한 디스크 사용량이 모니터링되는가?
 
-## 정리와 시리즈 마무리
+## 심화 앵커: 프로덕션 구성 템플릿과 복구 런북
 
+운영 환경에서는 retry, timeout, 관측성, 백업 검증을 한 묶음으로 관리해야 합니다. 아래 connection 템플릿은 시작점으로 바로 사용할 수 있습니다.
+
+```python
+import sqlite3
+
+def open_prod_conn(path: str) -> sqlite3.Connection:
+    conn = sqlite3.connect(path, timeout=5.0, isolation_level=None)
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA synchronous=NORMAL")
+    conn.execute("PRAGMA foreign_keys=ON")
+    conn.execute("PRAGMA busy_timeout=5000")
+    conn.row_factory = sqlite3.Row
+    return conn
+```
+
+| 장애 등급 | 신호 | 즉시 조치 |
+| --- | --- | --- |
+| Sev-1 | `SQLITE_CORRUPT` | 트래픽 차단 후 백업 복구 |
+| Sev-2 | `SQLITE_BUSY` 급증 | write 직렬화, 트랜잭션 축소 |
+| Sev-3 | slow query 증가 | 인덱스/배치 크기 점검 |
+
+복구 절차는 문서만으로 끝내지 말고 주기적으로 리허설해야 합니다. `PRAGMA integrity_check`와 핵심 테이블 row count 검증을 자동화하면 백업 품질을 측정할 수 있습니다.
+
+## 정리
 10개의 글에서 다음을 다뤘습니다.
 
 - DB-API 2.0(PEP 249)이 정의하는 인터페이스와 sqlite3 매핑
@@ -341,19 +366,28 @@ production에서 흔히 쓰는 SLO 항목과 측정 방법:
 
 읽어 주셔서 감사합니다.
 
+## 처음 질문으로 돌아가기
+
+- **`busy_timeout`, `timeout`, 애플리케이션 retry는 서로 무엇이 다르고 왜 함께 써야 할까요?**
+  - 글은 `sqlite3.connect(timeout=5.0)`와 `PRAGMA busy_timeout=5000`이 한 SQL 호출 안에서 락을 얼마나 기다릴지 정하는 장치이고, 애플리케이션 retry는 호출 자체를 몇 번 다시 시도할지 정하는 정책이라고 구분했습니다. 그래서 production 기본값은 둘 중 하나만 길게 두는 것이 아니라 `busy_timeout=2000~5000ms`와 `max_attempts=3~5`를 함께 잡아 지연 상한과 성공 확률을 같이 관리하는 방식입니다.
+- **slow query 로그, OpenTelemetry span, BUSY 발생률은 SQLite 운영 상태를 어떻게 드러내 줄까요?**
+  - 본문은 `timed_query()`가 `SLOW_QUERY_THRESHOLD_MS`를 넘긴 호출을 로그로 남기고, `trace_query()`가 `db.system=sqlite`와 duration을 span에 기록하며, retry 데코레이터의 attempt 증가가 BUSY 비율을 보여 주도록 구성했습니다. 이 세 신호를 함께 보면 성능 회귀, 락 경합, 추적 누락을 각각 다른 층에서 바로 식별할 수 있습니다.
+- **`Connection.backup()`과 `restore_check()`까지 포함한 흐름이 왜 `cp app.db`보다 중요한가요?**
+  - 글은 `cp`가 트랜잭션 중인 파일의 일관성을 보장하지 못하므로 운영 백업으로는 금지라고 못 박았습니다. 대신 `Connection.backup()`으로 온라인 일관성을 지키고, `restore_check()`에서 `PRAGMA integrity_check`와 핵심 테이블 row count까지 확인해야 비로소 복구 가능한 백업인지 검증할 수 있습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
-- [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
-- [Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- [Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
-- [Row factory와 type adapter (sqlite3, PEP 249)](./06-row-factories-adapters.md)
-- [PEP 249 예외 계층과 SQLite 에러 처리](./07-error-handling-exception-hierarchy.md)
-- [SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링](./08-connection-pooling.md)
-- [aiosqlite로 비동기 SQLite 다루기](./09-async-aiosqlite.md)
-- **SQLite Production 패턴: retry, timeout, 관측성, 백업 (현재 글)**
+- [Python DB-API 101 (1/10): 왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Python DB-API 101 (5/10): Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- [Python DB-API 101 (7/10): PEP 249 예외 계층과 SQLite 에러 처리](./07-error-handling-exception-hierarchy.md)
+- [Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링](./08-connection-pooling.md)
+- [Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기](./09-async-aiosqlite.md)
+- **Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업 (현재 글)**
 
 <!-- toc:end -->
 
@@ -364,3 +398,5 @@ production에서 흔히 쓰는 SLO 항목과 측정 방법:
 - [SQLite PRAGMA busy_timeout](https://www.sqlite.org/pragma.html#pragma_busy_timeout)
 - [OpenTelemetry — Semantic Conventions for Database Calls](https://opentelemetry.io/docs/specs/semconv/database/database-spans/)
 - [SQLite — VACUUM INTO](https://www.sqlite.org/lang_vacuum.html#vacuuminto)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-dbapi-101/ko)

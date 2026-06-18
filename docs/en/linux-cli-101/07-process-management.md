@@ -1,11 +1,11 @@
 ---
-title: Process Management
+title: "Linux CLI 101 (7/10): Process Management"
 series: linux-cli-101
 episode: 7
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,36 +17,26 @@ tags:
 - kill
 - Background
 - CLI
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: A process is a running instance of a program, each with a unique
   PID, acting as an independent worker.
 ---
 
-# Process Management
+# Linux CLI 101 (7/10): Process Management
 
-> Linux CLI 101 series (7/10)
+Process problems show up in very practical ways: a port is already in use, CPU spikes to 100 percent, or a long-running job dies the moment your SSH session closes. If you cannot inspect and control processes, those problems stay mysterious longer than they should.
 
----
+This is post 7 in the Linux CLI 101 series.
 
-<!-- a-grade-intro:begin -->
 
-## Key Questions
+![Linux CLI 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/07/07-01-mental-model.en.png)
+*Linux CLI 101 chapter 7 flow overview*
 
-- What is the difference between a program and a process?
-- How do you check which processes are running on the system?
-- What is the safe way to stop an unresponsive process?
-- Why would you run a command in the background?
+## Questions to Keep in Mind
 
-> A process is a running instance of a program, each with a unique PID, acting as an independent worker.
-
-<!-- a-grade-intro:end -->
-
-## What you will learn
-
-- Checking running processes with `ps` and `top`
-- Terminating processes with `kill` and `kill -9`
-- Switching between background and foreground with `&`, `bg`, `fg`, `jobs`
-- Keeping processes alive after SSH disconnection with `nohup`
+- Checking running processes with `ps` and `top`?
+- Terminating processes with `kill` and `kill -9`?
+- Switching between background and foreground with `&`, `bg`, `fg`, `jobs`?
 
 ## Why it matters
 
@@ -199,6 +189,13 @@ Process management is not just "run it and forget" — it includes "how to manag
 
 Even during development, process awareness matters. Building the habit of asking "Will the server die if I close this terminal?" and "Is something still running in the background?" prevents production incidents down the road.
 
+## When it breaks, check these first
+
+- If a port conflict appears, do not reboot first. Run `lsof -i :PORT` and confirm which command is holding the port so you can tell whether it is your dev server, another service, or a stale background job.
+- If `kill PID` does nothing, re-check the state with `ps -p PID -o pid,stat,cmd`. States like `D` or zombie cleanup issues behave differently from a normal running process.
+- If `ps aux | grep python` gives too many lines, use `pgrep -af "python app.py"` or `ps -ef --forest` to narrow the search. Misidentifying the PID is more common than the process itself being weird.
+- If jobs die after SSH disconnects, assume they were launched in the foreground until proven otherwise. For anything long-running, make `nohup`, `tmux`, or a process manager part of the default plan.
+
 ## Checklist
 
 - [ ] You can check all system processes with `ps aux`
@@ -223,15 +220,24 @@ Even during development, process awareness matters. Building the habit of asking
 
 The next post covers **environment variables and PATH** — how the Shell finds commands and manages configuration.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
-- [Permissions and Ownership](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- [grep, find, xargs](./05-grep-find-xargs.md)
-- [Pipes and Redirection](./06-pipe-and-redirection.md)
+- **Checking running processes with `ps` and `top`?**
+  - The article treats Process Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Terminating processes with `kill` and `kill -9`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Switching between background and foreground with `&`, `bg`, `fg`, `jobs`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): Permissions and Ownership](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents](./04-viewing-files.md)
+- [Linux CLI 101 (5/10): grep, find, xargs — The Search Trio](./05-grep-find-xargs.md)
+- [Linux CLI 101 (6/10): Pipes and Redirection](./06-pipe-and-redirection.md)
 - **Process Management (current)**
 - Environment Variables and PATH (upcoming)
 - Shell Script Basics (upcoming)

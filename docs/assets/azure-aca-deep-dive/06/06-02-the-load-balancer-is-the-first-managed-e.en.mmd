@@ -1,0 +1,4 @@
+flowchart TD
+  PublicIP["Public IP Address"] --> ALB["Azure Load Balancer (Managed)"]
+  ALB --> Nodes["AKS Worker Nodes"]
+  Nodes --> Envoy["Envoy Proxy"]

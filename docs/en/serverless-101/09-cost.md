@@ -1,10 +1,10 @@
 ---
 series: serverless-101
 episode: 9
-title: Cost
+title: "Serverless 101 (9/10): Cost"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,23 @@ seo_description: A beginner-friendly guide to serverless cost components, invoca
 last_reviewed: '2026-05-04'
 ---
 
-# Cost
+# Serverless 101 (9/10): Cost
 
-> Serverless 101 series (9/10)
+Serverless often gets sold with the easiest line item to quote: the price per invocation. That number is memorable, but it rarely explains the bill you eventually pay. What surprises teams is usually everything wrapped around the call count.
 
-<!-- a-grade-intro:begin -->
+Duration, memory, data transfer, provisioned capacity, and downstream managed services all shape the real total. Once traffic grows, the architecture decisions behind those numbers matter more than the tiny unit price that looked so attractive on day one.
 
-**Core question**: If each invocation costs *$0.0000002*, why does the *bill* still surprise you?
+This is post 9 in the Serverless 101 series.
 
-> *Cost* is the *sum* of *calls + duration + memory + data transfer + downstream services*.
 
-<!-- a-grade-intro:end -->
+![serverless 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.en.png)
+*serverless 101 chapter 9 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Cost?
+- Which signal should the example or diagram make visible for Cost?
+- What failure should be prevented first when Cost reaches a real system?
 
 ## What You Will Learn
 
@@ -42,17 +48,11 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-*Serverless* is *not always cheaper*. For some workloads it can cost *more* than a steady *EC2* instance.
+Serverless is not automatically cheaper. It can be extremely efficient for short and bursty work, and surprisingly expensive for long-running, high-volume, or network-heavy workloads.
 
-## Concept at a Glance
+That is why cost belongs in architecture review, not just in monthly reporting. The same feature can land in a very different cost envelope depending on memory size, downstream calls, egress, and whether you pay an idle tax for provisioned capacity.
 
-```mermaid
-flowchart LR
-    Calls["calls"] --> Bill["bill"]
-    Mem["memory * duration"] --> Bill
-    Net["data transfer"] --> Bill
-    Deps["downstream services"] --> Bill
-```
+The useful lesson in this diagram is that the bill is a composition of multiple behaviors. Optimizing only call volume or only code runtime is rarely enough.
 
 ## Key Terms
 
@@ -70,7 +70,9 @@ flowchart LR
 
 ## Hands-on: Modeling Cost
 
-### Step 1 — Invocation cost
+The constants in the sample below are an **AWS Lambda pricing example**, not a provider-neutral serverless default. Azure Functions and Google Cloud Functions use different pricing rules, free tiers, and billing details, so treat the numbers as one worked example rather than a universal formula.
+
+### Step 1 — Invocation cost (AWS Lambda example)
 
 ```python
 def calls_cost(n, unit_price=0.0000002):
@@ -84,14 +86,14 @@ def gb_seconds(memory_mb, duration_ms, n):
     return (memory_mb / 1024) * (duration_ms / 1000) * n
 ```
 
-### Step 3 — Egress
+### Step 3 — Egress (example rate)
 
 ```python
 def egress_cost(gb, price_per_gb=0.09):
     return gb * price_per_gb
 ```
 
-### Step 4 — Scenario comparison
+### Step 4 — Scenario comparison (AWS-shaped sample)
 
 ```python
 def total(n, mem_mb, dur_ms, gb_out):
@@ -110,15 +112,29 @@ for s in sizes:
     print(s, total(1_000_000, s, 200, 5))
 ```
 
+## Scenario Review
+
+Before choosing a cost posture, compare at least two realistic operating scenarios.
+
+| Scenario | What usually dominates | First question to ask |
+| --- | --- | --- |
+| Spiky low-volume API | invocation + tail latency mitigation | do we need provisioned capacity? |
+| High-volume short jobs | memory × duration | can memory tuning cut runtime enough to win overall? |
+| Media-heavy responses | egress | can CDN or object storage reduce outbound traffic? |
+| Async pipeline | downstream services | which queue, database, and retry costs grow with traffic? |
+
+This keeps the discussion anchored in workload shape instead of in isolated pricing units.
+
 ## What to Notice in This Code
 
+- The numeric constants are **provider-specific example values**, not universal serverless defaults.
 - *Memory* sets both *CPU* and *cost*.
 - *Data transfer* is a *hidden* line item.
 - Compare alternatives at the *scenario* level, not the unit level.
 
 ## Five Common Mistakes
 
-1. **Estimating *total cost* from the *per-call price* only.**
+1. **Treating one provider's published constants as if they were generic *serverless* defaults.**
 2. **Pinning *memory* at the *minimum* without measuring duration.**
 3. **Ignoring *egress*.**
 4. **Forgetting *DB* and *queue* charges.**
@@ -153,22 +169,40 @@ A *FinOps* team feeds *margin per call* back into *product decisions* — pricin
 
 The final episode is *Designing a Serverless App*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Cost?**
+  - The article treats Cost as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Cost?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Cost reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
-- [Function as a Service](./02-function-as-a-service.md)
-- [Triggers and Events](./03-trigger-and-event.md)
-- [Cold Start](./04-cold-start.md)
-- [Scaling](./05-scaling.md)
-- [State Management](./06-state-management.md)
-- [Queues and Event-driven Architecture](./07-queue-and-event-driven.md)
-- [Observability](./08-observability.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
+- [Serverless 101 (2/10): Function as a Service](./02-function-as-a-service.md)
+- [Serverless 101 (3/10): Trigger and Event](./03-trigger-and-event.md)
+- [Serverless 101 (4/10): Cold Start](./04-cold-start.md)
+- [Serverless 101 (5/10): Scaling](./05-scaling.md)
+- [Serverless 101 (6/10): State Management](./06-state-management.md)
+- [Serverless 101 (7/10): Queue and Event-driven Architecture](./07-queue-and-event-driven.md)
+- [Serverless 101 (8/10): Observability](./08-observability.md)
 - **Cost (current)**
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Lambda Pricing](https://aws.amazon.com/lambda/pricing/)
-- [Cloud Functions Pricing](https://cloud.google.com/functions/pricing)
-- [Azure Functions Pricing](https://azure.microsoft.com/pricing/details/functions/)
+### Official Pricing Docs
+
+- [AWS Lambda pricing](https://aws.amazon.com/lambda/pricing/)
+- [Google Cloud Functions pricing](https://cloud.google.com/functions/pricing)
+- [Azure Functions pricing](https://azure.microsoft.com/pricing/details/functions/)
+
+### FinOps and Related Reading
+
 - [FinOps Foundation](https://www.finops.org/)
+- [AWS Lambda power tuning (GitHub)](https://github.com/alexcasalboni/aws-lambda-power-tuning)

@@ -1,10 +1,10 @@
 ---
 series: clean-code-101
 episode: 3
-title: Small Functions
-status: content-ready
+title: "Clean Code 101 (3/10): Small Functions"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,44 +18,43 @@ tags:
   - Refactoring
   - Readability
 seo_description: Why small functions help, doing one thing only, the extract function procedure, and how to remove side effects.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Small Functions
+# Clean Code 101 (3/10): Small Functions
 
-> Clean Code 101 series (3/10)
+Large functions rarely fail because of one dramatic bug. They fail because reading them feels like switching tasks every three lines.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Clean Code 101 series.
 
-**Core question**: How small is small enough?
+Here we will define what “small enough” really means, walk through a safe extraction sequence, and show how side effects and argument growth tell you when to stop.
 
-> Small enough that "does one thing" is visible. The name carries that one thing.
 
-<!-- a-grade-intro:end -->
+![clean code 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 3 flow overview*
+> Extraction makes names possible, and good names make reuse and testing easy.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Four effects of small functions
-- The Extract Function procedure
-- Patterns that remove side effects
-- Command-Query Separation
-- Parameter objects to simplify signatures
+- What boundary should you inspect first when applying Small Functions?
+- Which signal should the example or diagram make visible for Small Functions?
+- What failure should be prevented first when Small Functions reaches a real system?
+
+## Questions this article answers
+
+- What do you gain when functions stay small?
+- In what order should you apply Extract Function to keep the refactor safe?
+- What common patterns help reduce side effects?
+- Why does Command-Query Separation cut debugging time?
+- When is it worth introducing a parameter object?
+
+> As functions get smaller, names do more of the work than comments, and tests become much easier to write.
 
 ## Why It Matters
 
 A small function explains itself by name. A large function asks for comments, and comments turn into lies.
 
 > When functions shrink, names do the work.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    B["Giant function"] --> E["Extract"]
-    E --> S["Does one thing"]
-    S --> N["Good name"]
-    N --> R["Reuse and test"]
-```
 
 Extraction enables names; names enable reuse.
 
@@ -150,6 +149,23 @@ def discount(price: int, rate: float) -> int:
 
 Pure functions are one-line tests.
 
+## How to Verify This in a Real Codebase
+
+```bash
+radon cc app/ -a -s
+python -m pytest -q tests/test_checkout.py
+```
+
+**Expected output**
+
+- You can compare complexity before and after extraction while keeping tests stable.
+- The function body should read like a table of contents.
+
+## Failure Modes to Watch
+
+- Argument count explodes after extraction.
+- Query-style functions still mutate hidden state.
+
 ## What to Notice in This Code
 
 - The body reads like a table of contents.
@@ -194,9 +210,20 @@ Strong teams gate function length, arg count, and cyclomatic complexity via lint
 
 Small functions enable names and tests. Next, the chief reason for big functions — conditionals.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Small Functions?**
+  - The article treats Small Functions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Small Functions?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Small Functions reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
-- [Naming](./02-naming.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
+- [Clean Code 101 (2/10): Naming](./02-naming.md)
 - **Small Functions (current)**
 - Simplifying Conditionals (upcoming)
 - Removing Duplication (upcoming)
@@ -205,6 +232,7 @@ Small functions enable names and tests. Next, the chief reason for big functions
 - Testable Code (upcoming)
 - Refactoring Basics (upcoming)
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -213,3 +241,4 @@ Small functions enable names and tests. Next, the chief reason for big functions
 - [Refactoring — Extract Function](https://refactoring.com/catalog/extractFunction.html)
 - [Martin Fowler — Command Query Separation](https://martinfowler.com/bliki/CommandQuerySeparation.html)
 - [Refactoring — Introduce Parameter Object](https://refactoring.com/catalog/introduceParameterObject.html)
+- [Python dataclasses documentation](https://docs.python.org/3/library/dataclasses.html)

@@ -1,10 +1,10 @@
 ---
 series: linear-algebra-101
 episode: 1
-title: What Is Linear Algebra?
-status: content-ready
+title: "Linear Algebra 101 (1/10): What Is Linear Algebra?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,40 @@ tags:
   - DataScience
   - Beginner
 seo_description: A beginner-friendly intro to linear algebra — vectors, matrices, and linear transformations, why they matter for ML, with hands-on NumPy code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is Linear Algebra?
+# Linear Algebra 101 (1/10): What Is Linear Algebra?
 
-> Linear Algebra 101 series (1/10)
+If you learn machine learning through formulas, there is usually a moment when the notation suddenly gets dense. Data becomes vectors, parameters become matrices, and one model layer starts to look like a transformation. If linear algebra still feels like a table of numbers, the formulas remain memorized procedures instead of connected ideas.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Linear Algebra 101 series. Here we will treat linear algebra as the language that ties vectors, matrices, and linear transformations into one picture.
 
-**Core question**: Is *linear algebra* just a *grid of numbers*, or is it the *language of space*?
 
-> *Linear algebra is the language of *vectors and linear transformations* — the grammar behind every ML model.*
+![linear algebra 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 1 flow overview*
+> Linear algebra is not a bag of calculations. It is a language for expressing space with coordinates and turning geometric rules into computation.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
+- What boundary should you inspect first when applying What Is Linear Algebra??
+- Which signal should the example or diagram make visible for What Is Linear Algebra??
+- What failure should be prevented first when What Is Linear Algebra? reaches a real system?
 
-- The *definition* of *linear algebra*
-- Intuition for *vectors* and *matrices*
-- *Linear transformations* as the unifying concept
-- A 5-step hands-on walk-through
-- Five common pitfalls
+## Questions This Post Answers
+
+- What does linear algebra actually study beyond symbol manipulation?
+- Why do vectors and matrices keep reappearing in ML, graphics, and statistics?
+- Why is matrix multiplication easier to understand as composition of transformations?
+- How does the linear-transformation viewpoint connect the rest of the series?
+
+> Linear algebra is not a bag of calculations. It is a language for expressing space with coordinates and turning geometric rules into computation.
 
 ## Why It Matters
 
-ML, statistics, graphics, and signal processing all run on *vectors and matrices*. If your *linear algebra is shaky*, you cannot *see inside* a model.
+In machine learning, input data arrives as vectors, parameters live in matrices, and an entire layer is usually a linear transformation followed by a nonlinearity. Recommender systems, graphics, and signal processing are not all the same field, but they keep returning to the same vector-and-matrix grammar.
 
-> *Linear algebra is the language of data.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Vec["Vectors"] --> Mat["Matrices"]
-    Mat --> Trans["Linear transformations"]
-    Trans --> App["ML, graphics, signals"]
-```
+If your linear algebra intuition is weak, the inside of a model stays opaque. Once you can read what a vector stores, what a matrix compresses, and why multiplication depends on order, the notation stops feeling like decoration and starts revealing structure.
 
 ## Key Terms
 
@@ -110,6 +107,12 @@ print("R(A v):", R @ (A @ v))
 print("(R A) v:", (R @ A) @ v)
 ```
 
+## Read One Numeric Pass
+
+- `np.linalg.norm([3, 4])` returns `5.0`. One vector length already gives you a geometric anchor.
+- `A @ v` becomes `array([11., 25.])`, which shows that the same input vector can be reinterpreted by a matrix rule.
+- A 90-degree rotation sends `[3, 4]` to `[-4., 3.]`, making the idea of a transformation visible instead of purely symbolic.
+
 ## What to Notice in This Code
 
 - A *vector* has *direction + magnitude* — not just a list of numbers.
@@ -153,7 +156,18 @@ Recommender systems, image processing, graphics, and every layer of deep learnin
 
 Linear algebra is the *language of space*. The next post explores *vector operations* and their *geometric meaning* in depth.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Linear Algebra??**
+  - The article treats What Is Linear Algebra? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Linear Algebra??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Linear Algebra? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Linear Algebra? (current)**
 - Vectors (upcoming)
 - Matrices (upcoming)
@@ -164,11 +178,12 @@ Linear algebra is the *language of space*. The next post explores *vector operat
 - Matrix Decomposition (upcoming)
 - PCA (upcoming)
 - Linear Algebra in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
 - [3Blue1Brown — Essence of Linear Algebra](https://www.3blue1brown.com/topics/linear-algebra)
-- [Khan Academy — Linear Algebra](https://www.khanacademy.org/math/linear-algebra)
-- [Gilbert Strang — Linear Algebra (MIT OCW)](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/)
-- [NumPy — Linear algebra](https://numpy.org/doc/stable/reference/routines.linalg.html)
+- [MIT OpenCourseWare — 18.06 Linear Algebra](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/)
+- [NumPy — Linear algebra routines](https://numpy.org/doc/stable/reference/routines.linalg.html)
+- [Khan Academy — Linear algebra](https://www.khanacademy.org/math/linear-algebra)

@@ -1,10 +1,10 @@
 ---
 series: cloud-computing-101
 episode: 9
-title: Cost Management
-status: content-ready
+title: "Cloud Computing 101 (9/10): Cost Management"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,33 @@ tags:
   - AWS
   - Architecture
 seo_description: Tags, budgets, Savings Plans, and rightsizing — the FinOps fundamentals every cloud engineer needs, taught with boto3 examples.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Cost Management
+# Cloud Computing 101 (9/10): Cost Management
 
-> Cloud Computing 101 series (9/10)
+Cloud lets you create infrastructure quickly, which also means you can create cost quickly. Surprise invoices are common not because the cloud is mysterious, but because visibility, ownership, and cleanup policies were weak from the start.
 
-<!-- a-grade-intro:begin -->
+Cloud cost is not a single number; it is a sum of on-demand rates, reserved discounts, spot prices, storage tiers, data transfer charges, and managed service premiums. Without tagging and analysis, you cannot answer 'who spent what and why.' Without budgets, costs surprise you.
 
-**Core question**: Why does the cloud bill always come in higher than predicted?
+This is post 9 in the Cloud Computing 101 series.
 
-> *Cloud cost is tamed in four steps — visibility (tags), budgets (alerts), commitments (Savings), and optimization (rightsizing).*
+In this post, we'll use tags, budgets, Savings Plans, and rightsizing as a practical framework for engineering-led cost control.
 
-<!-- a-grade-intro:end -->
+> FinOps starts with visibility, not discounts. Make cost attributable first, then automate alerts, commitments, and cleanup around real usage patterns.
 
-## What You Will Learn
+
+![cloud computing 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/09/09-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 9 flow overview*
+> Cost control is not about spending less. It is about spending intentionally and knowing where your money goes.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Cost Management?
+- Which signal should the example or diagram make visible for Cost Management?
+- What failure should be prevented first when Cost Management reaches a real system?
+
+## Questions This Chapter Answers
 
 - Cloud cost basics
 - Cost allocation through tags
@@ -43,16 +54,6 @@ last_reviewed: '2026-05-04'
 ## Why It Matters
 
 A surprise on the first invoice is a rite of passage. FinOps is part of engineering, not a finance team chore.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Tag["tag"] --> Visibility["visibility"]
-    Budget["budget"] --> Alert["alert"]
-    Savings["savings plan"] --> Discount["discount"]
-    Right["right-size"] --> Saving["saving"]
-```
 
 ## Key Terms
 
@@ -131,6 +132,26 @@ require_tags = {
 - A tag-enforcement policy is a precondition for cost tracking.
 - Budgets can be scoped per team.
 
+## How to Verify This Example
+
+Budgets and tag enforcement are easy to declare and easy to forget. Verify that the budget exists with the right threshold and remember that alerts are only useful when ownership for the response is also clear.
+
+```bash
+aws budgets describe-budget --account-id "$ACCOUNT_ID" --budget-name monthly-cap
+```
+
+**Expected output:**
+
+- The budget should show a `500 USD` monthly limit.
+- The 80% notification threshold should be visible in the response.
+- Without a tag-enforcement policy, the report may still tell you what cost happened without telling you who created it.
+
+### Where teams usually get stuck
+
+- Budgets warn; they do not automatically block spend.
+- Savings Plans are safest after you have observed stable demand instead of guessed it.
+- NAT and data-transfer charges often grow outside the application code path, so architecture review has to surface them deliberately.
+
 ## Five Common Mistakes
 
 1. **Untagged resources.**
@@ -168,17 +189,29 @@ A `Project=acme` tag separates team costs. A scheduled Lambda stops non-prod at 
 
 Operations, security, and cost are all in. Time to stitch the picture together. The next post covers Cloud Architecture Basics.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Cost Management?**
+  - The article treats Cost Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Cost Management?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Cost Management reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region and Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
-- [Storage](./05-storage.md)
-- [Network](./06-network.md)
-- [Identity and Security](./07-identity-and-security.md)
-- [Monitoring](./08-monitoring.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region and Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
+- [Cloud Computing 101 (5/10): Storage](./05-storage.md)
+- [Cloud Computing 101 (6/10): Network](./06-network.md)
+- [Cloud Computing 101 (7/10): Identity and Security](./07-identity-and-security.md)
+- [Cloud Computing 101 (8/10): Monitoring](./08-monitoring.md)
 - **Cost Management (current)**
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,10 +1,10 @@
 ---
 series: software-engineering-101
 episode: 2
-title: Understanding Requirements
+title: "Software Engineering 101 (2/10): Understanding Requirements"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,26 @@ tags:
   - UserStory
   - Process
 seo_description: A short, code-first guide to requirements — what makes one good, user stories, and the INVEST principle that keeps stories shippable.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Understanding Requirements
+# Software Engineering 101 (2/10): Understanding Requirements
 
-> Software Engineering 101 series (2/10)
+Requirements often sound obvious at first. "Add search." "Improve response time." "Let users reset passwords." The danger is that everyone hears familiar words and imagines a different finish line. Product, design, engineering, and operations can all agree with the same sentence while still carrying different assumptions about scope, risk, and success.
 
-<!-- a-grade-intro:begin -->
+That is why requirement mistakes are so expensive. A bug found during implementation can usually be fixed. A misunderstood requirement can force you to rewrite the code, the tests, the rollout plan, and the user expectation all at once. The cost is not just rework. It is false progress.
 
-**Core question**: Is hearing a requirement the same as understanding it?
+This is post 2 in the Software Engineering 101 series. In this chapter, we turn vague requests into testable statements by connecting user stories, acceptance criteria, non-functional requirements, and the question patterns that expose ambiguity early.
 
-> Solving the wrong problem precisely is the most expensive kind of waste.
 
-<!-- a-grade-intro:end -->
+![software engineering 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Understanding Requirements?
+- Which signal should the example or diagram make visible for Understanding Requirements?
+- What failure should be prevented first when Understanding Requirements reaches a real system?
 
 ## What You Will Learn
 
@@ -46,16 +52,6 @@ last_reviewed: '2026-05-04'
 Over half of code defects originate at the requirements stage. The later you find them, the cost grows exponentially.
 
 > The most expensive code is code you rewrite.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    U["User"] --> N["Need"]
-    N --> R["Requirement"]
-    R --> A["Acceptance Criteria"]
-    A --> T["Tests"]
-```
 
 Requirements only become real when they map to tests.
 
@@ -145,6 +141,28 @@ Append 5W1H to expose vagueness.
 
 A spoken agreement does not exist.
 
+## A practical ambiguity check
+
+When a requirement arrives, resist the urge to design immediately. First convert the sentence into something a tester, reviewer, and operator can all inspect. That small pause is where most requirement quality is won.
+
+### Verification steps
+
+1. Copy a real feature request into a scratch note.
+2. Rewrite it in terms of role, input, success condition, and failure behavior.
+3. Add at least two non-functional constraints such as latency, security, or observability.
+
+**Expected output:**
+
+- The original sentence becomes testable instead of merely familiar.
+- Missing edge cases show up before they turn into implementation drift.
+- The acceptance criteria start looking like the future PR checklist.
+
+### Failure modes to watch
+
+- The requirement still depends on words like "fast" or "properly" with no threshold.
+- Unregistered users, failed requests, or measurement points are undefined.
+- The agreement lives only in meeting memory instead of a ticket, RFC, or PRD.
+
 ## What to Notice in This Code
 
 - "Verifiable" is the start of a good requirement.
@@ -190,8 +208,19 @@ PM, designers, and engineers run a discovery meeting and capture requirements in
 
 Good requirements are measurable. Next we look at the step before code — design vs implementation.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Understanding Requirements?**
+  - The article treats Understanding Requirements as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Understanding Requirements?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Understanding Requirements reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Engineering?](./01-what-is-software-engineering.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
 - **Understanding Requirements (current)**
 - Design vs Implementation (upcoming)
 - Code Review (upcoming)
@@ -201,6 +230,7 @@ Good requirements are measurable. Next we look at the step before code — desig
 - Collaboration Process (upcoming)
 - Maintenance and Tech Debt (upcoming)
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,10 +1,10 @@
 ---
 series: pandas-101
 episode: 4
-title: Filtering and Selection
-status: content-ready
+title: "Pandas 101 (4/10): Filtering and Selection"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,31 @@ tags:
   - Indexing
   - Beginner
 seo_description: Master loc, iloc, boolean indexing, and query — the four ways Pandas selects rows and columns, with code and a clear mental model
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Filtering and Selection
+# Pandas 101 (4/10): Filtering and Selection
 
-> Pandas 101 series (4/10)
+Pandas gets confusing fast when you notice that there are several ways to pick rows and columns from the same table. `loc`, `iloc`, boolean masks, and `query` can look interchangeable at first, but they are not. If you do not separate them by intent, selection code becomes harder to read and assignment bugs show up sooner than you expect.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Pandas 101 series.
 
-**Core question**: Why are there *four ways* to *pick rows* in Pandas?
+My goal here is to organize selection tools as a small decision framework: labels, positions, and conditions. Once you think that way, the syntax choices become much easier to justify.
 
-> *Different intents (label, position, condition) need *different tools*. Do not force one approach to do everything.*
 
-<!-- a-grade-intro:end -->
+![pandas 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/04/04-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 4 flow overview*
+> *Filtering is repeating at every stage of analysis. Slow or ambiguous selection code breaks everything downstream — treat this as a core skill, not syntax.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The difference between *loc* and *iloc*
-- The intuition behind *boolean indexing*
-- The readability of *query*
-- A 5-step selection hands-on
-- Five common mistakes
+- The difference between *loc* and *iloc?
+- The intuition behind *boolean indexing?
+- The readability of *query?
 
 ## Why It Matters
 
 *Every step of analysis* involves *subset extraction*. *Slow or wrong selection* shakes the *whole pipeline*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    DF["DataFrame"] --> Loc["loc (label)"]
-    DF --> Iloc["iloc (position)"]
-    DF --> Bool["boolean mask"]
-    DF --> Q["query (string)"]
-```
 
 ## Key Terms
 
@@ -86,6 +75,16 @@ print(df.loc["a"])
 print(df.loc[["a", "c"], "x"])
 ```
 
+Label-based selection pays off because the output remains easy to read. The result tells you exactly which rows you asked for, without forcing you to remember positional offsets.
+
+**Expected output:**
+
+```text
+a    1
+c    3
+Name: x, dtype: int64
+```
+
 ### Step 3 — iloc
 
 ```python
@@ -105,6 +104,19 @@ print(df[(df["x"] > 1) & (df["y"] < 30)])
 ```python
 print(df.query("x > 1 and y < 30"))
 print(df[df["x"].isin([1, 3])])
+```
+
+This is where readability starts to matter more than syntax trivia. `query` keeps longer expressions compact, and `isin` replaces brittle chains of repeated OR conditions.
+
+**Expected output:**
+
+```text
+   x   y
+b  2  20
+
+   x   y
+a  1  10
+c  3  30
 ```
 
 ## What to Notice in This Code
@@ -146,21 +158,33 @@ KPI dashboards, outlier detection, A/B test slicing — *condition-based selecti
 2. Use *iloc* to print the *first 5 rows*.
 3. Express *two or more conditions* with *query*.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 Selection is the *primitive operation of analysis*. Next we tackle *missing value handling*.
 
+## Answering the Opening Questions
+
+- **The difference between *loc* and *iloc?**
+  - The article treats Filtering and Selection as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The intuition behind *boolean indexing?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The readability of *query?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
-- [Reading CSV and Excel](./03-read-csv-and-excel.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
+- [Pandas 101 (3/10): Reading CSV and Excel](./03-read-csv-and-excel.md)
 - **Filtering and Selection (current)**
 - Handling Missing Values (upcoming)
-- groupby (upcoming)
+- Groupby and Aggregation (upcoming)
 - Merge and Join (upcoming)
 - Time Series (upcoming)
-- apply and Vectorization (upcoming)
-- Real-world Data Analysis (upcoming)
+- Apply and Vectorization (upcoming)
+- Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,0 +1,11 @@
+flowchart TD
+    DS["Evaluation dataset"] --> P["Production distribution\nLargest share"]
+    DS --> E["Edge cases\nSmaller but critical"]
+    DS --> A["Adversarial cases\nIntentional stress tests"]
+
+    P --> P1["Reflect common real user traffic"]
+    E --> E1["Verify robustness on rare inputs"]
+    A --> A1["Probe prompt injection and misuse"]
+    P1 --> B["Balanced composition"]
+    E1 --> B
+    A1 --> B

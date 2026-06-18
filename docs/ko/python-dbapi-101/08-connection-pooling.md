@@ -1,7 +1,7 @@
 ---
 episode: 8
 language: ko
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 series: python-dbapi-101
 status: publish-ready
 tags:
@@ -13,35 +13,37 @@ tags:
 - PEP 249
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
-title: 'SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링'
+title: "Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링"
 seo_description: SQLite connection은 다른 DB의 client/server connection과 다르다.
 ---
 
-# SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링
+# Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링
 
 다른 DB와 달리 SQLite는 별도의 서버 프로세스가 없습니다. connection은 그냥 파일 핸들이고, 트랜잭션 락은 파일 시스템에 표현됩니다. 이 단순함 덕분에 SQLite는 임베디드부터 중간 규모 웹앱까지 쓰이지만, 동시에 connection을 어떻게 다룰지에 대한 의사결정을 개발자에게 그대로 떠넘깁니다.
 
 "connection 하나를 전역으로 공유해도 되는가?", "스레드마다 새로 만들어야 하는가?", "FastAPI 같은 비동기 프레임워크에서 connection을 어떻게 쥐어야 하는가?" 이 글은 그 질문들에 답합니다.
 
-![SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링](../../assets/python-dbapi-101/08/08-01-sqlite-connection-management-thread-safe.ko.png)
+이 글은 Python DB-API 101 시리즈의 여덟 번째 글입니다.
+
+![SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-01-sqlite-connection-management-thread-safe.ko.png)
 
 *SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링*
 
-## 이 글에서 다룰 문제
+![Python DB-API 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-02-mental-model-a-connection-is-a-file-hand.ko.png)
+*Python DB-API 101 8장 흐름 개요*
 
-SQLite를 가볍게 도입하면 보통 두 가지 함정 중 하나에 빠집니다. 첫째, "전역 connection 하나"를 만들고 모든 스레드가 공유합니다. 트래픽이 적을 때는 잘 돌다가, 동시 요청이 늘어난 순간부터 `ProgrammingError: SQLite objects created in a thread can only be used in that same thread`가 쏟아집니다. 둘째, 그 에러를 본 뒤 `check_same_thread=False`로 끄고 그대로 둡니다. 이번에는 데이터 손상까지는 아니더라도 "어떤 트랜잭션이 어디서 commit되는지" 추적이 불가능해집니다.
+## 먼저 던지는 질문
 
-올바른 답은 "thread-safety 모드를 확인하고, 스레드 모델에 맞는 connection 전략을 명시적으로 선택하는 것"입니다. SQLite의 자유도가 높기 때문에, 정책을 코드로 표현해 두지 않으면 시간이 지나면서 모두가 다른 가정을 갖게 됩니다.
+- `sqlite3.threadsafety`와 `check_same_thread`는 각각 무엇을 보장하고, 어떤 조합에서 connection 공유를 피해야 할까요?
+- 요청별 connection, 스레드별 connection, 단일 shared connection, 단일 writer 큐 중에서 SQLite에 맞는 선택 기준은 무엇일까요?
+- FastAPI에서 전역 connection 대신 `Depends(get_db)`와 `BEGIN IMMEDIATE` 패턴을 쓰면 어떤 사고를 줄일 수 있을까요?
 
 ## Mental Model: connection은 "파일을 연 핸들"이다
 
-![Mental Model: connection은 "파일을 연 핸들"이다](../../assets/python-dbapi-101/08/08-02-mental-model-a-connection-is-a-file-hand.ko.png)
-
-*Mental Model: connection은 "파일을 연 핸들"이다*
 > SQLite connection은 다른 DB의 client/server connection과 다르다. 별도 프로세스가 없고, 락은 파일 시스템 락이며, connection 객체는 본질적으로 파일 핸들 + 캐시 + 트랜잭션 상태다.
 
 이 차이가 결정하는 것:
@@ -55,25 +57,33 @@ SQLite를 가볍게 도입하면 보통 두 가지 함정 중 하나에 빠집�
 
 ## 핵심 개념
 
-![핵심 개념](../../assets/python-dbapi-101/08/08-03-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-03-core-concepts.ko.png)
 
 *핵심 개념*
 ### SQLite의 세 가지 thread-safety 모드
 
-SQLite C 라이브러리는 컴파일 시 세 가지 모드 중 하나를 가집니다.
+SQLite C 라이브러리는 컴파일 시 세 가지 native 모드 중 하나를 가집니다.
 
-- **Single-thread (0)**: 어떤 스레드 동시성도 허용하지 않음. 임베디드용.
-- **Multi-thread (1)**: 서로 다른 connection을 서로 다른 스레드에서 사용 가능. 한 connection을 두 스레드가 동시에 쓰면 안 됨.
-- **Serialized (2)**: 한 connection을 여러 스레드가 동시에 사용해도 안전. 내부 mutex가 직렬화.
+- **Single-thread**: 어떤 스레드 동시성도 허용하지 않음. 임베디드용.
+- **Multi-thread**: 서로 다른 connection을 서로 다른 스레드에서 사용 가능. 한 connection을 두 스레드가 동시에 쓰면 안 됨.
+- **Serialized**: 한 connection을 여러 스레드가 동시에 사용해도 안전. 내부 mutex가 직렬화.
 
-Python의 `sqlite3` 모듈은 사용 중인 모드를 노출합니다.
+이 native 모드 이름과 Python DB-API의 `sqlite3.threadsafety` 숫자는 같은 체계가 아닙니다. Python이 노출하는 DB-API 매핑은 다음과 같습니다.
+
+- **0** -> SQLite single-thread
+- **1** -> SQLite multi-thread
+- **3** -> SQLite serialized
+
+SQLite 컴파일 타임의 `SQLITE_THREADSAFE` 숫자도 또 다릅니다(같은 순서로 `0`, `2`, `1`).
+
+Python의 `sqlite3` 모듈은 DB-API 값을 이렇게 노출합니다.
 
 ```python
 import sqlite3
-print(sqlite3.threadsafety)  # 0, 1, 2, 또는 3
+print(sqlite3.threadsafety)  # 0, 1, or 3
 ```
 
-대부분의 배포판에서 `1` 또는 `3`을 봅니다. Python 3.11+에서 값이 `3`이면 `serialized` 모드이고 한 connection을 여러 스레드가 안전하게 공유할 수 있습니다.
+대부분의 배포판에서 `1` 또는 `3`을 봅니다. Python 3.11+에서 값 `3`은 SQLite의 `serialized` 모드에 대응합니다. 반대로 값 `1`은 `multi-thread`에 대응하므로, connection 하나를 여러 스레드가 공유해도 된다는 뜻이 아닙니다.
 
 ### `check_same_thread`의 의미
 
@@ -82,7 +92,7 @@ print(sqlite3.threadsafety)  # 0, 1, 2, 또는 3
 ```python
 import sqlite3, threading
 
-conn = sqlite3.connect("app.db")  # check_same_thread=True (기본)
+conn = sqlite3.connect("app.db")  # check_same_thread=True (default)
 
 def worker():
     conn.execute("SELECT 1")  # ProgrammingError
@@ -90,7 +100,7 @@ def worker():
 threading.Thread(target=worker).start()
 ```
 
-`check_same_thread=False`로 끄면 Python 가드가 사라지고, 이후의 안전성은 전적으로 SQLite C 라이브러리가 어떤 thread-safety 모드로 컴파일되어 있느냐에 달립니다. 즉 `check_same_thread=False`만으로는 안전하지 않습니다. **반드시 `sqlite3.threadsafety >= 1`인 환경에서, 그리고 한 connection을 한 번에 한 스레드만 사용하도록 코드 수준에서 보장**해야 합니다.
+`check_same_thread=False`로 끄면 Python 가드가 사라지고, 이후의 안전성은 전적으로 SQLite C 라이브러리가 어떤 thread-safety 모드로 컴파일되어 있느냐에 달립니다. 즉 `check_same_thread=False`만으로는 안전하지 않습니다. **connection 하나를 여러 스레드에서 공유하려면 먼저 `sqlite3.threadsafety == 3`인지 확인**해야 합니다. 그 외에는 더 안전한 기본 원칙, 즉 connection 하나를 여러 스레드가 공유하지 않는 쪽으로 설계하세요.
 
 ### per-thread vs shared connection
 
@@ -98,17 +108,16 @@ threading.Thread(target=worker).start()
 |------|------|------|------------|
 | 요청마다 새 connection | 가장 단순. 트랜잭션 경계가 요청과 일치 | connection 생성 빈도가 높음(SQLite는 저비용이지만 0은 아님) | 짧은 요청, 낮은 동시성 |
 | 스레드별 connection (`threading.local`) | 스레드 안에서 재사용. `check_same_thread` 가드 유지 | 스레드 풀이 커지면 connection 수 증가 | 전통적인 WSGI/Flask |
-| 단일 shared connection | 가장 작은 자원 사용 | `serialized` 모드 + `check_same_thread=False` 필수, writer가 직렬화됨 | 임베디드, 단일 워커 |
+| 단일 shared connection | 가장 작은 자원 사용 | `sqlite3.threadsafety == 3` + `check_same_thread=False` 필수, writer가 직렬화됨 | 임베디드, 단일 워커 |
 | asyncio용 외부 풀(`aiosqlite`) | 코루틴 친화적 | 순차 실행 모델이라 동시성 이득은 제한적 | FastAPI/aiohttp |
 
 ### 왜 SQLite에는 큰 connection pool이 어울리지 않는가
 
-PostgreSQL용 pool은 (1) connection 핸드셰이크 비용을 아끼고, (2) 서버의 동시 connection 한도를 보호하기 위해 존재합니다. SQLite에는 (1) 핸드셰이크가 없고, (2) 서버 프로세스가 없으므로 한도라는 개념이 다릅니다. 대신 SQLite의 한도는 **writer 1명**이라는 점입니다. 30개의 connection을 풀에 띄워도 쓰기 처리량은 늘어나지 않습니다. 오히려 writer 경쟁이 늘어 BUSY 에러만 더 자주 봅니다.
+PostgreSQL용 pool은 (1) connection 핸드셰이크 비용을 아끼고, (2) 서버의 동시 connection 한도를 보호하기 위해 존재합니다. SQLite에는 (1) 핸드셰이크가 없고, (2) 서버 프로세스가 없으므로 한도라는 개념이 다릅니다. 대신 SQLite의 한도는 **writer 1명**이라는 사실입니다. 30개의 connection을 풀에 띄워도 쓰기 처리량은 늘어나지 않습니다. 오히려 writer 경쟁이 늘어 BUSY 에러만 더 자주 봅니다.
 
 따라서 "큰 풀"이 아니라 "역할별로 나뉜 작은 풀"이 어울립니다. 예: read connection 다수 + write connection 1개.
 
-## Before / After
-
+## 적용 전후 비교
 ### Before: 전역 connection을 그대로 공유
 
 ```python
@@ -157,7 +166,7 @@ def get_user(user_id: int):
 
 ## 단계별 실습: FastAPI에서 SQLite를 안전하게 쥐기
 
-![단계별 실습: FastAPI에서 SQLite를 안전하게 쥐기](../../assets/python-dbapi-101/08/08-04-step-by-step-holding-sqlite-safely-in-fa.ko.png)
+![단계별 실습: FastAPI에서 SQLite를 안전하게 쥐기](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-04-step-by-step-holding-sqlite-safely-in-fa.ko.png)
 
 *단계별 실습: FastAPI에서 SQLite를 안전하게 쥐기*
 ### 1단계: 환경 점검
@@ -227,14 +236,19 @@ FastAPI는 `Depends`마다 새 generator를 호출하므로, 요청 단위로 �
 ```python
 @app.post("/users", status_code=201)
 def create_user(payload: UserCreate, db: sqlite3.Connection = Depends(get_db)):
-    with db:  # context manager가 BEGIN/COMMIT 처리
+    db.execute("BEGIN IMMEDIATE")
+    try:
         cur = db.execute(
             "INSERT INTO users(email) VALUES (?)", (payload.email,)
         )
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
     return {"id": cur.lastrowid}
 ```
 
-`with db:` 블록이 트랜잭션 경계를 만듭니다. 예외가 나면 롤백되고, 성공하면 commit됩니다. `isolation_level=None`로 두었기 때문에 명시적 `BEGIN`이 필요할 때는 직접 `db.execute("BEGIN IMMEDIATE")`를 호출할 수 있습니다.
+`open_conn()`이 `isolation_level=None`로 connection을 열기 때문에 SQLite는 명시적 `BEGIN ...`이 나오기 전까지 autocommit 모드에 머뭅니다. 여기서는 `BEGIN IMMEDIATE`가 write 트랜잭션 경계를 만들고, 성공 시 `commit()`, 예외 시 `rollback()`이 그 경계를 닫습니다.
 
 ### 5단계: 동시 쓰기 시뮬레이션
 
@@ -242,8 +256,16 @@ def create_user(payload: UserCreate, db: sqlite3.Connection = Depends(get_db)):
 import concurrent.futures, sqlite3
 
 def writer(i):
-    with open_conn() as conn:
+    conn = open_conn()
+    try:
+        conn.execute("BEGIN IMMEDIATE")
         conn.execute("INSERT INTO log(msg) VALUES (?)", (f"msg-{i}",))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 with concurrent.futures.ThreadPoolExecutor(max_workers=20) as ex:
     list(ex.map(writer, range(200)))
@@ -304,8 +326,39 @@ threading.Thread(target=writer_worker, daemon=True).start()
 - [ ] 동시 쓰기 부하 테스트로 BUSY 발생률을 측정했는가?
 - [ ] connection 누수가 없는지 (`PRAGMA database_list`나 OS 핸들 모니터링) 확인했는가?
 
-## 정리와 다음 글
+## 심화 앵커: 풀링 메트릭으로 병목을 식별하는 방법
 
+SQLite 풀링은 connection 생성 비용 절감보다 경계 제어가 목적입니다. 그래서 풀 크기보다 대기 시간과 BUSY 비율을 먼저 봐야 합니다.
+
+```python
+import sqlite3
+import queue
+import time
+
+class Pool:
+    def __init__(self, path: str, size: int = 4):
+        self.q = queue.Queue(maxsize=size)
+        for _ in range(size):
+            conn = sqlite3.connect(path, timeout=5.0, isolation_level=None)
+            conn.execute("PRAGMA journal_mode=WAL")
+            self.q.put(conn)
+
+    def acquire(self):
+        t0 = time.perf_counter()
+        conn = self.q.get()
+        print(f"metric=pool.wait_ms value={(time.perf_counter()-t0)*1000:.1f}")
+        return conn
+```
+
+| 지표 | 의미 |
+| --- | --- |
+| `pool.wait_ms` | connection 대기 시간 |
+| `pool.in_use` | 동시 사용 수 |
+| `db.busy_rate` | 락 충돌 비율 |
+
+권장 구조는 read 경로와 write 경로 분리입니다. read pool은 다수, write 경로는 단일 직렬화로 두는 편이 SQLite 특성과 가장 잘 맞습니다.
+
+## 정리
 - SQLite connection은 파일 핸들에 가깝고, 큰 connection pool보다 "역할별 작은 connection 전략"이 어울립니다.
 - `sqlite3.threadsafety`와 `check_same_thread`는 별개의 가드이며 둘 다 이해해야 합니다.
 - 대부분의 웹앱에는 "요청 단위 open/close + WAL 모드 + busy_timeout"이 가장 단순하고 안전한 기본값입니다.
@@ -313,19 +366,28 @@ threading.Thread(target=writer_worker, daemon=True).start()
 
 다음 글에서는 동기 모델을 떠나 `aiosqlite`로 비동기 SQLite를 다룹니다. asyncio 컨텍스트에서 connection과 트랜잭션을 어떻게 쥐는지, 그리고 FastAPI의 async path와 어떻게 어우러지는지 살펴봅니다.
 
+## 처음 질문으로 돌아가기
+
+- **`sqlite3.threadsafety`와 `check_same_thread`는 각각 무엇을 보장하고, 어떤 조합에서 connection 공유를 피해야 할까요?**
+  - 글은 `sqlite3.threadsafety`가 SQLite C 라이브러리의 동시성 능력을 DB-API 숫자로 보여 주고, `check_same_thread`는 Python 레벨에서 같은 스레드 사용만 허용하는 별도 가드라고 구분했습니다. 그래서 `check_same_thread=False`만 켠 채 공유하는 것은 위험하며, 최소한 `threadsafety == 3` 여부를 확인하지 못했다면 connection 공유를 피하는 쪽이 안전합니다.
+- **요청별 connection, 스레드별 connection, 단일 shared connection, 단일 writer 큐 중에서 SQLite에 맞는 선택 기준은 무엇일까요?**
+  - 본문 표는 요청별 open/close를 기본값으로 두고, 전통적인 WSGI에서는 `threading.local`, 임베디드 단일 워커에서는 shared connection, 쓰기 병목 경로에서는 단일 writer 큐를 선택지로 놓았습니다. 핵심 기준은 connection 생성 비용이 아니라 writer 1명 제약과 트랜잭션 경계를 얼마나 명확하게 유지할 수 있느냐입니다.
+- **FastAPI에서 전역 connection 대신 `Depends(get_db)`와 `BEGIN IMMEDIATE` 패턴을 쓰면 어떤 사고를 줄일 수 있을까요?**
+  - 글의 FastAPI 예제는 요청마다 `get_db()`가 새 connection을 열고 닫게 해서 트랜잭션 경계가 요청 단위와 정확히 맞도록 만들었습니다. 여기에 write 경로에서 `BEGIN IMMEDIATE`를 명시하면 전역 connection 공유 때문에 다른 요청이 남의 transaction을 `commit()`하거나, 여러 writer가 뒤엉켜 BUSY를 늦게 맞는 문제를 줄일 수 있습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
-- [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
-- [Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- [Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
-- [Row factory와 type adapter (sqlite3, PEP 249)](./06-row-factories-adapters.md)
-- [PEP 249 예외 계층과 SQLite 에러 처리](./07-error-handling-exception-hierarchy.md)
-- **SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (현재 글)**
-- aiosqlite로 비동기 SQLite 다루기 (예정)
-- SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
+- [Python DB-API 101 (1/10): 왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Python DB-API 101 (5/10): Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- [Python DB-API 101 (7/10): PEP 249 예외 계층과 SQLite 에러 처리](./07-error-handling-exception-hierarchy.md)
+- **Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (현재 글)**
+- Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기 (예정)
+- Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
 
 <!-- toc:end -->
 
@@ -336,3 +398,5 @@ threading.Thread(target=writer_worker, daemon=True).start()
 - [Write-Ahead Logging](https://www.sqlite.org/wal.html)
 - [SQLite URI filenames](https://www.sqlite.org/uri.html)
 - [FastAPI — Dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-dbapi-101/ko)

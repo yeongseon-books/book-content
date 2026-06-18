@@ -1,10 +1,10 @@
 ---
 series: cloud-computing-101
 episode: 8
-title: Monitoring
-status: content-ready
+title: "Cloud Computing 101 (8/10): Monitoring"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,33 @@ tags:
   - AWS
   - Observability
 seo_description: CloudWatch metrics, logs, and alarms — the foundation of cloud monitoring explained step by step with boto3 examples for beginners.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Monitoring
+# Cloud Computing 101 (8/10): Monitoring
 
-> Cloud Computing 101 series (8/10)
+If you cannot see a system clearly, your customers end up doing the detection for you. A well-chosen alarm can turn a weekend outage into a short investigation, while a noisy dashboard can waste the same weekend in alert fatigue.
 
-<!-- a-grade-intro:begin -->
+Metrics tell you what is happening (CPU, memory, requests). Logs tell you why (application events, errors). Traces show you how a request flowed through your system. Dashboards make patterns visible. Alerts wake you up. Together, they form the feedback loop that lets you operate a system.
 
-**Core question**: When do you reach for metrics, logs, or traces — and which tool answers each question?
+This is post 8 in the Cloud Computing 101 series.
 
-> *Monitoring makes a system observable through three axes — numbers (metrics), text (logs), and flow (traces).*
+In this post, we'll connect metrics, logs, traces, CloudWatch, and alert routing into one practical observability baseline.
 
-<!-- a-grade-intro:end -->
+> Monitoring works when numbers, events, and request flow answer different questions but reinforce one another during diagnosis.
 
-## What You Will Learn
+
+![cloud computing 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/08/08-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 8 flow overview*
+> Good monitoring answers 'what is broken and where is the break' faster than the alternative: downtime without clues.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Monitoring?
+- Which signal should the example or diagram make visible for Monitoring?
+- What failure should be prevented first when Monitoring reaches a real system?
+
+## Questions This Chapter Answers
 
 - Metrics vs logs vs traces
 - CloudWatch basics
@@ -43,17 +54,6 @@ last_reviewed: '2026-05-04'
 ## Why It Matters
 
 Without monitoring, your *customers* tell you about outages first. A single well-tuned alarm protects entire weekends.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    App["app"] --> Logs["log"]
-    App --> Metric["metric"]
-    Metric --> Alarm["alarm"]
-    Alarm --> SNS["sns/email"]
-    Logs --> Insight["query"]
-```
 
 ## Key Terms
 
@@ -128,6 +128,26 @@ def emit(value):
 - Custom metrics let you alert on business signals.
 - Topics decouple alarms from recipients.
 
+## How to Verify This Example
+
+The interesting part of an alarm is not that it exists. It is whether you can explain exactly when it fires. Reading `Period`, `EvaluationPeriods`, and `Threshold` together is what separates a useful alarm from either noise or silence.
+
+```bash
+aws cloudwatch describe-alarms --alarm-names high-cpu-demo
+```
+
+**Expected output:**
+
+- `MetricName` should be `CPUUtilization`.
+- You should see `Period=60`, `EvaluationPeriods=5`, and `Threshold=80`.
+- If the SNS email subscription was never confirmed, the alarm may exist while notifications still never reach a human.
+
+### Where teams usually get stuck
+
+- More alarms do not automatically create better observability. Unactionable alerts train teams to ignore the system.
+- Log retention defaults can quietly turn into a cost problem.
+- Infrastructure metrics alone can miss a business outage that is obvious in application signals.
+
 ## Five Common Mistakes
 
 1. **Alarming on everything — alarm fatigue.**
@@ -165,17 +185,29 @@ ALB 5xx rate, RDS connections, Lambda error rate, and orders-per-minute all flow
 
 Once visibility is in place, you have to control the bill. The next post covers Cost Management.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Monitoring?**
+  - The article treats Monitoring as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Monitoring?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Monitoring reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region and Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
-- [Storage](./05-storage.md)
-- [Network](./06-network.md)
-- [Identity and Security](./07-identity-and-security.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region and Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
+- [Cloud Computing 101 (5/10): Storage](./05-storage.md)
+- [Cloud Computing 101 (6/10): Network](./06-network.md)
+- [Cloud Computing 101 (7/10): Identity and Security](./07-identity-and-security.md)
 - **Monitoring (current)**
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

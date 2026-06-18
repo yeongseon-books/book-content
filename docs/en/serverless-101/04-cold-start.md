@@ -1,10 +1,10 @@
 ---
 series: serverless-101
 episode: 4
-title: Cold Start
+title: "Serverless 101 (4/10): Cold Start"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,23 @@ seo_description: A beginner-friendly tour of cold start in serverless covering c
 last_reviewed: '2026-05-04'
 ---
 
-# Cold Start
+# Serverless 101 (4/10): Cold Start
 
-> Serverless 101 series (4/10)
+You usually notice *cold start* from the outside first. A function that feels fast most of the time suddenly takes seconds on the first request after idle time, during a burst, or right after deployment. The average looks fine, but the user experience does not.
 
-<!-- a-grade-intro:begin -->
+That is why cold start is one of the earliest serverless topics worth understanding well. It shapes *p99 latency*, user-visible reliability, and the cost you are willing to pay to keep latency stable.
 
-**Core question**: why is the *first call* of a *function* slow?
+This is post 4 in the Serverless 101 series.
 
-> *Cold start* is the *time* to *create* the *container* and *load* the *runtime* and *code*.
 
-<!-- a-grade-intro:end -->
+![serverless 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.en.png)
+*serverless 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Cold Start?
+- Which signal should the example or diagram make visible for Cold Start?
+- What failure should be prevented first when Cold Start reaches a real system?
 
 ## What You Will Learn
 
@@ -42,16 +48,11 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-If *p99* spikes from *cold start*, *SLOs break*. You need a balance between *mitigation* and *acceptance*.
+Cold start is not just “sometimes slower.” On login, payment, webhook, or synchronous API paths, a few cold invocations can dominate the latency story that users actually feel.
 
-## Concept at a Glance
+The trap is that averages hide the problem. If warm invocations are common, the mean looks healthy while the tail still hurts real traffic. That makes cold start less of a micro-optimization topic and more of a design decision about where latency matters enough to spend money.
 
-```mermaid
-flowchart LR
-    Req["request"] --> Init["init container"]
-    Init --> Load["load runtime + code"]
-    Load --> Run["handler"]
-```
+This diagram matters because it shows that *cold start* is not one delay. It is the sum of multiple delays: environment creation, runtime initialization, dependency loading, and your own startup code. The mitigation strategy changes depending on which of those dominates.
 
 ## Key Terms
 
@@ -123,6 +124,28 @@ def percentile(values, p):
     return s[int(len(s) * p) - 1]
 ```
 
+## Verification Workflow
+
+When you suspect cold-start regressions, measure them in a way that separates initialization from steady-state work.
+
+```bash
+# hit the function once after an idle window
+curl -s https://example.com/hello
+
+# hit it again immediately
+curl -s https://example.com/hello
+```
+
+**Expected output:** the second call should usually be faster than the first if the platform reused a warm environment.
+
+Then compare platform logs or traces with these questions in mind:
+
+- Did the runtime create a fresh environment?
+- Did dependency loading dominate the delay?
+- Did your own initialization code do more work than the business logic?
+
+If the first request is consistently slow even after package trimming, that is the moment to evaluate provisioned concurrency rather than guessing from averages.
+
 ## What to Notice in This Code
 
 - Code *outside the handler* runs *only once* on cold.
@@ -166,10 +189,21 @@ Use *provisioning* on *latency-sensitive* paths like *payments, login*; *accept*
 
 Next, we look at *Scaling* and the *concurrency model*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Cold Start?**
+  - The article treats Cold Start as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Cold Start?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Cold Start reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
-- [Function as a Service](./02-function-as-a-service.md)
-- [Trigger and Event](./03-trigger-and-event.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
+- [Serverless 101 (2/10): Function as a Service](./02-function-as-a-service.md)
+- [Serverless 101 (3/10): Trigger and Event](./03-trigger-and-event.md)
 - **Cold Start (current)**
 - Scaling (upcoming)
 - State Management (upcoming)
@@ -177,11 +211,19 @@ Next, we look at *Scaling* and the *concurrency model*.
 - Observability (upcoming)
 - Cost (upcoming)
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Lambda cold start](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html)
-- [Provisioned Concurrency](https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html)
-- [Package optimization](https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html)
-- [SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html)
+### Official Docs
+
+- [AWS Lambda runtime environment](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html)
+- [AWS Lambda Provisioned Concurrency](https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html)
+- [AWS Lambda best practices](https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html)
+- [AWS Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html)
+
+### Code and Related Reading
+
+- [AWS Lambda power tuning (GitHub)](https://github.com/alexcasalboni/aws-lambda-power-tuning)
+- [Azure Functions 101](../azure-functions-101/)

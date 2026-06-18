@@ -1,10 +1,10 @@
 ---
 series: cloud-computing-101
 episode: 2
-title: IaaS, PaaS, SaaS
-status: content-ready
+title: "Cloud Computing 101 (2/10): IaaS, PaaS, SaaS"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,33 @@ tags:
   - SaaS
   - Architecture
 seo_description: Compare IaaS, PaaS, and SaaS by what you operate vs what the provider runs, with five concrete selection criteria and example services.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# IaaS, PaaS, SaaS
+# Cloud Computing 101 (2/10): IaaS, PaaS, SaaS
 
-> Cloud Computing 101 series (2/10)
+EC2, Heroku, and Notion are all cloud services, but they feel nothing alike when you operate them. One makes you think about instances and patching. One wants your code and a start command. One gives you a finished application and asks almost nothing about infrastructure.
 
-<!-- a-grade-intro:begin -->
+IaaS, PaaS, and SaaS differ in what part of the stack the provider manages. With IaaS, you manage the OS and runtime. With PaaS, the platform handles more. With SaaS, you use a finished product. Picking the right level requires knowing what tradeoff you're making.
 
-**Core question**: EC2, Heroku, and Notion are all "cloud" — *why do they feel completely different*?
+This is post 2 in the Cloud Computing 101 series.
 
-> *Cloud service models split work between you and the provider — IaaS, PaaS, SaaS — depending on how much of the OS, runtime, and app you manage yourself.*
+In this post, we'll compare service models through control, speed, lock-in, and operational burden so you can match them to real workloads.
 
-<!-- a-grade-intro:end -->
+> Cloud service models are easiest to understand as operating boundaries: the more the provider runs for you, the less control you keep and the faster you usually move.
 
-## What You Will Learn
+
+![cloud computing 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/02/02-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 2 flow overview*
+> The choice between IaaS, PaaS, and SaaS is a statement about who runs what, not about which is objectively better.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying IaaS, PaaS, SaaS?
+- Which signal should the example or diagram make visible for IaaS, PaaS, SaaS?
+- What failure should be prevented first when IaaS, PaaS, SaaS reaches a real system?
+
+## Questions This Chapter Answers
 
 - IaaS, PaaS, SaaS definitions
 - The shared-responsibility diagram
@@ -43,16 +54,6 @@ last_reviewed: '2026-05-04'
 ## Why It Matters
 
 Pick the wrong model and you waste both *cost* and *speed*. Each stage of an organization fits a different abstraction level.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    OS["OS"] --> Run["runtime"]
-    Run --> App["app"]
-    App --> Data["data"]
-    Data --> User["user"]
-```
 
 ## Key Terms
 
@@ -122,6 +123,28 @@ print("PaaS = git push, IaaS = the four steps above by hand")
 - On IaaS, every step is your responsibility.
 - SaaS removes the code itself from your scope.
 
+## How to Verify This Example
+
+This example is really about the deployment contract. Run it locally in the same shape that a PaaS expects, then compare that short contract with the extra moving parts you would have to own on IaaS.
+
+```bash
+pip install -r requirements.txt
+gunicorn app:app --bind 0.0.0.0:8000
+curl http://127.0.0.1:8000/
+```
+
+**Expected output:**
+
+- Gunicorn should start without import or path errors.
+- `curl` should return a JSON payload like `{"hello":"cloud"}`.
+- Once that works, it becomes obvious why PaaS can remove a large amount of platform setup from the critical path.
+
+### Where teams usually get stuck
+
+- A mismatched process command or module path is one of the most common reasons a PaaS deployment fails after a successful local test.
+- Do not reduce the choice to convenience. The real question is where operations responsibility stops.
+- SaaS evaluation should include export, SSO, and audit concerns, not just feature lists.
+
 ## Five Common Mistakes
 
 1. **Treating a PaaS like a VM.**
@@ -159,8 +182,19 @@ Early-stage startups run on PaaS like Heroku or Render. As they grow they move w
 
 Once you pick a model, the next question is *where it runs*. The next post covers Regions and Availability Zones.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying IaaS, PaaS, SaaS?**
+  - The article treats IaaS, PaaS, SaaS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for IaaS, PaaS, SaaS?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when IaaS, PaaS, SaaS reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
 - **IaaS, PaaS, SaaS (current)**
 - Region and Availability Zone (upcoming)
 - Compute (upcoming)
@@ -170,6 +204,7 @@ Once you pick a model, the next question is *where it runs*. The next post cover
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

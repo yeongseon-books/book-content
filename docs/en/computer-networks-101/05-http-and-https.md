@@ -1,10 +1,10 @@
 ---
 series: computer-networks-101
 episode: 5
-title: HTTP and HTTPS
-status: content-ready
+title: "Computer Networks 101 (5/10): HTTP and HTTPS"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,28 @@ tags:
   - REST
   - Headers
 seo_description: HTTP request and response anatomy, methods and status codes, important headers, and what the S in HTTPS actually adds — explained from the wire up.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# HTTP and HTTPS
+# Computer Networks 101 (5/10): HTTP and HTTPS
 
 > Computer Networks 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: What shape of message is HTTP, and what exactly does the "S" add when it appears?
 
 > HTTP is a simple text-based request and response protocol. Method, path, headers, body — those four parts are enough to read every REST API and every website. HTTPS slips TLS underneath to stop eavesdropping, tampering, and impersonation. We cover TLS in detail in episode 6; today we just see its shadow.
 
-<!-- a-grade-intro:end -->
+This is post 5 in the Computer Networks 101 series.
+
+
+![computer networks 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/05/05-01-concept-at-a-glance.en.png)
+*computer networks 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying HTTP and HTTPS?
+- Which signal should the example or diagram make visible for HTTP and HTTPS?
+- What failure should be prevented first when HTTP and HTTPS reaches a real system?
 
 ## What You Will Learn
 
@@ -46,23 +54,6 @@ last_reviewed: '2026-05-04'
 HTTP is the common language of essentially every service — backend, frontend, mobile, data, and ML serving. Misuse of methods and status codes silently breaks caching, retries, and error handling. HTTPS is the default now, but if you cannot answer "why?", certificate expiry, mixed content, and HSTS incidents stay mysteries.
 
 > HTTP is "the agreed shape of a text message", and REST is a style that organizes those agreements around resources.
-
-## Concept at a Glance
-
-```text
-Request
-GET /users/42 HTTP/1.1
-Host: api.example.com
-Accept: application/json
-Authorization: Bearer ...
-
-Response
-HTTP/1.1 200 OK
-Content-Type: application/json
-Cache-Control: max-age=60
-
-{"id": 42, "name": "..."}
-```
 
 Both requests and responses are "start line + headers + blank line + body".
 
@@ -218,17 +209,29 @@ HTTP is an agreement about message shape, and REST is a style that organizes tha
 
 Next we open up the "S" — TLS basics.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying HTTP and HTTPS?**
+  - The article treats HTTP and HTTPS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for HTTP and HTTPS?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when HTTP and HTTPS reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Network?](./01-what-is-a-network.md)
-- [IP and Subnet](./02-ip-and-subnet.md)
-- [TCP and UDP](./03-tcp-and-udp.md)
-- [DNS](./04-dns.md)
+## In this series
+
+- [Computer Networks 101 (1/10): What Is a Network?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP and Subnet](./02-ip-and-subnet.md)
+- [Computer Networks 101 (3/10): TCP and UDP](./03-tcp-and-udp.md)
+- [Computer Networks 101 (4/10): DNS](./04-dns.md)
 - **HTTP and HTTPS (current)**
-- TLS basics (upcoming)
+- TLS Basics (upcoming)
 - Routing and NAT (upcoming)
 - Load Balancer (upcoming)
-- WebSocket and real-time (upcoming)
-- Debugging network problems (upcoming)
+- WebSocket and Real-Time Communication (upcoming)
+- Debugging Network Problems (upcoming)
+
 <!-- toc:end -->
 
 ## References

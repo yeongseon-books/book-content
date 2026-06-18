@@ -1,5 +1,5 @@
 ---
-title: Training Loop and Hyperparameters
+title: "LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters"
 series: llm-finetuning-101
 episode: 4
 language: en
@@ -17,25 +17,25 @@ tags:
 - Optimizer
 - Python
 last_reviewed: '2026-05-01'
-seo_description: 'A single training step decomposes into six stages:'
+seo_description: Deconstruct one LLM training step into six stages to understand how learning rate, batch size, and gradient accumulation drive convergence.
 ---
 
-# Training Loop and Hyperparameters
+# LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters
 
-## Questions this post answers
+Training loops are easier to debug once you stop treating them like framework magic.
 
-![Questions this post answers](../../assets/llm-finetuning-101/04/04-01-questions-this-post-answers.en.png)
+This is the fourth post in the LLM Fine-tuning 101 series.
 
-*Questions this post answers*
+This article breaks one training step into its six moving parts so you can reason about convergence and hyperparameters from first principles. The goal is not to chase a low loss number yet. The goal is to prove that one honest weight update actually happened.
+
+![LLM Fine-tuning 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.en.png)
+*LLM Fine-tuning 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
 
 - What is the minimum you must set in `TrainingArguments` for a single training step to run?
 - Why do `labels` and a data collator matter even in tiny experiments?
 - When debugging a training loop, which output should you read first?
-- How do learning rate, batch size, and gradient accumulation interact?
-
-> The training loop is not a giant black box. It is a repetition: feed a tokenized batch into the model and reduce the loss once.
-
-Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/04-training)
 
 ## Why this matters
 
@@ -47,7 +47,7 @@ Episode 4 also breaks the habit of tuning many hyperparameters at once. If you c
 
 A single training step decomposes into six stages:
 
-```
+```text
 1. batch = data_collator([sample_i, sample_j, ...])
 2. outputs = model(input_ids=..., attention_mask=..., labels=...)
 3. loss = outputs.loss
@@ -81,7 +81,7 @@ Two more relationships worth memorizing:
 
 **After** — Following the 1-step pattern in this article produces this single line:
 
-```
+```text
 {'train_runtime': 1.42, 'train_samples_per_second': 1.41,
  'train_steps_per_second': 0.7, 'train_loss': 8.7421, 'epoch': 0.5}
 ```
@@ -90,13 +90,9 @@ The absolute loss value (8.74) is meaningless. What matters is (1) the run compl
 
 ## What you can shrink and what you cannot
 
-![Comparison of shrinkable and must-keep components](../../assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.en.png)
-
-*Comparison of shrinkable and must-keep components*
-
 Sample count and step count can be cut down. But **tokenized inputs, labels, optimizer step, and loss computation** cannot be removed — drop any of them and you no longer have a training validation, just an inference test. That is why even the smallest example in this article keeps every training-related component intact.
 
-![What you can shrink and what you cannot](../../assets/llm-finetuning-101/04/04-01-what-you-can-shrink-and-what-you-cannot.en.png)
+![What you can shrink and what you cannot](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-01-what-you-can-shrink-and-what-you-cannot.en.png)
 
 *What you can shrink and what you cannot*
 
@@ -163,9 +159,113 @@ args.max_steps = 1
 
 The two configurations have the same effective batch size, so the loss output should be nearly identical. If it differs, there is a data leak somewhere.
 
+## Runnable smoke test: one real training step
+
+The most useful addition to this chapter is a self-contained script that performs exactly one weight update with the same ingredients you will later scale up.
+
+```python
+from datasets import Dataset
+from peft import LoraConfig, TaskType, get_peft_model
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
+)
+
+tokenizer = AutoTokenizer.from_pretrained("sshleifer/tiny-gpt2")
+tokenizer.pad_token = tokenizer.eos_token
+
+texts = [
+    "Q: How do I sort a Python list? A: Use sorted(lst) or lst.sort().",
+    "Q: What does HTTP 404 mean? A: The requested resource was not found.",
+]
+
+rows = []
+for text in texts:
+    encoded = tokenizer(text, truncation=True, padding="max_length", max_length=64)
+    encoded["labels"] = encoded["input_ids"].copy()
+    rows.append(encoded)
+
+dataset = Dataset.from_list(rows)
+
+base = AutoModelForCausalLM.from_pretrained("sshleifer/tiny-gpt2")
+config = LoraConfig(
+    task_type=TaskType.CAUSAL_LM,
+    r=8,
+    lora_alpha=16,
+    lora_dropout=0.05,
+    target_modules=["c_attn", "c_proj"],
+    bias="none",
+)
+model = get_peft_model(base, config)
+
+args = TrainingArguments(
+    output_dir="artifacts",
+    per_device_train_batch_size=2,
+    max_steps=1,
+    learning_rate=5e-4,
+    save_strategy="no",
+    logging_steps=1,
+    report_to=[],
+)
+
+trainer = Trainer(
+    model=model,
+    args=args,
+    train_dataset=dataset,
+    data_collator=DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False),
+)
+
+metrics = trainer.train().metrics
+print(metrics)
+```
+
+Run it with:
+
+```bash
+python main.py
+```
+
+**Expected output:**
+
+```text
+{'train_runtime': 1.2, 'train_samples_per_second': 1.6,
+ 'train_steps_per_second': 0.8, 'train_loss': 8.7, 'epoch': 1.0}
+```
+
+Your exact runtime and loss will differ by hardware and seed. The invariants to verify are simpler:
+
+1. the process exits cleanly,
+2. `train_loss` is finite,
+3. `train_steps_per_second` is non-zero, and
+4. the training loop reports one completed step.
+
+## First-check guide when the step fails
+
+| Symptom | Check first | Likely cause |
+| --- | --- | --- |
+| `KeyError: 'labels'` | Dataset columns | You forgot to create `labels` or renamed the field |
+| Loss is `NaN` on step 1 | Learning rate and dtype | LR too high, unstable precision, or broken inputs |
+| Training runs but loss never changes | Adapter wiring | `target_modules` are wrong or trainable params are 0 |
+| CUDA OOM | Effective batch size | Batch too large, sequence too long, or accumulation too high |
+| Step is extremely slow | Model loading and padding | Base model too large or `max_length` is much bigger than needed |
+
+## Hyperparameter sweep order that stays debuggable
+
+Once the single-step smoke test passes, widen only one dimension at a time.
+
+1. **Hold the dataset fixed** and sweep `learning_rate` on a log scale.
+2. **Hold lr fixed** and change effective batch size with accumulation.
+3. **Hold both fixed** and extend `max_steps` or epochs.
+4. **Only then** compare LoRA ranks or target modules.
+
+This order matters because it preserves blame. If a run regresses, you can still point to one changed cause instead of three overlapping ones.
+
 ## What to notice in this code
 
-![Relationship between batch size and gradient accumulation](../../assets/llm-finetuning-101/04/04-03-what-to-notice-in-this-code.en.png)
+![Relationship between batch size and gradient accumulation](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-03-what-to-notice-in-this-code.en.png)
 
 *Relationship between batch size and gradient accumulation*
 
@@ -176,7 +276,7 @@ The two configurations have the same effective batch size, so the loss output sh
 
 ## Common mistakes
 
-![Decision flow for training debug output priority](../../assets/llm-finetuning-101/04/04-04-where-engineers-get-confused.en.png)
+![Decision flow for training debug output priority](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-04-where-engineers-get-confused.en.png)
 
 *Decision flow for training debug output priority*
 
@@ -217,15 +317,24 @@ The training loop can be validated in surprisingly small units. Once a single st
 
 The next article (episode 5) covers evaluation. We will use perplexity as a quick sanity check and combine it with golden-set qualitative and quantitative evaluation, all in code.
 
+## Answering the Opening Questions
+
+- **What is the minimum you must set in `TrainingArguments` for a single training step to run?**
+  - The article treats Training Loop and Hyperparameters as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do `labels` and a data collator matter even in tiny experiments?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When debugging a training loop, which output should you read first?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LLM Fine-tuning Primer](./01-intro.md)
-- [Dataset Preparation and Preprocessing](./02-dataset.md)
-- [Configuring LoRA Adapters](./03-lora.md)
-- **Training Loop and Hyperparameters (current)**
-- Model Evaluation (upcoming)
-- Model Serving (upcoming)
+- [LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer](./01-intro.md)
+- [LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing](./02-dataset.md)
+- [LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters](./03-lora.md)
+- **LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters (current)**
+- LLM Fine-tuning 101 (5/6): Model Evaluation (upcoming)
+- LLM Fine-tuning 101 (6/6): Model Serving (upcoming)
 
 <!-- toc:end -->
 

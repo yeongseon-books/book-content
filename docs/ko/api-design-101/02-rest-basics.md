@@ -1,15 +1,15 @@
 ---
+title: "API Design 101 (2/10): REST 기본"
 series: api-design-101
 episode: 2
-title: REST 기본
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Computer Science
   - APIDesign
@@ -17,148 +17,357 @@ tags:
   - HTTP
   - Backend
   - WebDevelopment
-seo_description: REST의 6가지 제약과 자원 중심 사고를 정리합니다 — 백엔드 주니어를 위한 안내.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-20'
+seo_description: REST의 여섯 제약과 리소스 중심 설계가 무엇인지 기초부터 정리합니다.
 ---
 
-# REST 기본
+# API Design 101 (2/10): REST 기본
 
-> API Design 101 시리즈 (2/10)
+비슷해 보이는 두 API가 실제로는 전혀 다르게 느껴지는 이유는 대개 REST라는 이름 때문이 아니라 예측 가능성 때문입니다. URL은 그럴듯한데 호출할 때마다 규칙이 달라지면, 클라이언트는 문서를 읽고도 계속 추측해야 합니다.
 
+여기서는 REST를 URL 스타일이 아니라 여섯 가지 제약이 만드는 설계 규율로 정리합니다. 그래야 이후 글에서 리소스, 메서드, 캐시, 문서 구조를 따로 배워도 같은 방향으로 이해할 수 있습니다.
 
-## 이 글에서 다룰 문제
+![클라이언트-리소스-서버 계층 구조](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/02/02-01-concept-at-a-glance.ko.png)
+*REST의 계층 구조: 클라이언트 → 캐시/LB → 서버 → 데이터*
 
-REST는 가장 흔한 API 스타일입니다. 잘 따르면 *예측 가능* 하고, 잘못 따르면 *어디 한 번 본 적 있는데?* 가 됩니다. 핵심을 잡아두면 모든 후속 글이 쉬워집니다.
+## 먼저 던지는 질문
 
-> 규칙을 외우기보다 *왜 그 규칙인지* 를 이해하세요.
+- REST는 어디서 나왔고 무엇을 뜻할까요?
+- REST를 이루는 여섯 가지 아키텍처 제약은 무엇일까요?
+- 리소스 중심 사고는 RPC 스타일과 어떻게 다를까요?
 
-## 전체 흐름
-```mermaid
-flowchart LR
-    Client["Client"] -->|"GET /users/42"| Server["Server"]
-    Server -->|"200 OK + JSON"| Client
-    Server --- DB[("Resources")]
+## REST의 탄생과 핵심 정의
+
+REST(Representational State Transfer)는 Roy Fielding이 2000년 박사 논문에서 정의한 아키텍처 스타일입니다. 당시 HTTP 1.1 표준화 작업에 참여하던 Fielding은 "웹이 왜 이렇게 잘 확장되는가?"라는 질문에서 출발했습니다. 답은 웹 자체에 내재된 아키텍처 제약이었고, 그 제약을 형식화한 것이 REST입니다.
+
+핵심 아이디어를 한 문장으로 요약하면 이렇습니다.
+
+> 서버는 리소스의 현재 상태(representation)를 클라이언트에 전달하고, 클라이언트는 그 표현을 보고 다음 상태 전이(state transfer)를 결정합니다.
+
+이름 자체가 이 동작을 설명합니다. Representational(표현의) State(상태) Transfer(전달). "리소스의 표현을 통해 상태를 전달한다"는 뜻입니다.
+
+중요한 점은 REST가 프로토콜이나 표준이 아니라 **제약의 집합**이라는 사실입니다. HTTP를 사용하지 않아도 REST할 수 있고, HTTP를 사용해도 REST가 아닐 수 있습니다. 제약을 따르는지가 기준입니다.
+
+## 여섯 가지 아키텍처 제약
+
+REST를 구성하는 제약은 다음 여섯 가지입니다. 각각은 독립적인 이점을 주지만, 함께 적용될 때 웹 규모의 확장성을 만들어 냅니다.
+
+### 1. Client-Server 분리
+
+클라이언트(UI)와 서버(데이터 저장·비즈니스 로직)의 관심사를 분리합니다. 클라이언트는 데이터가 어디에 저장되는지 모르고, 서버는 화면이 어떻게 그려지는지 모릅니다.
+
+**이점:** 각자 독립적으로 진화할 수 있습니다. 모바일 앱을 새로 만들어도 서버 API는 바꿀 필요가 없고, 서버를 Python에서 Go로 재작성해도 클라이언트는 영향을 받지 않습니다.
+
+### 2. Stateless (무상태)
+
+각 요청은 처리에 필요한 모든 정보를 자체적으로 담아야 합니다. 서버는 클라이언트의 이전 요청을 기억하지 않습니다.
+
+```python
+# Stateless: 매 요청에 인증 정보를 포함
+GET /users/42
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 ```
 
-자원은 URL로 식별되고, 동작은 HTTP method로 표현됩니다.
+**이점:** 서버 인스턴스를 자유롭게 추가하거나 교체할 수 있습니다. 요청이 어느 서버로 가든 결과가 같으므로 수평 확장이 쉽습니다.
 
-## Before/After
+**주의:** "서버가 아무것도 저장하지 않는다"는 뜻이 아닙니다. 데이터베이스에 사용자 정보를 저장하는 것은 당연합니다. Stateless는 **요청 간 세션 상태**를 서버 메모리에 붙들지 않는다는 의미입니다.
+
+### 3. Cacheable (캐시 가능)
+
+응답에 캐시 가능 여부를 명시해야 합니다. 캐시 가능한 응답은 클라이언트나 중간 계층(CDN, 프록시)이 저장해 두고 재사용할 수 있습니다.
+
+```http
+HTTP/1.1 200 OK
+Cache-Control: public, max-age=3600
+ETag: "abc123"
+
+{"id": 42, "name": "Alice"}
+```
+
+**이점:** 네트워크 트래픽과 서버 부하가 줄어듭니다. 동일한 리소스를 수천 명이 조회해도 서버는 한 번만 처리하면 됩니다.
+
+### 4. Uniform Interface (일관된 인터페이스)
+
+모든 리소스에 동일한 규칙으로 접근합니다. HTTP에서는 이렇게 구현됩니다.
+
+| 원칙 | 의미 |
+|---|---|
+| 리소스 식별 | URI로 리소스를 고유하게 지정 (`/users/42`) |
+| 표현을 통한 조작 | JSON/XML 형태로 리소스를 읽고 수정 |
+| 자기 서술 메시지 | 요청/응답에 처리에 필요한 모든 정보 포함 |
+| HATEOAS | 응답에 다음 가능한 행동의 링크 포함 |
+
+**이점:** 하나의 endpoint 사용법을 배우면 나머지도 비슷하게 동작합니다. 학습 비용이 크게 줄어듭니다.
+
+### 5. Layered System (계층화)
+
+클라이언트는 직접 연결된 계층만 알면 됩니다. 그 뒤에 로드 밸런서, 캐시 서버, 보안 게이트웨이가 있든 없든 클라이언트 코드는 바뀌지 않습니다.
+
+```text
+Client → CDN → Load Balancer → API Gateway → App Server → Database
+         ^                       ^
+         |                       |-- 인증/인가, rate limit
+         |-- 정적 자산 캐시
+```
+
+**이점:** 인프라를 자유롭게 진화시킬 수 있습니다. CDN을 추가하든, WAF를 넣든, 서버를 분산하든 클라이언트 계약은 그대로입니다.
+
+### 6. Code on Demand (선택적)
+
+서버가 실행 가능한 코드(JavaScript 등)를 클라이언트에 전달할 수 있습니다. 이 제약은 유일하게 **선택 사항**입니다.
+
+**현실:** 웹 브라우저가 서버에서 JavaScript를 받아 실행하는 것이 대표적인 예입니다. REST API 설계에서는 거의 사용하지 않으므로 이 시리즈에서는 깊게 다루지 않습니다.
+
+## RPC 스타일 vs REST 스타일
+
+REST의 핵심을 가장 빠르게 이해하는 방법은 RPC 스타일과 비교하는 것입니다.
+
+| 비교 항목 | RPC 스타일 | REST 스타일 |
+|---|---|---|
+| URL 의미 | 동작(verb) | 리소스(noun) |
+| Method 사용 | 대부분 POST | GET/POST/PUT/DELETE 의미대로 |
+| 예시 | `POST /getUserById` | `GET /users/42` |
+| 예시 | `POST /createOrder` | `POST /orders` |
+| 예시 | `POST /cancelOrder` | `DELETE /orders/99` 또는 `PATCH /orders/99 {"status": "cancelled"}` |
+| 캐시 활용 | 어려움 (모두 POST) | 자연스러움 (GET은 캐시 가능) |
+| 발견 가능성 | 낮음 (endpoint마다 고유 이름) | 높음 (리소스 + method 조합) |
+
+RPC가 나쁜 것은 아닙니다. gRPC처럼 내부 서비스 간 고성능 통신에는 RPC가 더 적합한 경우도 많습니다. 하지만 **외부에 공개하는 API**에서는 REST의 예측 가능성과 캐시 친화성이 대부분의 경우 더 큰 이점을 줍니다.
+
+## 전후 비교: 같은 기능, 다른 설계
 
 **Before (RPC 스타일)**
 
-```
-POST /getUser?id=42
-POST /createUser
-POST /deleteUser?id=42
+```http
+POST /api/getUser
+Content-Type: application/json
+
+{"userId": 42}
 ```
 
-동사가 URL에 들어가 있습니다.
+```http
+POST /api/createUser
+Content-Type: application/json
+
+{"name": "Alice", "email": "alice@example.com"}
+```
+
+```http
+POST /api/deleteUser
+Content-Type: application/json
+
+{"userId": 42}
+```
+
+모든 요청이 POST입니다. URL에 동사가 있습니다. 캐시가 불가능합니다. endpoint 목록이 늘어날수록 이름 짓기가 어려워집니다.
 
 **After (REST 스타일)**
 
+```http
+GET /users/42
 ```
-GET    /users/42
-POST   /users
+
+```http
+POST /users
+Content-Type: application/json
+
+{"name": "Alice", "email": "alice@example.com"}
+```
+
+```http
 DELETE /users/42
 ```
 
-자원은 URL, 동작은 method.
+리소스(`/users`)는 같고 method가 의도를 표현합니다. GET은 캐시 가능하고, DELETE는 멱등합니다. 새로운 리소스를 추가해도 동일한 패턴을 반복합니다.
 
-## REST 6제약 따라가기
+## 실습: 여섯 제약을 코드로 확인하기
 
-### 1단계 — Client-Server 분리
+### 단계 1 — Client-Server 분리 확인
 
 ```python
 # 1_client_server.py
-# 클라이언트는 UI, 서버는 데이터 — 서로 *교체 가능* 해야 한다
 import requests
-print(requests.get("https://api.github.com").status_code)
+
+# 클라이언트는 서버가 Python인지 Go인지 모름
+# 오직 계약(URL + method + 응답 형태)만 알면 됨
+r = requests.get("https://api.github.com")
+print(r.status_code)  # 200
+print(r.json().keys())  # 사용 가능한 리소스 URL 목록
 ```
 
-서버 구현이 바뀌어도 클라이언트는 살아남습니다.
+서버 구현이 바뀌어도 계약이 유지되면 이 코드는 그대로 동작합니다.
 
-### 2단계 — Stateless 호출
+### 단계 2 — Stateless 요청
 
 ```python
 # 2_stateless.py
 import requests
-# 매 호출이 *자기 완결적* — 토큰을 매번 보낸다
-headers = {"Authorization": "token TEST"}
-requests.get("https://api.example.com/me", headers=headers)
+
+# 매 요청에 인증 정보를 포함 — 서버는 이전 요청을 기억하지 않음
+headers = {"Authorization": "Bearer my-token-123"}
+
+# 이 두 요청은 서로 독립적 — 어느 서버 인스턴스가 받아도 동일 결과
+r1 = requests.get("https://api.example.com/users/1", headers=headers)
+r2 = requests.get("https://api.example.com/users/2", headers=headers)
 ```
 
-서버는 세션을 *기억* 하지 않습니다 — 호출이 모든 정보를 가져야 합니다.
-
-### 3단계 — Cacheable 응답
+### 단계 3 — 캐시 헤더 설정
 
 ```python
 # 3_cache.py
-from flask import Flask, jsonify
+from flask import Flask, jsonify, make_response
+
 app = Flask(__name__)
 
-@app.get("/articles/1")
-def article():
-    resp = jsonify(id=1, title="REST 기본")
+@app.get("/articles/<int:article_id>")
+def get_article(article_id):
+    article = {"id": article_id, "title": "REST Basics", "author": "Alice"}
+    resp = make_response(jsonify(article))
+    # 이 응답은 60초간 캐시 가능
     resp.headers["Cache-Control"] = "public, max-age=60"
+    resp.headers["ETag"] = f'"{article_id}-v1"'
+    return resp
+
+@app.post("/articles")
+def create_article():
+    # POST 응답은 캐시하지 않음
+    resp = make_response(jsonify(id=99, title="New"), 201)
+    resp.headers["Cache-Control"] = "no-store"
     return resp
 ```
 
-응답이 캐시 가능한지 *명시* 합니다.
+GET 응답에는 캐시 정책을 명시하고, POST/PUT/DELETE 응답에는 `no-store`를 붙이는 것이 일반적입니다.
 
-### 4단계 — Uniform Interface
+### 단계 4 — Uniform Interface 실전
 
 ```python
 # 4_uniform.py
-# 같은 자원에 대해 method만 바꾼다
-# GET    /users/42  -> 조회
-# PUT    /users/42  -> 교체
-# DELETE /users/42  -> 삭제
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+users = {1: {"id": 1, "name": "Alice"}, 2: {"id": 2, "name": "Bob"}}
+
+@app.get("/users/<int:uid>")
+def get_user(uid):
+    """같은 리소스 URI, GET = 조회"""
+    if uid not in users:
+        return jsonify(error="not_found"), 404
+    return jsonify(users[uid])
+
+@app.put("/users/<int:uid>")
+def replace_user(uid):
+    """같은 리소스 URI, PUT = 전체 교체"""
+    users[uid] = request.json
+    users[uid]["id"] = uid
+    return jsonify(users[uid])
+
+@app.delete("/users/<int:uid>")
+def delete_user(uid):
+    """같은 리소스 URI, DELETE = 삭제"""
+    users.pop(uid, None)
+    return "", 204
 ```
 
-호출 규칙이 *일관* 되어야 학습 비용이 줄어듭니다.
+하나의 URI(`/users/{id}`)에 대해 method만 바꾸면 의도가 달라집니다. 이 패턴이 모든 리소스에 동일하게 적용되므로, 하나를 배우면 나머지도 예측할 수 있습니다.
 
-### 5단계 — Layered + Code on Demand
+### 단계 5 — 계층 투명성
 
 ```python
 # 5_layered.py
-# Client -> CDN -> LB -> App -> DB
-# 클라이언트는 *옆 계층* 만 압니다
+import requests
+
+# 클라이언트는 이 URL 뒤에 CDN, LB, Gateway가 있는지 모름
+# 계약만 맞으면 인프라 구성은 자유롭게 바꿀 수 있음
+r = requests.get("https://api.myservice.com/products/1")
+assert r.status_code == 200
 ```
 
-중간에 캐시·게이트웨이가 들어가도 클라이언트 코드는 안 바뀝니다.
+## Richardson Maturity Model: REST 수준 측정
 
-## 이 코드에서 주목할 점
+Martin Fowler가 정리한 Richardson Maturity Model은 API가 REST에 얼마나 가까운지를 네 단계로 분류합니다.
 
-- 동사는 *method* 가, 명사는 *URL* 이 표현합니다.
-- 토큰은 매 호출에 — 세션을 *서버* 에 두지 않습니다.
-- `Cache-Control` 같은 *부가 약속* 도 API의 일부입니다.
+| Level | 설명 | 특징 |
+|---|---|---|
+| 0 | 단일 URI, 단일 method | `POST /api`에 모든 요청을 보냄 (SOAP) |
+| 1 | 리소스 분리 | URI로 리소스를 구분하지만 method는 아직 POST 위주 |
+| 2 | HTTP method 활용 | GET/POST/PUT/DELETE를 의미대로 사용 |
+| 3 | HATEOAS | 응답에 다음 행동 링크를 포함 |
 
-## 자주 하는 실수 5가지
+대부분의 실무 REST API는 **Level 2**에 해당합니다. Level 3(HATEOAS)까지 구현하는 경우는 드물지만, 이 모델을 알면 "우리 API가 얼마나 RESTful한가?"를 객관적으로 판단할 수 있습니다.
 
-1. **URL에 동사 사용.** `/getUser` — RPC 신호.
-2. **POST로 모든 것.** method의 의미를 버림.
-3. **세션 의존.** 서버를 *수평 확장* 못 함.
-4. **에러를 200으로.** 클라이언트가 분기 못 함.
-5. **REST를 *URL 규칙* 으로만 이해.** 6제약을 잊음.
+## 자주 하는 실수 다섯 가지
 
-## 실무에서는 이렇게 쓰입니다
+1. **URL에 동사를 넣습니다.** `/getUser`, `/deleteOrder`는 RPC 시절의 습관입니다. REST에서는 `/users/{id}` + `DELETE` method로 표현합니다.
 
-GitHub, Stripe, GitLab — 대부분의 공개 API는 *대체로 REST* 입니다. 완벽한 HATEOAS는 드물지만 *자원 중심 + uniform interface* 는 표준이 되었습니다. 사내에서도 REST를 기본으로 두고, 필요할 때만 GraphQL이나 gRPC로 *추가* 합니다.
+2. **모든 일을 POST로 처리합니다.** 조회도 POST, 삭제도 POST면 HTTP method의 의미론이 사라집니다. 캐시도 불가능하고, 브라우저 뒤로 가기도 안전하지 않습니다.
+
+3. **서버 세션에 의존합니다.** 로그인 후 세션 쿠키를 서버 메모리에 저장하면, 로드 밸런서가 sticky session을 강제해야 합니다. 서버를 추가하거나 재시작할 때마다 문제가 생깁니다.
+
+4. **에러도 200으로 반환합니다.** `{"success": false, "message": "not found"}`를 200으로 보내면, 모니터링 도구는 "에러 없음"으로 인식하고 CDN은 에러 응답을 캐시합니다.
+
+5. **REST를 URL 패턴으로만 이해합니다.** "슬래시로 구분하고 복수형 쓰면 REST"라고 생각하면, stateless·cacheable·layered 같은 진짜 이점을 놓칩니다.
+
+## 실무에서 REST가 선택되는 이유
+
+GitHub, Stripe, GitLab, Slack 같은 공개 API는 대체로 REST 스타일(Level 2)을 따릅니다. 순수한 HATEOAS까지 밀어붙이는 경우는 드물지만, 리소스 중심 설계와 uniform interface는 사실상 업계 표준이 되었습니다.
+
+REST가 기본 선택지가 된 현실적 이유는 다음과 같습니다.
+
+- **도구 생태계:** OpenAPI, Swagger UI, Postman, curl 모두 REST 친화적입니다.
+- **캐시 인프라:** HTTP 캐시, CDN, 브라우저 캐시가 GET 요청에 자연스럽게 동작합니다.
+- **학습 비용:** 새 개발자가 합류해도 `/resources/{id}` + HTTP method 패턴만 알면 바로 이해합니다.
+- **점진적 채택:** 기존 시스템에 REST endpoint를 하나씩 추가할 수 있습니다.
+
+반면 GraphQL(클라이언트가 필드를 선택)이나 gRPC(바이너리 고성능)는 특정 조건에서 REST보다 유리하지만, 도입 비용이 높고 범용성이 낮습니다. **기본은 REST, 이득이 분명할 때만 다른 선택지**가 현업의 경향입니다.
+
+## 시니어 엔지니어의 REST 설계 사고방식
+
+1. **먼저 리소스의 경계를 정의합니다.** "이 API는 어떤 명사를 다루는가?"부터 시작합니다. 동사는 HTTP method에 맡깁니다.
+2. **method가 상태 전이를 표현하게 둡니다.** POST는 생성, PUT은 전체 교체, PATCH는 부분 수정, DELETE는 삭제. 이 의미를 일관되게 유지합니다.
+3. **캐시, 인증, 에러도 정식 계약으로 취급합니다.** `Cache-Control`, `Authorization` 헤더, 에러 응답 형태 모두 문서화합니다.
+4. **REST를 종교처럼 다루지 않습니다.** 파일 업로드, 긴 작업(long-running operation), 이벤트 스트리밍처럼 REST에 억지로 끼워 맞추면 어색해지는 영역이 있습니다. 그때는 다른 방식을 선택합니다.
+5. **항상 클라이언트 입장에서 예측 가능한가를 묻습니다.** "내가 이 API를 처음 보는 개발자라면, URL과 method만 보고 의도를 알 수 있는가?"
+
+## 검증 포인트와 실패 신호
+
+- **Expected output:** 같은 리소스에 `GET`, `POST`, `DELETE`를 매핑했을 때, URL을 바꾸지 않고도 읽기·생성·삭제 의도를 설명할 수 있어야 합니다.
+- **First check:** 엔드포인트 설명에 `/getUser`, `/deleteOrder` 같은 동사가 반복되면 RPC over HTTP로 기울고 있다는 신호입니다.
+- **Failure mode:** 인증 상태를 서버 세션에 묶거나 모든 응답을 `200 OK`로 보내기 시작하면 캐시, 재시도, 수평 확장 전략이 함께 약해집니다.
 
 ## 체크리스트
 
 - [ ] URL에 동사가 없는가?
-- [ ] 같은 method 의미를 모든 자원에서 지키는가?
-- [ ] 응답에 적절한 cache 헤더가 있는가?
-- [ ] 인증이 매 호출에 자기 완결적인가?
-- [ ] 에러 상태 코드가 명확한가?
+- [ ] 같은 method가 리소스마다 비슷한 의미를 가지는가?
+- [ ] 응답에 적절한 cache header가 포함되는가?
+- [ ] 인증 정보가 매 요청에 자기완결적으로 담기는가?
+- [ ] 에러 status code가 모호하지 않은가?
+- [ ] Richardson Maturity Model 기준으로 최소 Level 2를 충족하는가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-REST는 *6제약* 의 합입니다. 다음 글에서는 그 중심인 — 자원(resource) 설계 — 를 자세히 봅니다.
+1. 익숙한 REST API(GitHub, Stripe, JSONPlaceholder 등) 하나를 골라 endpoint 다섯 개의 method, URL, 의미를 표로 정리해 보세요. 어떤 것이 Level 2이고 어떤 것이 Level 3에 가까운지 판단해 보세요.
+2. Step 4 예제에 `PATCH /users/{id}`를 추가해 보세요. PUT과의 차이를 직접 구현하면서 확인합니다. (힌트: PUT은 전체 교체, PATCH는 부분 수정)
+3. 같은 기능(사용자 CRUD)을 RPC over HTTP와 REST 두 방식으로 각각 설계해 보고, endpoint 수·캐시 가능성·문서화 편의성을 비교해 보세요.
+
+## 정리와 다음 글
+
+REST는 단순한 URL 컨벤션이 아니라, 여섯 가지 아키텍처 제약이 함께 만드는 **확장 가능한 설계 규율**입니다. 이 제약을 따르면 캐시, 수평 확장, 계층 추가가 자연스러워지고, 클라이언트 개발자의 학습 비용이 줄어듭니다.
+
+다음 글에서는 REST의 핵심인 **리소스 설계**를 더 깊게 다룹니다. 어떤 단위로 리소스를 나누고, URL을 어떻게 구성하며, 관계를 어떻게 표현하는지 구체적인 패턴을 살펴봅니다.
+
+## 처음 질문으로 돌아가기
+
+- **REST는 어디서 나왔고 무엇을 뜻할까요?**
+  - Roy Fielding이 2000년 박사 논문에서 웹의 확장성 원리를 형식화한 아키텍처 스타일입니다. "리소스의 표현(Representation)을 통해 상태(State)를 전달(Transfer)한다"는 뜻이며, 프로토콜이 아니라 제약의 집합입니다.
+- **REST를 이루는 여섯 가지 아키텍처 제약은 무엇일까요?**
+  - Client-Server 분리, Stateless, Cacheable, Uniform Interface, Layered System, Code on Demand(선택)입니다. 처음 다섯 가지가 필수이며, 함께 적용될 때 웹 규모의 확장성과 예측 가능성을 만들어 냅니다.
+- **리소스 중심 사고는 RPC 스타일과 어떻게 다를까요?**
+  - RPC는 "무엇을 할 것인가(동사)"를 URL에 표현하고, REST는 "무엇에 대해(명사)"를 URL에 두고 동작은 HTTP method에 맡깁니다. 이 차이로 REST는 캐시 친화적이고, endpoint 패턴이 예측 가능하며, 새 리소스를 추가해도 동일한 규칙이 반복됩니다.
 
 <!-- toc:begin -->
-- [API란 무엇인가?](./01-what-is-an-api.md)
+## 시리즈 목차
+
+- [API Design 101 (1/10): API란 무엇인가?](./01-what-is-an-api.md)
 - **REST 기본 (현재 글)**
 - 리소스 설계 (예정)
 - HTTP method와 status code (예정)
@@ -168,11 +377,14 @@ REST는 *6제약* 의 합입니다. 다음 글에서는 그 중심인 — 자원
 - OpenAPI와 Swagger (예정)
 - Versioning (예정)
 - 좋은 API 문서 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
+- [API Design 101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/api-design-101/ko)
 - [Roy Fielding — Architectural Styles (Ch. 5)](https://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm)
 - [REST API Tutorial (restfulapi.net)](https://restfulapi.net/)
 - [HTTP overview (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview)
 - [Richardson Maturity Model (Martin Fowler)](https://martinfowler.com/articles/richardsonMaturityModel.html)
+- [Google API Design Guide — Resource Oriented Design](https://cloud.google.com/apis/design/resources)

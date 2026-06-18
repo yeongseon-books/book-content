@@ -1,10 +1,10 @@
 ---
 series: sre-101
 episode: 8
-title: Reducing Toil
+title: "SRE 101 (8/10): Reducing Toil"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,34 @@ tags:
   - Productivity
   - Operations
 seo_description: A beginner-friendly guide to reducing toil covering definitions, measurement, automation priorities, savings strategies, and tech-debt connections
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Reducing Toil
+# SRE 101 (8/10): Reducing Toil
 
-> SRE 101 series (8/10)
+Teams can be very busy and still spend too much of their time on work that should not stay manual. The danger is that repetitive recovery, repeated validation, and copied communication all start to look normal simply because the service still runs.
 
-<!-- a-grade-intro:begin -->
+Toil matters because it quietly taxes improvement. The more time a team spends repeating automatable work, the less room it has for safer releases, better observability, and structural fixes.
 
-**Core question**: How much of the *team's time* is being *eaten by repetitive work*?
+This is post 8 in the SRE 101 series. Here we define toil in operational terms, measure its cost, rank automation candidates, and decide where automation actually pays back.
 
-> *Toil* is *manual labor* that *automation* can *remove*.
 
-<!-- a-grade-intro:end -->
+![sre 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/08/08-01-concept-at-a-glance.en.png)
+*sre 101 chapter 8 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *definition* of *toil*
-- How to *measure* it
-- How to *prioritize automation*
-- *Savings* strategies
-- The relation to *technical debt*
+- What separates toil from valuable operational work that still takes time?
+- How can a team measure how much capacity is disappearing into repetitive work?
+- Which automation candidates should move first if time is limited?
 
-## Why It Matters
+## Why this topic matters
 
-When *toil* exceeds *50%*, *improvement stops*.
+When toil becomes a large share of the week, improvement stops. The team is still working hard, but more of that effort goes into keeping the current system upright rather than making the next week better.
 
-## Concept at a Glance
+Reducing toil is therefore not just a productivity topic. It is a reliability topic because it decides how much engineering time remains for prevention work.
 
-```mermaid
-flowchart LR
-    Manual["manual"] --> Toil["toil"]
-    Toil --> Automate["automate"]
-    Automate --> Saved["time saved"]
-```
+> Toil is manual labor that automation can remove.
 
 ## Key Terms
 
@@ -147,17 +140,29 @@ def auto_restart(service):
 
 Next, we cover *capacity planning*.
 
+## Answering the Opening Questions
+
+- **What separates toil from valuable operational work that still takes time?**
+  - The article treats Reducing Toil as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How can a team measure how much capacity is disappearing into repetitive work?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which automation candidates should move first if time is limited?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is SRE?](./01-what-is-sre.md)
-- [Reliability](./02-reliability.md)
-- [SLI, SLO, SLA](./03-sli-slo-sla.md)
-- [Error Budget](./04-error-budget.md)
-- [Monitoring](./05-monitoring.md)
-- [Incident Response](./06-incident-response.md)
-- [Postmortem](./07-postmortem.md)
+## In this series
+
+- [SRE 101 (1/10): What is SRE?](./01-what-is-sre.md)
+- [SRE 101 (2/10): Reliability](./02-reliability.md)
+- [SRE 101 (3/10): SLI, SLO, SLA](./03-sli-slo-sla.md)
+- [SRE 101 (4/10): Error Budget](./04-error-budget.md)
+- [SRE 101 (5/10): Monitoring](./05-monitoring.md)
+- [SRE 101 (6/10): Incident Response](./06-incident-response.md)
+- [SRE 101 (7/10): Postmortem](./07-postmortem.md)
 - **Reducing Toil (current)**
 - Capacity Planning (upcoming)
 - Building Operable Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

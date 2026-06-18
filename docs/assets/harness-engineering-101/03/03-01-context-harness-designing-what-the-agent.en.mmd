@@ -1,0 +1,15 @@
+flowchart LR
+    Window["Shared context window\nfinite token budget"] --> Harness["Context Harness\nchoose what the agent should know now"]
+
+    Sources["Competing inputs\nsystem prompt · task spec · history · retrieval · tool outputs"] --> Harness
+    Hidden["Deliberately hidden\nsecrets · irrelevant tools · stale outputs"] --> Harness
+
+    Harness --> Dense["Dense task-ready context\nright information in the right slots"]
+    Dense --> Outcome["Faster, cheaper, more reproducible reasoning"]
+    Sources --> Risk["Without allocation\nhistory and retrieval crowd out signal"]
+
+    style Window fill:#e3f2fd,stroke:#1976d2
+    style Harness fill:#f3e5f5,stroke:#7b1fa2
+    style Dense fill:#e8f5e9,stroke:#388e3c
+    style Outcome fill:#fff8e1,stroke:#f9a825
+    style Risk fill:#ffebee,stroke:#c62828

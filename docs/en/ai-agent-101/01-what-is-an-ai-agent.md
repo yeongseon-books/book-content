@@ -1,11 +1,11 @@
 ---
-title: What Is an AI Agent?
+title: "AI Agent 101 (1/10): What Is an AI Agent?"
 series: ai-agent-101
 episode: 1
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -22,22 +22,23 @@ seo_description: A chatbot is a dictionary that gives you an answer. An Agent is
   intern you hand a task to and walk away from.
 ---
 
-# What Is an AI Agent?
+# AI Agent 101 (1/10): What Is an AI Agent?
 
-> AI Agent 101 series (1/10)
+When most people first encounter LLMs, they frame them as systems that answer questions well. That mental model feels sufficient in a chat window, but it starts to break the moment you ask the model to finish real work on your behalf.
 
----
+Classifying customer tickets, creating follow-up tasks, and drafting replies all require more than polished text generation. The model has to interact with external systems, inspect results, and decide what to do next, which is exactly where the line between a chatbot and an Agent becomes useful.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the AI Agent 101 series. Here we build the basic mental model for Agents by separating them from chatbots and walking through the observe → think → act → check loop.
 
-## Key Questions
+![Agent loop at a glance](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.en.png)
+*Agent loop at a glance*
+> An agent starts not with a smarter style of prose, but with a control loop that keeps executing toward a goal.
 
-- What essentially separates a chatbot from an agent?
-- Why is the Observe → Think → Act → Check loop necessary?
-- What is the minimum bar for calling something an agent?
-- What scope of agents does this series cover?
+## Questions to Keep in Mind
 
-<!-- a-grade-intro:end -->
+- What changes when you separate chatbots and agents by execution responsibility instead of product labels?
+- How does the Observe → Think → Act → Check loop help you locate agent failures?
+- Which boundary should be defined before choosing tools for a first agent?
 
 ## What you will learn
 
@@ -227,19 +228,28 @@ The next episode covers **context engineering** - the discipline of deciding wha
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **What changes when you separate chatbots and agents by execution responsibility instead of product labels?**
+  - A chatbot usually produces a reply for a human to read. An agent owns the path to completion, so the design unit becomes the execution loop, not the final sentence.
+- **How does the Observe → Think → Act → Check loop help you locate agent failures?**
+  - The loop lets you separate missing observation, bad reasoning, failed action, and absent checking instead of blaming the whole agent at once.
+- **Which boundary should be defined before choosing tools for a first agent?**
+  - Define the goal, allowed actions, stop condition, and human-intervention boundary first. Tools are execution mechanisms inside that boundary.
+
 <!-- toc:begin -->
 ## In this series
 
-- **What Is an AI Agent? (current)**
-- Context Engineering (upcoming)
-- Tool Use Fundamentals (upcoming)
-- Agent Workflow Design (upcoming)
-- Memory and State (upcoming)
-- Multi-Agent Systems (upcoming)
-- Agent Evaluation (upcoming)
-- Error Handling and Reliability (upcoming)
-- Production Operations (upcoming)
-- Building Your First Agent (upcoming)
+- **AI Agent 101 (1/10): What Is an AI Agent? (current)**
+- AI Agent 101 (2/10): Context Engineering (upcoming)
+- AI Agent 101 (3/10): Tool Use Fundamentals (upcoming)
+- AI Agent 101 (4/10): Agent Workflow Design (upcoming)
+- AI Agent 101 (5/10): Memory and State (upcoming)
+- AI Agent 101 (6/10): Multi-Agent Systems (upcoming)
+- AI Agent 101 (7/10): Agent Evaluation (upcoming)
+- AI Agent 101 (8/10): Error Handling and Reliability (upcoming)
+- AI Agent 101 (9/10): Production Operations (upcoming)
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 

@@ -1,0 +1,13 @@
+flowchart TD
+    subgraph ARM["Azure Resource Manager (ARM)"]
+        Req["Deployment Request"]
+    end
+    subgraph Env["ACA Environment Control Plane"]
+        Reconciler["Environment Reconciler"]
+        Cert["Certificate Manager"]
+        DNS["DNS Manager"]
+    end
+    Req --> Reconciler
+    Reconciler --> Cert
+    Reconciler --> DNS
+    Reconciler --> K8s["Underlying AKS Cluster"]

@@ -1,12 +1,12 @@
 ---
-title: LLM-as-Judge — 모델로 모델을 평가하기
+title: "AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기"
 series: ai-evaluation-101
 episode: 4
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,33 +14,63 @@ tags:
 - LLM-as-Judge
 - Bias
 - Cohen Kappa
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: 사람이 모든 응답을 평가할 수 없을 때, 강력한 LLM에게 채점을 맡기는 방법이 LLM-as-judge입니다.
 ---
 
-# LLM-as-Judge — 모델로 모델을 평가하기
+# AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기
 
-> AI Evaluation 101 시리즈 (4/10)
+자유 형식 답변을 평가하려고 하면 곧 한계가 드러납니다. BLEU와 ROUGE로는 의미가 맞는 답을 지나치게 깎고, 사람에게 전부 채점시키기에는 비용과 시간이 감당되지 않습니다. 이 사이를 메우는 대표적인 방법이 LLM-as-Judge입니다.
 
-사람이 모든 응답을 평가할 수 없을 때, 강력한 LLM에게 채점을 맡기는 방법이 LLM-as-judge입니다. 이 글은 judge prompt 작성, bias 통제, 사람 평가와의 일치도 측정을 다룹니다.
+하지만 여기서 가장 흔한 오해는 강한 모델에게 점수만 시키면 곧바로 신뢰할 수 있다고 믿는 것입니다. 실제로는 judge 프롬프트, 위치 편향, 길이 편향, 자기 모델 선호 편향을 어떻게 통제하느냐가 결과를 크게 바꿉니다.
 
----
-![LLM-as-Judge - 모델로 모델을 평가하기](../../assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.ko.png)
+현업에서 저는 LLM judge를 붙인 뒤 오히려 더 자신 있게 잘못된 결론을 내리는 팀도 봤습니다. 사람 기준선 없이 judge 점수만 높다고 배포를 밀어붙였기 때문입니다. 반대로 프롬프트를 몇 차례 다듬고 사람과의 일치도를 재보는 팀은 놀랄 만큼 빠르게 품질 판단 속도를 끌어올립니다.
 
+여기서는 judge 프롬프트를 어떻게 쓰고, 어떤 편향을 통제하고, 사람 채점과 어느 정도 일치해야 실무에서 믿고 쓸 수 있는지 정리하겠습니다.
+
+![LLM-as-Judge - 모델로 모델을 평가하기](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.ko.png)
 *LLM-as-Judge - 모델로 모델을 평가하기*
+> LLM judge는 강력하지만, 기준선과 편향 통제 없이 쓰면 평가 자동화가 아니라 자동화된 착각이 됩니다.
 
-## LLM-as-judge가 필요한 이유
+## 먼저 던지는 질문
 
-![LLM-as-judge가 필요한 이유](../../assets/ai-evaluation-101/04/04-02-why-llm-as-judge.ko.png)
+- LLM-as-Judge는 언제 사람이 매번 평가하기 어려운 품질 판단을 도와줄까요?
+- judge prompt와 rubric이 없으면 자동 채점기는 어떤 편향에 흔들릴까요?
+- 사람 기준선과 agreement를 어떻게 붙여야 judge 결과를 믿을 수 있을까요?
+
+## 왜 이 글이 중요한가
+
+LLM judge를 제대로 설계하면 수천 건 규모의 자유 형식 응답도 실무 속도로 채점할 수 있습니다. 특히 모델 비교나 프롬프트 A/B 실험처럼 상대 평가가 필요한 상황에서는 사람보다 훨씬 빠른 피드백 루프를 만들 수 있습니다.
+
+반면 설계를 잘못하면 편향이 그대로 자동화됩니다. 첫 번째 답을 더 자주 고르는 judge, 긴 답을 더 좋게 보는 judge, 자기 계열 모델을 편애하는 judge는 팀을 조용히 오판으로 이끕니다.
+
+그래서 이 글의 핵심은 'judge를 쓸까 말까'가 아니라 'judge를 운영 가능한 평가자로 만들려면 무엇을 검증해야 하나'입니다. 사람 기준선과 편향 통제 없이 judge를 쓰는 것은 자동화가 아니라 자동 착시에 가깝습니다.
+
+## 핵심 관점
+
+이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다. LLM judge를 제대로 설계하면 수천 건 규모의 자유 형식 응답도 실무 속도로 채점할 수 있습니다. 특히 모델 비교나 프롬프트 A/B 실험처럼 상대 평가가 필요한 상황에서는 사람보다 훨씬 빠른 피드백 루프를 만들 수 있습니다.
+
+> LLM judge는 사람을 완전히 대체하지 않습니다. 다만 사람이 다 볼 수 없는 규모에서, 명확한 프롬프트와 사람 기준선이 있을 때 일관된 1차 판정자로 매우 강력하게 작동합니다.
+
+이 관점을 먼저 잡아 두면 뒤에 나오는 코드와 지표를 기능 설명이 아니라 운영 설계 관점에서 읽을 수 있습니다. 결국 중요한 것은 수치 이름보다, 그 수치가 어떤 의사결정을 가능하게 하느냐입니다.
+
+## 핵심 개념
+
+LLM-as-Judge - 모델로 모델을 평가하기
+
+### LLM-as-judge가 필요한 이유
+
+![LLM-as-judge가 필요한 이유](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-02-why-llm-as-judge.ko.png)
 
 *LLM-as-judge가 필요한 이유*
-Ep3에서 다룬 deterministic metrics(BLEU, ROUGE, Exact Match)는 정답이 짧고 명확할 때만 잘 작동합니다. 하지만 실제 LLM 응답은 다음과 같은 경우가 많습니다.
+
+Ep3에서 다룬 결정적 지표(BLEU, ROUGE, Exact Match)는 정답이 짧고 명확할 때만 잘 작동합니다. 하지만 실제 LLM 응답은 다음과 같은 경우가 많습니다.
 
 - 정답이 여러 개인 자유 형식 답변 (예: "이 코드를 설명해 줘")
 - 톤, 명확성, 유용성 같은 주관적 품질
 - 사람이 직접 채점하기에는 너무 많은 데이터 (수천~수만 건)
 
-이때 **강력한 LLM(GPT-4, Claude Opus 등)에게 채점을 맡기는 방식**이 LLM-as-judge입니다. 사람보다 빠르고, deterministic metrics보다 유연합니다.
+이때 강력한 LLM(GPT-4, Claude Opus 등)에게 채점을 맡기는 방식이 LLM-as-judge입니다. 사람보다 빠르고, 결정적 지표보다 유연합니다.
 
 | 평가 방식 | 속도 | 비용 | 자유 형식 처리 | 일관성 |
 |----------|------|-----|--------------|--------|
@@ -48,13 +78,12 @@ Ep3에서 다룬 deterministic metrics(BLEU, ROUGE, Exact Match)는 정답이 �
 | Deterministic | 매우 빠름 | 거의 무료 | 약함 | 100% 재현 가능 |
 | LLM-as-judge | 빠름 | 중간 | 우수 | 70~90% (prompt 의존) |
 
----
+### Judge prompt 설계 — 3가지 패턴
 
-## Judge prompt 설계 — 3가지 패턴
-
-![Judge prompt 설계 - 3가지 패턴](../../assets/ai-evaluation-101/04/04-03-judge-prompt-design-three-patterns.ko.png)
+![Judge prompt 설계 - 3가지 패턴](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-03-judge-prompt-design-three-patterns.ko.png)
 
 *Judge prompt 설계 - 3가지 패턴*
+
 ### 패턴 1: Single scoring (1~5점 척도)
 
 가장 단순한 방식입니다. judge에게 응답 하나를 보여주고 점수를 매기게 합니다.
@@ -65,19 +94,19 @@ from openai import OpenAI
 
 client = OpenAI()
 
-JUDGE_PROMPT = """당신은 엄격한 평가자입니다. 아래 질문과 답변을 보고 1~5점으로 채점하세요.
+JUDGE_PROMPT = """You are a strict evaluator. Read the question and answer below and grade on a 1-5 scale.
 
-질문: {question}
-답변: {answer}
+Question: {question}
+Answer: {answer}
 
-채점 기준:
-- 5: 정확하고 완전하며 명확함
-- 4: 정확하지만 일부 누락 또는 모호함
-- 3: 부분적으로 정확함
-- 2: 대부분 부정확함
-- 1: 완전히 부정확하거나 무관함
+Rubric:
+- 5: Accurate, complete, clear
+- 4: Accurate but missing minor details or slightly ambiguous
+- 3: Partially accurate
+- 2: Mostly inaccurate
+- 1: Completely wrong or off-topic
 
-먼저 한 문장으로 근거를 쓰고, 마지막 줄에 'Score: N' 형식으로 점수만 출력하세요.
+Write a one-sentence reasoning first, then output only 'Score: N' on the last line.
 """
 
 def judge_single(question: str, answer: str) -> tuple[int, str]:
@@ -86,24 +115,23 @@ def judge_single(question: str, answer: str) -> tuple[int, str]:
         messages=[{"role": "user", "content": JUDGE_PROMPT.format(
             question=question, answer=answer
         )}],
-        temperature=0,  # 재현성 확보
+        temperature=0,  # reproducibility
     )
     text = response.choices[0].message.content
-    # 마지막 줄에서 점수 추출
     last_line = text.strip().split("\n")[-1]
     score = int(last_line.replace("Score:", "").strip())
     return score, text
 
 if __name__ == "__main__":
     score, reasoning = judge_single(
-        "Python에서 list와 tuple의 차이는?",
-        "list는 변경 가능하고 tuple은 변경 불가능합니다."
+        "What is the difference between list and tuple in Python?",
+        "Lists are mutable and tuples are immutable."
     )
-    print(f"점수: {score}\n근거: {reasoning}")
+    print(f"Score: {score}\nReasoning: {reasoning}")
 ```
 
-**장점**: 단순합니다. 한 응답씩 독립 평가가 가능합니다.
-**단점**: 점수 인플레이션이 발생합니다. judge가 대부분 4~5점을 줍니다.
+장점: 단순합니다. 한 응답씩 독립 평가가 가능합니다.
+단점: 점수 인플레이션이 발생합니다. judge가 대부분 4~5점을 줍니다.
 
 ### 패턴 2: Pairwise comparison (둘 중 하나)
 
@@ -111,14 +139,14 @@ if __name__ == "__main__":
 
 ```python
 # eval/judge_pairwise.py
-PAIRWISE_PROMPT = """질문에 대한 두 답변 중 어느 쪽이 더 나은지 선택하세요.
+PAIRWISE_PROMPT = """Pick the better answer to the question.
 
-질문: {question}
-답변 A: {answer_a}
-답변 B: {answer_b}
+Question: {question}
+Answer A: {answer_a}
+Answer B: {answer_b}
 
-다음 중 하나로 답하세요: 'A', 'B', 'Tie'
-근거를 한 문장으로 먼저 쓰고, 마지막 줄에 'Verdict: X' 형식으로 답만 출력하세요.
+Respond with one of: 'A', 'B', 'Tie'.
+Write a one-sentence reasoning first, then output only 'Verdict: X' on the last line.
 """
 
 def judge_pairwise(question: str, answer_a: str, answer_b: str) -> str:
@@ -134,8 +162,8 @@ def judge_pairwise(question: str, answer_a: str, answer_b: str) -> str:
     return last_line.replace("Verdict:", "").strip()
 ```
 
-**장점**: 점수 인플레이션이 없습니다. 사람의 직관과 잘 맞습니다.
-**단점**: 절대 품질을 알 수 없습니다 (둘 다 나빠도 하나는 뽑힘).
+장점: 점수 인플레이션이 없습니다. 사람의 직관과 잘 맞습니다.
+단점: 절대 품질을 알 수 없습니다 (둘 다 나빠도 하나는 뽑힘).
 
 ### 패턴 3: Reference-based (정답 비교)
 
@@ -143,27 +171,26 @@ def judge_pairwise(question: str, answer_a: str, answer_b: str) -> str:
 
 ```python
 # eval/judge_reference.py
-REFERENCE_PROMPT = """답변이 정답과 의미적으로 일치하는지 판단하세요.
+REFERENCE_PROMPT = """Decide whether the answer is semantically equivalent to the reference.
 
-질문: {question}
-정답: {reference}
-답변: {answer}
+Question: {question}
+Reference: {reference}
+Answer: {answer}
 
-답변이 정답의 핵심 내용을 모두 담고 있으면 'PASS', 빠진 내용이 있거나 틀리면 'FAIL'.
-근거를 한 문장 쓰고 마지막 줄에 'Result: PASS' 또는 'Result: FAIL'만 출력하세요.
+If the answer covers all the key points of the reference, output 'PASS'. Otherwise 'FAIL'.
+Write a one-sentence reasoning, then output only 'Result: PASS' or 'Result: FAIL' on the last line.
 """
 ```
 
-**장점**: 정답이 있는 QA 데이터셋에 적합합니다. BLEU/ROUGE보다 의미 비교가 잘 됩니다.
-**단점**: 정답을 미리 만들어야 합니다.
+장점: 정답이 있는 QA 데이터셋에 적합합니다. BLEU/ROUGE보다 의미 비교가 잘 됩니다.
+단점: 정답을 미리 만들어야 합니다.
 
----
+### Bias 3가지와 통제 방법
 
-## Bias 3가지와 통제 방법
-
-![Bias 3가지와 통제 방법](../../assets/ai-evaluation-101/04/04-04-three-biases-and-how-to-control-them.ko.png)
+![Bias 3가지와 통제 방법](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-04-three-biases-and-how-to-control-them.ko.png)
 
 *Bias 3가지와 통제 방법*
+
 LLM judge는 사람과 다른 방식으로 편향됩니다. 다음 3가지 bias를 알아야 합니다.
 
 ### Bias 1: Position bias (위치 편향)
@@ -174,15 +201,15 @@ Pairwise 평가에서 judge는 **첫 번째 답변을 더 자주 선택**하는 
 # eval/debias_position.py
 def judge_pairwise_debiased(question: str, ans_a: str, ans_b: str) -> str:
     v1 = judge_pairwise(question, ans_a, ans_b)  # A=ans_a, B=ans_b
-    v2 = judge_pairwise(question, ans_b, ans_a)  # A=ans_b, B=ans_a (swap)
+    v2 = judge_pairwise(question, ans_b, ans_a)  # A=ans_b, B=ans_a (swapped)
 
-    # v2의 A는 사실 ans_b이므로 결과를 뒤집어서 비교
+    # v2에서는 "A"가 실제로 ans_b를 의미하므로 뒤집어서 비교
     flip = {"A": "B", "B": "A", "Tie": "Tie"}
     v2_normalized = flip[v2]
 
     if v1 == v2_normalized:
-        return v1  # 일관됨
-    return "Tie"  # 순서에 따라 달라지면 무승부 처리
+        return v1  # consistent
+    return "Tie"  # if order changes the verdict, call it a tie
 ```
 
 ### Bias 2: Length bias (길이 편향)
@@ -199,40 +226,37 @@ GPT-4가 GPT-4 응답을 채점하면, 다른 모델 응답보다 자기 모델 
 - Generator 모델과 judge 모델을 다르게 선택 (예: Claude로 생성, GPT-4로 평가)
 - 가능하면 두 judge로 cross-validation
 
----
+### 사람과의 일치도 측정 — Cohen's kappa
 
-## 사람과의 일치도 측정 — Cohen's kappa
-
-![사람과의 일치도 측정 - Cohen's kappa](../../assets/ai-evaluation-101/04/04-05-measuring-agreement-with-humans-cohen-s.ko.png)
+![사람과의 일치도 측정 - Cohen's kappa](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-05-measuring-agreement-with-humans-cohen-s.ko.png)
 
 *사람과의 일치도 측정 - Cohen's kappa*
+
 Judge가 실제로 믿을 만한지 어떻게 압니까? **사람이 채점한 50~100건과 judge 점수를 비교**해서 일치도를 측정합니다. 단순 정확도(percentage agreement)는 우연히 맞는 경우를 보정하지 못하므로, **Cohen's kappa**를 사용합니다.
 
 ```python
 # eval/agreement.py
 from sklearn.metrics import cohen_kappa_score
 
-# 사람 평가자가 50개 샘플을 1~5로 채점
+# 인간 평가자가 50개 샘플을 1-5 척도로 평가
 human_scores  = [5, 4, 3, 5, 2, 4, 5, 3, 4, 5, ...]  # len=50
 judge_scores  = [5, 4, 4, 5, 2, 3, 5, 3, 4, 4, ...]  # len=50
 
-# Cohen's kappa: -1 ~ 1 (1=완전 일치, 0=우연 수준, <0=무작위 이하)
+# Cohen's kappa: -1~1 (1=완벽 일치, 0=우연 수준, <0=무작위보다 나쁨)
 kappa = cohen_kappa_score(human_scores, judge_scores, weights="quadratic")
 print(f"Cohen's kappa: {kappa:.3f}")
 
 # 해석 기준 (Landis & Koch, 1977):
-# 0.0~0.2: 약함
-# 0.2~0.4: 보통
-# 0.4~0.6: 중간
-# 0.6~0.8: 양호
-# 0.8~1.0: 매우 우수
+# 0.0-0.2: slight
+# 0.2-0.4: fair
+# 0.4-0.6: moderate
+# 0.6-0.8: substantial
+# 0.8-1.0: almost perfect
 ```
 
 **경험적 기준**: kappa 0.6 이상이면 production에서 judge를 신뢰할 수 있습니다. 0.4 미만이면 prompt를 다시 설계해야 합니다.
 
----
-
-## 비용 — judge는 공짜가 아닙니다
+### 비용 — judge는 공짜가 아닙니다
 
 GPT-4o 기준 judge call 한 번에 약 $0.01~0.03 듭니다. 1만 건 평가 시 $100~300입니다. 비용 관리 전략:
 
@@ -240,9 +264,119 @@ GPT-4o 기준 judge call 한 번에 약 $0.01~0.03 듭니다. 1만 건 평가 �
 - **Tier 분리**: 빠른 deterministic metrics → 의심스러운 샘플만 LLM judge로 재평가
 - **Cheaper judge**: 단순 PASS/FAIL은 GPT-4o-mini로 충분 (10x 저렴)
 
----
+### Judge 프롬프트 템플릿 버전 관리
 
-## Common Mistakes
+LLM-as-judge의 재현성을 높이려면 프롬프트를 코드처럼 버전 관리해야 합니다. 특히 rubric 변경, 출력 스키마 변경, 금지 규칙 변경은 결과 분포에 직접 영향을 줍니다.
+
+```yaml
+# eval/judge_prompts/v3.yaml
+name: support-judge-v3
+version: 3
+task: pairwise
+dimensions:
+  - correctness
+  - completeness
+  - policy_compliance
+output_schema:
+  winner: ["A", "B", "Tie"]
+  confidence: float
+  rationale: string
+rules:
+  - "답변 길이는 평가 기준에서 제외합니다."
+  - "정책 위반이 있으면 다른 장점이 있어도 감점합니다."
+```
+
+```python
+import yaml
+
+def load_judge_prompt(path: str) -> dict:
+    with open(path) as f:
+        return yaml.safe_load(f)
+
+prompt_cfg = load_judge_prompt("eval/judge_prompts/v3.yaml")
+assert prompt_cfg["version"] == 3
+```
+
+프롬프트 버전을 명시하면 "모델이 바뀌어서 점수가 흔들렸는지, judge 기준이 바뀌어서 흔들렸는지"를 분리할 수 있습니다.
+
+### 편향 감사 리포트 자동 생성
+
+편향 통제를 수동 체크리스트로만 두면 곧 빠집니다. 아래처럼 주기적으로 position/length/self-preference 신호를 보고서로 출력해 두는 편이 안전합니다.
+
+```python
+from statistics import mean
+
+def bias_audit(verdict_rows: list[dict]) -> dict:
+    # verdict_rows fields:
+    # first_position_wins(bool), long_answer_wins(bool), same_family_preferred(bool)
+    return {
+        "position_bias_rate": mean(int(r["first_position_wins"]) for r in verdict_rows),
+        "length_bias_rate": mean(int(r["long_answer_wins"]) for r in verdict_rows),
+        "self_preference_rate": mean(int(r["same_family_preferred"]) for r in verdict_rows),
+    }
+
+report = bias_audit(audit_rows)
+print(report)
+```
+
+```text
+운영 기준 예시
+- position_bias_rate > 0.58: swap 평가 강제 및 prompt 재작성
+- length_bias_rate > 0.65: "길이 무관" 규칙 강화
+- self_preference_rate > 0.60: judge 모델 family 교체 검토
+```
+
+### Judge 캘리브레이션 세션 운영법
+
+사람 채점자와 judge가 반복해서 어긋나는 차원은 캘리브레이션 세션으로 기준을 맞춰야 합니다. 이 작업을 빼면 kappa가 장기간 개선되지 않습니다.
+
+```text
+캘리브레이션 60분 템플릿
+1) 불일치 상위 20건 선별
+2) 사람 채점 근거와 judge 근거 나란히 비교
+3) anchor 문장 수정
+4) 금지/우선 규칙 재명시
+5) 동일 20건 재평가 후 kappa 재측정
+```
+
+### LLM-as-judge 출력 스키마 안정화
+
+프롬프트를 잘 써도 구조화 출력이 흔들리면 파이프라인이 자주 깨집니다. 스키마 검증 단계를 추가하면 실패를 조기 차단할 수 있습니다.
+
+```python
+REQUIRED_KEYS = {"winner", "confidence", "reason"}
+
+def validate_judge_output(payload: dict) -> bool:
+    if set(payload.keys()) & REQUIRED_KEYS != REQUIRED_KEYS:
+        return False
+    if payload["winner"] not in {"A", "B", "Tie"}:
+        return False
+    if not (0.0 <= float(payload["confidence"]) <= 1.0):
+        return False
+    if len(str(payload["reason"]).strip()) == 0:
+        return False
+    return True
+```
+
+이 검증을 넣으면 모델 출력 포맷이 바뀌었을 때 조용한 오작동 대신 즉시 실패로 드러납니다.
+
+또한 스키마 실패율을 별도 메트릭으로 관리하면 judge 파이프라인의 안정성을 장기적으로 추적할 수 있습니다.
+
+스키마 실패는 단순 파싱 오류가 아니라 평가 신뢰도 저하 신호이므로, 발생 즉시 원인 모델/프롬프트 버전을 기록해 두는 편이 좋습니다.
+
+작아 보여도 이 기록이 쌓이면 judge 안정화 속도가 크게 빨라집니다.
+
+누적 기록은 재발 방지에 특히 유효합니다.
+
+## 이 코드에서 먼저 봐야 할 점
+
+- 세 가지 judge 프롬프트 패턴을 나란히 보시면 어떤 평가 문제를 어떤 인터페이스로 바꿔야 하는지 감이 잡힙니다.
+- `judge_pairwise_debiased` 예제는 위치 편향을 코드로 제어하는 가장 실용적인 방식입니다. 순서를 바꿔 두 번 평가하는 규칙은 이후 A/B 테스트에서도 그대로 이어집니다.
+- Cohen's kappa 예제는 judge를 감으로 믿지 말고 사람과의 합의도로 검증해야 한다는 점을 가장 분명하게 보여 줍니다.
+
+이 세 지점을 먼저 읽고 나면 세부 구현과 지표 해석이 훨씬 빨라집니다. 코드가 길어 보여도 운영 질문은 대개 여기로 다시 돌아옵니다.
+
+## 어디서 자주 헷갈릴까요?
 
 ### Mistake 1: judge prompt를 한 번 쓰고 끝
 
@@ -264,9 +398,25 @@ Judge call에서 temperature가 0이 아니면, 같은 응답을 두 번 채점�
 
 Judge가 90점을 줬다고 좋은 응답이 아닙니다. **production 출시 전 반드시 50~100건을 사람이 직접 채점**하고 judge와의 kappa를 측정하세요.
 
----
+현업에서 제가 가장 자주 보는 문제는 결과 숫자만 보고 원인 분해를 건너뛰는 습관입니다. 평가가 개선을 돕지 못하고 보고서용 숫자로만 남는 순간, 팀은 다시 감각에 의존하게 됩니다.
 
-## 핵심 요약
+## 첫 번째 운영 체크리스트
+
+- [ ] judge 프롬프트를 운영 자산으로 보고 버전 관리하는가
+- [ ] pairwise 비교에서 답 순서를 항상 교차시키는가
+- [ ] temperature=0을 기본값으로 고정했는가
+- [ ] 사람이 직접 채점한 50~100건 기준선이 있는가
+- [ ] judge 비용을 샘플링과 계층화로 통제하는가
+
+## 실무에서는 이렇게 생각한다
+
+실무에서는 judge 자체보다 judge를 둘러싼 검증 절차가 더 중요합니다. 좋은 팀은 judge 점수를 기능 지표로 쓰기 전에, 사람과 어느 정도 합의하는지부터 확인합니다.
+
+또한 judge와 generator를 같은 계열로 두는 문제를 가볍게 보지 않습니다. 같은 모델 가족이 자기 스타일을 선호하는 경향은 생각보다 눈에 띄게 결과를 흔듭니다.
+
+다음 글의 rubric 기반 채점은 여기서 한 단계 더 나갑니다. 점수 하나로 끝내지 않고 정확성, 완전성, 명확성처럼 차원별 판단을 분리해야 실제 개선 포인트가 보이기 시작합니다.
+
+## 정리: LLM judge는 강력하지만, 사람 기준선과 편향 통제가 붙을 때만 믿을 수 있습니다
 
 - LLM-as-judge는 자유 형식 응답 평가에 강력합니다. 단, judge prompt 품질이 결과를 좌우합니다.
 - 3가지 패턴: single scoring(단순), pairwise(점수 인플레이션 없음), reference-based(정답 비교).
@@ -274,10 +424,53 @@ Judge가 90점을 줬다고 좋은 응답이 아닙니다. **production 출시 �
 - Cohen's kappa로 사람과의 일치도를 측정합니다. **0.6 이상이 production 신뢰 기준**입니다.
 - Temperature=0, 비용 관리(샘플링/tier 분리), 사람 평가 baseline은 필수입니다.
 
-다음 글에서는 단순 점수가 아닌 **여러 차원의 rubric**으로 채점하는 방법을 다룹니다.
+이제 단일 점수의 한계를 넘어 차원별 채점으로 가 보겠습니다. 다음 글에서는 rubric을 설계해 무엇이 실제로 망가졌는지를 더 또렷하게 드러내는 방법을 다룹니다.
+
+## 운영 체크리스트
+
+- [ ] judge 패턴을 평가 목적에 맞게 single, pairwise, reference-based로 나누기
+- [ ] 위치 편향 통제를 pairwise 코드에 기본 내장하기
+- [ ] 사람 채점과의 kappa를 정기적으로 다시 측정하기
+- [ ] judge 비용이 serving 비용을 잠식하지 않도록 샘플링하기
+- [ ] judge 점수만으로 배포 결정을 내리지 않기
+
+## 처음 질문으로 돌아가기
+
+- **LLM-as-Judge는 언제 사람이 매번 평가하기 어려운 품질 판단을 도와줄까요?**
+  - 대량의 주관적 품질 판단, 답변 유용성, 근거 충실도, tone 적합성처럼 deterministic metric으로 어려운 영역에서 도움이 됩니다.
+- **judge prompt와 rubric이 없으면 자동 채점기는 어떤 편향에 흔들릴까요?**
+  - 위치 편향, 장황한 답 선호, 자기 모델 선호, rubric 누락에 따른 임의 판단에 흔들릴 수 있습니다.
+- **사람 기준선과 agreement를 어떻게 붙여야 judge 결과를 믿을 수 있을까요?**
+  - 사람이 채점한 표본과 judge 결과를 비교하고, agreement metric과 disagreement review를 운영 루프에 넣어야 합니다.
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- **AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기 (현재 글)**
+- AI Evaluation 101 (5/10): Rubric 기반 채점 설계 (예정)
+- AI Evaluation 101 (6/10): RAG 시스템 평가하기 (예정)
+- AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory (예정)
+- AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게 (예정)
+- AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가 (예정)
+- AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
+
+### 공식 문서
 
 - [Zheng et al. (2023). Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena (NeurIPS)](https://arxiv.org/abs/2306.05685)
 - [Anthropic — Evaluating Claude (judge prompting guide)](https://docs.anthropic.com/en/docs/build-with-claude/develop-tests)
 - [OpenAI Evals — model-graded evaluations](https://github.com/openai/evals/blob/main/docs/eval-templates.md)
 - [scikit-learn — Cohen's kappa score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.cohen_kappa_score.html)
+
+### 관련 시리즈
+
+- [이전 글 — 결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [다음 글 — Rubric 기반 채점 설계](./05-rubric-based-scoring.md)
+- [시리즈 현재 위치 다시 보기](./04-llm-as-judge.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-evaluation-101/ko/04-llm-as-judge)

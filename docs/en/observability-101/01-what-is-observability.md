@@ -1,10 +1,10 @@
 ---
 series: observability-101
 episode: 1
-title: What Is Observability?
-status: content-ready
+title: "Observability 101 (1/10): What Is Observability?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,28 +17,35 @@ tags:
   - DevOps
   - Metrics
 seo_description: Monitoring versus observability, the three pillars (metrics, logs, traces), and where production visibility actually starts.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is Observability?
+# Observability 101 (1/10): What Is Observability?
 
-> Observability 101 series (1/10)
+Production systems rarely fail in a dramatic way. Checkout gets slower, a small slice of requests starts timing out, and logs leave only a few clues. You can see the symptom, but not the mechanism, and that gap is what makes incident response expensive.
 
-<!-- a-grade-intro:begin -->
+Observability is what closes that gap. It is the difference between watching a known threshold and being able to infer the inside of a system from the outside when the failure mode is new.
 
-**Core question**: When systems *fail quietly*, how do we *understand the inside from the outside*?
+This is the first post in the Observability 101 series.
 
-> *Observability is the ability to *understand a system's internal state from external signals alone*. Monitoring *watches known problems*; observability *asks unknown questions*.*
 
-<!-- a-grade-intro:end -->
+![observability 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/01/01-01-concept-at-a-glance.en.png)
+*observability 101 chapter 1 flow overview*
+> What Is Observability is about the boundary decision, not the tool choice.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The difference between *monitoring* and *observability*
-- The three pillars: *metrics, logs, traces*
-- *Known unknowns* vs *unknown unknowns*
-- Five steps to your first signals
-- Five common pitfalls
+- What boundary should you inspect first when applying What Is Observability??
+- Which signal should the example or diagram make visible for What Is Observability??
+- What failure should be prevented first when What Is Observability? reaches a real system?
+
+## Questions this article answers
+
+- How is observability different from monitoring?
+- What question does each signal — metrics, logs, and traces — answer?
+- Why do you need to read the three signals together?
+- Why is `trace_id` the connective tissue of observability?
+- Where should a small service start when adding its first signals?
 
 ## Why It Matters
 
@@ -46,17 +53,7 @@ Production systems break in *unpredictable ways*. Pre-built dashboards cannot ex
 
 > *Dashboards are *answers*; observability is *questions*.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    App["application"] --> Metric["metric"]
-    App --> Log["log"]
-    App --> Trace["trace"]
-    Metric --> Dashboard["dashboard / alert"]
-    Log --> Search["log search"]
-    Trace --> Flow["request flow"]
-```
+Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms
 
@@ -126,6 +123,25 @@ grep '"trace_id": "abc-123"' app.log
 3. log: db connection timeout
 ```
 
+## How to Narrow the First Incident
+
+Suppose checkout latency jumps right after a deploy. The fastest path is not to open every tool at once, but to keep the three signals in a fixed order.
+
+```text
+1) metric  → checkout p95 rises from 180ms to 1.8s
+2) trace   → one payment span dominates the request time
+3) log     → db_pool_timeout, retry=3, trace_id=9f3c...
+```
+
+That order matters. Metrics tell you when the symptom started, traces show where the latency accumulated, and logs explain why that part of the path failed.
+
+```text
+Expected output:
+- The latency chart shows checkout getting worse before the incident ticket arrives.
+- The trace view points to one slow span instead of the whole service.
+- The matching log lines confirm whether the cause is a timeout, retry storm, or dependency failure.
+```
+
 ## What to Notice in This Code
 
 - The three signals *complement each other*. None of them is *enough alone*.
@@ -169,7 +185,18 @@ Most SRE teams treat the *three pillars* as their *minimum signal set* and then 
 
 Observability is the discipline of *asking inside from outside*. Next we look deeper into *the three pillars*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Observability??**
+  - The article treats What Is Observability? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Observability??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Observability? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Observability? (current)**
 - Metrics, Logs, and Traces (upcoming)
 - Collecting and Visualizing Metrics (upcoming)
@@ -180,6 +207,7 @@ Observability is the discipline of *asking inside from outside*. Next we look de
 - SLI and SLO Basics (upcoming)
 - Cost and Cardinality (upcoming)
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

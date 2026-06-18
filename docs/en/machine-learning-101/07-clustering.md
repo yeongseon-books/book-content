@@ -1,10 +1,10 @@
 ---
 series: machine-learning-101
 episode: 7
-title: Clustering
-status: content-ready
+title: "Machine Learning 101 (7/10): Clustering"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,28 @@ tags:
   - DBSCAN
   - UnsupervisedLearning
 seo_description: When to use KMeans versus DBSCAN, how to pick K with the elbow and silhouette methods, and why standardization changes everything in clustering
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Clustering
+# Machine Learning 101 (7/10): Clustering
 
-> Machine Learning 101 series (7/10)
+Clustering feels less certain than classification because there is no answer sheet waiting in the test set. That uncertainty is exactly why teams misuse it. A clean-looking cluster plot can tempt you into believing you discovered truth when you may only have discovered the geometry created by scaling choices.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Machine Learning 101 series. Here we will compare KMeans and DBSCAN, use elbow and silhouette scores as guide rails, and keep the main discipline in view: clusters are hypotheses that still need interpretation.
 
-**Core question**: With no labels to score against, how do you know the clusters are any good?
 
-> *Clustering reveals latent structure in data through similarity. Validation requires both metrics and judgment.*
+![machine learning 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 7 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The difference between KMeans and DBSCAN
-- How to choose K with elbow and silhouette
-- Why standardization is decisive
-- The responsibility of interpreting clusters
-- Five common pitfalls
+- Without labels, how do you judge whether the clusters are any good?
+- When should you prefer KMeans over DBSCAN?
+- How do you choose `K` without pretending the metric picks it for you?
 
 ## Why It Matters
 
 Clustering is the backbone of segmentation, anomaly detection, and exploratory data analysis. It often runs before any supervised model.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Data["X (no y)"] --> Std["standardize"]
-    Std --> KM["KMeans (K)"]
-    Std --> DB["DBSCAN (eps)"]
-    KM --> Out["clusters"]
-    DB --> Out
-```
 
 ## Key Terms
 
@@ -110,11 +95,19 @@ db = DBSCAN(eps=0.5, min_samples=5).fit(X)
 print("labels:", set(db.labels_))
 ```
 
+**Expected output:** KMeans produces inertia and silhouette values, while DBSCAN returns a set of labels that may include `-1` for noise. If that label appears, the algorithm is telling you some points do not belong cleanly to any dense region.
+
 ## What to Notice in This Code
 
 - KMeans needs `K`; DBSCAN needs `eps`.
 - Standardization changes the entire result.
 - A label of `-1` from DBSCAN means noise.
+
+## Read the first failure signal this way
+
+- If the cluster assignment changes wildly after scaling, the distance geometry was doing more work than your intuition.
+- If elbow and silhouette disagree, plot the clusters and ask which decision would survive contact with the business context.
+- If DBSCAN labels almost everything as noise, revisit `eps`, `min_samples`, and feature scale before concluding the data has no structure.
 
 ## Five Common Mistakes
 
@@ -153,17 +146,29 @@ Customer segmentation, color quantization, and anomaly detection all rely on clu
 
 Clustering exposes hidden structure. Next, we examine overfitting and regularization, the limits of model fitting.
 
+## Answering the Opening Questions
+
+- **Without labels, how do you judge whether the clusters are any good?**
+  - The article treats Clustering as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When should you prefer KMeans over DBSCAN?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do you choose `K` without pretending the metric picks it for you?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
-- [Linear Regression](./04-linear-regression.md)
-- [Logistic Regression](./05-logistic-regression.md)
-- [Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
+- [Machine Learning 101 (4/10): Linear Regression](./04-linear-regression.md)
+- [Machine Learning 101 (5/10): Logistic Regression](./05-logistic-regression.md)
+- [Machine Learning 101 (6/10): Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
 - **Clustering (current)**
 - Overfitting and Regularization (upcoming)
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

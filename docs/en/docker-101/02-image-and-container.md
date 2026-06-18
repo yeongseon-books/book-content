@@ -1,10 +1,10 @@
 ---
 series: docker-101
 episode: 2
-title: Images and Containers
-status: content-ready
+title: "Docker 101 (2/10): Images and Containers"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,44 +17,32 @@ tags:
   - Layer
   - Lifecycle
 seo_description: Image and container lifecycle, layer model, and the ten commands you actually use day to day, with hands-on inspection.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Images and Containers
+# Docker 101 (2/10): Images and Containers
 
-> Docker 101 series (2/10)
+The first serious confusion in Docker usually appears between images and containers. Teams pull an image, change files inside a running container, restart it, and then wonder why the change disappeared. The failure is not mysterious; it comes from mixing up a deployable artifact with a disposable runtime instance.
 
-<!-- a-grade-intro:begin -->
+Once that distinction is clear, a lot of troubleshooting gets easier. You can separate image build issues from runtime state issues, and you can explain why some changes belong in a Dockerfile while others belong in a volume or an environment variable.
 
-**Core question**: *Images are immutable; containers change* — what does that *actually* mean in practice?
+This is post 2 in the Docker 101 series. Here we use layers, copy-on-write, and lifecycle commands to build a durable mental model for image state, container state, and what actually survives a restart.
 
-> *An image is a *class*; a container is an *instance*. Keeping them separate makes debugging tractable.*
 
-<!-- a-grade-intro:end -->
+![docker 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.en.png)
+*docker 101 chapter 2 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *lifecycle* of *images* and *containers*
-- *Layers* and *copy-on-write*
-- The *ten commands* you actually use
-- How to *look inside* a container
-- Five common pitfalls
+- The *lifecycle* of *images* and *containers?
+- Layers* and *copy-on-write?
+- The *ten commands* you actually use?
 
 ## Why It Matters
 
 If you do not understand how containers behave, *debugging becomes luck*. Knowing layers and lifecycle makes *80% of issues* *predictable*.
 
 > *Half of "non-reproducible" bugs come from *misunderstanding container state*.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Image["Image (immutable)"] --> Run["docker run"]
-    Run --> Container["Container (mutable)"]
-    Container --> Stop["Stopped"]
-    Stop --> Rm["Removed"]
-```
 
 ## Key Terms
 
@@ -113,6 +101,16 @@ docker image prune -f          # remove dangling
 docker image rm nginx:1.27
 ```
 
+### Verify right after you run it
+
+- `docker history nginx:1.27` should show a list of image layers, and `docker exec web2 ls /tmp/hello` should fail because the file lived only in the first container instance.
+- Those two observations together confirm the difference between image state and container state.
+
+### If it does not work, check this first
+
+- If `docker exec -it web bash` fails, the image may not include `bash`; retry with `sh`.
+- If image cleanup fails, check `docker ps -a` first and make sure no running container still references the image.
+
 ## What to Notice in This Code
 
 - `docker history` shows the *commands behind each layer*.
@@ -156,8 +154,19 @@ CI systems build with *digest pins* for reproducibility, and operations correlat
 
 Separating images and containers is the *fundamentals* of Docker. Next we *build images with Dockerfile*.
 
+## Answering the Opening Questions
+
+- **The *lifecycle* of *images* and *containers?**
+  - The article treats Images and Containers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Layers* and *copy-on-write?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The *ten commands* you actually use?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
 - **Images and Containers (current)**
 - Writing a Dockerfile (upcoming)
 - Volumes and Networks (upcoming)
@@ -167,11 +176,18 @@ Separating images and containers is the *fundamentals* of Docker. Next we *build
 - Running with a Database (upcoming)
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References
+
+### Official docs
 
 - [Docker images](https://docs.docker.com/engine/reference/commandline/image/)
 - [Docker container lifecycle](https://docs.docker.com/engine/reference/commandline/container/)
 - [Storage drivers and layers](https://docs.docker.com/storage/storagedriver/)
 - [Image digests](https://docs.docker.com/engine/reference/commandline/pull/#pull-an-image-by-digest-immutable-identifier)
+
+### Verification and troubleshooting
+
+- [docker exec reference](https://docs.docker.com/engine/reference/commandline/exec/)

@@ -1,10 +1,10 @@
 ---
 series: data-warehouse-101
 episode: 10
-title: Warehouse Design Example
-status: content-ready
+title: "Data Warehouse 101 (10/10): Warehouse Design Example"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,35 @@ tags:
   - EndToEnd
   - Analytics
 seo_description: An end-to-end e-commerce warehouse walkthrough — grain, dimensions, star schema, partition, ETL, and a final mart for the dashboard
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Warehouse Design Example
+# Data Warehouse 101 (10/10): Warehouse Design Example
 
-> Data Warehouse 101 series (10/10)
+Knowing the parts of warehouse design is useful. Designing one coherent system from source data to dashboard is the harder skill. That is where grain, dimensions, loading strategy, and marts stop being isolated concepts and start becoming engineering decisions.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Data Warehouse 101 series.
 
-**Core question**: How do we *combine* everything we have learned and *design one warehouse* from scratch?
+In this post, we assemble the whole picture with a single e-commerce example. The point is not to memorize one schema, but to see the order in which design choices lock each other in.
 
-> *Every good design starts with one line of grain.*
 
-<!-- a-grade-intro:end -->
+![data warehouse 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/10/10-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 10 flow overview*
+> A real warehouse design balances current constraints with future goals. Most decisions are reversible if you plan the transition path.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Warehouse Design Example?
+- Which signal should the example or diagram make visible for Warehouse Design Example?
+- What failure should be prevented first when Warehouse Design Example reaches a real system?
+
+## Questions this article answers
+
+- Why should warehouse design start with a single line that defines the grain?
+- In what order do fact, dimension, schema, partitioning, ETL, and marts connect?
+- Which dimensions become shared assets in an e-commerce domain?
+- Why does a design fall apart quickly when the team works without documentation?
+- How do you explain the path from a finished warehouse to the dashboard it supports?
 
 ## What You Will Learn
 
@@ -46,18 +61,7 @@ Knowing the parts is not enough — *putting them together* is the real skill. A
 
 > *All clean designs begin with one line of grain.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Source["Source Systems"] --> Lake["Data Lake"]
-    Lake --> Stage["Staging"]
-    Stage --> Fact["fact_orders"]
-    Stage --> Dim["dim_user, dim_product, dim_date"]
-    Fact --> Mart["mart_sales"]
-    Dim --> Mart
-    Mart --> BI["Dashboard"]
-```
+This picture shows a complete design example from requirement to deployment. The key is not to memorize this specific schema, but to see how all the concepts combine.
 
 ## Key Terms
 
@@ -174,17 +178,29 @@ Data teams write a *one-page design doc* listing *grain, dimensions, partition, 
 
 You can now see a warehouse *as one flow*, from *grain to dashboard*. The next series moves into *Data Science* and *MLOps* — where this warehouse becomes the *training ground* for models.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Warehouse Design Example?**
+  - The article treats Warehouse Design Example as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Warehouse Design Example?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Warehouse Design Example reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
-- [OLTP and OLAP](./02-oltp-and-olap.md)
-- [Fact and Dimension](./03-fact-and-dimension.md)
-- [Star Schema](./04-star-schema.md)
-- [Partition and Clustering](./05-partition-and-clustering.md)
-- [ETL and ELT](./06-etl-and-elt.md)
-- [BI and Dashboard](./07-bi-and-dashboard.md)
-- [Data Mart](./08-data-mart.md)
-- [Performance Optimization](./09-performance-optimization.md)
+## In this series
+
+- [Data Warehouse 101 (1/10): What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
+- [Data Warehouse 101 (2/10): OLTP and OLAP](./02-oltp-and-olap.md)
+- [Data Warehouse 101 (3/10): Fact and Dimension](./03-fact-and-dimension.md)
+- [Data Warehouse 101 (4/10): Star Schema](./04-star-schema.md)
+- [Data Warehouse 101 (5/10): Partition and Clustering](./05-partition-and-clustering.md)
+- [Data Warehouse 101 (6/10): ETL and ELT](./06-etl-and-elt.md)
+- [Data Warehouse 101 (7/10): BI and Dashboard](./07-bi-and-dashboard.md)
+- [Data Warehouse 101 (8/10): Data Mart](./08-data-mart.md)
+- [Data Warehouse 101 (9/10): Performance Optimization](./09-performance-optimization.md)
 - **Warehouse Design Example (current)**
+
 <!-- toc:end -->
 
 ## References

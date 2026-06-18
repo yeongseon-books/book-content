@@ -1,12 +1,12 @@
 ---
 series: incident-response-101
 episode: 4
-title: Communication
-status: content-ready
+title: "Incident Response 101 (4/10): Communication"
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -16,105 +16,359 @@ tags:
   - Statuspage
   - OnCall
   - Operations
-seo_description: Incident 커뮤니케이션, 청중 분리, 업데이트 주기, 상태 페이지, 템플릿을 입문자 관점에서 정리한 글
-last_reviewed: '2026-05-04'
+seo_description: incident 중 내부 팀, 고객, 경영진에게 다른 메시지를 어떤 cadence로 보내야 하는지 운영 원칙을 설명합니다.
+last_reviewed: '2026-05-15'
 ---
 
-# Communication
+# Incident Response 101 (4/10): Communication
 
-> Incident Response 101 시리즈 (4/10)
+incident 대응에서 기술 복구만 잘하면 끝이라고 생각하기 쉽습니다. 하지만 실제로는 공지가 없거나 잘못된 사람에게 잘못된 메시지가 가는 편이 신뢰를 더 빨리 무너뜨립니다.
 
+고객, 내부 대응팀, 경영진은 같은 사건을 보더라도 필요한 정보가 다릅니다. 그래서 communication은 부가 작업이 아니라 대응 그 자체의 일부가 됩니다.
 
-## 이 글에서 다룰 문제
+이 글은 Incident Response 101 시리즈의 4번째 글입니다. 여기서는 청중별 메시지 분리, 업데이트 cadence, 상태 페이지 운영, 복구 후 종료 공지까지 한 흐름으로 다룹니다.
 
-*기술적 복구* 보다 *공지 실패* 가 *신뢰* 를 더 많이 깎습니다.
+![Incident Response 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/04/04-01-diagram-at-a-glance.ko.png)
+*Incident Response 101 4장 흐름 개요*
+> Communication은 먼저 채널을 정하고, 각 채널에서 누구와 얼마나 자주 공유할지 정합니다. 이것이 대응 속도를 결정합니다.
 
-## 전체 흐름
-```mermaid
-flowchart LR
-    Incident["incident"] --> Internal["internal"]
-    Incident --> External["external"]
-    Incident --> Exec["exec"]
-    Internal --> Slack["slack"]
-    External --> Status["statuspage"]
-    Exec --> Email["email"]
-```
+## 먼저 던지는 질문
 
-## Before/After
+- incident 중 누가 어떤 메시지를 언제 받아야 할까요?
+- 내부 팀, 고객, 경영진 메시지를 왜 분리해야 할까요?
+- 첫 공지는 얼마나 완벽해야 할까요?
 
-**Before**: *한 채널* 에 모두 섞어 보냅니다.
+## 왜 이 주제가 중요한가
 
-**After**: *청중 별 채널* 과 *템플릿* 으로 나눠 보냅니다.
+고객은 완벽한 기술 원인을 지금 당장 알고 싶은 것이 아닙니다. 문제가 있는지, 어떤 영향을 받는지, 무엇을 해야 하는지, 다음 업데이트가 언제 나오는지를 알고 싶어 합니다. 경영진도 마찬가지입니다. 로그 한 줄보다 사업 영향과 복구 진행도가 더 중요합니다.
 
-## 청중별 메시지 만들기
+communication이 흔들리면 복구 작업도 함께 흔들립니다. 대응자는 같은 질문에 여러 번 답하느라 집중을 잃고, 고객은 침묵을 더 큰 문제로 받아들이며, 경영진은 현재 상태를 파악하지 못한 채 별도 채널을 열기 시작합니다. 그래서 좋은 팀은 메시지를 즉흥적으로 만들지 않고, 청중과 형식을 미리 정해 둡니다.
 
-### 1단계 — 청중 정의
+## 한눈에 보는 구조
+
+한 incident에서도 청중은 적어도 셋으로 나뉩니다. 내부 대응팀은 기술 세부사항이 필요하고, 고객은 영향과 행동 안내가 필요하며, 경영진은 요약과 사업 영향을 빠르게 알아야 합니다. 채널이 다르면 메시지의 길이와 어휘도 함께 달라져야 합니다.
+
+## 핵심 용어
+
+- **internal**: 대응팀 내부에서 공유하는 메시지입니다.
+- **external**: 고객에게 보내는 메시지입니다.
+- **exec**: 경영진용 요약 메시지입니다.
+- **cadence**: 업데이트 간격입니다.
+- **statuspage**: 공식 상태 공지 페이지입니다.
+
+이 용어를 구분하지 않으면 문제가 생깁니다. internal 메시지를 그대로 고객에게 보내면 지나치게 기술적이고, exec 메시지를 대응 채널에 붙이면 정보 밀도가 부족합니다. 같은 사건이라도 청중마다 필요한 정보가 다르다는 사실을 전제로 해야 합니다.
+
+## 전후 비교
+
+이전: 모든 내용을 하나의 채널에 몰아넣고 같은 문장을 모두에게 보냅니다.
+
+이후: 청중별 채널과 템플릿을 분리해 같은 사실을 다른 언어로 전달합니다.
+
+이후 상태의 장점은 분명합니다. 대응팀은 기술 논의를 이어 갈 수 있고, 고객은 행동 가능한 정보만 빠르게 받으며, 경영진은 필요한 수준의 요약만 받습니다. 한 문장으로 모든 요구를 만족시키려는 시도보다 훨씬 안정적입니다.
+
+## 단계별 실습: 청중별 메시지 만들기
+
+### 1단계 — 청중 정의하기
+
+먼저 누구에게 말할지부터 고정합니다. incident마다 새로 생각하지 않도록 청중 목록을 미리 정해 두는 편이 좋습니다.
 
 ```python
 AUDIENCES = ("internal", "external", "exec")
 ```
 
-### 2단계 — 템플릿 함수
+### 2단계 — 템플릿 함수 만들기
+
+메시지를 구조화하면 재사용과 자동화가 쉬워집니다. 청중, severity, 요약을 필드로 나누는 이유가 여기에 있습니다.
 
 ```python
 def message(audience, sev, summary):
     return {"to": audience, "sev": sev, "text": summary}
 ```
 
-### 3단계 — 주기 계산
+### 3단계 — 업데이트 주기 계산하기
+
+SEV1이면 더 자주, SEV3이면 상대적으로 길게 가져갑니다. cadence를 미리 정해 두면 공지가 들쭉날쭉해지는 일을 줄일 수 있습니다.
 
 ```python
 def cadence(sev):
     return {"SEV1": 15, "SEV2": 30, "SEV3": 60}.get(sev, 120)
 ```
 
-### 4단계 — 상태 페이지 초안
+### 4단계 — 상태 페이지 초안 만들기
+
+고객 공지는 길게 설명하기보다 상태와 영향을 분명하게 적는 편이 좋습니다. 간결한 초안이 있으면 첫 공지를 빠르게 낼 수 있습니다.
 
 ```python
 def statuspage(component, state):
     return f"{component} is {state}"
 ```
 
-### 5단계 — 발송 큐
+### 5단계 — 발송 큐 만들기
+
+메시지가 여러 개일 때는 순서를 다뤄야 합니다. severity 기준으로 정렬하면 우선순위를 잡기 쉽습니다.
 
 ```python
 def queue(messages):
     return sorted(messages, key=lambda m: m["sev"])
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 볼 점
 
-- *청중* 이 *데이터 구조* 의 *키*.
-- *주기* 는 *SEV* 에 *연동*.
-- *템플릿* 은 *함수* 로 *재사용*.
+- 청중이 메시지 구조의 핵심 키입니다.
+- 업데이트 주기는 severity와 연결돼야 일관성이 생깁니다.
+- 템플릿은 한 번 만들면 반복해서 재사용할 수 있습니다.
+
+첫 공지가 완벽할 필요는 없습니다. 오히려 짧고 정확한 첫 공지가 늦고 장황한 공지보다 낫습니다. “문제를 인지했고 조사 중이며, 다음 업데이트는 15분 뒤에 주겠다”는 한 문장만으로도 신뢰를 지킬 수 있습니다.
 
 ## 자주 하는 실수 5가지
 
-1. **모든 사람에게 *같은 메시지*.**
-2. **첫 *공지* 가 *완벽* 해야 한다는 환상.**
-3. ***주기* 없이 *불규칙* 하게.**
-4. ***경영진* 에게 *기술 용어* 그대로.**
-5. ***복구 후* 종료 공지 누락.**
+1. 모든 사람에게 같은 메시지를 그대로 보냅니다.
+2. 첫 공지가 완벽해야 한다고 생각해 너무 늦게 보냅니다.
+3. 정해진 cadence 없이 생각날 때만 업데이트합니다.
+4. 경영진에게 원시 기술 용어를 그대로 전달합니다.
+5. 복구 후 종료 공지를 빼먹고 조용히 끝냅니다.
 
-## 실무에서는 이렇게 쓰입니다
+특히 마지막 실수는 자주 반복됩니다. 복구가 끝났다면 “문제가 끝났다”는 사실도 명시적으로 알려야 합니다. 그래야 고객과 내부 팀 모두 상황을 닫을 수 있습니다.
 
-*Statuspage* + *Slack* + *이메일 broadcaster* 를 묶어 *한 번 입력* 으로 *세 채널* 에 동시에 발송합니다.
+## 실무에서는 이렇게 봅니다
+
+실무에서는 상태 페이지, Slack, 이메일 브로드캐스트를 서로 연결해 한 번 입력한 사실이 세 채널로 퍼지도록 구성하기도 합니다. 그래도 메시지 본문은 같지 않습니다. 내부 채널은 상세하고, 고객 공지는 간결하며, 경영진 메시지는 영향과 일정 중심으로 압축됩니다.
+
+시니어 엔지니어는 communication에서 침묵을 최악의 선택으로 봅니다. 길고 드문 공지보다 짧고 자주 오는 공지가 낫고, 기술 설명보다 다음 행동이 더 중요하다는 점을 잘 알기 때문입니다.
+
+## 공지 템플릿 예시
+
+청중을 나눴다면 템플릿도 함께 나눠야 합니다. 같은 사실이라도 채널마다 문장 길이와 강조점이 달라집니다.
+
+```text
+[internal]
+SEV2 incident on checkout. Error rate is elevated after 14:05 deploy. IC: Mina. Next update in 30 minutes.
+
+[external]
+We are investigating elevated checkout failures for some customers. We will share the next update in 30 minutes.
+
+[exec]
+Checkout incident, currently SEV2. Payment conversion is affected. Rollback is in progress; next executive update in 30 minutes.
+```
+
+첫 공지의 목적은 모든 사실을 담는 일이 아니라, 상황 인지와 다음 업데이트 시점을 분명히 남기는 일입니다.
 
 ## 체크리스트
 
-- [ ] *청중 정의*.
-- [ ] *템플릿 보관소*.
-- [ ] *주기 표*.
-- [ ] *Statuspage 권한*.
+- [ ] internal, external, exec 청중 정의가 있다.
+- [ ] 청중별 메시지 템플릿이 준비되어 있다.
+- [ ] severity별 업데이트 cadence 표가 있다.
+- [ ] 상태 페이지 권한과 게시 절차가 정리되어 있다.
 
-## 정리 및 다음 단계
+## 연습 문제
 
-다음 글은 *Timeline 작성* 입니다.
+1. cadence를 한 문장으로 정의해 보세요.
+2. 상태 페이지와 내부 채팅 채널의 역할 차이를 적어 보세요.
+3. 경영진 메시지에 꼭 들어가야 할 항목 세 가지를 적어 보세요.
+
+## 정리와 다음 글
+
+incident communication의 핵심은 사실을 빨리, 적절한 청중에게, 정해진 간격으로 전달하는 것입니다. 내부 팀, 고객, 경영진은 같은 incident를 보더라도 필요한 정보가 다르기 때문에 채널과 템플릿을 분리해야 합니다. 첫 공지는 완벽함보다 속도가 중요하고, 복구 후 종료 공지까지 포함해야 communication이 완성됩니다.
+
+다음 글에서는 사건이 어떻게 전개됐는지 기록하는 timeline 작성 방법을 다루겠습니다.
+
+## 커뮤니케이션 심화: 템플릿 체계와 보고 주기 표
+
+incident communication은 문장력이 아니라 구조의 문제입니다. 같은 사실을 누구에게, 어떤 깊이로, 어떤 간격으로 전달할지 고정하면 대응팀 집중력이 유지됩니다. 반대로 구조가 없으면 대응자는 같은 질문에 반복 답변을 하느라 복구 속도를 잃습니다.
+
+### 청중별 메시지 원칙
+
+| 청중 | 핵심 질문 | 메시지 초점 | 길이 |
+| --- | --- | --- | --- |
+| 내부 대응팀 | 지금 무엇을 할 것인가 | 사실, 가설, 다음 액션 | 상세 |
+| 고객 | 내가 어떤 영향을 받는가 | 영향, 우회 방법, 다음 공지 시점 | 간결 |
+| 경영진 | 사업 영향이 어느 수준인가 | 영향 규모, 리스크, 예상 복구 경로 | 요약 |
+
+같은 문장을 세 채널에 복사하면 품질이 떨어집니다. 내부는 정확성, 고객은 명확성, 경영진은 의사결정 지원이 목적입니다.
+
+### 상황 보고 주기 표
+
+| Severity | 내부 업데이트 | 고객 공지 | 경영진 보고 |
+| --- | --- | --- | --- |
+| SEV1 | 15분 | 30분 | 30분 |
+| SEV2 | 30분 | 60분 | 60분 |
+| SEV3 | 60분 | 필요 시 | 180분 |
+
+주기 표는 "메시지 품질"보다 "예측 가능성"을 제공합니다. 공지가 완벽하지 않아도 정시 업데이트가 반복되면 신뢰가 유지됩니다.
+
+## 템플릿 예시 세트
+
+```text
+[내부]
+SEV2 incident on checkout. Error ratio is 8.4% since 14:05 deploy. Rollback in progress. Next update in 30 minutes.
+
+[고객]
+현재 일부 결제 요청에서 실패가 발생하고 있습니다. 원인 조사와 완화 조치를 진행 중이며, 다음 안내는 30분 후 업데이트하겠습니다.
+
+[경영진]
+결제 경로 SEV2 incident입니다. 전환율 하락이 관측되며 rollback 진행 중입니다. 30분 단위로 사업 영향 수치를 공유하겠습니다.
+```
+
+템플릿의 핵심은 "확정 사실"과 "다음 약속"입니다. 원인 추정은 변동 가능성이 높기 때문에 확인 전까지 단정 표현을 피해야 합니다.
+
+## 메시지 큐 운영 예시
+
+```python
+def build_update(audience: str, sev: str, summary: str, next_min: int) -> dict:
+    return {
+        "audience": audience,
+        "severity": sev,
+        "summary": summary,
+        "next_update_minutes": next_min,
+    }
+
+def cadence_minutes(sev: str) -> int:
+    return {"SEV1": 15, "SEV2": 30, "SEV3": 60}.get(sev, 120)
+```
+
+큐 기반 운영을 쓰면 "누가 언제 무엇을 보냈는지"를 쉽게 추적할 수 있고, postmortem에서 커뮤니케이션 품질을 객관적으로 점검할 수 있습니다.
+
+## 실무 운영 규칙
+
+- 첫 공지는 10분 내 발행하고, 불확실성은 불확실성으로 명시합니다.
+- 공지마다 "다음 업데이트 시점"을 반드시 포함합니다.
+- 종료 공지는 "완화"와 "해결" 상태를 구분해 씁니다.
+- 내부 채널의 미확정 가설을 외부 공지로 직접 전파하지 않습니다.
+
+이 규칙을 유지하면 커뮤니케이션이 복구를 방해하는 요소가 아니라 복구를 가속하는 요소로 작동합니다.
+
+## 종료 공지 품질 기준
+
+incident 종료 공지는 "끝났습니다" 한 문장으로 마무리하면 안 됩니다. 최소한 영향 종료 시점, 복구 확인 지표, 후속 업데이트 계획을 포함해야 고객과 내부 팀이 같은 상태를 인식할 수 있습니다. 특히 완화 상태에서 종료 상태로 전환할 때는 문구를 분리해 오해를 줄여야 합니다.
+
+또한 종료 공지 후 24시간 내에 요약 공지를 제공하면 신뢰가 높아집니다. 상세 RCA를 즉시 공개하지 않더라도, 어떤 범주의 개선을 진행할지 방향을 명시하면 고객 입장에서 사건이 "닫혔다"는 느낌을 받을 수 있습니다.
+
+## 운영 보강 메모
+
+현장에서는 문서 규칙만으로 품질이 자동으로 올라가지 않습니다. 그래서 각 팀은 월 1회 이상 실제 incident 사례를 골라 기준 적용 여부를 점검해야 합니다. 점검 항목은 단순할수록 좋습니다. 선언 근거가 수치로 남았는지, 역할 분리가 지켜졌는지, 커뮤니케이션 주기가 유지됐는지, 후속 조치가 티켓으로 연결됐는지 네 가지를 반복 확인하면 됩니다.
+
+이 보강 메모를 남기는 목적은 분량을 늘리는 데 있지 않습니다. 기준을 사건 데이터와 연결해 "다음 대응의 입력"으로 쓰는 데 있습니다. 문서가 저장소 안에서 살아 있으려면 변경 이력, 검증 절차, 교육 루프가 함께 있어야 합니다. 결국 incident 대응 역량은 한 번의 완벽한 대응이 아니라, 같은 실수를 덜 반복하는 조직 습관에서 만들어집니다.
+
+## 운영 리허설 권장안
+
+문서 개정 후에는 반드시 짧은 리허설을 수행해야 합니다. 20분짜리 tabletop만으로도 기준 누락을 빠르게 발견할 수 있습니다. 진행 순서는 간단합니다. 가상 알림을 열고, 역할을 배정하고, 첫 공지를 작성하고, 종료 조건을 선언해 봅니다. 그 과정에서 헷갈리는 문장이나 끊긴 링크가 나오면 즉시 수정 항목으로 기록합니다.
+
+리허설의 목적은 사람 평가가 아니라 문서 검증입니다. 실제 incident는 긴장 상태에서 진행되므로, 평시에는 분명해 보이던 절차도 현장에서는 모호해질 수 있습니다. 정기 리허설을 운영 루틴에 넣으면 문서와 실행 사이의 간극을 줄일 수 있습니다.
+
+## 청중별 커뮤니케이션 템플릿 세트
+
+incident 커뮤니케이션은 "잘 쓰는 문장"보다 "같은 구조"가 더 중요합니다. 아래 템플릿은 내부 대응팀, 고객, 경영진 각각에게 필요한 필드를 분리해 둔 예시입니다.
+
+```text
+[internal-update]
+- sev:
+- impact_metrics:
+- mitigation_status:
+- unresolved_risk:
+- next_update:
+
+[customer-update]
+- 영향받는 기능:
+- 현재 상태(조사 중/완화 중/복구 완료):
+- 고객이 해야 할 행동(있다면):
+- 다음 업데이트 시각:
+
+[executive-update]
+- 사업 영향 요약:
+- 현재 severity:
+- 복구 예상 범위:
+- 의사결정 필요 사항:
+```
+
+템플릿을 분리하면 메시지 재가공 시간이 줄고, 대응팀은 복구에 집중할 수 있습니다. 특히 경영진 메시지에는 기술 로그보다 의사결정 정보가 먼저 와야 합니다.
+
+## 보고 주기 운영표
+
+| 심각도 | 내부 업데이트 | 고객 공지 | 경영진 보고 |
+| --- | --- | --- | --- |
+| SEV1 | 15분 | 30분 | 30분 |
+| SEV2 | 30분 | 60분 | 60분 |
+| SEV3 | 60분 | 필요 시 | 180분 |
+
+보고 주기는 사건마다 바뀌어도 되지만, 기본값이 없으면 커뮤니케이션 품질이 흔들립니다. 먼저 기본 주기를 두고 incident 성격에 따라 조정하는 방식이 안전합니다.
+
+## 운영 부록: 커뮤니케이션 승인 흐름
+
+커뮤니케이션은 속도가 중요하지만, 고심각 incident에서는 최소 승인 흐름도 필요합니다. 아래 흐름은 속도와 정확성을 함께 잡기 위한 예시입니다.
+
+| 메시지 유형 | 작성자 | 검토자 | 발행 채널 |
+| --- | --- | --- | --- |
+| 내부 업데이트 | Comms | IC | incident 채널 |
+| 고객 공지 | Comms | IC + 법무/CS(필요 시) | status page |
+| 경영진 보고 | IC | incident lead | exec 채널 |
+
+## 운영 부록: 고객 공지 문장 가이드
+
+- 확정 사실만 쓴다.
+- 추정 원인은 단정하지 않는다.
+- 다음 업데이트 시점을 반드시 넣는다.
+- 영향 범위와 우회 방법을 분리해 쓴다.
+- 종료 공지에는 종료 근거 지표를 포함한다.
+
+## 운영 부록: 종료 공지 템플릿
+
+```text
+[incident-resolved-notice]
+- 종료 시각(UTC):
+- 영향 종료 확인 지표:
+- 고객 영향 기간:
+- 현재 상태: 해결됨(원인 제거 완료)
+- 후속 업데이트: postmortem 요약 예정 시각
+```
+
+종료 공지는 incident 품질의 마지막 단계입니다. 종료 근거를 명시하면 대응팀과 고객이 같은 상태를 공유할 수 있습니다.
+
+## 커뮤니케이션 운영 추가 점검 항목
+
+아래 항목은 실무에서 바로 점검할 수 있는 추가 체크포인트입니다.
+
+- 체크포인트 1: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 2: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 3: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 4: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 5: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 6: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 7: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+
+```text
+[quick-audit]
+- declaration_latency_minutes:
+- first_update_latency_minutes:
+- mitigation_started_minutes:
+- recovery_verification_metrics:
+- postmortem_linked: true/false
+```
+
+## 운영 메모: 점검 루프
+
+운영 문서는 작성으로 끝나지 않습니다. 월간 점검 루프를 통해 선언 기준, 역할 분리, 공지 주기, 후속 조치 추적이 실제 incident에서 유지되는지 확인해야 합니다. 점검 결과는 다음 리허설 시나리오와 runbook 개정 항목으로 바로 연결하는 편이 좋습니다.
+
+운영팀은 이 점검 결과를 다음 주 온콜 브리핑에서 공유하고, 기준 변경이 있으면 같은 날 runbook과 템플릿을 함께 갱신해 문서-실행 간 시차를 줄여야 합니다.
+
+커뮤니케이션 템플릿은 단순히 문장 양식이 아니라, 수신자별 관심사를 사전에 정리한 의사결정 도구입니다. 경영진에게는 비즈니스 영향과 복구 ETA를, 고객에게는 현재 상태와 우회 방법을, 엔지니어링 팀에게는 기술적 원인과 다음 단계를 중심으로 메시지를 구성해야 합니다.
+
+또한 월 1회 교차 리뷰를 통해 템플릿 문장, 보고 주기, 연락 체계가 실제 조직 변경을 반영하는지 확인하고, 변경 사항은 즉시 버전 이력으로 남겨야 합니다.
+
+## 처음 질문으로 돌아가기
+
+- **incident 중 누가 어떤 메시지를 언제 받아야 할까요?**
+  - 채널 → 호출 범위 → 보고 주기를 먼저 정합니다. 커뮤니케이션 기준이 있어야 협업이 명확해집니다.
+- **내부 팀, 고객, 경영진 메시지를 왜 분리해야 할까요?**
+  - 한 번에 한 채널에만 집중하고, 각 채널의 목적(팀 내/경영진/고객)을 명확히 합니다.
+- **첫 공지는 얼마나 완벽해야 할까요?**
+  - 5분 주기, 15분 주기, 30분 주기 같은 고정 간격으로 보고하고 마지막 단계를 명확히 합니다.
 
 <!-- toc:begin -->
-- [Incident란 무엇인가?](./01-what-is-incident.md)
-- [Severity 분류](./02-severity.md)
-- [초기 대응](./03-initial-response.md)
+## 시리즈 목차
+
+- [Incident Response 101 (1/10): Incident란 무엇인가?](./01-what-is-incident.md)
+- [Incident Response 101 (2/10): Severity 분류](./02-severity.md)
+- [Incident Response 101 (3/10): 초기 대응](./03-initial-response.md)
 - **Communication (현재 글)**
 - Timeline 작성 (예정)
 - Root Cause Analysis (예정)
@@ -122,11 +376,17 @@ def queue(messages):
 - Postmortem (예정)
 - 재발 방지 (예정)
 - Incident Runbook 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
-- [Incident Communication - Atlassian](https://www.atlassian.com/incident-management/incident-communication)
-- [Statuspage Best Practices](https://www.atlassian.com/software/statuspage/best-practices)
-- [Communicating During Incidents - PagerDuty](https://response.pagerduty.com/during/external_comms/)
-- [Incident Comms Playbook - Increment](https://increment.com/on-call/communication/)
+### 공식 문서
+- [External communication during incidents - PagerDuty](https://response.pagerduty.com/during/external_comms/)
+- [Incident communication - Atlassian](https://www.atlassian.com/incident-management/incident-communication)
+- [Statuspage best practices](https://www.atlassian.com/software/statuspage/best-practices)
+
+### 예제 소스
+- [incident-response-101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/incident-response-101/ko)
+- [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)
+- [Managing Incidents - Google SRE Book](https://sre.google/sre-book/managing-incidents/)

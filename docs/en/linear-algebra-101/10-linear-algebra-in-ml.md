@@ -1,10 +1,10 @@
 ---
 series: linear-algebra-101
 episode: 10
-title: Linear Algebra in Machine Learning
-status: content-ready
+title: "Linear Algebra 101 (10/10): Linear Algebra in Machine Learning"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,44 +17,40 @@ tags:
   - DataScience
   - Beginner
 seo_description: A capstone tour of where linear algebra shows up in ML — linear regression, neural networks, embeddings, and optimizers — with runnable code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Linear Algebra in Machine Learning
+# Linear Algebra 101 (10/10): Linear Algebra in Machine Learning
 
-> Linear Algebra 101 series (10/10)
+If you have followed the series this far, one question remains: where does all of this actually surface in machine learning? The short answer is that it shows up almost everywhere. Data representation, model definition, loss computation, and optimization all run on top of vectors and matrices.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Linear Algebra 101 series. Here we will pull linear regression, neural-network layers, embeddings, gradients, and PCA into one closing picture.
 
-**Core question**: Where does the *linear algebra* you have learned actually *show up in ML*?
 
-> *Linear algebra is the common language of *data representation*, *model definition*, and *training algorithms*.*
+![linear algebra 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/10/10-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 10 flow overview*
+> Linear algebra is the language beneath machine learning. Regression, classification, and dimensionality reduction are all expressed through vector and matrix operations, and the concepts of eigenvalues, decomposition, and orthogonality decide algorithmic efficiency and stability.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
+- What boundary should you inspect first when applying Linear Algebra in Machine Learning?
+- Which signal should the example or diagram make visible for Linear Algebra in Machine Learning?
+- What failure should be prevented first when Linear Algebra in Machine Learning reaches a real system?
 
-- The *normal equations* of *linear regression*
-- *Matrix multiplications* inside *neural network layers*
-- *Inner product / cosine* in *embedding spaces*
-- A 5-step capstone hands-on
-- Five common pitfalls
+## Questions This Post Answers
+
+- Where do vectors and matrices appear across an ML pipeline?
+- How can linear regression and neural networks be read in linear-algebra terms?
+- Why are embedding similarity and gradient updates both linear-algebra problems?
+- How do the ideas from the earlier posts connect inside real ML systems?
+
+> Linear algebra is not background trivia for machine learning. It is the skeleton. Data is represented as vectors and matrices, models are defined as transformations, and training keeps adjusting that structure.
 
 ## Why It Matters
 
-An *ML engineer with weak linear algebra* cannot *debug or optimize*. They lose the *eye for what's inside the model*.
+Without linear-algebra intuition, the inside of a model stays opaque. Shape mismatches, strange embedding behavior, unstable gradients, and PCA outputs all feel like unrelated failures.
 
-> *Every ML algorithm has linear algebra inside.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Data["Data X (matrix)"] --> Model["Model = matrices"]
-    Model --> Loss["Loss"]
-    Loss --> Grad["Gradient = vectors/matrices"]
-    Grad --> Update["Weight update"]
-```
+With the right mental model, the internals get much less mysterious. A layer becomes matrix multiplication plus a nonlinearity. Embedding retrieval becomes a vector-comparison problem. Optimization becomes repeated updates to a parameter vector. That intuition survives even when the framework changes.
 
 ## Key Terms
 
@@ -128,6 +124,12 @@ X_2d = Xc @ Vt[:2].T
 print("compressed:", X_2d.shape)
 ```
 
+## Read One Numeric Pass
+
+- `np.linalg.lstsq` recovers weights close to `[1, -2, 0.5]`, which is exactly the hidden linear rule used to generate the target.
+- The hidden layer has shape `(100, 4)`, and the embedding similarity matrix has shape `(5, 5)`. Even the shapes already tell you what kind of transformation happened.
+- Gradient descent moves `w` toward the same neighborhood as the least-squares solution, which connects optimization back to the same linear-algebra backbone.
+
 ## What to Notice in This Code
 
 - *Every layer* is *matrix product + nonlinearity*.
@@ -171,22 +173,34 @@ Linear regression, logistic regression, *MLP / CNN / RNN / Transformer*, *embedd
 
 Linear algebra is the *skeleton of ML*. I hope this series gave you the *eye to see inside models*. The next step is the *Calculus for ML* series.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Linear Algebra in Machine Learning?**
+  - The article treats Linear Algebra in Machine Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Linear Algebra in Machine Learning?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Linear Algebra in Machine Learning reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Linear Algebra?](./01-what-is-linear-algebra.md)
-- [Vectors](./02-vectors.md)
-- [Matrices](./03-matrices.md)
-- [Inner Product and Distance](./04-inner-product-and-distance.md)
-- [Linear Transformations](./05-linear-transformation.md)
-- [Basis and Dimension](./06-basis-and-dimension.md)
-- [Eigenvalues and Eigenvectors](./07-eigenvalues-and-eigenvectors.md)
-- [Matrix Decomposition](./08-matrix-decomposition.md)
-- [PCA](./09-pca.md)
+## In this series
+
+- [Linear Algebra 101 (1/10): What Is Linear Algebra?](./01-what-is-linear-algebra.md)
+- [Linear Algebra 101 (2/10): Vectors](./02-vectors.md)
+- [Linear Algebra 101 (3/10): Matrices](./03-matrices.md)
+- [Linear Algebra 101 (4/10): Inner Product and Distance](./04-inner-product-and-distance.md)
+- [Linear Algebra 101 (5/10): Linear Transformations](./05-linear-transformation.md)
+- [Linear Algebra 101 (6/10): Basis and Dimension](./06-basis-and-dimension.md)
+- [Linear Algebra 101 (7/10): Eigenvalues and Eigenvectors](./07-eigenvalues-and-eigenvectors.md)
+- [Linear Algebra 101 (8/10): Matrix Decomposition](./08-matrix-decomposition.md)
+- [Linear Algebra 101 (9/10): PCA](./09-pca.md)
 - **Linear Algebra in Machine Learning (current)**
+
 <!-- toc:end -->
 
 ## References
 
 - [Deep Learning Book — Linear Algebra](https://www.deeplearningbook.org/contents/linear_algebra.html)
-- [fast.ai — Computational Linear Algebra](https://github.com/fastai/numerical-linear-algebra)
 - [Stanford CS229 — Linear Algebra Review](https://cs229.stanford.edu/section/cs229-linalg.pdf)
-- [3Blue1Brown — Essence of Linear Algebra](https://www.3blue1brown.com/topics/linear-algebra)
+- [NumPy — linalg.lstsq](https://numpy.org/doc/stable/reference/generated/numpy.linalg.lstsq.html)
+- [fast.ai — Computational Linear Algebra](https://github.com/fastai/numerical-linear-algebra)

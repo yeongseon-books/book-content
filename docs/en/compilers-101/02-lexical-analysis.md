@@ -1,10 +1,10 @@
 ---
 series: compilers-101
 episode: 2
-title: lexical analysis
+title: "Compilers 101 (2/10): lexical analysis"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: Lexical analysis splits text into meaningful tokens. Build a sm
 last_reviewed: '2026-05-04'
 ---
 
-# lexical analysis
+# Compilers 101 (2/10): lexical analysis
+
+This is post 2 in the Compilers 101 series.
 
 > Compilers 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: In the single line `print("hello")`, exactly how many "words" does the compiler see?
 
 > Lexical analysis (or lexing) is the step that cuts a raw string into meaningful pieces called **tokens**. When this step is well defined, every step above it (parser, semantic analyzer) works on clean units instead of raw text.
 
-<!-- a-grade-intro:end -->
+
+![compilers 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/02/02-01-big-picture.en.png)
+*compilers 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying lexical analysis?
+- Which signal should the example or diagram make visible for lexical analysis?
+- What failure should be prevented first when lexical analysis reaches a real system?
 
 ## What You Will Learn
 
@@ -46,8 +54,6 @@ last_reviewed: '2026-05-04'
 The difference between someone who can answer "where does `SyntaxError: unexpected token` come from?" and someone who cannot is whether they have ever looked at lexical analysis. A good lexer is the starting point of good error messages.
 
 > If you cut tokens wrong, every step after that is built on the same wrong split.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -255,8 +261,19 @@ Most language tooling uses regex-based lexers or a variant (DFA). PEG and parser
 
 The lexer is the first transformation that turns text into meaningful units. The next post looks at the step that turns that token stream into a tree (AST) — parsing.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying lexical analysis?**
+  - The article treats lexical analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for lexical analysis?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when lexical analysis reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Compiler?](./01-what-is-a-compiler.md)
+## In this series
+
+- [Compilers 101 (1/10): What Is a Compiler?](./01-what-is-a-compiler.md)
 - **lexical analysis (current)**
 - parsing and AST (upcoming)
 - semantic analysis (upcoming)
@@ -265,7 +282,8 @@ The lexer is the first transformation that turns text into meaningful units. The
 - optimization basics (upcoming)
 - code generation (upcoming)
 - JIT vs AOT (upcoming)
-- building a tiny interpreter (upcoming)
+- Building a Tiny Interpreter (upcoming)
+
 <!-- toc:end -->
 
 ## References

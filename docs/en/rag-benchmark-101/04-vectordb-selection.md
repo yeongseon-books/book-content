@@ -1,11 +1,11 @@
 ---
-title: VectorDB selection criteria
+title: "RAG Evaluation and Benchmarking 101 (4/6): VectorDB selection criteria"
 series: rag-benchmark-101
 episode: 4
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -17,23 +17,24 @@ tags:
 - Recall
 - ANN
 last_reviewed: '2026-05-01'
-seo_description: 'The skeleton of a VectorDB comparison:'
+seo_description: Compare VectorDB indexes fairly. Learn to balance accuracy, latency, and memory by benchmarking flat vs. approximate nearest neighbor indexes.
 ---
 
-# VectorDB selection criteria
+# RAG Evaluation and Benchmarking 101 (4/6): VectorDB selection criteria
 
-## Questions this post answers
+VectorDB comparison is really a comparison of index behavior under the same vectors and the same queries. Hold that frame steady and the trade-offs across accuracy, latency, and memory become hard to ignore.
 
-![Questions this post answers](../../assets/rag-benchmark-101/04/04-01-questions-this-post-answers.en.png)
+This is the 4th article in the RAG Evaluation and Benchmarking 101 series.
 
-*Questions this post answers*
-
-- How do you compare a FAISS flat index against an IVF index fairly?
-- What do you have to record alongside accuracy to talk about a real trade-off?
-- How do you surface the trade-offs of approximate nearest neighbor (ANN) search even on a small example?
-- What needs to be fixed to compare candidate vector databases (FAISS, Chroma, pgvector, Qdrant) on equal footing?
-
+![same vectors compared across flat and IVF indexes](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png)
+*same vectors compared across flat and IVF indexes*
 > Choosing a vector database is **not a brand comparison**. It is an experiment that measures how the same embedding vectors behave when placed inside different index structures.
+
+## Questions to Keep in Mind
+
+- Which operating conditions should compare VectorDBs beyond feature lists?
+- What must stay fixed when changing only the VectorDB over the same embeddings and corpus?
+- How should you decide when accuracy, latency, filtering, and operational complexity conflict?
 
 ## Why this matters
 
@@ -47,7 +48,7 @@ That is why you have to measure on your own corpus. The comparison in this post 
 
 The skeleton of a VectorDB comparison:
 
-```
+```text
 [fixed] embedding model + corpus embeddings (doc_vectors)
                   │
                   ▼
@@ -83,7 +84,7 @@ Recall is not the same as hit rate. **Hit rate** asks if the gold doc made it in
 
 **After**: same embedding vectors, two indexes side by side.
 
-```
+```text
 index               recall@5  search_ms  memory_mb
 IndexFlatIP         1.00      18.3       384
 IndexIVFFlat (n=1)  0.72       2.1       386
@@ -109,14 +110,10 @@ dimension = doc_vectors.shape[1]
 
 ### Step 2 — Build the flat index
 
-![same vectors compared across flat and IVF indexes](../../assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png)
-
-*same vectors compared across flat and IVF indexes*
-
 The runnable code lives in `rag-benchmark-101/en/04-vectordb-selection/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/04-vectordb-selection
+cd en/04-vectordb-selection
 python3 main.py
 ```
 
@@ -142,7 +139,7 @@ ivf_index.nprobe = 4
 
 ### Step 4 — Measure pure search latency
 
-![Boundary between embedding and search time](../../assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.en.png)
+![Boundary between embedding and search time](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.en.png)
 
 *Boundary between embedding and search time*
 
@@ -171,7 +168,7 @@ recall = np.mean([recall_at_k(a, e) for a, e in zip(ivf_results, flat_results)])
 
 ### Step 6 — Sweep `nprobe`
 
-![nprobe trade-off between speed and accuracy](../../assets/rag-benchmark-101/04/04-03-nprobe-trade-off-between-speed-and-accur.en.png)
+![nprobe trade-off between speed and accuracy](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-03-nprobe-trade-off-between-speed-and-accur.en.png)
 
 *nprobe trade-off between speed and accuracy*
 
@@ -187,7 +184,7 @@ Vary `nprobe` across 1, 2, 4, 8, 16 and plot recall and latency. There is almost
 
 ## In production
 
-![Index decision axes for real workloads](../../assets/rag-benchmark-101/04/04-04-index-decision-axes-for-real-workloads.en.png)
+![Index decision axes for real workloads](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-04-index-decision-axes-for-real-workloads.en.png)
 
 *Index decision axes for real workloads*
 
@@ -216,15 +213,26 @@ This post fed identical embedding vectors into flat and IVF indexes and measured
 
 Episode 5 evaluates the **end-to-end RAG pipeline** with the retriever wired to an LLM, measuring not just retrieval but the answer itself.
 
+## Answering the Opening Questions
+
+- **Which operating conditions should compare VectorDBs beyond feature lists?**
+  Compare by data size, latency target, filter needs, update frequency, team operations capacity, and cost model.
+
+- **What must stay fixed when changing only the VectorDB over the same embeddings and corpus?**
+  Fix embeddings, chunking, query set, gold labels, metadata schema, top_k, and hardware so the VectorDB is the main variable.
+
+- **How should you decide when accuracy, latency, filtering, and operational complexity conflict?**
+  Set product-weighted tradeoffs before choosing; if filter correctness is critical, a slightly slower candidate may be better.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Understanding RAG evaluation metrics](./01-evaluation-metrics.md)
-- [Measuring retrieval performance](./02-retrieval-benchmarking.md)
-- [Comparing embedding models](./03-embedding-comparison.md)
-- **VectorDB selection criteria (current)**
-- End-to-end RAG pipeline evaluation (upcoming)
-- Completing the RAG Benchmark (upcoming)
+- [RAG Evaluation and Benchmarking 101 (1/6): Understanding RAG evaluation metrics](./01-evaluation-metrics.md)
+- [RAG Evaluation and Benchmarking 101 (2/6): Measuring retrieval performance](./02-retrieval-benchmarking.md)
+- [RAG Evaluation and Benchmarking 101 (3/6): Comparing embedding models](./03-embedding-comparison.md)
+- **RAG Evaluation and Benchmarking 101 (4/6): VectorDB selection criteria (current)**
+- RAG Evaluation and Benchmarking 101 (5/6): End-to-end RAG pipeline evaluation (upcoming)
+- RAG Evaluation and Benchmarking 101 (6/6): Completing the RAG benchmark (upcoming)
 
 <!-- toc:end -->
 

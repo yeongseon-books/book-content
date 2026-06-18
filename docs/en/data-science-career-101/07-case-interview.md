@@ -1,10 +1,10 @@
 ---
 series: data-science-career-101
 episode: 7
-title: The Case Interview
-status: content-ready
+title: "Data Science Career 101 (7/10): The Case Interview"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,27 @@ tags:
   - Metrics
   - Beginner
 seo_description: A beginner-friendly tour of a structured frame for the case interview.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# The Case Interview
+# Data Science Career 101 (7/10): The Case Interview
 
-> Data Science Career 101 series (7/10)
+Case interviews often feel abstract because they do not offer the comforting shape of a coding problem. There is no obvious schema, no single query to write, and no algorithm name to anchor on. That makes many candidates answer too quickly and confuse brainstorming with structured reasoning.
 
-<!-- a-grade-intro:begin -->
+What interviewers usually want instead is a visible thinking process. Can you clarify the problem, choose the metric that matters, generate competing hypotheses, propose a concrete data plan, and still close with a decision rather than an endless list of possibilities?
 
-**Core question**: How do you answer a *case interview*?
+This is post 7 in the Data Science Career 101 series.
 
-> Clarify the problem, pick the metric, form hypotheses, use data, decide.
 
-<!-- a-grade-intro:end -->
+![data science career 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/07/07-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 7 flow overview*
+> In case interviews, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
+## Questions to Keep in Mind
+
+- What does a case interview actually test in a data candidate?
+- Why should clarification come before analysis?
+- How do you choose a north star metric and supporting metrics?
 
 ## What You Will Learn
 
@@ -42,18 +49,11 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-Tech without product sense fails the loop.
+Technical skill alone does not solve ambiguous product problems.
 
-## Concept at a Glance
+As data roles become more embedded in product and business teams, the ability to structure a fuzzy situation becomes as important as the ability to query or model the underlying data.
 
-```mermaid
-flowchart LR
-    Q[Clarify] --> M[Metric]
-    M --> H[Hypothesis]
-    H --> D[Data]
-    D --> Dec[Decision]
-```
-
+A case interview feels open-ended because it is. You need to structure the ambiguity yourself: ask clarifying questions, propose a frame, estimate numbers, and explain your reasoning at each step.
 ## Key Terms
 
 - **product sense**: Sense of product impact.
@@ -70,6 +70,7 @@ flowchart LR
 
 ## Hands-on: Five-Step Frame
 
+Most case answers follow the same skeleton. Build muscle memory by solving five cases using the same frame: clarify, scope, approach, estimate, reflect.
 ### Step 1 — Clarify
 
 ```text
@@ -122,7 +123,9 @@ flowchart LR
 
 ## How This Shows Up in Production
 
-More than half of big tech PM/scientist interviews are case-style.
+Case-style questioning is common because real product and analytics work rarely arrives as a cleanly defined ticket.
+
+The day-to-day version of this interview looks like a metric drop, a launch question, a retention problem, or a growth trade-off where the first useful step is not code but clarification.
 
 ## How a Senior Engineer Thinks
 
@@ -147,24 +150,38 @@ More than half of big tech PM/scientist interviews are case-style.
 
 ## Wrap-up and Next Steps
 
-Next post covers *Settling into the First Data Job*.
+Strong case answers move in a reliable sequence: clarify the scope, anchor on a metric, generate multiple hypotheses, ask for the right data, and then make a recommendation with risks and follow-up measurement attached.
+
+The next post turns from interviews to the first 90 days after you land the job.
+
+## Answering the Opening Questions
+
+- **What does a case interview actually test in a data candidate?**
+  - The article treats The Case Interview as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should clarification come before analysis?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do you choose a north star metric and supporting metrics?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What Is a Data Career](./01-what-is-data-career.md)
-- [Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
-- [Designing the Learning Path](./03-learning-path.md)
-- [The Data Portfolio](./04-data-portfolio.md)
-- [SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
-- [The ML Interview](./06-ml-interview.md)
+## In this series
+
+- [Data Science Career 101 (1/10): What Is a Data Career](./01-what-is-data-career.md)
+- [Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
+- [Data Science Career 101 (3/10): Designing the Learning Path](./03-learning-path.md)
+- [Data Science Career 101 (4/10): The Data Portfolio](./04-data-portfolio.md)
+- [Data Science Career 101 (5/10): SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
+- [Data Science Career 101 (6/10): The ML Interview](./06-ml-interview.md)
 - **The Case Interview (current)**
 - Settling into the First Data Job (upcoming)
 - Building Domain Expertise (upcoming)
 - The Path to Senior in Data (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Decode and Conquer](https://www.amazon.com/Decode-Conquer-Lewis-Lin/dp/0615930417)
-- [Cracking the PM Interview](https://www.amazon.com/Cracking-PM-Interview-Product-Technology/dp/0984782818)
-- [Stratechery](https://stratechery.com/)
-- [Trustworthy Online Controlled Experiments](https://experimentguide.com/)
+- [Lewis C. Lin - Decode and Conquer](https://www.lewis-lin.com/decode-and-conquer)
+- [Cracking the PM Interview](https://www.crackingthepminterview.com/)
+- [Ben Thompson - Stratechery](https://stratechery.com/)
+- [Ron Kohavi et al. - Trustworthy Online Controlled Experiments](https://experimentguide.com/)

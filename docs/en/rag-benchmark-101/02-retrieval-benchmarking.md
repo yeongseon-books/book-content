@@ -1,11 +1,11 @@
 ---
-title: Measuring retrieval performance
+title: "RAG Evaluation and Benchmarking 101 (2/6): Measuring retrieval performance"
 series: rag-benchmark-101
 episode: 2
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -16,24 +16,25 @@ tags:
 - Hit-Rate
 - Latency
 - MRR
-last_reviewed: '2026-05-01'
-seo_description: 'A retrieval benchmark binds four things together:'
+last_reviewed: '2026-05-15'
+seo_description: Build a RAG retrieval benchmark loop. Measure hit rate, MRR, and latency to quantify search performance before scaling to production.
 ---
 
-# Measuring retrieval performance
+# RAG Evaluation and Benchmarking 101 (2/6): Measuring retrieval performance
 
-## Questions this post answers
+A retrieval benchmark works only when questions, gold documents, ranked results, and metrics stay in the same loop. Fix those inputs and you can tell whether a retriever change improved the system or just changed the feel of a few examples.
 
-![Questions this post answers](../../assets/rag-benchmark-101/02/02-01-questions-this-post-answers.en.png)
+This is post 2 in the RAG Evaluation and Benchmarking 101 series.
 
-*Questions this post answers*
-
-- How do you attach hit rate and MRR to a FAISS retriever?
-- Where should retrieval latency be measured, and in what unit?
-- Can you start a meaningful benchmark with only a small gold set?
-- What needs to stay fixed so the same loop works for any retriever or embedding model?
-
+![Benchmark loop for queries and latency](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.en.png)
+*Benchmark loop for queries and latency*
 > The core of retrieval benchmarking is not the vector DB or index. It is the **repeatable loop of query, gold document, and metric collection** that lets you observe the same retriever again and again.
+
+## Questions to Keep in Mind
+
+- What must stay fixed to turn retrieval performance from a feeling into a benchmark loop?
+- What different aspects of a retriever do hit rate, MRR, and latency measure?
+- Can a small gold set still create a meaningful regression check?
 
 ## Why this matters
 
@@ -47,7 +48,7 @@ The loop in this post is small but complete. Episodes 3 (embedding comparison) a
 
 A retrieval benchmark binds four things together:
 
-```
+```text
 QUERIES (question + gold ids)
    │
    ▼
@@ -95,23 +96,23 @@ QUERIES = [
 
 ### Step 2 — Build the measurement loop
 
-![Benchmark loop for queries and latency](../../assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.en.png)
-
-*Benchmark loop for queries and latency*
-
 The runnable code lives in `rag-benchmark-101/en/02-retrieval-benchmarking/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/02-retrieval-benchmarking
+cd en/02-retrieval-benchmarking
 python3 main.py
 ```
 
 ```python
 import time
+import numpy as np
 
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 latencies_ms = []
 all_ranked = []
+
+for question, _ in QUERIES[:1]:
+    retriever.invoke(question)  # warm-up
 
 for question, relevant_ids in QUERIES:
     started_at = time.perf_counter()
@@ -120,11 +121,15 @@ for question, relevant_ids in QUERIES:
     ranked_ids = [doc.metadata["id"] for doc in docs]
     latencies_ms.append(elapsed_ms)
     all_ranked.append((question, ranked_ids, relevant_ids))
+
+p95_latency_ms = float(np.percentile(latencies_ms, 95))
 ```
+
+The warm-up call is not cosmetic. The first call often includes model load, cache misses, or lazy initialization. If you skip warm-up, your numbers describe startup behavior instead of the steady-state path users hit all day.
 
 ### Step 3 — Compute the metrics
 
-![Retrieval quality axes with hit rate and MRR](../../assets/rag-benchmark-101/02/02-02-retrieval-quality-axes-with-hit-rate-and.en.png)
+![Retrieval quality axes with hit rate and MRR](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-02-retrieval-quality-axes-with-hit-rate-and.en.png)
 
 *Retrieval quality axes with hit rate and MRR*
 
@@ -144,15 +149,58 @@ rrs = [reciprocal_rank(r, g) for _, r, g in all_ranked]
 print(f"hit_rate@3 = {sum(hits)/len(hits):.2f}")
 print(f"MRR        = {sum(rrs)/len(rrs):.2f}")
 print(f"avg latency = {sum(latencies_ms)/len(latencies_ms):.1f} ms")
+print(f"p95 latency = {p95_latency_ms:.1f} ms")
 ```
 
 ### Step 4 — Record the result
 
 Keep the per-query ranked ids in the log. Storing only averages makes regressions impossible to debug — you cannot tell which query collapsed.
 
+```python
+report_rows = []
+for question, ranked_ids, relevant_ids in all_ranked:
+    report_rows.append({
+        "question": question,
+        "ranked_ids": ranked_ids,
+        "relevant_ids": sorted(relevant_ids),
+        "hit": hit_rate(ranked_ids, relevant_ids),
+        "rr": reciprocal_rank(ranked_ids, relevant_ids),
+    })
+
+summary = {
+    "hit_rate@3": round(sum(hits) / len(hits), 2),
+    "MRR": round(sum(rrs) / len(rrs), 2),
+    "avg_latency_ms": round(sum(latencies_ms) / len(latencies_ms), 1),
+    "p95_latency_ms": round(p95_latency_ms, 1),
+}
+
+print(summary)
+for row in report_rows:
+    print(row)
+```
+
+```text
+{'hit_rate@3': 0.67, 'MRR': 0.56, 'avg_latency_ms': 4.8, 'p95_latency_ms': 6.1}
+{'question': 'What distance does FAISS use by default?', 'ranked_ids': ['doc-faiss-basics', 'doc-ann-overview', 'doc-chunking'], 'relevant_ids': ['doc-faiss-basics'], 'hit': 1.0, 'rr': 1.0}
+{'question': 'What does MRR measure?', 'ranked_ids': ['doc-bm25', 'doc-mrr-intro', 'doc-ranking'], 'relevant_ids': ['doc-mrr-intro'], 'hit': 1.0, 'rr': 0.5}
+```
+
+That output already tells you what to try next. If hit rate is 1.0 but reciprocal rank is 0.5, the retriever is finding the right document but ranking it too low. That points to ranking quality, not coverage.
+
+### Step 5 — Turn benchmark output into a triage order
+
+| What you observe | First thing to inspect | Common root cause |
+| --- | --- | --- |
+| Low hit rate, healthy latency | embedding model, chunking, query formulation | relevant docs are missing entirely |
+| High hit rate, low MRR | reranker, score fusion, top-k order | the right doc is present but too low |
+| Healthy quality, bad p95 | infrastructure, caching, network path | a tail-latency issue rather than retrieval quality |
+| Good average, one broken query | per-query rows | domain mismatch or gold-set labeling issue |
+
+This is where the benchmark becomes operationally useful. It stops being just a scoreboard and starts acting like a debugger.
+
 ## Common mistakes
 
-![High hit rate with weak ranking](../../assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.en.png)
+![High hit rate with weak ranking](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.en.png)
 
 *High hit rate with weak ranking*
 
@@ -173,7 +221,7 @@ As the harness grows, capture more context.
 
 ## Checklist
 
-![Benchmark record with gold IDs and logs](../../assets/rag-benchmark-101/02/02-04-benchmark-record-with-gold-ids-and-logs.en.png)
+![Benchmark record with gold IDs and logs](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-04-benchmark-record-with-gold-ids-and-logs.en.png)
 
 *Benchmark record with gold IDs and logs*
 
@@ -195,15 +243,26 @@ This post lifted the hand-written metrics onto a real retriever and produced a s
 
 In Episode 3 we swap the embedding model on top of the same loop. The code change is a single line, but interpreting the result needs care.
 
+## Answering the Opening Questions
+
+- **What must stay fixed to turn retrieval performance from a feeling into a benchmark loop?**
+  Fix the question set, gold document ids, evaluation k, corpus version, and metric code so changes can be compared fairly.
+
+- **What different aspects of a retriever do hit rate, MRR, and latency measure?**
+  Hit rate measures whether any relevant document appeared, MRR measures first-hit rank, and latency measures retrieval time. Together they show quality-speed tradeoffs.
+
+- **Can a small gold set still create a meaningful regression check?**
+  A small gold set is useful for regression detection if it covers important cases, but its coverage limits must be stated.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Understanding RAG evaluation metrics](./01-evaluation-metrics.md)
-- **Measuring retrieval performance (current)**
-- Comparing embedding models (upcoming)
-- VectorDB selection criteria (upcoming)
-- End-to-end RAG pipeline evaluation (upcoming)
-- Completing the RAG Benchmark (upcoming)
+- [RAG Evaluation and Benchmarking 101 (1/6): Understanding RAG evaluation metrics](./01-evaluation-metrics.md)
+- **RAG Evaluation and Benchmarking 101 (2/6): Measuring retrieval performance (current)**
+- RAG Evaluation and Benchmarking 101 (3/6): Comparing embedding models (upcoming)
+- RAG Evaluation and Benchmarking 101 (4/6): VectorDB selection criteria (upcoming)
+- RAG Evaluation and Benchmarking 101 (5/6): End-to-end RAG pipeline evaluation (upcoming)
+- RAG Evaluation and Benchmarking 101 (6/6): Completing the RAG benchmark (upcoming)
 
 <!-- toc:end -->
 

@@ -1,0 +1,13 @@
+flowchart LR
+    G["Good evaluation dataset"] --> P["Resembles production"]
+    G --> X["Includes edge cases"]
+
+    P --> P1["happy_path\nRepresents core traffic"]
+    P --> P2["Matches everyday request frequency"]
+
+    X --> X1["edge_case\nCatches rare-input failures"]
+    X --> X2["adversarial\nTests intentional abuse and attacks"]
+
+    P1 --> O["Reliable real-world signal"]
+    X1 --> O
+    X2 --> O

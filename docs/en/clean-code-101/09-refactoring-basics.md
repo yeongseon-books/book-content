@@ -1,10 +1,10 @@
 ---
 series: clean-code-101
 episode: 9
-title: Refactoring Basics
-status: content-ready
+title: "Clean Code 101 (9/10): Refactoring Basics"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,43 +18,43 @@ tags:
   - LegacyCode
   - Quality
 seo_description: Apply safe refactoring steps, the Fowler catalog, characterization tests, and incremental improvement to legacy code.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Refactoring Basics
+# Clean Code 101 (9/10): Refactoring Basics
 
-> Clean Code 101 series (9/10)
+Refactoring looks risky when it is approached as a rewrite. It becomes manageable when every step is small enough that a failing test can tell you exactly where the move went wrong.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Clean Code 101 series.
 
-**Core question**: When should you stop refactoring?
+Here we will use characterization tests, rename and extraction moves, and the “two hats” rule to turn legacy cleanup into a sequence of reviewable, reversible steps.
 
-> When the next change is easier — not when the code looks cleaner.
 
-<!-- a-grade-intro:end -->
+![clean code 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/09/09-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 9 flow overview*
+> Move from one green state to the next green state, one small step at a time.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- What refactoring is and what it is not
-- Core techniques from the Fowler catalog
-- Characterization tests
-- A safe step-by-step refactoring process
-- Strategies for legacy code
+- What boundary should you inspect first when applying Refactoring Basics?
+- Which signal should the example or diagram make visible for Refactoring Basics?
+- What failure should be prevented first when Refactoring Basics reaches a real system?
+
+## Questions this article answers
+
+- What is refactoring exactly, and how is it different from rewriting?
+- Which techniques from Fowler's catalog matter most in day-to-day work?
+- Why are characterization tests so important in legacy code?
+- What small steps make a refactoring safe?
+- How do you break a large change into smaller pieces you can actually review?
+
+> Refactoring is not about making code prettier. It is an investment that makes the next change easier.
 
 ## Why It Matters
 
 Refactoring is not rewriting. It improves internal structure while preserving external behavior.
 
 > Refactoring is an investment that lowers the cost of the next change.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    T["Tests pass"] --> R["Tiny refactor"]
-    R --> T2["Tests pass"]
-    T2 --> R2["Next step"]
-```
 
 Small steps between green and green.
 
@@ -150,6 +150,23 @@ Raise cohesion.
 
 Make the change reviewable.
 
+## How to Verify This in a Real Codebase
+
+```bash
+python -m pytest -q tests/test_order_total.py
+python -m pytest -q tests/test_legacy_characterization.py
+```
+
+**Expected output**
+
+- Characterization tests should go green before structural changes begin.
+- Extraction, rename, and move steps must preserve the same result set.
+
+## Failure Modes to Watch
+
+- Feature changes slip into the same refactoring commit.
+- Names improve but misplaced responsibilities stay where they were.
+
 ## What to Notice in This Code
 
 - Tests stay green after every step.
@@ -194,17 +211,29 @@ Strong teams require a refactoring PR to be merged before each feature PR. Featu
 
 Refactoring is an investment that lowers the next change's cost. The final episode wraps the series with good code review standards.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Refactoring Basics?**
+  - The article treats Refactoring Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Refactoring Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Refactoring Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
-- [Naming](./02-naming.md)
-- [Small Functions](./03-small-functions.md)
-- [Simplifying Conditionals](./04-simplifying-conditionals.md)
-- [Removing Duplication](./05-removing-duplication.md)
-- [Error Handling](./06-error-handling.md)
-- [Comments and Documentation](./07-comments-and-docs.md)
-- [Testable Code](./08-testable-code.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
+- [Clean Code 101 (2/10): Naming](./02-naming.md)
+- [Clean Code 101 (3/10): Small Functions](./03-small-functions.md)
+- [Clean Code 101 (4/10): Simplifying Conditionals](./04-simplifying-conditionals.md)
+- [Clean Code 101 (5/10): Removing Duplication](./05-removing-duplication.md)
+- [Clean Code 101 (6/10): Error Handling](./06-error-handling.md)
+- [Clean Code 101 (7/10): Comments and Documentation](./07-comments-and-docs.md)
+- [Clean Code 101 (8/10): Testable Code](./08-testable-code.md)
 - **Refactoring Basics (current)**
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -213,3 +242,5 @@ Refactoring is an investment that lowers the next change's cost. The final episo
 - [Refactoring Catalog](https://refactoring.com/catalog/)
 - [Working Effectively with Legacy Code (M. Feathers)](https://www.oreilly.com/library/view/working-effectively-with/0131177052/)
 - [The Mikado Method](https://mikadomethod.info/)
+- [Refactoring catalog](https://refactoring.com/catalog/)
+- [Working Effectively with Legacy Code](https://www.oreilly.com/library/view/working-effectively-with/0131177052/)

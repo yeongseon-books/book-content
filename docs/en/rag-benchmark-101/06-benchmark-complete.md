@@ -1,11 +1,11 @@
 ---
-title: Completing the RAG Benchmark
+title: "RAG Evaluation and Benchmarking 101 (6/6): Completing the RAG benchmark"
 series: rag-benchmark-101
 episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -17,23 +17,24 @@ tags:
 - Reproducibility
 - Reporting
 last_reviewed: '2026-05-01'
-seo_description: 'A finished benchmark is a single function:'
+seo_description: Integrate RAG evaluation into a repeatable benchmark. Build a CI pipeline to compare results against baselines and detect regressions automatically.
 ---
 
-# Completing the RAG Benchmark
+# RAG Evaluation and Benchmarking 101 (6/6): Completing the RAG benchmark
 
-## Questions this post answers
+A finished benchmark has to encode its experimental knobs in configuration and reproduce the same result from the same inputs. That is what turns scattered evaluation code into something you can use for regression checks, candidate comparison, and operational tracking.
 
-![Questions this post answers](../../assets/rag-benchmark-101/06/06-01-questions-this-post-answers.en.png)
+This is the final article in the RAG Evaluation and Benchmarking 101 series.
 
-*Questions this post answers*
-
-- How do we wire dataset → retrieval → generation → evaluation into a **single executable**?
-- What separation do we need when merging retrieval metrics and RAGAS scores into one report?
-- Which experimental knobs should be frozen first in the final pipeline benchmark?
-- How do we attach the benchmark to CI so it blocks regressions automatically?
-
+![End-to-end benchmark pipeline in one run](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.en.png)
+*End-to-end benchmark pipeline in one run*
 > A finished RAG benchmark is **not a single number**. It is a reproducible pipeline that splits retrieval and generation and runs them under the same fixed experimental conditions, on demand.
+
+## Questions to Keep in Mind
+
+- What turns a one-off benchmark script into a repeatable decision tool?
+- Which failure cases should an automatic report show beyond average scores?
+- What regression thresholds should become blockers when the benchmark runs in CI?
 
 ## Why this matters
 
@@ -52,7 +53,7 @@ The pipeline we build in this post is small, but it is the skeleton that support
 
 A finished benchmark is a single function:
 
-```
+```text
 run_benchmark(config) ──►  report
    │
    ├─ Phase 1: build retriever (corpus + embedding + index)
@@ -83,7 +84,7 @@ Splitting the report into aggregate and per-question pieces matters. With only t
 
 **After**: every PR runs `python3 run_benchmark.py --config configs/ci.yaml` automatically and posts a one-line comparison against baseline as a comment.
 
-```
+```text
                   baseline  this PR  delta
 hit_rate@3        0.94      0.96    +0.02 ✓
 MRR               0.78      0.81    +0.03 ✓
@@ -111,14 +112,10 @@ ragas_metrics: ["faithfulness", "answer_relevancy"]
 
 ### Step 2 — Write the integrated function
 
-![End-to-end benchmark pipeline in one run](../../assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.en.png)
-
-*End-to-end benchmark pipeline in one run*
-
 The runnable code lives at `rag-benchmark-101/en/06-benchmark-complete/main.py`. It expects `GROQ_API_KEY` to be set.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/06-benchmark-complete
+cd en/06-benchmark-complete
 export GROQ_API_KEY=...
 python3 main.py
 ```
@@ -155,7 +152,7 @@ def run_benchmark(config):
 
 ### Step 3 — Split the report
 
-![Retrieval and generation report split](../../assets/rag-benchmark-101/06/06-02-retrieval-and-generation-report-split.en.png)
+![Retrieval and generation report split](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-02-retrieval-and-generation-report-split.en.png)
 
 *Retrieval and generation report split*
 
@@ -193,7 +190,7 @@ def compare(report, baseline):
 
 ### Step 5 — The CI gate
 
-![Branching search failures from generation failures](../../assets/rag-benchmark-101/06/06-03-branching-search-failures-from-generatio.en.png)
+![Branching search failures from generation failures](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-03-branching-search-failures-from-generatio.en.png)
 
 *Branching search failures from generation failures*
 
@@ -219,7 +216,7 @@ def gate(deltas):
 
 ## Field notes
 
-![Baseline-to-decision benchmark loop](../../assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.en.png)
+![Baseline-to-decision benchmark loop](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.en.png)
 
 *Baseline-to-decision benchmark loop*
 
@@ -263,15 +260,26 @@ The recurring idea is **not a single fused number, but repeatable measurement un
 
 Natural follow-ups from here include longer corpora (100k+), hybrid retrievers (BM25 + vector), rerankers, and multi-turn conversation evaluation.
 
+## Answering the Opening Questions
+
+- **What turns a one-off benchmark script into a repeatable decision tool?**
+  It needs a fixed dataset, version record, reproducible command, structured JSON output, readable report, and regression thresholds.
+
+- **Which failure cases should an automatic report show beyond average scores?**
+  Reports should show worst queries, score drops, latency increases, raw failures, and diffs from the previous run, not only averages.
+
+- **What regression thresholds should become blockers when the benchmark runs in CI?**
+  Block CI when key metrics such as Recall, MRR, faithfulness, or latency cross the agreed regression threshold.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Understanding RAG evaluation metrics](./01-evaluation-metrics.md)
-- [Measuring retrieval performance](./02-retrieval-benchmarking.md)
-- [Comparing embedding models](./03-embedding-comparison.md)
-- [VectorDB selection criteria](./04-vectordb-selection.md)
-- [End-to-end RAG pipeline evaluation](./05-e2e-evaluation.md)
-- **Completing the RAG Benchmark (current)**
+- [RAG Evaluation and Benchmarking 101 (1/6): Understanding RAG evaluation metrics](./01-evaluation-metrics.md)
+- [RAG Evaluation and Benchmarking 101 (2/6): Measuring retrieval performance](./02-retrieval-benchmarking.md)
+- [RAG Evaluation and Benchmarking 101 (3/6): Comparing embedding models](./03-embedding-comparison.md)
+- [RAG Evaluation and Benchmarking 101 (4/6): VectorDB selection criteria](./04-vectordb-selection.md)
+- [RAG Evaluation and Benchmarking 101 (5/6): End-to-end RAG pipeline evaluation](./05-e2e-evaluation.md)
+- **RAG Evaluation and Benchmarking 101 (6/6): Completing the RAG benchmark (current)**
 
 <!-- toc:end -->
 

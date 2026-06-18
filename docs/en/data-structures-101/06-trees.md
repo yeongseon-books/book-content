@@ -1,10 +1,10 @@
 ---
 series: data-structures-101
 episode: 6
-title: Trees
+title: "Data Structures 101 (6/10): Trees"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: Tree fundamentals, ways to represent them, and the three depth-
 last_reviewed: '2026-05-04'
 ---
 
-# Trees
+# Data Structures 101 (6/10): Trees
 
 > Data Structures 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: What single data structure powers file systems, the HTML DOM, organization charts, and regex parsers?
 
 > A tree branches out from a starting node into multiple children, forming a hierarchy. With just two rules — no cycles and exactly one parent per node — you can express almost any hierarchy. This article walks through tree terminology, two representations, and the three classic depth-first traversals (preorder, inorder, postorder) implemented from scratch.
 
-<!-- a-grade-intro:end -->
+This is post 6 in the Data Structures 101 series.
+
+
+![data structures 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/06/06-01-big-picture.en.png)
+*data structures 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Trees?
+- Which signal should the example or diagram make visible for Trees?
+- What failure should be prevented first when Trees reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 Trees are the basic skeleton of nearly every hierarchical dataset: database indexes, the abstract syntax tree (AST) of a compiler, the file system in an operating system, the parsed result of JSON or XML. Without fluency in trees, you cannot handle graphs, BSTs, or heaps with confidence.
 
 > A tree is the structure where recursion feels most natural.
-
-## Concept at a Glance
 
 > A tree is a connected, acyclic graph of nodes and edges. A binary tree is a tree where each node has at most two children — the form algorithms use most often.
 
@@ -119,7 +125,6 @@ class TreeNode:
         self.children.append(child)
         return child
 
-
 root = TreeNode("CEO")
 cto = root.add(TreeNode("CTO"))
 cfo = root.add(TreeNode("CFO"))
@@ -138,7 +143,6 @@ class BinaryNode:
         self.value = value
         self.left = left
         self.right = right
-
 
 # Build the tree
 #         1
@@ -164,7 +168,6 @@ def preorder(node):
     preorder(node.left)
     preorder(node.right)
 
-
 def inorder(node):
     """left -> root -> right"""
     if node is None:
@@ -173,7 +176,6 @@ def inorder(node):
     print(node.value, end=" ")
     inorder(node.right)
 
-
 def postorder(node):
     """left -> right -> root"""
     if node is None:
@@ -181,7 +183,6 @@ def postorder(node):
     postorder(node.left)
     postorder(node.right)
     print(node.value, end=" ")
-
 
 print("preorder: ", end=""); preorder(root); print()
 print("inorder:  ", end=""); inorder(root); print()
@@ -198,7 +199,6 @@ When you visit the root determines the traversal. Postorder evaluates expression
 ```python
 from collections import deque
 
-
 def bfs(root):
     if root is None:
         return
@@ -210,7 +210,6 @@ def bfs(root):
             queue.append(node.left)
         if node.right:
             queue.append(node.right)
-
 
 print("BFS:", end=" "); bfs(root); print()   # 1 2 3 4 5
 ```
@@ -225,12 +224,10 @@ def height(node):
         return -1
     return 1 + max(height(node.left), height(node.right))
 
-
 def count(node):
     if node is None:
         return 0
     return 1 + count(node.left) + count(node.right)
-
 
 print(f"height: {height(root)}")    # 2
 print(f"count:  {count(root)}")     # 5
@@ -291,17 +288,29 @@ A tree is a hierarchical structure with no cycles and exactly one parent per nod
 
 Next we look at the binary search tree (BST), a sorted binary tree. It offers average O(log n) lookups, but degrades to O(n) when balance is lost — a subtle structure worth careful attention.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Trees?**
+  - The article treats Trees as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Trees?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Trees reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
-- [Linked Lists](./03-linked-lists.md)
-- [Stacks and Queues](./04-stacks-and-queues.md)
-- [Hash Tables](./05-hash-tables.md)
+## In this series
+
+- [Data Structures 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
+- [Data Structures 101 (3/10): Linked Lists](./03-linked-lists.md)
+- [Data Structures 101 (4/10): Stacks and Queues](./04-stacks-and-queues.md)
+- [Data Structures 101 (5/10): Hash Tables](./05-hash-tables.md)
 - **Trees (current)**
 - Binary Search Trees (upcoming)
 - Heaps (upcoming)
 - Graphs (upcoming)
 - Choosing Data Structures (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,10 +1,10 @@
 ---
 series: statistics-101
 episode: 7
-title: Hypothesis Testing
+title: "Statistics 101 (7/10): Hypothesis Testing"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,25 +20,24 @@ seo_description: A walkthrough of null and alternative hypotheses, the t-test fo
 last_reviewed: '2026-05-04'
 ---
 
-# Hypothesis Testing
+# Statistics 101 (7/10): Hypothesis Testing
 
-> Statistics 101 series (7/10)
+In statistical work, we constantly run into questions about differences. Did the new button lift conversion? Is the new treatment better than the old one? Is the model improvement real, or just noise in the sample?
 
-<!-- a-grade-intro:begin -->
+Hypothesis testing exists because visible differences are not automatically meaningful differences. Samples always wobble. Without a formal procedure, it is easy to mistake random fluctuation for evidence.
 
-**Core question**: How do we *prove with data* that *“there is a difference”*? How likely is it that the difference *appeared by chance*?
+This is post 7 in the Statistics 101 series. Here we will define the null and alternative hypotheses, walk through the basic t-test flow, and explain why Type I error, Type II error, and statistical power matter in real decision-making.
 
-> *Hypothesis testing turns chance into a number.*
 
-<!-- a-grade-intro:end -->
+![statistics 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/07/07-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 7 flow overview*
+> Hypothesis testing answers: *Is this difference real or just noise?* It does not prove truth—it *measures evidence*.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The meaning of *H0* and *H1*
-- *t-test*, *chi-square*, *proportion* tests
-- *Type I / II errors* and *power*
-- A 5-step hypothesis testing exercise
-- Five common mistakes
+- How far can data support the claim that a difference exists?
+- What do H0 and H1 actually mean?
+- Why is p-value alone not enough?
 
 ## Why It Matters
 
@@ -47,15 +46,7 @@ last_reviewed: '2026-05-04'
 > *Asking the right question matters more than the answer.*
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    H0["H0: no difference"] --> Test["Test Statistic"]
-    H1["H1: difference"] --> Test
-    Test --> Pvalue["p-value"]
-    Pvalue --> Decide["Reject or Not"]
-```
-
+A hypothesis test starts with a claim (the *null hypothesis*), then checks whether your data is *consistent* with that claim. If your data is *too unusual* under that assumption, you reject the claim.
 ## Key Terms
 
 - **H0 (Null Hypothesis)**: *no difference*.
@@ -97,11 +88,15 @@ stat, p = ttest_ind(a, b, equal_var=False)
 print("t:", stat, "p:", p)
 ```
 
+**Expected output:** a line like `t: ... p: ...`, which gives the first formal signal for whether the gap is plausibly just chance.
+
 ### Step 4 — Decide
 
 ```python
 print("Reject H0" if p < 0.05 else "Fail to reject H0")
 ```
+
+**Expected output:** in this example you will usually see `Reject H0`.
 
 ### Step 5 — Effect size
 
@@ -110,6 +105,8 @@ diff = b.mean() - a.mean()
 pooled = np.sqrt((a.var(ddof=1) + b.var(ddof=1)) / 2)
 print("Cohen's d:", diff / pooled)
 ```
+
+**Expected output:** a Cohen's d value often around `0.3` to `0.5` for this synthetic setup, giving you magnitude rather than only significance.
 
 ## What to Notice in This Code
 
@@ -154,17 +151,29 @@ A/B test result pages, *model performance comparisons*, *clinical trials* — th
 
 Hypothesis testing is the *standard language of decisions*. The next episode looks at the *relationship between variables* — *correlation and regression*.
 
+## Answering the Opening Questions
+
+- **How far can data support the claim that a difference exists?**
+  - The article treats Hypothesis Testing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What do H0 and H1 actually mean?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is p-value alone not enough?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
-- [Distributions](./03-distributions.md)
-- [Sample and Population](./04-sample-and-population.md)
-- [Estimation](./05-estimation.md)
-- [Confidence Interval](./06-confidence-interval.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): Distributions](./03-distributions.md)
+- [Statistics 101 (4/10): Sample and Population](./04-sample-and-population.md)
+- [Statistics 101 (5/10): Estimation](./05-estimation.md)
+- [Statistics 101 (6/10): Confidence Interval](./06-confidence-interval.md)
 - **Hypothesis Testing (current)**
 - Correlation and Regression (upcoming)
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

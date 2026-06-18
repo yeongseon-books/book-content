@@ -6,7 +6,7 @@ language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -15,7 +15,7 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
-seo_description: 처음 Azure App Service를 접하면 대개 이렇게 생각합니다.
+seo_description: "처음 Azure App Service를 접하면 이렇게 생각합니다: 코드만 올리면 됩니다."
 ---
 
 # Azure App Service란? - 플랫폼 아키텍처 이해하기
@@ -27,6 +27,14 @@ App Service는 단순히 “편한 배포 서비스”로만 보면 자주 헷�
 이 글은 Azure App Service 101 시리즈의 첫 번째 글입니다. 여기서는 App Service를 처음 쓰는 개발자 관점에서, “이 서비스가 정확히 무엇이고, 어떤 멘탈 모델로 이해해야 운영이 쉬워지는가”를 설명해 보겠습니다. 한 가지 관점이 중요합니다. **App Service는 하나의 박스가 아니라, 서로 역할이 다른 여러 면(plane)으로 이루어진 플랫폼**이라는 점입니다.
 
 ---
+
+## 이 글에서 다룰 문제
+
+- App Service는 PaaS(Platform as a Service) 스펙트럼 안에서 어디에 놓인 서비스일까요?
+- Linux 호스팅과 Windows 호스팅은 같은 가격이 아닌데, 실제로 무엇이 다른 걸까요?
+- App Service Plan과 App은 어떻게 1:N 관계를 이루고, 과금은 누구 기준으로 일어날까요?
+- 코드 배포, 컨테이너 배포, WebJobs는 하나의 App Service 안에서 어떻게 공존할까요?
+- 어떤 워크로드를 보면 “이건 App Service보다 다른 서비스가 더 맞겠다”는 신호로 봐야 할까요?
 
 ## App Service가 뭔가요?
 
@@ -57,7 +65,7 @@ App Service는 크게 다음 세 영역으로 나뉩니다.
 
 즉, 세 Plane은 서로 연결되어 있지만 **같은 것이 아니고**, 각자 **독립적인 API와 장애 모드**를 가집니다. “포털에서 설정은 정상인데 앱이 느리다”, “앱은 정상인데 배포 로그가 안 보인다” 같은 상황을 이해하려면 이 분리가 꼭 필요합니다.
 
-![세 Plane의 역할 분리 구조](../../assets/azure-app-service-101/01/01-three-plane-architecture.ko.png)
+![세 Plane의 역할 분리 구조](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/01/01-three-plane-architecture.ko.png)
 
 *세 Plane의 역할 분리 구조*
 
@@ -98,7 +106,7 @@ Management Plane을 다룰 때 기억할 문장은 이겁니다. **설정은 곧
 
 요청 흐름을 가장 단순하게 그리면 아래와 같습니다.
 
-![Frontend와 Worker를 거치는 요청 흐름](../../assets/azure-app-service-101/01/02-request-flow.ko.png)
+![Frontend와 Worker를 거치는 요청 흐름](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/01/02-request-flow.ko.png)
 
 *Frontend와 Worker를 거치는 요청 흐름*
 
@@ -177,7 +185,7 @@ app.run(host="0.0.0.0", port=port)
 
 App Service에서 파일시스템은 아주 자주 오해되는 주제입니다. 특히 처음 배포한 뒤 SSH나 Kudu로 파일을 들여다보면 “아, 여기도 결국 서버 하나구나”라는 착각이 들기 쉽습니다. 하지만 운영 관점에서는 **임시 저장소와 영구 저장소를 명확히 구분해서 생각해야** 합니다.
 
-![임시 저장소와 홈 디렉터리의 차이](../../assets/azure-app-service-101/01/03-file-system-layout.ko.png)
+![임시 저장소와 홈 디렉터리의 차이](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/01/03-file-system-layout.ko.png)
 
 *임시 저장소와 홈 디렉터리의 차이*
 
@@ -283,3 +291,5 @@ Azure App Service를 처음 보면 편리함이 먼저 보입니다. 그건 사�
 - [Azure Functions 101](../azure-functions-101/)
 
 ---
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-101/ko/01-what-is-app-service)

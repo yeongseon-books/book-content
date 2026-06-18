@@ -1,10 +1,10 @@
 ---
 series: backend-development-101
 episode: 1
-title: What Is Backend Development?
-status: content-ready
+title: "Backend Development 101 (1/10): What Is Backend Development?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,49 +17,30 @@ tags:
   - Architecture
   - Python
 seo_description: A clear map of backend development — HTTP servers, routing, services, databases, auth, and deployment for engineers starting their first backend role.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is Backend Development?
+# Backend Development 101 (1/10): What Is Backend Development?
 
-> Backend Development 101 series (1/10)
+Users only see the screen, but the part that keeps a service trustworthy is the code behind it. If you cannot explain where a request enters, where rules live, and where data stops being trustworthy, you can add features quickly but you cannot operate the system for long.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Backend Development 101 series. Here, we define backend development as a set of responsibilities — receiving requests, applying rules, touching data, and returning responses — instead of treating it as one vague technical label.
 
-**Core question**: Users only see the screen. So what is the *backend* actually doing behind it?
 
-> It receives a request, applies rules, touches data, and returns a response. The backend is a *set of responsibilities*.
+![backend development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/01/01-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 1 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The role and the boundaries of a backend
-- The five layers that form a backend system
-- The path of one request through that system
-- A map of this whole series
-- Why each next chapter exists
+- The role and the boundaries of a backend?
+- The five layers that form a backend system?
+- The path of one request through that system?
 
 ## Why It Matters
 
 Building only the frontend lets you ship *what the user sees*. Building the backend lets you ship *systems that survive*. Data, authentication, consistency, and operations all live behind the screen, and someone has to design them.
 
 > The backend is invisible, but it decides everything.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Client["Client"] --> HTTP["HTTP server"]
-    HTTP --> Route["Router"]
-    Route --> Service["Service"]
-    Service --> DB["Database"]
-    Service --> Ext["External API"]
-    DB --> Service
-    Service --> Route
-    Route --> HTTP
-    HTTP --> Client
-```
 
 Requests flow left to right; responses retrace the same path.
 
@@ -156,6 +137,16 @@ curl -X POST -H "Content-Type: application/json" \
 
 You get JSON back.
 
+## Verification points
+
+**Expected output:** after `uvicorn 1_app:app --reload`, `/` should return `{"message": "hello"}` and `POST /users` should return JSON for the new user.
+
+### First failure modes to check
+
+- If `uvicorn` cannot import `1_app:app`, confirm the filename and app object name match.
+- If `POST /users` returns `422`, verify the payload still includes the `name` field.
+- An empty `GET /users` response is fine here; the point is verifying the request path reaches the handler and returns data.
+
 ## What to Notice in This Code
 
 - A server is a *path-to-function* mapping.
@@ -200,7 +191,18 @@ The shape of a backend is similar from a startup to a large company — Router, 
 
 The backend is a *set of responsibilities*. Next, we open up the lowest layer and build an *HTTP server* by hand to see how it really works.
 
+## Answering the Opening Questions
+
+- **The role and the boundaries of a backend?**
+  - The article treats What Is Backend Development? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The five layers that form a backend system?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The path of one request through that system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Backend Development? (current)**
 - Building an HTTP Server (upcoming)
 - Routing and Controllers (upcoming)
@@ -211,11 +213,17 @@ The backend is a *set of responsibilities*. Next, we open up the lowest layer an
 - Testing the Backend (upcoming)
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+### Official Docs
+
 - [FastAPI Tutorial](https://fastapi.tiangolo.com/tutorial/)
 - [HTTP overview (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview)
 - [The Twelve-Factor App](https://12factor.net/)
+
+### Further Reading
+
 - [Backend roadmap](https://roadmap.sh/backend)

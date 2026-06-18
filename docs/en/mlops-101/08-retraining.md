@@ -1,10 +1,10 @@
 ---
 series: mlops-101
 episode: 8
-title: Retraining
-status: content-ready
+title: "MLOps 101 (8/10): Retraining"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,43 +16,52 @@ tags:
   - Automation
   - Pipeline
   - DataScience
-seo_description: Trigger retraining from schedule, drift, or performance signals, then promote a challenger via shadow and canary stages with confidence.
-last_reviewed: '2026-05-04'
+seo_description: Trigger retraining from schedule, drift, or performance signals, then compare a challenger against the champion before any promotion.
+last_reviewed: '2026-05-15'
 ---
 
-# Retraining
+# MLOps 101 (8/10): Retraining
 
-> MLOps 101 series (8/10)
+Deploying a model once is not the end of the job. Input distributions move, user behavior changes, and performance targets change. At some point, the team has to train again. The hard part is deciding who should trigger that retraining and on what evidence.
 
-<!-- a-grade-intro:begin -->
+If retraining depends only on human instinct, it becomes slow and inconsistent. One team retrains on a schedule, another retrains only after an incident, and another swaps in a new model without proving it is actually better.
 
-**Core question**: When should you *retrain*, and how do you know the new model is *actually* better?
+This is post 8 in the MLOps 101 series.
 
-> *Retraining runs train, evaluate, compare against champion, and promote — automatically — based on explicit triggers.*
+Here, we will treat retraining as an operating loop that starts from an explicit trigger, produces a challenger, and separates retraining from promotion.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![mlops 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/08/08-01-see-the-flow-first.en.png)
+*mlops 101 chapter 8 flow overview*
+> Retraining is not automatic just because you built the trigger. It is a policy question: which signals justify training, how good must the new model be to promote, and what happens if everything fails?
 
-- Three trigger types (schedule / drift / performance)
-- The Champion / Challenger pattern
-- Shadow evaluation
-- Automatic promotion policies
-- Five common pitfalls
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Retraining?
+- Which signal should the example or diagram make visible for Retraining?
+- What failure should be prevented first when Retraining reaches a real system?
+
+## Questions this article answers
+
+- Which signals should trigger retraining in the first place?
+- How do schedule-based, drift-based, and performance-based triggers differ?
+- Why do champion-versus-challenger comparisons need a margin?
+- What risk does shadow evaluation remove?
+- Why should retraining and deployment never be treated as the same step?
+
+> Mental model: retraining creates a new candidate model. Promotion decides whether that candidate should become the new live model. The stages are connected, but they are not the same decision.
 
 ## Why It Matters
 
-Manual retraining is slow and biased. Automated retraining is fast and evidence-driven.
+Without retraining, a model ages quietly. But a fully automatic retraining loop is not automatically safe either. If the policy is weak, the system may replace models too often and trade stability for false momentum.
 
-## Concept at a Glance
+That is why the real problem is policy, not automation for its own sake. The team has to define what starts retraining, how much better the challenger must be, and what path exists if the decision was wrong.
 
-```mermaid
-flowchart LR
-    Trig["trigger"] --> Train["train challenger"]
-    Train --> Eval["evaluate"]
-    Eval --> Cmp["vs champion"]
-    Cmp --> Promo["promote / reject"]
-```
+## See the Flow First
+
+This structure explains retraining well. A trigger fires, a challenger is trained, the challenger is evaluated against the champion, and the system either promotes it or rejects it.
+
+So retraining is not just about running training again. It is about adding comparison and promotion policy around the training run.
 
 ## Key Terms
 
@@ -165,17 +174,29 @@ A recommender model retrains nightly, compares AUC and CTR against the champion,
 
 Retraining is only clean if features are consistent across train and serve. The next post covers the *Feature Store*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Retraining?**
+  - The article treats Retraining as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Retraining?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Retraining reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is MLOps?](./01-what-is-mlops.md)
-- [Experiment Tracking](./02-experiment-tracking.md)
-- [Data Versioning](./03-data-versioning.md)
-- [Model Training Pipeline](./04-training-pipeline.md)
-- [Model Deployment](./05-model-deployment.md)
-- [Model Monitoring](./06-model-monitoring.md)
-- [Data Drift and Model Drift](./07-data-and-model-drift.md)
+## In this series
+
+- [MLOps 101 (1/10): What Is MLOps?](./01-what-is-mlops.md)
+- [MLOps 101 (2/10): Experiment Tracking](./02-experiment-tracking.md)
+- [MLOps 101 (3/10): Data Versioning](./03-data-versioning.md)
+- [MLOps 101 (4/10): Model Training Pipeline](./04-training-pipeline.md)
+- [MLOps 101 (5/10): Model Deployment](./05-model-deployment.md)
+- [MLOps 101 (6/10): Model Monitoring](./06-model-monitoring.md)
+- [MLOps 101 (7/10): Data Drift and Model Drift](./07-data-and-model-drift.md)
 - **Retraining (current)**
 - Feature Store (upcoming)
 - Building a Production ML System (upcoming)
+
 <!-- toc:end -->
 
 ## References

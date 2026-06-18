@@ -1,0 +1,20 @@
+flowchart TD
+  subgraph Single["단일 리비전 모드"]
+    S_Rev1["리비전 1 (활성)"] -. "비활성화됨" .-> S_Rev2["리비전 2 (활성)"]
+  end
+  subgraph Multiple["다중 리비전 모드"]
+    M_Rev1["리비전 1 (활성)"]
+    M_Rev2["리비전 2 (활성)"]
+  end
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

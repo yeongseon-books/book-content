@@ -1,0 +1,9 @@
+flowchart TD
+  subgraph Cluster["Kubernetes Cluster"]
+    Ingress["Envoy Ingress"]
+    Service1["Service (Rev 1)"]
+    Service2["Service (Rev 2)"]
+  end
+  Client["Client"] --> Ingress
+  Ingress -- "80%" --> Service1
+  Ingress -- "20%" --> Service2

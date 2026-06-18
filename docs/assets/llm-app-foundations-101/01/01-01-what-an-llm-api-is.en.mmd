@@ -1,0 +1,19 @@
+flowchart LR
+    UserText["User text\n'Explain list comprehensions'"] --> Messages["messages[]\nrole + content"]
+    ModelChoice["model\nllama-3.1-8b-instant"] --> RequestBody["JSON request body"]
+    Messages --> RequestBody
+    Options["generation options\ntemperature, max_tokens"] --> RequestBody
+    RequestBody --> Remote["Remote LLM API"]
+    Remote --> JsonOut["JSON response"]
+    JsonOut --> Choice["choices[0].message.content"]
+    JsonOut --> Meta["model + usage + finish_reason"]
+
+    style UserText fill:#e3f2fd,stroke:#1976d2
+    style Messages fill:#f3e5f5,stroke:#7b1fa2
+    style ModelChoice fill:#f3e5f5,stroke:#7b1fa2
+    style Options fill:#f3e5f5,stroke:#7b1fa2
+    style RequestBody fill:#fff3e0,stroke:#f57c00
+    style Remote fill:#e8f5e9,stroke:#388e3c
+    style JsonOut fill:#ede7f6,stroke:#5e35b1
+    style Choice fill:#fff8e1,stroke:#f9a825
+    style Meta fill:#e0f7fa,stroke:#00838f

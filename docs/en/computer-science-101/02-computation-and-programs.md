@@ -1,10 +1,10 @@
 ---
 series: computer-science-101
 episode: 2
-title: Computation and Programs
-status: content-ready
+title: "Computer Science 101 (2/10): Computation and Programs"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,34 @@ tags:
   - Compilers
   - Interpreters
 seo_description: The definition of computation, the Turing machine, the evolution of programming languages, and the major paradigms that shape software design.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Computation and Programs
+# Computer Science 101 (2/10): Computation and Programs
 
-> Computer Science 101 series (2/10)
+“Can a program solve this?” sounds simple until you ask where the boundary of computability really is. The answer does not stop at theory. It also shapes how we organize code, choose a paradigm, and reason about what a programming language is even doing for us.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Computer Science 101 series.
 
-**Key question**: What does it precisely mean that something is "computable," and how does a program express computation?
+In this article, we'll connect the formal definition of computation, the idea of uncomputable problems, and the way programming languages express those computations for humans.
 
-> In 1936 Alan Turing gave a mathematical definition of "what can be computed." The surprising conclusion: a simple machine that moves along a tape and reads or writes symbols can carry out *every* computation. That theoretical machine is the foundation of every modern computer. This article covers the definition of computation, problems that cannot be computed, the evolution of programming languages, and the major paradigms.
 
-<!-- a-grade-intro:end -->
+![Computer Science 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Computation and Programs?
+- Which signal should the example or diagram make visible for Computation and Programs?
+- What failure should be prevented first when Computation and Programs reaches a real system?
+
+## Questions This Article Answers
+
+- What does it actually mean to call a problem computable?
+- Why is the Turing machine still the reference model for modern computing?
+- What does the halting problem tell us about the limits of software?
+- How do imperative, functional, and object-oriented styles express the same computation differently?
+- How do compilers and interpreters change the way code reaches execution?
 
 ## What You Will Learn
 
@@ -46,23 +60,7 @@ The answer to "Can every problem be solved by a program?" is no. Computation the
 
 > Computation theory = the constitution of CS. A paradigm = a philosophy of organizing code.
 
-## Concept at a Glance
-
 > Computation is the process of transforming input by rules. The Turing machine is the most basic model of that process, and a programming language is how we make it human-readable.
-
-```text
-Mathematical functions (theory)
-        │
-Turing machine (computation model)
-        │
-Machine code (hardware)
-        │
-Assembly (low level)
-        │
-High-level languages (Python, Java)
-        │
-Paradigms (imperative, functional, OOP)
-```
 
 ## Key Terms
 
@@ -96,7 +94,6 @@ def process_orders(orders):
 ```python
 from dataclasses import dataclass
 
-
 @dataclass
 class Order:
     price: int
@@ -107,7 +104,6 @@ class Order:
     def total_price(self) -> int:
         base = self.price * self.quantity
         return int(base * 0.9) if self.discount else base
-
 
 def process_orders(orders: list[Order]) -> int:
     return sum(o.total_price() for o in orders if o.status == "paid")
@@ -127,7 +123,6 @@ def simple_state_machine(tape: list[str]) -> list[str]:
             result.append("1" if symbol == "0" else "0")
     return result
 
-
 tape = ["1", "0", "1", "1", "0"]
 print(simple_state_machine(tape))  # ['0', '1', '0', '0', '1']
 ```
@@ -143,10 +138,8 @@ def halts(program, input_data):
     # Proof sketch: assuming this function exists leads to a contradiction.
     raise NotImplementedError("The halting problem is undecidable")
 
-
 # A practical workaround: use a timeout
 import signal
-
 
 def run_with_timeout(func, timeout_sec: int = 5):
     """Abort if the function does not finish within the time limit."""
@@ -169,7 +162,6 @@ def sum_of_squares_imperative(n: int) -> int:
         total += i * i
     return total
 
-
 print(sum_of_squares_imperative(5))  # 55
 ```
 
@@ -184,7 +176,6 @@ from functools import reduce
 def sum_of_squares_functional(n: int) -> int:
     return reduce(lambda acc, x: acc + x * x, range(1, n + 1), 0)
 
-
 print(sum_of_squares_functional(5))  # 55
 ```
 
@@ -198,10 +189,8 @@ The functional paradigm expresses computation by composing functions instead of 
 
 import dis
 
-
 def add(a: int, b: int) -> int:
     return a + b
-
 
 # Inspect the Python bytecode
 dis.dis(add)
@@ -210,6 +199,8 @@ dis.dis(add)
 # BINARY_ADD
 # RETURN_VALUE
 ```
+
+**Expected output:** you should see bytecode operations such as `LOAD_FAST`, `BINARY_ADD`, and `RETURN_VALUE`, confirming that Python code is translated into a lower-level form before execution.
 
 A compiler translates the entire program ahead of time, while an interpreter runs it line by line. Python is a hybrid: it compiles to bytecode and then interprets that bytecode on a virtual machine.
 
@@ -266,22 +257,34 @@ Computation is the process of transforming input by rules, and the Turing machin
 
 The next article looks at how computers represent data — binary, character encodings, and types.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Computation and Programs?**
+  - The article treats Computation and Programs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Computation and Programs?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Computation and Programs reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
 - **Computation and Programs (current)**
-- [Data Representation](./03-data-representation.md)
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
-- [Computer Architecture](./05-computer-architecture.md)
-- [Operating Systems](./06-operating-systems.md)
-- [Networks](./07-networks.md)
-- [Databases](./08-databases.md)
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Data Representation (upcoming)
+- Algorithms and Complexity (upcoming)
+- Computer Architecture (upcoming)
+- Operating Systems (upcoming)
+- Networks (upcoming)
+- Databases (upcoming)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
 - [Alan Turing — On Computable Numbers (1936)](https://www.cs.virginia.edu/~robins/Turing_Paper_1936.pdf)
-- [Wikipedia — Halting Problem](https://en.wikipedia.org/wiki/Halting_problem)
+- [Stanford Encyclopedia of Philosophy — The Church-Turing Thesis](https://plato.stanford.edu/entries/church-turing/)
 - [SICP — Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book.html)
 - [Programming Paradigms for Dummies (Peter Van Roy)](https://www.info.ucl.ac.be/~pvr/VanRoyChapter.pdf)

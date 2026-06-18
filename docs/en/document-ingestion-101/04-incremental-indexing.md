@@ -1,11 +1,11 @@
 ---
-title: Incremental indexing — updating only changed documents
+title: "Document Ingestion 101 (4/6): Incremental indexing — updating only changed documents"
 series: document-ingestion-101
 episode: 4
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,40 +14,34 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: Incremental indexing is less a vector-store trick and more an operational
   memory problem.
 ---
 
-# Incremental indexing — updating only changed documents
+# Document Ingestion 101 (4/6): Incremental indexing — updating only changed documents
 
-## Questions this post answers
+Rebuilding an entire index is simple, but it stops scaling surprisingly quickly. Once the corpus grows, the real question becomes how to remember what changed and skip the rest safely.
 
-- What do you need to process only changed documents instead of rebuilding everything?
-- What is the simplest shape for a hash-based state store?
-- How do you distinguish unchanged, updated, and new files in the run log?
+This is the fourth post in the Document Ingestion 101 series. Here, we use file hashes and a small state store to separate added, unchanged, and updated documents.
 
+![Incremental scan and change detection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-01-incremental-scan-and-change-detection.en.png)
+*Incremental scan and change detection flow*
 > Incremental indexing is less a vector-store trick and more an operational memory problem.
 
-Example code: `/root/Github/document-ingestion-101/en/04-incremental-indexing/main.py`
+## Questions to Keep in Mind
 
-![Questions this post answers](../../assets/document-ingestion-101/04/04-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-A full rebuild is acceptable for dozens of files, but it becomes wasteful once the corpus grows into the thousands.
-
-This example uses only file hashes and a JSON state file to classify `added`, `unchanged`, and `updated`. That simple classifier is the foundation for every later vector-store update step.
+- What cost appears when every small document change rebuilds the full index?
+- Why are content hashes and a state store safer than file timestamps for change detection?
+- How should deleted documents and modified chunks be separated in the index?
 
 ## Incremental scan and change detection
 
-![Incremental scan and change detection flow](../../assets/document-ingestion-101/04/04-01-incremental-scan-and-change-detection.en.png)
-
-*Incremental scan and change detection flow*
 The first win in incremental indexing is narrowing the work set before any expensive downstream processing starts.
 
 ## State store and hash comparison
 
-![State store and hash comparison flow](../../assets/document-ingestion-101/04/04-02-state-store-and-hash-comparison.en.png)
+![State store and hash comparison flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-02-state-store-and-hash-comparison.en.png)
 
 *State store and hash comparison flow*
 A content hash next to timestamps makes the change detector much more trustworthy than mtime alone.
@@ -103,10 +97,8 @@ def reset_demo_state() -> None:
 
 def seed_files() -> list[Path]:
     files = {
-        'alpha.txt': 'This is the first document. It acts as the baseline for incremental indexing.
-',
-        'beta.txt': 'This is the second document. We will revise it later.
-',
+        'alpha.txt': 'This is the first document. It acts as the baseline for incremental indexing.\n',
+        'beta.txt': 'This is the second document. We will revise it later.\n',
     }
     paths = []
     for name, content in files.items():
@@ -131,8 +123,7 @@ def main() -> None:
     store = IndexStateStore(STATE_FILE)
     scan(store, files, 'first run')
     scan(store, files, 'second run without changes')
-    files[1].write_text('This is the second document. Its contents changed, so it must be reprocessed.
-', encoding='utf-8')
+    files[1].write_text('This is the second document. Its contents changed, so it must be reprocessed.\n', encoding='utf-8')
     scan(store, files, 'third run after beta update')
 
 if __name__ == '__main__':
@@ -163,7 +154,7 @@ python main.py
 
 ### Added updated and deleted paths
 
-![Added updated and deleted decision flow](../../assets/document-ingestion-101/04/04-01-added-updated-and-deleted-paths.en.png)
+![Added updated and deleted decision flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-01-added-updated-and-deleted-paths.en.png)
 
 *Added updated and deleted decision flow*
 Once deletion is modeled as its own path, index cleanup becomes an extension of the same state machine.
@@ -176,7 +167,7 @@ Once deletion is modeled as its own path, index cleanup becomes an extension of 
 
 ### Index version and run history flow
 
-![Index version and run history flow](../../assets/document-ingestion-101/04/04-02-index-version-and-run-history-flow.en.png)
+![Index version and run history flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-02-index-version-and-run-history-flow.en.png)
 
 *Index version and run history flow*
 Past a certain scale, knowing which run produced which index version becomes as important as change detection itself.
@@ -192,18 +183,37 @@ Past a certain scale, knowing which run produced which index version becomes as 
 - [ ] A later file edit resolves to updated.
 - [ ] You identified where deletion handling would plug in.
 
+## Answering the Opening Questions
+
+- **What cost appears when every small document change rebuilds the full index?**
+  Full rebuilds take time and cost more, and at larger corpus sizes they can disrupt search quality during deployment.
+
+- **Why are content hashes and a state store safer than file timestamps for change detection?**
+  Timestamps can change or be preserved by copy and deploy workflows, while content hashes represent actual content changes. A state store lets you compare previous hashes and chunk ids.
+
+- **How should deleted documents and modified chunks be separated in the index?**
+  Deletes should remove existing vectors and metadata for that document; updates should replace the previous chunk set with the new one.
+
 <!-- toc:begin -->
 ## In this series
 
-- [PDF parsing and text extraction](./01-pdf-parsing.md)
-- [Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
-- [Metadata design and filtering](./03-metadata-filtering.md)
-- **Incremental indexing — updating only changed documents (current)**
-- Multi-format document pipeline (upcoming)
-- Completing the document ingestion pipeline (upcoming)
+- [Document Ingestion 101 (1/6): PDF parsing and text extraction](./01-pdf-parsing.md)
+- [Document Ingestion 101 (2/6): Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
+- [Document Ingestion 101 (3/6): Metadata design and filtering](./03-metadata-filtering.md)
+- **Document Ingestion 101 (4/6): Incremental indexing — updating only changed documents (current)**
+- Document Ingestion 101 (5/6): Multi-format document pipeline (upcoming)
+- Document Ingestion 101 (6/6): Completing the document ingestion pipeline (upcoming)
 
 <!-- toc:end -->
 
 ## References
 
-- https://docs.python.org/3/library/hashlib.html
+### Official docs
+
+- [Python hashlib documentation](https://docs.python.org/3/library/hashlib.html)
+- [Python json documentation](https://docs.python.org/3/library/json.html)
+
+### Verification-friendly sources
+
+- [Python pathlib documentation](https://docs.python.org/3/library/pathlib.html)
+- [Python datetime documentation](https://docs.python.org/3/library/datetime.html)

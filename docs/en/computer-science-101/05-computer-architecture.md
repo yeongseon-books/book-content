@@ -1,10 +1,10 @@
 ---
 series: computer-science-101
 episode: 5
-title: Computer Architecture
-status: content-ready
+title: "Computer Science 101 (5/10): Computer Architecture"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,34 @@ tags:
   - Cache
   - Performance
 seo_description: How CPUs, memory, and the cache hierarchy work, and how they shape the real performance of your code.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Computer Architecture
+# Computer Science 101 (5/10): Computer Architecture
 
-> Computer Science 101 series (5/10)
+Sometimes two implementations share the same Big-O and still feel very different in practice. Once that happens, the next question is not about asymptotic complexity anymore. It is about how the code touches the CPU, cache, and memory hierarchy underneath it.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Computer Science 101 series.
 
-**Key question**: Two pieces of code share the same Big-O. Why is one ten times slower than the other in practice?
+In this article, we'll connect the von Neumann model, CPU execution, cache hierarchy, and memory locality to the performance differences you can observe in real programs.
 
-> Even with the same algorithm, performance depends heavily on how the code uses hardware. The CPU does not touch memory directly — it goes through a cache. Cache-friendly code can be tens of times faster than code that misses the cache constantly. This article covers the von Neumann model, the CPU and memory and cache hierarchy, and how all of it shows up in your code.
 
-<!-- a-grade-intro:end -->
+![Computer Science 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/05/05-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Computer Architecture?
+- Which signal should the example or diagram make visible for Computer Architecture?
+- What failure should be prevented first when Computer Architecture reaches a real system?
+
+## Questions This Article Answers
+
+- Why can two algorithms with the same order run at very different speeds?
+- What roles do the CPU, registers, cache, and RAM each play?
+- Why does row-major versus column-major traversal matter?
+- What does locality mean in practical code?
+- Why does a Python `list` feel different from a dense numeric array?
 
 ## What You Will Learn
 
@@ -48,22 +62,7 @@ There is always a performance gap that algorithms alone cannot explain. Why one 
 
 An algorithm written without hardware awareness is fast only on paper.
 
-## Concept at a Glance
-
 > Higher in the hierarchy means faster, more expensive, and smaller. Lower means slower, cheaper, and bigger.
-
-```text
-Tier            Approx. access time   Size
-────────────────────────────────────────────
-Register        < 1 ns                tens of bytes
-L1 cache        ~1 ns                 32-64 KB
-L2 cache        ~4 ns                 hundreds of KB
-L3 cache        ~10 ns                tens of MB
-Main memory     ~100 ns               tens of GB
-SSD             ~100 µs               hundreds of GB - TB
-HDD             ~10 ms                TB
-Network         ~ms - seconds         —
-```
 
 ## Key Terms
 
@@ -124,6 +123,8 @@ for j in range(N):
 print(f"column-major: {time.perf_counter() - start:.3f}s")
 ```
 
+**Expected output:** even with the same O(n²), `row-major` should finish faster than `column-major`, making cache locality visible in the timings.
+
 ### Step 2: Inspect memory layout with NumPy
 
 ```python
@@ -174,7 +175,6 @@ def cpu_cycle(instruction: str) -> None:
     write_back = "storing result"
     print(fetch, decode, execute, write_back, sep=" -> ")
 
-
 cpu_cycle("ADD R1, R2, R3")
 ```
 
@@ -191,7 +191,6 @@ class Point:
     def __init__(self, x: float, y: float) -> None:
         self.x = x
         self.y = y
-
 
 points = [Point(i, i) for i in range(N)]
 xs = array.array("d", [float(i) for i in range(N)])
@@ -258,17 +257,29 @@ The CPU is fast and memory is slow. The cache fills the gap, and code that uses 
 
 The next article covers how multiple programs coexist and share resources on this hardware — the operating system.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Computer Architecture?**
+  - The article treats Computer Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Computer Architecture?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Computer Architecture reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
-- [Computation and Programs](./02-computation-and-programs.md)
-- [Data Representation](./03-data-representation.md)
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): Computation and Programs](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): Data Representation](./03-data-representation.md)
+- [Computer Science 101 (4/10): Algorithms and Complexity](./04-algorithms-and-complexity.md)
 - **Computer Architecture (current)**
-- [Operating Systems](./06-operating-systems.md)
-- [Networks](./07-networks.md)
-- [Databases](./08-databases.md)
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Operating Systems (upcoming)
+- Networks (upcoming)
+- Databases (upcoming)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References

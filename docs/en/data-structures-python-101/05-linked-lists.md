@@ -1,10 +1,10 @@
 ---
 series: data-structures-python-101
 episode: 5
-title: Linked Lists
+title: "Data Structures with Python 101 (5/10): Linked Lists"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,28 @@ tags:
   - Node
   - Pointers
 seo_description: Implement singly and doubly linked lists in Python and compare their performance characteristics with arrays.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Linked Lists
+# Data Structures with Python 101 (5/10): Linked Lists
 
 > Data Structures with Python 101 Series (5/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: Python already has list — why learn linked lists?
 
 > Python list is array-based, so mid-list insertion and deletion are O(n). Linked lists connect nodes with pointers, achieving O(1) insertion and deletion. This article implements singly and doubly linked lists in Python and compares them with arrays.
 
-<!-- a-grade-intro:end -->
+This is post 5 in the Data Structures with Python 101 series.
+
+
+![Data Structures with Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.en.png)
+*Data Structures with Python 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Linked Lists?
+- Which signal should the example or diagram make visible for Linked Lists?
+- What failure should be prevented first when Linked Lists reaches a real system?
 
 ## What You Will Learn
 
@@ -51,13 +59,15 @@ Linked list problems are among the most frequently tested in coding interviews. 
 
 > Linked list = a linear data structure where nodes are connected by pointers
 
-```
+```text
 [Singly Linked List]
   head -> [A|->] -> [B|->] -> [C|->] -> None
 
 [Doubly Linked List]
   None <- [<-|A|->] <-> [<-|B|->] <-> [<-|C|->] -> None
 ```
+
+## Linked Structure at a Glance
 
 ## Key Concepts
 
@@ -263,6 +273,10 @@ print(has_cycle(a))  # True
 - Reversal and cycle detection are classic interview problems
 - Python's collections.deque is implemented internally as a doubly linked list
 
+The practical trade-off is that linked lists win on pointer updates, not on total throughput. Python lists keep elements in contiguous memory, which is friendly to CPU caches and fast for iteration. Linked lists spread nodes across separate objects, so following pointers can cost more than their O(1) insertion story suggests.
+
+You also need to separate "finding the node" from "rewiring the node." Deleting a node is O(1) only after you already have a reference to the previous node. If every operation starts with a linear scan, the overall workload may still be O(n). That is why production Python code usually reaches for deque, OrderedDict, or library implementations instead of a custom linked list.
+
 ## 5 Common Mistakes
 
 | Mistake | Why It Is a Problem | Fix |
@@ -305,22 +319,34 @@ For interview preparation, linked lists are essential. They are the best data st
 
 Linked lists connect nodes with pointers to achieve O(1) insertion and deletion. Unlike arrays, they do not require contiguous memory, but index access is O(n). The next article covers trees and binary trees for representing hierarchical structures.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Linked Lists?**
+  - The article treats Linked Lists as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Linked Lists?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Linked Lists reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Lists](./02-arrays-and-lists.md)
-- [Stacks and Queues](./03-stacks-and-queues.md)
-- [Hash Tables and dict](./04-hash-tables-and-dict.md)
+## In this series
+
+- [Data Structures with Python 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures with Python 101 (2/10): Arrays and Lists](./02-arrays-and-lists.md)
+- [Data Structures with Python 101 (3/10): Stacks and Queues](./03-stacks-and-queues.md)
+- [Data Structures with Python 101 (4/10): Hash Tables and dict](./04-hash-tables-and-dict.md)
 - **Linked Lists (current)**
 - Trees and Binary Trees (upcoming)
 - Heaps and Priority Queues (upcoming)
 - Graph Representations (upcoming)
 - Sets and Set Operations (upcoming)
 - Choosing the Right Data Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+- [Python Docs — collections.deque](https://docs.python.org/3/library/collections.html#collections.deque)
+- [CPython Source — collections module implementation](https://github.com/python/cpython/blob/main/Modules/_collectionsmodule.c)
 - [Real Python — Linked Lists in Python](https://realpython.com/linked-lists-python/)
-- [GeeksforGeeks — Linked List Data Structure](https://www.geeksforgeeks.org/data-structures/linked-list/)
-- [Visualgo — Linked List Visualization](https://visualgo.net/en/list)
-- [LeetCode — Linked List Problems](https://leetcode.com/tag/linked-list/)
+- [Runestone Academy — Linked Lists](https://runestone.academy/ns/books/published/pythonds3/BasicDS/ImplementinganUnorderedListLinkedLists.html)

@@ -1,7 +1,7 @@
 ---
 episode: 9
 language: ko
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 series: python-dbapi-101
 status: publish-ready
 tags:
@@ -13,38 +13,38 @@ tags:
 - PEP 249
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
-title: aiosqlite로 비동기 SQLite 다루기
+title: "Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기"
 seo_description: aiosqlite는 SQLite를 비동기로 바꾸지 않는다. connection마다 백그라운드 스레드를 띄우고, await되는
   메서드 호출을…
 ---
 
-# aiosqlite로 비동기 SQLite 다루기
+# Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기
 
 `asyncio` 코드 안에 `sqlite3.connect()`를 그대로 두면 어떻게 될까요? 코드는 동작하지만, `execute()`가 동기 호출이라 이벤트 루프가 그 시간 동안 멈춥니다. 한 요청이 1초 걸리는 쿼리를 돌리면 같은 워커의 다른 모든 요청이 1초 동안 응답을 못 받습니다.
 
 `aiosqlite`는 이 문제를 해결합니다. 다만 "해결"의 의미를 정확히 알아야 합니다. 이 라이브러리는 SQLite를 진짜 비동기로 만들지 않고, **별도 스레드에서 sqlite3 호출을 실행하고 결과를 future로 돌려주는 어댑터**입니다. 그래서 이벤트 루프는 안 막히지만, SQLite 엔진 자체의 단일 writer 제약은 그대로 남습니다.
 
-![aiosqlite로 비동기 SQLite 다루기](../../assets/python-dbapi-101/09/09-01-asynchronous-sqlite-with-aiosqlite.ko.png)
+이 글은 Python DB-API 101 시리즈의 아홉 번째 글입니다.
+
+![aiosqlite로 비동기 SQLite 다루기](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-01-asynchronous-sqlite-with-aiosqlite.ko.png)
 
 *aiosqlite로 비동기 SQLite 다루기*
 
-## 이 글에서 다룰 문제
+![Python DB-API 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-02-mental-model-aiosqlite-is-sqlite3-thread.ko.png)
+*Python DB-API 101 9장 흐름 개요*
 
-asyncio 기반 프레임워크(FastAPI, aiohttp, Starlette)에서 동기 SQLite를 그대로 호출하면 I/O 시간만큼 워커가 멈춥니다. 한 워커가 100개의 동시 요청을 처리한다고 가정할 때, 평균 50ms짜리 쿼리 하나가 들어오면 다른 99개 요청의 p99 latency가 망가집니다.
+## 먼저 던지는 질문
 
-해결책은 두 가지입니다. (1) 동기 sqlite3을 별도 스레드 풀(`run_in_executor`, FastAPI의 `def` 핸들러)로 옮기거나, (2) `aiosqlite`로 비동기 인터페이스를 사용하는 것. 둘은 본질적으로 같은 메커니즘이지만, `aiosqlite`는 connection-per-thread 관리를 캡슐화해 주고 `async with` 문법이 자연스럽게 어울립니다.
-
-이 글은 `aiosqlite`가 실제로 무엇을 해 주고 무엇을 안 해 주는지를 정직하게 보여 줍니다. "비동기"라는 단어 때문에 동시 쓰기 처리량이 늘어날 거라고 기대하면 실망합니다.
+- `aiosqlite`는 SQLite를 진짜 비동기로 만드는 것이 아니라면 정확히 무엇을 비동기로 바꿔 주는 걸까요?
+- `async with aiosqlite.connect(...)`, `transactional()`, `SQLitePool`은 각각 어떤 경계를 맡고 왜 분리해야 할까요?
+- async 핸들러에서 동기 `sqlite3`를 쓰거나, 한 `aiosqlite` connection을 여러 코루틴이 같이 잡으면 어떤 문제가 생길까요?
 
 ## Mental Model: aiosqlite는 sqlite3 + thread + Future
 
-![Mental Model: aiosqlite는 sqlite3 + thread + Future](../../assets/python-dbapi-101/09/09-02-mental-model-aiosqlite-is-sqlite3-thread.ko.png)
-
-*Mental Model: aiosqlite는 sqlite3 + thread + Future*
 > aiosqlite는 SQLite를 비동기로 바꾸지 않는다. connection마다 백그라운드 스레드를 띄우고, `await`되는 메서드 호출을 그 스레드의 큐로 넣고, 결과를 Future로 받아 이벤트 루프에 돌려준다.
 
 이 구조의 함의:
@@ -58,7 +58,7 @@ asyncio 기반 프레임워크(FastAPI, aiohttp, Starlette)에서 동기 SQLite�
 
 ## 핵심 개념
 
-![핵심 개념](../../assets/python-dbapi-101/09/09-03-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-03-core-concepts.ko.png)
 
 *핵심 개념*
 ### 설치와 기본 사용
@@ -88,13 +88,13 @@ asyncio.run(main())
 ### 동기와 비동기를 한 줄로 비교
 
 ```python
-# 동기
+# Sync
 import sqlite3
 conn = sqlite3.connect("app.db")
 cur = conn.execute("SELECT 1")
 row = cur.fetchone()
 
-# 비동기
+# Async
 import aiosqlite
 async with aiosqlite.connect("app.db") as conn:
     async with conn.execute("SELECT 1") as cur:
@@ -121,7 +121,7 @@ async with aiosqlite.connect("app.db", isolation_level=None) as db:
 
 `async with db:`처럼 connection 자체를 context manager로 쓰는 동기 패턴은 `aiosqlite`에서 동일하게 동작하지 않습니다. connection의 `__aexit__`은 commit이 아니라 close를 의미합니다.
 
-## Before / After: FastAPI 핸들러
+## 적용 전과 후: FastAPI 핸들러
 
 ### Before: async path에서 동기 sqlite3 직접 호출
 
@@ -141,7 +141,7 @@ async def read_note(note_id: int):
 
 문제 두 가지: (1) `execute()`가 이벤트 루프를 막고, (2) 전역 connection을 공유해 트랜잭션 경계가 모호합니다.
 
-### After: aiosqlite + per-request connection
+### 적용 후: aiosqlite + 요청별 연결
 
 ```python
 from fastapi import FastAPI, Depends
@@ -168,7 +168,7 @@ async def read_note(note_id: int, db: aiosqlite.Connection = Depends(get_db)):
 
 ## 단계별 실습: 가벼운 connection 풀 만들기
 
-![단계별 실습: 가벼운 connection 풀 만들기](../../assets/python-dbapi-101/09/09-04-step-by-step-a-lightweight-connection-po.ko.png)
+![단계별 실습: 가벼운 connection 풀 만들기](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-04-step-by-step-a-lightweight-connection-po.ko.png)
 
 *단계별 실습: 가벼운 connection 풀 만들기*
 `aiosqlite`는 풀을 기본 제공하지 않습니다. 직접 만든다면 다음과 같은 모양이 됩니다.
@@ -324,8 +324,35 @@ FastAPI는 핸들러가 `def`(동기)이면 자동으로 thread pool에서 실�
 - [ ] 동시 쓰기 부하 테스트로 BUSY 발생률을 확인했는가?
 - [ ] 풀 누수 모니터링(예: `_queue.qsize()`)이 있는가?
 
-## 정리와 다음 글
+## 심화 앵커: aiosqlite 운영 패턴의 상한 관리
 
+`aiosqlite`는 이벤트 루프를 보호하지만, connection 하나당 백그라운드 스레드가 생긴다는 제약이 있습니다. 따라서 풀 크기를 크게 잡는 대신 트랜잭션 길이를 짧게 유지해야 합니다.
+
+```python
+import asyncio
+import aiosqlite
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def tx(conn: aiosqlite.Connection):
+    await conn.execute("BEGIN IMMEDIATE")
+    try:
+        yield conn
+        await conn.commit()
+    except Exception:
+        await conn.rollback()
+        raise
+```
+
+운영에서는 세 가지를 함께 측정합니다.
+
+- loop lag: 이벤트 루프 지연
+- pool wait time: connection 획득 대기
+- `SQLITE_BUSY` 비율: write 경합 정도
+
+비동기 전환의 목표는 write 처리량 증가가 아니라, 같은 워커에서 다른 요청이 막히지 않게 만드는 것입니다.
+
+## 정리
 - `aiosqlite`는 SQLite를 진짜 비동기로 만들지 않는다. 이벤트 루프 보호용 어댑터다.
 - 동시 쓰기 처리량은 늘지 않는다. SQLite의 단일 writer 제약은 그대로다.
 - async path가 진짜 필요할 때만 도입하라. 그렇지 않다면 `def` 핸들러 + sqlite3가 더 단순하다.
@@ -333,19 +360,28 @@ FastAPI는 핸들러가 `def`(동기)이면 자동으로 thread pool에서 실�
 
 다음 글(Ep10, 시리즈 마지막)은 production 패턴을 정리합니다. retry+timeout+observability, slow query logging, OpenTelemetry instrumentation, 백업 전략까지 한 번에 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **`aiosqlite`는 SQLite를 진짜 비동기로 만드는 것이 아니라면 정확히 무엇을 비동기로 바꿔 주는 걸까요?**
+  - 본문은 `aiosqlite`를 sqlite3 호출을 connection별 백그라운드 스레드로 넘기고 결과를 Future로 돌려주는 어댑터라고 설명했습니다. 그래서 바뀌는 것은 이벤트 루프가 막히지 않는 실행 방식이지, SQLite 엔진의 단일 writer 제약이나 connection 내부 직렬 실행 모델 자체는 아닙니다.
+- **`async with aiosqlite.connect(...)`, `transactional()`, `SQLitePool`은 각각 어떤 경계를 맡고 왜 분리해야 할까요?**
+  - `async with aiosqlite.connect(...)`는 connection 생성과 close 경계를 맡고, `transactional()`은 `BEGIN IMMEDIATE`부터 `commit()`·`rollback()`까지 transaction 경계를 맡습니다. `SQLitePool`은 그 바깥에서 connection 재사용만 담당하므로, 수명 관리와 transaction 관리와 대기열 제어가 서로 섞이지 않게 분리할 수 있습니다.
+- **async 핸들러에서 동기 `sqlite3`를 쓰거나, 한 `aiosqlite` connection을 여러 코루틴이 같이 잡으면 어떤 문제가 생길까요?**
+  - 동기 `sqlite3`를 async path에 두면 `execute()` 동안 이벤트 루프가 멈춰 같은 워커의 다른 요청도 같이 막히고, 이것이 `aiosqlite` 도입 이유 자체를 무너뜨립니다. 또 한 connection을 여러 코루틴이 동시에 잡으면 호출 순서와 transaction 경계가 꼬일 수 있으므로, 글은 풀에서 한 번에 한 코루틴만 connection을 빌리고 lifespan에서 초기화·종료를 고정하라고 정리했습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
-- [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
-- [Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- [Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
-- [Row factory와 type adapter (sqlite3, PEP 249)](./06-row-factories-adapters.md)
-- [PEP 249 예외 계층과 SQLite 에러 처리](./07-error-handling-exception-hierarchy.md)
-- [SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링](./08-connection-pooling.md)
-- **aiosqlite로 비동기 SQLite 다루기 (현재 글)**
-- SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
+- [Python DB-API 101 (1/10): 왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Python DB-API 101 (5/10): Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- [Python DB-API 101 (7/10): PEP 249 예외 계층과 SQLite 에러 처리](./07-error-handling-exception-hierarchy.md)
+- [Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링](./08-connection-pooling.md)
+- **Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기 (현재 글)**
+- Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
 
 <!-- toc:end -->
 
@@ -356,3 +392,5 @@ FastAPI는 핸들러가 `def`(동기)이면 자동으로 thread pool에서 실�
 - [FastAPI — Concurrency and async/await](https://fastapi.tiangolo.com/async/)
 - [Python asyncio — Streams and synchronization primitives](https://docs.python.org/3/library/asyncio.html)
 - [SQLite — Write-Ahead Logging](https://www.sqlite.org/wal.html)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-dbapi-101/ko)

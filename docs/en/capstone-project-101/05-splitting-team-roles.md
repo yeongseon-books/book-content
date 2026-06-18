@@ -1,10 +1,10 @@
 ---
 series: capstone-project-101
 episode: 5
-title: Splitting Team Roles
-status: content-ready
+title: "Capstone Project 101 (5/10): Splitting Team Roles"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,27 @@ tags:
   - Collaboration
   - Beginner
 seo_description: A beginner-friendly tour of splitting capstone team roles, mapping primary owners, backups, and decision rights.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Splitting Team Roles
+# Capstone Project 101 (5/10): Splitting Team Roles
 
-> Capstone Project 101 series (5/10)
+Teams with fuzzy roles often look busy while moving slowly. Work circulates because nobody is sure who owns the final decision or who can safely take over when someone gets blocked.
 
-<!-- a-grade-intro:begin -->
+In a capstone, role splitting is not about drawing boxes around people. It is about preventing decision bottlenecks and making sure the project can keep moving under schedule pressure.
 
-**Core question**: *Why* does *overlapping* roles slow a team down?
+This is post 5 in the Capstone Project 101 series. It outlines a simple role model that uses primary owners, backups, and explicit decision rights to keep collaboration moving.
 
-> When *responsibility* is *diffused*, *decisions* are *delayed*.
 
-<!-- a-grade-intro:end -->
+![capstone project 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/05/05-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 5 flow overview*
+> Role clarity matters most when communication breaks down. Each role owns specific outcomes and handoff points.
+
+## Questions to Keep in Mind
+
+- Why do overlapping roles slow decisions down?
+- How should teams assign primary owners and backups?
+- How is a lead different from a code owner?
 
 ## What You Will Learn
 
@@ -42,17 +49,28 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-*Clear roles* create *responsibility* and *speed*.
+Clear primary ownership speeds up decisions because the team knows exactly where questions and approvals should go.
 
-## Concept at a Glance
+Backup ownership matters just as much. Student teams are vulnerable to exams, interviews, and conflicting schedules, so a single absent owner can quickly turn into a project-wide slowdown.
 
-```mermaid
-flowchart LR
-    L[Lead] --> B[Backend]
-    L --> F[Frontend]
-    L --> D[Data]
-    L --> Q[QA]
+## Practical artifact: a responsibility matrix
+
+Even a small team benefits from writing responsibility lines like these before implementation starts.
+
+```text
+Workstream | Primary owner | Backup | Decision right
+Requirement changes | Team lead | Frontend owner | Lead approval
+API design | Backend owner | Data owner | Backend proposes, lead approves
+Demo scenario | QA owner | Team lead | QA proposes, team agrees
+Deployment check | Backend owner | Frontend owner | Must follow deployment checklist
 ```
+
+## What to validate first
+
+- Check that each workstream has one clear primary owner.
+- Look for critical areas with no backup owner.
+- Mark ambiguous decision rights early instead of discovering them mid-sprint.
+- Leave room to record when and why role assignments change.
 
 ## Key Terms
 
@@ -72,33 +90,23 @@ flowchart LR
 
 ### Step 1 — List members
 
-```python
-members = ["A", "B", "C", "D"]
-```
+List the team members clearly first, such as `A`, `B`, `C`, and `D`, so you can judge role overlap realistically.
 
 ### Step 2 — Map primary roles
 
-```python
-primary = {"A": "lead", "B": "backend", "C": "frontend", "D": "data"}
-```
+Map the primary roles explicitly, for example `A=lead`, `B=backend`, `C=frontend`, and `D=data`.
 
 ### Step 3 — Map backups
 
-```python
-backup = {"backend": "C", "frontend": "B", "data": "A"}
-```
+Define the backup mapping early too, such as `backend=C`, `frontend=B`, and `data=A`.
 
 ### Step 4 — Responsibility table
 
-```python
-raci = {"deploy": ("A", "B"), "test": ("D", "C")}
-```
+For the responsibility table, concise pairings such as `deploy=(A, B)` and `test=(D, C)` are usually enough.
 
 ### Step 5 — Review cadence
 
-```python
-review = "weekly"
-```
+Set the review cadence explicitly; a weekly role review is usually enough to catch drift early.
 
 ## What to Notice in This Code
 
@@ -141,24 +149,38 @@ Company teams use *RACI* to clarify decision rights every week.
 
 ## Wrap-up and Next Steps
 
-Next post: *Designing the MVP*.
+Role splitting is a bottleneck-reduction design, not an org-chart exercise. Primary ownership, backup coverage, and explicit decision rights make the team far more resilient under capstone pressure. The next post shows how that structure supports MVP scoping.
+
+## Answering the Opening Questions
+
+- **Why do overlapping roles slow decisions down?**
+  - The article treats Splitting Team Roles as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should teams assign primary owners and backups?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How is a lead different from a code owner?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What is a Capstone Project](./01-what-is-capstone.md)
-- [Choosing a Topic](./02-choosing-a-topic.md)
-- [Defining the Problem](./03-defining-the-problem.md)
-- [Organizing Requirements](./04-organizing-requirements.md)
+## In this series
+
+- [Capstone Project 101 (1/10): What is a Capstone Project](./01-what-is-capstone.md)
+- [Capstone Project 101 (2/10): Choosing a Topic](./02-choosing-a-topic.md)
+- [Capstone Project 101 (3/10): Defining the Problem](./03-defining-the-problem.md)
+- [Capstone Project 101 (4/10): Organizing Requirements](./04-organizing-requirements.md)
 - **Splitting Team Roles (current)**
 - Designing the MVP (upcoming)
 - Choosing the Tech Stack (upcoming)
 - Schedule Management (upcoming)
 - Building Presentation Materials (upcoming)
 - Project Retrospective (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [RACI Matrix - PMI](https://www.pmi.org/learning/library/raci-responsibility-matrix-9410)
+### Official docs and practical guides
+
+- [RACI Matrix — PMI](https://www.pmi.org/learning/library/raci-responsibility-matrix-9410)
 - [Team Topologies](https://teamtopologies.com/)
+- [Code Ownership — Martin Fowler](https://martinfowler.com/bliki/CodeOwnership.html)
 - [The Mythical Man-Month](https://en.wikipedia.org/wiki/The_Mythical_Man-Month)
-- [Code Ownership - Martin Fowler](https://martinfowler.com/bliki/CodeOwnership.html)

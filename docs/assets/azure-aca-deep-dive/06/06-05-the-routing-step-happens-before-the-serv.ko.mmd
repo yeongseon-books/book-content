@@ -1,0 +1,4 @@
+flowchart TD
+  Req["요청"] --> Match["호스트 이름 및 경로 일치 확인"]
+  Match --> Route["Envoy 클러스터 선택"]
+  Route --> Service["K8s 서비스로 전달"]

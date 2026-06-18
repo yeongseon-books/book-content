@@ -1,10 +1,10 @@
 ---
 series: algorithms-101
 episode: 2
-title: Time and Space Complexity
+title: "Algorithms 101 (2/10): Time and Space Complexity"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,23 @@ seo_description: Big-O, Big-Omega, and Big-Theta as the shared vocabulary for co
 last_reviewed: '2026-05-04'
 ---
 
-# Time and Space Complexity
-
-> Algorithms 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
+# Algorithms 101 (2/10): Time and Space Complexity
 
 **Core question**: How can we predict whether an algorithm will be fast enough before writing the code?
 
-> Time and space complexity describe how an algorithm's cost grows with input size. They abstract away hardware, language, and constants so we can compare algorithms on equal footing. Big-O is an upper bound, Big-Omega a lower bound, Big-Theta a tight bound. Most engineering work uses Big-O for the worst case. Once you can read the asymptotic class of an algorithm at a glance, you can decide whether it scales before writing it.
+Time and space complexity describe how an algorithm's cost grows with input size. They abstract away hardware, language, and constants so we can compare algorithms on equal footing. Once you can read the asymptotic class of an algorithm at a glance, you can decide whether it scales before writing it.
 
-<!-- a-grade-intro:end -->
+This is post 2 in the Algorithms 101 series. Here we cover Big-O and related notation, plus the cost model you need to compare algorithms before you benchmark them.
+
+
+![algorithms 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/02/02-01-big-picture.en.png)
+*algorithms 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Time and Space Complexity?
+- Which signal should the example or diagram make visible for Time and Space Complexity?
+- What failure should be prevented first when Time and Space Complexity reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +51,6 @@ last_reviewed: '2026-05-04'
 Asymptotic analysis is the shared vocabulary engineers use to discuss performance. Without it, "is this fast enough" becomes guesswork. With it, you can compare two algorithms before running either, and you can estimate whether code will hold at 100x its current load.
 
 > Big-O is the language in which performance arguments are made.
-
-## Concept at a Glance
 
 > Complexity describes growth, not absolute time. An O(n) algorithm may be slower than an O(n log n) one for small inputs but always wins for large ones. The constant factors disappear in asymptotic notation, which is what allows fair comparison across machines and languages.
 
@@ -216,8 +220,19 @@ Asymptotic analysis is the language we use to argue about performance. Big-O for
 
 The next article applies this vocabulary to search algorithms, where the difference between O(n) and O(log n) is the difference between scanning a million items and looking at twenty.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Time and Space Complexity?**
+  - The article treats Time and Space Complexity as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Time and Space Complexity?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Time and Space Complexity reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an Algorithm?](./01-what-is-an-algorithm.md)
+## In this series
+
+- [Algorithms 101 (1/10): What Is an Algorithm?](./01-what-is-an-algorithm.md)
 - **Time and Space Complexity (current)**
 - Search Algorithms (upcoming)
 - Sorting Algorithms (upcoming)
@@ -227,6 +242,7 @@ The next article applies this vocabulary to search algorithms, where the differe
 - Graph Algorithms (upcoming)
 - String Algorithm Basics (upcoming)
 - Algorithm Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,10 +1,10 @@
 ---
 series: devops-101
 episode: 7
-title: Monitoring and Alerting
-status: content-ready
+title: "DevOps 101 (7/10): Monitoring and Alerting"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,28 +17,35 @@ tags:
   - Alerting
   - SRE
 seo_description: A practical guide to Prometheus metrics, Grafana dashboards, and meaningful alert design.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Monitoring and Alerting
+# DevOps 101 (7/10): Monitoring and Alerting
 
-> DevOps 101 series (7/10)
+The most painful monitoring failure is not a missing dashboard. It is learning about an outage from a customer before your team sees the signal. At that point, your observability stack is not helping you operate the system.
 
-<!-- a-grade-intro:begin -->
+Good monitoring shortens two loops at once: how quickly you notice trouble and how quickly you narrow it down. Metrics, dashboards, and alerts matter because they help the team answer "what changed?" and "where do we look first?" under pressure.
 
-**Core question**: Has your *customer ever told you first* that *the service is down*?
+This is post 7 in the DevOps 101 series. In this chapter, we build the operational view around Prometheus, Grafana, RED metrics, and alerts that actually deserve to wake someone up.
 
-> Good monitoring tells *us before the customer does*.
 
-<!-- a-grade-intro:end -->
+![devops 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/07/07-01-concept-at-a-glance.en.png)
+*devops 101 chapter 7 flow overview*
+> Effective monitoring *doesn't show everything*—it surfaces *the few signals* that let the team *act decisively*.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *three signals* of monitoring (logs, metrics, traces)
-- The basic flow of *Prometheus* and *Grafana*
-- The *RED / USE* metric patterns
-- Designing *meaningful alerts*
-- Five common pitfalls
+- What boundary should you inspect first when applying Monitoring and Alerting?
+- Which signal should the example or diagram make visible for Monitoring and Alerting?
+- What failure should be prevented first when Monitoring and Alerting reaches a real system?
+
+## Questions this article answers
+
+- How do *logs*, *metrics*, and *traces* play different roles as the *three signals* of monitoring?
+- How do *Prometheus* and *Grafana* work together in practice?
+- Why do patterns like *RED* and *USE* come up so often in operations?
+- How do you design alerts that really deserve action?
+- What traps do teams keep falling into even after they add monitoring?
 
 ## Why It Matters
 
@@ -46,16 +53,7 @@ Incidents *always come*. The difference is *how fast you know* and *how fast you
 
 > Operating without monitoring is *driving with eyes closed*.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    App["app /metrics"] --> Scrape["Prometheus scrape"]
-    Scrape --> TSDB["time-series DB"]
-    TSDB --> Grafana["Grafana dashboard"]
-    TSDB --> Alert["Alertmanager"]
-    Alert --> Slack["Slack/PagerDuty"]
-```
+Monitoring collects metrics over time. Alerting triggers *when those metrics cross a boundary*. Together they answer: *Is it running? Is it healthy? What should I do right now?*
 
 ## Key Terms
 
@@ -171,17 +169,29 @@ Mature teams use *SLO-based alerting*. They define an *error budget* and only al
 
 Monitoring is the *eyes*. In the next post we cover *logs*, the *ears*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Monitoring and Alerting?**
+  - The article treats Monitoring and Alerting as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Monitoring and Alerting?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Monitoring and Alerting reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is DevOps?](./01-what-is-devops.md)
-- [CI Pipeline](./02-ci-pipeline.md)
-- [CD and Deployment Strategies](./03-cd-and-deployment.md)
-- [Environments and Configuration](./04-environments-and-config.md)
-- [Infrastructure as Code](./05-infrastructure-as-code.md)
-- [Containers and Build](./06-containers-and-build.md)
+## In this series
+
+- [DevOps 101 (1/10): What Is DevOps?](./01-what-is-devops.md)
+- [DevOps 101 (2/10): CI Pipeline](./02-ci-pipeline.md)
+- [DevOps 101 (3/10): CD and Deployment Strategies](./03-cd-and-deployment.md)
+- [DevOps 101 (4/10): Environments and Configuration](./04-environments-and-config.md)
+- [DevOps 101 (5/10): Infrastructure as Code](./05-infrastructure-as-code.md)
+- [DevOps 101 (6/10): Containers and Build](./06-containers-and-build.md)
 - **Monitoring and Alerting (current)**
 - Logging and Analysis (upcoming)
 - Incident Response and On-Call (upcoming)
 - An Operable DevOps Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

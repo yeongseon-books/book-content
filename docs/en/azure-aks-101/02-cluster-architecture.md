@@ -1,11 +1,11 @@
 ---
-title: Cluster architecture — control plane and node pools
+title: "Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools"
 series: azure-aks-101
 episode: 2
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -15,10 +15,10 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
-seo_description: Azure Kubernetes Service 101 series (2/7)
+seo_description: Explore Azure Kubernetes Service (AKS) architecture, including the managed control plane, system vs. user node pools, and Spot capacity strategy.
 ---
 
-# Cluster architecture — control plane and node pools
+# Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools
 
 > Azure Kubernetes Service 101 series (2/7)
 
@@ -26,21 +26,19 @@ The first structural split to get right in AKS is the split between the cluster'
 
 This post is about reading that boundary. We'll look at what the control plane does, why system and user node pools exist, and where Spot capacity fits into the picture.
 
----
+This is the second post in the Azure Kubernetes Service 101 series. Here, we turn the managed-Kubernetes boundary into a concrete cluster shape by looking at the control plane, node pools, and their operational roles.
 
-## Questions this chapter answers
+![azure kubernetes service 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png)
+*azure kubernetes service 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
 
 - What does each control-plane component (API server, scheduler, controller manager, etcd) actually do?
 - How does the kubelet, kube-proxy, and container runtime path on a node fit together?
 - Where do AKS managed identity and RBAC plug into the authn/authz flow?
-- Which resources land in the managed `MC_` resource group, and why?
-- What is the blast radius of a node upgrade versus a control-plane upgrade?
 
 ## Cut the cluster in half
 
-![Responsibility boundary between control plane and node pools](../../assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png)
-
-*Responsibility boundary between control plane and node pools*
 The left side is the Azure-managed layer. The right side is the layer you shape more directly. That single picture explains a lot: why the control plane is not billed separately, why node count is your decision, and why pod scaling and node scaling are different conversations.
 
 ---
@@ -86,7 +84,7 @@ Pods are the logical unit. Node pools are the capacity and cost unit.
 
 This is the first node-pool distinction to learn in AKS.
 
-![Role split between system and user pools](../../assets/azure-aks-101/02/02-02-system-node-pool-vs-user-node-pool.en.png)
+![Role split between system and user pools](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/02/02-02-system-node-pool-vs-user-node-pool.en.png)
 
 *Role split between system and user pools*
 ### System node pool
@@ -240,6 +238,44 @@ kubectl get nodes -o wide
 kubectl get pods -n kube-system
 ```
 
+To connect the Azure-resource view with the Kubernetes view, add these as a pair.
+
+```bash
+az aks nodepool list \
+  --resource-group $RG \
+  --cluster-name $CLUSTER \
+  --query "[].{name:name, mode:mode, count:count, vmSize:vmSize, osType:osType}"
+
+kubectl get nodes -L kubernetes.azure.com/agentpool,kubernetes.azure.com/mode
+```
+
+The first command shows the pool definitions as Azure resources. The second shows which nodes actually belong to which pool and mode from the Kubernetes side. Reading them together is how node-pool design stops being abstract.
+
+## A practical first-pass troubleshooting order
+
+Architecture becomes real when it shortens the first five minutes of debugging.
+
+### 1. Decide whether the problem starts at the API layer
+
+If `kubectl get nodes` is unexpectedly slow or fails outright, start with the control-plane boundary and credentials before diving into workload YAML. That is usually a faster cut than inspecting application pods immediately.
+
+### 2. If pods do not start, inspect pool capacity and scheduling signals
+
+When pods stay `Pending`, the question is often not “is Kubernetes broken?” but “what prevented this pod from landing on a node?”
+
+```bash
+kubectl describe pod <pod-name>
+kubectl top nodes
+```
+
+`describe` exposes selector mismatches, taints, and insufficient CPU or memory. `kubectl top nodes` gives you a quick read on which pool is actually under pressure.
+
+### 3. If system workloads wobble, treat the blast radius as larger
+
+There is a meaningful difference between an app Deployment being unhealthy and `kube-system` components such as CoreDNS or metrics-server wobbling. The latter usually means you are no longer looking at one workload problem. You are looking at cluster-operability risk.
+
+That is why the control-plane vs node-pool model matters operationally. It is not only an architecture diagram. It is the fastest way to decide whether you should inspect the API boundary, system pools, or user-pool capacity first.
+
 ## Operational checklist
 
 - [ ] Can articulate the role of each control-plane component
@@ -248,16 +284,25 @@ kubectl get pods -n kube-system
 - [ ] Inventoried what AKS creates in the managed `MC_` resource group
 - [ ] Estimated blast radius of node and control-plane upgrades
 
+## Answering the Opening Questions
+
+- **What does each control-plane component (API server, scheduler, controller manager, etcd) actually do?**
+  - The article treats Cluster architecture — control plane and node pools as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How does the kubelet, kube-proxy, and container runtime path on a node fit together?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where do AKS managed identity and RBAC plug into the authn/authz flow?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
-- **Cluster architecture — control plane and node pools (current)**
-- Your first cluster, your first deploy — Python/FastAPI (upcoming)
-- Pod, Deployment, Service — the three ways you express a workload (upcoming)
-- Networking and Ingress — the path in and out of the cluster (upcoming)
-- Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
-- Monitoring and ops — Container Insights, logs, alerts (upcoming)
+- [Azure Kubernetes Service 101 (1/7): What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
+- **Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools (current)**
+- Azure Kubernetes Service 101 (3/7): Your first cluster, your first deploy — Python/FastAPI (upcoming)
+- Azure Kubernetes Service 101 (4/7): Pod, Deployment, Service — the three ways you express a workload (upcoming)
+- Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster (upcoming)
+- Azure Kubernetes Service 101 (6/7): Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
+- Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts (upcoming)
 
 <!-- toc:end -->
 

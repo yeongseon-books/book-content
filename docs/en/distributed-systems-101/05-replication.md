@@ -1,10 +1,10 @@
 ---
 series: distributed-systems-101
 episode: 5
-title: Replication
-status: content-ready
+title: "Distributed Systems 101 (5/10): Replication"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,52 +18,32 @@ tags:
   - QuorumWrites
   - Durability
 seo_description: We cover the replication models behind distributed data — leader-follower, multi-leader, leaderless, sync vs async, and quorum tuning.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Replication
+# Distributed Systems 101 (5/10): Replication
 
-> Distributed Systems 101 series (5/10)
+Copying data sounds easy until you ask the operational questions that follow. Which copy is authoritative? How long can replicas trail? What is acceptable to lose after a crash? The answers are not implementation details; they are the promises your system makes.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Distributed Systems 101 series.
 
-**Core question**: Putting the same data on more than one node sounds simple — why does it produce so many modes and knobs?
+Here we look at replication as the layer that turns durability, availability, and stale-read behavior into explicit knobs.
 
-> Replication is the basic tool for durability and availability. But sync vs async, leader count, and quorum settings change visible behavior dramatically.
 
-<!-- a-grade-intro:end -->
+![distributed systems 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/05/05-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 5 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Why we replicate, what kinds exist, and the tradeoffs
-- The leader-follower, multi-leader, and leaderless models
-- Sync vs async replication and the risk of data loss
-- Quorum reads and writes and the meaning of R+W>N
-- How to measure and handle replication lag
+- Why we replicate, what kinds exist, and the tradeoffs?
+- The leader-follower, multi-leader, and leaderless models?
+- Sync vs async replication and the risk of data loss?
 
 ## Why It Matters
 
 Replication is the lowest layer in any distributed data system. The choices here shape what you saw in episode 4 (consistency) and what you will see in episode 6 (consensus). The answer to "why does my DB behave this way?" is usually in the replication settings.
 
 > Replication settings are the exchange rate between safety and speed.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    subgraph LF[leader-follower]
-        L["leader"] --> F1["follower 1"]
-        L --> F2["follower 2"]
-    end
-    subgraph ML[multi-leader]
-        M1["leader A"] <--> M2["leader B"]
-    end
-    subgraph LL[leaderless]
-        N1["node"] --- N2["node"]
-        N2 --- N3["node"]
-        N3 --- N1
-    end
-```
 
 These three topologies cover more than ninety percent of real systems.
 
@@ -210,17 +190,29 @@ PostgreSQL and MySQL use leader-follower by default. Cassandra and DynamoDB are 
 
 Replication is the foundation of distributed data. Next we look at the algorithm by which nodes agree on what the next value is — consensus and Raft.
 
+## Answering the Opening Questions
+
+- **Why we replicate, what kinds exist, and the tradeoffs?**
+  - The article treats Replication as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The leader-follower, multi-leader, and leaderless models?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Sync vs async replication and the risk of data loss?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Distributed System?](./01-what-is-a-distributed-system.md)
-- [Failure Models](./02-failure-model.md)
-- [RPC and Message Passing](./03-rpc-and-message-passing.md)
-- [Consistency and CAP](./04-consistency-and-cap.md)
+## In this series
+
+- [Distributed Systems 101 (1/10): What Is a Distributed System?](./01-what-is-a-distributed-system.md)
+- [Distributed Systems 101 (2/10): Failure Models](./02-failure-model.md)
+- [Distributed Systems 101 (3/10): RPC and Message Passing](./03-rpc-and-message-passing.md)
+- [Distributed Systems 101 (4/10): Consistency and CAP](./04-consistency-and-cap.md)
 - **Replication (current)**
-- consensus and Raft (upcoming)
-- leader election (upcoming)
-- message queues and event sourcing (upcoming)
-- distributed transactions (upcoming)
-- patterns for operable distributed systems (upcoming)
+- Consensus and Raft (upcoming)
+- Leader Election (upcoming)
+- Message Queues and Event Sourcing (upcoming)
+- Distributed Transactions (upcoming)
+- Patterns for Operable Distributed Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

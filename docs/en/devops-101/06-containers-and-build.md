@@ -1,10 +1,10 @@
 ---
 series: devops-101
 episode: 6
-title: Containers and Build
-status: content-ready
+title: "DevOps 101 (6/10): Containers and Build"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,28 +17,35 @@ tags:
   - Build
   - Image
 seo_description: Write Dockerfiles, use multi-stage builds, and optimize images for lightweight, secure containers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Containers and Build
+# DevOps 101 (6/10): Containers and Build
 
-> DevOps 101 series (6/10)
+"It works on my laptop" is usually an environment problem wearing an application mask. If the runtime libraries, OS packages, and process entrypoints differ between local and production, deployment quality depends on luck more than engineering.
 
-<!-- a-grade-intro:begin -->
+Containers reduce that gap by freezing the runtime environment into an image. Once the image becomes the deployable unit, teams can reason about versioning, rollback, and promotion much more cleanly.
 
-**Core question**: What is the *only way* to make *your laptop* and *the server* produce *the same result*?
+This is post 6 in the DevOps 101 series. Here we focus on how Dockerfiles, layer caching, multi-stage builds, and non-root execution turn containerization into a real operational advantage.
 
-> Containers freeze *the environment itself* into an *image*.
 
-<!-- a-grade-intro:end -->
+![devops 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/06/06-01-concept-at-a-glance.en.png)
+*devops 101 chapter 6 flow overview*
+> Containers solve *"it works on my laptop"* by making the deployment unit *consistent* across every machine.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The difference between *containers* and *VMs*
-- The core *Dockerfile* commands
-- Shrinking images with *multi-stage builds*
-- Leveraging *layer caching*
-- Five common pitfalls
+- What boundary should you inspect first when applying Containers and Build?
+- Which signal should the example or diagram make visible for Containers and Build?
+- What failure should be prevented first when Containers and Build reaches a real system?
+
+## Questions this article answers
+
+- How are *containers* different from *VMs*, and why do they improve deployment repeatability?
+- Which basic *Dockerfile* instructions do you need to understand first?
+- How do *multi-stage builds* change image size and security?
+- Why does a *Dockerfile* that uses *layer caching* well also speed up development?
+- What traps commonly appear when *container images* move into production?
 
 ## Why It Matters
 
@@ -46,15 +53,7 @@ The same build artifact must *behave the same* in *every environment*. Container
 
 > Containers realize *Build once, run anywhere*.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Code["app code"] --> Build["docker build"]
-    Build --> Image["image (immutable)"]
-    Image --> Registry["registry push"]
-    Registry --> Run["docker run / k8s"]
-```
+Containers package code and its *exact runtime* into one deployable unit. Build automation runs the same steps every time, so *"works on my laptop"* becomes impossible.
 
 ## Key Terms
 
@@ -173,17 +172,29 @@ Mature teams wire *distroless* + *SBOM generation* + *image signing (cosign)* + 
 
 A container is *a frozen environment*. In the next post we cover how to *monitor* containers in production.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Containers and Build?**
+  - The article treats Containers and Build as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Containers and Build?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Containers and Build reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is DevOps?](./01-what-is-devops.md)
-- [CI Pipeline](./02-ci-pipeline.md)
-- [CD and Deployment Strategies](./03-cd-and-deployment.md)
-- [Environments and Configuration](./04-environments-and-config.md)
-- [Infrastructure as Code](./05-infrastructure-as-code.md)
+## In this series
+
+- [DevOps 101 (1/10): What Is DevOps?](./01-what-is-devops.md)
+- [DevOps 101 (2/10): CI Pipeline](./02-ci-pipeline.md)
+- [DevOps 101 (3/10): CD and Deployment Strategies](./03-cd-and-deployment.md)
+- [DevOps 101 (4/10): Environments and Configuration](./04-environments-and-config.md)
+- [DevOps 101 (5/10): Infrastructure as Code](./05-infrastructure-as-code.md)
 - **Containers and Build (current)**
 - Monitoring and Alerting (upcoming)
 - Logging and Analysis (upcoming)
 - Incident Response and On-Call (upcoming)
 - An Operable DevOps Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

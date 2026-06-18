@@ -1,12 +1,12 @@
 ---
-title: 문서 로딩과 청크 전략 — LangChain TextSplitter 내부
+title: "RAG Deep Dive (1/6): 문서 로딩과 청크 전략 — LangChain TextSplitter 내부"
 series: rag-deep-dive
 episode: 1
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,16 +14,29 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: PyPDFLoader와 RecursiveCharacterTextSplitter가 문서를 청크로 나누는 내부 동작을 예제와 함께 분해합니다.
 ---
 
-# 문서 로딩과 청크 전략 — LangChain TextSplitter 내부
+# RAG Deep Dive (1/6): 문서 로딩과 청크 전략 — LangChain TextSplitter 내부
 
-<!-- a-grade-example:begin -->
+PyPDFLoader와 RecursiveCharacterTextSplitter는 문서를 청크로 나누는 방식에 따라 이후 retrieval 품질을 좌우합니다. 여기서는 그 내부 동작을 예제와 함께 분해합니다.
+
+이 글은 RAG Deep Dive 시리즈의 첫 번째 글입니다.
+
+![문서 로더별 메타데이터 전달 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-01-loader-metadata-flow.ko.png)
+*문서 로더별 메타데이터 전달 흐름*
+> 청킹은 텍스트를 잘게 자르는 작업이 아닙니다. 나중에 retrieval이 다시 회수하길 바라는 의미 경계를 지금 얼려 두는 작업입니다.
+
+## 먼저 던지는 질문
+
+- 유사도 검색이 시작되기 전, 로더와 splitter 경계는 왜 검색 품질을 좌우할까요?
+- Character, Recursive, Token splitter는 같은 텍스트를 어떻게 다르게 자를까요?
+- `chunk_overlap`이 설정값만큼 정확히 겹치지 않는 것처럼 보일 때 어디를 봐야 할까요?
+
 ## 최소 실행 예제
 
-예제 파일: `/root/Github/rag-deep-dive/ko/01-document-loading-and-chunking/main.py`
+예제 파일: `en/01-document-loading-and-chunking/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py
@@ -87,6 +100,31 @@ if __name__ == "__main__":
 - 재귀 분할은 구조 보존에 강하지만, 도메인별 경계를 자동으로 이해하는 것은 아닙니다.
 - 문자 기준으로 안전해 보여도 토큰 기준 컨텍스트 한도는 초과할 수 있습니다.
 
+### 검증 출력 예시
+
+예제를 실행하면 정확한 문자열은 약간 달라도, 아래와 비슷한 형태가 나와야 합니다.
+
+```text
+=== CharacterTextSplitter (2 chunks) ===
+[1] '# Incident runbook\n\n## Retry policy\nThe worker retries ...'
+[2] 'After the final retry, the payload moves ...'
+
+=== RecursiveCharacterTextSplitter (2 chunks) ===
+[1] '# Incident runbook\n\n## Retry policy\nThe worker retries ...'
+[2] '## Operator action\nThe on-call engineer checks ...'
+
+=== TokenTextSplitter (3 chunks) ===
+[1] '# Incident runbook\n\n## Retry policy\nThe worker ...'
+[2] 'three times. After the final retry ...'
+[3] '## Operator action\nThe on-call engineer ...'
+```
+
+여기서 확인할 핵심은 세 가지입니다.
+
+- 문자 분할은 먼저 선택한 구분자를 최대한 지키는지
+- 재귀 분할은 일반 문자 분할보다 상위 구조를 더 오래 보존하는지
+- 토큰 분할은 텍스트가 조밀해질수록 창 개수를 더 예측 가능하게 만드는지
+
 <!-- a-grade-example:end -->
 ## 체크리스트
 
@@ -119,10 +157,6 @@ RAG에서 검색 품질은 임베딩 모델 하나로 결정되지 않습니다.
 
 LangChain에서 로더의 첫 책임은 파일을 읽는 일이고, 두 번째 책임은 그 결과를 `Document(page_content=..., metadata=...)` 형태로 만드는 일입니다. 이 두 번째가 중요합니다. 이후 splitter와 vector store는 대부분 이 `Document`의 `page_content`와 `metadata`를 그대로 이어받기 때문입니다. `langchain_core.documents.base.Document`는 텍스트와 메타데이터를 함께 갖는 아주 얇은 컨테이너인데, 바로 그 단순함 때문에 로더가 무엇을 넣어 두느냐가 전체 파이프라인에 오래 남습니다.
 
-![문서 로더별 메타데이터 전달 흐름](../../assets/rag-deep-dive/01/01-01-loader-metadata-flow.ko.png)
-
-*문서 로더별 메타데이터 전달 흐름*
-
 가장 단순한 `TextLoader`부터 보면 동작이 명확합니다. [`text.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/text.py)에서 `TextLoader.lazy_load()`는 파일을 `open()`으로 읽고, 성공하면 `metadata = {"source": str(self.file_path)}`를 만들어 단 하나의 `Document`를 yield 합니다. 자동 인코딩 감지는 `autodetect_encoding=True`일 때만 일어나고, 지정한 인코딩으로 실패하면 `detect_file_encodings()`가 돌려준 후보들을 다시 시도합니다. 다만 0.2.17 구현은 후보를 모두 소진했을 때 실패를 깔끔하게 예외로 표면화하지 못합니다. `text`가 빈 문자열인 채로 끝나도 그대로 `Document`를 yield 할 수 있어서, 이 구간은 소스 수준의 작은 quirk로 보는 편이 정확합니다. 즉 텍스트 파일 로딩 단계에서 붙는 기본 메타데이터는 사실상 `source` 하나입니다. 파일 경로가 곧 추적 키가 되는 셈입니다.
 
 `PDFMinerLoader`는 같은 “로더” 계층이지만 경계가 조금 다릅니다. [`pdf.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/pdf.py)에서 `PDFMinerLoader`는 실제 파싱을 `PDFMinerParser`에 위임합니다. 핵심은 [`parsers/pdf.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/parsers/pdf.py)의 `PDFMinerParser.lazy_parse()`입니다. `concatenate_pages=True`면 전체 PDF를 하나의 텍스트로 합쳐 `metadata={"source": blob.source}`만 붙입니다. 반대로 `concatenate_pages=False`면 페이지마다 `metadata={"source": blob.source, "page": str(i)}`가 붙은 `Document`가 나옵니다. 같은 PDF라도 이 설정 하나로 이후 청킹의 시작점이 완전히 달라집니다. 전자는 장 단위 문맥 보존에 유리하고, 후자는 페이지 번호 추적과 인용에는 유리합니다.
@@ -134,7 +168,7 @@ LangChain에서 로더의 첫 책임은 파일을 읽는 일이고, 두 번째 �
 ```python
 from pathlib import Path
 
-# deprecated since langchain 0.2.8 — use langchain_unstructured.UnstructuredLoader instead
+# langchain 0.2.8부터 지원 중단 — langchain_unstructured.UnstructuredLoader를 대신 사용하세요
 from langchain_community.document_loaders import (
     PDFMinerLoader,
     TextLoader,
@@ -185,7 +219,7 @@ if __name__ == "__main__":
 
 많은 설명이 `CharacterTextSplitter`를 “구분자로 자른다” 수준에서 멈추지만, 실제로 중요한 부분은 자른 뒤 다시 합치는 병합 단계입니다. [`character.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/text-splitters/langchain_text_splitters/character.py)의 `CharacterTextSplitter.split_text()`는 먼저 `_split_text_with_regex()`로 원문을 작은 조각들로 나눈 다음, 최종 결과는 `TextSplitter._merge_splits()`에 맡깁니다. 이 함수가 `chunk_size`, `chunk_overlap`, `length_function`의 상호작용을 결정합니다.
 
-![문자 분할 뒤 병합 창 이동 흐름](../../assets/rag-deep-dive/01/01-02-character-splitter-merge-window.ko.png)
+![문자 분할 뒤 병합 창 이동 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-02-character-splitter-merge-window.ko.png)
 
 *문자 분할 뒤 병합 창 이동 흐름*
 
@@ -241,7 +275,7 @@ for index, doc in enumerate(documents, start=1):
 `RecursiveCharacterTextSplitter`가 널리 쓰이는 이유는 정교해서가 아니라, 실패 방식이 비교적 온건하기 때문입니다. [`character.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/text-splitters/langchain_text_splitters/character.py)의 생성자를 보면 기본 `separators`는 `[
 "\n\n", "\n", " ", ""]`입니다. 문단, 줄, 공백, 마지막으로 문자 단위까지 단계적으로 후퇴합니다. 긴 문서를 일단 의미 있는 큰 경계부터 보존하려고 시도하고, 안 되면 점점 더 거친 절단으로 내려가는 구조입니다.
 
-![재귀 분할의 구분자 우선순위 흐름](../../assets/rag-deep-dive/01/01-03-recursive-separator-fallback.ko.png)
+![재귀 분할의 구분자 우선순위 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-03-recursive-separator-fallback.ko.png)
 
 *재귀 분할의 구분자 우선순위 흐름*
 
@@ -256,7 +290,7 @@ for index, doc in enumerate(documents, start=1):
 
 이 구현이 주는 장점은 “문단 경계가 있으면 최대한 문단을 살리고, 그게 안 될 때만 줄 단위로 내려간다”는 보수적 전략입니다. 예를 들어 API 가이드 문서처럼 섹션 간 빈 줄이 잘 들어간 텍스트라면 첫 단계 `"\n\n"`에서 대부분이 해결됩니다. 로그 파일처럼 빈 줄이 없고 줄바꿈만 있는 텍스트는 두 번째 단계 `"\n"`로 내려갑니다. 한국어 계약서 PDF를 OCR한 결과처럼 줄바꿈과 공백이 불규칙하면 결국 마지막 `""`까지 가서 문자 단위로 나뉠 수 있습니다.
 
-또 하나 중요한 기본값이 `keep_separator=True`라는 점입니다. `CharacterTextSplitter`와 달리 재귀 splitter는 구분자를 보존하는 쪽이 기본입니다. 문단 경계나 줄바꿈이 chunk의 앞이나 뒤에 남으므로, 제목과 본문 사이의 문맥 신호가 덜 사라집니다. 실무에서 이 차이는 검색 후 답변 품질에 생각보다 크게 작용합니다. 특히 markdown 문서나 정책 문서에서는 줄바꿈 하나가 의미 경계를 대신하기 때문입니다.
+또 하나 중요한 기본값이 `keep_separator=True`라는 사실입니다. `CharacterTextSplitter`와 달리 재귀 splitter는 구분자를 보존하는 쪽이 기본입니다. 문단 경계나 줄바꿈이 chunk의 앞이나 뒤에 남으므로, 제목과 본문 사이의 문맥 신호가 덜 사라집니다. 실무에서 이 차이는 검색 후 답변 품질에 생각보다 크게 작용합니다. 특히 markdown 문서나 정책 문서에서는 줄바꿈 하나가 의미 경계를 대신하기 때문입니다.
 
 아래 예시는 markdown 문서를 재귀 splitter로 나눌 때의 전형적인 형태입니다.
 
@@ -269,7 +303,7 @@ markdown_text = """# Service policy
 Users can reset passwords from the account settings page.
 The reset link expires after 15 minutes.
 
-## API rate limit
+# # API 속도 제한
 The public API allows 120 requests per minute per API key.
 Burst requests above the limit receive HTTP 429 responses.
 """
@@ -293,7 +327,7 @@ for index, chunk in enumerate(chunks, start=1):
 
 문자 수와 토큰 수는 다릅니다. 이 문장은 초급 설명에서는 당연하게 들리지만, 실제 장애는 늘 여기서 납니다. LLM의 컨텍스트 윈도는 토큰 기준인데, 많은 파이프라인은 여전히 문자 기준 splitter로 ingest를 끝냅니다. 그러면 인덱싱 때는 멀쩡해 보여도, 검색 후 여러 chunk를 프롬프트에 조립하는 단계에서 토큰 예산이 갑자기 넘칩니다.
 
-![문자 수와 토큰 수의 어긋남 흐름](../../assets/rag-deep-dive/01/01-04-token-aware-splitting.ko.png)
+![문자 수와 토큰 수의 어긋남 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-04-token-aware-splitting.ko.png)
 
 *문자 수와 토큰 수의 어긋남 흐름*
 
@@ -342,7 +376,7 @@ for chunk in token_chunks:
 
 정답 숫자는 없습니다. 대신 틀린 접근은 분명합니다. 문서 종류가 다른데도 모든 코퍼스에 `chunk_size=1000, chunk_overlap=200`을 일괄 적용하는 방식입니다. 제품 매뉴얼, 법률 계약서, 장애 대응 런북, 소스 코드는 모두 의미 단위가 다릅니다. 좋은 chunk 크기는 모델 한도보다 먼저 **질문이 요구하는 증거 단위**에 맞아야 합니다.
 
-![청크 품질 측정과 조정 순환 흐름](../../assets/rag-deep-dive/01/01-05-chunk-quality-feedback-loop.ko.png)
+![청크 품질 측정과 조정 순환 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-05-chunk-quality-feedback-loop.ko.png)
 
 *청크 품질 측정과 조정 순환 흐름*
 
@@ -400,21 +434,44 @@ if __name__ == "__main__":
 
 ---
 
-## 이번 화에서 남겨 둘 기준선
+## retriever를 의심하기 전에 먼저 볼 실패 신호
+
+retriever 설정을 만지기 전에, 청킹이 이미 근거를 망가뜨렸는지부터 확인해야 합니다.
+
+- 제목만 반복해서 검색되고 본문 설명이 자꾸 빠진다면 경계가 너무 공격적이거나 overlap이 기대만큼 실현되지 않은 경우가 많습니다.
+- 같은 정책 문장이 비슷한 청크 여러 개로 계속 돌아오면 청크가 너무 작아서 같은 근거 조각을 여러 번 저장한 것에 가깝습니다.
+- ingest 단계에서는 작아 보였는데 최종 프롬프트에서 자꾸 길이 초과가 나면 문자 수가 실제 토큰 비용을 가리고 있을 가능성이 큽니다.
+
+가장 빠른 점검 순서는 단순합니다. 로더 경계를 먼저 보고, 실제 청크 출력을 찍고, 토큰 길이를 재고, 그다음에야 retrieval을 조정합니다. 이 순서를 지키면 retriever를 억울하게 탓하는 일을 크게 줄일 수 있습니다.
+
+---
+
+## 정리
 
 RAG 파이프라인의 앞단은 생각보다 단순한 코드로 이루어져 있습니다. `TextLoader`는 파일 경로를 `source`에 담아 한 개 문서를 만들지만, 자동 인코딩 감지 경로에는 실패가 깔끔히 드러나지 않는 0.2.17의 quirk가 있습니다. `PDFMinerLoader`는 페이지 결합 여부에 따라 문서 경계를 바꾸고, deprecated 호환성 shim인 `UnstructuredFileLoader`는 element 수준 메타데이터까지 올려 보낼 수 있습니다. 그 위에서 `CharacterTextSplitter`와 `RecursiveCharacterTextSplitter`는 먼저 자르고 나중에 병합하는 방식으로 chunk를 만들고, `TokenTextSplitter`는 모델 토큰 기준으로 그 창을 다시 정의합니다.
 
 이 기준선을 잡아 두면 다음 화의 임베딩과 인덱스 논의가 훨씬 선명해집니다. 벡터 인덱스는 결코 중립적인 저장소가 아닙니다. 로더와 splitter가 만든 문서 단위를 그대로 기하학으로 바꾸는 장치입니다. 2화에서는 그 기하학이 실제로 어떻게 검색 동작으로 이어지는지, FAISS의 `IndexFlatL2`를 기준으로 이어서 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **유사도 검색이 시작되기 전, 로더와 splitter 경계는 왜 검색 품질을 좌우할까요?**
+  로더와 splitter가 만든 문서 단위가 그대로 임베딩되고 검색되므로, 경계가 무너지면 retriever는 좋은 근거를 회수하기 어렵습니다.
+
+- **Character, Recursive, Token splitter는 같은 텍스트를 어떻게 다르게 자를까요?**
+  Character splitter는 구분자와 문자 수, Recursive splitter는 우선순위 구분자, Token splitter는 토큰 창을 기준으로 잘라 같은 텍스트도 다른 청크를 만듭니다.
+
+- **`chunk_overlap`이 설정값만큼 정확히 겹치지 않는 것처럼 보일 때 어디를 봐야 할까요?**
+  실제 생성된 청크 출력과 병합 로직, separator, 토큰 길이를 먼저 확인해야 합니다. overlap은 “항상 정확히 N자 반복”이 아니라 분할·병합 결과에 따라 달라집니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **문서 로딩과 청크 전략 — LangChain TextSplitter 내부 (현재 글)**
-- 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리 (예정)
-- Retriever 설계 — VectorStoreRetriever와 MMR (예정)
-- 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (예정)
-- RAG Chain 조립 — RetrievalQA vs LCEL (예정)
-- 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
+- **RAG Deep Dive (1/6): 문서 로딩과 청크 전략 — LangChain TextSplitter 내부 (현재 글)**
+- RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리 (예정)
+- RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR (예정)
+- RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (예정)
+- RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL (예정)
+- RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
 
 <!-- toc:end -->
 
@@ -430,3 +487,9 @@ RAG 파이프라인의 앞단은 생각보다 단순한 코드로 이루어져 �
 - [LangChain `UnstructuredFileLoader` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/unstructured.py)
 - [LangChain `Document` base type](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/documents/base.py)
 - [Lewis et al., Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks](https://doi.org/10.48550/arXiv.2005.11401)
+
+### 관련 시리즈
+
+- [Vector Search 101](../vector-search-101/01-what-is-embedding.md) — RAG가 검색 결과를 그대로 받아 쓰는 그 "벡터 검색"을 직접 다룹니다. ANN 인덱스(FAISS, HNSW)나 임베딩 모델 선택 때문에 검색 품질이 흔들리면 이 시리즈로 한 단계 내려가 디버깅하기를 권장합니다.
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/rag-deep-dive/ko)

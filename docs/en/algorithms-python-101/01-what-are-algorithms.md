@@ -1,10 +1,10 @@
 ---
 series: algorithms-python-101
 episode: 1
-title: What Are Algorithms?
+title: "Algorithms with Python 101 (1/10): What Are Algorithms?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,23 @@ seo_description: Learn what algorithms are, why they matter, and write your firs
 last_reviewed: '2026-05-04'
 ---
 
-# What Are Algorithms?
+# Algorithms with Python 101 (1/10): What Are Algorithms?
 
-> Algorithms with Python 101 Series (1/10)
+Programming is ultimately about solving problems. Two pieces of code can produce the same answer and still behave very differently once the input gets large. That difference usually starts with the algorithm.
 
-<!-- a-grade-intro:begin -->
+Algorithms matter well beyond coding interviews. They shape performance tuning, data processing, and the way you reason about trade-offs in real systems.
 
-**Key Question**: Why does one piece of code finish in 1 second while another takes 10 minutes for the same problem?
+This is the first post in the Algorithms with Python 101 series. Here, we'll define what an algorithm is, look at its core properties, and write a simple Python example.
 
-> An algorithm is a step-by-step procedure for solving a problem. A good algorithm is correct, efficient, and clear. This article covers the definition and properties of algorithms, how to represent them, and how to write your first algorithm in Python.
 
-<!-- a-grade-intro:end -->
+![Algorithms with Python 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/01/01-01-big-picture.en.png)
+*Algorithms with Python 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Are Algorithms??
+- Which signal should the example or diagram make visible for What Are Algorithms??
+- What failure should be prevented first when What Are Algorithms? reaches a real system?
 
 ## What You Will Learn
 
@@ -51,7 +57,7 @@ Algorithmic thinking is a core skill across coding interviews, performance optim
 
 > Algorithm = a finite procedure that transforms input into the desired output
 
-```
+```text
 [Problem] → [Algorithm] → [Solution]
 
 Example: Find the maximum value in a list
@@ -162,7 +168,6 @@ print("algorithm"[::-1])  # mhtirogla
 ```python
 import time
 
-
 def has_duplicate_brute(data: list[int]) -> bool:
     """Check for duplicates — brute force O(n^2)."""
     for i in range(len(data)):
@@ -170,7 +175,6 @@ def has_duplicate_brute(data: list[int]) -> bool:
             if data[i] == data[j]:
                 return True
     return False
-
 
 def has_duplicate_set(data: list[int]) -> bool:
     """Check for duplicates — set-based O(n)."""
@@ -249,6 +253,12 @@ In day-to-day work, you rarely implement algorithms from scratch. Libraries and 
 
 Answering "Why is this code slow?" or "Is there a better approach?" requires a solid grasp of algorithm fundamentals.
 
+## What this changes in production code reviews
+
+- When input size grows, the first question is usually not “Can this code be cleaner?” but “What algorithm is hidden underneath this loop?”
+- Replacing a sort-plus-scan with a single pass or a repeated scan with a set lookup often matters more than micro-optimizing syntax.
+- Edge-case handling is part of algorithm quality. Empty input, duplicated values, and invalid states are where production bugs surface first.
+
 ## Checklist
 
 - [ ] Explain the definition and five properties of an algorithm
@@ -267,7 +277,18 @@ Answering "Why is this code slow?" or "Is there a better approach?" requires a s
 
 An algorithm is a clear procedure for solving a problem, and efficiency is the key criterion for choosing one. In the next article, we cover the tool for objectively measuring efficiency: time complexity and Big-O notation.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Are Algorithms??**
+  - The article treats What Are Algorithms? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Are Algorithms??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Are Algorithms? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Are Algorithms? (current)**
 - Time Complexity and Big-O (upcoming)
 - Linear Search and Binary Search (upcoming)
@@ -278,6 +299,7 @@ An algorithm is a clear procedure for solving a problem, and efficiency is the k
 - Shortest Path Basics (upcoming)
 - Greedy Algorithms (upcoming)
 - Coding Test Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

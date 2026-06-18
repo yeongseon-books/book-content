@@ -1,13 +1,13 @@
 ---
-title: Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)
+title: "Python DB-API 101 (4/10): Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)"
 series: python-dbapi-101
 episode: 4
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,33 +17,33 @@ tags:
 - Parameter Binding
 - PEP 249
 - Security
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_title: Parameter binding과 SQL injection 방어
-seo_description: 핵심은 SQL 토큰화(tokenization)가 binding보다 먼저 끝난다는 점입니다. ?
+seo_description: 핵심은 SQL 토큰화(tokenization)가 binding보다 먼저 끝난다는 사실입니다. ?
 ---
 
-# Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)
+# Python DB-API 101 (4/10): Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)
 
-![Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](../../assets/python-dbapi-101/04/04-01-parameter-binding-and-sql-injection-defe.ko.png)
+사용자 입력을 문자열로 이어 붙이는 SQL은 작은 편의처럼 보여도 전체 테이블 노출로 이어질 수 있습니다. 이 글에서는 sqlite3와 PEP 249 기준으로 parameter binding이 왜 SQL injection을 막는지 코드로 확인합니다.
+
+이 글은 Python DB-API 101 시리즈의 네 번째 글입니다.
+
+![Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-01-parameter-binding-and-sql-injection-defe.ko.png)
 
 *Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)*
 
-## 이 글에서 다룰 문제
+![Python DB-API 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-02-mental-model-keep-query-string-and-value.ko.png)
+*Python DB-API 101 4장 흐름 개요*
 
-OWASP Top 10에 SQL injection이 20년 가까이 머무르는 이유는 단순합니다. **개발자가 query string을 직접 조립하기 때문**입니다. `f"SELECT * FROM users WHERE name = '{name}'"` 한 줄이면 `name = "' OR 1=1 --"` 같은 입력으로 모든 row가 반환됩니다.
+## 먼저 던지는 질문
 
-PEP 249는 이를 driver 차원에서 막는 표준을 제시합니다. `cursor.execute(sql, params)` 호출은 SQL 문법 분석과 값 binding을 **별도 단계**에서 수행하므로, 사용자 입력이 SQL 토큰으로 해석될 가능성이 원천적으로 차단됩니다.
-
-이 글에서는 sqlite3로 공격을 직접 재현해 보고, parameter binding으로 막는 차이를 코드로 비교합니다. 한 번 눈으로 본 개발자는 다시는 f-string SQL을 쓰지 않습니다.
-
----
+- 왜 `find_user_BAD("Alice' OR 1=1 --")`는 전체 행을 유출하지만 `WHERE name = ?`는 빈 결과를 돌려줄까요?
+- sqlite3에서 `?`, `:name`, `module.paramstyle`은 언제 구분해서 써야 하고 driver 이관 때 무엇을 먼저 확인해야 할까요?
+- `IN (...)`, `ORDER BY`, table name처럼 placeholder가 못 들어가는 자리는 어떻게 안전하게 처리해야 할까요?
 
 ## Mental Model — query string과 값을 끝까지 분리
 
-![Mental Model - query string과 값을 끝까지 분리](../../assets/python-dbapi-101/04/04-02-mental-model-keep-query-string-and-value.ko.png)
-
-*Mental Model - query string과 값을 끝까지 분리*
-```
+```text
 [ User input ] ─┐
                 │
                 ▼
@@ -63,13 +63,15 @@ PEP 249는 이를 driver 차원에서 막는 표준을 제시합니다. `cursor.
         [ SQLite executes ]
 ```
 
-핵심은 SQL 토큰화(tokenization)가 binding보다 **먼저** 끝난다는 점입니다. `?`는 SQL parser에게 "여기에 값이 하나 들어올 자리"라고 알려 줄 뿐, 어떤 값이 와도 SQL 문법으로 재해석되지 않습니다. `' OR 1=1 --`이라는 문자열은 그대로 6글자짜리 문자열 값으로만 처리됩니다.
+> SQL injection은 query string과 사용자 입력이 하나의 문자열로 합쳐지는 순간 시작됩니다. parameter binding은 이 둘을 끝까지 분리해서, 값이 SQL 문법으로 다시 해석되지 못하게 막습니다.
+
+핵심은 SQL 토큰화(tokenization)가 binding보다 먼저 끝난다는 사실입니다. `?`는 SQL parser에게 "여기에 값이 하나 들어올 자리"라고 알려 줄 뿐, 어떤 값이 와도 SQL 문법으로 재해석되지 않습니다. `' OR 1=1 --`이라는 문자열은 그대로 12글자짜리 문자열 값으로만 처리됩니다.
 
 ---
 
 ## 핵심 개념
 
-![핵심 개념](../../assets/python-dbapi-101/04/04-03-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-03-core-concepts.ko.png)
 
 *핵심 개념*
 ### qmark style (`?`)
@@ -107,20 +109,19 @@ sqlite3는 `qmark`와 `named`를 모두 지원합니다. `import sqlite3; print(
 
 ### binding되지 않는 자리
 
-placeholder는 **값** 자리에만 쓸 수 있습니다. 다음은 binding 대상이 **아닙니다**.
+placeholder는 값 자리에만 쓸 수 있습니다. 다음은 binding 대상이 아닙니다.
 
-- table name (`FROM ?` ❌)
-- column name (`SELECT ? FROM users` ❌)
-- ORDER BY 방향 (`ORDER BY age ?` ❌)
+- table name (`FROM ?` Fail)
+- column name (`SELECT ? FROM users` Fail)
+- ORDER BY 방향 (`ORDER BY age ?` Fail)
 - LIMIT/OFFSET (sqlite3는 일부 지원, 다른 driver는 미지원)
 
 이런 자리에는 whitelist 검증을 거쳐 직접 문자열로 삽입합니다.
 
 ---
 
-## Before / After
-
-![Before / after](../../assets/python-dbapi-101/04/04-04-before-after.ko.png)
+## 적용 전후 비교
+![Before / after](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-04-before-after.ko.png)
 
 *Before / after*
 ### Before — 취약한 코드
@@ -139,16 +140,16 @@ def find_user_BAD(name: str):
     sql = f"SELECT id, name, secret FROM users WHERE name = '{name}'"
     return con.execute(sql).fetchall()
 
-# 정상 호출
+# Normal call
 print(find_user_BAD('Alice'))
 # → [(1, 'Alice', 'A-token')]
 
-# 공격
+# Attack
 print(find_user_BAD("Alice' OR 1=1 --"))
-# → [(1, 'Alice', 'A-token'), (2, 'Bob', 'B-token')]   ← 모든 row 노출
+# → [(1, 'Alice', 'A-token'), (2, 'Bob', 'B-token')] ← 모든 행 유출
 ```
 
-### After — parameter binding
+### 적용 후 — 파라미터 바인딩
 
 ```python
 def find_user_OK(name: str):
@@ -156,7 +157,7 @@ def find_user_OK(name: str):
     return con.execute(sql, (name,)).fetchall()
 
 print(find_user_OK("Alice' OR 1=1 --"))
-# → []   ← 그런 이름의 user가 없으므로 빈 결과
+# → [] ← 해당 이름을 가진 사용자가 없으므로 비어 있습니다.
 ```
 
 차이는 한 줄입니다. 그러나 보안 결과는 정반대입니다.
@@ -193,8 +194,7 @@ con.commit()
 
 값은 항상 **tuple 또는 list**로 넘깁니다. 단일 값이라도 `(value,)`처럼 쉼표를 빠뜨리지 마세요.
 
-### 단계 3 — `:name` placeholder
-
+### 단계 3 — `:name` 플레이스홀더
 ```python
 con.execute(
     '''INSERT INTO products(name, price, category)
@@ -323,25 +323,114 @@ sqlite3 → PostgreSQL로 옮길 때 가장 흔한 이슈가 paramstyle 차이�
 
 ---
 
-## 정리·다음 글
+## 심화 앵커: 인젝션 방어를 회귀 테스트로 고정하기
 
+보안 규칙은 문장보다 테스트가 강합니다. 아래 테스트를 CI에 넣으면 문자열 결합 SQL이 다시 들어오는 순간 즉시 탐지할 수 있습니다.
+
+```python
+import sqlite3
+
+def test_injection_blocked():
+    con = sqlite3.connect(":memory:")
+    con.execute("CREATE TABLE users(id INTEGER PRIMARY KEY, name TEXT)")
+    con.execute("INSERT INTO users(name) VALUES (?)", ("alice",))
+    payload = "alice' OR 1=1 --"
+    rows = con.execute("SELECT id FROM users WHERE name = ?", (payload,)).fetchall()
+    assert rows == []
+```
+
+placeholder로 바인딩할 수 없는 자리는 whitelist 검증을 별도로 둬야 합니다.
+
+```python
+ALLOWED_SORT = {"name", "created_at"}
+if sort not in ALLOWED_SORT:
+    raise ValueError("invalid sort")
+sql = f"SELECT id, name FROM users ORDER BY {sort}"
+```
+
+sqlite3(`?`)와 psycopg2(`%s`)의 차이를 감추기 위해 문자열 포맷팅으로 우회하면 취약점이 재발합니다. paramstyle 확인을 이관 체크리스트에 포함해야 합니다.
+
+## 추가 심화 노트: 운영 품질 게이트
+
+아래 항목은 개발 환경에서는 자주 생략되지만, 운영에서는 장애 예방에 직접 영향을 줍니다.
+
+### A. 배포 전 검증 스크립트 예시
+
+```bash
+python -m pytest tests/test_dbapi_contract.py -q
+python scripts/check_sql_bindings.py
+python scripts/check_transaction_boundaries.py
+```
+
+### B. 계약 테스트 예시
+
+```python
+def test_dbapi_contract(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT 1")
+    assert cur.fetchone()[0] == 1
+    cur.close()
+```
+
+### C. 관측성 필드 표준
+
+| 필드 | 설명 |
+| --- | --- |
+| `db.driver` | sqlite3 / psycopg2 |
+| `db.operation` | SELECT/INSERT/UPDATE/DELETE |
+| `db.retry.count` | 재시도 횟수 |
+| `db.elapsed_ms` | 실행 시간 |
+| `db.tx.state` | commit/rollback |
+
+### D. 성능 측정 루틴
+
+```python
+import time
+
+def timed(fn, *args, **kwargs):
+    t0 = time.perf_counter()
+    v = fn(*args, **kwargs)
+    elapsed = (time.perf_counter() - t0) * 1000
+    print(f"metric=db.elapsed_ms value={elapsed:.1f}")
+    return v
+```
+
+### E. 장애 대응 기본 규칙
+
+- `IntegrityError`: 재시도하지 않고 입력/업무 규칙 오류로 처리합니다.
+- `OperationalError`의 BUSY/LOCKED 계열: 짧은 백오프 재시도를 적용합니다.
+- `ProgrammingError`: 코드 수정 대상이므로 즉시 알림합니다.
+- `DatabaseError`의 손상 징후: 복구 런북으로 전환합니다.
+
+이 노트는 새로운 개념을 추가하기보다, 본문의 원칙을 운영 절차로 고정하는 데 목적이 있습니다.
+
+## 정리
 PEP 249의 parameter binding은 SQL injection을 차단하는 가장 단순하면서도 가장 강력한 도구입니다. 값과 SQL 문법을 끝까지 분리하는 것이 핵심이고, 이 분리가 깨지는 자리(table name 등)는 whitelist로 보완합니다.
 
 다음 글에서는 **transaction과 isolation level**을 다룹니다. `commit`/`rollback`의 정확한 의미, sqlite3의 `isolation_level=None` autocommit 모드, BEGIN의 종류(DEFERRED, IMMEDIATE, EXCLUSIVE)와 lock 동작을 코드로 비교합니다.
 
+## 처음 질문으로 돌아가기
+
+- **왜 `find_user_BAD("Alice' OR 1=1 --")`는 전체 행을 유출하지만 `WHERE name = ?`는 빈 결과를 돌려줄까요?**
+  - 본문은 SQL parser가 먼저 `?`를 값 자리로만 해석하고, 그 뒤 value binder가 사용자 입력을 문자열 값으로 넣는 흐름을 그림과 함께 보여 줬습니다. 그래서 `find_user_BAD()`에서는 공격 문자열이 SQL 문법으로 합쳐졌지만, `find_user_OK()`에서는 같은 문자열이 단순 값으로만 처리되어 결과가 비어 있습니다.
+- **sqlite3에서 `?`, `:name`, `module.paramstyle`은 언제 구분해서 써야 하고 driver 이관 때 무엇을 먼저 확인해야 할까요?**
+  - 글에서는 sqlite3가 `qmark`와 `named`를 모두 지원하지만, 다른 driver는 `format`이나 `pyformat`을 쓸 수 있다고 표로 정리했습니다. 그래서 현재 코드가 `?` 기반인지 `:name` 기반인지 명확히 하고, 이관 전에는 `module.paramstyle`을 먼저 확인해 placeholder 문법을 안전하게 맞춰야 합니다.
+- **`IN (...)`, `ORDER BY`, table name처럼 placeholder가 못 들어가는 자리는 어떻게 안전하게 처리해야 할까요?**
+  - `IN (...)`은 placeholder 개수를 동적으로 만들어도 실제 값은 `execute(sql, ids)`로 분리해 넘겨야 안전하다고 설명했습니다. 반면 `ORDER BY` 방향, table name, column name은 바인딩 대상이 아니므로 `ALLOWED`, `ALLOWED_DIR` 같은 whitelist 검증을 통과한 값만 문자열로 넣어야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
-- [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
-- **Parameter binding과 SQL injection 방어 (sqlite3, PEP 249) (현재 글)**
-- Transaction과 isolation level (sqlite3, PEP 249) (예정)
-- Row factory와 type adapter (sqlite3, PEP 249) (예정)
-- PEP 249 예외 계층과 SQLite 에러 처리 (예정)
-- SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
-- aiosqlite로 비동기 SQLite 다루기 (예정)
-- SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
+- [Python DB-API 101 (1/10): 왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
+- **Python DB-API 101 (4/10): Parameter binding과 SQL injection 방어 (sqlite3, PEP 249) (현재 글)**
+- Python DB-API 101 (5/10): Transaction과 isolation level (sqlite3, PEP 249) (예정)
+- Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249) (예정)
+- Python DB-API 101 (7/10): PEP 249 예외 계층과 SQLite 에러 처리 (예정)
+- Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
+- Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기 (예정)
+- Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
 
 <!-- toc:end -->
 
@@ -354,3 +443,5 @@ PEP 249의 parameter binding은 SQL injection을 차단하는 가장 단순하�
 - [OWASP — SQL Injection Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html)
 - [Bandit — B608 hardcoded_sql_expressions](https://bandit.readthedocs.io/en/latest/plugins/b608_hardcoded_sql_expressions.html)
 - [SQLite SQL parameters](https://www.sqlite.org/lang_expr.html#varparam)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-dbapi-101/ko)

@@ -1,0 +1,14 @@
+flowchart TD
+  A["StateGraph 정의<br/>노드 + 엣지 + 상태 계약"] --> B["노드 업데이트 규칙<br/>바뀐 필드만 반환"]
+  B --> C["실행 경로<br/>START → choose_topic → build_outline → write_answer"]
+  C --> D["invoke()<br/>그래프 전체 실행"]
+  D --> E["최종 상태 스냅샷<br/>topic + outline + answer"]
+
+  C --> F["같은 구조 위에 나중에<br/>loop와 branch를 확장 가능"]
+
+  style A fill:#e3f2fd,stroke:#1976d2
+  style B fill:#fff3e0,stroke:#f57c00
+  style C fill:#e8f5e9,stroke:#388e3c
+  style D fill:#f3e5f5,stroke:#7b1fa2
+  style E fill:#fff8e1,stroke:#f9a825
+  style F fill:#fce4ec,stroke:#c2185b

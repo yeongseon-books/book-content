@@ -1,10 +1,10 @@
 ---
 series: database-systems-101
 episode: 2
-title: The Relational Model
+title: "Database Systems 101 (2/10): The Relational Model"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: Relations, tuples, primary and foreign keys, and integrity cons
 last_reviewed: '2026-05-04'
 ---
 
-# The Relational Model
+# Database Systems 101 (2/10): The Relational Model
+
+This is post 2 in the Database Systems 101 series.
 
 > Database Systems 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Behind the simple picture of "rows in a table," what is the mathematical model that has lasted half a century?
 
 > The relational model treats data as **sets**. A table is a set of rows; each row is a tuple of the same shape. Keys, foreign keys, normalization, and SQL itself all sit on top of that one promise. Once the model clicks, SQL stops looking like syntax and starts looking like algebra over relations.
 
-<!-- a-grade-intro:end -->
+
+![database systems 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/02/02-01-big-picture.en.png)
+*database systems 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying The Relational Model?
+- Which signal should the example or diagram make visible for The Relational Model?
+- What failure should be prevented first when The Relational Model reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 If you blur "table" and "relation," everything that comes later — normalization, indexes, transactions — feels slightly off. Get the model right once and SQL becomes "the language we use to operate on relations," not a list of incantations.
 
 > SQL is not a procedural language. It is a set of operations defined over relations. That is why you describe **what** you want, not **how**.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -249,8 +255,19 @@ Sometimes you **denormalize** for performance. That is fine, but it always pairs
 
 The relational model fits in three lines: a table is a set of like-shaped rows; rows are addressed by keys; relationships are represented by foreign keys. That simple promise shapes both SQL and what a DBMS can guarantee. Next we look at SQL itself — how a single SELECT actually gets processed.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying The Relational Model?**
+  - The article treats The Relational Model as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for The Relational Model?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when The Relational Model reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Database System?](./01-what-is-a-database.md)
+## In this series
+
+- [Database Systems 101 (1/10): What Is a Database System?](./01-what-is-a-database.md)
 - **The Relational Model (current)**
 - SQL and Query Processing (upcoming)
 - Indexes (upcoming)
@@ -260,6 +277,7 @@ The relational model fits in three lines: a table is a set of like-shaped rows; 
 - Query Optimization (upcoming)
 - Replication and Backup (upcoming)
 - OLTP and OLAP (upcoming)
+
 <!-- toc:end -->
 
 ## References

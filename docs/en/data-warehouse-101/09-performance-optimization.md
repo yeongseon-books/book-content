@@ -1,10 +1,10 @@
 ---
 series: data-warehouse-101
 episode: 9
-title: Performance Optimization
-status: content-ready
+title: "Data Warehouse 101 (9/10): Performance Optimization"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,35 @@ tags:
   - Cost
   - Analytics
 seo_description: Patterns that drive warehouse performance, five ways to cut cost, and how to read a query plan like a senior analyst.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Performance Optimization
+# Data Warehouse 101 (9/10): Performance Optimization
 
-> Data Warehouse 101 series (9/10)
+Warehouse tuning starts when someone asks why two queries that look similar cost wildly different amounts. In practice, the answer is usually hiding in scan volume, shuffle volume, or work the engine had no chance to skip.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Data Warehouse 101 series.
 
-**Core question**: Why does *one query finish in a second* and another *take five minutes*? How do you *cut cost*?
+In this post, we treat optimization as a measurement discipline instead of a bag of tricks. The goal is to read the plan, locate the expensive stage, and change the query shape before cost becomes a surprise.
 
-> *Warehouse performance is shaped by *bytes read* and *data shuffled*.*
 
-<!-- a-grade-intro:end -->
+![data warehouse 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/09/09-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 9 flow overview*
+> Performance tuning follows a cycle: measure, find the bottleneck, improve, and measure again. Start with the query plan, not your intuition.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Performance Optimization?
+- Which signal should the example or diagram make visible for Performance Optimization?
+- What failure should be prevented first when Performance Optimization reaches a real system?
+
+## Questions this article answers
+
+- Which patterns create the biggest performance differences in a warehouse?
+- How do you get the same answer at lower cost?
+- Why should bytes scanned, shuffle, and spill be the first signals you inspect?
+- When do approximate aggregations and materialized views pay off?
+- Why does tuning so often miss the mark when you skip the query plan?
 
 ## What You Will Learn
 
@@ -46,16 +61,7 @@ Warehouses charge by *what you read*. The same answer with *fewer bytes* means *
 
 > *Optimization without measurement is *guessing*. Read the plan first.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Query["SQL"] --> Plan["Query Plan"]
-    Plan --> Scan["Bytes Scanned"]
-    Plan --> Shuffle["Shuffle"]
-    Plan --> Spill["Spill to Disk"]
-    Scan --> Cost["Cost"]
-```
+This picture shows the performance optimization cycle. The key is not to memorize tuning tricks, but to learn how to find where time is actually spent.
 
 ## Key Terms
 
@@ -162,17 +168,29 @@ Analysts read *query plans* daily. *Cost alerts* fire to *Slack* above threshold
 
 Performance starts with *measurement*. Next we walk through *designing a warehouse* end to end.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Performance Optimization?**
+  - The article treats Performance Optimization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Performance Optimization?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Performance Optimization reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
-- [OLTP and OLAP](./02-oltp-and-olap.md)
-- [Fact and Dimension](./03-fact-and-dimension.md)
-- [Star Schema](./04-star-schema.md)
-- [Partition and Clustering](./05-partition-and-clustering.md)
-- [ETL and ELT](./06-etl-and-elt.md)
-- [BI and Dashboard](./07-bi-and-dashboard.md)
-- [Data Mart](./08-data-mart.md)
+## In this series
+
+- [Data Warehouse 101 (1/10): What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
+- [Data Warehouse 101 (2/10): OLTP and OLAP](./02-oltp-and-olap.md)
+- [Data Warehouse 101 (3/10): Fact and Dimension](./03-fact-and-dimension.md)
+- [Data Warehouse 101 (4/10): Star Schema](./04-star-schema.md)
+- [Data Warehouse 101 (5/10): Partition and Clustering](./05-partition-and-clustering.md)
+- [Data Warehouse 101 (6/10): ETL and ELT](./06-etl-and-elt.md)
+- [Data Warehouse 101 (7/10): BI and Dashboard](./07-bi-and-dashboard.md)
+- [Data Warehouse 101 (8/10): Data Mart](./08-data-mart.md)
 - **Performance Optimization (current)**
 - Warehouse Design Example (upcoming)
+
 <!-- toc:end -->
 
 ## References

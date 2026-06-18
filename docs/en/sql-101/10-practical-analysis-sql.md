@@ -1,10 +1,10 @@
 ---
 series: sql-101
 episode: 10
-title: Practical Analysis SQL
+title: "SQL 101 (10/10): Practical Analysis SQL"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,44 +17,37 @@ tags:
   - Funnel
   - Retention
 seo_description: Cohort, funnel, retention, top-N — patterns for assembling real analytical reports from one SQL file using everything you have learned.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Practical Analysis SQL
+# SQL 101 (10/10): Practical Analysis SQL
 
-> SQL 101 series (10/10)
+By the time you reach real reporting work, SQL features stop appearing one at a time. A single analytics request usually asks for filtering, grouping, window calculations, and layered intermediate steps in the same query.
 
-<!-- a-grade-intro:begin -->
+That is why the final chapter is best approached as pattern assembly. The goal is not to learn one more clause. It is to see how familiar building blocks combine into the shapes teams actually reuse for dashboards and decision-making.
 
-**Core question**: How do you *assemble* SELECT, JOIN, GROUP BY, and windows into *real reports* like *cohort, funnel, retention*?
+This is the final post in the SQL 101 series. It ties the earlier clauses together into practical query patterns for analysis work.
 
-> *Analysis is *not magic*. It is the same tools *stacked in layers*.*
 
-<!-- a-grade-intro:end -->
+![sql 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/10/10-01-analytics-query-layering-flow.en.png)
+*sql 101 chapter 10 flow overview*
+> A production analysis query is built from the pieces you've learned: filters that are correct, joins that produce the right cardinality, aggregations that answer the actual question, and windows that add rank or context without losing rows.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The SQL pattern for *DAU / WAU / MAU*
-- The basic shape of *cohort retention*
-- A *funnel* analysis
-- *Top-N per group*
-- Five common mistakes
+- What do DAU, WAU, and MAU queries usually look like?
+- How do you structure cohort and retention logic in layers?
+- What is the cleanest shape for a funnel query?
 
 ## Why It Matters
 
-Most dashboard numbers are variations on a few patterns. Learn them, and you can write a *first draft in minutes* for any new request. Over time, these queries become *team assets*.
+Most analytics requests are variations on a small set of patterns: active users, retention, conversion, top performers, and trend changes over time. Once those shapes become familiar, new requests stop starting from a blank screen.
 
-> *Analytics SQL is the *final exam* of the series — and *the starting point* of real work.*
+Well-structured analytics SQL also becomes reusable team knowledge. A clean cohort query or funnel query does not just answer one ticket. It becomes the basis for dashboards, models, and later reviews about whether the metric definition is still correct.
 
-## Concept at a Glance
+## Analytics query layering flow
 
-```mermaid
-flowchart LR
-    Events["Events"] --> CTE1["1. clean"]
-    CTE1 --> CTE2["2. aggregate"]
-    CTE2 --> CTE3["3. window"]
-    CTE3 --> Report["report"]
-```
+Build analysis queries step-by-step using CTEs. Each CTE represents one logical step: 'filter to the date range,' 'join with customer info,' 'aggregate by segment,' 'rank within segment.' Test each CTE independently before combining them.
 
 ## Key Terms
 
@@ -108,6 +101,12 @@ SELECT
 FROM events;
 ```
 
+**Expected output:**
+
+| s1_view | s2_cart | s3_pay |
+| --- | --- | --- |
+| 1200 | 420 | 180 |
+
 ### Step 4 — Top-N per group
 
 ```sql
@@ -132,6 +131,22 @@ SELECT month, rev,
         / NULLIF(LAG(rev) OVER (ORDER BY month), 0) AS mom_pct
 FROM monthly;
 ```
+
+## Verification checks before you trust the metric
+
+Analytical SQL should be treated like logic you can audit, not just a query that happened to run.
+
+- **Check the definition first.** Confirm what counts as an active user, a cohort start, or a funnel step before comparing numbers.
+- **Check row counts at each layer.** CTE boundaries are the easiest places to confirm whether the dataset is shrinking or expanding as expected.
+- **Check the time boundary.** Timezone handling can move daily and monthly metrics enough to invalidate a dashboard.
+
+## Troubleshooting patterns for real reports
+
+| Symptom | First thing to verify | Common fix |
+| --- | --- | --- |
+| DAU looks lower than expected | Event definition and timezone cutoff | Align the metric definition and date truncation logic |
+| Funnel conversion looks too good | Whether users are counted out of chronological order | Add explicit time-order checks between steps |
+| Retention shifts after a model change | Cohort definition and deduplication logic | Recheck the cohort layer before blaming the chart |
 
 ## What to Notice in This Code
 
@@ -176,17 +191,29 @@ Analytics teams maintain a *pattern library* of these queries. With PR review an
 
 Closing the series: *SQL is the shared language of reads, writes, and analytics*. Next stops: *deeper query plans*, *running PostgreSQL*, and *data warehouses*.
 
+## Answering the Opening Questions
+
+- **What do DAU, WAU, and MAU queries usually look like?**
+  - The article treats Practical Analysis SQL as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do you structure cohort and retention logic in layers?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What is the cleanest shape for a funnel query?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
-- [WHERE and Conditions](./03-where-and-conditions.md)
-- [JOIN](./04-join.md)
-- [GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
-- [Subquery](./06-subquery.md)
-- [Window Function](./07-window-function.md)
-- [INSERT, UPDATE, DELETE](./08-insert-update-delete.md)
-- [Index and Query Plan](./09-index-and-query-plan.md)
+## In this series
+
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE and Conditions](./03-where-and-conditions.md)
+- [SQL 101 (4/10): JOIN](./04-join.md)
+- [SQL 101 (5/10): GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
+- [SQL 101 (6/10): Subquery](./06-subquery.md)
+- [SQL 101 (7/10): Window Function](./07-window-function.md)
+- [SQL 101 (8/10): INSERT, UPDATE, DELETE](./08-insert-update-delete.md)
+- [SQL 101 (9/10): Index and Query Plan](./09-index-and-query-plan.md)
 - **Practical Analysis SQL (current)**
+
 <!-- toc:end -->
 
 ## References
@@ -195,3 +222,4 @@ Closing the series: *SQL is the shared language of reads, writes, and analytics*
 - [PostgreSQL — Window Functions](https://www.postgresql.org/docs/current/tutorial-window.html)
 - [dbt — Analytics Engineering](https://docs.getdbt.com/)
 - [Looker — Block Library](https://cloud.google.com/looker/docs)
+- [PostgreSQL — Aggregate Functions](https://www.postgresql.org/docs/current/functions-aggregate.html)

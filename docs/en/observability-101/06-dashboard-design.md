@@ -1,10 +1,10 @@
 ---
 series: observability-101
 episode: 6
-title: Dashboard Design
-status: content-ready
+title: "Observability 101 (6/10): Dashboard Design"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,28 +17,35 @@ tags:
   - SRE
   - Monitoring
 seo_description: USE and RED patterns and how to choose panels that answer questions instead of decorating the wall.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Dashboard Design
+# Observability 101 (6/10): Dashboard Design
 
-> Observability 101 series (6/10)
+Large dashboards often look impressive right until an incident starts. The screen is full, but the first person on call still does not know where to look, what changed first, or whether the problem is user-facing or internal.
 
-<!-- a-grade-intro:begin -->
+Good dashboard design fixes that. The first screen should compress the system into a small number of questions that lead directly to the next action.
 
-**Core question**: What separates a *good* dashboard from one that is *wallpaper*?
+This is post 6 in the Observability 101 series.
 
-> *Good dashboards answer *one question*. Patterns like *USE* and *RED* turn panels into *units of meaning*.*
 
-<!-- a-grade-intro:end -->
+![observability 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/06/06-01-concept-at-a-glance.en.png)
+*observability 101 chapter 6 flow overview*
+> Dashboard Design is about the boundary decision, not the tool choice.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- *USE* (Utilization, Saturation, Errors)
-- *RED* (Rate, Errors, Duration)
-- The four *Golden signals*
-- Building dashboards as *question units*
-- Five common pitfalls
+- What boundary should you inspect first when applying Dashboard Design?
+- Which signal should the example or diagram make visible for Dashboard Design?
+- What failure should be prevented first when Dashboard Design reaches a real system?
+
+## Questions this article answers
+
+- What separates a good dashboard from one that is just wallpaper?
+- What questions do the RED and USE patterns answer?
+- Why should you look at distributions instead of averages?
+- Which panels belong on the first screen?
+- How should you show context such as deploy timestamps alongside the charts?
 
 ## Why It Matters
 
@@ -46,14 +53,7 @@ Most dashboards are *decoration*. If you do not know *where to look* during an i
 
 > *A dashboard is a *tool that answers*. If it does not answer, delete it.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Q["question"] --> RED["RED: rate, error, duration"]
-    Q --> USE["USE: util, saturation, error"]
-    Q --> Golden["Golden: latency, traffic, error, saturation"]
-```
+Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms
 
@@ -117,6 +117,24 @@ $env = staging | production
 $service = api | worker | scheduler
 ```
 
+## How to Validate the First Screen
+
+The real test is whether the first 30 seconds change your next action. Imagine checkout latency rising right after a deploy.
+
+```text
+1) Check latency p95/p99 on the summary row.
+2) Check whether 5xx rises at the same time.
+3) Check saturation: queue depth, CPU, memory.
+4) Align the anomaly with deploy annotations.
+```
+
+```text
+Expected output:
+- The summary row distinguishes latency regression from error spikes.
+- Healthy saturation suggests the bottleneck is inside the app or a dependency, not the host.
+- A deploy marker overlapping the change makes rollback or config review the next obvious step.
+```
+
 ## What to Notice in This Code
 
 - *RED* is the *outside view*; *USE* is the *inside view*.
@@ -160,17 +178,29 @@ The most consulted *Service Overview* dashboard collapses into 6 *RED + USE* pan
 
 Question-driven dashboards change *decision speed*. Next: *alerts and on-call*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Dashboard Design?**
+  - The article treats Dashboard Design as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Dashboard Design?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Dashboard Design reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
-- [Metrics, Logs, and Traces](./02-metric-log-trace.md)
-- [Collecting and Visualizing Metrics](./03-metric-collection.md)
-- [Structured Logging](./04-structured-logging.md)
-- [Distributed Tracing Basics](./05-distributed-tracing.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
+- [Observability 101 (2/10): Metrics, Logs, and Traces](./02-metric-log-trace.md)
+- [Observability 101 (3/10): Collecting and Visualizing Metrics](./03-metric-collection.md)
+- [Observability 101 (4/10): Structured Logging](./04-structured-logging.md)
+- [Observability 101 (5/10): Distributed Tracing Basics](./05-distributed-tracing.md)
 - **Dashboard Design (current)**
 - Alerts and On-Call (upcoming)
 - SLI and SLO Basics (upcoming)
 - Cost and Cardinality (upcoming)
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -179,3 +209,4 @@ Question-driven dashboards change *decision speed*. Next: *alerts and on-call*.
 - [Tom Wilkie — RED Method](https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/)
 - [Google SRE — Golden Signals](https://sre.google/sre-book/monitoring-distributed-systems/)
 - [Grafana dashboard best practices](https://grafana.com/docs/grafana/latest/best-practices/)
+- [Grafana panels and visualizations](https://grafana.com/docs/grafana/latest/panels-visualizations/)

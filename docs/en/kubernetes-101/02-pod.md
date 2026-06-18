@@ -1,10 +1,10 @@
 ---
 series: kubernetes-101
 episode: 2
-title: Pod
-status: content-ready
+title: "Kubernetes 101 (2/10): Pod"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,32 @@ tags:
   - YAML
   - DevOps
 seo_description: A beginner guide to Kubernetes Pods — what they are, how they relate to containers, the sidecar pattern, and the pod lifecycle in YAML
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Pod
+# Kubernetes 101 (2/10): Pod
 
-> Kubernetes 101 series (2/10)
+The first thing that confuses many Docker users is that Kubernetes does not treat the container itself as the base unit. That design choice looks odd until you hit the real operational problems: shared networking, helper processes, startup ordering, and the fact that several containers sometimes have to live and die together.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Kubernetes 101 series.
 
-**Core question**: Why is the *base unit* a *Pod*, and not a *container*?
+Here, we will define a Pod as the smallest deployable execution bundle in Kubernetes and connect that idea to sidecars, shared storage, and the Pod lifecycle you debug in production.
 
-> A *Pod* is a *bundle of containers* that *live and die together* — the *smallest deployable unit* in *Kubernetes*.
+> A Pod is not a prettier name for one container. It is the boundary Kubernetes uses when scheduling, networking, and replacing a unit of work.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![kubernetes 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/02/02-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 2 flow overview*
 
-- The definition of a *Pod*
-- How it differs from a *container*
-- The *sidecar* pattern
-- The *lifecycle* phases
-- *Why* you should not create one directly
+## Questions to Keep in Mind
+
+- The definition of a *Pod?
+- How it differs from a *container?
+- The *sidecar* pattern?
 
 ## Why It Matters
 
 *Every workload* eventually runs *on a Pod*. You must understand the *Pod model* before higher-level objects make sense.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Pod["pod"] --> C1["app container"]
-    Pod --> C2["sidecar"]
-    Pod --> Vol["shared volume"]
-    Pod --> Net["shared network ns"]
-```
 
 ## Key Terms
 
@@ -124,6 +114,22 @@ def delete(name):
     subprocess.run(["kubectl", "delete", "pod", name], check=True)
 ```
 
+## Verification workflow
+
+```bash
+kubectl get pod web -o wide
+kubectl describe pod web
+kubectl logs web
+```
+
+**Expected output:** `get pod` should show a Pod that is `Running` or still becoming ready, `describe` should list scheduling and container-start events in order, and `logs` should surface the first app messages from standard output. Together they show state, reason, and app-level evidence instead of only a green/red summary.
+
+**Failure modes to check first:**
+
+- A long `Pending` state usually means scheduling or resource issues before it means application failure.
+- `ImagePullBackOff` points to image tag or registry access before it points to Pod YAML shape.
+- Empty logs often mean the process exited immediately or the app is still writing only to files inside the container.
+
 ## What to Notice in This Code
 
 - The *Pod name* must be *unique*.
@@ -167,8 +173,19 @@ def delete(name):
 
 With *Pods* understood, the next step is the *Deployment*, which owns *restarts and rolling updates*.
 
+## Answering the Opening Questions
+
+- **The definition of a *Pod?**
+  - The article treats Pod as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How it differs from a *container?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The *sidecar* pattern?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
 - **Pod (current)**
 - Deployment (upcoming)
 - Service (upcoming)
@@ -178,6 +195,7 @@ With *Pods* understood, the next step is the *Deployment*, which owns *restarts 
 - HPA (upcoming)
 - Helm (upcoming)
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -186,3 +204,4 @@ With *Pods* understood, the next step is the *Deployment*, which owns *restarts 
 - [Pod lifecycle](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/)
 - [Init containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)
 - [Sidecar containers](https://kubernetes.io/blog/2023/08/25/native-sidecar-containers/)
+- [Debug Pods](https://kubernetes.io/docs/tasks/debug/debug-application/debug-pods/)

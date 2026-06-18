@@ -1,10 +1,10 @@
 ---
 series: frontend-development-101
 episode: 7
-title: Forms and Validation
+title: "Frontend Development 101 (7/10): Forms and Validation"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,21 @@ seo_description: Controlled inputs, validation, error messages, and accessibilit
 last_reviewed: '2026-05-04'
 ---
 
-# Forms and Validation
+# Frontend Development 101 (7/10): Forms and Validation
 
-> Frontend Development 101 series (7/10)
+Forms are where products have their longest conversation with users. Sign-up, login, payment, search, and settings changes all pass through fields, buttons, and validation messages. When that conversation is awkward, users feel it immediately.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Frontend Development 101 series. Here we treat a form as a guided interaction rather than as a bag of inputs. A good form helps while the user is typing, shows errors in plain language, and makes correction easier than failure.
 
-**Core question**: How do you tell a user *kindly* that they made a mistake?
 
-> A good form *helps while typing* and never *scolds only after submit*.
+![frontend development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/07/07-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 7 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Forms and Validation?
+- Which signal should the example or diagram make visible for Forms and Validation?
+- What failure should be prevented first when Forms and Validation reaches a real system?
 
 ## What You Will Learn
 
@@ -45,17 +49,6 @@ last_reviewed: '2026-05-04'
 Forms drive *conversion*. Sign-up, payment, search — all forms. *Slightly awkward* forms cause users to leave. Forms are the *UX exam* of the frontend.
 
 > Great forms *ask less*, *catch typos early*, and *submit fast*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Input["Input"] --> Format["Format check"]
-    Format --> Rule["Business rule"]
-    Rule --> Submit["Submit"]
-    Submit --> Server["Server validation"]
-    Server -->|error| Input
-```
 
 ## Key Terms
 
@@ -131,6 +124,16 @@ const result = SignupSchema.safeParse({ email, password });
 if (!result.success) showErrors(result.error.format());
 ```
 
+## Verification
+
+- Type an invalid email and confirm that the inline error appears before submit; then type a valid one and verify that the submit button becomes usable.
+- Tab through the form using only the keyboard and confirm that labels, focus order, and `aria-invalid` all communicate the same state.
+
+## If It Fails, Check This First
+
+- If errors never clear, check the controlled state update path and the exact timing of your format validation.
+- If assistive feedback is weak, verify the `label`, `id`, and `aria-describedby` connections first.
+
 ## What to Notice in This Code
 
 - Validation happens *while the user types*.
@@ -175,22 +178,38 @@ Most React apps use *React Hook Form + Zod*. State, validation, submission, and 
 
 Forms are *the longest conversation with the user*. Next, we look at how the form — and the rest of the screen — gets *its appearance* via styling and design systems.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Forms and Validation?**
+  - The article treats Forms and Validation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Forms and Validation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Forms and Validation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
-- [HTML and CSS Basics](./02-html-and-css-basics.md)
-- [JavaScript Basics](./03-javascript-basics.md)
-- [Components and State](./04-components-and-state.md)
-- [Routing and Pages](./05-routing-and-pages.md)
-- [API Calls and Async](./06-api-calls-and-async.md)
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML and CSS Basics](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript Basics](./03-javascript-basics.md)
+- [Frontend Development 101 (4/10): Components and State](./04-components-and-state.md)
+- [Frontend Development 101 (5/10): Routing and Pages](./05-routing-and-pages.md)
+- [Frontend Development 101 (6/10): API Calls and Async](./06-api-calls-and-async.md)
 - **Forms and Validation (current)**
 - Styling and Design Systems (upcoming)
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [React Hook Form](https://react-hook-form.com/)
-- [Zod docs](https://zod.dev/)
-- [MDN Form validation](https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation)
-- [W3C Form best practices](https://www.w3.org/WAI/tutorials/forms/)
+### Official Docs
+- [React Hook Form documentation](https://react-hook-form.com/)
+- [Zod documentation](https://zod.dev/)
+- [MDN: Client-side form validation](https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation)
+
+### Verification and Further Reading
+- [WAI: Forms tutorial](https://www.w3.org/WAI/tutorials/forms/)
+- [MDN: ARIA aria-invalid](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-invalid)

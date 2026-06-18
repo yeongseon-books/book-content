@@ -1,0 +1,5 @@
+flowchart TD
+  Client["클라이언트"] --> LB["Azure 로드 밸런서"]
+  LB --> Envoy["Envoy 엣지 프록시"]
+  Envoy --> Svc["Kubernetes 서비스"]
+  Svc --> Pod["앱 파드"]

@@ -1,10 +1,10 @@
 ---
 series: observability-101
 episode: 9
-title: Cost and Cardinality
-status: content-ready
+title: "Observability 101 (9/10): Cost and Cardinality"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,28 +17,35 @@ tags:
   - Metrics
   - Sampling
 seo_description: How cardinality explosions, retention tiers, and sampling decisions actually drive — and tame — observability cost.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Cost and Cardinality
+# Observability 101 (9/10): Cost and Cardinality
 
-> Observability 101 series (9/10)
+Observability rarely looks expensive at the beginning. A few counters, a few logs, a bit of tracing, and the bill seems harmless. Then one month later the cost curve changes shape and nobody can explain why.
 
-<!-- a-grade-intro:begin -->
+The answer is usually structural, not accidental: too many unique labels, too much retention, and too little sampling discipline.
 
-**Core question**: Why does observability cost *suddenly* go up *10x*?
+This is post 9 in the Observability 101 series.
 
-> *Cardinality explosion, retention, and missing sampling — these three account for *99% of cost bombs*.*
 
-<!-- a-grade-intro:end -->
+![observability 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/09/09-01-concept-at-a-glance.en.png)
+*observability 101 chapter 9 flow overview*
+> Cost and Cardinality is about the boundary decision, not the tool choice.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- How *cardinality* drives cost
-- Tiered *retention* policy
-- Two models of *sampling*
-- The *cost curve* of each signal
-- Five common pitfalls
+- What boundary should you inspect first when applying Cost and Cardinality?
+- Which signal should the example or diagram make visible for Cost and Cardinality?
+- What failure should be prevented first when Cost and Cardinality reaches a real system?
+
+## Questions this article answers
+
+- Why is cardinality directly tied to cost?
+- Why should retention be split into tiers?
+- How do head sampling and tail sampling differ?
+- What cost curve does each signal — metrics, logs, and traces — follow?
+- Why does a team need its own observability cost budget?
 
 ## Why It Matters
 
@@ -46,15 +53,7 @@ In young companies the *#1 line on the AWS bill* is often *observability*. When 
 
 > *If you do not know the cost of measurement, *measurement becomes the enemy*.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Labels["label combinations"] --> Series["time series count"]
-    Series --> Storage["storage cost"]
-    Logs["log volume"] --> Index["index cost"]
-    Traces["trace count"] --> Sample["sampling"]
-```
+Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms
 
@@ -81,7 +80,7 @@ topk(20, count by (__name__) (...))  # top metrics
 
 ### Step 2 — Remove dangerous labels
 
-```python
+```text
 # Bad: per-user series
 http_requests_total{user_id="42", path="/buy"}
 # Good: dimension reduction
@@ -120,6 +119,22 @@ processors:
 metric:  <= X million series
 log:     <= Y GB per day
 trace:   <= Z traces per minute after sampling
+```
+
+## How to Start a Cost Review
+
+Do not wait for the invoice. Review high-cardinality metrics directly in the monitoring system.
+
+```promql
+count({__name__=~".+"})
+topk(10, count by (__name__) ({__name__=~".+"}))
+```
+
+```text
+Expected output:
+- A small set of metrics accounts for most time series.
+- Finite labels such as `path` and `status` stay, while identifiers such as `user_id` and `request_id` get removed from metrics.
+- Teams can act before budgets are exceeded by cutting labels, retention, or sampling volume.
 ```
 
 ## What to Notice in This Code
@@ -165,17 +180,29 @@ Most companies combine *team cardinality budgets*, *retention tiers*, and *tail 
 
 Without cost awareness, *observability becomes the enemy*. Next: *a production-ready stack*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Cost and Cardinality?**
+  - The article treats Cost and Cardinality as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Cost and Cardinality?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Cost and Cardinality reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
-- [Metrics, Logs, and Traces](./02-metric-log-trace.md)
-- [Collecting and Visualizing Metrics](./03-metric-collection.md)
-- [Structured Logging](./04-structured-logging.md)
-- [Distributed Tracing Basics](./05-distributed-tracing.md)
-- [Dashboard Design](./06-dashboard-design.md)
-- [Alerts and On-Call](./07-alert-and-oncall.md)
-- [SLI and SLO Basics](./08-sli-and-slo.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
+- [Observability 101 (2/10): Metrics, Logs, and Traces](./02-metric-log-trace.md)
+- [Observability 101 (3/10): Collecting and Visualizing Metrics](./03-metric-collection.md)
+- [Observability 101 (4/10): Structured Logging](./04-structured-logging.md)
+- [Observability 101 (5/10): Distributed Tracing Basics](./05-distributed-tracing.md)
+- [Observability 101 (6/10): Dashboard Design](./06-dashboard-design.md)
+- [Observability 101 (7/10): Alerts and On-Call](./07-alert-and-oncall.md)
+- [Observability 101 (8/10): SLI and SLO Basics](./08-sli-and-slo.md)
 - **Cost and Cardinality (current)**
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,10 +1,10 @@
 ---
 series: machine-learning-101
 episode: 1
-title: What Is Machine Learning?
-status: content-ready
+title: "Machine Learning 101 (1/10): What Is Machine Learning?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,28 @@ tags:
   - Foundations
   - Beginner
 seo_description: A clear intro to machine learning — what learning, generalization, and prediction mean and how ML differs from statistics and rule-based code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is Machine Learning?
+# Machine Learning 101 (1/10): What Is Machine Learning?
 
-> Machine Learning 101 series (1/10)
+Recommendation systems, fraud filters, and medical triage tools all get called “machine learning,” but that label hides the real operating question. Are you writing smarter rules, doing statistics with a new library, or building a system that learns a reusable function from data? If that distinction stays fuzzy, every later discussion about models, metrics, and deployment turns into memorizing API names.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Machine Learning 101 series. Here we will pin the topic down to one practical definition: machine learning means fitting a function from data, then trusting that function on inputs the model has never seen before.
 
-**Core question**: Is *machine learning* just *a new name for statistics*, or *a new programming paradigm*?
 
-> *Machine learning *learns a function from data* and uses it to *predict on new inputs*.*
+![machine learning 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 1 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The *definition* of *machine learning*
-- The intuition of *learning, generalization, prediction*
-- The *difference* from *statistics* and *rule-based code*
-- A 5-step first ML hands-on
-- Five common mistakes
+- What exactly is the model learning when we say “machine learning”?
+- Why is generalization different from scoring well on the training set?
+- Where does machine learning diverge from statistics and rule-based code?
 
 ## Why It Matters
 
 Recommendation, medicine, finance, autonomous driving — *every industry* is being *reshaped* by ML. Weak fundamentals make *every model collapse* later.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Data["data (X, y)"] --> Train["train: learn f"]
-    Train --> Model["model f̂"]
-    Model --> Predict["predict y_hat for new X"]
-```
 
 ## Key Terms
 
@@ -102,11 +89,19 @@ print(model.predict(X[:5]))
 print("acc:", model.score(X, y))
 ```
 
+**Expected output:** `X.shape` and `y.shape` should report a small tabular dataset such as `(150, 4)` and `(150,)`, `model.predict(X[:5])` should print class IDs, and the training accuracy will usually look very high. That last number is a teaching device, not proof that the model generalizes.
+
 ## What to Notice in This Code
 
 - *fit / predict / score* is the *scikit-learn standard interface*.
 - *score* here is only *training accuracy* — not generalization.
 - *Model choice* depends on *problem type*.
+
+## Read the first failure signal this way
+
+- If training accuracy looks excellent but live data fails, check whether the input distribution changed or whether the target was defined too loosely.
+- If the team cannot explain what `X` and `y` represent in one sentence, the project is not ready for model comparison yet.
+- If a notebook demo works only on the sample rows you kept reusing, suspect leakage or accidental memorization before you blame the algorithm.
 
 ## Five Common Mistakes
 
@@ -145,7 +140,18 @@ Recommendation, fraud detection, demand forecasting, image recognition, NLP chat
 
 ML is *a function learned from data*. Next we cover *supervised vs unsupervised learning*.
 
+## Answering the Opening Questions
+
+- **What exactly is the model learning when we say “machine learning”?**
+  - The article treats What Is Machine Learning? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is generalization different from scoring well on the training set?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where does machine learning diverge from statistics and rule-based code?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Machine Learning? (current)**
 - Supervised and Unsupervised Learning (upcoming)
 - Train/Test Split (upcoming)
@@ -156,6 +162,7 @@ ML is *a function learned from data*. Next we cover *supervised vs unsupervised 
 - Overfitting and Regularization (upcoming)
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

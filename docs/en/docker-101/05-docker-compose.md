@@ -1,10 +1,10 @@
 ---
 series: docker-101
 episode: 5
-title: Docker Compose
-status: content-ready
+title: "Docker 101 (5/10): Docker Compose"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,46 +17,32 @@ tags:
   - MultiContainer
   - Dev
 seo_description: Define and run multi-container environments from a single YAML file with Docker Compose, including healthchecks and profiles.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Docker Compose
+# Docker 101 (5/10): Docker Compose
 
-> Docker 101 series (5/10)
+A few `docker run` commands are manageable when you have only one service. The moment you need a web app, a database, a cache, and maybe a worker, that command-line memory game stops scaling. Teams start depending on tribal knowledge instead of a reproducible environment definition.
 
-<!-- a-grade-intro:begin -->
+Compose matters because it turns that memory into a checked-in declaration. Services, ports, volumes, healthchecks, and optional profiles become reviewable configuration instead of setup folklore.
 
-**Core question**: How do you start many containers *reproducibly* and *all at once*?
+This is post 5 in the Docker 101 series. It shows how to express a multi-container environment in Compose, what `depends_on` can and cannot guarantee, and which verification steps tell you the stack is actually ready.
 
-> *Compose codifies a *multi-container environment* into *one YAML file*.*
 
-<!-- a-grade-intro:end -->
+![docker 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/05/05-01-concept-at-a-glance.en.png)
+*docker 101 chapter 5 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Defining *services / networks / volumes*
-- *depends_on* and healthchecks
-- *profiles* for *selective execution*
-- *.env* files and variable interpolation
-- Five common pitfalls
+- Defining *services / networks / volumes?
+- depends_on* and healthchecks?
+- profiles* for *selective execution?
 
 ## Why It Matters
 
 New-hire setup finishes in *under five minutes*. The *README setup section* simply disappears.
 
 > *Compose is the shortest path to *environment-as-code*.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Compose["compose.yaml"] --> Web["web service"]
-    Compose --> Db["db service"]
-    Compose --> Cache["cache service"]
-    Web --> Net["app-net"]
-    Db --> Net
-    Cache --> Net
-```
 
 ## Key Terms
 
@@ -142,6 +128,16 @@ docker compose down            # remove containers
 docker compose down -v         # also remove volumes
 ```
 
+### Verify right after you run it
+
+- In `docker compose ps`, the database should become `healthy` before the web service settles into its running state.
+- `docker compose logs -f web` should show the application starting without immediate database connection errors.
+
+### If it does not work, check this first
+
+- If the web container exits too early, verify that `depends_on` uses `condition: service_healthy` rather than plain start order.
+- If test data vanished after `down -v`, that is expected; make sure disposable and persistent data do not share the same volume strategy.
+
 ## What to Notice in This Code
 
 - *healthcheck + condition: service_healthy* waits for *real readiness*.
@@ -185,22 +181,40 @@ Most companies' *local dev environments* run on Compose. CI also uses it for *in
 
 Compose is your team's *first piece of infrastructure as code*. Next, the patterns of *environment variables and configuration*.
 
+## Answering the Opening Questions
+
+- **Defining *services / networks / volumes?**
+  - The article treats Docker Compose as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **depends_on* and healthchecks?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **profiles* for *selective execution?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
-- [Images and Containers](./02-image-and-container.md)
-- [Writing a Dockerfile](./03-dockerfile.md)
-- [Volumes and Networks](./04-volume-and-network.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Images and Containers](./02-image-and-container.md)
+- [Docker 101 (3/10): Writing a Dockerfile](./03-dockerfile.md)
+- [Docker 101 (4/10): Volumes and Networks](./04-volume-and-network.md)
 - **Docker Compose (current)**
 - Environment Variables and Configuration (upcoming)
 - Containerizing a Python App (upcoming)
 - Running with a Database (upcoming)
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References
+
+### Official docs
 
 - [Compose specification](https://docs.docker.com/compose/compose-file/)
 - [Overview of Compose](https://docs.docker.com/compose/)
 - [Compose profiles](https://docs.docker.com/compose/profiles/)
 - [Healthcheck in Compose](https://docs.docker.com/compose/compose-file/05-services/#healthcheck)
+
+### Verification and troubleshooting
+
+- [Compose startup order and dependency conditions](https://docs.docker.com/compose/how-tos/startup-order/)

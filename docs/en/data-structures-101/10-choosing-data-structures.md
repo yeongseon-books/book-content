@@ -1,10 +1,10 @@
 ---
 series: data-structures-101
 episode: 10
-title: Choosing Data Structures
+title: "Data Structures 101 (10/10): Choosing Data Structures"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: A closing guide to choosing data structures with a decision tre
 last_reviewed: '2026-05-04'
 ---
 
-# Choosing Data Structures
+# Data Structures 101 (10/10): Choosing Data Structures
 
 > Data Structures 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: You've now studied nine data structures. When you face a brand-new problem, what should come to mind first?
 
 > Choosing a data structure is decided by "which operations happen most often", not by "what kind of data you store". Even with the same user records, frequent lookups want a hash table; frequent sorted iteration wants a BST; frequent push and pop at both ends wants a deque; frequent priority access wants a heap. This closing article wraps up the series with how to analyse workloads, a decision tree, and the bad picks you'll encounter most often in real projects.
 
-<!-- a-grade-intro:end -->
+This is the final post in the Data Structures 101 series.
+
+
+![data structures 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/10/10-01-big-picture.en.png)
+*data structures 101 chapter 10 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Choosing Data Structures?
+- Which signal should the example or diagram make visible for Choosing Data Structures?
+- What failure should be prevented first when Choosing Data Structures reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 Algorithms run on top of data structures, so the data structure you pick sets the upper bound on system performance. A bad choice is hard to recover from with algorithmic optimisation alone. But picking a data structure without analysing the workload is just as risky. "What I know" or "the theoretically fastest one" is not always the right answer.
 
 > Choosing a data structure = workload analysis + understanding trade-offs + measurement.
-
-## Concept at a Glance
 
 > A good choice starts not from "the shape of the data" but from "the frequency and pattern of operations". You first define which operations are on the hot path, how big the input is, and what the memory constraints are.
 
@@ -153,7 +159,6 @@ def recommend_structure(workload):
     if primary == "ordered_iteration":
         return "list / array"
     return "list (default)"
-
 
 print(recommend_structure({"primary_op": "key_lookup"}))     # dict / set
 print(recommend_structure({"primary_op": "min_or_max"}))      # heap
@@ -271,17 +276,29 @@ Choosing a data structure is the final gate of computer-science fundamentals and
 
 The nine data structures covered in this series — array, linked list, stack, queue, hash table, tree, BST, heap, graph — are the vocabulary of nearly every algorithm and system design. The next series covers algorithms: sorting, searching, dynamic programming, and graph algorithms — what you build on top of these structures.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Choosing Data Structures?**
+  - The article treats Choosing Data Structures as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Choosing Data Structures?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Choosing Data Structures reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
-- [Linked Lists](./03-linked-lists.md)
-- [Stacks and Queues](./04-stacks-and-queues.md)
-- [Hash Tables](./05-hash-tables.md)
-- [Trees](./06-trees.md)
-- [Binary Search Trees](./07-binary-search-trees.md)
-- [Heaps](./08-heaps.md)
-- [Graphs](./09-graphs.md)
+## In this series
+
+- [Data Structures 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
+- [Data Structures 101 (3/10): Linked Lists](./03-linked-lists.md)
+- [Data Structures 101 (4/10): Stacks and Queues](./04-stacks-and-queues.md)
+- [Data Structures 101 (5/10): Hash Tables](./05-hash-tables.md)
+- [Data Structures 101 (6/10): Trees](./06-trees.md)
+- [Data Structures 101 (7/10): Binary Search Trees](./07-binary-search-trees.md)
+- [Data Structures 101 (8/10): Heaps](./08-heaps.md)
+- [Data Structures 101 (9/10): Graphs](./09-graphs.md)
 - **Choosing Data Structures (current)**
+
 <!-- toc:end -->
 
 ## References

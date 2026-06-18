@@ -1,0 +1,7 @@
+flowchart LR
+    A["Korean system message\nrole + language + length"] --> D["Groq chat.completions.create"]
+    B["User question\nvector search vs keyword search"] --> D
+    C["temperature=0.3\nmax_completion_tokens=300"] --> D
+    D --> E["choices[0].message.content"]
+    E --> F["3-5 sentence Korean answer"]
+    F --> G["Later swap only provider layer\nfor Solar / HyperCLOVA"]

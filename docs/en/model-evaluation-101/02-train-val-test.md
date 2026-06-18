@@ -1,10 +1,10 @@
 ---
 series: model-evaluation-101
 episode: 2
-title: Train, Validation, and Test
-status: content-ready
+title: "Model Evaluation 101 (2/10): Train, Validation, and Test"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,30 @@ tags:
   - CrossValidation
   - scikit-learn
 seo_description: How to separate train, validation, and test sets, prevent leakage and group spillover, and split time-series data correctly with scikit-learn
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Train, Validation, and Test
+# Model Evaluation 101 (2/10): Train, Validation, and Test
 
-> Model Evaluation 101 series (2/10)
+Model quality is often decided long before you compute the first metric. If the split is wrong, every number that follows can still look polished while being untrustworthy. Leakage from preprocessing, random splits on time-series data, or the same user showing up in multiple splits can all inflate performance fast.
 
-<!-- a-grade-intro:begin -->
+That is why train, validation, and test are not textbook ceremony. They are a discipline for separating learning, selection, and final verification. Once those roles blur together, evaluation stops being evidence and starts becoming wishful thinking.
 
-**Core question**: Why must validation and test be separate?
+This is post 2 in the Model Evaluation 101 series. In this post, we define what each split is allowed to do and where leakage usually sneaks in.
 
-> *Train fits, validation tunes, and test is touched exactly once. The discipline of three roles is the foundation of all evaluation.*
 
-<!-- a-grade-intro:end -->
+![model evaluation 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 2 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The role of each dataset
-- Different forms of data leakage
-- Principles for splitting time-series data
-- Group-aware splitting to prevent group leakage
-- Five common pitfalls
+- The role of each dataset?
+- Different forms of data leakage?
+- Principles for splitting time-series data?
 
 ## Why It Matters
 
 A wrong split invalidates every measurement that follows. Model comparisons become misleading.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    All["all data"] --> Tr["train (fit)"]
-    All --> Va["valid (tune)"]
-    All --> Te["test (final)"]
-```
 
 ## Key Terms
 
@@ -117,6 +106,8 @@ m = LogisticRegression(max_iter=1000).fit(sc.transform(Xtr), ytr)
 print("valid:", m.score(sc.transform(Xva), yva))
 ```
 
+**Expected output:** You should see that fitting transforms on the full dataset quietly leaks statistics, while time-aware and group-aware splits preserve the boundary between what the model is allowed to know and what it must still prove.
+
 ## What to Notice in This Code
 
 - Fitting on the full dataset leaks statistics.
@@ -160,8 +151,19 @@ Recommendation, healthcare, and finance all rely on group-aware or time-aware sp
 
 The split strategy is the prerequisite for every measurement. Next, we examine the limits of accuracy.
 
+## Answering the Opening Questions
+
+- **The role of each dataset?**
+  - The article treats Train, Validation, and Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Different forms of data leakage?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Principles for splitting time-series data?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
+## In this series
+
+- [Model Evaluation 101 (1/10): Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
 - **Train, Validation, and Test (current)**
 - The Limits of Accuracy (upcoming)
 - Precision and Recall (upcoming)
@@ -171,6 +173,7 @@ The split strategy is the prerequisite for every measurement. Next, we examine t
 - Cross Validation (upcoming)
 - Error Analysis (upcoming)
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References

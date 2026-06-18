@@ -1,10 +1,10 @@
 ---
 series: information-security-101
 episode: 1
-title: What Is Information Security?
+title: "Information Security 101 (1/10): What Is Information Security?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,26 @@ seo_description: The starting point of information security - confidentiality, i
 last_reviewed: '2026-05-04'
 ---
 
-# What Is Information Security?
+# Information Security 101 (1/10): What Is Information Security?
 
 > Information Security 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Is security the work of "blocking" or the work of "deciding"?
 
 > Security is not the work of reducing threats to zero — it is the work of knowing the threats and deciding how much you can absorb.
 
-<!-- a-grade-intro:end -->
+This is the first post in the Information Security 101 series.
+
+
+![information security 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/01/01-01-big-picture.en.png)
+*information security 101 chapter 1 flow overview*
+> Information security is not knowing technology names. It is building a state where your team can say "we protect X, we watch for Y, we accept Z."
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Information Security??
+- Which signal should the example or diagram make visible for What Is Information Security??
+- What failure should be prevented first when What Is Information Security? reaches a real system?
 
 ## What You Will Learn
 
@@ -46,8 +55,6 @@ last_reviewed: '2026-05-04'
 Security incidents almost never happen because the team lacked technology — they happen because the team did not make a decision. The other nine posts cover "how"; this one defines "what" and "why." Everything else stands on top of it.
 
 > Security is a discipline of decisions, not technology.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -189,17 +196,29 @@ OWASP threat modeling, ISO 27001 / SOC 2 risk assessments, AWS Well-Architected 
 
 The starting point of information security is not control technology — it is the question "what are we protecting and why." Next we cover the most common control: authentication and authorization.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Information Security??**
+  - The article treats What Is Information Security? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Information Security??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Information Security? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Information Security? (current)**
-- authentication and authorization (upcoming)
-- cryptography and hashing (upcoming)
-- TLS and certificates (upcoming)
-- web security basics (upcoming)
-- SQL injection and XSS (upcoming)
-- secret management (upcoming)
-- least privilege (upcoming)
-- logging and audit (upcoming)
-- security incident response (upcoming)
+- Authentication and Authorization (upcoming)
+- Cryptography and Hashing (upcoming)
+- TLS and Certificates (upcoming)
+- Web Security Basics (upcoming)
+- SQL Injection and XSS (upcoming)
+- Secret Management (upcoming)
+- Least Privilege (upcoming)
+- Logging and Audit (upcoming)
+- Incident Response (upcoming)
+
 <!-- toc:end -->
 
 ## References

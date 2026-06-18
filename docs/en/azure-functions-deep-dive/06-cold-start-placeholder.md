@@ -1,11 +1,11 @@
 ---
-title: Cold Start and Placeholder Mode — What Happens When a New Instance Is Born
+title: "Azure Functions Deep Dive (6/6): Cold Start and Placeholder Mode — What Happens When a New Instance Is Born"
 series: azure-functions-deep-dive
 episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -19,9 +19,13 @@ seo_description: This part closes out the Azure Functions Deep Dive series. Part
   covered host bootstrap, Part 2 the worker process, Parts 3–4 the gRPC channel and…
 ---
 
-# Cold Start and Placeholder Mode — What Happens When a New Instance Is Born
+# Azure Functions Deep Dive (6/6): Cold Start and Placeholder Mode — What Happens When a New Instance Is Born
 
 > Azure Functions Deep Dive series (6/6)
+
+Scaling out explains why a new instance appears, but not why that instance sometimes feels instant and sometimes painfully slow. The answer lives in the placeholder-to-specialization path, where the platform decides how much startup work it can finish before your app is even assigned.
+
+This is the final post in the Azure Functions Deep Dive series. Here, we trace cold start from placeholder initialization to specialization and host restart.
 
 ## Source Version
 
@@ -35,23 +39,19 @@ The answer to that question is **Placeholder Mode**. This part follows the code 
 
 > All code citations reference [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).
 
----
+![azure functions deep dive chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.en.png)
+*azure functions deep dive chapter 6 flow overview*
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Of host bootstrap, worker start, and JIT, which is the most expensive part of a Functions cold start?
 - What exactly does the Placeholder instance prepare in advance?
 - How does a Premium-plan always-ready instance differ from a placeholder?
-- What are the code-level rules to reduce cold start?
-- How will you express cold-start metric in the SLO?
 
 ## Why Cold Start Is Expensive — Decomposing the Bootstrap Cost
 
 Let's first lay out the steps a single new instance has to traverse before it's ready to run a function from scratch.
 
-![Shared bootstrap and user-specific stages](../../assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.en.png)
-
-*Shared bootstrap and user-specific stages*
 Steps 1 through 5 (VM allocation through DI container build) are **independent of user code**. Every customer's function goes through the same steps. Starting from step 6 (downloading code), things become user-specific.
 
 Placeholder Mode's idea exploits exactly this separation.
@@ -357,7 +357,7 @@ This is the code-level guarantee that **cold start cost is paid exactly once, on
 
 Putting everything we've seen so far into a single sequence diagram:
 
-![Instance lifecycle from placeholder to execution](../../assets/azure-functions-deep-dive/06/06-02-the-whole-picture-the-life-of-an-instanc.en.png)
+![Instance lifecycle from placeholder to execution](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/06/06-02-the-whole-picture-the-life-of-an-instanc.en.png)
 
 *Instance lifecycle from placeholder to execution*
 ---
@@ -426,15 +426,24 @@ This part closes out the Azure Functions Deep Dive series. Part 1 covered host b
 - [ ] Pinned cold-start latency in the SLO document
 - [ ] Load-tested the scenario where scale-out exposes cold-start to users
 
+## Answering the Opening Questions
+
+- **Of host bootstrap, worker start, and JIT, which is the most expensive part of a Functions cold start?**
+  - The article treats Cold Start and Placeholder Mode — What Happens When a New Instance Is Born as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What exactly does the Placeholder instance prepare in advance?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How does a Premium-plan always-ready instance differ from a placeholder?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
-- [Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
-- [The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
-- [Dispatcher and Invocation — How a Function Call Reaches the Worker](./04-dispatcher-and-invocation.md)
-- [Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans](./05-scaling-internals.md)
-- **Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (current)**
+- [Azure Functions Deep Dive (1/6): Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
+- [Azure Functions Deep Dive (2/6): Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
+- [Azure Functions Deep Dive (3/6): The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
+- [Azure Functions Deep Dive (4/6): Dispatcher and Invocation — How a Function Call Reaches the Worker](./04-dispatcher-and-invocation.md)
+- [Azure Functions Deep Dive (5/6): Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans](./05-scaling-internals.md)
+- **Azure Functions Deep Dive (6/6): Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (current)**
 
 <!-- toc:end -->
 

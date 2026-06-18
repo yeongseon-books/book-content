@@ -1,0 +1,8 @@
+flowchart LR
+    subgraph C["Portfolio Building"]
+        C1["Problem Definition"] --> C2["Data Collection & Cleaning"]
+        C2 --> C3["Exploratory Data Analysis (EDA)"]
+        C3 --> C4["Modeling / Visualization"]
+        C4 --> C5["Result Interpretation & Deploy"]
+    end
+    C5 -.->|"Feedback Loop"| C1

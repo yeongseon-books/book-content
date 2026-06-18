@@ -1,10 +1,10 @@
 ---
 series: kubernetes-101
 episode: 5
-title: Ingress
-status: content-ready
+title: "Kubernetes 101 (5/10): Ingress"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,32 @@ tags:
   - TLS
   - DevOps
 seo_description: A beginner guide to Kubernetes Ingress — host and path routing, TLS termination, and how to choose an Ingress Controller
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Ingress
+# Kubernetes 101 (5/10): Ingress
 
-> Kubernetes 101 series (5/10)
+Exposing one service to the outside world is simple enough. Exposing several services, under one domain, with TLS and path-based routing is where copy-paste load balancers start turning into cost and operational drift.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Kubernetes 101 series.
 
-**Core question**: How do you split *several services* under *one domain* by *path*?
+Here, we will separate the declarative Ingress rule from the controller that enforces it, then use that split to reason about host routing, path routing, and TLS termination.
 
-> *Ingress* consolidates *L7 HTTP routing* and *TLS termination* into a *single entry point*.
+> Ingress is the routing rule. The Ingress controller is the runtime that makes the rule real.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![kubernetes 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 5 flow overview*
 
-- Splitting *Ingress* and *IngressController*
-- *Host / path* routing
-- *TLS termination*
-- Relation to the *external LoadBalancer*
-- *Gateway API* in one line
+## Questions to Keep in Mind
+
+- Splitting *Ingress* and *IngressController?
+- Host / path* routing?
+- TLS termination?
 
 ## Why It Matters
 
 A *LoadBalancer Service per app* explodes *cost*. *Ingress* collapses everything into a *single entry*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    User["client"] --> LB["external lb"]
-    LB --> IC["ingress controller"]
-    IC --> S1["svc a"]
-    IC --> S2["svc b"]
-```
 
 ## Key Terms
 
@@ -134,6 +124,22 @@ def curl(host, path):
     return res.stdout
 ```
 
+## Verification workflow
+
+```bash
+kubectl get ingress web
+kubectl describe ingress web
+curl -sk -H 'Host: example.com' https://<ingress-address>/api
+```
+
+**Expected output:** `get ingress` should show an address or controller-managed endpoint, `describe ingress` should list the expected host/path/backend mapping, and the `curl` response should prove that `/api` reaches a different backend than the site root.
+
+**Failure modes to check first:**
+
+- An address-less Ingress usually means the controller path is broken, not the rule object itself.
+- TLS handshake failures often come from the secret namespace or secret name before they come from certificate content.
+- If `/` works and `/api` does not, inspect path precedence and `pathType` interpretation first.
+
 ## What to Notice in This Code
 
 - *Ingress* is the *rule*; the *Controller* is the *executor*.
@@ -177,17 +183,29 @@ def curl(host, path):
 
 With routing in place, the next step is *separating config and secrets*. The next post covers *ConfigMap and Secret*.
 
+## Answering the Opening Questions
+
+- **Splitting *Ingress* and *IngressController?**
+  - The article treats Ingress as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Host / path* routing?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **TLS termination?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
 - **Ingress (current)**
 - ConfigMap and Secret (upcoming)
 - Volume (upcoming)
 - HPA (upcoming)
 - Helm (upcoming)
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -196,3 +214,4 @@ With routing in place, the next step is *separating config and secrets*. The nex
 - [Ingress Controllers](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
 - [cert-manager](https://cert-manager.io/docs/)
 - [Gateway API](https://gateway-api.sigs.k8s.io/)
+- [Set up Ingress on Minikube](https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/)

@@ -1,0 +1,5 @@
+flowchart TD
+  Create["App Created"] --> Inject["Dapr Sidecar Injected"]
+  Inject --> LoadComp["Load Environment Components"]
+  LoadComp --> Serve["Serve Traffic & Events"]
+  Serve --> Stop["Graceful Shutdown"]

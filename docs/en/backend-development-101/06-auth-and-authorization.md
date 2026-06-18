@@ -1,10 +1,10 @@
 ---
 series: backend-development-101
 episode: 6
-title: Authentication and Authorization
-status: content-ready
+title: "Backend Development 101 (6/10): Authentication and Authorization"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,46 +17,30 @@ tags:
   - JWT
   - Python
 seo_description: Understand the difference between authentication and authorization and build a safe FastAPI login flow with bcrypt, JWT, and role checks.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Authentication and Authorization
+# Backend Development 101 (6/10): Authentication and Authorization
 
-> Backend Development 101 series (6/10)
+Login looks small from the UI, but the server has to answer two separate questions on every protected request. It must know who the user is, and it must decide what that user is allowed to do right now.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Backend Development 101 series. Here, we separate authentication from authorization and build a safe baseline with password hashing, JWT verification, and explicit role checks in FastAPI.
 
-**Core question**: From the *server* point of view, what does "logged in" actually mean?
 
-> A user has *proven who they are* and the server now knows *what they can do* on this request. Authentication and authorization are *two different problems*.
+![backend development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 6 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The difference between authentication and authorization
-- Minimum safe practices for password storage
-- Sessions vs JWT — when to use which
-- How to build a protected endpoint in FastAPI
-- How to model permissions as roles
+- The difference between authentication and authorization?
+- Minimum safe practices for password storage?
+- Sessions vs JWT — when to use which?
 
 ## Why It Matters
 
 Auth is the *one area* where a single mistake can sink a company. A line that stored passwords as plain text or skipped a token check returns *years later* as a security incident.
 
 > Auth code must be small, standard, and boring.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    User["User"] -->|"id+pw"| Login["/login"]
-    Login -->|"token / cookie"| User
-    User -->|"Authorization header"| API["/api"]
-    API --> Verify["Verify"]
-    Verify --> Authz["Check role"]
-    Authz --> Handler["Handler"]
-```
 
 Authentication asks *who*; authorization asks *can you*.
 
@@ -159,6 +143,16 @@ def delete_user(uid: int, _: dict = Depends(require_role("admin"))):
     return {"deleted": uid}
 ```
 
+## Verification points
+
+**Expected output:** a correct password should issue a token, a wrong password should return `401`, and a user without the required role should hit `403` on the protected admin path.
+
+### First failure modes to check
+
+- If password verification always fails, confirm hashing and verification still use the same algorithm path.
+- If expired JWTs still pass, inspect whether `exp` validation is really happening in decode.
+- If permissions exist only in the frontend, the server has not actually enforced the rule yet.
+
 ## What to Notice in This Code
 
 - Passwords are *never* stored as plain text.
@@ -203,22 +197,39 @@ Most SaaS products start with *bcrypt + JWT + role-based access*. As they grow, 
 
 Authentication is *identity*; authorization is *permission*. Next, we look at the operator's eyes — *Logging and Error Handling*.
 
+## Answering the Opening Questions
+
+- **The difference between authentication and authorization?**
+  - The article treats Authentication and Authorization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Minimum safe practices for password storage?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Sessions vs JWT — when to use which?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Backend Development?](./01-what-is-backend-development.md)
-- [Building an HTTP Server](./02-building-an-http-server.md)
-- [Routing and Controllers](./03-routing-and-controllers.md)
-- [The Service Layer](./04-service-layer.md)
-- [The Database Layer](./05-database-layer.md)
+## In this series
+
+- [Backend Development 101 (1/10): What Is Backend Development?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): Building an HTTP Server](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing and Controllers](./03-routing-and-controllers.md)
+- [Backend Development 101 (4/10): The Service Layer](./04-service-layer.md)
+- [Backend Development 101 (5/10): The Database Layer](./05-database-layer.md)
 - **Authentication and Authorization (current)**
 - Logging and Error Handling (upcoming)
 - Testing the Backend (upcoming)
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+### Official Docs
+
 - [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
 - [FastAPI Security](https://fastapi.tiangolo.com/tutorial/security/)
-- [JWT Introduction](https://jwt.io/introduction)
 - [Passlib bcrypt docs](https://passlib.readthedocs.io/en/stable/lib/passlib.hash.bcrypt.html)
+
+### Further Reading
+
+- [JWT Introduction](https://jwt.io/introduction)

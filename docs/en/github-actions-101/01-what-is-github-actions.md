@@ -1,10 +1,10 @@
 ---
 series: github-actions-101
 episode: 1
-title: What Is GitHub Actions?
+title: "GitHub Actions 101 (1/10): What Is GitHub Actions?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,26 @@ tags:
   - DevOps
   - Workflow
 seo_description: Core concepts of GitHub Actions and your first workflow. The starting line for replacing manual steps with automation.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is GitHub Actions?
+# GitHub Actions 101 (1/10): What Is GitHub Actions?
 
-> GitHub Actions 101 series (1/10)
+At first glance, GitHub Actions looks like “CI built into GitHub.” That is a fair starting point, but it does not explain why some teams move faster with better release discipline while others just accumulate more YAML and still rely on manual steps.
 
-<!-- a-grade-intro:begin -->
+The more useful way to think about GitHub Actions is as an execution platform that lives next to your repository. Once a push, pull request, or tag becomes the trigger for test, lint, build, and deploy, the team stops depending on memory and starts depending on repeatable code.
 
-**Core question**: Where do you start so that *one push* triggers *test, lint, and deploy* automatically?
+This is the first post in the GitHub Actions 101 series. In this post, we will frame GitHub Actions as an execution platform for repository events rather than a convenient automation button.
 
-> Automation belongs in *code, not in hands*.
 
-<!-- a-grade-intro:end -->
+![github actions 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/01/01-01-concept-at-a-glance.en.png)
+*github actions 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is GitHub Actions??
+- Which signal should the example or diagram make visible for What Is GitHub Actions??
+- What failure should be prevented first when What Is GitHub Actions? reaches a real system?
 
 ## What You Will Learn
 
@@ -45,16 +51,6 @@ last_reviewed: '2026-05-04'
 CI/CD determines *team speed and quality*. *GitHub Actions* runs *next to your code* as a default automation engine, with no servers to operate.
 
 > Real CI starts at the moment a *PR is merged*, not when a human remembers.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Push["git push"] --> Trigger["event"]
-    Trigger --> Workflow["workflow.yml"]
-    Workflow --> Job["job: test"]
-    Job --> Step["step: pytest"]
-```
 
 ## Key Terms
 
@@ -93,8 +89,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
       - run: pip install -r requirements.txt
@@ -167,7 +163,18 @@ Mature teams split *test / lint / typecheck / build / deploy* into *separate wor
 
 GitHub Actions is *automation that lives next to your code*. The next post explores *Workflow and Job* structure in depth.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is GitHub Actions??**
+  - The article treats What Is GitHub Actions? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is GitHub Actions??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is GitHub Actions? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is GitHub Actions? (current)**
 - Workflows and Jobs (upcoming)
 - Understanding Triggers (upcoming)
@@ -178,6 +185,7 @@ GitHub Actions is *automation that lives next to your code*. The next post explo
 - Deployment Automation (upcoming)
 - Secret Management (upcoming)
 - A Real-World CI/CD Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

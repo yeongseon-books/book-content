@@ -1,11 +1,11 @@
 ---
-title: 'Data migrations: separating schema changes from data changes'
+title: "Alembic 101 (6/10): Data migrations: separating schema changes from data changes"
 series: alembic-101
 episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,26 @@ tags:
 - op.execute
 - batch
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: A data migration is a revision that leaves the schema alone and transforms
   rows.
 ---
 
-# Data migrations: separating schema changes from data changes
+# Alembic 101 (6/10): Data migrations: separating schema changes from data changes
 
-## What you will learn
+Data migrations are often slower and more irreversible than the schema changes around them. How you isolate row transformation work inside revisions determines lock time, retry behavior, and recovery difficulty.
 
-- How a "data migration" is different from a schema migration
-- Two writing styles for `op.execute` — raw SQL and SQLAlchemy core
-- A pattern for splitting a large dataset into batches
-- Why schema-only and data-only revisions should be separated
-- How to ensure idempotency and safe re-execution
+This is post 6 in the Alembic 101 series. Here we will focus on why schema changes and data changes should be split, and what safe execution patterns look like.
+
+
+![alembic 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/06/06-01-diagram-the-three-stage-split-for-data-m.en.png)
+*alembic 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- How a "data migration" is different from a schema migration?
+- Two writing styles for `op.execute` — raw SQL and SQLAlchemy core?
+- A pattern for splitting a large dataset into batches?
 
 ## Why it matters
 
@@ -41,6 +47,8 @@ seo_description: A data migration is a revision that leaves the schema alone and
 > A data migration is **a revision that leaves the schema alone and transforms rows**. Separating it from schema-only revisions lets you (1) split a giant transaction into smaller batches, (2) preserve the schema part and re-run only the data part on failure, and (3) make the intent obvious to reviewers.
 
 To borrow a git analogy: schema changes are code refactors, and data changes are database migration scripts. Mixing both into one commit clouds the history.
+
+### Diagram: the three-stage split for data migrations
 
 ## Core concepts
 
@@ -216,6 +224,15 @@ def upgrade() -> None:
 
 An assertion validates backfill completeness. On failure, the transaction rolls back and the schema-tighten step never runs.
 
+## Verification routine
+
+```bash
+alembic upgrade head
+sqlite3 app.db "SELECT COUNT(*) FROM users WHERE tier IS NULL;"
+```
+
+**Expected output:** the NULL row count is zero before you ship the tighten revision. If it is not zero, the backfill is incomplete.
+
 ## Common mistakes
 
 - **Bundling schema and data into one revision.** The leading cause of timeouts and lock incidents on large datasets.
@@ -254,12 +271,35 @@ The standard form for data migrations is to split them out as separate revisions
 
 The next post goes deep on `--sql` for offline DDL and the SQLite-specific batch mode — the online vs offline DDL story.
 
-## References
+## Answering the Opening Questions
 
-- Alembic: Operation Reference (`op.execute`) — https://alembic.sqlalchemy.org/en/latest/ops.html#alembic.operations.Operations.execute
-- Alembic: Run Code at Migration Time — https://alembic.sqlalchemy.org/en/latest/cookbook.html#run-arbitrary-python-during-migrations
-- SQLAlchemy: SQL Expression Language Tutorial — https://docs.sqlalchemy.org/en/20/tutorial/index.html
-- Alembic: Working With Custom Types and Data — https://alembic.sqlalchemy.org/en/latest/cookbook.html
+- **How a "data migration" is different from a schema migration?**
+  - The article treats Data migrations: separating schema changes from data changes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Two writing styles for `op.execute` — raw SQL and SQLAlchemy core?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **A pattern for splitting a large dataset into batches?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
+## In this series
+
+- [Alembic 101 (1/10): Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [Alembic 101 (2/10): env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Alembic 101 (3/10): Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- [Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
+- [Alembic 101 (5/10): branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
+- **Data migrations: separating schema changes from data changes (current)**
+- Online and offline modes: previewing DDL with --sql and handling SQLite batch (upcoming)
+- Downgrade strategy: when to write it for real and when to forbid it (upcoming)
+- Deploy ordering and blue/green: synchronizing schema and application code safely (upcoming)
+- Production and team workflow: PR, CI, monitoring, and incident response (upcoming)
+
 <!-- toc:end -->
+
+## References
+
+- [sqlalchemy/alembic GitHub repository](https://github.com/sqlalchemy/alembic)
+- [Alembic: Operation Reference (`op.execute`)](https://alembic.sqlalchemy.org/en/latest/ops.html#alembic.operations.Operations.execute)
+- [Alembic: Run Code at Migration Time](https://alembic.sqlalchemy.org/en/latest/cookbook.html#run-arbitrary-python-during-migrations)
+- [SQLAlchemy: SQL Expression Language Tutorial](https://docs.sqlalchemy.org/en/20/tutorial/index.html)
+- [Alembic: Working With Custom Types and Data](https://alembic.sqlalchemy.org/en/latest/cookbook.html)

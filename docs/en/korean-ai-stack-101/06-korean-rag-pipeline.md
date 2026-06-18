@@ -1,11 +1,11 @@
 ---
-title: Assembling a Korean RAG pipeline
+title: "Korean AI Stack 101 (6/6): Assembling a Korean RAG pipeline"
 series: korean-ai-stack-101
 episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -16,26 +16,24 @@ tags:
 - Retrieval
 - LLM
 - Python
-last_reviewed: '2026-05-03'
-seo_description: '!Core flow'
+last_reviewed: '2026-05-15'
+seo_description: Assemble a minimal Korean RAG pipeline by connecting embedding, OCR, and generation. Learn chunking, retrieval metrics, and prompt engineering.
 ---
 
-# Assembling a Korean RAG pipeline
+# Korean AI Stack 101 (6/6): Assembling a Korean RAG pipeline
 
-## Questions this post answers
+RAG stops feeling mystical once you can see where each failure comes from. In Korean workflows, chunking, retrieval, and generation each introduce their own class of mistakes, so the only sane approach is to wire them together in a way you can inspect stage by stage.
+
+This is the final post in the Korean AI Stack 101 series. Here, we connect the earlier embedding, OCR, and generation pieces into one minimal Korean RAG pipeline.
+
+![Korean AI Stack 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-core-flow.en.png)
+*Korean AI Stack 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
 
 - What stages are non-negotiable in a minimal Korean RAG pipeline?
 - Which stage most often becomes the quality bottleneck — chunking, embedding, retrieval, or generation?
 - How should retrieved context be formatted before it reaches the LLM?
-- How do the earlier pieces of this series (KoSimCSE, BGE-M3, CLOVA OCR, HyperCLOVA/Solar) connect into one working pipeline?
-
-> RAG quality is not produced by one magical call. It emerges from the combined behavior of chunk boundaries, retrieval candidates, and the way context is handed to the model.
-
-> Korean AI Stack 101 (6/6)
-
-Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/06-korean-rag-pipeline)
-
----
 
 ## What you will learn
 
@@ -63,10 +61,6 @@ The code in this post deliberately prints intermediate state and logs retrieval 
 ---
 
 ## Mental Model — the four-stage pipeline
-
-![Core flow](../../assets/korean-ai-stack-101/06/06-01-core-flow.en.png)
-
-*Core flow*
 
 RAG decomposes into four independent stages.
 
@@ -154,7 +148,7 @@ index.add(vectors)
 
 ### Step 2 — retrieval
 
-![Minimal runnable example](../../assets/korean-ai-stack-101/06/06-01-minimal-runnable-example.en.png)
+![Minimal runnable example](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-minimal-runnable-example.en.png)
 
 *Minimal runnable example*
 
@@ -175,7 +169,7 @@ for h in hits:
 
 ### Step 3 — generation
 
-![What to notice in this code](../../assets/korean-ai-stack-101/06/06-02-what-to-notice-in-this-code.en.png)
+![What to notice in this code](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-02-what-to-notice-in-this-code.en.png)
 
 *What to notice in this code*
 
@@ -226,11 +220,143 @@ print(f'Recall@3 = {recall_hits}/{len(eval_set)}')
 
 Even ten cases are enough for the impact of chunking and embedding changes to show up as numbers.
 
+### Step 5 — wrap everything in one runnable function
+
+RAG turns abstract the moment each stage makes sense separately but the full path no longer shows what to print or inspect. Even a small tutorial benefits from a single `run_pipeline()` that preserves intermediate state.
+
+```python
+import json
+import re
+
+def mask_pii(text: str) -> str:
+    text = re.sub(r'\b\d{6}-\d{7}\b', '[RRN]', text)
+    text = re.sub(r'\b\d{2,3}-\d{3,4}-\d{4}\b', '[PHONE]', text)
+    return text
+
+def run_pipeline(question: str) -> dict:
+    masked_question = mask_pii(question)
+    hits = retrieve(masked_question, top_k=2)
+    answer = generate(masked_question, hits)
+    result = {
+        'question': masked_question,
+        'hit_ids': [h['id'] for h in hits],
+        'hit_scores': [round(h['score'], 3) for h in hits],
+        'answer': answer,
+    }
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return result
+
+run_pipeline('결제는 됐는데 주문 내역이 없을 때 어떤 순서로 점검해야 하나요?')
+```
+
+**Expected output:**
+
+```json
+{
+  "question": "결제는 됐는데 주문 내역이 없을 때 어떤 순서로 점검해야 하나요?",
+  "hit_ids": [0, 1],
+  "hit_scores": [0.873, 0.522],
+  "answer": "먼저 주문 동기화 지연 여부를 확인하고, 그다음 결제 성공과 주문 저장 실패가 분리된 상황인지 점검해야 합니다. [sources: 0,1]"
+}
+```
+
+That output matters for two reasons. First, the answer is logged together with the selected chunks and scores. Second, the log line is enough to reopen the case later and ask whether retrieval failed or generation failed.
+
+### Step 6 — force a failure case on purpose
+
+One validation step is easy to skip: ask a question the corpus cannot answer. That is the only honest way to verify that the no-speculation prompt really works.
+
+```python
+unknown_question = '우리 회사 포인트 만료 정책은 몇 개월인가요?'
+unknown_result = run_pipeline(unknown_question)
+print(unknown_result['answer'])
+```
+
+**Expected output:**
+
+```text
+I could not find a relevant policy [sources: 1,3]
+```
+
+If you skip this test, it is easy to ship a pipeline whose retrieval is weak but whose answers still sound confident.
+
+---
+
+## A fast way to locate the bottleneck
+
+When debugging RAG, it is usually faster to map symptoms to a first check than to write a long description of the problem.
+
+| Symptom | Usual cause | First log to inspect |
+| --- | --- | --- |
+| Answer sounds fluent but factually wrong | retrieve failure or generation speculation | `hit_ids`, `hit_scores`, citation line |
+| Retrieval scores are all close together | chunks are too short or too generic | chunk-length distribution, top-5 scores |
+| top-1 chunk is right but answer is still off | weak context formatting | `Context:` string, system prompt |
+| Only some questions keep failing | eval-set bias or missing corpus content | whether the gold chunk exists at all |
+| Long documents fail more often | chunk boundaries cut through meaning | paragraph vs fixed-token comparison |
+
+This table is simple enough to paste into an internal wiki. It turns “the LLM feels weird” into a concrete first-check sequence.
+
+---
+
+## Context-format rules for Korean RAG
+
+One frequent generation mistake is pasting retrieved chunks together with no structure. In Korean workflows, these three rules help a lot.
+
+1. **Prefix chunk ids.** Citations and debugging become easy.
+2. **Separate chunks with blank lines.** Chunk boundaries stay visible.
+3. **Make the model read context before question semantics.** The system prompt should enforce that priority.
+
+```python
+def build_context(hits: list[dict]) -> str:
+    return '\n\n'.join(
+        f"[chunk:{hit['id']}]\n{hit['text']}"
+        for hit in hits
+    )
+```
+
+It looks like a tiny helper, but without a stable format, both citation quality and debugging speed degrade quickly.
+
+---
+
+## A tiny evaluation loop before production
+
+Even the first version needs around ten labeled questions. The goal is not an impressive evaluation framework. The goal is a tiny loop that catches regressions quickly.
+
+```python
+def evaluate_retrieval(eval_set):
+    failures = []
+    hits = 0
+
+    for case in eval_set:
+        result = retrieve(case['q'], top_k=3)
+        hit_ids = [item['id'] for item in result]
+        ok = case['expected_chunk'] in hit_ids
+        hits += int(ok)
+        if not ok:
+            failures.append({'question': case['q'], 'hit_ids': hit_ids})
+
+    recall = hits / len(eval_set)
+    return recall, failures
+
+recall, failures = evaluate_retrieval(eval_set)
+print('Recall@3 =', round(recall, 2))
+print('Failures =', failures)
+```
+
+**Expected output:**
+
+```text
+Recall@3 = 1.0
+Failures = []
+```
+
+Whenever a failure appears, promote that question into the permanent regression set. Strong RAG teams do not start with huge eval suites. They start with small ones that keep accumulating.
+
 ---
 
 ## Common mistakes
 
-![Where engineers get confused](../../assets/korean-ai-stack-101/06/06-03-where-engineers-get-confused.en.png)
+![Where engineers get confused](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-03-where-engineers-get-confused.en.png)
 
 *Where engineers get confused*
 
@@ -241,6 +367,30 @@ Even ten cases are enough for the impact of chunking and embedding changes to sh
 5. **Chunks that are too long or too short.** Over 1000 tokens lets the LLM focus on irrelevant parts; under 50 tokens loses context. Aim for 200–500 tokens.
 6. **Sending sensitive data unmasked.** Mask resident registration numbers, card numbers, and account IDs before calling an external LLM API.
 7. **Tuning without an eval set.** "It feels better" invites regressions. Write ten cases and measure on every change.
+
+---
+
+## How this usually expands in production
+
+The first features that get added to a tutorial-sized RAG pipeline are usually these three:
+
+1. **Input-path separation** — HTML, PDF, and OCR output all land in the same `chunks` structure.
+2. **Post-retrieval reranking** — fetch top-20, then use a cross-encoder to choose top-3.
+3. **Answer audit logging** — write question, chunk ids, scores, citations, and user feedback as one JSON line.
+
+Even a tiny audit record already pays off.
+
+```python
+audit_log = {
+    'question': question,
+    'retrieved': hits,
+    'answer': answer,
+    'citations_present': '[sources:' in answer,
+}
+print(json.dumps(audit_log, ensure_ascii=False))
+```
+
+This is not just for analytics. It is the difference between guessing why an answer failed and reopening the exact retrieval path.
 
 ---
 
@@ -266,6 +416,7 @@ In real deployments you typically add the following:
 - [ ] An evaluation set of at least ten question/expected-chunk pairs exists, with Recall@k measured.
 - [ ] Sensitive-data masking runs immediately before `generate`.
 - [ ] Top-k starts at 3–5 and is tuned against the LLM context budget.
+- [ ] At least three unanswerable questions have been used to verify anti-speculation behavior.
 
 ---
 
@@ -282,6 +433,8 @@ In real deployments you typically add the following:
 
 The deeper lesson of the series is not a specific tool choice but the habit of **separating each Korean document-processing stage clearly**. By stacking embedding comparison (post 1), sentence similarity (post 2), multilingual retrieval (post 3), OCR (post 4), and generation APIs (post 5), you can design Korean RAG pipelines with much more composure.
 
+Three habits matter most: keep retrieval and generation visible as separate stages, always log chunk ids and scores with the answer, and test unanswerable questions on purpose. Those habits alone move a small Korean RAG system much closer to something you can actually operate.
+
 This post closes the series. Recommended next series:
 
 - **vector-search-101** — deep dive on FAISS, Qdrant, and Milvus, covering metadata filters, hybrid search, and index tuning.
@@ -289,15 +442,24 @@ This post closes the series. Recommended next series:
 
 A small evaluation set and a four-stage pipeline are the only two habits you really need to scale into much larger RAG systems with confidence.
 
+## Answering the Opening Questions
+
+- **What stages are non-negotiable in a minimal Korean RAG pipeline?**
+  - The article treats Assembling a Korean RAG pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which stage most often becomes the quality bottleneck — chunking, embedding, retrieval, or generation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should retrieved context be formatted before it reaches the LLM?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
-- [Building sentence similarity search with KoSimCSE](./02-kosimcse-similarity.md)
-- [BGE-M3 multilingual embedding in practice](./03-bge-m3-multilingual.md)
-- [Document text extraction with CLOVA OCR API](./04-clova-ocr.md)
-- [Using HyperCLOVA X and Solar API](./05-hyperclova-solar-api.md)
-- **Assembling a Korean RAG pipeline (current)**
+- [Korean AI Stack 101 (1/6): Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
+- [Korean AI Stack 101 (2/6): Building sentence similarity search with KoSimCSE](./02-kosimcse-similarity.md)
+- [Korean AI Stack 101 (3/6): BGE-M3 multilingual embedding in practice](./03-bge-m3-multilingual.md)
+- [Korean AI Stack 101 (4/6): Document text extraction with CLOVA OCR API](./04-clova-ocr.md)
+- [Korean AI Stack 101 (5/6): Using HyperCLOVA X and Solar API](./05-hyperclova-solar-api.md)
+- **Korean AI Stack 101 (6/6): Assembling a Korean RAG pipeline (current)**
 
 <!-- toc:end -->
 

@@ -1,0 +1,20 @@
+flowchart LR
+    subgraph A["No Records"]
+        A1["Adopt Technology"] --> A2["Unknown Reason"]
+        A1 --> A5["Hype Driven"]
+        A2 --> A3["No Alternatives"]
+        A5 --> A3
+        A3 --> A4["Lack of Persuasion"]
+        A3 --> A6["No Defense Logic"]
+    end
+
+    subgraph B["Decision Records"]
+        B1["Face Problem"] --> B2["Compare Alternatives"]
+        B1 --> B5["Analyze Constraints"]
+        B2 --> B3["Accept Trade-offs"]
+        B5 --> B3
+        B3 --> B4["Logical Engineering"]
+        B3 --> B6["Persuasive Decisions"]
+    end
+
+    A2 -. "Engineer's Mindset" .- B3

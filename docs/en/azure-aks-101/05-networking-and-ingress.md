@@ -1,11 +1,11 @@
 ---
-title: Networking and Ingress — the path in and out of the cluster
+title: "Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster"
 series: azure-aks-101
 episode: 5
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -15,10 +15,10 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
-seo_description: Azure Kubernetes Service 101 series (5/7)
+seo_description: Understand AKS networking models (CNI vs. Overlay), Ingress controllers, and how traffic flows into your Kubernetes cluster.
 ---
 
-# Networking and Ingress — the path in and out of the cluster
+# Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster
 
 > Azure Kubernetes Service 101 series (5/7)
 
@@ -26,21 +26,19 @@ Networking is where AKS often stops feeling simple. Pods can talk to each other,
 
 They get easier once you separate two layers: how pod IPs are assigned, and how external HTTP traffic gets from the edge into Services inside the cluster. This post is about keeping those layers straight.
 
----
+This is the fifth post in the Azure Kubernetes Service 101 series. Here, we connect the workload model to AKS networking by separating pod IP design from Ingress and external traffic flow.
 
-## Questions this chapter answers
+![azure kubernetes service 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/05/05-01-start-with-the-request-path.en.png)
+*azure kubernetes service 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
 
 - How does pod IP assignment differ from external HTTP routing, and why keep them separate?
 - When does kubenet beat Azure CNI, and when does Azure CNI Overlay sidestep both tradeoffs?
 - What does an Ingress controller add that a plain Service cannot?
-- Where should TLS termination happen, and why does that choice ripple through observability?
-- Which networking mistakes show up first when an AKS cluster scales beyond a single team?
 
 ## Start with the request path
 
-![External request flow through Ingress](../../assets/azure-aks-101/05/05-01-start-with-the-request-path.en.png)
-
-*External request flow through Ingress*
 From the outside, this is the shape that matters. The Service is the stable in-cluster endpoint. The Ingress layer is the HTTP router in front of it.
 
 Pod IP allocation, subnet sizing, and CNI choice sit further down the stack. Related problems, yes. The same problem, no.
@@ -96,7 +94,7 @@ In plain terms, Azure CNI Overlay keeps Azure integration while dramatically red
 
 ## Three models on one diagram
 
-![Comparison of three AKS network models](../../assets/azure-aks-101/05/05-02-three-models-on-one-diagram.en.png)
+![Comparison of three AKS network models](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/05/05-02-three-models-on-one-diagram.en.png)
 
 *Comparison of three AKS network models*
 At a glance, kubenet and Overlay can look similar because both separate node IPs from pod IPs. The important difference is support direction and operating model. For new AKS clusters, the modern recommendation is not “pick any overlay.” It is “start from Azure CNI Overlay unless you have a reason not to.”
@@ -196,7 +194,7 @@ Ingress usually targets **Services**, not pods directly.
 
 ## NGINX and AGIC feel different because they live in different places
 
-![Placement difference between NGINX and AGIC](../../assets/azure-aks-101/05/05-03-nginx-and-agic-feel-different-because-th.en.png)
+![Placement difference between NGINX and AGIC](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/05/05-03-nginx-and-agic-feel-different-because-th.en.png)
 
 *Placement difference between NGINX and AGIC*
 NGINX feels like an in-cluster reverse proxy. AGIC feels like an Azure-native L7 gateway in front of the cluster. Neither is inherently “the right one” in all cases. The right answer depends on existing Azure networking standards, WAF needs, and who owns edge traffic.
@@ -266,16 +264,25 @@ This is part 5 of the Azure Kubernetes Service 101 series. The previous post foc
 - [ ] Restricted pod-to-pod traffic with NetworkPolicy as intended
 - [ ] Managed the external LoadBalancer's static IP/DNS through IaC
 
+## Answering the Opening Questions
+
+- **How does pod IP assignment differ from external HTTP routing, and why keep them separate?**
+  - The article treats Networking and Ingress — the path in and out of the cluster as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When does kubenet beat Azure CNI, and when does Azure CNI Overlay sidestep both tradeoffs?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What does an Ingress controller add that a plain Service cannot?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
-- [Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
-- [Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
-- [Pod, Deployment, Service — the three ways you express a workload](./04-pod-deployment-service.md)
-- **Networking and Ingress — the path in and out of the cluster (current)**
-- Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
-- Monitoring and ops — Container Insights, logs, alerts (upcoming)
+- [Azure Kubernetes Service 101 (1/7): What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
+- [Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
+- [Azure Kubernetes Service 101 (3/7): Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
+- [Azure Kubernetes Service 101 (4/7): Pod, Deployment, Service — the three ways you express a workload](./04-pod-deployment-service.md)
+- **Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster (current)**
+- Azure Kubernetes Service 101 (6/7): Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
+- Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts (upcoming)
 
 <!-- toc:end -->
 

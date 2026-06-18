@@ -1,10 +1,10 @@
 ---
 series: pandas-101
 episode: 8
-title: Time Series
-status: content-ready
+title: "Pandas 101 (8/10): Time Series"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,31 @@ tags:
   - Datetime
   - Beginner
 seo_description: Work with DatetimeIndex, resample, rolling, and time zones — the standard Pandas toolkit for time series, with code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Time Series
+# Pandas 101 (8/10): Time Series
 
-> Pandas 101 series (8/10)
+Sales, traffic, sensor, and financial data often stop behaving like ordinary tables once time becomes the main organizing dimension. If dates stay as strings, comparisons feel awkward and weekly summaries or moving averages become noisier to implement than they should be. The whole experience changes once time becomes the index.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Pandas 101 series.
 
-**Core question**: Why do *time series* need *their own toolkit*?
+In this chapter, we will keep time series work inside core Pandas patterns. The focus is on DatetimeIndex, time-aware grouping, rolling windows, and explicit time-zone handling.
 
-> *Time has *irregular gaps, time zones, and missing points*. Pandas' time series tools handle all of that *out of the box*.*
 
-<!-- a-grade-intro:end -->
+![pandas 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/08/08-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 8 flow overview*
+> *Time series is about *order and frequency*. Skip the date index, miss a time period, or ignore seasonality and your trend analysis crumbles.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The intuition of *DatetimeIndex*
-- *resample* and *rolling*
-- Handling *time zones (tz)*
-- A 5-step time series hands-on
-- Five common mistakes
+- The intuition of *DatetimeIndex?
+- resample* and *rolling?
+- Handling *time zones (tz)?
 
 ## Why It Matters
 
 Sales, traffic, sensors, finance — *most operational data* is time series. Treating *time as an index* makes *KPI trends* visible immediately.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    TS["DatetimeIndex"] --> R["resample (downsample)"]
-    TS --> W["rolling window"]
-    TS --> S["shift / diff / pct_change"]
-```
 
 ## Key Terms
 
@@ -90,6 +80,18 @@ print(ts.loc["2026-01-03":"2026-01-06"])
 print(ts.resample("3D").sum())
 ```
 
+Resampling makes the time-axis transformation visible. Once you see daily data collapse into three-day buckets, the difference between plain aggregation and time-aware aggregation becomes much easier to reason about.
+
+**Expected output:**
+
+```text
+2026-01-01     3
+2026-01-04    12
+2026-01-07    21
+2026-01-10     9
+Freq: 3D, dtype: int64
+```
+
 ### Step 4 — rolling
 
 ```python
@@ -101,6 +103,19 @@ print(ts.rolling(window=3).mean())
 ```python
 ts2 = ts.tz_localize("UTC").tz_convert("Asia/Seoul")
 print(ts2.head())
+```
+
+Time-zone conversion is one of those details that feels abstract until you print it. The output shows the same underlying instants represented in a different local clock.
+
+**Expected output:**
+
+```text
+2026-01-01 09:00:00+09:00    0
+2026-01-02 09:00:00+09:00    1
+2026-01-03 09:00:00+09:00    2
+2026-01-04 09:00:00+09:00    3
+2026-01-05 09:00:00+09:00    4
+Freq: D, dtype: int64
 ```
 
 ## What to Notice in This Code
@@ -142,21 +157,33 @@ Sales trends, user activity patterns, IoT sensor monitoring — *time-bucket con
 2. Build a *7-day moving average* and handle *boundary NaN*.
 3. Print the result of *UTC → Asia/Seoul* conversion.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 Time series is *a Pandas strength*. Next we cover *apply and vectorization*.
 
+## Answering the Opening Questions
+
+- **The intuition of *DatetimeIndex?**
+  - The article treats Time Series as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **resample* and *rolling?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Handling *time zones (tz)?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
-- [Reading CSV and Excel](./03-read-csv-and-excel.md)
-- [Filtering and Selection](./04-filtering-and-selection.md)
-- [Handling Missing Values](./05-missing-values.md)
-- [groupby](./06-groupby.md)
-- [Merge and Join](./07-merge-and-join.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
+- [Pandas 101 (3/10): Reading CSV and Excel](./03-read-csv-and-excel.md)
+- [Pandas 101 (4/10): Filtering and Selection](./04-filtering-and-selection.md)
+- [Pandas 101 (5/10): Handling Missing Values](./05-missing-values.md)
+- [Pandas 101 (6/10): Groupby and Aggregation](./06-groupby.md)
+- [Pandas 101 (7/10): Merge and Join](./07-merge-and-join.md)
 - **Time Series (current)**
-- apply and Vectorization (upcoming)
-- Real-world Data Analysis (upcoming)
+- Apply and Vectorization (upcoming)
+- Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

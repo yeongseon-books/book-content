@@ -1,10 +1,10 @@
 ---
 series: secure-coding-101
 episode: 8
-title: XSS and CSRF Defense
+title: "Secure Coding 101 (8/10): XSS and CSRF Defense"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,30 @@ tags:
   - SecureCoding
   - WebSecurity
 seo_description: Output escaping, CSP, SameSite cookies, CSRF tokens, and a five-step playbook to defend against browser-side attacks.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# XSS and CSRF Defense
+# Secure Coding 101 (8/10): XSS and CSRF Defense
 
-> Secure Coding 101 series (8/10)
+The browser is a convenience layer for legitimate users, but it is also one of the most effective execution environments available to an attacker. A single comment rendered unsafely can become script execution, and a state-changing endpoint that trusts cookies alone can turn a different site into a trigger for actions the user never intended to perform.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Secure Coding 101 series.
 
-**Core question**: How do we tell whether the *user's browser* is *on our side* or has been turned into the *attacker's weapon*?
+In this chapter, we will treat browser security as a system of output escaping, CSP, cookie policy, and request verification rather than as a single sanitization trick. That framing makes it easier to see when the browser is acting on the application's behalf and when it has effectively become the attacker's tool.
 
-> *XSS runs the *attacker's code on our page*. CSRF triggers *unintended requests with the user's authority*.*
+> XSS runs attacker-controlled code in our page. CSRF abuses the user's existing authority to send a request they did not mean to send.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![secure coding 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying XSS and CSRF Defense?
+- Which signal should the example or diagram make visible for XSS and CSRF Defense?
+- What failure should be prevented first when XSS and CSRF Defense reaches a real system?
+
+## Questions This Chapter Answers
 
 - The three flavors of *XSS*
 - The role of *output escaping* and *CSP*
@@ -45,16 +53,6 @@ last_reviewed: '2026-05-04'
 A single *XSS* can hijack the session. *CSRF* triggers transfers and deletes *without the user knowing*.
 
 > *Default rule — *escape on output, verify origin on request*.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Input["User input"] --> Store["Storage"]
-    Store --> Render["Render (escape!)"]
-    Form["Form on another site"] -->|cookies auto-sent| API["Our API"]
-    API --> Csrf["CSRF token / SameSite check"]
-```
 
 ## Key Terms
 
@@ -113,6 +111,26 @@ def verify_csrf(form_token, session_token):
 element.textContent = userInput;    // safe
 ```
 
+## Failure signals and quick verification
+
+Browser-side issues often surface as "random logout," "weird popup," or "an action happened by itself." Those are vague symptoms unless you already know what to inspect.
+
+```text
+Symptom: CSP reports spike after a frontend release
+Check first:
+1. new inline scripts or third-party widget injection
+2. nonce / hash mismatch in templates
+3. report-only violations that should become blocking
+
+Symptom: CSRF failures increase for a single form
+Check first:
+1. token not included on the rendered page
+2. SameSite behavior during cross-site redirect flow
+3. Origin / Referer mismatch at the proxy layer
+```
+
+Writing these checks down is practical security work. It shortens the path from an ambiguous user complaint to a concrete browser-side cause.
+
 ## What to Notice in This Code
 
 - Output escaping must match the *context* (HTML, JS, attribute, URL).
@@ -156,17 +174,29 @@ Most teams keep *template auto-escape* on by default. They roll out *CSP* in *re
 
 Browser-side attacks are stopped by *fundamentals*. Next we tackle the code we *did not write* — *dependency vulnerabilities*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying XSS and CSRF Defense?**
+  - The article treats XSS and CSRF Defense as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for XSS and CSRF Defense?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when XSS and CSRF Defense reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Secure Coding?](./01-what-is-secure-coding.md)
-- [Input Validation](./02-input-validation.md)
-- [Authentication and Session](./03-authentication-and-session.md)
-- [Authorization and Permissions](./04-authorization-and-permissions.md)
-- [Safe Data Storage](./05-safe-data-storage.md)
-- [Secret and Key Management](./06-secret-and-key-management.md)
-- [SQL Injection and Safe ORM Usage](./07-sql-injection-and-orm.md)
+## In this series
+
+- [Secure Coding 101 (1/10): What Is Secure Coding?](./01-what-is-secure-coding.md)
+- [Secure Coding 101 (2/10): Input Validation](./02-input-validation.md)
+- [Secure Coding 101 (3/10): Authentication and Session](./03-authentication-and-session.md)
+- [Secure Coding 101 (4/10): Authorization and Permissions](./04-authorization-and-permissions.md)
+- [Secure Coding 101 (5/10): Safe Data Storage](./05-safe-data-storage.md)
+- [Secure Coding 101 (6/10): Secret and Key Management](./06-secret-and-key-management.md)
+- [Secure Coding 101 (7/10): SQL Injection and Safe ORM Usage](./07-sql-injection-and-orm.md)
 - **XSS and CSRF Defense (current)**
 - Managing Dependency Vulnerabilities (upcoming)
 - Safe Logging and Audit (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,12 +1,12 @@
 ---
-title: Rubric 기반 채점 설계
+title: "AI Evaluation 101 (5/10): Rubric 기반 채점 설계"
 series: ai-evaluation-101
 episode: 5
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,26 +14,56 @@ tags:
 - Rubric
 - Multi-Dimensional
 - JSON Output
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: 단순 1-5 점수보다 '정확성', '안전성', '문체' 같은 차원별 rubric이 훨씬 유용합니다.
 ---
 
-# Rubric 기반 채점 설계
+# AI Evaluation 101 (5/10): Rubric 기반 채점 설계
 
-> AI Evaluation 101 시리즈 (5/10)
+LLM judge를 도입한 팀이 다음으로 맞닥뜨리는 문제는 '그래서 3점이 왜 3점인가'입니다. 단일 점수는 비교에는 편하지만, 실제 개선 작업에는 자주 모호합니다. 정확성이 낮아서 3점인지, 설명이 장황해서 3점인지 분간이 안 되기 때문입니다.
 
-단순 1-5 점수보다 '정확성', '안전성', '문체' 같은 차원별 rubric이 훨씬 유용합니다. 이 글은 평가 차원을 정의하고, 각 차원의 anchor를 만들고, 점수를 집계하는 방법을 다룹니다.
+운영에서는 이 구분이 중요합니다. 사실이 틀린 답과 문체만 어색한 답은 처리 우선순위가 완전히 다릅니다. 그런데 둘 다 같은 3점으로 묶이면 팀은 잘못된 문제를 고치기 쉽습니다.
 
----
-![Rubric 기반 채점 설계](../../assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.ko.png)
+제가 본 강한 팀들은 이 지점에서 rubric으로 넘어갔습니다. 사용자 가치에 맞는 차원을 3~5개로 나누고, 각 차원마다 1점·3점·5점의 기준 예시를 써 두면 judge도 사람도 훨씬 일관되게 평가할 수 있습니다.
 
+여기서는 평가 차원을 어떻게 뽑고, anchor를 어떻게 쓰고, 평균 하나로 뭉개지지 않게 집계를 어떻게 설계해야 하는지 정리하겠습니다.
+
+![Rubric 기반 채점 설계](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.ko.png)
 *Rubric 기반 채점 설계*
+> Rubric의 가치는 점수를 예쁘게 만드는 데 있지 않고, 어디가 망가졌는지 분해해서 보여 주는 데 있습니다.
 
-## 단일 점수의 한계
+## 먼저 던지는 질문
 
-![단일 점수의 한계](../../assets/ai-evaluation-101/05/05-02-the-limits-of-single-scores.ko.png)
+- 단일 점수 하나로 LLM 품질을 말하면 어떤 고장 위치가 가려질까요?
+- 좋은 rubric 차원은 어떻게 서로 겹치지 않게 나눠야 할까요?
+- rubric 점수를 집계할 때 평균만 보면 어떤 위험을 놓칠까요?
+
+## 왜 이 글이 중요한가
+
+Rubric은 팀의 개선 우선순위를 또렷하게 만듭니다. 정확성은 충분한데 명확성이 낮다면 프롬프트 구조를 손봐야 하고, 정확성 자체가 낮다면 검색이나 모델 품질을 다시 봐야 합니다. 한 점수로는 이런 차이를 읽기 어렵습니다.
+
+또한 운영 리뷰가 훨씬 실용적으로 바뀝니다. '전체 평균 4.1점'보다 '정확성 4.8, 명확성 3.4'가 훨씬 행동 가능하기 때문입니다. 무엇을 먼저 고쳐야 하는지가 즉시 드러납니다.
+
+그래서 rubric은 점수를 더 복잡하게 만드는 장치가 아니라, 품질 논의를 문제 해결 가능한 단위로 쪼개는 설계입니다. 차원을 잘못 잡으면 평가가 무너지고, 잘 잡으면 개선 속도가 붙습니다.
+
+## 핵심 관점
+
+이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다. Rubric은 팀의 개선 우선순위를 또렷하게 만듭니다. 정확성은 충분한데 명확성이 낮다면 프롬프트 구조를 손봐야 하고, 정확성 자체가 낮다면 검색이나 모델 품질을 다시 봐야 합니다. 한 점수로는 이런 차이를 읽기 어렵습니다.
+
+> 단일 점수는 결과를 말해 주지만 원인을 말해 주지 않습니다. Rubric은 정확성, 완전성, 명확성, 톤처럼 품질 차원을 분리해서 팀이 어디를 고쳐야 하는지 바로 보이게 만듭니다.
+
+이 관점을 먼저 잡아 두면 뒤에 나오는 코드와 지표를 기능 설명이 아니라 운영 설계 관점에서 읽을 수 있습니다. 결국 중요한 것은 수치 이름보다, 그 수치가 어떤 의사결정을 가능하게 하느냐입니다.
+
+## 핵심 개념
+
+Rubric 기반 채점 설계
+
+### 단일 점수의 한계
+
+![단일 점수의 한계](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-02-the-limits-of-single-scores.ko.png)
 
 *단일 점수의 한계*
+
 Ep4의 single scoring은 응답에 1~5점을 매깁니다. 그런데 "3점"이 무슨 뜻일까요? 사실이 부정확해서 3점일 수도 있고, 정확하지만 톤이 어색해서 3점일 수도 있습니다. **단일 점수는 무엇이 잘못됐는지 알려주지 않습니다.**
 
 Rubric 기반 채점은 응답을 여러 차원으로 나눠서 각각 점수를 매깁니다. 예를 들어 LLM 챗봇 응답을 다음 4가지로 평가합니다.
@@ -47,16 +77,15 @@ Rubric 기반 채점은 응답을 여러 차원으로 나눠서 각각 점수를
 
 이렇게 하면 "Correctness 5, Tone 2"처럼 **약점을 정확히 짚을 수 있습니다.**
 
----
+### Rubric 차원 정의 — 4단계 프로세스
 
-## Rubric 차원 정의 — 4단계 프로세스
-
-![Rubric 차원 정의 - 4단계 프로세스](../../assets/ai-evaluation-101/05/05-03-defining-rubric-dimensions-a-four-step-p.ko.png)
+![Rubric 차원 정의 - 4단계 프로세스](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-03-defining-rubric-dimensions-a-four-step-p.ko.png)
 
 *Rubric 차원 정의 - 4단계 프로세스*
+
 좋은 rubric은 즉흥적으로 만들 수 없습니다. 다음 4단계를 따릅니다.
 
-### Step 1: 사용자 가치에서 차원 도출
+### 단계 1: 사용자 가치에서 차원 도출
 
 "좋은 응답"이 무엇인지 사용자 관점으로 적습니다. 고객 지원 봇의 경우:
 
@@ -66,7 +95,7 @@ Rubric 기반 채점은 응답을 여러 차원으로 나눠서 각각 점수를
 
 도메인마다 다릅니다. 코드 리뷰 봇이면 Correctness, Specificity, Actionability를 씁니다.
 
-### Step 2: 차원당 anchor 작성
+### 단계 2: 차원당 anchor 작성
 
 각 차원에 대해 1점, 3점, 5점이 어떤 모습인지 **구체적인 예시**를 작성합니다.
 
@@ -75,19 +104,19 @@ Rubric 기반 채점은 응답을 여러 차원으로 나눠서 각각 점수를
 dimension: Clarity
 anchors:
   5: |
-    응답이 짧고 명확합니다. 한 번 읽으면 이해됩니다.
-    예: "API key는 환경변수 OPENAI_API_KEY에 설정하세요."
+    Short and clear. Understood on first read.
+    Example: "Set the API key in the OPENAI_API_KEY environment variable."
   3: |
-    이해할 수 있지만 한 번 더 읽어야 합니다. 약간 장황하거나 용어가 모호합니다.
-    예: "Authentication credential을 환경 설정에서 적절히 구성하면 됩니다."
+    Understandable, but you have to re-read. Slightly verbose or vague.
+    Example: "Configure the authentication credential appropriately in your environment settings."
   1: |
-    이해 불가. 전문용어 남발 또는 횡설수설.
-    예: "credential provisioning을 위한 implicit context propagation을 활용..."
+    Incomprehensible. Jargon dump or rambling.
+    Example: "Leverage implicit context propagation for credential provisioning..."
 ```
 
 Anchor가 없으면 judge LLM도 사람도 채점이 흔들립니다.
 
-### Step 3: 차원이 독립적인지 검증
+### 단계 3: 차원이 독립적인지 검증
 
 두 차원이 비슷한 것을 측정하면 중복입니다. 예: "Accuracy"와 "Correctness"는 같습니다. 50건 샘플로 차원 간 상관관계를 봅니다.
 
@@ -101,20 +130,20 @@ df = pd.DataFrame({
     "tone":        [5, 5, 3, 4, 4, ...],
 })
 print(df.corr())
-# 상관계수가 0.9 이상이면 두 차원이 사실상 같음 → 합치거나 제거
+# 상관계수 > 0.9이면 두 차원은 사실상 동일합니다.
+# → 하나로 병합하거나 하나를 제거
 ```
 
-### Step 4: 3~5개로 제한
+### 단계 4: 3~5개로 제한
 
 차원이 10개를 넘으면 judge가 일관되게 채점하지 못합니다. **핵심 3~5개**로 줄이세요.
 
----
+### Judge prompt에 rubric 넣기
 
-## Judge prompt에 rubric 넣기
-
-![Judge prompt에 rubric 넣기](../../assets/ai-evaluation-101/05/05-04-putting-the-rubric-into-the-judge-prompt.ko.png)
+![Judge prompt에 rubric 넣기](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-04-putting-the-rubric-into-the-judge-prompt.ko.png)
 
 *Judge prompt에 rubric 넣기*
+
 Ep4의 single scoring prompt를 rubric으로 확장합니다.
 
 ```python
@@ -124,24 +153,24 @@ import json
 
 client = OpenAI()
 
-RUBRIC_PROMPT = """다음 차원별로 답변을 1~5점으로 채점하세요.
+RUBRIC_PROMPT = """Grade the answer on each dimension from 1 to 5.
 
-질문: {question}
-답변: {answer}
+Question: {question}
+Answer: {answer}
 
-차원:
-1. Correctness — 사실이 정확한가 (5: 모두 맞음, 1: 거짓 정보 포함)
-2. Completeness — 핵심 정보가 빠지지 않았나 (5: 완전함, 1: 절반 이상 빠짐)
-3. Clarity — 이해하기 쉬운가 (5: 한 번에 이해, 1: 이해 불가)
-4. Tone — 톤이 적절한가 (5: 정중하고 전문적, 1: 무례하거나 부적절)
+Dimensions:
+1. Correctness — Are the facts right (5: all correct, 1: contains false info)
+2. Completeness — Is the key information complete (5: complete, 1: more than half missing)
+3. Clarity — Easy to understand (5: understood on first read, 1: incomprehensible)
+4. Tone — Appropriate tone (5: polite and professional, 1: rude or off)
 
-다음 JSON 형식으로만 출력하세요. 다른 텍스트 금지.
+Respond with JSON only. No other text.
 {{
   "correctness": <int>,
   "completeness": <int>,
   "clarity": <int>,
   "tone": <int>,
-  "reasoning": "한 문장 근거"
+  "reasoning": "one-sentence justification"
 }}
 """
 
@@ -158,8 +187,8 @@ def judge_rubric(question: str, answer: str) -> dict:
 
 if __name__ == "__main__":
     result = judge_rubric(
-        "API key는 어디에 설정하나요?",
-        "환경변수 OPENAI_API_KEY에 설정하세요."
+        "Where do I set the API key?",
+        "Set it in the OPENAI_API_KEY environment variable."
     )
     print(result)
     # {'correctness': 5, 'completeness': 4, 'clarity': 5, 'tone': 5, 'reasoning': '...'}
@@ -167,13 +196,12 @@ if __name__ == "__main__":
 
 `response_format={"type": "json_object"}`로 강제하면 파싱 실패가 거의 없습니다.
 
----
+### 점수 집계 — 평균이 답이 아닙니다
 
-## 점수 집계 — 평균이 답이 아닙니다
-
-![점수 집계 - 평균이 답이 아닙니다](../../assets/ai-evaluation-101/05/05-05-aggregating-scores-the-mean-is-not-the-a.ko.png)
+![점수 집계 - 평균이 답이 아닙니다](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-05-aggregating-scores-the-mean-is-not-the-a.ko.png)
 
 *점수 집계 - 평균이 답이 아닙니다*
+
 차원별 점수를 어떻게 하나로 합칠까요? 흔한 실수는 **단순 평균**입니다. 이는 약점을 가립니다.
 
 | 응답 | Correct | Complete | Clarity | Tone | 평균 | 진실 |
@@ -194,7 +222,7 @@ def aggregate_weighted(scores: dict) -> tuple[float, str]:
                "clarity": 0.15, "tone": 0.15}
     weighted = sum(scores[k] * weights[k] for k in weights)
 
-    # Correctness 3점 미만이면 무조건 FAIL
+    # Correctness < 3이면 자동 FAIL
     if scores["correctness"] < 3:
         return weighted, "FAIL"
     if weighted >= 4.0:
@@ -224,9 +252,7 @@ print(df[["correctness","completeness","clarity","tone"]].describe())
 # min       1        2        1        3
 ```
 
----
-
-## 사람과의 일치도 — 차원별로 측정
+### 사람과의 일치도 — 차원별로 측정
 
 Ep4에서는 단일 점수에 대해 Cohen's kappa를 측정했습니다. Rubric은 **차원별로 따로** kappa를 측정합니다.
 
@@ -242,15 +268,139 @@ for dim in dimensions:
     print(f"{dim}: kappa={k:.3f}")
 # correctness: kappa=0.78  ← 신뢰 가능
 # completeness: kappa=0.65 ← 신뢰 가능
-# clarity:     kappa=0.42  ← 보통, prompt 개선 필요
-# tone:        kappa=0.31  ← 약함, anchor 다시 작성
+# clarity:     kappa=0.42  ← 보통 수준, prompt 개선 필요
+# tone:        kappa=0.31  ← 약함, 앵커 재작성 필요
 ```
 
 차원별 kappa가 다르면 **약한 차원의 anchor를 다시 작성**하세요. 모든 차원이 0.6 이상이 될 때까지 반복합니다.
 
----
+### Rubric 시각화: 레이더 차트보다 추세선이 먼저입니다
 
-## Common Mistakes
+Rubric 결과를 시각화할 때 레이더 차트만 붙이면 예쁘지만, 운영 판단에는 시간축 추세가 더 중요합니다. 차원별 주간 평균과 하위 10%를 함께 보아야 회귀를 조기에 잡을 수 있습니다.
+
+```python
+import pandas as pd
+
+def weekly_rubric_timeseries(scored_rows: list[dict]) -> pd.DataFrame:
+    # scored_rows fields: week, correctness, completeness, clarity, tone
+    df = pd.DataFrame(scored_rows)
+    summary = df.groupby("week").agg(
+        correctness_mean=("correctness", "mean"),
+        correctness_p10=("correctness", lambda s: s.quantile(0.1)),
+        completeness_mean=("completeness", "mean"),
+        clarity_mean=("clarity", "mean"),
+        tone_mean=("tone", "mean"),
+    )
+    return summary.reset_index()
+```
+
+이 리포트가 있으면 "총점은 유지되는데 clarity 하위 꼬리가 악화" 같은 신호를 평균 하나보다 먼저 볼 수 있습니다.
+
+### 정책 위반 차원은 가중치가 아니라 하드 게이트로 분리
+
+안전성이나 정책 준수는 가중 평균에 섞으면 위험합니다. 다른 차원이 높아서 정책 위반이 희석될 수 있기 때문입니다. 운영에서는 별도 하드 게이트로 분리하는 편이 안전합니다.
+
+```python
+def policy_hard_gate(scores: dict) -> str:
+    # scores keys: correctness, completeness, clarity, tone, policy_compliance
+    if scores["policy_compliance"] < 4:
+        return "FAIL_POLICY"
+
+    weighted, status = aggregate_weighted(scores)
+    if status == "FAIL":
+        return "FAIL_QUALITY"
+    if status == "REVIEW":
+        return "REVIEW"
+    return "PASS"
+```
+
+```text
+실무 규칙 예시
+- policy_compliance < 4: 즉시 fail
+- correctness < 3: 즉시 fail
+- 나머지 차원: 가중 평균 4.0 이상 통과
+```
+
+이 방식은 "중요하지만 드문 실패"를 평균에 묻히지 않게 해 줍니다.
+
+### Rubric 설계 리뷰 질문
+
+rubric을 만들고 나면 아래 질문으로 품질을 점검하는 편이 좋습니다.
+
+1. 차원 이름만 보고도 평가자가 같은 질문을 떠올리는가
+2. 1점과 5점 예시가 실제 운영 사례와 닮았는가
+3. 차원 간 상관이 과도하게 높지 않은가
+4. 배포 차단 기준이 명시되어 있는가
+
+```python
+def rubric_health_check(corr: dict, kappa: dict) -> list[str]:
+    issues = []
+    for pair, value in corr.items():
+        if value > 0.9:
+            issues.append(f"중복 차원 의심: {pair} corr={value:.2f}")
+    for dim, score in kappa.items():
+        if score < 0.6:
+            issues.append(f"일치도 낮음: {dim} kappa={score:.2f}")
+    return issues
+```
+
+### rubric 기반 회귀 감지 패턴
+
+단일 평균이 아니라 차원별 하락 폭으로 회귀를 잡는 규칙이 필요합니다.
+
+```python
+def detect_rubric_regression(current: dict, baseline: dict) -> list[str]:
+    alarms = []
+    for dim in ["correctness", "completeness", "clarity", "tone"]:
+        delta = current[dim] - baseline[dim]
+        if delta <= -0.3:
+            alarms.append(f"{dim} 하락: {delta:.2f}")
+    if current["correctness"] < 3.5:
+        alarms.append("correctness 절대 기준 미달")
+    return alarms
+```
+
+이 규칙이 있으면 "총점은 유사하지만 특정 차원이 무너진" 회귀를 조기에 차단할 수 있습니다.
+
+### Rubric 리뷰 회의 체크 질문
+
+1. 이번 주 하락 차원이 사용자 불만 카테고리와 일치하는가
+2. 하락한 차원의 anchor 문장이 실제 실패 사례를 설명하는가
+3. 임계값 조정이 필요한지, 아니면 프롬프트 수정을 먼저 할지 명확한가
+
+이 질문을 주간 회의에 고정하면 rubric 결과가 보고서에 머물지 않고 실제 개선 작업으로 연결됩니다.
+
+특히 correctness와 safety처럼 치명 차원은 "하락 이유 설명"을 필수 기록 항목으로 두면 개선 속도가 빨라집니다.
+
+### 운영 공지용 요약 문장 자동 생성
+
+Rubric 결과를 팀 전체에 공유할 때는 차원별 하락 포인트를 한 문장으로 요약해 주는 자동화가 유용합니다.
+
+```python
+def build_weekly_message(current: dict, baseline: dict) -> str:
+    drops = []
+    for dim in ["correctness", "completeness", "clarity", "tone"]:
+        delta = current[dim] - baseline[dim]
+        if delta < -0.2:
+            drops.append(f"{dim} {delta:.2f}")
+    if not drops:
+        return "이번 주 rubric 주요 하락 없음"
+    return "이번 주 하락 차원: " + ", ".join(drops)
+```
+
+이 메시지를 주간 공지에 고정하면 품질 논의가 빠르게 같은 사실 위에서 시작됩니다.
+
+작은 자동화지만 팀 정렬 효과가 큽니다.
+
+## 이 코드에서 먼저 봐야 할 점
+
+- 가장 먼저 차원 표를 보시면 단일 점수가 왜 원인 분석에 약한지 금방 이해됩니다. 같은 4점이라도 실제 위험도는 전혀 다를 수 있습니다.
+- YAML anchor 예제는 judge 프롬프트보다 더 중요할 때가 많습니다. 차원 이름만 있고 기준 예시가 없으면 사람도 모델도 제각각 해석합니다.
+- 집계 전략 세 가지는 실무에서 자주 갈립니다. 특히 정확성 1점이 다른 차원 5점으로 덮이지 않게 막는 임계값 규칙을 꼭 보셔야 합니다.
+
+이 세 지점을 먼저 읽고 나면 세부 구현과 지표 해석이 훨씬 빨라집니다. 코드가 길어 보여도 운영 질문은 대개 여기로 다시 돌아옵니다.
+
+## 어디서 자주 헷갈릴까요?
 
 ### Mistake 1: 차원을 너무 많이 만듦
 
@@ -262,7 +412,7 @@ Correctness, Completeness, Clarity, Tone, Empathy, Conciseness, Helpfulness, Fri
 
 ### Mistake 3: 단순 평균으로 집계
 
-Correctness 1점, Tone 5점인 응답을 평균 3점으로 보고하면 거짓 정보를 통과시킵니다. **가중 평균 + 임계값** 또는 **차원별 따로 보기**를 쓰세요.
+Correctness 1점, Tone 5점인 응답을 평균 3점으로 보고하면 거짓 정보를 통과시킵니다. **가중 평균 + 임계값 또는 차원별 따로 보기**를 쓰세요.
 
 ### Mistake 4: 모든 차원을 같은 가중치로 둠
 
@@ -272,20 +422,79 @@ Correctness 1점, Tone 5점인 응답을 평균 3점으로 보고하면 거짓 �
 
 Helpfulness와 Completeness가 0.95 상관관계면 사실상 한 차원입니다. **상관관계 0.9 이상이면 합치세요.**
 
----
+현업에서 제가 가장 자주 보는 문제는 결과 숫자만 보고 원인 분해를 건너뛰는 습관입니다. 평가가 개선을 돕지 못하고 보고서용 숫자로만 남는 순간, 팀은 다시 감각에 의존하게 됩니다.
 
-## 핵심 요약
+## 첫 번째 운영 체크리스트
+
+- [ ] 평가 차원을 3~5개로 제한했는가
+- [ ] 각 차원에 1점·3점·5점 anchor 예시가 있는가
+- [ ] 중복 차원을 상관계수로 점검했는가
+- [ ] 평균 점수만 보고 배포 결정을 내리지 않는가
+- [ ] 차원별 사람-judge 일치도를 따로 측정하는가
+
+## 실무에서는 이렇게 생각한다
+
+실무에서는 rubric 이름보다 anchor 품질이 더 중요합니다. '명확성'이라고 써 두는 것만으로는 부족하고, 어떤 답이 5점인지 사례 수준으로 적어 둬야 일관성이 생깁니다.
+
+또한 모든 차원을 같은 비중으로 두는 습관도 위험합니다. 의료, 금융처럼 사실 오류 비용이 큰 도메인에서는 정확성 가중치를 압도적으로 높게 두는 편이 맞습니다.
+
+다음 글의 RAG 평가로 넘어가면 이 감각이 더 중요해집니다. 검색 품질과 생성 품질을 분리해 보지 않으면, 평균이 그럴듯해도 실제로 어디가 고장 났는지 계속 놓치게 됩니다.
+
+## 정리: Rubric은 점수를 늘리는 것이 아니라 고장 위치를 드러내는 설계입니다
 
 - 단일 점수는 약점을 숨깁니다. **3~5개 차원**으로 나누면 무엇이 문제인지 보입니다.
 - Rubric 설계 4단계: 사용자 가치 → 차원 정의 → anchor 작성 → 독립성 검증.
 - Judge prompt에 차원과 anchor를 넣고 **JSON 출력 강제**로 파싱 실패를 줄입니다.
-- 단순 평균은 위험합니다. **가중 평균 + 임계값** 또는 **차원별 따로 보기**를 쓰세요.
-- Cohen's kappa를 **차원별로** 측정하고, 0.6 미만 차원의 anchor를 다시 작성하세요.
+- 단순 평균은 위험합니다. **가중 평균 + 임계값 또는 차원별 따로 보기**를 쓰세요.
+- Cohen's kappa를 차원별로 측정하고, 0.6 미만 차원의 anchor를 다시 작성하세요.
 
-다음 글에서는 RAG 파이프라인 평가 — retrieval, faithfulness, answer relevance — 를 다룹니다.
+다음 글에서는 이 분해 감각을 RAG 파이프라인에 적용합니다. 검색이 문제인지 생성이 문제인지 구분하려면 차원별 시야가 먼저 필요합니다.
+
+## 운영 체크리스트
+
+- [ ] 차원 이름만 만들지 말고 anchor 예시까지 반드시 작성하기
+- [ ] 정확성처럼 치명적 차원에는 별도 FAIL 임계값 두기
+- [ ] 평균 대신 차원별 대시보드를 운영 기본 화면으로 삼기
+- [ ] 상관이 높은 차원은 합치거나 삭제하기
+- [ ] 사람-judge 일치도가 낮은 차원부터 anchor 다시 쓰기
+
+## 처음 질문으로 돌아가기
+
+- **단일 점수 하나로 LLM 품질을 말하면 어떤 고장 위치가 가려질까요?**
+  - 정확성은 좋은데 근거가 약한지, 안전성은 통과했지만 완성도가 낮은지 같은 고장 위치가 총점 안에 묻힙니다.
+- **좋은 rubric 차원은 어떻게 서로 겹치지 않게 나눠야 할까요?**
+  - 각 차원은 하나의 판단 질문만 담고, 관찰 가능한 기준과 점수별 anchor를 가져야 합니다.
+- **rubric 점수를 집계할 때 평균만 보면 어떤 위험을 놓칠까요?**
+  - 평균이 괜찮아도 safety나 factuality 같은 핵심 차원이 낮으면 배포를 막아야 할 수 있습니다. 차원별 최소 기준이 필요합니다.
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기](./04-llm-as-judge.md)
+- **AI Evaluation 101 (5/10): Rubric 기반 채점 설계 (현재 글)**
+- AI Evaluation 101 (6/10): RAG 시스템 평가하기 (예정)
+- AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory (예정)
+- AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게 (예정)
+- AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가 (예정)
+- AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
+
+### 공식 문서
 
 - [Liu et al. (2023). G-Eval — NLG Evaluation using GPT-4 with Better Human Alignment](https://arxiv.org/abs/2303.16634)
 - [Anthropic — Multi-dimensional evaluation patterns](https://docs.anthropic.com/en/docs/build-with-claude/develop-tests)
 - [LangSmith — Custom Evaluators with Rubrics](https://docs.smith.langchain.com/evaluation/how_to_guides/custom_evaluator)
 - [Hugging Face — Evaluating LLMs with multi-dimensional criteria](https://huggingface.co/learn/cookbook/en/llm_judge)
+
+### 관련 시리즈
+
+- [이전 글 — LLM-as-Judge — 모델로 모델을 평가하기](./04-llm-as-judge.md)
+- [다음 글 — RAG 시스템 평가하기](./06-rag-evaluation.md)
+- [시리즈 현재 위치 다시 보기](./05-rubric-based-scoring.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-evaluation-101/ko/05-rubric-based-scoring)

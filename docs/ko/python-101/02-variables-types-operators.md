@@ -1,13 +1,13 @@
 ---
-title: 변수, 타입, 연산자
+title: "Python 101 (2/10): 변수, 타입, 연산자"
 series: python-101
 episode: 2
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,42 +17,34 @@ tags:
 - floating-point
 - decimal
 - type-hints
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: Python에서 변수는 값을 담는 상자가 아니라 객체에 붙는 이름표라는 한 가지 모델만 머릿속에 두면, 할당·비교·복사에서
   일어나는 거의…
 ---
 
-# 변수, 타입, 연산자
+# Python 101 (2/10): 변수, 타입, 연산자
+
+Python에서 변수는 값을 담는 상자가 아니라 객체에 붙는 이름표입니다. 이 모델 하나만 정확히 잡아도 할당, 비교, 복사에서 헷갈리는 지점이 크게 줄어듭니다.
+
+이 글은 Python 101 시리즈의 두 번째 글입니다.
 
 
-## 이 글에서 다룰 문제
+![Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/02/02-01-mental-model.ko.png)
+*Python 101 2장 흐름 개요*
+> 변수, 타입, 연산자의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-변수와 타입은 모든 코드의 뼈대입니다. "그냥 `x = 1`이지 뭐가 어렵냐"고 생각하면 다음과 같은 버그에 반복해서 부딪힙니다.
+## 먼저 던지는 질문
 
-- `total = total + items` 했더니 숫자에 문자열을 더했다는 `TypeError`가 납니다.
-- `if user.age == "18":` 처럼 비교했더니 영원히 `False`가 나옵니다.
-- `0.1 + 0.2 == 0.3`이 `False`라서 결제 금액 검증이 실패합니다.
-- 함수 인자로 list를 넘겼는데 호출 쪽 list가 같이 바뀌어 있어서 추적이 안 됩니다.
+- `total = total + items` 했더니 숫자에 문자열을 더했다는 `TypeError`가 납니다?
+- `if user.age == "18":` 처럼 비교했더니 영원히 `False`가 나옵니다?
+- `0.1 + 0.2 == 0.3`이 `False`라서 결제 금액 검증이 실패합니다?
 
-이 문제들의 공통 뿌리는 "변수가 무엇을 가리키는지", "타입이 무엇을 보장하는지"를 정확히 모르는 데 있습니다. 한 번만 제대로 잡고 가면 이후의 자료구조·함수·클래스 단원이 훨씬 가볍습니다.
-
-## Mental Model
+## 멘탈 모델
 
 > Python에서 변수는 값을 담는 상자가 아니라 객체에 붙는 이름표라는 한 가지 모델만 머릿속에 두면, 할당·비교·복사에서 일어나는 거의 모든 함정이 같은 그림으로 설명됩니다.
 Python에서 변수는 값을 담는 상자가 아닙니다. **객체에 붙는 이름표**입니다. 같은 객체에 여러 이름표가 붙을 수도 있고, 이름표를 다른 객체로 옮길 수도 있습니다.
 
-![Mental Model](../../assets/python-101/02/02-01-mental-model.ko.png)
-
-*Mental Model*
 위 그림에서 `a = 42; b = a`를 실행하면 `a`와 `b`는 모두 같은 정수 객체 `42`를 가리킵니다. 그리고 `a = "hi"`를 실행하면 `a`만 새 문자열 객체로 옮겨가고, `b`는 여전히 `42`를 가리킵니다.
-
-```mermaid
-flowchart LR
-    a["이름표 a"] --> obj1["int 객체 42"]
-    b["이름표 b"] --> obj1
-    a2["a = 'hi' 후의 a"] --> obj2["str 객체 'hi'"]
-    b2["b (그대로)"] --> obj1
-```
 
 왼쪽이 `b = a` 직후의 모습이고, 오른쪽이 `a = "hi"`로 이름표만 옮긴 뒤의 모습입니다. 객체 자체는 변하지 않습니다. 변하는 것은 어떤 이름표가 어떤 객체를 가리키는가뿐입니다.
 
@@ -68,8 +60,8 @@ flowchart LR
 Python은 변수 자체에 타입을 묶지 않습니다. 타입은 변수가 가리키는 객체에 붙어 있습니다.
 
 ```python
-x = 1          # 지금은 int 객체를 가리킵니다
-x = "hello"    # 같은 이름이 str 객체를 가리키도록 옮겼습니다
+x = 1          # the name now points at an int object
+x = "hello"    # the same name now points at a str object
 ```
 
 이 자유 덕분에 빠르게 짤 수 있지만, 큰 코드베이스에서는 "이 함수가 무엇을 받고 무엇을 돌려주는지"가 흐려집니다. 그래서 PEP 484 이후 Python은 **type hint**를 표준으로 채택했습니다.
@@ -98,10 +90,10 @@ def total_price(quantity: int, unit_price: float) -> float:
 산술은 익숙한 그대로지만, 정수 나눗셈과 거듭제곱은 처음 보면 헷갈립니다.
 
 ```python
-7 / 2     # 3.5 (항상 float)
-7 // 2    # 3   (정수 몫)
-7 % 2     # 1   (나머지)
-2 ** 10   # 1024 (거듭제곱)
+7 / 2     # 3.5 (always returns a float)
+7 // 2    # 3   (floor division)
+7 % 2     # 1   (remainder)
+2 ** 10   # 1024 (exponentiation)
 ```
 
 비교 연산자는 chain이 가능합니다. `0 <= x < 10`은 `x >= 0 and x < 10`과 같습니다. 이 표현은 가독성이 좋아서 적극적으로 사용해도 됩니다.
@@ -109,11 +101,11 @@ def total_price(quantity: int, unit_price: float) -> float:
 논리 연산자는 short-circuit 평가를 합니다. `a and b`에서 `a`가 falsy면 `b`는 평가하지 않습니다. 그래서 다음 패턴이 자주 쓰입니다.
 
 ```python
-name = user.name or "guest"          # user.name이 빈 문자열이면 "guest"
+name = user.name or "guest"          # if user.name is empty, fall back to "guest"
 config = override_config or default_config
 ```
 
-## Before-After
+## 전후 비교
 
 타입 힌트와 명시적인 변수가 코드 가독성을 어떻게 바꾸는지 짧게 비교해 봅니다.
 
@@ -141,23 +133,23 @@ REPL을 열고 한 줄씩 따라 입력해 보세요. 결과가 책과 다르면
 
 ### 1) 같은 객체와 다른 객체
 
-```python
+```text
 >>> a = [1, 2]
 >>> b = [1, 2]
->>> a == b      # 값 비교: True
+>>> a == b      # value comparison: True
 True
->>> a is b      # 정체성 비교: False (서로 다른 list 객체입니다)
+>>> a is b      # identity comparison: False (two distinct list objects)
 False
 >>> c = a
->>> c is a      # True — 같은 list 객체에 이름표 두 개
+>>> c is a      # True — two name tags on the same list object
 True
 ```
 
-위 예제에서 `a`와 `b`는 내용이 같은 list지만 서로 다른 객체입니다. 그래서 `a == b`는 `True`, `a is b`는 `False`입니다. 반면 `c = a`로 이름표를 하나 더 붙이면 `c`와 `a`는 같은 객체를 가리키므로 `c is a`는 `True`입니다. 핵심은 `==`은 값을, `is`는 객체 정체성을 본다는 점입니다. None을 비교할 때만 `is None`을 쓰고, 그 외에는 거의 항상 `==`을 씁니다.
+위 예제에서 `a`와 `b`는 내용이 같은 list지만 서로 다른 객체입니다. 그래서 `a == b`는 `True`, `a is b`는 `False`입니다. 반면 `c = a`로 이름표를 하나 더 붙이면 `c`와 `a`는 같은 객체를 가리키므로 `c is a`는 `True`입니다. 핵심은 `==`은 값을, `is`는 객체 정체성을 본다는 사실입니다. None을 비교할 때만 `is None`을 쓰고, 그 외에는 거의 항상 `==`을 씁니다.
 
 ### 2) 부동소수의 함정
 
-```python
+```text
 >>> 0.1 + 0.2
 0.30000000000000004
 >>> 0.1 + 0.2 == 0.3
@@ -171,7 +163,7 @@ True
 
 ### 3) 타입 변환
 
-```python
+```text
 >>> int("42")           # 42
 >>> float("3.14")       # 3.14
 >>> str(42)             # '42'
@@ -218,7 +210,7 @@ def append_id(item, items=None):
 **6. 큰 숫자를 가독성 없이 적기**
 `10000000`보다 `10_000_000`이 읽기 쉽습니다. Python은 정수 리터럴 안의 밑줄을 무시하므로 자릿수 구분에 자유롭게 쓰세요.
 
-## 실무 패턴
+## 실무에서는 이렇게 생각합니다
 
 **1. mypy로 타입 힌트 검증**
 타입 힌트는 적어 두기만 해서는 안전을 주지 않습니다. CI에서 `mypy src/`를 돌려야 의미가 있습니다. `pyproject.toml`에 다음을 넣어 두면 strict 모드로 검증합니다.
@@ -285,13 +277,259 @@ class Order:
 
 다음 글에서는 문자열을 깊이 있게 다룹니다. f-string과 format spec, str·bytes 차이, 정규표현식의 첫 만남까지 짚어 봅니다.
 
+## 실전 앵커: 객체 모델, 참조 카운트, 연산 비용을 눈으로 확인하기
+
+변수는 상자가 아니라 이름 바인딩이라는 설명을 들으면 대부분 이해했다고 느낍니다. 하지만 실제로는 연산자와 타입 변환이 섞이는 순간 다시 헷갈립니다. 여기서는 REPL 출력으로 객체 모델을 고정해 보겠습니다.
+
+```pycon
+>>> x = 10
+>>> y = x
+>>> id(x), id(y)
+(4381320848, 4381320848)
+>>> y += 1
+>>> x, y
+(10, 11)
+>>> id(x), id(y)
+(4381320848, 4381320880)
+```
+
+정수는 불변 객체이므로 `y += 1`은 같은 객체를 수정한 것이 아니라 새 객체에 재바인딩한 것입니다. 반대로 가변 타입은 다르게 동작합니다.
+
+```pycon
+>>> a = [1, 2]
+>>> b = a
+>>> b.append(3)
+>>> a
+[1, 2, 3]
+```
+
+이 차이를 이해하지 못하면 함수 인자 전달에서 버그가 발생합니다. 특히 기본값 인자와 결합되면 문제 재현이 어렵습니다.
+
+```python
+def add_item(item, bucket=[]):
+    bucket.append(item)
+    return bucket
+
+print(add_item('A'))
+print(add_item('B'))
+```
+
+출력:
+
+```text
+['A']
+['A', 'B']
+```
+
+이 코드는 호출마다 빈 리스트가 생길 것 같지만, 기본값은 함수 정의 시 한 번만 평가됩니다. 안전한 패턴은 `None` 센티널을 쓰는 것입니다.
+
+```python
+def add_item(item, bucket=None):
+    if bucket is None:
+        bucket = []
+    bucket.append(item)
+    return bucket
+```
+
+연산자 섹션에서는 `==`와 `is`를 반드시 분리해야 합니다. `==`는 값 동등성, `is`는 객체 동일성입니다.
+
+| 비교 | 의미 | 사용 시점 |
+|---|---|---|
+| `a == b` | 값이 같은가 | 숫자/문자열/시퀀스 비교 |
+| `a is b` | 같은 객체인가 | `None` 비교, 싱글턴 확인 |
+
+실전 예시:
+
+```pycon
+>>> a = 256
+>>> b = 256
+>>> a is b
+True
+>>> c = 257
+>>> d = 257
+>>> c is d
+False
+```
+
+작은 정수 캐싱 구현 세부에 기대어 `is`를 값 비교로 쓰면 안 됩니다.
+
+간단한 성능 감각도 이 시점에서 같이 잡아 두면 좋습니다.
+
+```python
+import timeit
+
+plus_cost = timeit.timeit('x + 1', setup='x = 10', number=5_000_000)
+inplace_cost = timeit.timeit('x += 1', setup='x = 10', number=5_000_000)
+print(plus_cost, inplace_cost)
+```
+
+예시 출력:
+
+```text
+0.129842851
+0.128991044
+```
+
+숫자 자체보다 중요한 것은 비교 실험 습관입니다. 감으로 최적화하지 말고, 작은 코드라도 `timeit`으로 검증하는 습관을 초반에 들이면 이후 자료구조 선택(리스트/셋/딕셔너리)에서 훨씬 정확한 판단을 하게 됩니다.
+
+마지막으로 CPython 내부를 한 번 더 보겠습니다.
+
+```python
+import sys
+
+name = 'python'
+print(sys.getrefcount(name))
+alias = name
+print(sys.getrefcount(name))
+del alias
+print(sys.getrefcount(name))
+```
+
+변수가 객체 자체가 아니라 참조를 붙잡는다는 감각이 이 출력에서 확실해집니다. 변수/타입/연산자 파트는 문법 암기보다 이 모델을 머리에 고정하는 것이 핵심입니다.
+
+### 추가 실습: 숫자 타입과 부동소수점 오해 정리
+
+연산자 파트에서 가장 흔한 오해는 부동소수점 비교입니다. 다음 출력은 의외처럼 보이지만 정상 동작입니다.
+
+```pycon
+>>> 0.1 + 0.2 == 0.3
+False
+>>> 0.1 + 0.2
+0.30000000000000004
+```
+
+정밀 비교가 필요하면 `math.isclose`를 기본값으로 사용합니다.
+
+```python
+import math
+print(math.isclose(0.1 + 0.2, 0.3, rel_tol=1e-9))
+```
+
+정수/실수/불리언의 상속 관계도 함께 기억하면 연산 버그를 줄일 수 있습니다.
+
+```pycon
+>>> isinstance(True, int)
+True
+>>> True + True
+2
+```
+
+불리언이 정수의 하위 타입이라는 사실을 모르면 집계 로직에서 의도치 않은 합산이 생깁니다.
+
+비트 연산도 운영 코드에서 자주 쓰입니다.
+
+```python
+READ = 0b001
+WRITE = 0b010
+EXEC = 0b100
+perm = READ | WRITE
+print(bool(perm & READ), bool(perm & EXEC))
+```
+
+출력:
+
+```text
+True False
+```
+
+마지막으로 `decimal` 표준 라이브러리는 금액 계산에서 거의 필수입니다.
+
+```python
+from decimal import Decimal
+
+price = Decimal('19.90')
+qty = Decimal('3')
+print(price * qty)
+```
+
+REPL에서 `float`와 `Decimal` 결과를 비교해 보면 타입 선택이 왜 중요한지 바로 체감할 수 있습니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
+### 보강 메모: 실수 줄이는 운영 습관
+
+학습 단계에서 만든 코드를 실제 프로젝트에 옮길 때는 세 가지를 같이 점검하는 편이 좋습니다. 첫째, 입력 검증 경계가 함수 시작 지점에 있는지 확인합니다. 둘째, 실패 시 사용자에게 보여 줄 메시지와 로그 메시지를 분리합니다. 셋째, 성능 판단은 추측이 아니라 `timeit` 또는 샘플 벤치마크로 남깁니다.
+
+간단한 템플릿은 다음과 같습니다.
+
+```python
+def safe_run(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        # 학습 단계에서는 원인 관찰을 우선
+        raise RuntimeError(f'실행 실패: {fn.__name__}') from e
+```
+
+또한 표준 라이브러리 문서를 읽을 때는 "모듈 개요 -> 대표 함수 3개 -> 예외 종류" 순서로 훑는 습관을 들이면 기억이 오래갑니다. 기능을 전부 외우는 것보다, 어떤 상황에서 어떤 모듈을 열어봐야 하는지 아는 것이 더 중요합니다.
+
+짧게 정리하면, 변수 파트의 핵심은 이름 바인딩, 타입 파트의 핵심은 불변/가변 구분, 연산자 파트의 핵심은 비교 의미(`==` 대 `is`)를 헷갈리지 않는 것입니다. 이 세 가지를 기준으로 코드를 읽으면 대부분의 초급 버그를 빠르게 분류할 수 있습니다.
+
+추가 팁: 실수/정수 혼합 계산, 불리언 암묵적 변환, 가변 객체 공유 참조는 초급 단계의 대표 함정입니다. 세 항목을 코드 리뷰 체크리스트에 넣어 두면 회귀 버그를 확실히 줄일 수 있습니다.
+
+한 줄 결론: 값과 객체를 구분해 생각하면 실수 대부분이 사라집니다.
+
+## 처음 질문으로 돌아가기
+
+- **`total = total + items` 했더니 숫자에 문자열을 더했다는 `TypeError`가 납니다?**
+  - Python은 동적 타입이라 런타임에야 타입 충돌이 드러나기 때문에, 본문에서 강조한 대로 입력 시점에 `int()`·`float()`로 명시 변환을 두거나 type hint와 함께 빈 검증을 두는 편이 안전합니다. 합산 누적은 `0` 같은 타입이 분명한 초기값으로 시작해 합산 도중 문자열이 끼어들 가능성을 좁혀야 합니다.
+- **`if user.age == "18":` 처럼 비교했더니 영원히 `False`가 나옵니다?**
+  - `==`은 값이 같은지 외에 타입까지 함께 봅니다. `user.age`가 정수면 문자열 `"18"`과는 절대 같지 않으므로, 본문 예시처럼 비교 전에 `int(user.age) == 18`로 타입을 맞추거나 입력 단계에서 한 타입으로 정규화해 두어야 합니다.
+- **`0.1 + 0.2 == 0.3`이 `False`라서 결제 금액 검증이 실패합니다?**
+  - 부동소수점은 이진수 근사라 본문에서 본 것처럼 `0.1 + 0.2`가 실제로는 `0.30000000000000004`가 됩니다. 결제·회계처럼 정확성이 필요한 도메인에서는 `Decimal`을 쓰거나, 단위를 원이 아닌 전(센트)으로 두어 모든 연산을 정수로 처리하는 패턴이 정석입니다.
+
 <!-- toc:begin -->
+## 시리즈 목차
+
+- [Python 101 (1/10): 왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
+- **변수, 타입, 연산자 (현재 글)**
+- 문자열과 포매팅 (예정)
+- list, tuple, set, dict (예정)
+- 제어 흐름: if, for, while, comprehension (예정)
+- 함수와 인자: def, args, kwargs, default, lambda (예정)
+- 모듈과 패키지: import, __init__, __name__ (예정)
+- 파일 I/O와 예외 처리 (예정)
+- 클래스와 객체: 데이터와 동작을 함께 묶기 (예정)
+- 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
-- Python 공식 문서 — Built-in Types: https://docs.python.org/3/library/stdtypes.html
-- Python 공식 문서 — `decimal`: https://docs.python.org/3/library/decimal.html
-- PEP 484 — Type Hints: https://peps.python.org/pep-0484/
-- PEP 8 — Style Guide for Python Code: https://peps.python.org/pep-0008/
-- mypy 공식 문서: https://mypy.readthedocs.io/
+- [Python 공식 문서 — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — `int`, `float`, `bool`, `None`, truthy/falsy, 시퀀스 공통 규칙의 기준 문서입니다.
+- [Python 공식 문서 — Expressions](https://docs.python.org/3/reference/expressions.html) — 산술·비교·`is`·논리 연산의 문법과 평가 순서를 정확히 확인할 수 있습니다.
+- [Python 튜토리얼 — Floating-Point Arithmetic: Issues and Limitations](https://docs.python.org/3/tutorial/floatingpoint.html) — `0.1 + 0.2` 같은 부동소수 표현 오차를 설명하는 공식 입문 자료입니다.
+- [Python 공식 문서 — `decimal`](https://docs.python.org/3/library/decimal.html) — 금액 계산처럼 정확한 십진 연산이 필요한 경우의 대안을 다룹니다.
+- [PEP 484 — Type Hints](https://peps.python.org/pep-0484/) — 타입 힌트가 런타임 강제가 아니라 정적 분석용 계약이라는 점의 출처입니다.
+- [Python Data Model](https://docs.python.org/3/reference/datamodel.html) — 객체 정체성, 변경 가능성, 이름이 객체를 가리킨다는 모델을 더 깊게 보완합니다.
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)

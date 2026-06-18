@@ -1,10 +1,10 @@
 ---
 series: software-engineering-101
 episode: 4
-title: Code Review
+title: "Software Engineering 101 (4/10): Code Review"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,26 @@ tags:
   - Collaboration
   - Quality
 seo_description: The real purpose of code review, how to write a reviewable PR, what reviewers actually look at, and the most common mistakes.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Code Review
+# Software Engineering 101 (4/10): Code Review
 
-> Software Engineering 101 series (4/10)
+Code review is one of the most common collaboration rituals in software teams, and one of the easiest to hollow out. The author wants to merge, the reviewer is busy, CI is already green, and the diff is hundreds of lines long. In that situation, review can quietly degrade into a formality that catches neither defects nor knowledge gaps.
 
-<!-- a-grade-intro:begin -->
+A strong review is not just a search for bugs. It is a checkpoint for intent, system impact, and team understanding. The practical question is not whether review is valuable. It is whether the pull request, the automation, and the comment culture make human judgment possible in the first place.
 
-**Core question**: Is code review about catching defects, or about sharing knowledge?
+This is post 4 in the Software Engineering 101 series. In this chapter, we look at how to make a PR reviewable, what humans should still review after automation, and how teams keep review focused on decisions instead of noise.
 
-> Both. But run it badly and you do neither.
 
-<!-- a-grade-intro:end -->
+![software engineering 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Code Review?
+- Which signal should the example or diagram make visible for Code Review?
+- What failure should be prevented first when Code Review reaches a real system?
 
 ## What You Will Learn
 
@@ -46,16 +52,6 @@ last_reviewed: '2026-05-04'
 Code review shapes both code quality and the distribution of knowledge in a team. The moment one person is the only one who understands a module, the organization is one resignation away from a freeze.
 
 > A review is a consensus, not a verdict.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    A["Author: PR"] --> B["Automated checks"]
-    B --> C["Reviewer comments"]
-    C --> D["Revise or discuss"]
-    D --> E["Approve and merge"]
-```
 
 Automation first, humans focus on judgment.
 
@@ -152,6 +148,28 @@ The smallest mergeable unit is the right unit.
 
 Tags accelerate decision making.
 
+## A two-minute reviewability check
+
+The fastest way to improve code review is not to ask reviewers for more time. It is to make the first two minutes enough for them to understand the intent, the risk, and the verification path.
+
+### Verification steps
+
+1. Read the PR title alone and try to describe the change in one sentence.
+2. Check whether the body covers What, Why, How, and Test without opening the diff.
+3. Count how many review comments could have been replaced by automation.
+
+**Expected output:**
+
+- A good PR exposes the review order before the reviewer scrolls through the code.
+- Missing automation shows up as human comments about formatting and static checks.
+- Oversized PRs reveal how quickly structure and risk questions get replaced by surface-level comments.
+
+### Failure modes to watch
+
+- The title says "misc fixes" or bundles unrelated concerns.
+- The test path is unclear, so the reviewer must guess how to validate behavior.
+- The comment tone evaluates the author instead of the code.
+
 ## What to Notice in This Code
 
 - Automation clears the human's field of view.
@@ -197,10 +215,21 @@ GitHub-based teams rely on CODEOWNERS for auto-assignment, 1~2 required reviews,
 
 Code review does defect detection and knowledge distribution at the same time. Next, we move defect detection to where it belongs — testing strategy.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Code Review?**
+  - The article treats Code Review as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Code Review?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Code Review reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Software Engineering?](./01-what-is-software-engineering.md)
-- [Understanding Requirements](./02-understanding-requirements.md)
-- [Design vs Implementation](./03-design-vs-implementation.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): Understanding Requirements](./02-understanding-requirements.md)
+- [Software Engineering 101 (3/10): Design vs Implementation](./03-design-vs-implementation.md)
 - **Code Review (current)**
 - Testing Strategy (upcoming)
 - Version Control and Release (upcoming)
@@ -208,6 +237,7 @@ Code review does defect detection and knowledge distribution at the same time. N
 - Collaboration Process (upcoming)
 - Maintenance and Tech Debt (upcoming)
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

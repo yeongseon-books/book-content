@@ -1,5 +1,5 @@
 ---
-title: Building sentence similarity search with KoSimCSE
+title: "Korean AI Stack 101 (2/6): Building sentence similarity search with KoSimCSE"
 series: korean-ai-stack-101
 episode: 2
 language: en
@@ -17,23 +17,23 @@ tags:
 - Embeddings
 - Python
 last_reviewed: '2026-05-01'
-seo_description: Sentence similarity search decomposes into four steps.
+seo_description: Build a Korean sentence similarity search using KoSimCSE and FAISS. Learn about embedding normalization, indexing, and retrieval metrics.
 ---
 
-# Building sentence similarity search with KoSimCSE
+# Korean AI Stack 101 (2/6): Building sentence similarity search with KoSimCSE
 
-## Questions this post answers
+The first working retrieval loop should be small enough to inspect with your own eyes. In Korean FAQ search, a single bad choice around normalization or indexing is enough to make every later LLM step look smarter than it really is.
+
+This is the second post in the Korean AI Stack 101 series. Here, we build a minimal Korean sentence-similarity search flow with KoSimCSE and make the retrieval mechanics explicit.
+
+![Korean AI Stack 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-01-core-flow.en.png)
+*Korean AI Stack 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
 
 - Where does KoSimCSE usually pay off first in Korean retrieval work?
 - Why is indexing FAQ questions alone a clean first version of search?
 - Why do normalized embeddings pair so well with `IndexFlatIP`?
-- How can a high similarity score still return the wrong result?
-
-> The first useful sentence-similarity system comes from clean embeddings plus a transparent index, not from a complicated orchestration layer.
-
-> Korean AI Stack 101 (2/6)
-
-Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/02-kosimcse-similarity)
 
 ## Why this matters
 
@@ -45,7 +45,7 @@ Sentence similarity deserves its own stage because many Korean RAG systems colla
 
 Sentence similarity search decomposes into four steps.
 
-```
+```text
 [corpus]                         [query]
    |                                |
    v                                v
@@ -94,12 +94,6 @@ query = '로그인 비밀번호를 다시 설정하고 싶어요.'  # "I want to
 
 What matters is (1) queries without the exact keyword "재설정" still match, (2) there is a large score gap between top-1 and top-2, and (3) you can manually inspect candidate meanings.
 
-## Core flow
-
-![Core flow](../../assets/korean-ai-stack-101/02/02-01-core-flow.en.png)
-
-*Core flow*
-
 ## Why index only the questions first
 
 If you embed both questions and answers on day one, debugging becomes harder. A bad match may come from the query text, the answer wording, or the fact that long answer sentences drift semantically. Start with questions only and join the answer at display time.
@@ -138,7 +132,7 @@ index.add(embeddings)
 
 ### Step 3 — Search a query
 
-![Minimal runnable example](../../assets/korean-ai-stack-101/02/02-01-minimal-runnable-example.en.png)
+![Minimal runnable example](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-01-minimal-runnable-example.en.png)
 
 *Minimal runnable example*
 
@@ -178,7 +172,7 @@ print(f"Recall@1 = {hits / len(test_cases):.2f}")
 
 ## What to notice in this code
 
-![What to notice in this code](../../assets/korean-ai-stack-101/02/02-02-what-to-notice-in-this-code.en.png)
+![What to notice in this code](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-02-what-to-notice-in-this-code.en.png)
 
 *What to notice in this code*
 
@@ -189,7 +183,7 @@ print(f"Recall@1 = {hits / len(test_cases):.2f}")
 
 ## Common mistakes
 
-![Where engineers get confused](../../assets/korean-ai-stack-101/02/02-03-where-engineers-get-confused.en.png)
+![Where engineers get confused](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-03-where-engineers-get-confused.en.png)
 
 *Where engineers get confused*
 
@@ -229,15 +223,24 @@ The KoSimCSE example is valuable because it keeps the retrieval loop visible. Th
 
 The next article (episode 3) covers BGE-M3. We will see where it surpasses KoSimCSE on mixed Korean-English corpora, and what dense + sparse multi-vector retrieval means in code.
 
+## Answering the Opening Questions
+
+- **Where does KoSimCSE usually pay off first in Korean retrieval work?**
+  - The article treats Building sentence similarity search with KoSimCSE as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is indexing FAQ questions alone a clean first version of search?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do normalized embeddings pair so well with `IndexFlatIP`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
-- **Building sentence similarity search with KoSimCSE (current)**
-- BGE-M3 multilingual embedding in practice (upcoming)
-- Document text extraction with CLOVA OCR API (upcoming)
-- Using HyperCLOVA X and Solar API (upcoming)
-- Assembling a Korean RAG pipeline (upcoming)
+- [Korean AI Stack 101 (1/6): Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
+- **Korean AI Stack 101 (2/6): Building sentence similarity search with KoSimCSE (current)**
+- Korean AI Stack 101 (3/6): BGE-M3 multilingual embedding in practice (upcoming)
+- Korean AI Stack 101 (4/6): Document text extraction with CLOVA OCR API (upcoming)
+- Korean AI Stack 101 (5/6): Using HyperCLOVA X and Solar API (upcoming)
+- Korean AI Stack 101 (6/6): Assembling a Korean RAG pipeline (upcoming)
 
 <!-- toc:end -->
 

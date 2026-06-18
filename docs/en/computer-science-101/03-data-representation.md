@@ -1,10 +1,10 @@
 ---
 series: computer-science-101
 episode: 3
-title: Data Representation
-status: content-ready
+title: "Computer Science 101 (3/10): Data Representation"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,34 @@ tags:
   - Floating Point
   - Data Types
 seo_description: How computers represent data — binary, character encoding (ASCII, UTF-8), and the way integers and floating-point numbers are stored.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Data Representation
+# Computer Science 101 (3/10): Data Representation
 
-> Computer Science 101 series (3/10)
+People often say that computers only understand 0 and 1, but that sentence does not become useful until you can connect it to real bugs. Garbled text, wrong money totals, and surprising overflows all start to make sense once you understand how raw bits get meaning.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Computer Science 101 series.
 
-**Key question**: A computer only knows 0 and 1, so how does it store and process letters, numbers, and images?
+In this article, we'll walk through bits and bytes, character encoding, signed integers, and floating-point limits so you can reason from representation to behavior.
 
-> Inside a computer every piece of data is a sequence of bits (0 or 1). The number 42, the letter 'A', and a single pixel in an image are all bit sequences in the end. The same bits can mean an integer in one context and a character in another. This article covers binary, character encodings, and the representation of integers and floating-point numbers.
 
-<!-- a-grade-intro:end -->
+![Computer Science 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/03/03-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 3 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Data Representation?
+- Which signal should the example or diagram make visible for Data Representation?
+- What failure should be prevented first when Data Representation reaches a real system?
+
+## Questions This Article Answers
+
+- How does a computer store numbers, text, and images using only 0 and 1?
+- Why do ASCII and UTF-8 use different byte counts?
+- Why are negative integers usually represented with two's complement?
+- Why does `0.1 + 0.2 != 0.3` happen in real programs?
+- What kinds of bugs appear when you confuse character length with byte length?
 
 ## What You Will Learn
 
@@ -48,17 +62,7 @@ Garbled characters, floating-point error, and integer overflow are all problems 
 
 Bit-level understanding is the foundation of debugging and performance work.
 
-## Concept at a Glance
-
 > Every piece of data is a sequence of bits (0/1). Encoding rules give meaning to the bits.
-
-```text
-Bits: 01000001
-   │
-   ├── Read as integer  -> 65
-   ├── Read as ASCII    -> 'A'
-   └── Read as a color  -> very dark blue
-```
 
 ## Key Terms
 
@@ -92,6 +96,8 @@ print(result)              # 0.3
 print(result == Decimal("0.3"))  # True
 ```
 
+**Expected output:** the `float` version should show `0.30000000000000004`, while the `Decimal` version should print an exact `0.3`.
+
 ## Hands-On: Step by Step
 
 ### Step 1: Binary and decimal conversion
@@ -105,7 +111,6 @@ print(bin(255))     # 0b11111111
 print(int("101010", 2))   # 42
 print(int("11111111", 2)) # 255
 
-
 # Verify the conversion principle in code
 def to_binary(n: int) -> str:
     """Convert a decimal integer to a binary string."""
@@ -116,7 +121,6 @@ def to_binary(n: int) -> str:
         bits.append(str(n % 2))
         n //= 2
     return "".join(reversed(bits))
-
 
 print(to_binary(42))  # 101010
 ```
@@ -159,7 +163,6 @@ def twos_complement(n: int, bits: int = 8) -> str:
     if n >= 0:
         return format(n, f"0{bits}b")
     return format((1 << bits) + n, f"0{bits}b")
-
 
 print(twos_complement(5))    # 00000101
 print(twos_complement(-5))   # 11111011
@@ -261,22 +264,34 @@ Every piece of data in a computer is a bit sequence. Encoding rules give bits th
 
 The next article covers algorithms — how to process data efficiently — and complexity, the way we measure their performance.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Data Representation?**
+  - The article treats Data Representation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Data Representation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Data Representation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
-- [Computation and Programs](./02-computation-and-programs.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): Computation and Programs](./02-computation-and-programs.md)
 - **Data Representation (current)**
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
-- [Computer Architecture](./05-computer-architecture.md)
-- [Operating Systems](./06-operating-systems.md)
-- [Networks](./07-networks.md)
-- [Databases](./08-databases.md)
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Algorithms and Complexity (upcoming)
+- Computer Architecture (upcoming)
+- Operating Systems (upcoming)
+- Networks (upcoming)
+- Databases (upcoming)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
 - [Unicode official site](https://home.unicode.org/)
-- [IEEE 754 — Floating-point standard](https://en.wikipedia.org/wiki/IEEE_754)
+- [Python docs — Floating Point Arithmetic: Issues and Limitations](https://docs.python.org/3/tutorial/floatingpoint.html)
 - [What Every Programmer Should Know About Floating-Point](https://floating-point-gui.de/)
 - [Joel Spolsky — The Absolute Minimum About Unicode](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/)

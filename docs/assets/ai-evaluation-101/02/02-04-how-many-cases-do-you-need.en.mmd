@@ -1,0 +1,10 @@
+flowchart TD
+    A["Dataset scale"] --> B1["Smoke test\n10-30 cases\nFast anomaly check"]
+    B1 --> B2["Regression test\n100-300 cases\nValidate changes"]
+    B2 --> B3["Model comparison\n300-1000 cases\nDetect meaningful differences"]
+    B3 --> B4["Benchmark scale\n1000+ cases\nDetailed comparison and reporting"]
+
+    B1 --> C["Larger decisions need larger samples"]
+    B2 --> C
+    B3 --> C
+    B4 --> C

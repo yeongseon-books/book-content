@@ -1,10 +1,10 @@
 ---
 series: programming-languages-101
 episode: 7
-title: Memory Management
-status: content-ready
+title: "Programming Languages 101 (7/10): Memory Management"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,47 +18,39 @@ tags:
   - Stack
   - Heap
 seo_description: Watch objects appear and disappear with one line of code. Trace stack vs heap, reference counting, and garbage collection in real Python.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Memory Management
+# Programming Languages 101 (7/10): Memory Management
 
-> Programming Languages 101 series (7/10)
+Writing `del x` does not necessarily mean the object disappears on that line. Names, objects, references, and lifetimes sit at different layers, and languages manage the relationship among those layers in different ways.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Programming Languages 101 series.
 
-**Core question**: When you write `del x`, does the object actually vanish on that line?
+In this post, we will treat memory management as the rule for deciding when an object is alive and when it is gone. That means walking through stack and heap, reference counting, garbage collection, weak references, and why leaks still happen even in languages that “have GC.”
 
-> Memory management is the rule that decides "when is this object alive, and when is it gone?" Languages answer differently — manual free, reference counting, garbage collection — but they all solve the same problem: keep what is alive, reclaim what is dead.
 
-<!-- a-grade-intro:end -->
+![programming languages 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/07/07-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 7 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Stack vs heap in one sentence
-- How Python's reference counting works
-- How a garbage collector untangles cycles
-- Why "memory leaks" still happen in GC languages
-- The tradeoffs between manual free, RAII, and GC
+- What boundary should you inspect first when applying Memory Management?
+- Which signal should the example or diagram make visible for Memory Management?
+- What failure should be prevented first when Memory Management reaches a real system?
+
+## Questions this article answers
+
+- How are the stack and the heap different?
+- When does Python's reference counting free an object immediately?
+- Why do cyclic references require a separate garbage collector?
+- Why do memory leaks still happen even in GC languages?
 
 ## Why It Matters
 
 Long-running services often slowly creep up in memory. Finding the cause means being able to answer "why is this object still alive?" Memory models are the tools that produce that answer.
 
 > Most leaks start with one forgotten reference.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    A["function call"] --> B["stack frame"]
-    B --> C["locals (auto freed)"]
-    A --> D["heap allocation"]
-    D --> E["refcount"]
-    D --> F["GC tracing"]
-    E -->|drops to 0| G["freed"]
-    F -->|cycle collected| G
-```
 
 The stack is reclaimed when the function returns. The heap needs someone to collect it.
 
@@ -236,17 +228,29 @@ C, C++, and Rust take different paths — Rust uses compile-time ownership inste
 
 The memory model answers "who holds it, when do they let go?" Next we look at the two roads that execute these objects — interpreters and compilers.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Memory Management?**
+  - The article treats Memory Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Memory Management?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Memory Management reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
-- [Type Systems](./03-type-system.md)
-- [Scope and Binding](./04-scope-and-binding.md)
-- [Functions and Closures](./05-functions-and-closures.md)
-- [Objects and Prototypes](./06-objects-and-prototypes.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
+- [Programming Languages 101 (3/10): Type Systems](./03-type-system.md)
+- [Programming Languages 101 (4/10): Scope and Binding](./04-scope-and-binding.md)
+- [Programming Languages 101 (5/10): Functions and Closures](./05-functions-and-closures.md)
+- [Programming Languages 101 (6/10): Objects and Prototypes](./06-objects-and-prototypes.md)
 - **Memory Management (current)**
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 episode: 2
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -13,63 +13,52 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
-title: HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
-seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
+  tistory: false
+title: "Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers"
+seo_description: Learn to use HuggingFace sentence-transformers locally to generate text vectors, manage batches, and save embeddings for semantic search applications.
 ---
 
-# HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
-
-> Vector Search 101 (2/6)
-
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/02-huggingface-embeddings)
+# Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
 
 Post 1 covered the concept. This post is about running real code. Moving from theory to working embeddings surfaces a set of practical questions that conceptual explanations skip: how to reduce model loading time, how to structure batches, how to save vectors to disk and reload them efficiently.
 
-`HuggingFaceEmbeddings` from `langchain-community` wraps `sentence-transformers` behind a LangChain-compatible interface. Even if you are not building a LangChain pipeline, the wrapper pattern itself is worth understanding — it shows how embedding models are typically integrated into larger application stacks.
+`HuggingFaceEmbeddings` from `langchain-huggingface` wraps `sentence-transformers` behind a LangChain-compatible interface. Even if you are not building a LangChain pipeline, the wrapper pattern itself is worth understanding — it shows how embedding models are typically integrated into larger application stacks.
 
-This post covers five things:
+This is post 2 in the Vector Search 101 series.
 
-- installing and initializing `HuggingFaceEmbeddings`
-- the difference between single-query and batch embedding
-- saving vectors to NumPy files and reloading them
-- practical tips for speeding up encoding on CPU
-- comparing the wrapper to the raw `SentenceTransformer` API
+Here we turn local embeddings into a reusable workflow: initialize once, encode in batch, persist the vectors, and reload them safely.
 
-![Single query embedding call flow](../../assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
-
+![Single query embedding call flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
 *Single query embedding call flow*
----
+> The core of HuggingFace embedding practice is not just learning to call one model well. It is learning a repeatable flow that produces the same vectors and lets you reuse them.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- What are the real tradeoffs between Hugging Face `sentence-transformers` and the OpenAI Embeddings API?
-- What performance traps appear when you run a local embedding model without a GPU?
-- How do multilingual versus English-only models split on Korean search quality?
-- How do you balance memory, batch size, and token limits when embedding in batch?
-- How do you migrate an existing index when the embedding model version moves?
+- Where do you verify that vectors from sentence-transformers are actually usable for search?
+- What changes in production when you move from one-by-one encoding to batch encoding?
+- What metadata must travel with saved vectors so the result can be reproduced later?
 
 ## Installation
 
 Three packages are needed.
 
 ```bash
-pip install langchain-community sentence-transformers numpy
+pip install langchain-huggingface sentence-transformers numpy
 ```
 
-`langchain-community` provides `HuggingFaceEmbeddings`. `sentence-transformers` handles model loading and encoding. `numpy` handles vector storage and arithmetic.
+`langchain-huggingface` provides `HuggingFaceEmbeddings`. `sentence-transformers` handles model loading and encoding. `numpy` handles vector storage and arithmetic.
 
 ---
 
 ## First embedding
 
-![Single query embedding call flow](../../assets/vector-search-101/02/02-01-first-embedding.en.png)
+![Single query embedding call flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-first-embedding.en.png)
 
 *Single query embedding call flow*
 Initialize the model and encode a single sentence.
 
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
@@ -100,19 +89,13 @@ print(f"first 5 values: {vector[:5]}")
 
 <!-- injected-output:end -->
 
-```
-type: <class 'list'>
-dimension: 384
-first 5 values: [0.0523, -0.1847, 0.3012, 0.0934, -0.0721]
-```
-
 `embed_query()` handles a single input and returns a plain Python list. Convert to `np.array()` when you need NumPy operations.
 
 ---
 
 ## Batch embedding
 
-![Single call and batch call contrast](../../assets/vector-search-101/02/02-02-batch-embedding.en.png)
+![Single call and batch call contrast](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-02-batch-embedding.en.png)
 
 *Single call and batch call contrast*
 For multiple documents, a single `embed_documents()` call outperforms a loop of `embed_query()` calls. The model processes inputs in batches internally, and the overhead of repeated setup adds up fast.
@@ -121,7 +104,7 @@ For multiple documents, a single `embed_documents()` call outperforms a loop of 
 import time
 
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
@@ -160,14 +143,14 @@ The gap between batch and loop grows with document count. For large corpora, alw
 
 ## Saving and reloading vectors
 
-![Vector and document save flow](../../assets/vector-search-101/02/02-03-saving-and-reloading-vectors.en.png)
+![Vector and document save flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-03-saving-and-reloading-vectors.en.png)
 
 *Vector and document save flow*
 Recomputing embeddings for the same documents on every run wastes time. Save the matrix once and reload it.
 
 ```python
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
@@ -207,7 +190,7 @@ Save the source texts alongside the vectors. Without the original text, search r
 ```python
 import json
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
@@ -243,7 +226,7 @@ Post 4 uses exactly this pattern to build a working FAISS search system.
 
 ## Practical speed tips
 
-![Model reuse and batch size path](../../assets/vector-search-101/02/02-04-practical-speed-tips.en.png)
+![Model reuse and batch size path](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-04-practical-speed-tips.en.png)
 
 *Model reuse and batch size path*
 CPU encoding is slow at scale. Several adjustments help.
@@ -278,14 +261,14 @@ def get_embedding_model() -> HuggingFaceEmbeddings:
 
 ## Comparing wrapper and raw API
 
-![Wrapper and raw API comparison structure](../../assets/vector-search-101/02/02-05-comparing-wrapper-and-raw-api.en.png)
+![Wrapper and raw API comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-05-comparing-wrapper-and-raw-api.en.png)
 
 *Wrapper and raw API comparison structure*
 `HuggingFaceEmbeddings` wraps `SentenceTransformer`. Their outputs are numerically identical.
 
 ```python
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from sentence_transformers import SentenceTransformer
 
 text = "Checking that both libraries produce the same output."
@@ -332,15 +315,26 @@ The next post moves to similarity computation. We will look at when cosine simil
 - [ ] Aligned the result dimension and dtype with your index schema
 - [ ] Stored the model version alongside any embedding kept long-term
 
+## Answering the Opening Questions
+
+- **Where do you verify that vectors from sentence-transformers are actually usable for search?**
+  Verify shape, dtype, dimensionality, and a few similarity results before treating the vectors as search-ready.
+
+- **What changes in production when you move from one-by-one encoding to batch encoding?**
+  Batch encoding reduces per-call overhead and improves throughput, but production code must also manage latency, memory, and batch size.
+
+- **What metadata must travel with saved vectors so the result can be reproduced later?**
+  Store model name, model version, dimensionality, normalization choice, and input hashes with the vectors so the index can be reproduced.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is an embedding — converting text into vectors](./01-what-is-embedding.md)
-- **HuggingFace embeddings in practice — creating your first vectors with sentence-transformers (current)**
-- Cosine similarity and vector search — computing sentence distances (upcoming)
-- FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)
-- Chunking strategies — how to split long documents (upcoming)
-- Vector search pipeline — from document ingestion to query (upcoming)
+- [Vector Search 101 (1/6): What is an embedding — converting text into vectors](./01-what-is-embedding.md)
+- **Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers (current)**
+- Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances (upcoming)
+- Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)
+- Vector Search 101 (5/6): Chunking strategies — how to split long documents (upcoming)
+- Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query (upcoming)
 
 <!-- toc:end -->
 
@@ -348,6 +342,6 @@ The next post moves to similarity computation. We will look at when cosine simil
 
 ## References
 
-- [langchain-community HuggingFaceEmbeddings](https://python.langchain.com/docs/integrations/text_embedding/huggingfacehub/)
+- [langchain-huggingface HuggingFaceEmbeddings](https://python.langchain.com/docs/integrations/text_embedding/huggingfacehub/)
 - [sentence-transformers encode API](https://www.sbert.net/docs/package_reference/SentenceTransformer.html)
 - [all-MiniLM-L6-v2 model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)

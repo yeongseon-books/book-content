@@ -1,10 +1,10 @@
 ---
 series: algorithms-101
 episode: 1
-title: What Is an Algorithm?
+title: "Algorithms 101 (1/10): What Is an Algorithm?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,23 @@ seo_description: What an algorithm is, how it differs from a program, and how co
 last_reviewed: '2026-05-04'
 ---
 
-# What Is an Algorithm?
-
-> Algorithms 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
+# Algorithms 101 (1/10): What Is an Algorithm?
 
 **Core question**: Why does a "good algorithm" matter so much when modern hardware is fast enough to run almost anything?
 
-> An algorithm is a finite sequence of clear, unambiguous steps that takes a well-defined input and produces a correct output. Three properties separate an algorithm from "any code that happens to work": correctness on every valid input, finiteness in time and space, and efficiency that scales with input growth. Hardware does not save us from a quadratic algorithm running on millions of records. This article maps the vocabulary the entire series will use.
+An algorithm is a finite sequence of clear, unambiguous steps that takes a well-defined input and produces a correct output. Three properties separate an algorithm from "any code that happens to work": correctness on every valid input, finiteness in time and space, and efficiency that scales with input growth. Hardware does not save us from a quadratic algorithm running on millions of records.
 
-<!-- a-grade-intro:end -->
+This is the first post in the Algorithms 101 series. Here we define what an algorithm is, how it differs from a program, and which core terms the rest of the series will build on.
+
+
+![algorithms 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/01/01-01-big-picture.en.png)
+*algorithms 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is an Algorithm??
+- Which signal should the example or diagram make visible for What Is an Algorithm??
+- What failure should be prevented first when What Is an Algorithm? reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +51,6 @@ last_reviewed: '2026-05-04'
 Most production incidents that look like "the system is slow" are really "the algorithm does not scale." A linear scan over 10 million rows is fine in a test fixture but lethal in production. Knowing the vocabulary of algorithms is the first step toward predicting whether a system will hold under realistic load.
 
 > An algorithm is the contract between a problem and its solution.
-
-## Concept at a Glance
 
 > An algorithm has three obligations. It must produce the correct output for every valid input (correctness). It must terminate in finite time using finite memory (finiteness). It must do so within an efficiency envelope appropriate to the input size. Programs add concrete syntax, environment, and side effects, but the algorithm is the abstract recipe behind them.
 
@@ -207,7 +211,18 @@ An algorithm is defined by correctness, finiteness, and efficiency. It is the ab
 
 The next article introduces time and space complexity, the formal vocabulary used to compare algorithms. Big-O, Big-Omega, and Big-Theta will give us shared terms for the rest of the series.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is an Algorithm??**
+  - The article treats What Is an Algorithm? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is an Algorithm??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is an Algorithm? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is an Algorithm? (current)**
 - Time and Space Complexity (upcoming)
 - Search Algorithms (upcoming)
@@ -218,6 +233,7 @@ The next article introduces time and space complexity, the formal vocabulary use
 - Graph Algorithms (upcoming)
 - String Algorithm Basics (upcoming)
 - Algorithm Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,12 +1,12 @@
 ---
-title: 검색 성능 측정
+title: "RAG Evaluation and Benchmarking 101 (2/6): 검색 성능 측정"
 series: rag-benchmark-101
 episode: 2
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -16,26 +16,40 @@ tags:
 - Hit-Rate
 - Latency
 - MRR
-last_reviewed: '2026-05-01'
-seo_description: 검색 벤치마크는 다음 네 가지 입력을 한 번에 묶어서 다룹니다.
+last_reviewed: '2026-05-15'
+seo_description: 검색 벤치마크는 질문, 정답 문서, 순위 결과, 지표가 같은 루프 안에 묶여 있을 때만 의미가 있습니다.
 ---
 
-# 검색 성능 측정
+# RAG Evaluation and Benchmarking 101 (2/6): 검색 성능 측정
 
-## 이 글에서 다룰 문제
+검색 벤치마크는 질문, 정답 문서, 순위 결과, 지표가 같은 루프 안에 묶여 있을 때만 의미가 있습니다.
 
-1편에서는 hit rate, MRR, nDCG를 종이 위 숫자로 익혔습니다. 하지만 실제 RAG 파이프라인에서는 retriever가 매번 다르게 동작하고, 코퍼스도 계속 바뀝니다. 측정 도구가 없으면 "체감상 좋아진 것 같다"라는 말로 의사결정을 하게 됩니다.
+이 글은 RAG 평가와 벤치마크 101 시리즈의 두 번째 글입니다. 여기서는 검색기 변경이 실제 개선인지, 단지 몇 개 예제가 그럴듯해 보인 것인지 구분할 수 있는 최소 측정 루프를 만들겠습니다.
 
-지표를 코드로 옮겨야 하는 이유는 세 가지입니다. 첫째, 임베딩 모델이나 chunk size를 바꿨을 때 **회귀(regression)를 바로 잡아낼 수 있습니다**. 둘째, 동일한 평가 루프를 CI에 붙이면 사람의 주관에 의존하지 않게 됩니다. 셋째, latency를 함께 기록해 두면 품질만 좋아지고 속도가 느려진 변경을 일찍 거를 수 있습니다.
+![질의와 지연 시간을 함께 묶는 검색 벤치마크 루프](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.ko.png)
+*질의와 지연 시간을 함께 묶는 검색 벤치마크 루프*
+> 검색 벤치마크의 핵심은 벡터 DB나 인덱스 자체가 아닙니다. **질문, 정답 문서, 순위 결과, 지표 수집이 반복 가능한 하나의 루프**로 묶여 있다는 점이 핵심입니다.
 
-이 글에서 만들 루프는 작지만 완결되어 있어서, 이후 임베딩 비교(3편)나 vector DB 선택(4편)에서도 동일한 코드 골격을 그대로 재사용합니다.
+## 먼저 던지는 질문
 
-## Mental Model
+- 검색 성능을 감이 아니라 벤치마크 루프로 보려면 무엇을 고정해야 할까요?
+- hit rate, MRR, latency는 검색기의 어떤 다른 측면을 측정할까요?
+- 작은 gold set으로 시작해도 의미 있는 회귀 검사를 만들 수 있을까요?
 
-검색 벤치마크는 다음 네 가지 입력을 한 번에 묶어서 다룹니다.
+## 왜 이 주제가 중요한가
 
-```
-QUERIES (질문 + 정답 id 집합)
+1편에서는 hit rate, MRR, nDCG를 손으로 계산해 보았습니다. 하지만 실제 RAG 시스템에서 검색기는 고정돼 있지 않습니다. 임베딩 모델을 바꾸고, 청크 크기를 바꾸고, 코퍼스가 늘어날 때마다 검색 결과도 함께 흔들립니다. 이때 측정 루프가 없으면 의사결정은 결국 "체감상 좋아 보인다" 수준에 머무릅니다.
+
+지표를 코드로 옮기는 이유는 세 가지입니다. 첫째, 임베딩이나 청크 전략을 바꿨을 때 **회귀를 즉시 발견할 수 있습니다.** 둘째, 같은 루프를 CI에 넣으면 사람마다 다른 인상 비평을 줄일 수 있습니다. 셋째, 품질 점수와 함께 지연 시간을 기록하면 Recall은 좋아졌지만 응답 시간이 두 배로 늘어난 변경을 초기에 걸러낼 수 있습니다.
+
+이 글에서 만드는 루프는 작지만 완전합니다. 이후 글에서 임베딩 모델 비교와 VectorDB 비교를 할 때도 같은 골격을 그대로 재사용합니다. 따라서 여기서 중요한 것은 특정 라이브러리 사용법보다 **측정 대상을 어떻게 고정하고 어떤 결과를 남기는가**입니다.
+
+## 기본 멘탈 모델
+
+검색 벤치마크는 다음 네 요소를 하나의 흐름으로 묶습니다.
+
+```text
+QUERIES (question + gold ids)
    │
    ▼
 retriever.invoke(question)  ──►  ranked_ids  ──►  metric(ranked_ids, gold_ids)
@@ -44,61 +58,63 @@ retriever.invoke(question)  ──►  ranked_ids  ──►  metric(ranked_ids,
 latency_ms                                       hit_rate / MRR
 ```
 
-핵심은 화살표 한 개를 측정 코드로 감싸는 것입니다. `retriever.invoke()` 호출만 시간으로 둘러싸면 검색 구간의 latency가 분리됩니다. 결과는 `metadata["id"]`로 표준화해서 평가 함수가 retriever 종류에 의존하지 않게 만듭니다.
+여기서 할 일은 단순합니다. `retriever.invoke()`만 타이머로 감싸 검색 구간의 순수 지연 시간을 분리합니다. 검색 결과를 `metadata["id"]`로 정규화해 두면, 이후 BM25·FAISS·하이브리드 검색기로 바뀌어도 평가 함수는 그대로 재사용할 수 있습니다.
 
-이 모델을 머릿속에 그려두면, 나중에 BM25, hybrid retriever, reranker가 들어와도 측정 코드는 거의 그대로 둘 수 있습니다.
+이 멘탈 모델이 중요한 이유는 확장성이 있기 때문입니다. 지금은 단일 검색기지만, 나중에 reranker나 다른 벡터 저장소가 들어와도 이 구조만 유지하면 비교 실험을 같은 틀에서 수행할 수 있습니다.
 
 ## 핵심 개념
 
-| 용어 | 의미 | 측정 단위 |
+| 용어 | 의미 | 단위 |
 | --- | --- | --- |
-| Gold set | 질문 + 관련 문서 id 집합 | 질문 수 |
-| Hit rate@k | top-k 안에 정답이 한 번이라도 들어간 비율 | 0.0 ~ 1.0 |
-| MRR | 정답의 첫 등장 순위의 역수 평균 | 0.0 ~ 1.0 |
-| Retrieval latency | retriever 호출 한 번의 소요 시간 | 밀리초(ms) |
-| p95 latency | 전체 latency의 95퍼센타일 값 | 밀리초(ms) |
+| Gold set | 질문과 관련 문서 ID 집합 | 질문 수 |
+| Hit rate@k | 상위 k개에 정답 문서가 한 번이라도 등장한 질의의 비율 | 0.0–1.0 |
+| MRR | 첫 정답 문서 순위의 역수 평균 | 0.0–1.0 |
+| Retrieval latency | `retriever.invoke()` 한 번의 소요 시간 | 밀리초 |
+| p95 latency | 전체 지연 시간의 95퍼센타일 | 밀리초 |
 
-평균 latency만 보면 꼬리 분포(tail latency)를 놓치기 쉽습니다. p95나 p99를 함께 기록해 두면 사용자 체감과 더 가까운 수치를 얻을 수 있습니다.
+평균 지연 시간만 보면 꼬리 구간을 놓칩니다. 실제 사용자 불만은 보통 느린 일부 요청에서 터지므로, 평균과 함께 p95를 반드시 보는 습관이 필요합니다.
 
-## Before vs. After
+## 측정 루프가 없을 때와 있을 때
 
-**Before**: "임베딩 모델을 바꿨더니 답변이 더 좋아진 것 같다"라고 말합니다. 근거는 서너 개 질문을 손으로 돌려 본 인상입니다. 며칠 뒤 다른 도메인 질문에서 품질이 떨어져도, 그 변경 때문인지 다른 변경 때문인지 구분할 수 없습니다.
+이전에는 "임베딩 모델을 바꿨더니 좀 더 좋아진 것 같다"는 말이 근거가 됩니다. 손으로 몇 개 질문을 던져 보고 느낌을 말하는 수준입니다. 며칠 뒤 다른 도메인 질문에서 성능이 떨어져도, 그 변경 때문인지 다른 변경 때문인지 설명할 수 없습니다.
 
-**After**: 같은 `QUERIES` 리스트로 두 retriever를 돌립니다. hit rate, MRR, 평균 latency, p95 latency를 한 줄짜리 결과로 비교합니다. 만약 hit rate가 0.9에서 1.0으로 올랐는데 p95 latency가 80ms에서 250ms로 뛰었다면, 그 트레이드오프를 의식적으로 받아들이거나 거절할 수 있습니다.
+이후에는 같은 `QUERIES` 집합으로 두 검색기를 돌리고, hit rate·MRR·평균 latency·p95 latency를 한 줄에서 비교합니다. 만약 hit rate가 0.90에서 1.00으로 올랐지만 p95 latency가 80ms에서 250ms로 뛰었다면, 이 변경을 받아들일지 말지를 분명한 근거 위에서 판단할 수 있습니다.
 
-## 단계별 실습
+## 단계별로 벤치마크 만들기
 
-### 1단계 — 골드셋 정의
+### 1단계 — 골드셋 정의하기
 
-질문과 정답 문서 id를 함께 적습니다. 처음에는 3~5개로 시작해도 충분합니다.
+먼저 질문과 관련 문서 ID를 짝지어 적습니다. 처음에는 3~5개만 있어도 충분합니다.
 
 ```python
 QUERIES = [
-    ("FAISS는 어떤 거리 함수를 기본으로 쓰나요?", {"doc-faiss-basics"}),
-    ("MRR은 무엇을 측정하나요?", {"doc-mrr-intro"}),
-    ("RAG에서 chunk size가 중요한 이유는?", {"doc-chunking"}),
+    ("What distance does FAISS use by default?", {"doc-faiss-basics"}),
+    ("What does MRR measure?", {"doc-mrr-intro"}),
+    ("Why is chunk size important in RAG?", {"doc-chunking"}),
 ]
 ```
 
-### 2단계 — 측정 루프 작성
+작게 시작해도 괜찮습니다. 이 단계의 목표는 완벽한 데이터셋이 아니라, 같은 질문 세트를 반복 실행할 수 있는 루프를 만드는 것입니다.
 
-![질의와 지연 시간이 묶인 검색 벤치마크 루프](../../assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.ko.png)
+### 2단계 — 측정 루프 만들기
 
-*질의와 지연 시간이 묶인 검색 벤치마크 루프*
-
-실행 코드는 `rag-benchmark-101/ko/02-retrieval-benchmarking/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
+실행 코드는 `rag-benchmark-101/en/02-retrieval-benchmarking/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
 
 ```bash
-cd /root/Github/rag-benchmark-101/ko/02-retrieval-benchmarking
+cd en/02-retrieval-benchmarking
 python3 main.py
 ```
 
 ```python
 import time
+import numpy as np
 
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 latencies_ms = []
 all_ranked = []
+
+for question, _ in QUERIES[:1]:
+    retriever.invoke(question)  # warm-up
 
 for question, relevant_ids in QUERIES:
     started_at = time.perf_counter()
@@ -107,13 +123,19 @@ for question, relevant_ids in QUERIES:
     ranked_ids = [doc.metadata["id"] for doc in docs]
     latencies_ms.append(elapsed_ms)
     all_ranked.append((question, ranked_ids, relevant_ids))
+
+p95_latency_ms = float(np.percentile(latencies_ms, 95))
 ```
 
-### 3단계 — 지표 계산
+여기서 중요한 점은 두 가지입니다. 첫째, 짧은 구간은 `time.perf_counter()`로 측정합니다. 둘째, 결과를 문서 ID 목록으로 정규화해 둡니다. 그래야 뒤의 평가 함수가 검색기 구현에 묶이지 않습니다.
 
-![Hit rate와 MRR을 함께 읽는 검색 품질 축](../../assets/rag-benchmark-101/02/02-02-retrieval-quality-axes-with-hit-rate-and.ko.png)
+워밍업 호출도 실무에서는 거의 필수입니다. 첫 호출에는 모델 로드, 파일 시스템 캐시, 네트워크 초기화가 섞일 수 있습니다. 워밍업 없이 평균을 내면 실제 운영에서 반복 호출될 때의 성능보다 더 느리게 기록될 수 있습니다.
 
-*Hit rate와 MRR을 함께 읽는 검색 품질 축*
+### 3단계 — 지표 계산하기
+
+![Hit rate와 MRR를 함께 읽는 검색 품질 축](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-02-retrieval-quality-axes-with-hit-rate-and.ko.png)
+
+*Hit rate와 MRR를 함께 읽는 검색 품질 축*
 
 ```python
 def hit_rate(ranked, gold):
@@ -131,66 +153,305 @@ rrs = [reciprocal_rank(r, g) for _, r, g in all_ranked]
 print(f"hit_rate@3 = {sum(hits)/len(hits):.2f}")
 print(f"MRR        = {sum(rrs)/len(rrs):.2f}")
 print(f"avg latency = {sum(latencies_ms)/len(latencies_ms):.1f} ms")
+print(f"p95 latency = {p95_latency_ms:.1f} ms")
 ```
 
-### 4단계 — 결과 기록
+Hit rate는 정답이 상위 k 안에 한 번이라도 들어왔는지만 보고, MRR은 첫 정답의 순위를 봅니다. 둘을 함께 봐야 "찾기는 찾는데 뒤에 나온다" 같은 실패를 구분할 수 있습니다.
 
-질문별 ranked id를 그대로 남겨야 나중에 어떤 질문이 무너졌는지 디버깅할 수 있습니다. 평균값만 저장하면 회귀가 발생했을 때 원인을 추적하기 어렵습니다.
+### 4단계 — 결과를 남기기
+
+평균값만 저장하면 디버깅이 막힙니다. 질문별 `ranked_ids`를 로그에 남겨야 어느 질문에서 회귀가 났는지 확인할 수 있습니다. 실제 운영에서는 평균 점수보다 **무너진 질문 목록**이 더 큰 가치를 가집니다.
+
+```python
+report_rows = []
+for question, ranked_ids, relevant_ids in all_ranked:
+    report_rows.append({
+        "question": question,
+        "ranked_ids": ranked_ids,
+        "relevant_ids": sorted(relevant_ids),
+        "hit": hit_rate(ranked_ids, relevant_ids),
+        "rr": reciprocal_rank(ranked_ids, relevant_ids),
+    })
+
+summary = {
+    "hit_rate@3": round(sum(hits) / len(hits), 2),
+    "MRR": round(sum(rrs) / len(rrs), 2),
+    "avg_latency_ms": round(sum(latencies_ms) / len(latencies_ms), 1),
+    "p95_latency_ms": round(p95_latency_ms, 1),
+}
+
+print(summary)
+for row in report_rows:
+    print(row)
+```
+
+```text
+{'hit_rate@3': 0.67, 'MRR': 0.56, 'avg_latency_ms': 4.8, 'p95_latency_ms': 6.1}
+{'question': 'What distance does FAISS use by default?', 'ranked_ids': ['doc-faiss-basics', 'doc-ann-overview', 'doc-chunking'], 'relevant_ids': ['doc-faiss-basics'], 'hit': 1.0, 'rr': 1.0}
+{'question': 'What does MRR measure?', 'ranked_ids': ['doc-bm25', 'doc-mrr-intro', 'doc-ranking'], 'relevant_ids': ['doc-mrr-intro'], 'hit': 1.0, 'rr': 0.5}
+```
+
+이 출력은 바로 행동으로 이어집니다. 두 번째 질문처럼 hit는 1.0인데 rr이 0.5라면, 검색 자체보다 순위화 품질을 먼저 의심해야 합니다.
+
+### 5단계 — 결과를 읽고 첫 번째 점검 순서를 정하기
+
+| 관측값 | 먼저 볼 것 | 흔한 원인 |
+| --- | --- | --- |
+| hit rate 낮음, latency 양호 | 임베딩/청크 전략 | 관련 문서를 아예 못 찾음 |
+| hit rate 높음, MRR 낮음 | reranker, 검색 점수 결합 방식 | 정답은 있지만 뒤쪽에 배치됨 |
+| quality 양호, p95만 높음 | 인프라, 캐시, 네트워크 | 일부 요청만 느림 |
+| 평균 양호, 특정 질문만 붕괴 | 질문별 로그 | 도메인 편향, gold set 누락 |
+
+이 표가 중요한 이유는 "숫자가 이상하다"에서 끝나지 않게 해 주기 때문입니다. 벤치마크는 결국 **다음 수정 방향을 좁혀 주는 도구**여야 합니다.
 
 ## 자주 하는 실수
 
-![Hit rate는 높지만 순위 품질은 낮은 실패 패턴](../../assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.ko.png)
+![Hit rate는 높지만 순위 품질은 약한 실패 패턴](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.ko.png)
 
-*Hit rate는 높지만 순위 품질은 낮은 실패 패턴*
+*Hit rate는 높지만 순위 품질은 약한 실패 패턴*
 
-- **hit rate만 보고 안심하기** — hit rate가 1.0이어도 MRR이 0.4면 정답이 매번 뒤쪽에 있다는 뜻입니다. 사용자에게는 첫 답변이 중요합니다.
-- **임베딩 시간을 retrieval latency에 섞기** — embedding 호출과 retriever 호출을 같은 타이머로 묶으면 검색기 자체의 병목을 구분할 수 없습니다.
-- **`time.time()` 사용** — 시스템 시계 변경에 영향을 받습니다. 짧은 구간 측정은 항상 `time.perf_counter()`를 씁니다.
-- **첫 호출 포함** — 첫 호출은 모델 로딩, 캐시 워밍 비용이 섞여 있습니다. warm-up 호출을 한두 번 돌린 뒤 측정을 시작합니다.
-- **작은 코퍼스 결과를 그대로 신뢰** — 5개 문서로 hit rate 1.0이 나와도 실제 서비스 코퍼스에서는 다릅니다. 이 단계에서는 **측정 루프 자체의 정합성**만 검증한다고 생각해야 합니다.
+- **Hit rate만 믿기** — hit rate가 1.0이어도 MRR이 낮으면 정답이 늘 뒤쪽에 배치된 상태입니다.
+- **임베딩 시간까지 같이 재기** — 검색기 자체의 속도를 보고 싶다면 `retriever.invoke()`만 재야 합니다.
+- **`time.time()` 사용하기** — 시스템 시계 변화에 민감합니다. 짧은 구간은 `time.perf_counter()`가 맞습니다.
+- **첫 호출까지 그대로 집계하기** — 첫 호출에는 모델 로드와 캐시 워밍이 섞입니다. 워밍업 호출 후 본 측정을 하는 편이 안정적입니다.
+- **작은 코퍼스 결과를 일반화하기** — 5개 문서에서 완벽하게 나왔다고 운영 환경에서도 같을 것이라고 생각하면 안 됩니다. 초기에는 검색기 성능보다 **측정 루프가 제대로 동작하는지**를 먼저 검증해야 합니다.
 
-## 실무 적용
+## 운영 환경으로 가져갈 때
 
-규모가 커지면 다음 항목을 함께 기록합니다.
+운영에 가까워질수록 결과와 함께 메타데이터를 남겨야 합니다. 임베딩 모델 이름, 청크 크기, 검색기 유형, 코퍼스 해시가 없으면 같은 결과를 다시 재현하기 어렵습니다.
 
-- **버전 메타데이터**: embedding model 이름, chunk size, retriever 종류, 코퍼스 hash. 결과만 보관하면 재현이 불가능합니다.
-- **p95/p99 latency**: 평균은 일부 빠른 호출에 가려집니다. `numpy.percentile(latencies_ms, 95)`로 함께 기록합니다.
-- **CI 게이트**: hit rate가 기준치 이하이거나 p95 latency가 기준치를 넘으면 PR을 막습니다. 처음에는 경고만, 안정화 후에 차단으로 옮깁니다.
-- **샘플링 전략**: 골드셋이 수백 개로 커지면 매 PR마다 전체를 돌리기 부담스럽습니다. 카테고리별 stratified sampling으로 50~100개를 빠르게 돌리고, 야간 작업에서 전체를 돌립니다.
+지연 시간도 평균만으로는 부족합니다. 평균은 빠른 요청에 끌려 내려가기 쉽기 때문에 p95, 가능하면 p99도 함께 기록해야 합니다. 그리고 PR마다 전량을 돌리기 부담스러워지면, 계층 표본 추출로 50~100개 정도를 빠르게 돌리고 전체 데이터셋은 야간 작업으로 분리하는 방식이 현실적입니다.
 
-## 실무에서는 이렇게 생각한다
-
-벤치마크를 처음 도입할 때 가장 큰 장벽은 골드셋 만들기입니다. 완벽한 골드셋을 기다리면 영원히 시작할 수 없으므로, 도메인 전문가와 30분 앙아 20개 쿼리를 만드는 것으로 시작하는 팀이 많습니다. 초기 골드셋이 작아도 방향은 보입니다.
-
-벤치마크를 CI에 넣을지 말지는 팀마다 다릅니다. retrieval 변경이 잦은 팀은 PR마다 돌리는 것이 좋고, 월 1회 바꾸는 팀은 야간 배치로 충분합니다. 중요한 것은 "돌리는 습관"이지, "매 커밋마다 돌리는 것"이 아닙니다.
+결국 이 벤치마크의 목적은 숫자를 예쁘게 만드는 것이 아닙니다. **같은 질문 세트에 대해 같은 검색기를 반복 관찰할 수 있게 만드는 것**이 목적입니다. 이 루프가 있어야 3편과 4편의 비교 실험도 의미를 갖습니다.
 
 ## 체크리스트
 
-![질문과 정답 문서를 함께 남기는 벤치마크 기록](../../assets/rag-benchmark-101/02/02-04-benchmark-record-with-gold-ids-and-logs.ko.png)
+![질문과 정답 ID를 함께 남기는 벤치마크 기록](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-04-benchmark-record-with-gold-ids-and-logs.ko.png)
 
-*질문과 정답 문서를 함께 남기는 벤치마크 기록*
+*질문과 정답 ID를 함께 남기는 벤치마크 기록*
 
-- [ ] 질문별 relevant document id를 명시적으로 적었다.
-- [ ] `retriever.invoke()`만 감싸서 retrieval latency를 분리했다.
-- [ ] hit rate, MRR, 평균 latency, p95 latency를 함께 출력했다.
-- [ ] 결과에 질문별 ranked ids도 남겼다.
-- [ ] 측정에 사용한 embedding model, chunk size, k 값을 기록했다.
+- [ ] 질문별 관련 문서 ID를 적었다.
+- [ ] `retriever.invoke()`만 감싸서 검색 지연 시간을 분리했다.
+- [ ] hit rate, MRR, 평균 latency, p95 latency를 함께 본다.
+- [ ] 질문별 순위 결과 ID도 출력에 남긴다.
+- [ ] 실행에 사용한 임베딩 모델, 청크 크기, k를 기록한다.
 
-## 정리 · 다음 글
+## 연습 문제
 
-이번 글에서는 손계산 지표를 실제 retriever 위로 옮겨서, hit rate · MRR · latency를 같은 루프에서 측정하는 패턴을 만들었습니다. 이 코드 골격은 앞으로의 모든 비교 실험에서 그대로 재사용됩니다.
+1. 한 번의 실행에서 `k=1`, `k=3`, `k=5`의 hit rate를 함께 출력하도록 루프를 바꿔 보세요. k가 커질수록 hit rate와 MRR는 어떻게 움직일까요?
+2. `time.perf_counter()`를 `time.time()`으로 바꾸고 문서를 읽어 보세요. 어떤 상황에서 측정이 틀릴 수 있을까요?
+3. 루프 앞에 워밍업 호출을 하나 추가해 보세요. 워밍업 유무에 따라 첫 측정 지연 시간이 얼마나 달라지나요?
 
-다음 글(3편)에서는 같은 측정 루프 위에 **임베딩 모델을 바꿔 끼워서 비교**합니다. 코드 변경은 한 줄이지만, 결과 해석에서 주의할 점이 많습니다.
+## 정리와 다음 글
+
+이 글에서는 손으로 계산하던 지표를 실제 검색기에 올려, hit rate·MRR·latency를 함께 수집하는 루프를 만들었습니다. 핵심은 특정 라이브러리보다 **반복 가능한 입력 집합과 결과 기록 방식**입니다.
+
+다음 글에서는 같은 루프를 그대로 둔 채 임베딩 모델만 바꿔 봅니다. 코드 변경은 한 줄에 가깝지만, 결과 해석은 의외로 까다롭습니다.
+
+## 벤치마크 입력 파일을 고정하는 실전 형식
+
+검색 실험에서 가장 흔한 재현 실패 원인은 질문 세트가 실행마다 달라지는 것입니다. 아래처럼 질문과 정답 문서 ID를 JSONL로 고정해 두면 실행 조건을 명확히 보존할 수 있습니다.
+
+```json
+{"query_id":"q-001","question":"MRR는 무엇을 측정하나요?","relevant_ids":["doc-mrr-01"]}
+{"query_id":"q-002","question":"IVF의 nprobe는 왜 필요한가요?","relevant_ids":["doc-ivf-02","doc-ivf-03"]}
+{"query_id":"q-003","question":"RAG에서 chunk size를 크게 잡으면 어떤 영향이 있나요?","relevant_ids":["doc-chunk-04"]}
+```
+
+그리고 실행 시점에는 입력 파일 해시를 리포트에 반드시 남깁니다.
+
+```python
+import hashlib
+from pathlib import Path
+
+def file_sha256(path: str) -> str:
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+meta = {
+    "gold_set_path": "data/gold_queries.jsonl",
+    "gold_set_sha256": file_sha256("data/gold_queries.jsonl"),
+}
+```
+
+이 메타데이터가 없으면, 점수 차이가 코드 변경 때문인지 입력 변경 때문인지 분리하기 어렵습니다.
+
+### 질문군별 hit rate를 함께 기록하기
+
+평균 hit rate 하나만 보면 특정 도메인 회귀를 놓치기 쉽습니다. 질문에 `segment`를 붙여 그룹별 지표를 같이 계산하면 더 빨리 원인을 찾을 수 있습니다.
+
+| segment | 예시 질문 | hit@3 | MRR | 해석 |
+| --- | --- | ---: | ---: | --- |
+| 개념 정의 | "RAGAS faithfulness는?" | 0.95 | 0.86 | 안정적 |
+| 운영 설정 | "IVF nprobe 튜닝" | 0.78 | 0.62 | 튜닝 문서 검색 약함 |
+| 장애 대응 | "검색 지연 급등 대응" | 0.64 | 0.49 | 런북 문서 회수 실패 |
+
+이 표는 제품팀과 운영팀이 같은 리포트를 보고도 즉시 행동 항목을 정할 수 있게 해 줍니다.
+
+### 지연 시간 측정에서 분리해야 할 구간
+
+검색 지연 시간을 신뢰하려면 아래 경계를 명확히 나누어야 합니다.
+
+```text
+[포함]   retriever.invoke(question)
+[제외]   질문 로딩, 임베딩 모델 초기화, 결과 직렬화, 로그 업로드
+```
+
+특히 서버형 VectorDB를 쓴다면 네트워크 RTT가 크게 작용하므로, 같은 리포트에 네트워크 환경도 남겨 두는 편이 좋습니다.
+
+```yaml
+environment:
+  region: ap-northeast-2
+  client_host: bench-runner-01
+  vectordb_endpoint: qdrant.internal:6333
+  transport: http
+  tls: false
+```
+
+### 검색 품질 차트 설명 템플릿
+
+문서에는 종종 그래프 이미지가 붙습니다. 차트 해석 문장을 표준화하면 팀 내 오해를 줄일 수 있습니다.
+
+1. x축은 `top-k`, y축은 `hit rate` 또는 `MRR`로 고정합니다.
+2. 두 검색기 곡선이 교차하는 k 지점을 본문에 명시합니다.
+3. 운영 top-k(예: 5)에서의 값 차이를 문장으로 다시 적습니다.
+
+예시 설명 문장:
+
+"k=1에서는 BM25가 MRR 0.71로 앞서지만, k=5에서는 hybrid 검색기가 hit rate 0.93으로 역전합니다. 운영 top-k=4 기준으로는 hybrid가 정답 회수율에서 0.08 우세합니다."
+
+### CI 회귀 검사용 간단한 비교 스크립트
+
+아래 스크립트는 이전 실행 결과와 현재 실행 결과를 비교해 핵심 지표 회귀를 판정합니다.
+
+```python
+import json
+import sys
+
+THRESHOLDS = {
+    "hit_rate@3": -0.02,
+    "MRR": -0.03,
+    "p95_latency_ms": 8.0,
+}
+
+before = json.load(open("reports/baseline.json", "r", encoding="utf-8"))
+after = json.load(open("reports/current.json", "r", encoding="utf-8"))
+
+delta_hit = after["aggregate"]["hit_rate@3"] - before["aggregate"]["hit_rate@3"]
+delta_mrr = after["aggregate"]["MRR"] - before["aggregate"]["MRR"]
+delta_p95 = after["aggregate"]["p95_latency_ms"] - before["aggregate"]["p95_latency_ms"]
+
+if delta_hit < THRESHOLDS["hit_rate@3"] or delta_mrr < THRESHOLDS["MRR"] or delta_p95 > THRESHOLDS["p95_latency_ms"]:
+    print("FAIL: retrieval benchmark regression")
+    sys.exit(1)
+
+print("PASS: retrieval benchmark thresholds satisfied")
+```
+
+이 정도 자동화만 있어도 "좋아 보인다"가 아니라 "기준을 통과했다"로 대화를 전환할 수 있습니다.
+
+## 실전 부록: 검색 벤치마크 운영 설정과 로그 포맷
+
+검색 벤치마크를 팀 공용 파이프라인으로 운영하려면 실행 설정과 로그 포맷을 표준화해야 합니다.
+
+### 실행 설정 YAML 예시
+
+```yaml
+benchmark:
+  top_k: 5
+  warmup_queries: 5
+  repeats_per_query: 3
+  sample_size: 120
+retriever:
+  type: faiss
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  search_kwargs:
+    k: 5
+latency:
+  percentile: [50, 95]
+  include_network_rtt: true
+report:
+  save_json: true
+  save_csv: true
+  out_dir: reports/retrieval
+```
+
+이 정도만 고정해도 환경별 실행 차이를 크게 줄일 수 있습니다.
+
+### 질문별 로그 CSV 권장 컬럼
+
+| 컬럼 | 설명 |
+| --- | --- |
+| run_id | 실행 식별자 |
+| query_id | 질문 ID |
+| question | 원문 질문 |
+| ranked_ids | 상위 문서 ID 목록 |
+| relevant_ids | 정답 문서 ID 목록 |
+| hit@k | hit 여부 |
+| rr | reciprocal rank |
+| latency_ms | 검색 지연 시간 |
+
+CSV를 함께 저장해 두면 PM이나 운영팀도 파이썬 코드 없이 쉽게 확인할 수 있습니다.
+
+### 지연 시간 분포를 텍스트로 요약하는 방식
+
+그래프가 없어도 분포 요약을 텍스트로 남기면 추세 분석이 가능합니다.
+
+```text
+latency summary (ms)
+  min: 3.1
+  p50: 5.4
+  p95: 12.8
+  p99: 19.2
+  max: 27.7
+```
+
+이 요약은 인프라 변경 전후 비교에 특히 유용합니다.
+
+### 검색 품질 회귀 진단 순서
+
+1. `Recall@k = 0` 질문 목록부터 확인합니다.
+2. 해당 질문의 `ranked_ids`와 `relevant_ids`를 비교합니다.
+3. 공통 실패 토픽(예: 약어, 제품명, 버전명)을 묶습니다.
+4. 쿼리 확장 또는 문서 메타데이터 보강 실험을 우선 배치합니다.
+
+이 순서를 표준 절차로 두면, 회귀가 발생해도 대응 속도를 일정하게 유지할 수 있습니다.
+
+### 운영 파라미터 비교 테이블 예시
+
+| run_id | retriever | top_k | hit@5 | MRR | p95(ms) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| r-20260521-a | bm25 | 5 | 0.81 | 0.63 | 21.4 |
+| r-20260521-b | faiss-flat | 5 | 0.90 | 0.77 | 34.8 |
+| r-20260521-c | hybrid | 5 | 0.93 | 0.80 | 39.2 |
+
+같은 질문 세트에서 위 표를 누적하면, 팀은 "품질 우선"인지 "지연 우선"인지 목적에 맞춰 검색기를 고를 수 있습니다.
+
+추가로, 실험 로그에는 "실패 질문 10개"를 별도 파일로 저장하는 편이 좋습니다. 평균 지표가 같아도 실패 질문 구성이 바뀌면 사용자 체감은 크게 달라질 수 있기 때문입니다. 실패 질문 목록이 누적되면 특정 도메인(예: 장애 대응 문서, 버전 호환성 문서)에서 반복적으로 취약한 패턴을 찾기 쉬워집니다.
+
+벤치마크 루프를 장기 운영할 때는 질문 세트 갱신 주기를 미리 정해 두는 것이 좋습니다. 예를 들어 월 1회 신규 질문 10%를 교체하고, 교체 전후 공통 질문 90%를 유지하면 추세 비교와 데이터 신선도를 함께 확보할 수 있습니다.
+
+또한 갱신된 질문은 최소 한 번 이상 도메인 리뷰를 거쳐 정답 문서 ID를 검증한 뒤 벤치마크에 반영해야, 지표 왜곡을 줄일 수 있습니다.
+
+## 처음 질문으로 돌아가기
+
+- **검색 성능을 감이 아니라 벤치마크 루프로 보려면 무엇을 고정해야 할까요?**
+  질문 집합, gold 문서 ID, 평가 k, 문서 버전, 측정 코드를 고정해야 변경 전후를 비교할 수 있습니다.
+
+- **hit rate, MRR, latency는 검색기의 어떤 다른 측면을 측정할까요?**
+  hit rate는 정답이 포함됐는지, MRR은 첫 정답 순위, latency는 검색 응답 시간을 측정합니다. 셋을 함께 봐야 품질과 속도 균형을 읽을 수 있습니다.
+
+- **작은 gold set으로 시작해도 의미 있는 회귀 검사를 만들 수 있을까요?**
+  작은 gold set도 핵심 질문을 잘 대표하면 회귀 감지에 유용합니다. 다만 대표 범위와 한계를 결과에 명시해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [RAG 평가 지표 이해](./01-evaluation-metrics.md)
-- **검색 성능 측정 (현재 글)**
-- 임베딩 모델 비교 (예정)
-- VectorDB 선택 기준 (예정)
-- 종단 간 RAG 파이프라인 평가 (예정)
-- RAG 벤치마크 완성 (예정)
+- [RAG Evaluation and Benchmarking 101 (1/6): RAG 평가 지표 이해](./01-evaluation-metrics.md)
+- **RAG Evaluation and Benchmarking 101 (2/6): 검색 성능 측정 (현재 글)**
+- RAG Evaluation and Benchmarking 101 (3/6): 임베딩 모델 비교 (예정)
+- RAG Evaluation and Benchmarking 101 (4/6): VectorDB 선택 기준 (예정)
+- RAG Evaluation and Benchmarking 101 (5/6): 종단 간 RAG 파이프라인 평가 (예정)
+- RAG Evaluation and Benchmarking 101 (6/6): RAG 벤치마크 완성 (예정)
 
 <!-- toc:end -->
 
@@ -202,3 +463,5 @@ print(f"avg latency = {sum(latencies_ms)/len(latencies_ms):.1f} ms")
 - [FAISS documentation](https://faiss.ai/)
 - [Python `time.perf_counter`](https://docs.python.org/3/library/time.html#time.perf_counter)
 - [BEIR: heterogeneous benchmark for IR](https://github.com/beir-cellar/beir)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/rag-benchmark-101/ko/02-retrieval-benchmarking)

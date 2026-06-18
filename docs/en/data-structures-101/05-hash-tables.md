@@ -1,10 +1,10 @@
 ---
 series: data-structures-101
 episode: 5
-title: Hash Tables
+title: "Data Structures 101 (5/10): Hash Tables"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: How a hash table delivers average O(1) lookup, with collision h
 last_reviewed: '2026-05-04'
 ---
 
-# Hash Tables
+# Data Structures 101 (5/10): Hash Tables
 
 > Data Structures 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Would you believe a structure that finds one entry among a trillion in roughly one operation?
 
 > A hash table converts a key to an integer index using a hash function, and then jumps straight into an array. Average time complexity is O(1) — astonishing performance — but you must handle collisions, rehashing, and hash quality carefully. This article walks through how a hash table works, two collision strategies (chaining and open addressing), and the design ideas inside Python's dict.
 
-<!-- a-grade-intro:end -->
+This is post 5 in the Data Structures 101 series.
+
+
+![data structures 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/05/05-01-big-picture.en.png)
+*data structures 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Hash Tables?
+- Which signal should the example or diagram make visible for Hash Tables?
+- What failure should be prevented first when Hash Tables reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 Hash tables sit in the standard library of nearly every language: Python's dict and set, Java's HashMap, JavaScript's Object and Map. Database indexes, caches, and compiler symbol tables all use hash tables. The single fact that average lookup is O(1) makes a great deal of computer science possible.
 
 > Without dict, half of the algorithm problems become hard.
-
-## Concept at a Glance
 
 > A hash table runs a two-step transform: "key → hash value → index" — landing on a specific slot in an array. When two keys map to the same slot, you resolve the collision with chaining (a linked list) or open addressing (probe for the next empty slot).
 
@@ -88,7 +94,7 @@ def find(uid):
 
 **After — searching keys with a dict:**
 
-```python
+```text
 users = {1: "Alice", 2: "Bob", 3: "Carol", ...}
 
 def find(uid):
@@ -125,7 +131,6 @@ class HashTable:
                 return v
         raise KeyError(key)
 
-
 h = HashTable()
 h.put("apple", 1); h.put("banana", 2)
 print(h.get("apple"))   # 1
@@ -151,7 +156,6 @@ class HashTable2(HashTable):
         self._size = 0
         for k, v in old:
             super().put(k, v)
-
 
 h = HashTable2(capacity=4)
 for i in range(10):
@@ -188,7 +192,6 @@ class OpenAddressTable:
             self._size += 1
         self._slots[idx] = (key, value)
 
-
 t = OpenAddressTable()
 t.put("a", 1); t.put("b", 2)
 ```
@@ -206,7 +209,6 @@ class BadHash:
         return 0
     def __eq__(self, other):
         return self.val == other.val
-
 
 import time
 
@@ -297,17 +299,29 @@ A hash table converts a key to an integer index and jumps into an array, deliver
 
 Next we look at the structure that naturally expresses hierarchy — the tree. File systems, the DOM, organization charts: nearly every hierarchical dataset shares the same skeleton.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Hash Tables?**
+  - The article treats Hash Tables as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Hash Tables?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Hash Tables reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
-- [Linked Lists](./03-linked-lists.md)
-- [Stacks and Queues](./04-stacks-and-queues.md)
+## In this series
+
+- [Data Structures 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
+- [Data Structures 101 (3/10): Linked Lists](./03-linked-lists.md)
+- [Data Structures 101 (4/10): Stacks and Queues](./04-stacks-and-queues.md)
 - **Hash Tables (current)**
 - Trees (upcoming)
 - Binary Search Trees (upcoming)
 - Heaps (upcoming)
 - Graphs (upcoming)
 - Choosing Data Structures (upcoming)
+
 <!-- toc:end -->
 
 ## References

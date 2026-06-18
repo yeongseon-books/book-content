@@ -1,11 +1,11 @@
 ---
-title: Evaluation and Quality Gates — RAGAS Metrics and Faithfulness
+title: "RAG Deep Dive (6/6): Evaluation and Quality Gates — RAGAS Metrics and Faithfulness"
 series: rag-deep-dive
 episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,33 +14,29 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: How RAGAS faithfulness and answer_relevancy metrics automate quality evaluation of RAG answers.
 ---
 
-# Evaluation and Quality Gates — RAGAS Metrics and Faithfulness
+# RAG Deep Dive (6/6): Evaluation and Quality Gates — RAGAS Metrics and Faithfulness
 
-<!-- a-grade-intro:begin -->
-## Questions this post answers
+RAGAS faithfulness and answer_relevancy metrics let you evaluate RAG answer quality without rereading every output by hand. This post shows how to turn those signals into a quality gate.
 
-- Why can’t RAGAS start from an answer string alone?
-- How does faithfulness decompose and verify an answer?
-- What does answer relevancy measure if not truth?
-- What needs to stay fixed before these scores become a CI gate?
+This is the final post in the RAG Deep Dive series.
 
+![Sample fields controlling metric eligibility](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.en.png)
+*Sample fields controlling metric eligibility*
 > Evaluation re-expands one RAG answer into the relationship between question, evidence, answer, and target truth, then turns that relationship into scores.
 
-![Questions this post answers](../../assets/rag-deep-dive/06/06-01-questions-this-post-answers.en.png)
+## Questions to Keep in Mind
 
-*Questions this post answers*
-<!-- a-grade-intro:end -->
+- Why do RAGAS dataset columns define what can actually be evaluated?
+- What does Faithfulness compare against evidence instead of judging whether the answer sounds plausible?
+- Which failures should a quality gate block in CI or production?
 
-> RAG Deep Dive series (6/6)
-
-<!-- a-grade-example:begin -->
 ## Minimal runnable example
 
-Example file: `/root/Github/rag-deep-dive/en/06-evaluation-and-quality-gates/main.py`
+Example file: `en/06-evaluation-and-quality-gates/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py
@@ -135,10 +131,6 @@ The first important thing to understand about RAGAS is that it is not a generic 
 
 Those four columns form the core frame for RAG evaluation. `question` is the user query. `contexts` is the ordered list of retrieved chunks. `answer` is the model output. `ground_truth` is the human reference answer. If you do not keep the original question, you cannot compute answer relevancy. If you do not keep retrieved context, you cannot check faithfulness. If you do not keep a reference answer, you lose metrics that need a target outcome.
 
-![Sample fields controlling metric eligibility](../../assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.en.png)
-
-*Sample fields controlling metric eligibility*
-
 The schema is also your failure taxonomy. An answer can drift away from the question, inject unsupported claims, or retrieve useful evidence too late in the ranking. The row shape decides which of those failures you can measure.
 
 It also explains why metrics have different contracts. Faithfulness needs `question`, `answer`, and `contexts`. Answer relevancy also requires all three because `evaluation_mode = qac`. Its `_create_question_gen_prompt()` method reads both `row["answer"]` and `row["contexts"]`, so if `contexts` is missing, `evaluate()` validation fails before scoring starts. Context precision needs `question`, `contexts`, and an answer target from `ground_truth`.
@@ -197,7 +189,7 @@ First, RAGAS does not judge the answer as one indivisible block. It uses an LLM 
 
 Second, each atomic claim is checked against the retrieved context list. The `NLI_STATEMENTS_MESSAGE` prompt asks whether every statement can be directly inferred from the provided context, returning a binary `verdict` for each one. In `_create_nli_prompt()`, the metric joins `contexts` into one context string and passes the claim list in JSON form. Then `_compute_score()` reduces the result to a ratio.
 
-![Claim decomposition and support verification flow](../../assets/rag-deep-dive/06/06-02-faithfulness-claim-decomposition-and-verification.en.png)
+![Claim decomposition and support verification flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-02-faithfulness-claim-decomposition-and-verification.en.png)
 
 *Claim decomposition and support verification flow*
 
@@ -250,7 +242,7 @@ Where faithfulness asks whether an answer stayed inside the evidence boundary, a
 
 The implementation uses a reverse-question generation prompt. `QUESTION_GEN` takes the `answer` together with `context`, then asks the LLM to produce a question plus a `noncommittal` flag. The default `strictness` is 3, so the metric usually generates multiple reverse questions for the same answer. `_calculate_score()` then embeds the original `question` and the generated reverse questions, computes cosine similarity, and averages the result.
 
-![Reverse questions measuring answer focus](../../assets/rag-deep-dive/06/06-03-answer-relevancy-reverse-question-flow.en.png)
+![Reverse questions measuring answer focus](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-03-answer-relevancy-reverse-question-flow.en.png)
 
 *Reverse questions measuring answer focus*
 
@@ -292,7 +284,7 @@ Context precision is the metric that looks most directly at retrieval ranking qu
 
 The input contract matters here too. `ragas==0.1.22` expects a `Dataset` with `question`, `contexts`, `answer`, and `ground_truth`, and `evaluate()` first normalizes aliases through `remap_column_names(dataset, column_map)`. After that normalization, context precision evaluates each context chunk against the question and the answer target carried by the dataset, which is why it is better understood as a retrieval metric than a generation metric.
 
-![Rank-weighted precision at k scoring](../../assets/rag-deep-dive/06/06-04-context-precision-at-k-ranking.en.png)
+![Rank-weighted precision at k scoring](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-04-context-precision-at-k-ranking.en.png)
 
 *Rank-weighted precision at k scoring*
 
@@ -336,7 +328,7 @@ Computing metrics is only half the job. The real value appears when those metric
 
 One versioning detail matters. In `ragas==0.1.22`, the executable dataset uses `question`, `contexts`, `answer`, and `ground_truth`. If your stored dataset uses names like `query`, `retrieved_passages`, `prediction`, or `reference_answer`, pass a `column_map` in the direction canonical name -> existing dataset column. For example, `{"question": "query"}` means the RAGAS `question` slot should read from the dataset column named `query`.
 
-![CI gate around faithfulness thresholds](../../assets/rag-deep-dive/06/06-05-quality-gate-pipeline-integration.en.png)
+![CI gate around faithfulness thresholds](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-05-quality-gate-pipeline-integration.en.png)
 
 *CI gate around faithfulness thresholds*
 
@@ -424,14 +416,46 @@ Why make faithfulness the first hard gate? Because chunking, retrieval, promptin
 LangChain’s evaluation layer is helpful here as a complement, not a replacement. `EvaluatorType` and `load_evaluator()` are useful for final-answer grading, criteria checks, or exact-match style comparisons. They do not natively compute retrieval-grounded faithfulness. That is the gap RAGAS fills.
 
 That gives the series a clean ending. Episodes 1 through 5 explained how chunks are created, retrieved, injected, and assembled. Episode 6 adds the final layer: a repeatable way to prove that a change made the system better rather than merely different. A production-ready RAG stack is complete only when it can fail a build before it fails a user.
+
+---
+
+## Answering the Opening Questions
+
+- **Why do RAGAS dataset columns define what can actually be evaluated?**
+  A metric can only run when required columns such as question, answer, contexts, or ground truth exist, so the schema defines the measurable quality surface.
+
+- **What does Faithfulness compare against evidence instead of judging whether the answer sounds plausible?**
+  Faithfulness decomposes the answer into claims and checks whether each claim is supported by the supplied context; fluency is not enough.
+
+- **Which failures should a quality gate block in CI or production?**
+  Block unsupported answers, low faithfulness, retrieval regressions, and score drops below the agreed threshold in CI or release gates.
+
+<!-- toc:begin -->
+## In this series
+
+- [RAG Deep Dive (1/6): Document Loading and Chunking — Inside LangChain TextSplitter](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): Embeddings and the Vector Index — Inside FAISS IndexFlatL2](./02-embeddings-and-vector-index.md)
+- [RAG Deep Dive (3/6): Retriever Design — VectorStoreRetriever and MMR](./03-retriever-design.md)
+- [RAG Deep Dive (4/6): Prompt Construction and Context Injection — Inside PromptTemplate](./04-prompt-construction-and-context-injection.md)
+- [RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL](./05-rag-chain-assembly.md)
+- **RAG Deep Dive (6/6): Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (current)**
+
+<!-- toc:end -->
+
 ---
 
 ## References
 
-1. [`ragas==0.1.22` package index](https://pypi.org/project/ragas/0.1.22/)
-2. `ragas/evaluation.py` from installed `ragas==0.1.22`
-3. `ragas/metrics/_faithfulness.py` from installed `ragas==0.1.22`
-4. `ragas/metrics/_answer_relevance.py` from installed `ragas==0.1.22`
-5. `ragas/metrics/_context_precision.py` from installed `ragas==0.1.22`
-6. [`langchain/evaluation/loading.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/loading.py)
-7. [`langchain/evaluation/schema.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/schema.py)
+### Official Docs
+
+- [RAGAS evaluation quickstart](https://docs.ragas.io/en/stable/getstarted/evaluation/)
+- [RAGAS metrics overview](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/)
+- [LangChain evaluation concepts](https://python.langchain.com/docs/concepts/evaluation/)
+
+### Source Code
+
+- [RAGAS `evaluation.py` source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/evaluation.py)
+- [RAGAS faithfulness metric source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_faithfulness.py)
+- [RAGAS answer relevancy metric source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_answer_relevance.py)
+- [RAGAS context precision metric source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_context_precision.py)
+- [LangChain evaluation loading source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/loading.py)

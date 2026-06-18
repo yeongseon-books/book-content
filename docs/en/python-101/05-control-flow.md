@@ -1,11 +1,11 @@
 ---
-title: 'Control flow: if, for, while, comprehension'
+title: "Python 101 (5/10): Control flow: if, for, while, comprehension"
 series: python-101
 episode: 5
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -22,18 +22,21 @@ seo_description: 'When wiring up control flow, split each branch and loop into t
   questions: "what truthy/falsy decision does this make" and "what is the termination…'
 ---
 
-# Control flow: if, for, while, comprehension
+# Python 101 (5/10): Control flow: if, for, while, comprehension
 
-## What you will learn
+Control flow gets easier when you break every branch and loop into two questions: what decision is being made, and what ends the loop. That framing keeps `if`, `for`, `while`, and comprehensions from turning into guesswork.
 
-By the end of this chapter you will be able to explain and code the following:
+This post is the 5th article in the Python 101 series. This is the point in the series where Python code starts to branch, loop, and compress repeated patterns.
 
-- How to handle truthy and falsy values deliberately when writing `if`/`elif`/`else`
-- A first-cut decision rule for choosing between `for` and `while`
-- How to combine `range`, `enumerate`, and `zip` for loops that read well
-- When to reach for list/dict/set comprehensions, and when to fall back to a regular loop
-- The subtle behavior of `break`, `continue`, and the `for ... else` clause
-- How to avoid common traps — mutating a sequence while iterating, deeply nested comprehensions, off-by-one errors
+
+![Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/05/05-01-mental-model.en.png)
+*Python 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
+
+- How to handle truthy and falsy values deliberately when writing `if`/`elif`/`else`?
+- A first-cut decision rule for choosing between `for` and `while`?
+- How to combine `range`, `enumerate`, and `zip` for loops that read well?
 
 ## Why it matters
 
@@ -48,9 +51,6 @@ This chapter is also a setup for the next one on functions and argument design. 
 > When wiring up control flow, split each branch and loop into two questions: "what truthy/falsy decision does this make" and "what is the termination condition". The same lens decides between a comprehension and a plain loop.
 Lay out the choices on a single page so that, while reading code, you can guess the next step in your head.
 
-![Mental model](../../assets/python-101/05/05-01-mental-model.en.png)
-
-*Mental model*
 Three rules carry most of the weight.
 
 1. **A single decision is `if`; the same work repeated is a loop.** `for` and `while` are two tools for the same job — repetition — and the choice depends on whether you already have something to iterate over.
@@ -224,7 +224,7 @@ Run the snippets in order, in a REPL or a small script. Lines starting with `>>>
 
 1. **Confirm truthy and falsy yourself.**
 
-```python
+```text
 >>> for v in [0, 1, "", "x", [], [0], None, {"a": 1}]:
 ...     print(repr(v), bool(v))
 0 False
@@ -241,7 +241,7 @@ Note that `[0]` is truthy because the container has length 1. The rule is "the c
 
 2. **Combine `enumerate` with `zip`.**
 
-```python
+```text
 >>> names = ["ada", "bob", "carol"]
 >>> roles = ["engineer", "designer", "engineer"]
 >>> for idx, (name, role) in enumerate(zip(names, roles), start=1):
@@ -255,7 +255,7 @@ Note that `[0]` is truthy because the container has length 1. The rule is "the c
 
 3. **Branch on a search result with `for`-`else`.**
 
-```python
+```text
 >>> def find_first_negative(nums):
 ...     for n in nums:
 ...         if n < 0:
@@ -268,7 +268,7 @@ Note that `[0]` is truthy because the container has length 1. The rule is "the c
 
 The same idea written with `for`-`else`:
 
-```python
+```text
 >>> def find_first_negative_v2(nums):
 ...     for n in nums:
 ...         if n < 0:
@@ -281,7 +281,7 @@ Here the `for`-`else` adds little because the trailing `return None` is already 
 
 4. **Move between comprehensions and a regular loop.**
 
-```python
+```text
 >>> nums = list(range(10))
 >>> [x * x for x in nums if x % 2 == 0]
 [0, 4, 16, 36, 64]
@@ -382,13 +382,35 @@ These two patterns reappear in the next chapter on function arguments and the ch
 
 The next chapter covers functions and arguments. We will pin down `def`, `*args`/`**kwargs`, defaults, and `lambda`, and look at how to package branching and looping bodies into named functions.
 
+## Answering the Opening Questions
+
+- **How to handle truthy and falsy values deliberately when writing `if`/`elif`/`else`?**
+  - The article treats Control flow: if, for, while, comprehension as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **A first-cut decision rule for choosing between `for` and `while`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to combine `range`, `enumerate`, and `zip` for loops that read well?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- [Python 101 (1/10): Why Python, and how to install and use venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): Variables, types, and operators](./02-variables-types-operators.md)
+- [Python 101 (3/10): Strings and formatting](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- **Control flow: if, for, while, comprehension (current)**
+- Functions and arguments: def, args, kwargs, default, lambda (upcoming)
+- Modules and packages: import, __init__, __name__ (upcoming)
+- File I/O and exception handling (upcoming)
+- Classes and objects: bundling data with behavior (upcoming)
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- Python tutorial — More Control Flow Tools: https://docs.python.org/3/tutorial/controlflow.html
-- Python docs — Truth Value Testing: https://docs.python.org/3/library/stdtypes.html#truth-value-testing
-- Python docs — `enumerate`: https://docs.python.org/3/library/functions.html#enumerate
-- Python docs — `zip` (including the strict option): https://docs.python.org/3/library/functions.html#zip
-- PEP 202 — List Comprehensions: https://peps.python.org/pep-0202/
+- [Python tutorial — More Control Flow Tools](https://docs.python.org/3/tutorial/controlflow.html) — Covers `if`, `for`, `while`, `break`, `continue`, loop `else`, and function-level examples in one place.
+- [Python docs — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — Canonical source for truth-value testing, chained comparisons, and boolean operator behavior.
+- [Python docs — Built-in Functions](https://docs.python.org/3/library/functions.html) — Documents `range`, `enumerate`, and `zip`, including the `strict` behavior referenced in the chapter.
+- [PEP 202 — List Comprehensions](https://peps.python.org/pep-0202/) — Historical and syntactic source for comprehension syntax as a control-flow shortcut.
+- [Python docs — Compound Statements](https://docs.python.org/3/reference/compound_stmts.html) — Language-reference view of `if`, `for`, `while`, and loop `else` semantics.

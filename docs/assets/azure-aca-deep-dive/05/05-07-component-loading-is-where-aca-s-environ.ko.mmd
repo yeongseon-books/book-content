@@ -1,0 +1,4 @@
+flowchart TD
+  Env["ACA 환경"] --> Fetch["사이드카가 스코프 가져옴"]
+  Fetch --> InitComp["사이드카가 일치하는 컴포넌트 초기화"]
+  InitComp --> Ready["Dapr 준비 완료"]

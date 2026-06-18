@@ -1,0 +1,9 @@
+flowchart TD
+    subgraph Env["ACA Environment"]
+        Comp1["Dapr Component: statestore (Redis)"]
+        Comp2["Dapr Component: pubsub (Service Bus)"]
+        App1["App 1 (uses statestore)"] --> Comp1
+        App2["App 2 (uses pubsub)"] --> Comp2
+        App3["App 3 (uses both)"] --> Comp1
+        App3 --> Comp2
+    end

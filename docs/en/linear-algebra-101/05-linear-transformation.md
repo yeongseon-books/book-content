@@ -1,10 +1,10 @@
 ---
 series: linear-algebra-101
 episode: 5
-title: Linear Transformations
-status: content-ready
+title: "Linear Algebra 101 (5/10): Linear Transformations"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,40 @@ tags:
   - DataScience
   - Beginner
 seo_description: A beginner-friendly intro to linear transformations — rotation, scaling, reflection, and shear with their matrix forms and NumPy code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Linear Transformations
+# Linear Algebra 101 (5/10): Linear Transformations
 
-> Linear Algebra 101 series (5/10)
+After learning matrices, the natural follow-up is simple: what do those matrices actually do to a space? Linear transformation is the idea that answers that question. A matrix is the coordinate form of a transformation rule.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Linear Algebra 101 series. Here we will read linear transformations geometrically through rotation, scaling, reflection, and shear.
 
-**Core question**: When you *multiply by a matrix*, what does that *do geometrically*?
 
-> *A linear transformation reshapes space while keeping *grid lines parallel and evenly spaced*.*
+![linear algebra 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 5 flow overview*
+> A linear transformation is a rule that maps vectors to vectors while preserving addition and scalar multiplication. When you read matrix multiplication as composition of transformations, it becomes clear why order matters.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
+- What boundary should you inspect first when applying Linear Transformations?
+- Which signal should the example or diagram make visible for Linear Transformations?
+- What failure should be prevented first when Linear Transformations reaches a real system?
 
-- The *definition* and *properties* of a *linear transformation*
-- *Matrix forms* of *rotation, scaling, reflection, and shear*
-- *Composition of transformations* via *matrix multiplication*
-- A 5-step hands-on
-- Five common pitfalls
+## Questions This Post Answers
+
+- What does it really mean to multiply a vector by a matrix?
+- How do rotation, scaling, reflection, and shear appear in matrix form?
+- Why is transformation composition written as matrix multiplication?
+- Where does the line between linear and nonlinear transformations actually sit?
+
+> A linear transformation redraws a space, but it does so while preserving the structure of addition and scalar multiplication. That constraint is what makes the geometry readable.
 
 ## Why It Matters
 
-Each *neural network layer* is a *linear transformation* plus a *nonlinear activation*. *Transformation intuition* equals *model intuition*.
+Every neural-network layer is a linear transformation plus a nonlinearity. Graphics pipelines, coordinate transforms, and many augmentation steps in vision use the same language.
 
-> *Every layer is a transformation of space.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Vec["Vector v"] --> Lin["Apply A"]
-    Lin --> Out["A v"]
-    Out --> Geom["Rotation, scaling, reflection, shear"]
-```
+Once this intuition clicks, a matrix stops being a static object. Some matrices rotate space, some stretch it, some flip orientation, and some slant an entire grid. At that point, linear algebra becomes a language for movement and structure rather than a page of arithmetic rules.
 
 ## Key Terms
 
@@ -110,6 +107,12 @@ M = R @ S
 print("compose RS:", M @ np.array([1.0, 0.0]))
 ```
 
+## Read One Numeric Pass
+
+- A 45-degree rotation maps `[1, 0]` to roughly `[0.707, 0.707]`, so the axis literally turns.
+- `diag(2, 0.5)` sends `[1, 1]` to `[2., 0.5]`, which makes axis-by-axis scaling concrete.
+- Building `R @ S` first means you can package multiple geometric changes into one matrix.
+
 ## What to Notice in This Code
 
 - *Matrix multiplication* is *composition* of transformations.
@@ -153,22 +156,34 @@ Graphics *model matrices*, *homographies* in computer vision, *data augmentation
 
 Linear transformations *reshape space*. The next post covers *basis and dimension*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Linear Transformations?**
+  - The article treats Linear Transformations as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Linear Transformations?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Linear Transformations reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Linear Algebra?](./01-what-is-linear-algebra.md)
-- [Vectors](./02-vectors.md)
-- [Matrices](./03-matrices.md)
-- [Inner Product and Distance](./04-inner-product-and-distance.md)
+## In this series
+
+- [Linear Algebra 101 (1/10): What Is Linear Algebra?](./01-what-is-linear-algebra.md)
+- [Linear Algebra 101 (2/10): Vectors](./02-vectors.md)
+- [Linear Algebra 101 (3/10): Matrices](./03-matrices.md)
+- [Linear Algebra 101 (4/10): Inner Product and Distance](./04-inner-product-and-distance.md)
 - **Linear Transformations (current)**
 - Basis and Dimension (upcoming)
 - Eigenvalues and Eigenvectors (upcoming)
 - Matrix Decomposition (upcoming)
 - PCA (upcoming)
 - Linear Algebra in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
 - [3Blue1Brown — Linear transformations](https://www.3blue1brown.com/lessons/linear-transformations)
-- [Wikipedia — Linear map](https://en.wikipedia.org/wiki/Linear_map)
-- [Wikipedia — Rotation matrix](https://en.wikipedia.org/wiki/Rotation_matrix)
-- [Khan Academy — Transformations](https://www.khanacademy.org/math/linear-algebra/matrix-transformations)
+- [MIT OpenCourseWare — Linear transformations and their matrices](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/video-lectures/)
+- [Khan Academy — Matrix transformations](https://www.khanacademy.org/math/linear-algebra/matrix-transformations)
+- [NumPy — Mathematical functions](https://numpy.org/doc/stable/reference/routines.math.html)

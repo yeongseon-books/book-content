@@ -1,10 +1,10 @@
 ---
 series: software-engineering-101
 episode: 9
-title: Maintenance and Tech Debt
+title: "Software Engineering 101 (9/10): Maintenance and Tech Debt"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,26 @@ tags:
   - Refactoring
   - Legacy
 seo_description: The four types of tech debt, how to prioritize repayment, safe refactoring, and a phased deprecation procedure you can copy.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Maintenance and Tech Debt
+# Software Engineering 101 (9/10): Maintenance and Tech Debt
 
-> Software Engineering 101 series (9/10)
+Every codebase gets awkward over time. A quick branch added under pressure, a duplicated workflow, an interface nobody wants to touch, a module that resists testing. Teams often respond with a vague promise to "clean it up later." Usually that later never arrives until a deadline slips or an incident forces the issue.
 
-<!-- a-grade-intro:begin -->
+Tech debt is not automatically a failure. Sometimes it is a conscious trade: speed now, cleanup later. The dangerous version is debt without explicit ownership, measurement, or repayment intent. That kind of debt quietly taxes reliability, lead time, and team confidence all at once.
 
-**Core question**: Is tech debt always bad?
+This is post 9 in the Software Engineering 101 series. In this chapter, we classify debt, prioritize repayment, and use phased replacement and deprecation patterns to keep maintenance work recoverable.
 
-> No. Deliberate debt is a tool. Inadvertent debt is an incident waiting to happen.
 
-<!-- a-grade-intro:end -->
+![software engineering 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/09/09-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 9 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Maintenance and Tech Debt?
+- Which signal should the example or diagram make visible for Maintenance and Tech Debt?
+- What failure should be prevented first when Maintenance and Tech Debt reaches a real system?
 
 ## What You Will Learn
 
@@ -46,17 +52,6 @@ last_reviewed: '2026-05-04'
 There is no codebase without debt. The question is whether you are aware of it, measuring it, and paying it down.
 
 > Debt is not the problem. Unconscious debt is.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    R["Requirement change"] --> D["Debt accrual"]
-    D --> M["Measure"]
-    M --> P["Prioritize"]
-    P --> F["Pay down"]
-    F --> R
-```
 
 Debt is a cycle, not an event.
 
@@ -145,6 +140,28 @@ Warn -> trace callers -> remove (one phase per quarter).
 
 What you do not measure, you do not pay.
 
+## A debt-management check
+
+Debt becomes manageable when it is specific enough to own, time-box, and replace safely. Pick one risky module and describe its debt in a way that could survive beyond the current conversation.
+
+### Verification steps
+
+1. Choose one module tied to a recent incident or slow change.
+2. Add the debt item to an index with owner, severity, and due window.
+3. Write the first incremental replacement step using a feature-flag or strangler pattern.
+
+**Expected output:**
+
+- The debt item becomes a prioritizable object instead of background frustration.
+- The safe first step is smaller than the emotional desire for a total rewrite.
+- Deprecation starts looking like a staged operational process, not a one-shot deletion.
+
+### Failure modes to watch
+
+- The only record is a vague TODO with no owner or due date.
+- The team cannot connect debt to incidents, lead time, or recovery cost.
+- "We will clean it all up later" is the only plan on the table.
+
 ## What to Notice in This Code
 
 - Debt has a due date and an owner.
@@ -190,17 +207,29 @@ Mature teams allocate 10~20% of sprint capacity to debt repayment. Strangler Fig
 
 Debt is a cycle. Be aware, measure, pay down each quarter. The final episode ties it all together — what makes good software.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Maintenance and Tech Debt?**
+  - The article treats Maintenance and Tech Debt as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Maintenance and Tech Debt?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Maintenance and Tech Debt reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Software Engineering?](./01-what-is-software-engineering.md)
-- [Understanding Requirements](./02-understanding-requirements.md)
-- [Design vs Implementation](./03-design-vs-implementation.md)
-- [Code Review](./04-code-review.md)
-- [Testing Strategy](./05-testing-strategy.md)
-- [Version Control and Release](./06-version-control-and-release.md)
-- [Documentation](./07-documentation.md)
-- [Collaboration Process](./08-collaboration-process.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): Understanding Requirements](./02-understanding-requirements.md)
+- [Software Engineering 101 (3/10): Design vs Implementation](./03-design-vs-implementation.md)
+- [Software Engineering 101 (4/10): Code Review](./04-code-review.md)
+- [Software Engineering 101 (5/10): Testing Strategy](./05-testing-strategy.md)
+- [Software Engineering 101 (6/10): Version Control and Release](./06-version-control-and-release.md)
+- [Software Engineering 101 (7/10): Documentation](./07-documentation.md)
+- [Software Engineering 101 (8/10): Collaboration Process](./08-collaboration-process.md)
 - **Maintenance and Tech Debt (current)**
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

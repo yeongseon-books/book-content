@@ -1,10 +1,10 @@
 ---
 series: operating-systems-101
 episode: 2
-title: Processes and Threads
-status: content-ready
+title: "Operating Systems 101 (2/10): Processes and Threads"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,33 @@ tags:
   - Concurrency
   - Systems
 seo_description: What a process actually contains, how a thread differs from a process, the fork/exec model, and how to choose between them in practice.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Processes and Threads
+# Operating Systems 101 (2/10): Processes and Threads
 
-> Operating Systems 101 series (2/10)
+"A running program" sounds obvious until you have to debug shared-state bugs, zombie children, or a worker model that scales badly. At that point, the vague phrase stops helping and the OS's real unit boundaries start to matter.
 
-<!-- a-grade-intro:begin -->
+Processes and threads look like two ways to do concurrency, but they answer different questions about memory sharing, isolation, and failure blast radius.
 
-**Core question**: "A running program" is too vague. From the OS's point of view, what exactly is it made of?
+This is post 2 in the Operating Systems 101 series. It explains what a process actually owns, what a thread borrows from that process, and how to choose between them in practice.
 
-> A process is the OS's basic unit for handling an application. Memory, open files, permissions, and CPU state are bundled together, and each process is isolated from the others. A thread is a flow of execution that lives inside one process and shares its memory with sibling threads. This article walks through what is inside a process, how threads differ, and when to reach for one over the other.
 
-<!-- a-grade-intro:end -->
+![operating systems 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.en.png)
+*operating systems 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Processes and Threads?
+- Which signal should the example or diagram make visible for Processes and Threads?
+- What failure should be prevented first when Processes and Threads reaches a real system?
+
+## Questions this article answers
+
+- Which resources does a process actually own?
+- What do threads share, and what stays private to each thread?
+- Why are `fork` and `exec` split into two separate steps?
+- In CPU-bound and I/O-bound work, when should you choose processes and when should you choose threads?
 
 ## What You Will Learn
 
@@ -46,9 +59,9 @@ Processes and threads are the two basic building blocks of concurrency. Mixing t
 
 > The process is the unit of isolation; the thread is the unit of concurrency. If you use the same tool for both, something usually leaks or blocks.
 
-## Concept at a Glance
-
 > Each process owns its own virtual address space, file descriptor table, signal handlers, and credentials. Inside it live one or more threads. Threads share memory and fds but have their own stack and registers.
+
+### What the process shares and what each thread keeps
 
 ```text
 +-----------------------------------------+
@@ -238,8 +251,19 @@ A process is an isolated bundle of resources; a thread is a unit of execution fl
 
 The next article zooms into the OS function that decides which of these many processes and threads gets the CPU next: scheduling.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Processes and Threads?**
+  - The article treats Processes and Threads as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Processes and Threads?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Processes and Threads reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an Operating System?](./01-what-is-an-operating-system.md)
+## In this series
+
+- [Operating Systems 101 (1/10): What Is an Operating System?](./01-what-is-an-operating-system.md)
 - **Processes and Threads (current)**
 - Scheduling (upcoming)
 - Concurrency and Race Conditions (upcoming)
@@ -249,6 +273,7 @@ The next article zooms into the OS function that decides which of these many pro
 - File Systems (upcoming)
 - System Calls (upcoming)
 - Containers and the Operating System (upcoming)
+
 <!-- toc:end -->
 
 ## References

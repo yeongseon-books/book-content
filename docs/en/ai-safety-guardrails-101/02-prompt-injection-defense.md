@@ -1,11 +1,11 @@
 ---
-title: Prompt Injection Defense
+title: "AI Safety & Guardrails 101 (2/10): Prompt Injection Defense"
 series: ai-safety-guardrails-101
 episode: 2
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,16 +14,28 @@ tags:
 - Prompt Injection
 - Guardrails
 - Red Team
-last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (2/10)
+last_reviewed: '2026-05-14'
+seo_description: Defend against direct and indirect prompt injection using a layered strategy of regex filters, embedding classifiers, and secondary LLM judges.
 ---
 
-# Prompt Injection Defense
+# AI Safety & Guardrails 101 (2/10): Prompt Injection Defense
 
 > AI Safety & Guardrails 101 Series (2/10)
 
----
-## Section 1
+Prompt injection works because system and user messages end up in the same context window. If you treat user input as harmless text, an attacker can turn it into an instruction channel.
+
+This is post 2 in the AI Safety & Guardrails 101 series. It breaks down why "ignore previous instructions" works and how to build layered defenses instead of relying on prompt wording alone.
+
+
+![Prompt injection defense flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/02/02-01-big-picture.en.png)
+*Prompt injection defense flow*
+> Prompt injection is not just a bad sentence; it is a boundary failure where untrusted data becomes executable instruction.
+
+## Questions to Keep in Mind
+
+- When does prompt injection begin by turning data into instructions?
+- How do direct and indirect injection differ in where they must be defended?
+- What should be recorded when red-team cases become a regression set?
 
 ## Why "Ignore Previous Instructions" Works
 
@@ -273,6 +285,41 @@ Wire this red-team set into CI (the regression pattern from Ep8) so every guardr
 - All external data must be treated as **untrusted** and wrapped with clear delimiters.
 - The LLM judge is strong but injectable itself; isolate user input inside it.
 - Maintain a **red-team regression set** in CI to validate every guardrail change.
+
+## Operational Checklist
+
+- [ ] Run a cheap regex layer on every request.
+- [ ] Route suspicious but not obvious prompts to a semantic classifier or judge.
+- [ ] Wrap every retrieved document and external message as untrusted data.
+- [ ] Keep red-team prompts in CI and track both recall and false positives.
+- [ ] Return generic block messages while logging detailed reasons internally.
+
+---
+
+## Answering the Opening Questions
+
+- **When does prompt injection begin by turning data into instructions?**
+  - It starts when the model interprets user or external text as instructions at the same level as system policy.
+- **How do direct and indirect injection differ in where they must be defended?**
+  - Direct injection is defended at the user-input boundary; indirect injection is defended where retrieved or external data enters context.
+- **What should be recorded when red-team cases become a regression set?**
+  - Record the payload, normalized form, detection signals, expected block decision, and bypass outcome so the case can be rerun.
+<!-- toc:begin -->
+## In this series
+
+- [AI Safety & Guardrails 101 (1/10): Why AI Safety Matters](./01-why-ai-safety-matters.md)
+- **AI Safety & Guardrails 101 (2/10): Prompt Injection Defense (current)**
+- AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation (upcoming)
+- AI Safety & Guardrails 101 (4/10): PII Detection and Redaction (upcoming)
+- AI Safety & Guardrails 101 (5/10): Jailbreak Detection (upcoming)
+- AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection (upcoming)
+- AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks (upcoming)
+- AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (upcoming)
+- AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)
+- AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [OWASP LLM01 — Prompt Injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/)

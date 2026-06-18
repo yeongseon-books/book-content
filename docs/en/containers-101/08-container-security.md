@@ -1,59 +1,52 @@
 ---
 series: containers-101
 episode: 8
-title: Container Security
-status: content-ready
+title: "Containers 101 (8/10): Container Security"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
 language: en
 tags:
-  - Containers
-  - Security
-  - seccomp
-  - Cosign
-  - DevOps
-seo_description: A beginner guide to container security covering non-root users, capabilities, seccomp, image scanning, and proper secret handling with examples
-last_reviewed: '2026-05-04'
+- Containers
+- Security
+- seccomp
+- Cosign
+- DevOps
+seo_description: A beginner guide to container security covering non-root users, capabilities,
+  seccomp, image scanning, and proper secret handling with examples
+last_reviewed: '2026-05-15'
 ---
 
-# Container Security
+# Containers 101 (8/10): Container Security
 
-> Containers 101 series (8/10)
+Isolation does not make a container automatically safe. Default settings can still leave you with a root process, excess capabilities, weak secret handling, and unsigned artifacts moving through production.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Containers 101 series.
 
-**Core question**: Just because a *container* is *isolated*, is it really *safe*?
+In this chapter, we build a practical baseline around non-root users, capability reduction, seccomp, read-only filesystems, image scanning, and signature-aware delivery.
 
-> *Container security* is built on three pillars: *least privilege*, *image trust*, and *runtime policy*.
+> Container security improves when defaults get narrower: fewer privileges, fewer writable paths, fewer blind spots.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![containers 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/08/08-01-concept-at-a-glance.en.png)
+*containers 101 chapter 8 flow overview*
+> Container security is not one choice but layers: no root, minimal privileges, image scanning, runtime policies, and host isolation — break any layer and risk grows.
 
-- What *non-root* means
-- *Capabilities* and *seccomp*
-- *Image scanning*
-- *Secret* handling
-- Enforcing *signed images*
+## Questions to Keep in Mind
+
+- What *non-root* means?
+- Capabilities* and *seccomp?
+- Image scanning?
 
 ## Why It Matters
 
 A default container runs as *root* with *too many privileges* and easily becomes the *starting point* of a security incident.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Image["image"] --> Scan["scan"]
-    Scan --> Sign["sign"]
-    Sign --> Run["run as user"]
-    Run --> Caps["drop caps"]
-    Caps --> Secrets["mount secrets"]
-```
+Never run containers as root unless forced to. Use non-root users in Dockerfile. Scan images for known CVEs. Apply runtime policies (seccomp, SELinux, AppArmor) to restrict syscalls. Remember: containers share the host kernel, so kernel bugs can leak between containers.
 
 ## Key Terms
 
@@ -130,6 +123,25 @@ def run_with_secret(image, secret_path):
 - After *--cap-drop=ALL* we add only what is needed.
 - *Secrets* are mounted as volumes.
 
+## Quick verification and failure signals
+
+```bash
+trivy image --severity HIGH,CRITICAL python:3.12-slim
+docker run --rm --user 1000:1000 python:3.12-slim id
+docker run --rm --cap-drop=ALL --cap-add=NET_BIND_SERVICE nginx:1.27-alpine nginx -t
+docker run --rm --read-only --tmpfs /tmp python:3.12-slim python -c "print("ok")"
+```
+
+**Expected output:**
+- `id` shows a non-root UID and GID.
+- The process still works with only the minimum extra capability added back.
+- The container can run read-only as long as writable scratch paths are explicit.
+
+**Check first if it fails:**
+- If non-root fails, inspect writable paths and ownership before broadening permissions.
+- If read-only mode fails, trace which directory the app expects to write to.
+- If scan results are noisy, start with base-image choice and package removal.
+
 ## Five Common Mistakes
 
 1. **Running as *root* and trusting the inside.**
@@ -167,17 +179,29 @@ def run_with_secret(image, secret_path):
 
 With security principles in place, the next topic is the *fundamental difference* between *containers and VMs*. The next post covers *containers vs VMs*.
 
+## Answering the Opening Questions
+
+- **What *non-root* means?**
+  - The article treats Container Security as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Capabilities* and *seccomp?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Image scanning?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Container?](./01-what-is-a-container.md)
-- [Image and Layer](./02-image-and-layer.md)
-- [Runtime](./03-runtime.md)
-- [Dockerfile](./04-dockerfile.md)
-- [Volume](./05-volume.md)
-- [Network](./06-network.md)
-- [Registry](./07-registry.md)
+## In this series
+
+- [Containers 101 (1/10): What is a Container?](./01-what-is-a-container.md)
+- [Containers 101 (2/10): Image and Layer](./02-image-and-layer.md)
+- [Containers 101 (3/10): Runtime](./03-runtime.md)
+- [Containers 101 (4/10): Dockerfile](./04-dockerfile.md)
+- [Containers 101 (5/10): Volume](./05-volume.md)
+- [Containers 101 (6/10): Network](./06-network.md)
+- [Containers 101 (7/10): Registry](./07-registry.md)
 - **Container Security (current)**
 - Containers vs VMs (upcoming)
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References

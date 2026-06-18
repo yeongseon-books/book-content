@@ -1,10 +1,10 @@
 ---
 series: calculus-for-ml-101
 episode: 7
-title: Gradient Descent
-status: content-ready
+title: "Calculus for ML 101 (7/10): Gradient Descent"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,40 @@ tags:
   - Optimization
   - Beginner
 seo_description: A beginner-friendly tour of gradient descent, learning rate, convergence, divergence, and stochastic gradient descent for ML
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Gradient Descent
+# Calculus for ML 101 (7/10): Gradient Descent
 
-> Calculus for ML 101 series (7/10)
+Knowing the gradient does not train a model by itself. The remaining question is procedural: how do you convert that directional signal into repeated parameter movement that reliably lowers loss? Gradient descent is the basic answer.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Calculus for ML 101 series.
 
-**Core question**: How can we find *optimal weights* using only the *loss gradient*?
+In this post, we'll look at the update rule itself, the role of the learning rate, and the difference between full-batch, stochastic, and mini-batch behavior. Once that clicks, loss curves stop feeling like random charts and start looking like readable optimization traces.
 
-> *Gradient descent* repeatedly takes a *small step* in the *opposite* direction of the gradient.
+> Gradient descent is not magic. It is a repeated decision about how far to move against the local slope that the loss is showing you right now.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![calculus for ml 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 7 flow overview*
 
-- The *gradient descent* algorithm
-- The role of the *learning rate*
-- *Convergence* and *divergence*
-- *Stochastic* gradient descent (SGD)
-- Intuition for *mini-batches*
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Gradient Descent?
+- Which signal should the example or diagram make visible for Gradient Descent?
+- What failure should be prevented first when Gradient Descent reaches a real system?
+
+## Questions this article answers
+
+- Why does moving in the direction opposite the gradient reduce the loss?
+- What does the learning rate do beyond acting as a simple multiplier?
+- How can you tell the difference between convergence and divergence in gradient descent?
+- What changes when you use the full-dataset gradient versus SGD or mini-batch gradients?
+- How do initialization and gradient noise affect the optimization path?
 
 ## Why It Matters
 
 Most ML training is a *variant* of gradient descent.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    W[Weights] --> G[Gradient]
-    G --> S[Step]
-    S --> W
-    W --> L[Loss decrease]
-```
 
 ## Key Terms
 
@@ -161,17 +159,29 @@ for lr in [0.001, 0.1, 1.5]:
 
 Next post: *Optimization*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Gradient Descent?**
+  - The article treats Gradient Descent as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Gradient Descent?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Gradient Descent reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Derivative](./01-what-is-derivative.md)
-- [Functions and Slope](./02-functions-and-slope.md)
-- [Partial Derivatives](./03-partial-derivatives.md)
-- [Gradient](./04-gradient.md)
-- [Chain Rule](./05-chain-rule.md)
-- [Loss Function](./06-loss-function.md)
+## In this series
+
+- [Calculus for ML 101 (1/10): What Is a Derivative](./01-what-is-derivative.md)
+- [Calculus for ML 101 (2/10): Functions and Slope](./02-functions-and-slope.md)
+- [Calculus for ML 101 (3/10): Partial Derivatives](./03-partial-derivatives.md)
+- [Calculus for ML 101 (4/10): Gradient](./04-gradient.md)
+- [Calculus for ML 101 (5/10): Chain Rule](./05-chain-rule.md)
+- [Calculus for ML 101 (6/10): Loss Function](./06-loss-function.md)
 - **Gradient Descent (current)**
 - Optimization (upcoming)
 - Backpropagation Intuition (upcoming)
 - Calculus in Deep Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,11 +1,11 @@
 ---
-title: Pipes and Redirection
+title: "Linux CLI 101 (6/10): Pipes and Redirection"
 series: linux-cli-101
 episode: 6
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,36 +17,26 @@ tags:
 - stdin
 - stdout
 - CLI
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: A pipe connects commands like plumbing, and redirection changes the
   flow of data from the screen to a file.
 ---
 
-# Pipes and Redirection
+# Linux CLI 101 (6/10): Pipes and Redirection
 
-> Linux CLI 101 series (6/10)
+Single commands are useful, but real CLI work usually starts when you connect them. Filtering logs, saving build output, and separating failures from normal output all depend on understanding where stdin, stdout, and stderr are flowing.
 
----
+This is post 6 in the Linux CLI 101 series.
 
-<!-- a-grade-intro:begin -->
 
-## Key Questions
+![Linux CLI 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/06/06-01-mental-model.en.png)
+*Linux CLI 101 chapter 6 flow overview*
 
-- How does `|` (pipe) connect two commands?
-- What is the difference between `>`, `>>`, and `<`?
-- Why are stdout and stderr separated?
-- How do you save only error messages to a file?
+## Questions to Keep in Mind
 
-> A pipe connects commands like plumbing, and redirection changes the flow of data from the screen to a file.
-
-<!-- a-grade-intro:end -->
-
-## What you will learn
-
-- Passing the output of one command as input to the next with pipe (`|`)
-- Saving output to a file with `>` (overwrite) and `>>` (append)
-- The meaning of stdin (0), stdout (1), and stderr (2) file descriptors
-- Merging or separating error and normal output with `2>&1`
+- Passing the output of one command as input to the next with pipe (`|`)?
+- Saving output to a file with `>` (overwrite) and `>>` (append)?
+- The meaning of stdin (0), stdout (1), and stderr (2) file descriptors?
 
 ## Why it matters
 
@@ -224,6 +214,13 @@ Pipes are the heart of the Unix philosophy. Composing small tools eliminates the
 
 On the other hand, when a pipe chain exceeds 5 stages, maintainability drops. At that point, it makes sense to move the logic to a Python or shell script. Pipes are optimal for "one-off analysis"; "logic that runs repeatedly" should be saved as a script for the sake of team collaboration.
 
+## When it breaks, check these first
+
+- If the pipeline output is empty, peel it apart from left to right. Check `grep "ERROR" app.log` first, then add `| sort`, then `| uniq -c`, so you can see exactly where data disappears.
+- If a file suddenly becomes empty, look for commands like `sort file.txt > file.txt`. The shell truncates the file before the command reads it, so you need a temporary file or a safer pattern.
+- If failure details never show up, verify whether stderr was redirected at all. For build and deploy logs, `2>&1 | tee build.log` is often the fastest way to keep both the screen view and the forensic record.
+- If you are unsure whether to overwrite or append, write to a temporary file first. Production logs and report files are expensive to recreate once `>` wipes them out.
+
 ## Checklist
 
 - [ ] You can connect two commands' output/input with `|`
@@ -248,14 +245,23 @@ On the other hand, when a pipe chain exceeds 5 stages, maintainability drops. At
 
 The next post covers **process management** — `ps`, `top`, `kill`, and background execution.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
-- [Permissions and Ownership](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- [grep, find, xargs](./05-grep-find-xargs.md)
+- **Passing the output of one command as input to the next with pipe (`|`)?**
+  - The article treats Pipes and Redirection as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Saving output to a file with `>` (overwrite) and `>>` (append)?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The meaning of stdin (0), stdout (1), and stderr (2) file descriptors?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): Permissions and Ownership](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents](./04-viewing-files.md)
+- [Linux CLI 101 (5/10): grep, find, xargs — The Search Trio](./05-grep-find-xargs.md)
 - **Pipes and Redirection (current)**
 - Process Management (upcoming)
 - Environment Variables and PATH (upcoming)

@@ -1,0 +1,18 @@
+flowchart LR
+    Task["Real task\nclassify or solve"] --> Request["One chat request"]
+    Examples["Few-shot examples\nshow answer schema"] --> Request
+    StepCue["CoT cue\nLet's think step by step"] --> Request
+    Request --> Model["Same base model"]
+    Model --> Pattern["More stable format\nlabels, order, tone"]
+    Model --> Reasoning["More careful intermediate checks\norder, arithmetic, rules"]
+    Pattern --> Better["More reliable final answer"]
+    Reasoning --> Better
+
+    style Task fill:#e3f2fd,stroke:#1976d2
+    style Examples fill:#f3e5f5,stroke:#7b1fa2
+    style StepCue fill:#f3e5f5,stroke:#7b1fa2
+    style Request fill:#fff3e0,stroke:#f57c00
+    style Model fill:#e8f5e9,stroke:#388e3c
+    style Pattern fill:#ede7f6,stroke:#5e35b1
+    style Reasoning fill:#ede7f6,stroke:#5e35b1
+    style Better fill:#fff8e1,stroke:#f9a825

@@ -1,10 +1,10 @@
 ---
 series: distributed-systems-101
 episode: 3
-title: RPC and Message Passing
-status: content-ready
+title: "Distributed Systems 101 (3/10): RPC and Message Passing"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,48 +18,32 @@ tags:
   - Async
   - Idempotency
 seo_description: We compare two communication models between nodes — RPC and message passing — and the tradeoffs that decide where each fits.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# RPC and Message Passing
+# Distributed Systems 101 (3/10): RPC and Message Passing
 
-> Distributed Systems 101 series (3/10)
+Once a system is split into services, the next hard question is no longer "what code should I write?" but "how should these parts talk?" The answer determines whether latency piles up in a synchronous chain or gets absorbed behind a queue boundary.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Distributed Systems 101 series.
 
-**Core question**: RPC feels like a function call and a queue feels like a mailbox. They do similar work, so why do they end up in different places?
+Here we compare RPC and message passing as two different contracts: one optimized for immediate answers, the other for decoupling time, failure, and load.
 
-> RPC follows the intuition of synchronous function calls. Message passing follows the intuition of asynchronous mailboxes. That single intuition gap drives big differences in latency, coupling, and resilience.
 
-<!-- a-grade-intro:end -->
+![distributed systems 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/03/03-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 3 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The definitions and differences of RPC and message passing
-- Synchronous vs asynchronous, request/response vs publish/subscribe
-- Strengths and weaknesses of each model and where each fits
-- What "function-like" RPC quietly hides
-- Patterns for blending the two
+- The definitions and differences of RPC and message passing?
+- Synchronous vs asynchronous, request/response vs publish/subscribe?
+- Strengths and weaknesses of each model and where each fits?
 
 ## Why It Matters
 
 Once you split services, the next decision is "how do they talk?" That decision drives latency budgets, blast radius, and operational complexity. Picking poorly creates RPC chains that take down the whole system when one node slows, or message flows you cannot trace.
 
 > The communication model decides system coupling.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    subgraph RPC[RPC]
-        A1["client"] -->|request| A2["server"]
-        A2 -->|response| A1
-    end
-    subgraph MSG[Message Passing]
-        B1["producer"] -->|publish| BQ["queue / topic"]
-        BQ -->|consume| B2["consumer"]
-    end
-```
 
 RPC is a two-way contract. Message passing is a one-way flow with an intermediary store.
 
@@ -217,17 +201,29 @@ User paths that need an immediate answer go through RPC. Long work (sending emai
 
 RPC and message passing trade off sync/async, coupling, and resilience. Next we tackle the biggest tradeoff that appears the moment data lives on multiple nodes: consistency and CAP.
 
+## Answering the Opening Questions
+
+- **The definitions and differences of RPC and message passing?**
+  - The article treats RPC and Message Passing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Synchronous vs asynchronous, request/response vs publish/subscribe?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Strengths and weaknesses of each model and where each fits?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Distributed System?](./01-what-is-a-distributed-system.md)
-- [Failure Models](./02-failure-model.md)
+## In this series
+
+- [Distributed Systems 101 (1/10): What Is a Distributed System?](./01-what-is-a-distributed-system.md)
+- [Distributed Systems 101 (2/10): Failure Models](./02-failure-model.md)
 - **RPC and Message Passing (current)**
-- consistency and CAP (upcoming)
-- replication (upcoming)
-- consensus and Raft (upcoming)
-- leader election (upcoming)
-- message queues and event sourcing (upcoming)
-- distributed transactions (upcoming)
-- patterns for operable distributed systems (upcoming)
+- Consistency and CAP (upcoming)
+- Replication (upcoming)
+- Consensus and Raft (upcoming)
+- Leader Election (upcoming)
+- Message Queues and Event Sourcing (upcoming)
+- Distributed Transactions (upcoming)
+- Patterns for Operable Distributed Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

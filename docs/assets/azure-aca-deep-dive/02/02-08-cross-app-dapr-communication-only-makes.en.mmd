@@ -1,0 +1,10 @@
+flowchart LR
+    subgraph EnvA["Environment A"]
+        App1["App 1 (Dapr)"]
+        App2["App 2 (Dapr)"]
+        App1 -- "Service Invocation" --> App2
+    end
+    subgraph EnvB["Environment B"]
+        App3["App 3 (Dapr)"]
+    end
+    App1 -. "Fails natively" .-x App3

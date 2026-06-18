@@ -1,12 +1,11 @@
 ---
-title: 'Deploy ordering and blue/green: synchronizing schema and application code
-  safely'
+title: "Alembic 101 (9/10): Deploy ordering and blue/green: synchronizing schema and application code safely"
 series: alembic-101
 episode: 9
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +17,26 @@ tags:
 - blue-green
 - ordering
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: A migration always ships "before the code, and with broader compatibility
   than the code".
 ---
 
-# Deploy ordering and blue/green: synchronizing schema and application code safely
+# Alembic 101 (9/10): Deploy ordering and blue/green: synchronizing schema and application code safely
 
-## What you will learn
+Many schema incidents begin with deploy ordering, not with the migration code itself. In blue/green or rolling setups, two app versions may share one database, so compatibility width has to be designed up front.
 
-- The difference between migration-first and code-first deploy ordering
-- Why a blue/green deploy requires schema changes that are compatible with two app versions at once
-- How to split a NOT NULL tightening into two phases via expand-contract
-- The four-phase pattern for a column rename
-- How to run a migration exactly once across many application instances
+This is post 9 in the Alembic 101 series. Here we will pin down the safe order for shipping migrations and application code together.
+
+
+![alembic 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.en.png)
+*alembic 101 chapter 9 flow overview*
+
+## Questions to Keep in Mind
+
+- The difference between migration-first and code-first deploy ordering?
+- Why a blue/green deploy requires schema changes that are compatible with two app versions at once?
+- How to split a NOT NULL tightening into two phases via expand-contract?
 
 ## Why this matters
 
@@ -42,6 +47,8 @@ Most production schema incidents are caused by code and schema being deployed in
 > A migration always ships **"before the code, and with broader compatibility than the code"**. When you add a column the column exists first; when you drop a column the code stops using it first. Memorize those two directions and most deploy incidents disappear.
 
 If git is your analogy, a migration is a PR that lands earlier than the code PR, and a drop is a PR that lands later than the "stop using" PR.
+
+### Diagram: the blue/green compatibility window
 
 ## Core concepts
 
@@ -78,7 +85,10 @@ phase 1 (now):
   - code: always writes a value into the new column
   - deploy: migration → code
 
-(time passes; verify every row has a value)
+gate before phase 2:
+  - query: SELECT COUNT(*) FROM users WHERE phone IS NULL
+  - pass: null_count == 0
+  - fail: null_count > 0, stop the tighten revision and keep backfilling
 
 phase 2 (next deploy):
   - DB: tighten column to nullable=False
@@ -86,7 +96,7 @@ phase 2 (next deploy):
   - deploy: migration only
 ```
 
-The interval between phases can be short or long, but you only apply phase 2 after you have proved that no row is still NULL.
+Here `users.phone` is the concrete example flow. Even after v2 starts writing `phone`, older rows can remain NULL, so phase 2 is only allowed once the `null_count == 0` gate has been proved.
 
 ### Four phases for a column rename
 
@@ -98,6 +108,17 @@ phase 4: drop the old column (code already stopped using it)
 ```
 
 Each phase is its own PR, and you confirm production stability between phases. It takes time, but it is the safest pattern available.
+
+### Late-stage rollout state table
+
+For changes such as `users.phone`, where add → write → tighten spans multiple deploys, a late-stage state table is often the fastest way to decide whether you may proceed.
+
+| Phase | DB shape | Code behavior | Allowed next action |
+| --- | --- | --- | --- |
+| Right after the expand revision | `phone` exists, nullable | v1 ignores it; v2 not deployed yet | Deploy v2 |
+| Blue/green overlap | `phone` exists, nullable | v1 ignores it; v2 writes `phone` | Keep backfilling and measure NULL rows |
+| Gate passed before tighten | `phone` exists, nullable, zero NULL rows | only v2 is live, write path stable | Apply the `nullable=False` tighten revision |
+| After contract | `phone` exists, NOT NULL | only v2 is live; reads and writes use `phone` | Run smoke tests, then consider dropping the old column in the next deploy cycle |
 
 ### Running once across many instances
 
@@ -126,7 +147,7 @@ Calling `alembic upgrade head` at application startup is fine for single-instanc
 4. blue/green both work correctly
 ```
 
-The After pattern has a zero-incident window. Enforcing this order on every deploy is the operational baseline.
+The After pattern keeps the schema compatible with both v1 and v2 throughout the overlap. Add a NULL-row gate and a smoke test, and you can decide when to tighten based on evidence rather than optimism.
 
 ## Step-by-step walkthrough
 
@@ -192,6 +213,73 @@ stages:
 
 Force `migrate` to always run before `deploy`.
 
+## Cutover runbook
+
+```bash
+set -euo pipefail
+
+export DATABASE_URL="postgresql+psycopg://app:secret@db/prod"
+export GREEN_DEPLOYMENT="api-green"
+export RELEASE_IMAGE="ghcr.io/acme/api:v2"
+export HEALTH_URL="https://api.example.com/health"
+
+echo "[1/5] apply expand revision"
+alembic upgrade add_users_phone
+
+echo "[2/5] deploy the app version that writes users.phone"
+kubectl set image deployment/"$GREEN_DEPLOYMENT" api="${RELEASE_IMAGE}"
+kubectl rollout status deployment/"$GREEN_DEPLOYMENT" --timeout=180s
+
+echo "[3/5] block contract until users.phone has no NULL rows"
+NULL_COUNT="$({ python3 - <<'PY'
+import os
+from sqlalchemy import create_engine, text
+
+engine = create_engine(os.environ["DATABASE_URL"])
+with engine.connect() as conn:
+    count = conn.execute(text("SELECT COUNT(*) FROM users WHERE phone IS NULL")).scalar_one()
+print(count)
+PY
+})"
+[ "$NULL_COUNT" = "0" ] || {
+  echo "Fail: users.phone still has $NULL_COUNT NULL rows; do not run tighten_users_phone_not_null"
+  exit 1
+}
+echo "Pass: users.phone NULL rows = $NULL_COUNT"
+
+echo "[4/5] apply tighten revision"
+alembic upgrade tighten_users_phone_not_null
+
+echo "[5/5] smoke test the live service"
+HEALTH_BODY="$(curl -fsS "$HEALTH_URL")"
+export HEALTH_BODY
+python3 - <<'PY'
+import json
+import os
+
+payload = json.loads(os.environ["HEALTH_BODY"])
+assert payload["status"] == "ok", payload
+print(f"Pass: status={payload['status']} alembic_version={payload.get('alembic_version', 'unknown')}")
+PY
+```
+
+The observable signals should be explicit.
+
+- If `[3/5]` does not produce `Pass: users.phone NULL rows = 0`, the run stops before the tighten revision.
+- `kubectl rollout status` must finish before you continue the cutover.
+- The final Python check passes only when `/health` returns `status=ok`.
+
+### First checks during a blue/green incident
+
+Before deeper analysis, answer these four questions first.
+
+1. Did the `migrate` stage actually run before `deploy`?
+2. Which application version is live right now: v1 or v2?
+3. Has `tighten_users_phone_not_null` already been applied?
+4. How many rows still match `SELECT COUNT(*) FROM users WHERE phone IS NULL`?
+
+Those four checks quickly narrow the problem to deploy ordering, the live app version, an early tighten, or incomplete data backfill.
+
 ## Common mistakes
 
 - **Code-first deploy.** If the code assumes the new schema first, you fail immediately.
@@ -231,12 +319,35 @@ Deploy ordering is an operations policy concern, not an Alembic feature. Keep th
 
 The next post covers real team workflows: PR conventions, CI checks, and operational automation.
 
-## References
+## Answering the Opening Questions
 
-- Alembic: Cookbook — https://alembic.sqlalchemy.org/en/latest/cookbook.html
-- Martin Fowler: Blue Green Deployment — https://martinfowler.com/bliki/BlueGreenDeployment.html
-- "Refactoring Databases" by Scott Ambler & Pramod Sadalage
-- Kubernetes: Init Containers — https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+- **The difference between migration-first and code-first deploy ordering?**
+  - The article treats Deploy ordering and blue/green: synchronizing schema and application code safely as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why a blue/green deploy requires schema changes that are compatible with two app versions at once?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to split a NOT NULL tightening into two phases via expand-contract?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
+## In this series
+
+- [Alembic 101 (1/10): Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [Alembic 101 (2/10): env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Alembic 101 (3/10): Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- [Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
+- [Alembic 101 (5/10): branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
+- [Alembic 101 (6/10): Data migrations: separating schema changes from data changes](./06-data-migrations.md)
+- [Alembic 101 (7/10): Online and offline modes: previewing DDL with --sql and handling SQLite batch](./07-online-vs-offline-and-batch.md)
+- [Alembic 101 (8/10): Downgrade strategy: when to write it for real and when to forbid it](./08-downgrade-strategy.md)
+- **Deploy ordering and blue/green: synchronizing schema and application code safely (current)**
+- Production and team workflow: PR, CI, monitoring, and incident response (upcoming)
+
 <!-- toc:end -->
+
+## References
+
+- [sqlalchemy/alembic GitHub repository](https://github.com/sqlalchemy/alembic)
+- [Alembic: Cookbook](https://alembic.sqlalchemy.org/en/latest/cookbook.html)
+- [Martin Fowler: Blue Green Deployment](https://martinfowler.com/bliki/BlueGreenDeployment.html)
+- "Refactoring Databases" by Scott Ambler & Pramod Sadalage
+- [Kubernetes: Init Containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)

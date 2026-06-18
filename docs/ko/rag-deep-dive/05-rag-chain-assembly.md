@@ -1,12 +1,12 @@
 ---
-title: RAG Chain 조립 — RetrievalQA vs LCEL
+title: "RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL"
 series: rag-deep-dive
 episode: 5
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,16 +14,29 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: RetrievalQA의 한계와 LCEL 파이프라인이 같은 RAG 흐름을 어떻게 더 명확하게 표현하는지 비교합니다.
 ---
 
-# RAG Chain 조립 — RetrievalQA vs LCEL
+# RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL
 
-<!-- a-grade-example:begin -->
+RetrievalQA는 편하지만 많은 단계를 감춥니다. 여기서는 LCEL 파이프라인이 같은 RAG 흐름을 어떻게 더 명확하게 드러내는지 비교합니다.
+
+이 글은 RAG Deep Dive 시리즈의 다섯 번째 글입니다.
+
+![RetrievalQA가 chain_type별 조립 경로를 고르는 분기](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.ko.png)
+*RetrievalQA가 chain_type별 조립 경로를 고르는 분기*
+> RAG 체인은 질문에서 근거, 프롬프트, 답변으로 이어지는 실행 그래프이며, LCEL은 그 경계를 더 명시적으로 드러냅니다.
+
+## 먼저 던지는 질문
+
+- `RetrievalQA` 같은 고전 API와 LCEL 조립은 각각 어떤 경계를 숨기고 드러낼까요?
+- retriever, prompt, llm, parser를 직접 이으면 디버깅에서 무엇이 쉬워질까요?
+- 체인 조립 후 source document를 잃지 않으려면 어디서 결과 형태를 고정해야 할까요?
+
 ## 최소 실행 예제
 
-예제 파일: `/root/Github/rag-deep-dive/ko/05-rag-chain-assembly/main.py`
+예제 파일: `en/05-rag-chain-assembly/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py
@@ -153,10 +166,6 @@ if __name__ == "__main__":
 
 `langchain/chains/retrieval_qa/base.py`를 먼저 보면 `BaseRetrievalQA`가 눈에 들어옵니다. 이 클래스는 `combine_documents_chain`, `input_key`, `output_key`, `return_source_documents`를 핵심 상태로 들고 있습니다. 기본 `input_key`는 `"query"`, 기본 `output_key`는 `"result"`입니다. 그래서 `qa.invoke({"query": "..."})`의 결과는 기본적으로 `{"result": "..."}` 모양이 됩니다. 여기에 `return_source_documents=True`를 주면 `output_keys` 프로퍼티가 `source_documents`를 추가해서 `{"result": "...", "source_documents": [...]}`를 반환합니다. 이름만 보면 사소해 보이지만, 이 규약이 중요한 이유는 `RetrievalQA`가 처음부터 “질문 한 개를 받아 답 하나를 돌려주는 봉인된 체인”으로 설계됐기 때문입니다. 입력 표면과 출력 표면이 좁고 고정적입니다.
 
-![RetrievalQA가 chain_type별 조립 경로를 고르는 분기](../../assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.ko.png)
-
-*RetrievalQA가 chain_type별 조립 경로를 고르는 분기*
-
 이 클래스에서 가장 자주 쓰이던 생성 경로가 `from_chain_type()`입니다. 구현은 짧습니다. `chain_type`과 `chain_type_kwargs`를 받아 `load_qa_chain(llm, chain_type=chain_type, **kwargs)`를 호출하고, 그 결과를 `combine_documents_chain`에 넣은 뒤 자신을 생성합니다. 즉 `RetrievalQA`가 직접 `stuff`나 `map_reduce`를 구현하는 것은 아닙니다. 문서를 어떻게 합칠지는 `load_qa_chain()`에 위임하고, 자신은 retriever와 combine-documents 체인을 접착하는 얇은 래퍼에 가깝습니다.
 
 실제 분기는 `langchain/chains/question_answering/chain.py`의 `load_qa_chain()`에 있습니다. 0.2.17 소스를 보면 `loader_mapping`이 `"stuff"`, `"map_reduce"`, `"refine"`, `"map_rerank"` 네 가지를 지원합니다. 이 중에서 RAG 입문 문맥에서 가장 많이 언급되는 것은 `stuff`, `map_reduce`, `refine`입니다.
@@ -227,7 +236,7 @@ if __name__ == "__main__":
 
 LCEL의 출발점은 `langchain_core.runnables.base.py`입니다. 여기서 `Runnable` 추상 클래스가 `invoke`, `batch`, `stream`, `input_schema`, `output_schema` 같은 공통 인터페이스를 정의합니다. 그리고 같은 파일 안에서 `Runnable.__or__()`는 단 두 줄로 핵심 아이디어를 드러냅니다. `self | other`가 호출되면 `RunnableSequence(self, coerce_to_runnable(other))`를 반환합니다. 즉 파이프 연산자는 특수한 문법이 아니라, “왼쪽 출력이 오른쪽 입력으로 흐르는 sequence 객체를 만든다”는 선언입니다.
 
-![LCEL 파이프가 runnable 순서를 고정하는 구조](../../assets/rag-deep-dive/05/05-02-lcel-runnable-sequence-composition.ko.png)
+![LCEL 파이프가 runnable 순서를 고정하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-02-lcel-runnable-sequence-composition.ko.png)
 
 *LCEL 파이프가 runnable 순서를 고정하는 구조*
 
@@ -286,7 +295,7 @@ chain = (
 
 겉보기에는 간단한 dict 리터럴 하나와 파이프 몇 개뿐입니다. 하지만 소스 기준으로 보면 여기에는 두 가지 중요한 변환이 숨어 있습니다. 첫째, `|` 오른쪽이나 왼쪽에 dict가 오면 `coerce_to_runnable(...)`이 그것을 `RunnableParallel`로 감쌉니다. 둘째, `RunnablePassthrough()`는 입력을 바꾸지 않는 identity runnable입니다. 그래서 위 코드는 사실상 “질문 하나를 받아, 같은 입력을 병렬로 두 갈래에 보내고, 한 갈래에서는 retriever를 돌려 `context`를 만들고, 다른 갈래에서는 질문 원문을 그대로 `question`으로 보존한 뒤, 그 dict를 prompt에 넘긴다”는 뜻입니다.
 
-![질문이 병렬 분기로 context와 question이 되는 흐름](../../assets/rag-deep-dive/05/05-03-lcel-rag-parallel-passthrough-flow.ko.png)
+![질문이 병렬 분기로 context와 question이 되는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-03-lcel-rag-parallel-passthrough-flow.ko.png)
 
 *질문이 병렬 분기로 context와 question이 되는 흐름*
 
@@ -368,9 +377,9 @@ if __name__ == "__main__":
 
 ## 4. `RunnablePassthrough.assign()`: 답만 주지 말고 출처도 같이 돌려주기
 
-LCEL로 체인을 짜다 보면 곧바로 부딪히는 요구가 있습니다. 최종 답변 문자열만으로는 부족하다는 점입니다. 운영용 RAG에서는 최소한 출처 목록, 사용한 문서 ID, 점수, 때로는 최종 prompt까지 같이 보고 싶습니다. 그런데 기본 `prompt | llm | parser` 패턴은 마지막에 문자열 하나만 남깁니다. 이때 유용한 도구가 `langchain_core.runnables.passthrough.py`의 `RunnablePassthrough.assign()`입니다.
+LCEL로 체인을 짜다 보면 곧바로 부딪히는 요구가 있습니다. 최종 답변 문자열만으로는 부족하다는 사실입니다. 운영용 RAG에서는 최소한 출처 목록, 사용한 문서 ID, 점수, 때로는 최종 prompt까지 같이 보고 싶습니다. 그런데 기본 `prompt | llm | parser` 패턴은 마지막에 문자열 하나만 남깁니다. 이때 유용한 도구가 `langchain_core.runnables.passthrough.py`의 `RunnablePassthrough.assign()`입니다.
 
-![assign이 답변 출력에 출처를 합치는 구조](../../assets/rag-deep-dive/05/05-04-passthrough-assign-output-enrichment.ko.png)
+![assign이 답변 출력에 출처를 합치는 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-04-passthrough-assign-output-enrichment.ko.png)
 
 *assign이 답변 출력에 출처를 합치는 구조*
 
@@ -383,7 +392,7 @@ RAG에서는 보통 이런 순서가 됩니다.
 3. 또 한 번 `assign(answer=...)`로 `context`와 `question`을 prompt·llm·parser에 태워 답변 문자열을 만듭니다.
 4. 마지막에 `RunnableLambda`나 `pick()`으로 필요한 필드만 남겨 `{"answer": ..., "sources": ...}`를 반환합니다.
 
-이 방식의 좋은 점은 retrieval 결과를 두 번 재계산하지 않는다는 것입니다. `RetrievalQA`에서는 `return_source_documents=True`가 내부 옵션이라 답과 docs를 같이 받을 수는 있지만, 그 docs가 어느 중간 단계에서 어떻게 조정되었는지 체인 바깥에서 풍부하게 확장하기 어렵습니다. LCEL에서는 source documents를 초기에 한 번 구해 dict에 올려 두고, 그 뒤 계산 단계마다 재사용하면 됩니다.
+이 방식의 좋은 점은 retrieval 결과를 두 번 재계산하지 않는다는 사실입니다. `RetrievalQA`에서는 `return_source_documents=True`가 내부 옵션이라 답과 docs를 같이 받을 수는 있지만, 그 docs가 어느 중간 단계에서 어떻게 조정되었는지 체인 바깥에서 풍부하게 확장하기 어렵습니다. LCEL에서는 source documents를 초기에 한 번 구해 dict에 올려 두고, 그 뒤 계산 단계마다 재사용하면 됩니다.
 
 또 이 섹션에서 `with_types()`가 다시 의미를 가집니다. 출력이 더 이상 문자열 하나가 아니라 `answer`와 `sources`를 가진 dict라면, 체인 자체에 그 모양을 선언해 두는 편이 좋습니다. 그러면 `output_schema`가 즉시 읽을 수 있는 문서가 되고, API 계층에서도 응답 구조를 안정적으로 재사용할 수 있습니다.
 
@@ -460,7 +469,7 @@ if __name__ == "__main__":
     main()
 ```
 
-이 예제에서 중요한 것은 `assign()`이 문법 설탕 이상이라는 점입니다. 앞단에서 만든 `sources`를 유지한 채 `context`와 `answer`를 순차적으로 덧붙이기 때문에, retrieval 결과를 잃지 않고 chain output을 점점 풍부하게 만들 수 있습니다. RAG를 API나 UI에 연결할 때 이 차이는 큽니다. 사용자에게는 답변을 보여 주면서, 개발자에게는 source list와 schema를 동시에 제공할 수 있기 때문입니다.
+이 예제에서 중요한 것은 `assign()`이 문법 설탕 이상이라는 사실입니다. 앞단에서 만든 `sources`를 유지한 채 `context`와 `answer`를 순차적으로 덧붙이기 때문에, retrieval 결과를 잃지 않고 chain output을 점점 풍부하게 만들 수 있습니다. RAG를 API나 UI에 연결할 때 이 차이는 큽니다. 사용자에게는 답변을 보여 주면서, 개발자에게는 source list와 schema를 동시에 제공할 수 있기 때문입니다.
 
 ---
 
@@ -468,7 +477,7 @@ if __name__ == "__main__":
 
 이제 실행 모델 차이를 볼 차례입니다. `RetrievalQA`는 `_call()`과 `_acall()` 중심의 고전 체인입니다. 최종적으로 `combine_documents_chain.run(...)` 또는 `arun(...)`을 호출해 문자열 답을 다 만든 뒤에야 결과를 반환합니다. source 문서를 같이 돌려주는 옵션은 있어도, 토큰이 생성되는 중간을 체인 표면에서 바로 흘려주지는 못합니다. 반면 LCEL은 runnable마다 `stream()`과 `transform()`을 공유하므로, 뒤 단계가 청크를 생산하면 그 청크를 sequence 전체가 전파할 수 있습니다.
 
-![스트리밍 청크가 runnable 단계를 통과하는 전파](../../assets/rag-deep-dive/05/05-05-lcel-streaming-chunk-propagation.ko.png)
+![스트리밍 청크가 runnable 단계를 통과하는 전파](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-05-lcel-streaming-chunk-propagation.ko.png)
 
 *스트리밍 청크가 runnable 단계를 통과하는 전파*
 
@@ -536,19 +545,54 @@ if __name__ == "__main__":
     main()
 ```
 
+## 정리
+
 실전에서는 `fake_streaming_llm` 자리에 실제 streaming chat model runnable이 들어갑니다. 여기서는 LCEL이 generator 기반 runnable에서 나온 청크를 다음 단계로 흘려보낼 수 있다는 점만 작게 보여 준 것입니다.
 
 정리하면 `RetrievalQA`는 고전적인 “질문 하나 -> 최종 답 하나” 모델에 최적화된 래퍼입니다. 빠르게 시작할 수 있지만, 스트리밍·중간 결과 재사용·출력 구조 확장·스키마 반사 같은 현대적 요구가 붙는 순간 답답해집니다. 반대로 LCEL은 처음에는 조금 더 장황해 보여도, retrieval과 prompt와 generation을 같은 runnable 언어로 다룰 수 있기 때문에 장기적으로 훨씬 다루기 쉽습니다.
 
 이 시리즈의 흐름으로 보면 이 결론은 자연스럽습니다. 1화부터 4화까지는 각 층을 따로 읽으며 어디서 정보가 손실되는지 봤습니다. 이제 5화에서는 그 층들을 하나의 실행 그래프로 묶었습니다. 결국 좋은 RAG는 “좋은 retriever를 고른다”에서 끝나지 않습니다. **검색 결과가 어떤 체인 구조를 통과해 어떤 타입으로 모델에 전달되고, 답과 출처가 어떤 인터페이스로 밖으로 나오느냐**까지 포함해 설계해야 합니다. 다음 6화에서는 이 조립된 체인을 어떻게 평가하고, 실패를 어떻게 측정하고, 품질 게이트를 어디에 둘지로 넘어가겠습니다.
+
+## 처음 질문으로 돌아가기
+
+- **`RetrievalQA` 같은 고전 API와 LCEL 조립은 각각 어떤 경계를 숨기고 드러낼까요?**
+  고전 API는 빠르게 조립해 주지만 내부 prompt와 combine 전략을 숨길 수 있고, LCEL은 단계가 길어지는 대신 각 경계를 코드에서 볼 수 있게 합니다.
+
+- **retriever, prompt, llm, parser를 직접 이으면 디버깅에서 무엇이 쉬워질까요?**
+  각 단계를 직접 이으면 검색 결과, 프롬프트 입력, 모델 출력, parser 결과를 따로 찍어 실패 위치를 좁히기 쉽습니다.
+
+- **체인 조립 후 source document를 잃지 않으려면 어디서 결과 형태를 고정해야 할까요?**
+  최종 출력 dict나 Pydantic 모델처럼 answer와 source_documents를 함께 담는 형태를 체인 끝에서 고정해야 출처가 사라지지 않습니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [RAG Deep Dive (1/6): 문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
+- [RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR](./03-retriever-design.md)
+- [RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부](./04-prompt-construction-and-context-injection.md)
+- **RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL (현재 글)**
+- RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
+
+<!-- toc:end -->
+
 ---
 
 ## 참고 자료
 
-1. [`langchain/chains/retrieval_qa/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
-2. [`langchain/chains/question_answering/chain.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/question_answering/chain.py)
-3. [`langchain/chains/combine_documents/stuff.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)
-4. [`langchain_core/runnables/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/base.py)
-5. [`langchain_core/runnables/passthrough.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/passthrough.py)
-6. [`langchain_core/output_parsers/string.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/output_parsers/string.py)
-7. [`langchain/chains/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/base.py)
+### 공식 문서
+
+- [LangChain retrieval 개념 가이드](https://python.langchain.com/docs/concepts/retrieval/)
+- [LangChain Expression Language 개요](https://python.langchain.com/docs/concepts/lcel/)
+- [LangChain `RunnablePassthrough` API 레퍼런스](https://python.langchain.com/api_reference/core/runnables/langchain_core.runnables.passthrough.RunnablePassthrough.html)
+- [LangChain `StrOutputParser` API 레퍼런스](https://python.langchain.com/api_reference/core/output_parsers/langchain_core.output_parsers.string.StrOutputParser.html)
+
+### 소스 코드
+
+- [LangChain `RetrievalQA` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
+- [LangChain QA chain loader source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/question_answering/chain.py)
+- [LangChain `StuffDocumentsChain` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)
+- [LangChain runnable base source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/base.py)
+- [LangChain `RunnablePassthrough` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/passthrough.py)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/rag-deep-dive/ko)

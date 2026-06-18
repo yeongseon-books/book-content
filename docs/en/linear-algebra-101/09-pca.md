@@ -1,10 +1,10 @@
 ---
 series: linear-algebra-101
 episode: 9
-title: PCA
-status: content-ready
+title: "Linear Algebra 101 (9/10): PCA"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,44 +17,40 @@ tags:
   - DataScience
   - Beginner
 seo_description: A beginner-friendly intro to PCA — its definition, SVD-based mechanics, and how it powers dimensionality reduction in ML, with NumPy code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# PCA
+# Linear Algebra 101 (9/10): PCA
 
-> Linear Algebra 101 series (9/10)
+When data lives in many dimensions, not every axis matters equally. Some directions carry most of the structure, while others mostly carry noise. PCA is the classic way to make that distinction explicit.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Linear Algebra 101 series. Here we will treat PCA as the process of finding the directions with the largest variance and expressing the data in that new coordinate system.
 
-**Core question**: How do you find the *most important directions* in *high-dimensional data*?
 
-> *PCA finds the *axes of greatest variance* and *projects the data* onto them.*
+![linear algebra 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 9 flow overview*
+> PCA is the most intuitive place where you see eigenvalues and eigenvectors in action. Principal components are the axes along which data varies the most, and a few components often preserve most information while cutting dimensionality.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
+- What boundary should you inspect first when applying PCA?
+- Which signal should the example or diagram make visible for PCA?
+- What failure should be prevented first when PCA reaches a real system?
 
-- The *definition and intuition* behind *PCA*
-- The two views: *SVD-based* and *covariance-based*
-- *Variance preservation* and *dimensionality reduction*
-- A 5-step hands-on
-- Five common pitfalls
+## Questions This Post Answers
+
+- Why is PCA allowed to call some directions more important than others?
+- How do the covariance view and the SVD view connect?
+- Why is centering mandatory before you trust the result?
+- How do you decide how many principal components to keep?
+
+> PCA finds a new set of orthogonal axes that explain the data well, then keeps only the axes that carry the most of the story.
 
 ## Why It Matters
 
-Dimensionality reduction, visualization, denoising, *feature compression* — *PCA* is the most fundamental and powerful tool.
+Dimensionality reduction, visualization, denoising, and feature compression show up constantly in practice. PCA is often the first reliable linear-algebra tool for that job.
 
-> *PCA finds the directions that explain the most variance.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Data["High-dim data X"] --> Center["Center"]
-    Center --> Cov["Covariance or SVD"]
-    Cov --> PC["Principal components"]
-    PC --> Proj["Project to top-k axes"]
-```
+It is also a useful synthesis chapter. Basis choice, eigenvalues, SVD, and reconstruction error all meet here. Once PCA feels concrete, the earlier chapters stop looking like isolated theory and start looking like parts of one workflow.
 
 ## Key Terms
 
@@ -112,6 +108,12 @@ err = np.linalg.norm(Xc - X_rec) / np.linalg.norm(Xc)
 print("relative reconstruction error:", err)
 ```
 
+## Read One Numeric Pass
+
+- `X_2d.shape` becomes `(100, 2)`, so the representation really did shrink from three dimensions to two.
+- The explained-variance ratio comes from squared singular values. Large components are not just bigger numbers; they are bigger shares of the story.
+- Reconstruction error stays non-zero because one axis was dropped, but a small error means the compressed view still keeps most of the structure.
+
 ## What to Notice in This Code
 
 - *Centering* is *mandatory*.
@@ -155,22 +157,34 @@ Image compression, denoising, *EDA visualization*, *feature compression*, *genom
 
 PCA is the *standard for dimensionality reduction*. The next post brings everything together for *linear algebra in ML*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying PCA?**
+  - The article treats PCA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for PCA?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when PCA reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Linear Algebra?](./01-what-is-linear-algebra.md)
-- [Vectors](./02-vectors.md)
-- [Matrices](./03-matrices.md)
-- [Inner Product and Distance](./04-inner-product-and-distance.md)
-- [Linear Transformations](./05-linear-transformation.md)
-- [Basis and Dimension](./06-basis-and-dimension.md)
-- [Eigenvalues and Eigenvectors](./07-eigenvalues-and-eigenvectors.md)
-- [Matrix Decomposition](./08-matrix-decomposition.md)
+## In this series
+
+- [Linear Algebra 101 (1/10): What Is Linear Algebra?](./01-what-is-linear-algebra.md)
+- [Linear Algebra 101 (2/10): Vectors](./02-vectors.md)
+- [Linear Algebra 101 (3/10): Matrices](./03-matrices.md)
+- [Linear Algebra 101 (4/10): Inner Product and Distance](./04-inner-product-and-distance.md)
+- [Linear Algebra 101 (5/10): Linear Transformations](./05-linear-transformation.md)
+- [Linear Algebra 101 (6/10): Basis and Dimension](./06-basis-and-dimension.md)
+- [Linear Algebra 101 (7/10): Eigenvalues and Eigenvectors](./07-eigenvalues-and-eigenvectors.md)
+- [Linear Algebra 101 (8/10): Matrix Decomposition](./08-matrix-decomposition.md)
 - **PCA (current)**
 - Linear Algebra in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Wikipedia — Principal component analysis](https://en.wikipedia.org/wiki/Principal_component_analysis)
 - [scikit-learn — PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html)
-- [Setosa — Principal Component Analysis](https://setosa.io/ev/principal-component-analysis/)
 - [Stanford CS229 — Notes on PCA](https://cs229.stanford.edu/notes2020spring/cs229-notes10.pdf)
+- [Setosa — Principal Component Analysis](https://setosa.io/ev/principal-component-analysis/)
+- [NumPy — linalg.svd](https://numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html)

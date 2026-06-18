@@ -1,10 +1,10 @@
 ---
 series: calculus-for-ml-101
 episode: 4
-title: Gradient
-status: content-ready
+title: "Calculus for ML 101 (4/10): Gradient"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,40 @@ tags:
   - Vector
   - Beginner
 seo_description: A beginner-friendly tour of gradient vectors, direction, magnitude, contour lines, and the steepest-ascent direction for ML
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Gradient
+# Calculus for ML 101 (4/10): Gradient
 
-> Calculus for ML 101 series (4/10)
+Once you have one partial derivative per variable, the next question is operational: how do you use all of them together? A model rarely updates one parameter in isolation. Training moves the whole parameter state at once, so you need a representation that preserves both per-coordinate responsibility and overall direction.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Calculus for ML 101 series.
 
-**Core question**: When we collect *all partial derivatives* into a *single vector*, what does it *mean*?
+In this post, we'll treat the gradient as a direction vector on a loss landscape rather than as a bag of numbers. That makes it much easier to understand why gradient descent follows the negative gradient, why gradient norm matters, and why contour-line intuition is so useful in practice.
 
-> A *gradient* is the *vector* pointing in the direction of *steepest loss increase*.
+> A gradient is not just a list of slopes. It is the direction-and-strength signal that tells an optimizer how the loss surface is pushing back at the current point.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![calculus for ml 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/04/04-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 4 flow overview*
 
-- The definition of a *gradient*
-- *Direction* and *magnitude*
-- Intuition for *contour lines*
-- The *steepest ascent* direction
-- The meaning of the *opposite* direction
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Gradient?
+- Which signal should the example or diagram make visible for Gradient?
+- What failure should be prevented first when Gradient reaches a real system?
+
+## Questions this article answers
+
+- What does it actually mean to bundle multiple partial derivatives into one gradient vector?
+- What do the direction and magnitude of a gradient each mean in practice?
+- Why does the gradient point in the direction of steepest increase in the loss?
+- Why does gradient descent move in the opposite direction of the gradient?
+- Why do contour lines make gradient intuition easier to build?
 
 ## Why It Matters
 
 *Gradient descent* takes *one step* in the *opposite* direction of the gradient.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    P[Partials] --> G[Gradient Vector]
-    G --> D[Direction]
-    G --> M[Magnitude]
-    D --> S[Steepest Ascent]
-```
 
 ## Key Terms
 
@@ -154,10 +152,21 @@ def step(w, g, lr=0.1):
 
 Next post: *Chain Rule*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Gradient?**
+  - The article treats Gradient as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Gradient?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Gradient reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Derivative](./01-what-is-derivative.md)
-- [Functions and Slope](./02-functions-and-slope.md)
-- [Partial Derivatives](./03-partial-derivatives.md)
+## In this series
+
+- [Calculus for ML 101 (1/10): What Is a Derivative](./01-what-is-derivative.md)
+- [Calculus for ML 101 (2/10): Functions and Slope](./02-functions-and-slope.md)
+- [Calculus for ML 101 (3/10): Partial Derivatives](./03-partial-derivatives.md)
 - **Gradient (current)**
 - Chain Rule (upcoming)
 - Loss Function (upcoming)
@@ -165,6 +174,7 @@ Next post: *Chain Rule*.
 - Optimization (upcoming)
 - Backpropagation Intuition (upcoming)
 - Calculus in Deep Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

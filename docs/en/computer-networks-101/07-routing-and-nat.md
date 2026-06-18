@@ -1,10 +1,10 @@
 ---
 series: computer-networks-101
 episode: 7
-title: Routing and NAT
-status: content-ready
+title: "Computer Networks 101 (7/10): Routing and NAT"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,28 @@ tags:
   - Default Gateway
   - Private IP
 seo_description: How packets cross the Internet through routers, and how NAT lets devices on private IPs reach public services — explained from the routing table.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Routing and NAT
+# Computer Networks 101 (7/10): Routing and NAT
 
 > Computer Networks 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: How does my laptop, sitting on a private IP, talk to a server out on the public Internet?
 
 > A router decides only the "next hop" for each packet. The routing table is the rule book for that decision. To reach the public Internet from a private IP, NAT rewrites the source IP and port into the router's public address. Half of the Internet is routing; the other half is NAT.
 
-<!-- a-grade-intro:end -->
+This is post 7 in the Computer Networks 101 series.
+
+
+![computer networks 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.en.png)
+*computer networks 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Routing and NAT?
+- Which signal should the example or diagram make visible for Routing and NAT?
+- What failure should be prevented first when Routing and NAT reaches a real system?
 
 ## What You Will Learn
 
@@ -45,16 +53,6 @@ last_reviewed: '2026-05-04'
 Without routing, you cannot answer "why does it only fail on our corporate network?". Without NAT, "why can't I reach our server from outside?" or "why does it work at the office but not at home?" stay mysteries. VPNs, container networks, and cloud VPCs are also routing + NAT variations.
 
 > A router sees only one hop at a time. The Internet is the sum of those small decisions.
-
-## Concept at a Glance
-
-```text
-my laptop (192.168.0.10/24)
-  └─ same /24? yes  → direct delivery
-  └─ same /24? no   → default gateway (192.168.0.1)
-                        └─ ISP router → ... → destination AS
-NAT rewrites source (192.168.0.10:54321) to (203.0.113.5:60000)
-```
 
 ## Key Terms
 
@@ -136,6 +134,23 @@ sudo ip route del 192.168.50.0/24
 
 You see the routing table change in real time and packet destinations follow.
 
+## Step 6: Read longest-prefix and NAT state together
+
+Routing and NAT failures often look similar from the outside, but their fingerprints are different.
+
+| Symptom you observe | Suspect first | Why it looks like that |
+| --- | --- | --- |
+| `ip route get 1.1.1.1` picks an unexpected interface | Longest-prefix conflict | A narrower route beat the default route |
+| Outbound connects, then long-idle replies disappear | NAT session timeout | The translation state vanished before the return traffic arrived |
+| A remote corporate range should cross VPN but still goes to local Wi-Fi | Missing static route | The specific corporate prefix is absent from the routing table |
+
+```bash
+ip route get 1.1.1.1
+# 1.1.1.1 via 192.168.0.1 dev wlan0 src 192.168.0.10
+```
+
+This is the fastest way to ask the OS, "If I send a packet there right now, which interface and source address will you choose?" It is often more actionable than `traceroute` at the start of a routing incident.
+
 ## What to Notice in This Code
 
 - Routing decisions are independent at every hop
@@ -189,17 +204,29 @@ Routers decide one hop at a time; NAT is the bridge that lets private IPs talk t
 
 Next we look at the device often sitting at the end of that route — the load balancer.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Routing and NAT?**
+  - The article treats Routing and NAT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Routing and NAT?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Routing and NAT reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Network?](./01-what-is-a-network.md)
-- [IP and Subnet](./02-ip-and-subnet.md)
-- [TCP and UDP](./03-tcp-and-udp.md)
-- [DNS](./04-dns.md)
-- [HTTP and HTTPS](./05-http-and-https.md)
-- [TLS Basics](./06-tls-basics.md)
+## In this series
+
+- [Computer Networks 101 (1/10): What Is a Network?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP and Subnet](./02-ip-and-subnet.md)
+- [Computer Networks 101 (3/10): TCP and UDP](./03-tcp-and-udp.md)
+- [Computer Networks 101 (4/10): DNS](./04-dns.md)
+- [Computer Networks 101 (5/10): HTTP and HTTPS](./05-http-and-https.md)
+- [Computer Networks 101 (6/10): TLS Basics](./06-tls-basics.md)
 - **Routing and NAT (current)**
 - Load Balancer (upcoming)
-- WebSocket and real-time (upcoming)
-- Debugging network problems (upcoming)
+- WebSocket and Real-Time Communication (upcoming)
+- Debugging Network Problems (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -208,3 +235,4 @@ Next we look at the device often sitting at the end of that route — the load b
 - [Cloudflare Learning — What is BGP?](https://www.cloudflare.com/learning/security/glossary/what-is-bgp/)
 - [Linux ip-route(8) man page](https://man7.org/linux/man-pages/man8/ip-route.8.html)
 - [Tanenbaum & Wetherall — Computer Networks](https://www.pearson.com/store/p/computer-networks/P100000875375)
+- [RFC 4271 — Border Gateway Protocol 4 (BGP-4)](https://www.rfc-editor.org/rfc/rfc4271)

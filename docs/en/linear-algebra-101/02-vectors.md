@@ -1,10 +1,10 @@
 ---
 series: linear-algebra-101
 episode: 2
-title: Vectors
-status: content-ready
+title: "Linear Algebra 101 (2/10): Vectors"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,40 @@ tags:
   - DataScience
   - Beginner
 seo_description: A beginner-friendly intro to vectors — definition, addition, scalar multiplication, norms, and normalization with NumPy code and geometric intuition
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Vectors
+# Linear Algebra 101 (2/10): Vectors
 
-> Linear Algebra 101 series (2/10)
+In machine learning, one row of data is a vector, an embedding is a vector, and a gradient is a vector too. But if you treat vectors as plain number bundles, the calculations may still work while the meaning slips away. A vector is both algebraic notation and a geometric object.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Linear Algebra 101 series. Here we will read vectors through three lenses at once: coordinates, arrows, and data representations.
 
-**Core question**: Is a *vector* just a *bundle of numbers*, or an *arrow in space*?
 
-> *A vector has *direction and magnitude* — and is also *one row* of your dataset.*
+![linear algebra 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/02/02-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 2 flow overview*
+> A vector is both a container of numbers and the smallest unit of direction in a space. You need both views to connect linear algebra to machine learning.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
+- What boundary should you inspect first when applying Vectors?
+- Which signal should the example or diagram make visible for Vectors?
+- What failure should be prevented first when Vectors reaches a real system?
 
-- The *three views* of a vector — arrow, coordinates, data row
-- *Geometric meaning* of *addition and scalar multiplication*
-- *Norm and normalization*
-- A 5-step hands-on
-- Five common pitfalls
+## Questions This Post Answers
+
+- What makes a vector different from an ordinary list?
+- What do vector addition and scalar multiplication mean geometrically?
+- Why does a norm mean more than just a length formula?
+- When does normalization help, and when can it hide useful information?
+
+> A vector is both a container of numbers and the smallest unit of direction in a space. You need both views to connect linear algebra to machine learning.
 
 ## Why It Matters
 
-In ML, *one row of data* is a *vector*. If you cannot *manipulate vectors* properly, you are stuck at the input stage.
+Feature rows, user embeddings, token embeddings, and gradients are all represented as vectors. Once you can read vectors cleanly, you can move from preprocessing to model internals without switching mental languages.
 
-> *Vectors are how we package data for machines.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Arrow["Arrow (geometry)"] --> Vec["Vector"]
-    Coord["Coordinates (algebra)"] --> Vec
-    Row["Data row (ML)"] --> Vec
-```
+This matters quickly in practice. Similarity search, normalization, and metric choice all become fragile when you cannot tell whether direction matters, magnitude matters, or both matter. Vectors are the first chapter of linear algebra, but they remain the basic unit all the way to production systems.
 
 ## Key Terms
 
@@ -108,6 +105,12 @@ unit_v = v / np.linalg.norm(v)
 print("unit v:", unit_v, "norm:", np.linalg.norm(unit_v))
 ```
 
+## Read One Numeric Pass
+
+- `v + w` becomes `[4., 6.]`, while `v - w` becomes `[2., 2.]`. The coordinate arithmetic is simple, but the geometric meaning is different.
+- `||[3, 4]||` is `5.0`, so the familiar 3-4-5 triangle shows up immediately.
+- Normalization gives roughly `[0.6, 0.8]`, which keeps direction and forces the norm to 1.
+
 ## What to Notice in This Code
 
 - *NumPy* vector operations are *element-wise*.
@@ -151,8 +154,19 @@ ML feature inputs, *embedding vectors*, *user/item vectors* in recommenders, and
 
 A vector is a *point/arrow in space* and *one row of your data*. The next post covers *matrices*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Vectors?**
+  - The article treats Vectors as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Vectors?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Vectors reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Linear Algebra?](./01-what-is-linear-algebra.md)
+## In this series
+
+- [Linear Algebra 101 (1/10): What Is Linear Algebra?](./01-what-is-linear-algebra.md)
 - **Vectors (current)**
 - Matrices (upcoming)
 - Inner Product and Distance (upcoming)
@@ -162,11 +176,12 @@ A vector is a *point/arrow in space* and *one row of your data*. The next post c
 - Matrix Decomposition (upcoming)
 - PCA (upcoming)
 - Linear Algebra in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
 - [3Blue1Brown — Vectors](https://www.3blue1brown.com/lessons/vectors)
-- [Khan Academy — Vectors](https://www.khanacademy.org/math/linear-algebra/vectors-and-spaces)
+- [MIT OpenCourseWare — Vectors and spaces](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/video-lectures/)
 - [NumPy — Array creation](https://numpy.org/doc/stable/user/basics.creation.html)
-- [Wikipedia — Euclidean vector](https://en.wikipedia.org/wiki/Euclidean_vector)
+- [Khan Academy — Vectors and spaces](https://www.khanacademy.org/math/linear-algebra/vectors-and-spaces)

@@ -1,10 +1,10 @@
 ---
 series: kubernetes-101
 episode: 7
-title: Volume
-status: content-ready
+title: "Kubernetes 101 (7/10): Volume"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,32 @@ tags:
   - StorageClass
   - DevOps
 seo_description: A beginner guide to Kubernetes Volumes, PVCs, StorageClasses, and the dynamic provisioning flow that keeps data alive across Pod restarts
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Volume
+# Kubernetes 101 (7/10): Volume
 
-> Kubernetes 101 series (7/10)
+Containers are easy to replace because their local filesystem is disposable. That convenience becomes a liability the moment your workload owns state that cannot disappear on the next reschedule.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Kubernetes 101 series.
 
-**Core question**: When a *Pod dies*, what does it take to *keep the data alive*?
+Here, we will connect Volumes, PersistentVolumeClaims, and StorageClasses into one storage model so you can separate Pod lifetime from data lifetime before stateful workloads become fragile.
 
-> A *PersistentVolumeClaim* uses a *StorageClass* to *dynamically* attach a *durable disk* to a *Pod*.
+> Kubernetes can restart a Pod for you. It preserves data only when you attach the right storage contract outside the Pod.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![kubernetes 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 7 flow overview*
 
-- *emptyDir* vs *PV/PVC*
-- The role of *StorageClass*
-- *Dynamic provisioning*
-- *Access modes*
-- The *backup* angle
+## Questions to Keep in Mind
+
+- emptyDir* vs *PV/PVC?
+- The role of *StorageClass?
+- Dynamic provisioning?
 
 ## Why It Matters
 
 A container's filesystem *vanishes* with the *Pod*. Stateful workloads *require* a *Volume*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Pod["pod"] --> PVC["pvc"]
-    PVC --> SC["storageclass"]
-    SC --> PV["pv (disk)"]
-```
 
 ## Key Terms
 
@@ -127,6 +118,22 @@ def delete(name):
     subprocess.run(["kubectl", "delete", "pvc", name], check=True)
 ```
 
+## Verification workflow
+
+```bash
+kubectl get pvc
+kubectl describe pvc data
+kubectl get pv
+```
+
+**Expected output:** the PVC should become `Bound`, `describe pvc` should reveal which StorageClass and PV fulfilled the claim, and the PV list should show the actual storage object and reclaim policy behind the claim.
+
+**Failure modes to check first:**
+
+- A PVC stuck in `Pending` usually means StorageClass, capacity, or access-mode mismatch before it means an app issue.
+- A bound claim with mount failure usually means the Pod spec path or volume wiring is wrong.
+- PVC deletion is dangerous because a `Delete` reclaim policy may remove the underlying disk too.
+
 ## What to Notice in This Code
 
 - The *PVC* receives a *PV dynamically*.
@@ -170,17 +177,29 @@ A *StatefulSet* automatically creates *one PVC per Pod*, and tools like *Velero*
 
 State is solved. The next post covers *matching Pod count to load* with *HPA*.
 
+## Answering the Opening Questions
+
+- **emptyDir* vs *PV/PVC?**
+  - The article treats Volume as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The role of *StorageClass?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Dynamic provisioning?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
-- [Ingress](./05-ingress.md)
-- [ConfigMap and Secret](./06-configmap-and-secret.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap and Secret](./06-configmap-and-secret.md)
 - **Volume (current)**
 - HPA (upcoming)
 - Helm (upcoming)
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -189,3 +208,4 @@ State is solved. The next post covers *matching Pod count to load* with *HPA*.
 - [Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
 - [Storage Classes](https://kubernetes.io/docs/concepts/storage/storage-classes/)
 - [Velero](https://velero.io/)
+- [Change the reclaim policy of a PersistentVolume](https://kubernetes.io/docs/tasks/administer-cluster/change-pv-reclaim-policy/)

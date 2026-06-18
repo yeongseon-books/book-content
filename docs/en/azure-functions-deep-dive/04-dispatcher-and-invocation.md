@@ -1,11 +1,11 @@
 ---
-title: Dispatcher and Invocation — How a Function Call Reaches the Worker
+title: "Azure Functions Deep Dive (4/6): Dispatcher and Invocation — How a Function Call Reaches the Worker"
 series: azure-functions-deep-dive
 episode: 4
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -19,9 +19,13 @@ seo_description: All code citations in this post are based on Azure/azure-functi
   @ 5e59423.
 ---
 
-# Dispatcher and Invocation — How a Function Call Reaches the Worker
+# Azure Functions Deep Dive (4/6): Dispatcher and Invocation — How a Function Call Reaches the Worker
 
 > Azure Functions Deep Dive series (4/6)
+
+Once the gRPC channel is in place, the next question is the one operators and application developers both eventually ask. When a trigger fires, how does that event become one concrete function invocation inside a worker process, and how does the result find its way back?
+
+This is the fourth post in the Azure Functions Deep Dive series. Here, we follow a single invocation through the dispatcher, worker channel, and response-correlation path.
 
 ## Source Version
 
@@ -37,23 +41,19 @@ Two objects play the leading roles in the answer: `IFunctionInvocationDispatcher
 
 > All code references are pinned to [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).
 
----
+![azure functions deep dive chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/04/04-01-the-big-picture-from-trigger-to-worker.en.png)
+*azure functions deep dive chapter 4 flow overview*
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Through what stages does the dispatcher split a single invocation?
 - Where is the invocation context born, and who tears it down?
 - Where in the dispatcher do concurrency controls (maxConcurrentRequests, batchSize) take effect?
-- Where is invocation failure-and-retry decided — dispatcher or trigger?
-- When invocation duration exceeds the timeout, what exactly happens?
 
-## The big picture — from trigger to worker
+## From trigger to worker
 
 Let's start by drawing the entire path of a single invocation in one diagram.
 
-![Invocation path from trigger to worker](../../assets/azure-functions-deep-dive/04/04-01-the-big-picture-from-trigger-to-worker.en.png)
-
-*Invocation path from trigger to worker*
 This diagram is what Part 4 is about. Let's walk through each step in code.
 
 ---
@@ -196,7 +196,7 @@ This post is host-centric, so I won't walk through the worker-side code. But eve
 
 Here's the path the worker's response takes:
 
-```
+```text
 gRPC stream
   → FunctionRpcService.EventStream (host-side handler)
   → write to the worker-specific inbound Channel<InboundGrpcEvent>
@@ -222,7 +222,7 @@ But **there's no guarantee about the order in which response messages come back.
 
 That said, **some message ordering does need to be preserved** — for example, log messages within the same invocation. That's why [`Channel/OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs) exists — it preserves message order *within* an invocation while keeping invocations in parallel with each other.
 
-![Concurrent invocation handling in one worker](../../assets/azure-functions-deep-dive/04/04-02-concurrent-invocations-one-worker-handle.en.png)
+![Concurrent invocation handling in one worker](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/04/04-02-concurrent-invocations-one-worker-handle.en.png)
 
 *Concurrent invocation handling in one worker*
 Messages with the same `invocation_id` are processed in arrival order, but different `invocation_id`s are processed in parallel.
@@ -297,15 +297,24 @@ This is part 4 of the Azure Functions Deep Dive series. Parts 1-3 established th
 - [ ] Set an alert policy that classifies invocation failure (transient vs permanent)
 - [ ] Identified long-running invocations as Durable Functions candidates
 
+## Answering the Opening Questions
+
+- **Through what stages does the dispatcher split a single invocation?**
+  - The article treats Dispatcher and Invocation — How a Function Call Reaches the Worker as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Where is the invocation context born, and who tears it down?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where in the dispatcher do concurrency controls (maxConcurrentRequests, batchSize) take effect?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
-- [Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
-- [The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
-- **Dispatcher and Invocation — How a Function Call Reaches the Worker (current)**
-- Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (upcoming)
-- Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
+- [Azure Functions Deep Dive (1/6): Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
+- [Azure Functions Deep Dive (2/6): Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
+- [Azure Functions Deep Dive (3/6): The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
+- **Azure Functions Deep Dive (4/6): Dispatcher and Invocation — How a Function Call Reaches the Worker (current)**
+- Azure Functions Deep Dive (5/6): Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (upcoming)
+- Azure Functions Deep Dive (6/6): Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
 
 <!-- toc:end -->
 

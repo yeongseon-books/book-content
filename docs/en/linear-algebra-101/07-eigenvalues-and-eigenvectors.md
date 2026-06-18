@@ -1,10 +1,10 @@
 ---
 series: linear-algebra-101
 episode: 7
-title: Eigenvalues and Eigenvectors
-status: content-ready
+title: "Linear Algebra 101 (7/10): Eigenvalues and Eigenvectors"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,44 +17,40 @@ tags:
   - DataScience
   - Beginner
 seo_description: A beginner-friendly intro to eigenvalues and eigenvectors — definition, geometric meaning, and uses in PCA and dynamics with NumPy code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Eigenvalues and Eigenvectors
+# Linear Algebra 101 (7/10): Eigenvalues and Eigenvectors
 
-> Linear Algebra 101 series (7/10)
+If you apply the same linear transformation again and again, some directions behave differently from the rest. Most directions get mixed or bent, but a few keep their direction and only change length. Eigenvalues and eigenvectors are the tools that describe those privileged axes.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Linear Algebra 101 series. Here we will read eigenvalues and eigenvectors as the natural axes of a transformation.
 
-**Core question**: When you *apply a matrix repeatedly*, are there *axes that do not change direction*?
 
-> *Eigenvectors are the *invariant axes* of a transformation; eigenvalues are the *stretching factors* along those axes.*
+![linear algebra 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/07/07-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 7 flow overview*
+> Eigenvalues and eigenvectors are the essence of a linear transformation. An eigenvector keeps its direction; an eigenvalue is how much it stretches in that direction.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
+- What boundary should you inspect first when applying Eigenvalues and Eigenvectors?
+- Which signal should the example or diagram make visible for Eigenvalues and Eigenvectors?
+- What failure should be prevented first when Eigenvalues and Eigenvectors reaches a real system?
 
-- The *definition* of *eigenvalues / eigenvectors*
-- Their *geometric meaning*
-- How to compute them with *NumPy*
-- A 5-step hands-on
-- Five common pitfalls
+## Questions This Post Answers
+
+- Why do some directions survive repeated matrix application?
+- What do eigenvectors and eigenvalues each tell you?
+- Why do symmetric matrices produce especially clean results?
+- How does this connect to PCA, PageRank, and dynamical systems?
+
+> An eigenvector is a direction that a transformation does not rotate away from. The eigenvalue tells you how strongly that direction is stretched or compressed.
 
 ## Why It Matters
 
-PCA, dynamics, quantum mechanics, PageRank — all rely on *eigendecomposition*. It lets you view a matrix in a *simple coordinate system*.
+Eigendecomposition lets you read a complicated transformation in a simpler coordinate system. If you can find the right axes, a messy matrix may reduce to mostly independent scaling behavior along those axes.
 
-> *Eigenvectors are the natural axes of a transformation.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    A["Matrix A"] --> Eq["A v = lambda v"]
-    Eq --> Vec["Eigenvector v"]
-    Eq --> Lam["Eigenvalue lambda"]
-    Vec --> Use["PCA, dynamics, PageRank"]
-```
+That is why the topic keeps returning in PCA, stability analysis, and ranking algorithms. Eigenvalues and eigenvectors are powerful not because they are formal, but because they tell you which modes dominate and which directions stay structurally meaningful.
 
 ## Key Terms
 
@@ -115,6 +111,12 @@ for _ in range(50):
 print("steady state:", v / np.linalg.norm(v, 1))
 ```
 
+## Read One Numeric Pass
+
+- The matrix `[[2, 1], [0, 3]]` has eigenvalues `2` and `3`, so it has two especially readable directions.
+- `np.allclose(A @ v, lambda * v)` returning `True` is the fastest sanity check that the computed vector is really an eigenvector.
+- Repeated multiplication reveals the dominant direction. In this toy example, the direction settles near `[0.5, 0.5]`.
+
 ## What to Notice in This Code
 
 - *Eigendecomposition* simplifies the *transformation*.
@@ -158,22 +160,34 @@ PCA (*eigendecomposition of the covariance matrix*), PageRank (*top eigenvector*
 
 Eigendecomposition reveals a transformation's *natural axes*. The next post covers *matrix decomposition*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Eigenvalues and Eigenvectors?**
+  - The article treats Eigenvalues and Eigenvectors as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Eigenvalues and Eigenvectors?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Eigenvalues and Eigenvectors reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Linear Algebra?](./01-what-is-linear-algebra.md)
-- [Vectors](./02-vectors.md)
-- [Matrices](./03-matrices.md)
-- [Inner Product and Distance](./04-inner-product-and-distance.md)
-- [Linear Transformations](./05-linear-transformation.md)
-- [Basis and Dimension](./06-basis-and-dimension.md)
+## In this series
+
+- [Linear Algebra 101 (1/10): What Is Linear Algebra?](./01-what-is-linear-algebra.md)
+- [Linear Algebra 101 (2/10): Vectors](./02-vectors.md)
+- [Linear Algebra 101 (3/10): Matrices](./03-matrices.md)
+- [Linear Algebra 101 (4/10): Inner Product and Distance](./04-inner-product-and-distance.md)
+- [Linear Algebra 101 (5/10): Linear Transformations](./05-linear-transformation.md)
+- [Linear Algebra 101 (6/10): Basis and Dimension](./06-basis-and-dimension.md)
 - **Eigenvalues and Eigenvectors (current)**
 - Matrix Decomposition (upcoming)
 - PCA (upcoming)
 - Linear Algebra in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
 - [3Blue1Brown — Eigenvectors and eigenvalues](https://www.3blue1brown.com/lessons/eigenvalues)
-- [Wikipedia — Eigenvalues and eigenvectors](https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors)
+- [MIT OpenCourseWare — Eigenvalues and eigenvectors](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/video-lectures/)
 - [NumPy — linalg.eig](https://numpy.org/doc/stable/reference/generated/numpy.linalg.eig.html)
 - [NumPy — linalg.eigh](https://numpy.org/doc/stable/reference/generated/numpy.linalg.eigh.html)

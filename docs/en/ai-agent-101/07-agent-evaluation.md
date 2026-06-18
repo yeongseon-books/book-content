@@ -1,5 +1,5 @@
 ---
-title: Agent Evaluation
+title: "AI Agent 101 (7/10): Agent Evaluation"
 series: ai-agent-101
 episode: 7
 language: en
@@ -15,36 +15,34 @@ tags:
 - Evaluation
 - Testing
 - Metrics
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-15'
 seo_description: What's harder than building an agent is evaluating "whether this
   agent works properly." Simple LLMs only need response quality evaluation, but…
 ---
 
-# Agent Evaluation
-
-> AI Agent 101 Series (7/10)
+# AI Agent 101 (7/10): Agent Evaluation
 
 What's harder than building an agent is evaluating "whether this agent works properly." Simple LLMs only need response quality evaluation, but agents require multiple metrics: tool calling accuracy, task completion rate, unnecessary step count, cost efficiency, etc.
 
 Agent evaluation is divided into three levels. Individual tool call accuracy (Tool Use Accuracy), task path efficiency (Trajectory Evaluation), and final result accuracy (End-to-End Success Rate).
 
-This article covers agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.
+This is post 7 in the AI Agent 101 series. Here we cover agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.
 
----
-<!-- a-grade-intro:begin -->
+![Evaluation signal path](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/07/07-01-evaluation-signal-path.en.png)
+*Evaluation signal path*
+> Agent evaluation is not answer grading; it is diagnosis across trajectory, tool use, and final outcome.
 
-## Key Questions
+## Questions to Keep in Mind
 
-- What makes agent evaluation fundamentally different from ML model evaluation?
-- What do you look at to call a trajectory success or failure?
-- How do you measure tool-call accuracy?
-- Where do end-to-end tests and benchmarks pull in different directions?
-
-<!-- a-grade-intro:end -->
+- Why is final-answer grading not enough for agent evaluation?
+- What failures do trajectory evaluation, tool-call accuracy, and end-to-end success each catch?
+- What real requests and failure cases belong in an eval set before production?
 
 ## Agent Evaluation Metrics
 
 Agent evaluation must look beyond "did it answer well" to multiple dimensions. The core metrics are below.
+
+### Evaluation signal path
 
 ### Task Success Rate
 
@@ -52,7 +50,8 @@ The percentage of user requests the agent completes successfully.
 
 ```python
 from dataclasses import dataclass
-from typing import List, Callable
+from collections.abc import Callable
+from typing import List
 
 @dataclass
 class TestCase:
@@ -143,7 +142,7 @@ class CostTracker:
 
     PRICING = {
         "gpt-4": {"prompt": 0.03 / 1000, "completion": 0.06 / 1000},
-        "gpt-3.5-turbo": {"prompt": 0.0015 / 1000, "completion": 0.002 / 1000}
+        "gpt-4o-mini": {"prompt": 0.15 / 1_000_000, "completion": 0.60 / 1_000_000}
     }
 
     def __init__(self):
@@ -172,6 +171,8 @@ class CostTracker:
 ```
 
 Cost metrics are critical in production. Even with high accuracy, if each task costs over $1, the business won't work.
+
+If you still keep `gpt-3.5-turbo` in an existing system, treat it as a legacy model. Its current legacy pricing is $0.50 per 1M input tokens and $1.50 per 1M output tokens, but for new low-cost budgeting examples `gpt-4o-mini` is the better default.
 
 ### Latency
 
@@ -621,32 +622,34 @@ Pre-deploy regression testing is mandatory.
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **Why is final-answer grading not enough for agent evaluation?**
+  - An agent can call the wrong tool and still produce plausible text. Final-answer grading misses cost, risk, and accidental success.
+- **What failures do trajectory evaluation, tool-call accuracy, and end-to-end success each catch?**
+  - Trajectory evaluation catches wasted or wrong paths, tool-call accuracy catches tool choice and argument errors, and end-to-end success checks user-visible completion.
+- **What real requests and failure cases belong in an eval set before production?**
+  - Include frequent real requests, boundary cases, tool failures, ambiguous inputs, and cases that trigger expensive loops.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- [Context Engineering](./02-context-engineering.md)
-- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
-- [Agent Workflow Design](./04-agent-workflow-design.md)
-- [Memory and State](./05-memory-and-state.md)
-- [Multi-Agent Systems](./06-multi-agent-systems.md)
-- **Agent Evaluation (current)**
-- Error Handling and Reliability (upcoming)
-- Production Operations (upcoming)
-- Building Your First Agent (upcoming)
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): Context Engineering](./02-context-engineering.md)
+- [AI Agent 101 (3/10): Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- [AI Agent 101 (4/10): Agent Workflow Design](./04-agent-workflow-design.md)
+- [AI Agent 101 (5/10): Memory and State](./05-memory-and-state.md)
+- [AI Agent 101 (6/10): Multi-Agent Systems](./06-multi-agent-systems.md)
+- **AI Agent 101 (7/10): Agent Evaluation (current)**
+- AI Agent 101 (8/10): Error Handling and Reliability (upcoming)
+- AI Agent 101 (9/10): Production Operations (upcoming)
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 
 ## References
 
-1. **AgentBench: Evaluating LLMs as Agents** - https://arxiv.org/abs/2308.03688  
-   Comprehensive Tsinghua/Stanford agent benchmark paper. Evaluates LLM agent reasoning and tool use across 8 environments.
-
-2. **GAIA: A Benchmark for General AI Assistants** - https://arxiv.org/abs/2311.12983  
-   Meta's general AI assistant benchmark. A 466-question set measuring real problem-solving capability.
-
-3. **LangSmith: Agent Evaluation** - https://docs.smith.langchain.com/evaluation  
-   LangChain's agent evaluation tooling docs. Provides trajectory recording and an automated evaluation pipeline.
-
-4. **OpenAI Evals Framework** - https://github.com/openai/evals  
-   OpenAI's model evaluation framework. Applicable to a wide range of LLM systems including agents.
+- [OpenAI evals design guide](https://platform.openai.com/docs/guides/evals)
+- [LangSmith evaluation](https://docs.smith.langchain.com/evaluation)
+- [AgentBench: Evaluating LLMs as Agents](https://arxiv.org/abs/2308.03688)
+- [GAIA: a benchmark for General AI Assistants](https://arxiv.org/abs/2311.12983)

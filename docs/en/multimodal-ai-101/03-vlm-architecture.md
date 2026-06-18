@@ -1,11 +1,11 @@
 ---
-title: Vision-Language Model Architecture
+title: "Multimodal AI 101 (3/10): Vision-Language Model Architecture"
 series: multimodal-ai-101
 episode: 3
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -16,16 +16,28 @@ tags:
 - Q-Former
 - BLIP-2
 - Multimodal Fusion
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Episode 2 covered CLIP, which aligns image and text in the same space.
   To do the kind of reasoning GPT-4V or LLaVA does ("describe this image and…
 ---
 
-# Vision-Language Model Architecture
+# Multimodal AI 101 (3/10): Vision-Language Model Architecture
 
-> Multimodal AI 101 series (3/10)
+Most VLM discussions get lost in model names too early. The useful question is simpler: once an image encoder has emitted visual features, how do those features enter the LLM without blowing up context length, training cost, or multilingual behavior?
 
----
+This is post 3 in the Multimodal AI 101 series.
+
+Here we compare the three connection patterns that dominate modern VLMs: simple projection, token compression, and cross-attention insertion.
+
+
+![Multimodal AI 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/03/03-01-common-skeleton-vision-encoder-adapter-l.en.png)
+*Multimodal AI 101 chapter 3 flow overview*
+
+## Questions to Keep in Mind
+
+- Where does a VLM actually spend its complexity: in the vision encoder, the adapter, or the LLM?
+- Why do projection, Q-Former compression, and gated cross-attention lead to different serving trade-offs?
+- When is the simplest adapter good enough, and when does token compression become mandatory?
 
 ## How VLMs give an LLM "eyes"
 
@@ -37,7 +49,7 @@ VLM architectures split into three schools by how they wire that connection. LLa
 
 Every VLM is a combination of three parts.
 
-```
+```text
 [Image] -> Vision Encoder (CLIP/SigLIP) -> visual features
                                                |
                                                v
@@ -113,7 +125,7 @@ Trade-off: the Q-Former itself trains in stages with mixed losses (ITC, ITM, ITG
 
 Flamingo took a different direction. It inserts new cross-attention layers between the LLM's transformer blocks, training only those new layers. Existing LLM weights are frozen.
 
-```
+```text
 LLM Block 1
 GATED CROSS-ATTENTION (new) <- vision features
 LLM Block 2
@@ -205,6 +217,14 @@ LLaVA-1.5 is built on Vicuna (LLaMA), which is weak in many non-English language
 
 VLMs span a wide task spectrum: OCR, charts, diagrams, real-world photos, documents. Track MMMU, ChartQA, DocVQA, TextVQA, and RealWorldQA together to expose model weaknesses.
 
+## Operations checklist
+
+- [ ] We measure visual-token cost against the real context budget of the serving model
+- [ ] We documented which layers stay frozen and which layers are allowed to train
+- [ ] We test multilingual prompts separately from English-only benchmarks
+- [ ] We evaluate document, chart, OCR, and real-photo workloads as separate slices
+- [ ] We chose the adapter pattern based on serving constraints, not model popularity alone
+
 ## Key Takeaways
 
 - Every VLM is vision encoder + adapter + LLM; the adapter design defines the school.
@@ -213,6 +233,34 @@ VLMs span a wide task spectrum: OCR, charts, diagrams, real-world photos, docume
 - Flamingo: gated cross-attention inserted inside the LLM. Most natural fit for multi-image and video.
 - Production starting point is LLaVA. For multilingual, evaluate Qwen2-VL or InternVL2.
 - Verify visual-token context budget, instruction data quality, vision encoder freeze policy, multilingual base choice, and multi-benchmark evaluation before going live.
+
+---
+
+## Answering the Opening Questions
+
+- **Where does a VLM actually spend its complexity: in the vision encoder, the adapter, or the LLM?**
+  - The article treats Vision-Language Model Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do projection, Q-Former compression, and gated cross-attention lead to different serving trade-offs?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When is the simplest adapter good enough, and when does token compression become mandatory?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Multimodal AI 101 (1/10): Why Multimodal AI Matters](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
+- **Vision-Language Model Architecture (current)**
+- Image Captioning and OCR Pipelines (upcoming)
+- Multimodal RAG: Searching Images and Text Together (upcoming)
+- Audio Processing and Whisper STT (upcoming)
+- Text-to-Image with Diffusion (upcoming)
+- Multimodal Embeddings and Cross-modal Search (upcoming)
+- Video Understanding - From Frame Sampling to Video-LLaVA (upcoming)
+- Building a Production Multimodal Application (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [Liu et al. - Visual Instruction Tuning (LLaVA)](https://arxiv.org/abs/2304.08485)

@@ -1,10 +1,10 @@
 ---
 series: incident-response-101
 episode: 9
-title: Prevention
-status: content-ready
+title: "Incident Response 101 (9/10): Prevention"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,58 +16,52 @@ tags:
   - Reliability
   - Testing
   - Operations
-seo_description: A beginner-friendly guide to incident prevention covering action item tracking, regression tests, guardrail code, and chaos engineering
-last_reviewed: '2026-05-04'
+seo_description: Learn how to convert postmortem learning into regression tests, guardrails, chaos drills, and tracked prevention work.
+last_reviewed: '2026-05-15'
 ---
 
-# Prevention
+# Incident Response 101 (9/10): Prevention
 
-> Incident Response 101 series (9/10)
+An incident is not truly closed when the postmortem is published. It is closed when the learning is pushed back into code, tests, automation, and operating constraints that make the same failure harder to repeat.
 
-<!-- a-grade-intro:begin -->
+Teams that stop at documentation keep relearning the same lesson. Teams that attach regression tests, guardrails, and review loops turn each incident into a measurable reliability improvement.
 
-**Core question**: How do you make sure an *incident* does *not* happen *again*?
+This is post 9 in the Incident Response 101 series. This post explains how to prioritize prevention work and how to make follow-up items survive beyond the week after the outage.
 
-> *Prevention* rests on *three pillars*: *action tracking*, *regression tests*, and *guardrails*.
 
-<!-- a-grade-intro:end -->
+![incident response 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.en.png)
+*incident response 101 chapter 9 flow overview*
+> Prevention items that are specific + measurable + assigned = items that actually get done.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- *Action tracking*
-- *Regression tests*
-- *Guardrail* code
-- *Chaos engineering*
-- The *learning loop*
+- Why do incidents repeat even after strong postmortems?
+- Which follow-up items deserve regression tests first?
+- How do guardrails differ from warnings or documentation?
 
-## Why It Matters
+## Why this topic matters
 
-If you stop at the *postmortem*, *organizational learning* never *converts* into *behavior*.
+Teams get weaker over time when they depend on memory. They get stronger over time when each incident leaves behind a test, a blocking control, or a better operating default.
 
-## Concept at a Glance
+That is why prevention is best treated as an engineering output. Good intentions do not survive turnover or fatigue; tests and safeguards do.
 
-```mermaid
-flowchart LR
-    Action["action item"] --> Test["regression test"]
-    Test --> Guard["guardrail"]
-    Guard --> Chaos["chaos exp"]
-    Chaos --> Learn["learning"]
-    Learn --> Action
-```
+## Diagram at a glance
+
+The loop matters as much as the individual controls. Action items become tests, tests become guardrails, and experiments verify that the protection still works under failure.
 
 ## Key Terms
 
-- **action item**: a *postmortem* follow-up.
-- **regression test**: confirms the *same bug* does not return.
-- **guardrail**: code that *blocks* dangerous actions.
-- **chaos exp**: *intentional* failure injection.
-- **learning loop**: the *cycle* of learning.
+- **action item**: a postmortem follow-up.
+- **regression test**: confirms the same bug does not return.
+- **guardrail**: code that blocks dangerous actions.
+- **chaos exp**: intentional failure injection.
+- **learning loop**: the cycle of learning.
 
 ## Before/After
 
-**Before**: only a *document* remains after the postmortem.
+**Before**: only a document remains after the postmortem.
 
-**After**: *code* and *tests* remain after the postmortem.
+**After**: code and tests remain after the postmortem.
 
 ## Hands-on: A Prevention Kit
 
@@ -109,63 +103,92 @@ def closed(action):
 
 ## What to Notice in This Code
 
-- *Status* has *two values*: open/done.
-- A *guardrail* is *one raise*.
-- *Chaos* always pairs with an *expected result*.
+- Status has two values: open/done.
+- A guardrail is one raise.
+- Chaos always pairs with an expected result.
 
 ## Five Common Mistakes
 
-1. **Registering *actions* and then *abandoning* them.**
-2. **Skipping the *regression test*.**
-3. **Leaving the *guardrail* as a *warning* only.**
-4. **Stating *hypotheses* without *chaos*.**
-5. **The *loop* never crosses a *quarter*.**
+1. **Registering actions and then abandoning them.**
+2. **Skipping the regression test.**
+3. **Leaving the guardrail as a warning only.**
+4. **Stating hypotheses without chaos.**
+5. **The loop never crosses a quarter.**
 
 ## How This Shows Up in Production
 
-Every *postmortem* action is *linked* into *Jira*, *converted* into *regression tests* and *chaos scenarios*, and run *weekly in CI*.
+Every postmortem action is linked into Jira, converted into regression tests and chaos scenarios, and run weekly in CI.
 
 ## How a Senior Engineer Thinks
 
-- *Prevention* is *code*.
-- The *document* is the *starting point*.
-- *Chaos* is your *friend*.
-- The *loop* is the *quarterly review*.
-- *Repetition* equals *failed learning*.
+- Prevention is code.
+- The document is the starting point.
+- Chaos is your friend.
+- The loop is the quarterly review.
+- Repetition equals failed learning.
+
+## Prioritizing prevention work
+
+Not every prevention item belongs in the same bucket. A simple priority table helps the team focus on work that most directly reduces repeat risk.
+
+| Item | Repeat-risk reduction | Delivery cost | Priority |
+| --- | --- | --- | --- |
+| Add a regression test | High | Low | Immediate |
+| Add a feature flag or kill switch | High | Medium | High |
+| Rework architecture for long-term resilience | High | High | Quarterly planning |
+| Expand wiki documentation | Low | Low | Supporting work |
+
+Documentation still matters, but tests and guardrails usually deserve priority because they block the failure path directly.
 
 ## Checklist
 
-- [ ] *Action tracking*.
-- [ ] *Regression tests*.
-- [ ] *Guardrail policy*.
-- [ ] *Chaos schedule*.
+- [ ] Action tracking.
+- [ ] Regression tests.
+- [ ] Guardrail policy.
+- [ ] Chaos schedule.
 
 ## Practice Problems
 
-1. Define *guardrail* in one line.
-2. Define *regression test* in one line.
-3. Define *learning loop* in one line.
+1. Define guardrail in one line.
+2. Define regression test in one line.
+3. Define learning loop in one line.
 
 ## Wrap-up and Next Steps
 
-Next is the capstone: *Building an Incident Runbook*.
+Next is the capstone: Building an Incident Runbook.
+
+## Answering the Opening Questions
+
+- **Why do incidents repeat even after strong postmortems?**
+  - The article treats Prevention as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which follow-up items deserve regression tests first?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do guardrails differ from warnings or documentation?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What is an Incident?](./01-what-is-incident.md)
-- [Severity Classification](./02-severity.md)
-- [Initial Response](./03-initial-response.md)
-- [Communication](./04-communication.md)
-- [Writing the Timeline](./05-timeline.md)
-- [Root Cause Analysis](./06-root-cause-analysis.md)
-- [Mitigation and Resolution](./07-mitigation-and-resolution.md)
-- [Postmortem](./08-postmortem.md)
+## In this series
+
+- [Incident Response 101 (1/10): What is an Incident?](./01-what-is-incident.md)
+- [Incident Response 101 (2/10): Severity Classification](./02-severity.md)
+- [Incident Response 101 (3/10): Initial Response](./03-initial-response.md)
+- [Incident Response 101 (4/10): Communication](./04-communication.md)
+- [Incident Response 101 (5/10): Writing the Timeline](./05-timeline.md)
+- [Incident Response 101 (6/10): Root Cause Analysis](./06-root-cause-analysis.md)
+- [Incident Response 101 (7/10): Mitigation and Resolution](./07-mitigation-and-resolution.md)
+- [Incident Response 101 (8/10): Postmortem](./08-postmortem.md)
 - **Prevention (current)**
 - Building an Incident Runbook (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Action Items - Google SRE Workbook](https://sre.google/workbook/postmortem-culture/)
-- [Chaos Engineering Principles](https://principlesofchaos.org/)
-- [Guardrails vs Gates - Thoughtworks](https://www.thoughtworks.com/insights/blog/guardrails-not-gates)
-- [Preventing Recurrence - PagerDuty](https://response.pagerduty.com/after/preventing/)
+### Official Docs
+- [Postmortem Action Items - Google SRE Workbook](https://sre.google/workbook/postmortem-culture/)
+- [Preventing recurrence - PagerDuty](https://response.pagerduty.com/after/preventing/)
+- [Principles of Chaos Engineering](https://principlesofchaos.org/)
+- [Guardrails, not gates - Thoughtworks](https://www.thoughtworks.com/insights/blog/guardrails-not-gates)
+
+### Example source
+- [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)

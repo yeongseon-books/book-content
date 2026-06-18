@@ -1,10 +1,10 @@
 ---
 series: data-science-101
 episode: 1
-title: What Is Data Science?
-status: content-ready
+title: "Data Science 101 (1/10): What Is Data Science?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,36 @@ tags:
   - Analytics
   - Beginner
 seo_description: A practical definition of data science, the differences between analyst, scientist and engineer roles, and the workflow that ties everything together
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is Data Science?
+# Data Science 101 (1/10): What Is Data Science?
 
-> Data Science 101 series (1/10)
+People usually enter data science through tools. They install pandas, copy a scikit-learn tutorial, and learn a dashboard product. A few weeks later, the vocabulary gets blurry. Analytics, experimentation, forecasting, ML engineering, and BI all sound adjacent, but not identical.
 
-<!-- a-grade-intro:begin -->
+That confusion matters because the field only starts to make sense when you see the job as a decision pipeline rather than a pile of techniques. If you cannot explain how a question becomes data, how data becomes evidence, and how evidence changes an action, every later chapter feels like isolated syntax.
 
-**Core question**: What is *data science*, and how is it different from *analysis* — and why has it become its own *job*?
+This is the first post in the Data Science 101 series. Here we build the mental model for the rest of the series: data science is the work of turning a fuzzy business question into a repeatable decision loop.
 
-> *Data science is the *job of bridging* a problem and the data behind it.*
 
-<!-- a-grade-intro:end -->
+![data science 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/01/01-01-concept-at-a-glance.en.png)
+*data science 101 chapter 1 flow overview*
+> Data science is about deciding what to verify at each boundary and which signal to keep—not about feature names or techniques.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Data Science??
+- Which signal should the example or diagram make visible for What Is Data Science??
+- What failure should be prevented first when What Is Data Science? reaches a real system?
+
+## Questions This Post Answers
+
+- What practical definition keeps data science from collapsing into a vague umbrella term?
+- Where do analyst, scientist, engineer, and EDA work split apart in a real team?
+- Why does the workflow have to end in a decision instead of a notebook or dashboard?
+- Which misconceptions make beginners learn tools in the wrong order?
+
+> Data science is the discipline of translating a business problem into evidence strong enough to change a decision.
 
 ## What You Will Learn
 
@@ -46,14 +62,7 @@ In a field full of *overlapping titles*, the boundaries blur fast. A clear *big 
 
 > *Learning without a *big picture* is just a pile of fragments.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Problem["Business Problem"] --> Data["Data"]
-    Data --> Model["Model / Insight"]
-    Model --> Decision["Decision"]
-```
+The fundamental distinction in this episode is between recognizing What Is Data Science as an abstract concept and understanding how it manifests at system boundaries—where data enters, where checks occur, and which signals persist.
 
 ## Key Terms
 
@@ -111,6 +120,8 @@ candidates = (
 Email campaign for 100 users → measure conversion → adjust next week
 ```
 
+**Expected output:** a compact workflow note that connects the problem statement, the key data, and the final decision in one line of reasoning.
+
 ## What to Notice in This Code
 
 - *One sentence of problem* sets the direction for *every line*.
@@ -154,7 +165,18 @@ Startup data teams often look like a *mini-org* of analyst + scientist + enginee
 
 Data science is the *job of bridging* problems and data. Next, we will see how to *turn a problem* into a *data problem* you can actually work on.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Data Science??**
+  - The article treats What Is Data Science? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Data Science??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Data Science? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Data Science? (current)**
 - Turning a Problem into a Data Problem (upcoming)
 - Data Collection (upcoming)
@@ -165,6 +187,7 @@ Data science is the *job of bridging* problems and data. Next, we will see how t
 - Evaluation (upcoming)
 - Result Interpretation (upcoming)
 - End-to-End Data Project Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

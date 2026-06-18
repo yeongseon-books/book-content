@@ -1,11 +1,11 @@
 ---
-title: Text-to-Image with Diffusion
+title: "Multimodal AI 101 (7/10): Text-to-Image with Diffusion"
 series: multimodal-ai-101
 episode: 7
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -21,11 +21,21 @@ seo_description: From 2014 to around 2020, GANs were the default for image gener
   StyleGAN produced eerily realistic faces, but it had two persistent…
 ---
 
-# Text-to-Image with Diffusion
+# Multimodal AI 101 (7/10): Text-to-Image with Diffusion
+
+This is post 7 in the Multimodal AI 101 series.
 
 > Multimodal AI 101 series (7/10)
 
----
+
+![Multimodal AI 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/07/07-01-big-picture.en.png)
+*Multimodal AI 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Text-to-Image with Diffusion?
+- Which signal should the example or diagram make visible for Text-to-Image with Diffusion?
+- What failure should be prevented first when Text-to-Image with Diffusion reaches a real system?
 
 ## Why diffusion replaced GANs
 
@@ -35,7 +45,7 @@ Diffusion models address both. Training is far more stable than GANs, and combin
 
 ## Forward / reverse process at a glance
 
-```
+```text
 original image x_0
     | progressively add Gaussian noise (T steps)
     v
@@ -98,7 +108,7 @@ image.save("nook.png")
 
 CFG runs the forward pass twice. It compares the result with and without the text condition and pushes the difference harder.
 
-```
+```text
 eps_guided = eps_uncond + scale * (eps_text - eps_uncond)
 ```
 
@@ -225,6 +235,34 @@ A 30-step SDXL generation takes about 5 seconds on an RTX 4090. User-facing serv
 - The diffusers library exposes SDXL, ControlNet, inpainting, and image-to-image through one API pattern.
 - Model selection comes down to SDXL (ecosystem), Flux (top quality), or DALL-E API (lightweight start).
 - Verify prompt token limits, NSFW / copyright filters, GPU memory, and the step-vs-latency trade-off before going to production.
+
+---
+
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Text-to-Image with Diffusion?**
+  - The article treats Text-to-Image with Diffusion as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Text-to-Image with Diffusion?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Text-to-Image with Diffusion reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Multimodal AI 101 (1/10): Why Multimodal AI Matters](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
+- [Multimodal AI 101 (3/10): Vision-Language Model Architecture](./03-vlm-architecture.md)
+- [Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines](./04-captioning-ocr-pipelines.md)
+- [Multimodal AI 101 (5/10): Multimodal RAG: Searching Images and Text Together](./05-multimodal-rag.md)
+- [Multimodal AI 101 (6/10): Audio Processing and Whisper STT](./06-audio-whisper.md)
+- **Text-to-Image with Diffusion (current)**
+- Multimodal Embeddings and Cross-modal Search (upcoming)
+- Video Understanding - From Frame Sampling to Video-LLaVA (upcoming)
+- Building a Production Multimodal Application (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [Rombach et al. - High-Resolution Image Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2112.10752)

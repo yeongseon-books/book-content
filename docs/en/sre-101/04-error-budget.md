@@ -1,10 +1,10 @@
 ---
 series: sre-101
 episode: 4
-title: Error Budget
+title: "SRE 101 (4/10): Error Budget"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,34 @@ tags:
   - Release
   - Risk
 seo_description: A beginner-friendly guide to error budgets covering the definition, calculation, burn-rate alerting, release decisions, and operational policy
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Error Budget
+# SRE 101 (4/10): Error Budget
 
-> SRE 101 series (4/10)
+As soon as a team writes down an SLO, the next practical question shows up: how much failure are we willing to tolerate while we keep shipping changes? Without a clear answer, every incident becomes a fresh argument between “move faster” and “slow everything down.”
 
-<!-- a-grade-intro:begin -->
+The error budget is useful because it turns that argument into policy. It gives the team a shared number for how much reliability risk remains, and that number should change release behavior before emotions do.
 
-**Core question**: How do you decide *how much failure* is *acceptable*?
+This is post 4 in the SRE 101 series. Here we connect SLO math to release policy, burn-rate alerting, and the day-to-day trade-off between stability work and product change.
 
-> An *error budget* is the *allowed distance* between *goal* and *reality*.
 
-<!-- a-grade-intro:end -->
+![sre 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.en.png)
+*sre 101 chapter 4 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *definition* of an *error budget*
-- How to *calculate* it
-- *Burn-rate* alerting
-- Its relationship to *release decisions*
-- The cultural effect on a *team*
+- Why does an error budget become the common language between speed and stability?
+- How do you calculate the allowed failure from an SLO target?
+- Why do total budget spend and burn rate answer different operating questions?
 
-## Why It Matters
+## Why this topic matters
 
-*Speed* and *stability* are not enemies — a *budget* mediates them.
+Speed and stability are not enemies, but they do need a shared decision rule. Otherwise every outage triggers a different reaction depending on who is loudest in the room.
 
-## Concept at a Glance
+With a budget, the discussion becomes more precise. If the service still has room, the team can take measured risk. If the budget is burning too fast, stability work moves to the front of the queue.
 
-```mermaid
-flowchart LR
-    SLO["SLO target"] --> Budget["error budget"]
-    Actual["actual errors"] --> Spent["spent"]
-    Spent --> Decision["release decision"]
-```
+> An error budget is the allowed distance between the reliability goal and actual behavior.
 
 ## Key Terms
 
@@ -151,10 +144,21 @@ If the *budget* has room, you *experiment*. Once it is *spent*, you *focus on st
 
 Next, we cover the *fundamentals of monitoring*.
 
+## Answering the Opening Questions
+
+- **Why does an error budget become the common language between speed and stability?**
+  - The article treats Error Budget as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do you calculate the allowed failure from an SLO target?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do total budget spend and burn rate answer different operating questions?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is SRE?](./01-what-is-sre.md)
-- [Reliability](./02-reliability.md)
-- [SLI, SLO, SLA](./03-sli-slo-sla.md)
+## In this series
+
+- [SRE 101 (1/10): What is SRE?](./01-what-is-sre.md)
+- [SRE 101 (2/10): Reliability](./02-reliability.md)
+- [SRE 101 (3/10): SLI, SLO, SLA](./03-sli-slo-sla.md)
 - **Error Budget (current)**
 - Monitoring (upcoming)
 - Incident Response (upcoming)
@@ -162,6 +166,7 @@ Next, we cover the *fundamentals of monitoring*.
 - Reducing Toil (upcoming)
 - Capacity Planning (upcoming)
 - Building Operable Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

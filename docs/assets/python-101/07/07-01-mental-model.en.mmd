@@ -1,0 +1,31 @@
+flowchart LR
+    Caller["Current file"] -->|"import pay.db"| ImportStmt["import statement"]
+    ImportStmt --> Search["Walk sys.path in order"]
+    Search --> PackageDir["pay/ directory"]
+    PackageDir --> InitFile["__init__.py"]
+    PackageDir --> PyFile["db.py file"]
+
+    InitFile --> PackageNamespace["package namespace"]
+    PyFile --> Execute["Run top-level code once"]
+    Execute --> ModuleObj["db module object"]
+    ModuleObj --> ModuleNamespace["module namespace<br/>functions, variables, classes"]
+
+    Search --> Cache{"Already in sys.modules?"}
+    Cache -->|"yes"| Reuse["Reuse cached module"]
+    Cache -->|"no"| Execute
+    Reuse --> Bind["Bind name in current file"]
+    ModuleNamespace --> Bind
+    PackageNamespace --> Bind
+
+    style Caller fill:#e3f2fd,stroke:#1976d2
+    style ImportStmt fill:#f3e5f5,stroke:#7b1fa2
+    style Search fill:#fff3e0,stroke:#f57c00
+    style PackageDir fill:#e8f5e9,stroke:#388e3c
+    style InitFile fill:#e8f5e9,stroke:#388e3c
+    style PyFile fill:#e8f5e9,stroke:#388e3c
+    style Execute fill:#fff8e1,stroke:#f9a825
+    style ModuleObj fill:#ede7f6,stroke:#5e35b1
+    style ModuleNamespace fill:#ede7f6,stroke:#5e35b1
+    style PackageNamespace fill:#ede7f6,stroke:#5e35b1
+    style Reuse fill:#fce4ec,stroke:#c2185b
+    style Bind fill:#e0f7fa,stroke:#00838f

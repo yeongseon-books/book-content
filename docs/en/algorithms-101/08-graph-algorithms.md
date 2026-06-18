@@ -1,10 +1,10 @@
 ---
 series: algorithms-101
 episode: 8
-title: Graph Algorithms
+title: "Algorithms 101 (8/10): Graph Algorithms"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,23 @@ seo_description: Graph representations, when to reach for BFS or DFS, Dijkstra's
 last_reviewed: '2026-05-04'
 ---
 
-# Graph Algorithms
-
-> Algorithms 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
+# Algorithms 101 (8/10): Graph Algorithms
 
 **Core question**: Road networks, social networks, and dependency graphs all live in different domains — why can the same algorithms solve them?
 
-> A graph encodes relationships as nodes and edges, and almost every system can be reasoned about on top of one. The core algorithms are BFS (unweighted shortest paths and layered traversal), DFS (connectivity and topological sort), Dijkstra (weighted shortest paths), and MST (minimum-cost connecting trees). Their cost depends on the representation, so adjacency list vs adjacency matrix is part of the decision. Once you have these tools, recommendations, search, routing, and build systems all start sounding like dialects of the same language.
+A graph encodes relationships as nodes and edges, and almost every system can be reasoned about on top of one. The core algorithms are BFS, DFS, Dijkstra, and MST, and their cost depends on the graph representation you choose.
 
-<!-- a-grade-intro:end -->
+This is post 8 in the Algorithms 101 series. Here we cover graph representations, traversal patterns, shortest paths, and minimum spanning trees.
+
+
+![algorithms 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/08/08-01-big-picture.en.png)
+*algorithms 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Graph Algorithms?
+- Which signal should the example or diagram make visible for Graph Algorithms?
+- What failure should be prevented first when Graph Algorithms reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +51,6 @@ last_reviewed: '2026-05-04'
 Most production problems reduce to graph problems eventually: microservice call dependencies, build-tool task graphs, user-item bipartite graphs in recommendation systems, road networks in routing. Without graph algorithms, the cores of all those systems are out of reach.
 
 > Graphs are the shared language of systems thinking.
-
-## Concept at a Glance
 
 > A graph has V nodes and E edges. The adjacency list uses O(V+E) memory; the adjacency matrix uses O(V^2). BFS uses a queue and gives unweighted shortest paths in O(V+E). DFS uses a stack (or recursion) and powers connectivity and topological sort. Dijkstra is greedy + priority queue for non-negative weighted shortest paths, and the canonical MST algorithms are Kruskal (union-find) and Prim (priority queue).
 
@@ -278,17 +282,29 @@ Graph algorithms let us express almost any system problem in the simple vocabula
 
 The next article covers string algorithm basics: the cost of naive matching, KMP's failure function, the Z function, and the production-grade tools you reach for most often — regular expressions and tries.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Graph Algorithms?**
+  - The article treats Graph Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Graph Algorithms?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Graph Algorithms reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an Algorithm?](./01-what-is-an-algorithm.md)
-- [Time and Space Complexity](./02-time-and-space-complexity.md)
-- [Search Algorithms](./03-search-algorithms.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
-- [Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
-- [Dynamic Programming](./06-dynamic-programming.md)
-- [Greedy Algorithms](./07-greedy-algorithms.md)
+## In this series
+
+- [Algorithms 101 (1/10): What Is an Algorithm?](./01-what-is-an-algorithm.md)
+- [Algorithms 101 (2/10): Time and Space Complexity](./02-time-and-space-complexity.md)
+- [Algorithms 101 (3/10): Search Algorithms](./03-search-algorithms.md)
+- [Algorithms 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
+- [Algorithms 101 (5/10): Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
+- [Algorithms 101 (6/10): Dynamic Programming](./06-dynamic-programming.md)
+- [Algorithms 101 (7/10): Greedy Algorithms](./07-greedy-algorithms.md)
 - **Graph Algorithms (current)**
 - String Algorithm Basics (upcoming)
 - Algorithm Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

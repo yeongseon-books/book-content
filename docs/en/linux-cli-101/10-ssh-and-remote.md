@@ -1,11 +1,11 @@
 ---
-title: SSH and Remote Access
+title: "Linux CLI 101 (10/10): SSH and Remote Access"
 series: linux-cli-101
 episode: 10
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,36 +17,26 @@ tags:
 - scp
 - Security
 - Server
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: SSH opens a remote terminal over an encrypted channel, and key-based
   authentication replaces passwords with a lock-and-key pair.
 ---
 
-# SSH and Remote Access
+# Linux CLI 101 (10/10): SSH and Remote Access
 
-> Linux CLI 101 series (10/10)
+The CLI becomes truly operational the moment you leave your own machine. Deploying code, checking logs on a server, copying build artifacts, and tunneling to a remote database all start with secure remote access.
 
----
+This is the final post in the Linux CLI 101 series.
 
-<!-- a-grade-intro:begin -->
 
-## Key Questions
+![Linux CLI 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/10/10-01-big-picture.en.png)
+*Linux CLI 101 chapter 10 flow overview*
 
-- What is SSH and why use it instead of Telnet?
-- What is the difference between password authentication and key-based authentication?
-- How does `~/.ssh/config` simplify connections?
-- How do you transfer files remotely with `scp` and `rsync`?
+## Questions to Keep in Mind
 
-> SSH opens a remote terminal over an encrypted channel. Key-based authentication replaces passwords with a lock-and-key pair.
-
-<!-- a-grade-intro:end -->
-
-## What you will learn
-
-- The basic SSH connection flow and key-based authentication setup
-- Generating a key pair with `ssh-keygen` and registering it on a server
-- Creating connection aliases with `~/.ssh/config`
-- Copying and syncing files remotely with `scp` and `rsync`
+- The basic SSH connection flow and key-based authentication setup?
+- Generating a key pair with `ssh-keygen` and registering it on a server?
+- Creating connection aliases with `~/.ssh/config`?
 
 ## Why it matters
 
@@ -230,6 +220,13 @@ SSH is fundamental to server management, but the fewer times you SSH into a serv
 
 That said, you still need to know SSH. When CI/CD fails, when monitoring misses a problem, the last resort is always "SSH in and check directly". SSH is the skill you rarely use day-to-day but absolutely must have for emergencies.
 
+## When it breaks, check these first
+
+- If you get `Permission denied (publickey)`, check key paths and permissions before blaming the network. `chmod 700 ~/.ssh`, `chmod 600 ~/.ssh/id_ed25519`, and `ssh -v host` usually surface the real cause.
+- If you see `REMOTE HOST IDENTIFICATION HAS CHANGED`, do not blindly delete the warning. First verify whether the server was rebuilt or replaced, then remove the old fingerprint with `ssh-keygen -R host`.
+- If `scp` or `rsync` fails, confirm the SSH user and port first. Many production hosts do not use port 22, and that often gets mistaken for a bad remote path.
+- If a remote command only half-runs, check whether shell init files or a `sudo` prompt interrupted non-interactive execution. In automation, break the flow into smaller remote steps until the failure point is obvious.
+
 ## Checklist
 
 - [ ] You can generate an SSH key pair and register the public key on a server
@@ -254,18 +251,27 @@ That said, you still need to know SSH. When CI/CD fails, when monitoring misses 
 
 This concludes the Linux CLI 101 series. You now have the CLI fundamentals to connect to servers, analyze logs, and automate deployments with confidence.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
-- [Permissions and Ownership](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- [grep, find, xargs](./05-grep-find-xargs.md)
-- [Pipes and Redirection](./06-pipe-and-redirection.md)
-- [Process Management](./07-process-management.md)
-- [Environment Variables and PATH](./08-environment-variables.md)
-- [Shell Script Basics](./09-shell-script-basics.md)
+- **The basic SSH connection flow and key-based authentication setup?**
+  - The article treats SSH and Remote Access as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Generating a key pair with `ssh-keygen` and registering it on a server?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Creating connection aliases with `~/.ssh/config`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): Permissions and Ownership](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents](./04-viewing-files.md)
+- [Linux CLI 101 (5/10): grep, find, xargs — The Search Trio](./05-grep-find-xargs.md)
+- [Linux CLI 101 (6/10): Pipes and Redirection](./06-pipe-and-redirection.md)
+- [Linux CLI 101 (7/10): Process Management](./07-process-management.md)
+- [Linux CLI 101 (8/10): Environment Variables and PATH](./08-environment-variables.md)
+- [Linux CLI 101 (9/10): Shell Script Basics](./09-shell-script-basics.md)
 - **SSH and Remote Access (current)**
 
 <!-- toc:end -->

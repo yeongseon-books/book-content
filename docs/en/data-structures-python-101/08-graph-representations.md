@@ -1,10 +1,10 @@
 ---
 series: data-structures-python-101
 episode: 8
-title: Graph Representations
+title: "Data Structures with Python 101 (8/10): Graph Representations"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,28 @@ tags:
   - BFS
   - DFS
 seo_description: Represent graphs as adjacency lists and adjacency matrices in Python and implement BFS and DFS traversals.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Graph Representations
+# Data Structures with Python 101 (8/10): Graph Representations
 
 > Data Structures with Python 101 Series (8/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: How do you represent social networks, maps, and dependency relationships in code?
 
 > Graphs represent relationships using nodes (vertices) and edges. In Python, you implement adjacency lists with dict and adjacency matrices with 2D lists. This article covers graph representation methods and BFS/DFS traversals.
 
-<!-- a-grade-intro:end -->
+This is post 8 in the Data Structures with Python 101 series.
+
+
+![Data Structures with Python 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.en.png)
+*Data Structures with Python 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Graph Representations?
+- Which signal should the example or diagram make visible for Graph Representations?
+- What failure should be prevented first when Graph Representations reaches a real system?
 
 ## What You Will Learn
 
@@ -51,13 +59,15 @@ Graph problems appear at medium-to-hard difficulty in coding interviews. You nee
 
 > Graph = a set of nodes (vertices) connected by edges
 
-```
+```text
 [Undirected Graph]        [Adjacency List]
   A --- B                  A: [B, C]
   |   / |                  B: [A, C, D]
   |  /  |                  C: [A, B]
   C --- D                  D: [B]
 ```
+
+## Graph Representation at a Glance
 
 ## Key Concepts
 
@@ -263,6 +273,10 @@ print(distances)  # {'A': 0, 'C': 2, 'B': 4, 'D': 3, 'E': 8}
 - BFS guarantees shortest paths in unweighted graphs
 - Dijkstra finds shortest paths in weighted graphs using a heap
 
+In production, representation choice is often a memory decision before it becomes an algorithm decision. An adjacency matrix gives constant-time edge checks, but it burns O(V^2) space even when the graph has very few edges. Adjacency lists scale far better for sparse graphs, but frequent edge-existence checks can still add noticeable traversal cost.
+
+Failure modes matter too. BFS can explode memory on wide graphs because the frontier grows level by level. Recursive DFS can blow the call stack on deep graphs. And Dijkstra quietly becomes the wrong tool the moment negative edges enter the model. A good graph design starts by naming those constraints, not just by picking BFS or DFS from habit.
+
 ## 5 Common Mistakes
 
 | Mistake | Why It Is a Problem | Fix |
@@ -305,22 +319,34 @@ The ability to model problems as graphs is the key skill. Recognizing "is this a
 
 Graphs are general-purpose data structures for representing relationships. You represent them with adjacency lists or adjacency matrices and traverse them with BFS and DFS. The next article covers sets — data structures that perform set operations efficiently.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Graph Representations?**
+  - The article treats Graph Representations as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Graph Representations?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Graph Representations reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Lists](./02-arrays-and-lists.md)
-- [Stacks and Queues](./03-stacks-and-queues.md)
-- [Hash Tables and dict](./04-hash-tables-and-dict.md)
-- [Linked Lists](./05-linked-lists.md)
-- [Trees and Binary Trees](./06-trees-and-binary-trees.md)
-- [Heaps and Priority Queues](./07-heaps-and-priority-queues.md)
+## In this series
+
+- [Data Structures with Python 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures with Python 101 (2/10): Arrays and Lists](./02-arrays-and-lists.md)
+- [Data Structures with Python 101 (3/10): Stacks and Queues](./03-stacks-and-queues.md)
+- [Data Structures with Python 101 (4/10): Hash Tables and dict](./04-hash-tables-and-dict.md)
+- [Data Structures with Python 101 (5/10): Linked Lists](./05-linked-lists.md)
+- [Data Structures with Python 101 (6/10): Trees and Binary Trees](./06-trees-and-binary-trees.md)
+- [Data Structures with Python 101 (7/10): Heaps and Priority Queues](./07-heaps-and-priority-queues.md)
 - **Graph Representations (current)**
 - Sets and Set Operations (upcoming)
 - Choosing the Right Data Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Real Python — Graphs in Python](https://realpython.com/python-graph-algorithm/)
-- [GeeksforGeeks — Graph Data Structure](https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/)
-- [Visualgo — Graph Traversal](https://visualgo.net/en/dfsbfs)
 - [NetworkX Documentation](https://networkx.org/documentation/stable/)
+- [Python Docs — heapq](https://docs.python.org/3/library/heapq.html)
+- [Runestone Academy — Graphs](https://runestone.academy/ns/books/published/pythonds3/Graphs/toctree.html)
+- [Real Python — Graphs in Python](https://realpython.com/python-graph-algorithm/)

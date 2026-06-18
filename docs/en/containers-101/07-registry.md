@@ -1,59 +1,52 @@
 ---
 series: containers-101
 episode: 7
-title: Registry
-status: content-ready
+title: "Containers 101 (7/10): Registry"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
 language: en
 tags:
-  - Containers
-  - Docker
-  - Registry
-  - ECR
-  - DevOps
-seo_description: A beginner guide to container registries (Docker Hub, ECR, GHCR), push and pull flow, tagging strategy, and signed images with Cosign
-last_reviewed: '2026-05-04'
+- Containers
+- Docker
+- Registry
+- ECR
+- DevOps
+seo_description: A beginner guide to container registries (Docker Hub, ECR, GHCR),
+  push and pull flow, tagging strategy, and signed images with Cosign
+last_reviewed: '2026-05-15'
 ---
 
-# Registry
+# Containers 101 (7/10): Registry
 
-> Containers 101 series (7/10)
+A well-built image is still useless if no one can pull the exact same artifact back later. Teams usually feel this when tags drift, push permissions are too broad, or deployment history can no longer prove what actually ran.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Containers 101 series.
 
-**Core question**: Where does your *built image* live, and *how* do you pull it back later?
+In this chapter, we treat the registry as the center of deployment identity, covering push and pull flow, digest pinning, permission separation, and the first steps toward image signing.
 
-> A *registry* is the *remote home* of an image and the *center* of every deployment flow.
+> A registry is not just storage. It is the identity system for what actually gets deployed.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![containers 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/07/07-01-concept-at-a-glance.en.png)
+*containers 101 chapter 7 flow overview*
+> A registry is not a backup folder; it is the distribution contract that binds tags, digests, manifests, and policy into one reproducible handoff.
 
-- The role of a *registry*
-- The *push / pull* flow
-- *Tagging* strategy
-- *Docker Hub / ECR / GHCR*
-- *Signed image* basics
+## Questions to Keep in Mind
+
+- The role of a *registry?
+- The *push / pull* flow?
+- Tagging* strategy?
 
 ## Why It Matters
 
 A reproducible image is useless if there is *no place to fetch it from*. *Deployment starts at the registry.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Dev["dev"] --> Build["docker build"]
-    Build --> Push["docker push"]
-    Push --> Reg["registry"]
-    Reg --> Pull["docker pull"]
-    Pull --> Prod["prod"]
-```
+Tags are human-friendly labels; digests are content-based hashes. The same tag can point to different digests over time, but a digest always refers to the exact same bytes. Private registries add authentication and network isolation; public ones rely on image content and scanning.
 
 ## Key Terms
 
@@ -121,6 +114,24 @@ def verify_pull(remote_digest):
 - *password-stdin* avoids leaking secrets.
 - Push happens *after role separation* only.
 
+## Quick verification and failure signals
+
+```bash
+docker login ghcr.io -u "$GITHUB_USER" --password-stdin
+docker tag myapp:dev ghcr.io/example/myapp:1.0.0
+docker push ghcr.io/example/myapp:1.0.0
+docker inspect --format "{{index .RepoDigests 0}}" ghcr.io/example/myapp:1.0.0
+```
+
+**Expected output:**
+- After push, `RepoDigests` exposes an immutable `@sha256:` reference.
+- Pulling by digest later resolves the exact same content in every environment.
+
+**Check first if it fails:**
+- If auth fails, inspect token scope or registry-specific permissions.
+- If the digest is unexpected, verify the tag points at the intended image.
+- Never leave production with only a mutable tag and no recorded digest.
+
 ## Five Common Mistakes
 
 1. **Using *latest* in production.**
@@ -158,17 +169,29 @@ def verify_pull(remote_digest):
 
 Once you know *where* to fetch images, the next question is *how to run them safely*. The next post covers *container security*.
 
+## Answering the Opening Questions
+
+- **The role of a *registry?**
+  - The article treats Registry as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The *push / pull* flow?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Tagging* strategy?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Container?](./01-what-is-a-container.md)
-- [Image and Layer](./02-image-and-layer.md)
-- [Runtime](./03-runtime.md)
-- [Dockerfile](./04-dockerfile.md)
-- [Volume](./05-volume.md)
-- [Network](./06-network.md)
+## In this series
+
+- [Containers 101 (1/10): What is a Container?](./01-what-is-a-container.md)
+- [Containers 101 (2/10): Image and Layer](./02-image-and-layer.md)
+- [Containers 101 (3/10): Runtime](./03-runtime.md)
+- [Containers 101 (4/10): Dockerfile](./04-dockerfile.md)
+- [Containers 101 (5/10): Volume](./05-volume.md)
+- [Containers 101 (6/10): Network](./06-network.md)
 - **Registry (current)**
 - Container Security (upcoming)
 - Containers vs VMs (upcoming)
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References

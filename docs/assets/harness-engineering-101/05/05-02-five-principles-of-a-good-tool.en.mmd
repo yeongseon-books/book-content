@@ -1,0 +1,11 @@
+flowchart LR
+    Single["1. Single responsibility\none tool, one job"] --> Good["Good agent tool"]
+    Idempotent["2. Idempotent when possible\nretries stay safe"] --> Good
+    SideEffects["3. Explicit side effects\nno hidden send or write"] --> Good
+    Structured["4. Structured output\nschema instead of free text"] --> Good
+    Errors["5. Actionable errors\nwhat / why / how"] --> Good
+
+    Good --> Predictable["Predictable agent behavior\nclear calls, safer retries, easier validation"]
+
+    style Good fill:#f3e5f5,stroke:#7b1fa2
+    style Predictable fill:#fff8e1,stroke:#f9a825

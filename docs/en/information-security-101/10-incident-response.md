@@ -1,10 +1,10 @@
 ---
 series: information-security-101
 episode: 10
-title: Incident Response
+title: "Information Security 101 (10/10): Incident Response"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,26 @@ seo_description: A short, code-first guide to incident response — the NIST IR 
 last_reviewed: '2026-05-04'
 ---
 
-# Incident Response
+# Information Security 101 (10/10): Incident Response
 
 > Information Security 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: When an incident hits, do we know what to do in the first minute?
 
 > The quality of response is set in peacetime. Procedures invented during an incident are not procedures.
 
-<!-- a-grade-intro:end -->
+This is the final post in the Information Security 101 series.
+
+
+![information security 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/10/10-01-big-picture.en.png)
+*information security 101 chapter 10 flow overview*
+> Incident response is not just a playbook. It is the ability to detect fast, respond immediately, investigate thoroughly, recover completely, and never make the same mistake twice.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Incident Response?
+- Which signal should the example or diagram make visible for Incident Response?
+- What failure should be prevented first when Incident Response reaches a real system?
 
 ## What You Will Learn
 
@@ -46,8 +55,6 @@ last_reviewed: '2026-05-04'
 Incidents will happen. Good response shrinks loss; bad response amplifies it. A two-hour difference can save a company.
 
 > "Prevention" does not aim at zero. "Response" is half of real security.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -194,17 +201,29 @@ PagerDuty/Opsgenie auto-assigns the IC. Slack workflows create the incident chan
 
 Incident response is preparation made visible. This closes the Information Security 101 series — from CIA to incident response, the core arc covered. Next steps to consider: threat modeling, cloud security, and compliance frameworks (SOC2, ISO 27001).
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Incident Response?**
+  - The article treats Incident Response as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Incident Response?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Incident Response reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Information Security?](./01-what-is-information-security.md)
-- [Authentication and Authorization](./02-authentication-and-authorization.md)
-- [Cryptography and Hashes](./03-cryptography-and-hash.md)
-- [TLS and Certificates](./04-tls-and-certificates.md)
-- [Web Security Basics](./05-web-security-basics.md)
-- [SQL Injection and XSS](./06-sql-injection-and-xss.md)
-- [Secret Management](./07-secret-management.md)
-- [Least Privilege](./08-least-privilege.md)
-- [Logging and Audit](./09-logging-and-audit.md)
+## In this series
+
+- [Information Security 101 (1/10): What Is Information Security?](./01-what-is-information-security.md)
+- [Information Security 101 (2/10): Authentication and Authorization](./02-authentication-and-authorization.md)
+- [Information Security 101 (3/10): Cryptography and Hashing](./03-cryptography-and-hash.md)
+- [Information Security 101 (4/10): TLS and Certificates](./04-tls-and-certificates.md)
+- [Information Security 101 (5/10): Web Security Basics](./05-web-security-basics.md)
+- [Information Security 101 (6/10): SQL Injection and XSS](./06-sql-injection-and-xss.md)
+- [Information Security 101 (7/10): Secret Management](./07-secret-management.md)
+- [Information Security 101 (8/10): Least Privilege](./08-least-privilege.md)
+- [Information Security 101 (9/10): Logging and Audit](./09-logging-and-audit.md)
 - **Incident Response (current)**
+
 <!-- toc:end -->
 
 ## References

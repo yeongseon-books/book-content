@@ -1,11 +1,11 @@
 ---
-title: Scaling internals — how Scale Out decisions become new workers
+title: "Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers"
 series: azure-app-service-deep-dive
 episode: 5
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,12 +14,15 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-04-29'
-seo_description: Microsoft doesn't publicly document the full implementation details
-  of the App Service Front-End, Worker, and File Server layers.
+last_reviewed: '2026-05-15'
+seo_description: See how Azure Monitor autoscale changes App Service Plan instance count and when new workers actually become traffic-ready.
 ---
 
-# Scaling internals — how Scale Out decisions become new workers
+# Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers
+
+Autoscale looks instantaneous in architecture diagrams, but production behavior is slower and more mechanical than that. There is a real control loop between a threshold crossing and a worker that is healthy enough to receive traffic.
+
+This is the fifth post in the Azure App Service Deep Dive series.
 
 ## Source Version
 
@@ -50,21 +53,17 @@ the safe facts are clear.
 This episode goes one level deeper without inventing private internals.
 The goal is to map the **publicly observable scale-decision loop** into a usable worker-pool mental model.
 
----
+![azure app service deep dive chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-01-the-control-path-in-one-diagram.en.png)
+*azure app service deep dive chapter 5 flow overview*
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - On what metric sources and what cadence does auto-scale evaluate rules?
 - Scale-out and scale-up are not the same decision tree — who decides what, and how?
 - When should you turn per-site scaling on, and when is it dangerous?
-- During scale, how far is cold-start of a new instance shielded from the user?
-- On scale-in, what happens to existing connections and any stateful in-process state?
 
 ## The control path in one diagram
 
-![Autoscale control path to new workers](../../assets/azure-app-service-deep-dive/05/05-01-the-control-path-in-one-diagram.en.png)
-
-*Autoscale control path to new workers*
 Two things matter here.
 
 1. separate the decision engine from the execution substrate
@@ -77,7 +76,7 @@ followed by App Service making more worker capacity available to that plan.
 
 ## What scale up and scale out actually change
 
-![Targets changed by scale up and scale out](../../assets/azure-app-service-deep-dive/05/05-02-what-scale-up-and-scale-out-actually-cha.en.png)
+![Targets changed by scale up and scale out](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-02-what-scale-up-and-scale-out-actually-cha.en.png)
 
 *Targets changed by scale up and scale out*
 The Learn documentation states the difference plainly.
@@ -100,7 +99,7 @@ This is one of the most common App Service misunderstandings.
 Even if you enter autoscale from an app-centric portal experience,
 the real target resource is the **App Service Plan**.
 
-![Autoscale rules attached to the plan](../../assets/azure-app-service-deep-dive/05/05-03-autoscale-attaches-to-the-plan-not-the-a.en.png)
+![Autoscale rules attached to the plan](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-03-autoscale-attaches-to-the-plan-not-the-a.en.png)
 
 *Autoscale rules attached to the plan*
 That structure has consequences.
@@ -121,7 +120,7 @@ The Azure Monitor autoscale documentation is explicit about the rule engine.
 - scale-out can trigger when any scale-out rule is met
 - scale-in requires all scale-in rules to be met
 
-![Autoscale loop with metrics and cooldown](../../assets/azure-app-service-deep-dive/05/05-04-what-azure-monitor-autoscale-actually-do.en.png)
+![Autoscale loop with metrics and cooldown](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-04-what-azure-monitor-autoscale-actually-do.en.png)
 
 *Autoscale loop with metrics and cooldown*
 That logic matters operationally.
@@ -193,7 +192,7 @@ They still support a sound mental model.
 3. the plan gains more worker capacity
 4. the Front-End starts sending traffic to the new healthy workers
 
-![Desired instance count becoming new workers](../../assets/azure-app-service-deep-dive/05/05-05-what-adding-a-worker-means-in-practice.en.png)
+![Desired instance count becoming new workers](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-05-what-adding-a-worker-means-in-practice.en.png)
 
 *Desired instance count becoming new workers*
 That is as far as you need to go without drifting into undocumented internals.
@@ -205,7 +204,7 @@ That is as far as you need to go without drifting into undocumented internals.
 Autoscale is reactive,
 not predictive.
 
-![Scaling feedback loop with lag and cooldown](../../assets/azure-app-service-deep-dive/05/05-06-why-autoscale-should-be-read-as-a-feedba.en.png)
+![Scaling feedback loop with lag and cooldown](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-06-why-autoscale-should-be-read-as-a-feedba.en.png)
 
 *Scaling feedback loop with lag and cooldown*
 That is why predictable spikes are safer with pre-scaling.
@@ -227,7 +226,7 @@ Adding a worker does not mean that worker can instantly receive user traffic.
 From the Front-End's perspective,
 the worker must first become eligible.
 
-![New worker entering the healthy pool](../../assets/azure-app-service-deep-dive/05/05-07-health-and-readiness-are-the-real-end-of.en.png)
+![New worker entering the healthy pool](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-07-health-and-readiness-are-the-real-end-of.en.png)
 
 *New worker entering the healthy pool*
 So the real end of scale-out is not the new instance count on paper.
@@ -332,15 +331,24 @@ az monitor metrics list \
 - [ ] Put scale-event alerts and instance-count graphs on the dashboard
 - [ ] Split runbooks for scale-up (SKU change) and scale-out
 
+## Answering the Opening Questions
+
+- **On what metric sources and what cadence does auto-scale evaluate rules?**
+  - The article treats Scaling internals — how Scale Out decisions become new workers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Scale-out and scale-up are not the same decision tree — who decides what, and how?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When should you turn per-site scaling on, and when is it dangerous?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
-- [Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
-- [Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
-- [Deployment and Kudu — build, sync, release from the inside](./04-deployment-and-kudu.md)
-- **Scaling internals — how Scale Out decisions become new workers (current)**
-- Cold start and warmup — why the first request is expensive (upcoming)
+- [Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
+- [Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
+- [Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
+- [Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside](./04-deployment-and-kudu.md)
+- **Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers (current)**
+- Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive (upcoming)
 
 <!-- toc:end -->
 

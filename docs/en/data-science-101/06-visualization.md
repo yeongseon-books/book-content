@@ -1,10 +1,10 @@
 ---
 series: data-science-101
 episode: 6
-title: Visualization
-status: content-ready
+title: "Data Science 101 (6/10): Visualization"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,36 @@ tags:
   - Seaborn
   - Beginner
 seo_description: A practical map from message to chart — distributions, comparisons, trends, relations, and parts of a whole, with rules that keep them honest
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Visualization
+# Data Science 101 (6/10): Visualization
 
-> Data Science 101 series (6/10)
+Charts are not the decorative end of analysis. They are the moment when your conclusions become fast enough for other people to consume. A good chart compresses a page of explanation into one glance. A bad chart makes a bad decision look reasonable.
 
-<!-- a-grade-intro:begin -->
+That is why visualization is really about judgment, not software. The core skill is picking a visual form that matches the message, then removing the distortions that exaggerate or hide what the data is actually saying.
 
-**Core question**: *Which chart* fits *which message*, and how do you keep the picture *honest*?
+This is post 6 in the Data Science 101 series. In this chapter, we connect common analytical messages to chart choices, and we treat axes, color, labels, and annotations as decision-support tools rather than styling details.
 
-> *One good picture beats *three pages* of writing.*
 
-<!-- a-grade-intro:end -->
+![data science 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/06/06-01-concept-at-a-glance.en.png)
+*data science 101 chapter 6 flow overview*
+> At its core, Visualization is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Visualization?
+- Which signal should the example or diagram make visible for Visualization?
+- What failure should be prevented first when Visualization reaches a real system?
+
+## Questions This Post Answers
+
+- How do you choose a chart from the message instead of from habit?
+- Which chart choices most often create misleading comparisons or trends?
+- Why do axis scale, labels, and annotations change the decision a chart supports?
+- How can one chart remain readable and honest for more than one audience?
+
+> The right chart is the one that makes the intended decision easier without exaggerating the pattern.
 
 ## What You Will Learn
 
@@ -46,16 +62,7 @@ Data is fastest to read as a *picture*. The wrong chart leads to the *wrong deci
 
 > *Visualization is the *last line* of an analysis.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Dist["Distribution"] --> Hist["Histogram / Box"]
-    Comp["Comparison"] --> Bar["Bar Chart"]
-    Trend["Trend"] --> Line["Line Chart"]
-    Rel["Relation"] --> Scatter["Scatter"]
-    Part["Part of Whole"] --> Stack["Stacked Bar"]
-```
+The key boundary in this episode is between the concept itself and how it operates in a real system. You need to know where the data comes in, where the decision happens, and what signal must be recorded.
 
 ## Key Terms
 
@@ -121,6 +128,8 @@ ax.axvline(pd.Timestamp("2026-04-01"), color="red", linestyle="--", label="campa
 ax.legend()
 ```
 
+**Expected output:** a first-pass chart choice tied to the message, plus the annotation points needed to keep the chart honest.
+
 ## What to Notice in This Code
 
 - The *message-to-chart* mapping comes *first*.
@@ -164,17 +173,29 @@ Analysts mix *Tableau / Looker* dashboards with *Python* charts. A *dashboard* i
 
 Visualization is the *bridge from analysis to decision*. Next we move into *modeling* — using data to *predict*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Visualization?**
+  - The article treats Visualization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Visualization?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Visualization reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Data Science?](./01-what-is-data-science.md)
-- [Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
-- [Data Collection](./03-data-collection.md)
-- [Data Cleaning](./04-data-cleaning.md)
-- [Exploratory Data Analysis](./05-exploratory-data-analysis.md)
+## In this series
+
+- [Data Science 101 (1/10): What Is Data Science?](./01-what-is-data-science.md)
+- [Data Science 101 (2/10): Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
+- [Data Science 101 (3/10): Data Collection](./03-data-collection.md)
+- [Data Science 101 (4/10): Data Cleaning](./04-data-cleaning.md)
+- [Data Science 101 (5/10): Exploratory Data Analysis](./05-exploratory-data-analysis.md)
 - **Visualization (current)**
 - Modeling (upcoming)
 - Evaluation (upcoming)
 - Result Interpretation (upcoming)
 - End-to-End Data Project Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

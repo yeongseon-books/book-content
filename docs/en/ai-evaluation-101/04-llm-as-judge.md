@@ -1,11 +1,11 @@
 ---
-title: LLM-as-Judge — Evaluating Models with Models
+title: "AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models"
 series: ai-evaluation-101
 episode: 4
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,24 +14,31 @@ tags:
 - LLM-as-Judge
 - Bias
 - Cohen Kappa
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: When humans cannot grade every response, you can delegate scoring
   to a strong LLM.
 ---
 
-# LLM-as-Judge — Evaluating Models with Models
+# AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models
 
-> AI Evaluation 101 Series (4/10)
+When humans cannot grade every response, you can delegate scoring to a strong LLM.
 
-When humans cannot grade every response, you can delegate scoring to a strong LLM. This post covers writing judge prompts, controlling bias, and measuring agreement with human evaluators.
+This is post 4 in the AI Evaluation 101 series. Here we cover writing judge prompts, controlling bias, and measuring agreement with human evaluators.
 
----
-![LLM-as-Judge - evaluating models with models](../../assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.en.png)
 
+![LLM-as-Judge - evaluating models with models](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.en.png)
 *LLM-as-Judge - evaluating models with models*
+> An LLM judge is powerful, but without baselines and bias control it becomes automated confidence rather than automated evaluation.
+
+## Questions to Keep in Mind
+
+- When can LLM-as-Judge help with quality judgments that humans cannot score every time?
+- What biases affect an automatic judge when the judge prompt and rubric are weak?
+- How do human baselines and agreement checks make judge results trustworthy?
+
 ## Why LLM-as-Judge
 
-![Why LLM-as-Judge](../../assets/ai-evaluation-101/04/04-02-why-llm-as-judge.en.png)
+![Why LLM-as-Judge](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-02-why-llm-as-judge.en.png)
 
 *Why LLM-as-Judge*
 The deterministic metrics from Ep3 (BLEU, ROUGE, Exact Match) work well only when the answer is short and unambiguous. Real LLM outputs are often the opposite:
@@ -52,7 +59,7 @@ LLM-as-judge **delegates scoring to a strong LLM** (GPT-4, Claude Opus, etc.). I
 
 ## Judge Prompt Design — Three Patterns
 
-![Judge prompt design - three patterns](../../assets/ai-evaluation-101/04/04-03-judge-prompt-design-three-patterns.en.png)
+![Judge prompt design - three patterns](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-03-judge-prompt-design-three-patterns.en.png)
 
 *Judge prompt design - three patterns*
 ### Pattern 1: Single scoring (1-5 scale)
@@ -160,7 +167,7 @@ Write a one-sentence reasoning, then output only 'Result: PASS' or 'Result: FAIL
 
 ## Three Biases and How to Control Them
 
-![Three biases and how to control them](../../assets/ai-evaluation-101/04/04-04-three-biases-and-how-to-control-them.en.png)
+![Three biases and how to control them](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-04-three-biases-and-how-to-control-them.en.png)
 
 *Three biases and how to control them*
 LLM judges are biased differently from humans. You must understand these three.
@@ -202,7 +209,7 @@ When GPT-4 grades GPT-4 outputs, it prefers them over outputs from other model f
 
 ## Measuring Agreement With Humans — Cohen's Kappa
 
-![Measuring agreement with humans - Cohen's kappa](../../assets/ai-evaluation-101/04/04-05-measuring-agreement-with-humans-cohen-s.en.png)
+![Measuring agreement with humans - Cohen's kappa](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-05-measuring-agreement-with-humans-cohen-s.en.png)
 
 *Measuring agreement with humans - Cohen's kappa*
 How do you know the judge is trustworthy? **Compare 50-100 human-graded samples to the judge scores** and measure agreement. Plain accuracy (percentage agreement) does not correct for chance, so use **Cohen's kappa**.
@@ -274,6 +281,41 @@ A judge giving 90 does not mean the system is good. **Before production, grade 5
 - Temperature=0, cost control (sampling, tiering), and a human baseline are non-negotiable.
 
 The next post covers **multi-dimensional rubrics**, where you grade several axes instead of one number.
+
+---
+
+## Operational checklist
+
+- [ ] Choose the judge pattern based on the task: single-score, pairwise, or reference-based.
+- [ ] Set `temperature=0` and log the exact prompt version used for grading.
+- [ ] Swap answer order in pairwise runs to neutralize position bias.
+- [ ] Compare at least 50 human-rated samples against the judge before production use.
+- [ ] Track judge cost separately so evaluation spend stays visible.
+
+## Answering the Opening Questions
+
+- **When can LLM-as-Judge help with quality judgments that humans cannot score every time?**
+  - It helps for high-volume subjective judgments such as usefulness, faithfulness, tone fit, and answer quality that deterministic metrics cannot capture.
+- **What biases affect an automatic judge when the judge prompt and rubric are weak?**
+  - It can drift with position bias, verbosity preference, self-model preference, and arbitrary judgments when the rubric is incomplete.
+- **How do human baselines and agreement checks make judge results trustworthy?**
+  - Compare judge scores with human-labeled samples, track agreement metrics, and review disagreements as part of the operating loop.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- **AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models (current)**
+- AI Evaluation 101 (5/10): Designing Rubric-Based Scoring (upcoming)
+- AI Evaluation 101 (6/10): Evaluating RAG Systems (upcoming)
+- AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (upcoming)
+- AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)
+- AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [Zheng et al. (2023). Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena (NeurIPS)](https://arxiv.org/abs/2306.05685)

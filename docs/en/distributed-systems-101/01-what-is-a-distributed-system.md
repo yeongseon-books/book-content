@@ -1,10 +1,10 @@
 ---
 series: distributed-systems-101
 episode: 1
-title: What Is a Distributed System?
-status: content-ready
+title: "Distributed Systems 101 (1/10): What Is a Distributed System?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,46 +18,32 @@ tags:
   - Failure
   - Coordination
 seo_description: We frame distributed systems around three axes that bend single-machine intuition — latency, failure, and coordination.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is a Distributed System?
+# Distributed Systems 101 (1/10): What Is a Distributed System?
 
-> Distributed Systems 101 series (1/10)
+The moment one service calls another service, or one database replica trails another, you are already outside the world where local intuition works. The code may look familiar, but latency, partial failure, and independent clocks quietly change the contract underneath it.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Distributed Systems 101 series.
 
-**Core question**: Why is running the same code on one machine so different from running it on a hundred?
+Here we build the mental model for the rest of the series: a distributed system is not "many computers" in the abstract, but a system whose core behavior is shaped by latency, failure, and coordination.
 
-> A distributed system is not just "many computers." Three essential differences — latency, failure, and coordination — bend every intuition you carry from single-machine programming.
 
-<!-- a-grade-intro:end -->
+![distributed systems 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/01/01-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 1 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The definition of a distributed system and how it really differs from a single machine
-- The meaning of the three axes: latency, failure, and coordination
-- Lessons from the eight fallacies of distributed computing
-- A typical topology of a distributed system
-- The big picture this series will cover
+- The definition of a distributed system and how it really differs from a single machine?
+- The meaning of the three axes: latency, failure, and coordination?
+- Lessons from the eight fallacies of distributed computing?
 
 ## Why It Matters
 
 Almost every service you build today is effectively a distributed system. A single database with a replica is distributed. Two microservices talking are distributed. Code written with single-machine intuition (instant response, always success, one clock) breaks the moment it sees production traffic.
 
 > Distributed systems live exactly where the assumptions of a single-machine program break.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    A["client"] --> B["service A"]
-    B --> C["service B"]
-    B --> D["database"]
-    C --> E["replica"]
-    D --> E
-    B -.->|network failure| C
-```
 
 Every arrow can carry latency, partial failure, and an unknown response. That is fundamentally different from a function call.
 
@@ -203,17 +189,29 @@ Every web backend is effectively a distributed system. An RDBMS with a replica p
 
 Distributed systems differ from single-machine programs along three axes: latency, failure, and coordination. Next, we model failure itself (crash, omission, Byzantine) so we can reason about it precisely.
 
+## Answering the Opening Questions
+
+- **The definition of a distributed system and how it really differs from a single machine?**
+  - The article treats What Is a Distributed System? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The meaning of the three axes: latency, failure, and coordination?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Lessons from the eight fallacies of distributed computing?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Distributed System? (current)**
-- failure models (upcoming)
-- RPC and message passing (upcoming)
-- consistency and CAP (upcoming)
-- replication (upcoming)
-- consensus and Raft (upcoming)
-- leader election (upcoming)
-- message queues and event sourcing (upcoming)
-- distributed transactions (upcoming)
-- patterns for operable distributed systems (upcoming)
+- Failure Models (upcoming)
+- RPC and Message Passing (upcoming)
+- Consistency and CAP (upcoming)
+- Replication (upcoming)
+- Consensus and Raft (upcoming)
+- Leader Election (upcoming)
+- Message Queues and Event Sourcing (upcoming)
+- Distributed Transactions (upcoming)
+- Patterns for Operable Distributed Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

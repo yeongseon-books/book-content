@@ -1,10 +1,10 @@
 ---
 series: machine-learning-101
 episode: 9
-title: Model Evaluation
-status: content-ready
+title: "Machine Learning 101 (9/10): Model Evaluation"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,44 +17,28 @@ tags:
   - ROC
   - scikit-learn
 seo_description: How to choose the right metric for classification and regression, read confusion matrices, and compare ROC and PR curves with scikit-learn
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Model Evaluation
+# Machine Learning 101 (9/10): Model Evaluation
 
-> Machine Learning 101 series (9/10)
+“Which model is better?” is an incomplete question until someone adds a metric and a business cost. Without that context, evaluation becomes theater: numbers move, dashboards look scientific, and the organization still cannot decide which errors it is willing to pay for.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Machine Learning 101 series. Here we will connect confusion matrices, ROC and PR curves, regression metrics, and threshold choices back to the more important decision: what kind of failure matters most in the real system.
 
-**Core question**: When someone asks which model is better and you do not push back with "by which metric," you are already in trouble.
 
-> *Model evaluation is where you prove, in code, that picking the metric comes before picking the model.*
+![machine learning 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 9 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- Classification metrics: accuracy, precision, recall, F1, ROC-AUC, PR-AUC
-- Regression metrics: MAE, MSE, RMSE, R-squared
-- The anatomy of a confusion matrix
-- When to choose ROC over PR (and vice versa)
-- Five common pitfalls
+- Which metrics belong to classification versus regression?
+- What does each cell of the confusion matrix tell you operationally?
+- When should PR outrank ROC in your analysis?
 
 ## Why It Matters
 
 Wrong metric, wrong decision. When business cost and metric drift apart, the model only looks good on paper.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Pred["predictions"] --> CM["confusion matrix"]
-    CM --> P["precision"]
-    CM --> R["recall"]
-    CM --> F["F1"]
-    Prob["probabilities"] --> ROC["ROC-AUC"]
-    Prob --> PR["PR-AUC"]
-```
 
 ## Key Terms
 
@@ -117,11 +101,19 @@ print("RMSE:", mean_squared_error(yt, yp) ** 0.5)
 print("R^2:", r2_score(yt, yp))
 ```
 
+**Expected output:** the confusion matrix should expose the actual error mix, while ROC-AUC and PR-AUC summarize ranking quality across thresholds. In the regression toy example, MAE and RMSE stay close only because the errors are small and fairly even.
+
 ## What to Notice in This Code
 
 - AUC is independent of the threshold.
 - PR-AUC is more informative on imbalanced data.
 - RMSE and MAE differ in their sensitivity to outliers.
+
+## Read the first failure signal this way
+
+- If metric debates drag on, translate the disagreement into the cost of false positives versus false negatives.
+- If the dataset is imbalanced, do not stop at ROC-AUC before checking PR behavior and threshold sensitivity.
+- If a model looks good by one metric and bad by another, that is not a contradiction; it is a prompt to clarify which failure matters.
 
 ## Five Common Mistakes
 
@@ -160,17 +152,29 @@ A/B testing, model gates, and MLOps monitoring all rest on the metric definition
 
 Evaluation is the language of model selection. Next, we close the series with the end-to-end ML project workflow.
 
+## Answering the Opening Questions
+
+- **Which metrics belong to classification versus regression?**
+  - The article treats Model Evaluation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does each cell of the confusion matrix tell you operationally?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When should PR outrank ROC in your analysis?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
-- [Linear Regression](./04-linear-regression.md)
-- [Logistic Regression](./05-logistic-regression.md)
-- [Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
-- [Clustering](./07-clustering.md)
-- [Overfitting and Regularization](./08-overfitting-and-regularization.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
+- [Machine Learning 101 (4/10): Linear Regression](./04-linear-regression.md)
+- [Machine Learning 101 (5/10): Logistic Regression](./05-logistic-regression.md)
+- [Machine Learning 101 (6/10): Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
+- [Machine Learning 101 (7/10): Clustering](./07-clustering.md)
+- [Machine Learning 101 (8/10): Overfitting and Regularization](./08-overfitting-and-regularization.md)
 - **Model Evaluation (current)**
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

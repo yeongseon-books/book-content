@@ -1,10 +1,10 @@
 ---
 series: pandas-101
 episode: 3
-title: Reading CSV and Excel
-status: content-ready
+title: "Pandas 101 (3/10): Reading CSV and Excel"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,31 @@ tags:
   - DataAnalysis
   - Beginner
 seo_description: Master read_csv and read_excel — encoding, separator, dtype, and date parsing — to load data correctly the first time
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Reading CSV and Excel
+# Pandas 101 (3/10): Reading CSV and Excel
 
-> Pandas 101 series (3/10)
+A lot of analysis work goes wrong long before modeling or visualization starts. If text encoding breaks, numeric columns land as strings, or dates stay as plain text, every downstream calculation becomes less trustworthy. File loading is not a throwaway pre-step. It is where data quality gets its first serious test.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Pandas 101 series.
 
-**Core question**: Is *loading data well* really *half of the analysis*?
+In this chapter, we will treat `read_csv` and `read_excel` as data-loading contracts rather than convenience helpers. The goal is to make data land in memory the way you intended on the first read.
 
-> *Bad loading is *the start of bad analysis*. Get your read_csv options right from the beginning.*
 
-<!-- a-grade-intro:end -->
+![pandas 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/03/03-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 3 flow overview*
+> *Reading is not just opening a file — it's your **first quality gate**. Encoding, delimiter, dtype, datetime parsing — get these right here or pay for it later.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *core options* of *read_csv* and *read_excel*
-- Handling *encoding* and *separators*
-- The value of explicit *dtype*
-- A 5-step loading hands-on
-- Five common mistakes
+- The *core options* of *read_csv* and *read_excel?
+- Handling *encoding* and *separators?
+- The value of explicit *dtype?
 
 ## Why It Matters
 
 *80%* of analysis is *loading and cleaning*. *Mistakes at load time* come back as *debugging cost* later.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    File["CSV / Excel"] --> Read["read_csv / read_excel"]
-    Read --> Check["dtypes / shape / head"]
-    Check --> Fix["fix encoding / dtype / header"]
-```
 
 ## Key Terms
 
@@ -75,6 +65,18 @@ flowchart LR
 import pandas as pd
 df = pd.read_csv("sales.csv")
 print(df.shape, df.dtypes)
+```
+
+A quick shape-and-dtypes check tells you whether loading already went wrong before you touch any analysis logic. You want that signal immediately, not twenty lines later.
+
+**Expected output:**
+
+```text
+(3, 3)
+product_id    object
+qty            int64
+amount       float64
+dtype: object
 ```
 
 ### Step 2 — Encoding and separator
@@ -109,6 +111,14 @@ total = 0
 for chunk in pd.read_csv("big.csv", chunksize=100_000):
     total += len(chunk)
 print(total)
+```
+
+Chunked loading lets you validate large files without betting all your memory on a single read. In production, that often turns a risky file load into a routine streaming check.
+
+**Expected output:**
+
+```text
+1000000
 ```
 
 ## What to Notice in This Code
@@ -150,21 +160,33 @@ ERP CSV exports, accounting Excel files, CSV from external APIs — to *load rel
 2. Compare *dtype* with and without *parse_dates*.
 3. Write a function that counts rows using *chunksize*.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 Good loading is the *start of good analysis*. Next we cover *filtering and selection*.
 
+## Answering the Opening Questions
+
+- **The *core options* of *read_csv* and *read_excel?**
+  - The article treats Reading CSV and Excel as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Handling *encoding* and *separators?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The value of explicit *dtype?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
 - **Reading CSV and Excel (current)**
 - Filtering and Selection (upcoming)
 - Handling Missing Values (upcoming)
-- groupby (upcoming)
+- Groupby and Aggregation (upcoming)
 - Merge and Join (upcoming)
 - Time Series (upcoming)
-- apply and Vectorization (upcoming)
-- Real-world Data Analysis (upcoming)
+- Apply and Vectorization (upcoming)
+- Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

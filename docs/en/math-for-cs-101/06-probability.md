@@ -1,10 +1,10 @@
 ---
 series: math-for-cs-101
 episode: 6
-title: Probability
-status: content-ready
+title: "Math for CS 101 (6/10): Probability"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,40 +20,40 @@ seo_description: A beginner-friendly tour of sample space, events, conditional p
 last_reviewed: '2026-05-04'
 ---
 
-# Probability
+# Math for CS 101 (6/10): Probability
 
-> Math for CS 101 series (6/10)
+Engineering work is full of uncertainty. Was that A/B test result luck or a real signal? Is a false positive rate acceptable? How likely is a failure pattern to repeat? If you do not have a probability model, those questions often collapse into intuition dressed up as confidence.
 
-<!-- a-grade-intro:begin -->
+Probability does not eliminate uncertainty. It gives you a structured way to compare and update beliefs under uncertainty. Once you separate the possible outcomes, the event you care about, and the conditions already known, fuzzy judgment becomes something you can reason about.
 
-**Core question**: How do we *quantify* uncertainty instead of guessing?
+This is post 6 in the Math for CS 101 series.
 
-> *Probability* is the *language of uncertainty* and the foundation of *machine learning* and *reliability*.
+Here we use probability as the language for uncertainty in engineering decisions, connecting sample spaces, conditional probability, Bayes updates, expectation, and variance.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![math for cs 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/06/06-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 6 flow overview*
+> Probability lets you stop hand-waving about uncertainty and instead reason quantitatively about expectations and distributions.
 
-- *Sample space* and *events*
-- *Conditional probability*
-- *Bayes theorem*
-- *Expectation*
-- *Variance*
+## Questions to Keep in Mind
+
+- How do you turn uncertainty into a model instead of a vague guess?
+- What is the difference between a sample space and an event?
+- Why is conditional probability really about changing the denominator world?
 
 ## Why It Matters
 
-*A/B testing*, *recommendation*, *classifiers*, and *failure rates* are all probability models.
+A/B testing, recommendation ranking, classifier evaluation, and reliability work all rely on probability. Without the model, the numbers are still there, but the interpretation is shaky because the conditions behind the numbers stay hidden.
 
-## Concept at a Glance
+The main habit is to ask what world the denominator describes. Many practical mistakes in probability are not bad multiplication. They are failures to notice that the conditioning changed the space you are talking about.
 
-```mermaid
-flowchart LR
-    S[Sample Space] --> E[Event]
-    E --> P[P E]
-    P --> C[Conditional]
-    C --> B[Bayes]
-    P --> X[Expectation]
-```
+Probability quantifies *likelihood* through events, conditional probabilities, distributions, and Bayes' theorem. It turns vague "probably" into precise numbers.
+
+## Before/After
+
+**Before**: "This might fail sometimes."
+
+**After**: "This fails with probability 0.001 under these assumptions.
 
 ## Key Terms
 
@@ -148,19 +148,33 @@ def variance(values, probs):
 
 ## Wrap-up and Next Steps
 
-Next post: *Linear Algebra*.
+Probability gives you a way to reason about uncertainty without pretending that uncertainty disappears. Once you can describe events, conditions, priors, averages, and spread clearly, many engineering discussions become less emotional and more precise.
+
+Next, we move into linear algebra, where the focus shifts from uncertainty to representing data and transformations in a compact form.
+
+## Answering the Opening Questions
+
+- **How do you turn uncertainty into a model instead of a vague guess?**
+  - The article treats Probability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What is the difference between a sample space and an event?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is conditional probability really about changing the denominator world?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
-- [Logic and Proofs](./02-logic-and-proofs.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Graphs](./04-graphs.md)
-- [Combinatorics](./05-combinatorics.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
+- [Math for CS 101 (2/10): Logic and Proofs](./02-logic-and-proofs.md)
+- [Math for CS 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Math for CS 101 (4/10): Graphs](./04-graphs.md)
+- [Math for CS 101 (5/10): Combinatorics](./05-combinatorics.md)
 - **Probability (current)**
 - Linear Algebra (upcoming)
 - Calculus (upcoming)
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -169,3 +183,4 @@ Next post: *Linear Algebra*.
 - [Bayes Theorem - Stanford Encyclopedia](https://plato.stanford.edu/entries/bayes-theorem/)
 - [Introduction to Probability - Blitzstein](https://projects.iq.harvard.edu/stat110)
 - [Python statistics Module](https://docs.python.org/3/library/statistics.html)
+- [SciPy GitHub repository](https://github.com/scipy/scipy)

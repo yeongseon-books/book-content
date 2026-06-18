@@ -1,10 +1,10 @@
 ---
 series: api-design-101
 episode: 6
-title: Pagination and Filtering
-status: content-ready
+title: "API Design 101 (6/10): Pagination and Filtering"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,27 @@ tags:
   - Performance
   - Backend
 seo_description: Practical patterns for paginating, sorting, filtering, and searching REST collections — offset vs cursor, with the trade-offs explained.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Pagination and Filtering
+# API Design 101 (6/10): Pagination and Filtering
 
-> API Design 101 series (6/10)
+List endpoints look simple right up until the dataset gets large enough to expose every weak assumption at once. Slow scans, duplicate rows across pages, and missing items often show up together—and by then the public parameter contract is already in use.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the API Design 101 series.
 
-**Core question**: When you must return a large collection in *chunks*, what is the safe and fast way to do it?
+Here, we treat pagination, sorting, and filtering as part of the API's correctness and performance contract. The central design choice is whether offset or cursor behavior gives you a safer operating model for the collection you are exposing.
 
-> The answer depends on how *fast the data changes* — offset for static data, cursor for fast-changing data.
 
-<!-- a-grade-intro:end -->
+![api design 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.en.png)
+*api design 101 chapter 6 flow overview*
+> Pagination and filtering are not about performance — they are about letting the client ask questions instead of forcing it to process the entire dataset.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The limits of offset / limit pagination
-- Cursor-based pagination
-- Sorting, filtering, and searching
-- Response metadata and link headers
-- Performance traps in large result sets
+- The limits of offset / limit pagination?
+- Cursor-based pagination?
+- Sorting, filtering, and searching?
 
 ## Why It Matters
 
@@ -47,16 +46,7 @@ Bad pagination produces slow queries *and* duplicates *and* gaps — at the same
 
 > Large collections must travel in *chunks*.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    A["?limit=20"] --> P1["page 1 + next_cursor"]
-    P1 --> A2["?limit=20&cursor=..."]
-    A2 --> P2["page 2 + next_cursor"]
-```
-
-A cursor marks the *start of the next page*.
+The client should not have to understand the cursor internals. The server owns the ordering key and page boundary logic so that large collections can move forward without duplicates or gaps.
 
 ## Key Terms
 
@@ -70,13 +60,13 @@ A cursor marks the *start of the next page*.
 
 **Before (sort, filter, page mashed together)**
 
-```
+```http
 GET /orders?p=3&s=date&q=paid
 ```
 
 **After (named, standard, with metadata)**
 
-```
+```http
 GET /orders?status=paid&sort=created_at:desc&limit=20&cursor=eyJpZCI6MTIzfQ
 ```
 
@@ -120,7 +110,7 @@ Cursors are *opaque* — clients do not parse them.
 
 ### Step 3 — sorting
 
-```
+```http
 GET /items?sort=created_at:desc
 GET /items?sort=name:asc,id:desc
 ```
@@ -129,7 +119,7 @@ Standardize multi-key sort too.
 
 ### Step 4 — filtering
 
-```
+```http
 GET /orders?status=paid&tier=pro
 GET /orders?created_at__gte=2026-01-01
 ```
@@ -138,7 +128,7 @@ Use explicit operator suffixes like `__gte`, `__lt`.
 
 ### Step 5 — search
 
-```
+```http
 GET /articles?q=python+logging
 ```
 
@@ -170,6 +160,12 @@ GitHub returns next/prev URLs in the `Link` header. Fast-moving data — Twitter
 - Document filter values as enums.
 - Consider moving search to a *separate endpoint*.
 
+## Verification Signals and Failure Modes
+
+- **Expected output:** Repeated page traversal should produce no duplicates or gaps at page boundaries, and the documented `limit` cap should match the implementation.
+- **First check:** If calls such as `offset=100000` are common but nobody expects latency to change, you are probably hiding an expensive scan.
+- **Failure mode:** Always computing total count or exposing cursor internals creates a mix of performance and security problems that is painful to unwind later.
+
 ## Checklist
 
 - [ ] Is `limit` capped?
@@ -188,17 +184,29 @@ GitHub returns next/prev URLs in the `Link` header. Fast-moving data — Twitter
 
 Pagination sits at the intersection of *performance and correctness*. The next episode tackles a topic every API hits — designing error responses.
 
+## Answering the Opening Questions
+
+- **The limits of offset / limit pagination?**
+  - The article treats Pagination and Filtering as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Cursor-based pagination?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Sorting, filtering, and searching?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
-- [REST Basics](./02-rest-basics.md)
-- [Resource Design](./03-resource-design.md)
-- [HTTP Methods and Status Codes](./04-http-methods-and-status.md)
-- [Request and Response Schemas](./05-request-and-response-schema.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
+- [API Design 101 (2/10): REST Basics](./02-rest-basics.md)
+- [API Design 101 (3/10): Resource Design](./03-resource-design.md)
+- [API Design 101 (4/10): HTTP Methods and Status Codes](./04-http-methods-and-status.md)
+- [API Design 101 (5/10): Request and Response Schemas](./05-request-and-response-schema.md)
 - **Pagination and Filtering (current)**
 - Designing Error Responses (upcoming)
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

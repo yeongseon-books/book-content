@@ -1,11 +1,11 @@
 ---
-title: Worker Processes — How One Host Hosts Many Languages
+title: "Azure Functions Deep Dive (2/6): Worker Processes — How One Host Hosts Many Languages"
 series: azure-functions-deep-dive
 episode: 2
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -19,9 +19,13 @@ seo_description: All code citations in this post are based on Azure/azure-functi
   @ 5e59423.
 ---
 
-# Worker Processes — How One Host Hosts Many Languages
+# Azure Functions Deep Dive (2/6): Worker Processes — How One Host Hosts Many Languages
 
 > Azure Functions Deep Dive series (2/6)
+
+At the end of host bootstrap, one practical question remains. How does a .NET host turn language selection into a real Node.js, Python, Java, or PowerShell process, and where does that boundary become an operating-system concern instead of a runtime abstraction?
+
+This is the second post in the Azure Functions Deep Dive series. Here, we follow the worker startup path from `worker.config.json` discovery to the final `Process.Start()` call.
 
 ## Source Version
 
@@ -31,15 +35,14 @@ At the end of part 1 I left a question hanging: *what exactly happens inside the
 
 The reference commit is the same as in part 1: `5e59423`.
 
----
+![azure functions deep dive chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.en.png)
+*azure functions deep dive chapter 2 flow overview*
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How does the worker process differ across languages, and what does that mean operationally?
 - Is the worker stateless? How far is in-process state safe?
 - When a worker OOMs or hangs, by what signal does the host detect it?
-- How do worker pool size and the function execution model (in-process, out-of-process) meet?
-- Where do worker logs and function logs separate visually?
 
 ## Starting point — `worker.config.json`
 
@@ -78,9 +81,6 @@ When the Host boots, the object at the center of worker-config aggregation is `W
 
 At `5e59423`, those providers are `DefaultWorkerConfigurationProvider`, `DynamicWorkerConfigurationProvider`, and `ExplicitWorkerConfigurationProvider`, all sharing `WorkerConfigurationProviderBase`. The default provider scans the host's built-in `workers/` directory, the dynamic provider resolves versioned workers from probing paths, and the explicit provider applies app-setting overrides for a specific worker directory.
 
-![Worker config provider aggregation flow](../../assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.en.png)
-
-*Worker config provider aggregation flow*
 That is why language workers plug in cleanly. **The Host does not carry language-specific launch logic for each runtime; it reads a config description and builds from there.**
 
 ---
@@ -107,7 +107,7 @@ That stdout/stderr wiring matters operationally. **Every line a worker writes to
 
 A running OS process does not mean the Worker is “ready.” Process boot and the gRPC handshake are separate stages. The sequence below is the full path a single Worker takes to reach the “ready” state inside one instance.
 
-![Worker process and channel readiness](../../assets/azure-functions-deep-dive/02/02-02-worker-lifecycle-within-a-single-instanc.en.png)
+![Worker process and channel readiness](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/02/02-02-worker-lifecycle-within-a-single-instanc.en.png)
 
 *Worker process and channel readiness*
 The `GrpcWorkerChannel` that appears here is “the Host-side handle that corresponds to one worker process.” When the worker dies, the channel is torn down with it, and the Host spins up a new worker along with a new channel.
@@ -132,7 +132,7 @@ Two different knobs get conflated here, and the host code keeps them separate.
 
 So `FUNCTIONS_WORKER_PROCESS_COUNT=4` means “start four workers for this instance.” `WorkerConcurrencyOptions` means “watch live worker latency and decide whether to add another one.” Dynamic concurrency is limited to a subset of runtimes such as Node.js, Python, and PowerShell, and it is skipped when `FUNCTIONS_WORKER_PROCESS_COUNT` is explicitly set.
 
-![Multiple worker layout within one instance](../../assets/azure-functions-deep-dive/02/02-03-functions-worker-process-count-multiple.en.png)
+![Multiple worker layout within one instance](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/02/02-03-functions-worker-process-count-multiple.en.png)
 
 *Multiple worker layout within one instance*
 ---
@@ -148,7 +148,7 @@ A worker process runs arbitrary user code. Which means it can always die: infini
 
 Operationally, this isolation is the reason “a function may fail occasionally while the Host itself stays perfectly healthy.” The Host is designed around detecting and recovering from the death of **a child process** — not its own.
 
-![Worker failure detection and recovery flow](../../assets/azure-functions-deep-dive/02/02-04-what-happens-when-a-worker-dies.en.png)
+![Worker failure detection and recovery flow](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/02/02-04-what-happens-when-a-worker-dies.en.png)
 
 *Worker failure detection and recovery flow*
 ---
@@ -184,15 +184,24 @@ This is part 2 of the Azure Functions Deep Dive series. Part 1 covered host boot
 - [ ] Verified automatic recovery behaviour on worker hang
 - [ ] Split worker logs and business logs into distinct categories
 
+## Answering the Opening Questions
+
+- **How does the worker process differ across languages, and what does that mean operationally?**
+  - The article treats Worker Processes — How One Host Hosts Many Languages as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Is the worker stateless? How far is in-process state safe?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When a worker OOMs or hangs, by what signal does the host detect it?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
-- **Worker Processes — How One Host Hosts Many Languages (current)**
-- The gRPC Event Stream — What Do the Host and Worker Actually Exchange? (upcoming)
-- Dispatcher and Invocation — How a Function Call Reaches the Worker (upcoming)
-- Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (upcoming)
-- Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
+- [Azure Functions Deep Dive (1/6): Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
+- **Azure Functions Deep Dive (2/6): Worker Processes — How One Host Hosts Many Languages (current)**
+- Azure Functions Deep Dive (3/6): The gRPC Event Stream — What Do the Host and Worker Actually Exchange? (upcoming)
+- Azure Functions Deep Dive (4/6): Dispatcher and Invocation — How a Function Call Reaches the Worker (upcoming)
+- Azure Functions Deep Dive (5/6): Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (upcoming)
+- Azure Functions Deep Dive (6/6): Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
 
 <!-- toc:end -->
 

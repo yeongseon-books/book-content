@@ -1,10 +1,10 @@
 ---
 series: algorithms-python-101
 episode: 8
-title: Shortest Path Basics
+title: "Algorithms with Python 101 (8/10): Shortest Path Basics"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,23 @@ seo_description: Implement Dijkstra's algorithm in Python using heapq to find sh
 last_reviewed: '2026-05-04'
 ---
 
-# Shortest Path Basics
+# Algorithms with Python 101 (8/10): Shortest Path Basics
 
-> Algorithms with Python 101 Series (8/10)
+Route planning, network latency, and logistics optimization all come down to the same question: what is the cheapest path from here to there?
 
-<!-- a-grade-intro:begin -->
+Once edge weights matter, breadth-first search is no longer enough. You need a better model for prioritizing the next candidate path, and that is where Dijkstra's algorithm earns its place.
 
-**Key Question**: How do you find the shortest distance from one node to every other node in a weighted graph?
+This is post 8 in the Algorithms with Python 101 series. Here, we'll frame the shortest-path problem on weighted graphs and implement Dijkstra's algorithm in Python with `heapq`.
 
-> BFS guarantees shortest paths only on unweighted graphs. When edges have weights, you need Dijkstra's algorithm. This article implements Dijkstra's algorithm using Python's heapq module.
 
-<!-- a-grade-intro:end -->
+![Algorithms with Python 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.en.png)
+*Algorithms with Python 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Shortest Path Basics?
+- Which signal should the example or diagram make visible for Shortest Path Basics?
+- What failure should be prevented first when Shortest Path Basics reaches a real system?
 
 ## What You Will Learn
 
@@ -51,7 +57,7 @@ Dijkstra combines a greedy strategy with a priority queue to run in O((V+E) log 
 
 > Shortest path = the path from source to destination with the minimum total edge weight
 
-```
+```text
 Weighted graph:
 A --4-- B --3-- D
 |       |
@@ -138,7 +144,6 @@ for node, neighbors in graph.items():
 ```python
 import heapq
 
-
 def dijkstra(
     graph: dict[str, list[tuple[str, int]]], start: str
 ) -> dict[str, int]:
@@ -173,7 +178,6 @@ for node, d in sorted(distances.items()):
 
 ```python
 import heapq
-
 
 def dijkstra_with_path(
     graph: dict[str, list[tuple[str, int]]], start: str
@@ -214,7 +218,6 @@ for node in sorted(paths):
 
 ```python
 import heapq
-
 
 def grid_shortest_path(grid: list[list[int]]) -> int:
     """Minimum-cost path from top-left to bottom-right in a grid."""
@@ -293,6 +296,13 @@ You rarely implement Dijkstra yourself, but recognizing that a problem is a shor
 
 In production, you use NetworkX's shortest_path() or a mapping API. But understanding the internals helps you diagnose performance issues and select the right algorithm.
 
+## What to check when Dijkstra looks wrong or slow
+
+- Verify the graph has no negative edges before debugging the implementation. That one assumption breaks the whole algorithm.
+- Skip stale heap entries aggressively. Many “Dijkstra is too slow” reports are really about reprocessing outdated candidates.
+- If reconstructed paths look wrong, inspect when `prev` changes. It should only move when you discover a genuinely shorter route.
+- In systems with constantly changing topology, the operational trade-off is not just correctness. Rebuild cost, cache invalidation, and acceptable staleness matter too.
+
 ## Checklist
 
 - [ ] Explain how Dijkstra's algorithm works
@@ -311,17 +321,29 @@ In production, you use NetworkX's shortest_path() or a mapping API. But understa
 
 Dijkstra's algorithm finds shortest paths in non-negative weighted graphs in O((V+E) log V). The key insight is processing the nearest unfinalized node first via a priority queue. In the next article, we explore greedy algorithms — the strategy of always making the locally optimal choice.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Shortest Path Basics?**
+  - The article treats Shortest Path Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Shortest Path Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Shortest Path Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Algorithms?](./01-what-are-algorithms.md)
-- [Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
-- [Linear Search and Binary Search](./03-linear-and-binary-search.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
-- [Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
-- [Dynamic Programming Basics](./06-dynamic-programming-basics.md)
-- [Graph Traversal — BFS and DFS](./07-graph-traversal-bfs-dfs.md)
+## In this series
+
+- [Algorithms with Python 101 (1/10): What Are Algorithms?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
+- [Algorithms with Python 101 (3/10): Linear Search and Binary Search](./03-linear-and-binary-search.md)
+- [Algorithms with Python 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
+- [Algorithms with Python 101 (5/10): Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
+- [Algorithms with Python 101 (6/10): Dynamic Programming Basics](./06-dynamic-programming-basics.md)
+- [Algorithms with Python 101 (7/10): Graph Traversal — BFS and DFS](./07-graph-traversal-bfs-dfs.md)
 - **Shortest Path Basics (current)**
 - Greedy Algorithms (upcoming)
 - Coding Test Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,0 +1,20 @@
+flowchart LR
+    subgraph A["Unprepared Interview"]
+        A1["Listing Facts"] --> A2["Deep Questions"]
+        A1 --> A5["Surface Answers"]
+        A2 --> A3["Stuck on Answers"]
+        A5 --> A3
+        A3 --> A4["Loss of Trust"]
+        A3 --> A6["Rejection Factor"]
+    end
+
+    subgraph B["Successful Explanation"]
+        B1["State Background"] --> B2["Process-Oriented"]
+        B1 --> B5["Overcoming Fails"]
+        B2 --> B3["Defend Questions"]
+        B5 --> B3
+        B3 --> B4["Leading Interview"]
+        B3 --> B6["Higher Pass Rate"]
+    end
+
+    A2 -. "Communication Competency" .- B2

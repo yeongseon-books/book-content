@@ -1,9 +1,9 @@
 ---
-title: Video Understanding - From Frame Sampling to Video-LLaVA
+title: "Multimodal AI 101 (9/10): Video Understanding - From Frame Sampling to Video-LLaVA"
 series: multimodal-ai-101
 episode: 9
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,12 +17,14 @@ tags:
 - Temporal Modeling
 - VideoMAE
 - Action Recognition
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: An image is a single frame; a video is a frame sequence with a time
   axis.
 ---
 
-# Video Understanding - From Frame Sampling to Video-LLaVA
+# Multimodal AI 101 (9/10): Video Understanding - From Frame Sampling to Video-LLaVA
+
+This is post 9 in the Multimodal AI 101 series.
 
 > Multimodal AI 101 series (9/10)
 
@@ -31,6 +33,24 @@ seo_description: An image is a single frame; a video is a frame sequence with a 
 An image is a single frame; a video is a frame sequence with a time axis. A one-minute clip at 30fps is 1,800 frames, and feeding all of them into a VLM blows up the token budget and the GPU at the same time. Ninety percent of video understanding is the sampling and aggregation question: which frames do we pick, and which model do we feed them to?
 
 This episode covers frame sampling strategies, the core temporal models (VideoMAE, TimeSformer, Video-LLaVA), an action recognition pipeline, and production pitfalls.
+
+
+![Multimodal AI 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/09/09-01-big-picture.en.png)
+*Multimodal AI 101 chapter 9 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Video Understanding - From Frame Sampling to Video-LLaVA?
+- Which signal should the example or diagram make visible for Video Understanding - From Frame Sampling to Video-LLaVA?
+- What failure should be prevented first when Video Understanding - From Frame Sampling to Video-LLaVA reaches a real system?
+
+## Questions this article answers
+
+- Why is frame sampling the first key decision in video understanding?
+- When are PyAV and scene-change-based keyframe extraction each useful?
+- What trade-offs do video encoders like VideoMAE, TimeSformer, and X-CLIP make?
+- What frame grouping is most practical for Video-LLaVA Q&A?
+- Why do fps confusion, codec dependence, ignoring audio, and memory management often become operational issues?
 
 ## 1. Why Frame Sampling Is the Core Decision
 
@@ -167,7 +187,7 @@ Video-LLaVA compresses 8 frames into a single video token sequence. That is enou
 
 A production action recognition pipeline looks like this:
 
-```
+```text
 input video ──► frame sampler (8-16) ──► VideoMAE / X-CLIP ──► action label + score
                                                                    │
                                                                    ▼
@@ -182,6 +202,14 @@ input video ──► frame sampler (8-16) ──► VideoMAE / X-CLIP ──►
 - **Encoder**: X3D-S on CPU, VideoMAE-Base on GPU
 - **Aggregation**: smooth clip-level scores over a 5-second window
 - **Threshold**: 0.7+ if precision matters, 0.4 if recall matters
+
+## Operations checklist
+
+- [ ] We choose sampling strategy based on question type, not just clip length
+- [ ] We test codec and container fallbacks before videos hit the main pipeline
+- [ ] We separate event-detection workloads from broad-summary workloads
+- [ ] We decide explicitly whether audio is part of the evidence set
+- [ ] We enforce frame-resize and batch-memory limits before GPU inference starts
 
 ## Five Common Pitfalls
 
@@ -220,9 +248,48 @@ img = frame.to_image().resize((224, 224))  # shrink right away
 - Video-LLaVA enables 8-frame Q&A; longer clips use chunk-and-merge with an LLM summarizer.
 - The standard pipeline is sampler → encoder → aggregator → threshold → event store.
 - fps, codec, short events, audio cues, and memory are the most common production pitfalls.
+
+---
+
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Video Understanding - From Frame Sampling to Video-LLaVA?**
+  - The article treats Video Understanding - From Frame Sampling to Video-LLaVA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Video Understanding - From Frame Sampling to Video-LLaVA?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Video Understanding - From Frame Sampling to Video-LLaVA reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Multimodal AI 101 (1/10): Why Multimodal AI Matters](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
+- [Multimodal AI 101 (3/10): Vision-Language Model Architecture](./03-vlm-architecture.md)
+- [Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines](./04-captioning-ocr-pipelines.md)
+- [Multimodal AI 101 (5/10): Multimodal RAG: Searching Images and Text Together](./05-multimodal-rag.md)
+- [Multimodal AI 101 (6/10): Audio Processing and Whisper STT](./06-audio-whisper.md)
+- [Multimodal AI 101 (7/10): Text-to-Image with Diffusion](./07-text-to-image-diffusion.md)
+- [Multimodal AI 101 (8/10): Multimodal Embeddings and Cross-modal Search](./08-multimodal-embeddings.md)
+- **Video Understanding - From Frame Sampling to Video-LLaVA (current)**
+- Building a Production Multimodal Application (upcoming)
+
+<!-- toc:end -->
+
 ## References
+
+### Official Docs
+
+- [PyAV cookbook: decoding video streams](https://pyav.org/docs/stable/cookbook/basics.html)
+- [Hugging Face Transformers video-classification tasks](https://huggingface.co/docs/transformers/en/tasks/video_classification)
+- [FFmpeg documentation](https://ffmpeg.org/documentation.html)
+
+### Papers and model references
 
 - [Tong et al. - VideoMAE: Masked Autoencoders Are Data-Efficient Learners for Video](https://arxiv.org/abs/2203.12602)
 - [Bertasius et al. - Is Space-Time Attention All You Need for Video Understanding? (TimeSformer)](https://arxiv.org/abs/2102.05095)
 - [Lin et al. - Video-LLaVA: Learning United Visual Representation by Alignment Before Projection](https://arxiv.org/abs/2311.10122)
-- [PyAV Documentation - Decoding Video Streams](https://pyav.org/docs/stable/cookbook/basics.html)
+
+### Related series
+
+- [AI Agent 101 - Production operations](../ai-agent-101/09-production-operations.md)

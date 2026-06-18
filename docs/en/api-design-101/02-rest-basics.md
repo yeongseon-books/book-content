@@ -1,10 +1,10 @@
 ---
 series: api-design-101
 episode: 2
-title: REST Basics
-status: content-ready
+title: "API Design 101 (2/10): REST Basics"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,27 @@ tags:
   - Backend
   - WebDevelopment
 seo_description: A junior backend engineer's guide to the six REST constraints and resource-centric thinking — what it really means and what it does not.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# REST Basics
+# API Design 101 (2/10): REST Basics
 
-> API Design 101 series (2/10)
+Two APIs can both look "REST-ish" in screenshots and still feel completely different in production. The difference is usually not the path shape alone. It is whether the client can predict what each call means without re-learning the rules every time.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the API Design 101 series.
 
-**Core question**: REST is not just a *URL convention* — what is it really?
+Here, we treat REST as a set of architectural constraints rather than a fashionable URL style. That is the lens you need before resource design, method selection, caching, and documentation start to reinforce each other.
 
-> It is the set of *six architectural constraints* defined by Roy Fielding. At its center sits the *resource*.
 
-<!-- a-grade-intro:end -->
+![api design 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/02/02-01-concept-at-a-glance.en.png)
+*api design 101 chapter 2 flow overview*
+> REST is not a list of rules — it is the discipline of thinking in HTTP verbs and resources instead of arbitrary function names.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The definition and history of REST
-- The six architectural constraints
-- Resource-centric thinking
-- The intuition behind HTTP method mapping
-- What looks like REST but is not (RPC over HTTP)
+- The definition and history of REST?
+- The six architectural constraints?
+- Resource-centric thinking?
 
 ## Why It Matters
 
@@ -47,16 +46,7 @@ REST is the most common API style. Follow it well and your API becomes *predicta
 
 > Understand *why* the rule exists, not only the rule.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Client["Client"] -->|"GET /users/42"| Server["Server"]
-    Server -->|"200 OK + JSON"| Client
-    Server --- DB[("Resources")]
-```
-
-Resources are identified by URLs; actions are expressed as HTTP methods.
+A client should be able to read `GET /users/42` and predict the intent immediately. Once that predictability disappears, the API may still use JSON over HTTP, but it stops behaving like a coherent REST interface.
 
 ## Key Terms
 
@@ -70,7 +60,7 @@ Resources are identified by URLs; actions are expressed as HTTP methods.
 
 **Before (RPC style)**
 
-```
+```http
 POST /getUser?id=42
 POST /createUser
 POST /deleteUser?id=42
@@ -80,7 +70,7 @@ Verbs leak into the URL.
 
 **After (REST style)**
 
-```
+```http
 GET    /users/42
 POST   /users
 DELETE /users/42
@@ -177,6 +167,12 @@ GitHub, Stripe, GitLab — most public APIs are *mostly REST*. Pure HATEOAS is r
 - Do not turn REST into a religion — RPC has its place.
 - Always ask: is this *predictable* from the client side?
 
+## Verification Signals and Failure Modes
+
+- **Expected output:** You should be able to describe read, create, and delete behavior on the same resource without changing the URL shape—only the HTTP method.
+- **First check:** Repeated paths such as `/getUser` or `/deleteOrder` are strong signals that the API is drifting back toward RPC over HTTP.
+- **Failure mode:** Once auth depends on server-side session memory or every response becomes `200 OK`, caching, retries, and horizontal scaling all get harder at the same time.
+
 ## Checklist
 
 - [ ] No verbs in URLs?
@@ -195,8 +191,19 @@ GitHub, Stripe, GitLab — most public APIs are *mostly REST*. Pure HATEOAS is r
 
 REST is the *sum of six constraints*. The next episode dives into the heart of those constraints — resource design.
 
+## Answering the Opening Questions
+
+- **The definition and history of REST?**
+  - The article treats REST Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The six architectural constraints?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Resource-centric thinking?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
 - **REST Basics (current)**
 - Resource Design (upcoming)
 - HTTP Methods and Status Codes (upcoming)
@@ -206,6 +213,7 @@ REST is the *sum of six constraints*. The next episode dives into the heart of t
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

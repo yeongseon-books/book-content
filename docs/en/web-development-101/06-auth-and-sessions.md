@@ -1,10 +1,10 @@
 ---
 series: web-development-101
 episode: 6
-title: Authentication and Sessions
-status: content-ready
+title: "Web Development 101 (6/10): Authentication and Sessions"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,24 @@ tags:
   - Security
   - Backend
 seo_description: Cookies, sessions, JWT, and OAuth — the four ways servers remember a user on top of stateless HTTP, explained for new web developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Authentication and Sessions
+# Web Development 101 (6/10): Authentication and Sessions
 
-> Web Development 101 series (6/10)
+HTTP does not remember who you are between requests, but real products absolutely need memory: who signed in, what permissions they have, and whether this request should be trusted. That gap is where many early security mistakes happen.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Web Development 101 series. Here we connect cookies, sessions, JWTs, and OAuth into one practical model so login stops looking like a black box and starts looking like a set of explicit trade-offs.
 
-**Core question**: HTTP is *stateless* — so how does a server *remember* who you are?
 
-> Cookies, sessions, JWTs, and OAuth — four tools that lay *memory* on top of *no memory*.
+![web development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/06/06-01-concept-at-a-glance.en.png)
+*web development 101 chapter 6 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The difference between authentication and authorization
-- How cookies and sessions actually work
-- The structure of a JWT (token-based auth)
-- The OAuth flow for third-party login
-- Common security mistakes and defenses
+- The difference between authentication and authorization?
+- How cookies and sessions actually work?
+- The structure of a JWT (token-based auth)?
 
 ## Why It Matters
 
@@ -47,17 +43,17 @@ Almost every app has login. A weak design lets *account takeover* happen in one 
 
 > Auth is not a *feature* — it is *foundation*.
 
-## Concept at a Glance
+The key idea in this picture is that the password should not travel on every request. One successful login creates an identifier, and the browser replays that identifier so the server can recover user context safely.
 
-```mermaid
-flowchart LR
-    User["User"] -->|"id/pw"| Server["Server"]
-    Server -->|"session id (cookie)"| Browser["Browser"]
-    Browser -->|"cookie"| Server
-    Server -->|"data"| Browser
-```
+### What to verify yourself
 
-The server issues a *session id*; the browser sends it on every request.
+- Log in once and inspect the cookie stored in DevTools.
+- Use `curl -c` and `curl -b` to prove that cookie storage and cookie replay are separate steps.
+- After logout, call a protected endpoint again and verify that it now returns 401.
+
+**Expected output:** A session cookie appears after login, protected endpoints work while the session is active, and the same cookie stops working after logout.
+
+**Failure mode to watch for:** Missing `HttpOnly`, `Secure`, or `SameSite` flags increases replay and theft risk. Secrets placed inside JWT payloads remain visible even when the token is signed.
 
 ## Key Terms
 
@@ -189,22 +185,38 @@ Web apps use *session cookies* with CSRF tokens. Mobile, SPA, and microservice s
 
 Auth is *foundation*. Next, we look at the database connection that makes user data *permanent*.
 
+## Answering the Opening Questions
+
+- **The difference between authentication and authorization?**
+  - The article treats Authentication and Sessions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How cookies and sessions actually work?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The structure of a JWT (token-based auth)?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
-- [The Browser and the DOM](./03-browser-and-dom.md)
-- [HTTP and APIs](./04-http-and-api.md)
-- [Frontend and Backend](./05-frontend-and-backend.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): The Browser and the DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP and APIs](./04-http-and-api.md)
+- [Web Development 101 (5/10): Frontend and Backend](./05-frontend-and-backend.md)
 - **Authentication and Sessions (current)**
 - Connecting to a Database (upcoming)
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [HTTP cookies (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies)
-- [Flask sessions](https://flask.palletsprojects.com/en/latest/quickstart/#sessions)
+### Official Docs
+- [Using HTTP cookies (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies)
+- [Flask sessions](https://flask.palletsprojects.com/en/stable/quickstart/#sessions)
+- [OAuth 2.0 Authorization Framework (RFC 6749)](https://www.rfc-editor.org/rfc/rfc6749)
+
+### Security Guides
 - [JWT introduction](https://jwt.io/introduction)
-- [OAuth 2.0 simplified](https://www.oauth.com/)
+- [Session Management Cheat Sheet (OWASP)](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)

@@ -1,5 +1,5 @@
 ---
-title: Why DB-API 2.0 - The Problem PEP 249 Solved
+title: "Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved"
 series: python-dbapi-101
 episode: 1
 language: en
@@ -22,35 +22,29 @@ seo_description: If you have used Python with a database, you have probably touc
   sqlite3, psycopg, pymysql, or oracledb.
 ---
 
-# Why DB-API 2.0 - The Problem PEP 249 Solved
-
-> Python DB-API 101 series (1/10)
-
----
+# Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved
 
 If you have used Python with a database, you have probably touched `sqlite3`, `psycopg`, `pymysql`, or `oracledb`. Their APIs feel oddly similar: `connect()` to open a connection, `cursor()` to get a cursor, `execute()` to run a query, `fetchone()` / `fetchall()` to read results. That uniformity is not a coincidence. It comes from a 1996 standard called **PEP 249 — Python Database API Specification v2.0** (DB-API 2.0 for short).
 
 This first episode walks through why DB-API 2.0 exists, what it standardizes, why we use SQLite throughout the series, and how the same code transfers to other drivers like PostgreSQL or MySQL.
 
-<!-- a-grade-intro:begin -->
+This is the first article in the Python DB-API 101 series.
 
-![Why DB-API 2.0 - the problem PEP 249 solved](../../assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.en.png)
+![Why DB-API 2.0 - the problem PEP 249 solved](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.en.png)
 
 *Why DB-API 2.0 - the problem PEP 249 solved*
-## Key Questions
+
+![python db-api 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png)
+*python db-api 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
 
 - How was database access done in Python before PEP 249?
 - What five things did DB-API 2.0 actually standardize?
 - Why does paramstyle differ across drivers, and how do you protect your code?
-- Where does DB-API stop and other layers begin?
-
-<!-- a-grade-intro:end -->
 
 ## 1. The Chaos Before DB-API
 
-![The chaos before DB-API](../../assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png)
-
-*The chaos before DB-API*
 Before the standard, every database library had its own API.
 
 ```python
@@ -69,7 +63,7 @@ Function names, argument order, and return types were all different. Even within
 
 ## 2. Five Things PEP 249 Standardized
 
-![Five things PEP 249 standardized](../../assets/python-dbapi-101/01/01-03-2-five-things-pep-249-standardized.en.png)
+![Five things PEP 249 standardized](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-03-2-five-things-pep-249-standardized.en.png)
 
 *Five things PEP 249 standardized*
 DB-API 2.0 defines a minimal contract every driver must satisfy.
@@ -127,7 +121,7 @@ These seven steps are nearly identical for PostgreSQL and MySQL. The differences
 
 ## 4. Only paramstyle Really Differs
 
-![Only paramstyle really differs](../../assets/python-dbapi-101/01/01-04-4-only-paramstyle-really-differs.en.png)
+![Only paramstyle really differs](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-04-4-only-paramstyle-really-differs.en.png)
 
 *Only paramstyle really differs*
 PEP 249 allows five paramstyles.
@@ -249,19 +243,28 @@ The next episode digs into the connection and cursor lifecycle and the context-m
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **How was database access done in Python before PEP 249?**
+  - The article treats Why DB-API 2.0 - The Problem PEP 249 Solved as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What five things did DB-API 2.0 actually standardize?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why does paramstyle differ across drivers, and how do you protect your code?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- **Why DB-API 2.0 - The Problem PEP 249 Solved (current)**
-- Connection and Cursor Lifecycle (upcoming)
-- execute, executemany, and Fetch Patterns (upcoming)
-- Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)
-- Transactions and isolation levels (sqlite3, PEP 249) (upcoming)
-- Row factories and type adapters (sqlite3, PEP 249) (upcoming)
-- PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
-- SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
-- Asynchronous SQLite with aiosqlite (upcoming)
-- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+- **Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved (current)**
+- Python DB-API 101 (2/10): Connection and Cursor Lifecycle (upcoming)
+- Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns (upcoming)
+- Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)
+- Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249) (upcoming)
+- Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249) (upcoming)
+- Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
+- Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
+- Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite (upcoming)
+- Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
 
 <!-- toc:end -->
 
@@ -273,3 +276,7 @@ The next episode digs into the connection and cursor lifecycle and the context-m
 - [Python sqlite3 module documentation](https://docs.python.org/3/library/sqlite3.html)
 - [SQLite official documentation](https://www.sqlite.org/docs.html)
 - [psycopg 3 documentation - DB-API 2.0 compliance](https://www.psycopg.org/psycopg3/docs/)
+
+### Related Series
+
+- [SQLAlchemy 101](../sqlalchemy-101/01-sqlalchemy-2x-engine-connection.md) — covers the ORM and Core layers that sit on top of the DB-API this series unpacks. Drop down to this series whenever SQLAlchemy connection behavior or SQL execution feels opaque and you need to see what the underlying driver actually does.

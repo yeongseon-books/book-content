@@ -1,10 +1,10 @@
 ---
 series: statistics-101
 episode: 4
-title: Sample and Population
+title: "Statistics 101 (4/10): Sample and Population"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,25 +20,24 @@ seo_description: How a sample becomes representative of a population, focusing o
 last_reviewed: '2026-05-04'
 ---
 
-# Sample and Population
+# Statistics 101 (4/10): Sample and Population
 
-> Statistics 101 series (4/10)
+Statistics usually begins without complete information. We cannot survey every customer, destructively test every manufactured item, or run every user through the same experiment. So we look at a part and try to say something about the whole.
 
-<!-- a-grade-intro:begin -->
+The hard part is representativeness. If the sample does not resemble the population closely enough, even a careful analysis starts from the wrong place.
 
-**Core question**: We almost never see the *whole population* — yet we draw confident conclusions. *How can a sample resemble the population* well enough to make that work?
+This is post 4 in the Statistics 101 series. Here we will clarify the relationship between population, sample, parameter, and statistic, then explain why random sampling and sampling bias sit at the foundation of statistical work.
 
-> *Inference is the art of speaking about the whole through a part.*
 
-<!-- a-grade-intro:end -->
+![statistics 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/04/04-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 4 flow overview*
+> You can *never* measure the entire population — so statistics teaches you how to *measure the sample* and *speak confidently* about the whole.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The relationship between *population, sample, and estimate*
-- The *power* of *random sampling*
-- *Five sources* of sampling bias
-- A 5-step sample design exercise
-- Five common mistakes
+- How do population and sample differ?
+- What makes a sample representative enough to trust?
+- Why does random sampling appear so often in statistics?
 
 ## Why It Matters
 
@@ -47,14 +46,7 @@ last_reviewed: '2026-05-04'
 > *Garbage sample → Garbage decision.*
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Pop["Population"] --> Sample["Sample"]
-    Sample --> Stat["Statistic"]
-    Stat --> Estimate["Estimate of Parameter"]
-```
-
+Every statistic you compute comes from a *sample*—a *part* of the population you actually care about. The quality of your inference depends on whether that sample is *representative* and *large enough*.
 ## Key Terms
 
 - **Population**: the *whole group* we want to learn about.
@@ -148,10 +140,21 @@ A/B testing, surveys, quality inspections, pre-launch beta tests — in all of t
 
 Sample design is the *foundation of statistics*. The next episode enters the world of *estimation*, where we use samples to *guess at population parameters*.
 
+## Answering the Opening Questions
+
+- **How do population and sample differ?**
+  - The article treats Sample and Population as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What makes a sample representative enough to trust?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why does random sampling appear so often in statistics?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
-- [Distributions](./03-distributions.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): Distributions](./03-distributions.md)
 - **Sample and Population (current)**
 - Estimation (upcoming)
 - Confidence Interval (upcoming)
@@ -159,6 +162,7 @@ Sample design is the *foundation of statistics*. The next episode enters the wor
 - Correlation and Regression (upcoming)
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

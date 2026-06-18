@@ -1,11 +1,11 @@
 ---
-title: HPA and Cluster Autoscaler internals — two control loops
+title: "Azure Kubernetes Service Deep Dive (5/6): HPA and Cluster Autoscaler internals — two control loops"
 series: azure-aks-deep-dive
 episode: 5
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,12 +14,15 @@ tags:
 - Kubernetes
 - Distributed Systems
 - Containers
-last_reviewed: '2026-04-29'
-seo_description: AKS control plane is managed by Microsoft, so the upstream code here
-  is a behavioral comparison baseline, not a statement about the exact binaries…
+last_reviewed: '2026-05-15'
+seo_description: Separate HPA from Cluster Autoscaler in AKS and see why Pending Pods, race windows, and slow scale-down are normal parts of the design.
 ---
 
-# HPA and Cluster Autoscaler internals — two control loops
+# Azure Kubernetes Service Deep Dive (5/6): HPA and Cluster Autoscaler internals — two control loops
+
+“Autoscaling is slow” usually hides two different control loops under one complaint. One loop changes replica count, the other changes node count, and they react on different inputs and different timelines.
+
+This is the fifth post in the Azure Kubernetes Service Deep Dive series. Here, I separate HPA from Cluster Autoscaler and show where their race window comes from in real AKS behavior.
 
 ## Source Version
 
@@ -40,21 +43,17 @@ In AKS, both loops belong to the managed control-plane story even though they ac
 HPA runs inside `kube-controller-manager` and computes desired replicas from metrics.
 Cluster Autoscaler is operated by Microsoft as part of the AKS managed control plane. You configure it with the cluster autoscaler profile, for example via `az aks update --cluster-autoscaler-profile`, but you do not deploy or manage CA pods yourself.
 
----
+![azure kubernetes service deep dive chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png)
+*azure kubernetes service deep dive chapter 5 flow overview*
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - From what metric sources does HPA read on what cadence, and how does it decide?
 - What signals tell the Cluster Autoscaler that new nodes are required?
 - When HPA and CA move at the same time, how does the race appear and how do you tame it?
-- Why must scale-up be fast and scale-down slow, and where do you set the ratio?
-- Which workload shapes make it safe to combine VPA and HPA?
 
 ## Put both loops in one diagram
 
-![Two loops for Pod and node scaling](../../assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png)
-
-*Two loops for Pod and node scaling*
 ---
 
 ## The HPA side
@@ -67,7 +66,7 @@ and stabilization windows.
 
 Operationally, HPA is the faster loop. It can decide to raise replica count well before the cluster has spare node capacity. That is why HPA-driven scale-up often appears first as new Pending Pods rather than instantly as more Ready Pods.
 
-![HPA loop adjusting replica count from metrics](../../assets/azure-aks-deep-dive/05/05-02-the-hpa-side.en.png)
+![HPA loop adjusting replica count from metrics](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/05/05-02-the-hpa-side.en.png)
 
 *HPA loop adjusting replica count from metrics*
 ---
@@ -81,7 +80,7 @@ It asks whether extra nodes from a specific pool would make the Pods schedulable
 
 In AKS, the default `scan-interval` is 10 seconds. The node provisioning wait budget is controlled by `max-node-provision-time`, which defaults to 15 minutes. Scale-down behavior is intentionally conservative: `scale-down-unneeded-time` defaults to 10 minutes, and `scale-down-delay-after-add` also defaults to 10 minutes. That means HPA can ask for more Pods, scheduler can mark them Pending, and CA can still be in the "adding nodes" phase for a while before the new node becomes Ready enough for binding.
 
-![CA loop adding nodes for unschedulable Pods](../../assets/azure-aks-deep-dive/05/05-03-the-ca-side.en.png)
+![CA loop adding nodes for unschedulable Pods](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/05/05-03-the-ca-side.en.png)
 
 *CA loop adding nodes for unschedulable Pods*
 ---
@@ -126,15 +125,24 @@ kubectl get nodes -L agentpool,kubernetes.azure.com/scalesetpriority
 - [ ] Specified graceful drain policy for spot node pools
 - [ ] Classified workloads into VPA-eligible vs VPA-forbidden
 
+## Answering the Opening Questions
+
+- **From what metric sources does HPA read on what cadence, and how does it decide?**
+  - The article treats HPA and Cluster Autoscaler internals — two control loops as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What signals tell the Cluster Autoscaler that new nodes are required?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When HPA and CA move at the same time, how does the race appear and how do you tame it?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Control plane anatomy — what AKS hides from you](./01-control-plane-anatomy.md)
-- [kubelet and containerd — how a container actually starts on a node](./02-kubelet-and-containerd.md)
-- [CNI and Azure CNI Overlay — where Pod IPs come from](./03-cni-and-azure-cni-overlay.md)
-- [Scheduler and Pod placement — who decides which node](./04-scheduler-and-pod-placement.md)
-- **HPA and Cluster Autoscaler internals — two control loops (current)**
-- KEDA internals — how a ScaledObject builds an HPA (upcoming)
+- [Azure Kubernetes Service Deep Dive (1/6): Control plane anatomy — what AKS hides from you](./01-control-plane-anatomy.md)
+- [Azure Kubernetes Service Deep Dive (2/6): kubelet and containerd — how a container actually starts on a node](./02-kubelet-and-containerd.md)
+- [Azure Kubernetes Service Deep Dive (3/6): CNI and Azure CNI Overlay — where Pod IPs come from](./03-cni-and-azure-cni-overlay.md)
+- [Azure Kubernetes Service Deep Dive (4/6): Scheduler and Pod placement — who decides which node](./04-scheduler-and-pod-placement.md)
+- **Azure Kubernetes Service Deep Dive (5/6): HPA and Cluster Autoscaler internals — two control loops (current)**
+- Azure Kubernetes Service Deep Dive (6/6): KEDA internals — how a ScaledObject builds an HPA (upcoming)
 
 <!-- toc:end -->
 

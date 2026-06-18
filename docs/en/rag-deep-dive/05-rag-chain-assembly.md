@@ -1,11 +1,11 @@
 ---
-title: Assembling the RAG Chain — RetrievalQA vs LCEL
+title: "RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL"
 series: rag-deep-dive
 episode: 5
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,33 +14,29 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: Why RetrievalQA falls short and how LCEL pipelines express the same RAG flow more clearly.
 ---
 
-# Assembling the RAG Chain — RetrievalQA vs LCEL
+# RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL
 
-<!-- a-grade-intro:begin -->
-## Questions this post answers
+RetrievalQA is convenient, but it hides too much of the pipeline. This post compares it with LCEL to show the same RAG flow more explicitly.
 
-- Which steps does `RetrievalQA` hide behind its classic interface?
-- How does LCEL expose the RAG graph more directly?
-- Why is `RunnablePassthrough()` useful for preserving the original question?
-- Where do you attach source-return logic in each approach?
+This is post 5 in the RAG Deep Dive series.
 
+![RetrievalQA chain-type dispatch path](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.en.png)
+*RetrievalQA chain-type dispatch path*
 > A RAG chain is an execution graph from question to evidence to prompt to answer, and LCEL makes those seams explicit.
 
-![Questions this post answers](../../assets/rag-deep-dive/05/05-01-questions-this-post-answers.en.png)
+## Questions to Keep in Mind
 
-*Questions this post answers*
-<!-- a-grade-intro:end -->
+- Which boundaries do classic APIs like `RetrievalQA` hide, and which boundaries does LCEL expose?
+- What becomes easier to debug when retriever, prompt, llm, and parser are wired directly?
+- Where should the result shape be fixed so source documents are not lost after assembly?
 
-> RAG Deep Dive series (5/6)
-
-<!-- a-grade-example:begin -->
 ## Minimal runnable example
 
-Example file: `/root/Github/rag-deep-dive/en/05-rag-chain-assembly/main.py`
+Example file: `en/05-rag-chain-assembly/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py
@@ -170,10 +166,6 @@ This episode traces both paths from the source. We will first walk through `Retr
 
 The first file to read is `langchain/chains/retrieval_qa/base.py`. `BaseRetrievalQA` holds four pieces of state that define the public surface: `combine_documents_chain`, `input_key`, `output_key`, and `return_source_documents`. The defaults are `input_key="query"` and `output_key="result"`, so the classic call shape is `qa.invoke({"query": "..."})`, returning `{"result": "..."}`. If `return_source_documents=True`, the `output_keys` property appends `"source_documents"`, which changes the output contract to `{"result": "...", "source_documents": [...]}`.
 
-![RetrievalQA chain-type dispatch path](../../assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.en.png)
-
-*RetrievalQA chain-type dispatch path*
-
 The popular constructor was `from_chain_type()`. Its implementation is intentionally small. It takes an LLM, a `chain_type`, optional `chain_type_kwargs`, calls `load_qa_chain(llm, chain_type=chain_type, **kwargs)`, and stores the returned combine-documents chain in `combine_documents_chain`. In other words, `RetrievalQA` does not itself implement stuffing, map-reduce, or refinement. It delegates document combination to a separate factory and acts as the glue between retriever output and that factory-produced answer chain.
 
 The real dispatch lives in `langchain/chains/question_answering/chain.py`. In 0.2.17, `load_qa_chain()` exposes a `loader_mapping` with `"stuff"`, `"map_reduce"`, `"refine"`, and `"map_rerank"`. The three options most relevant to the mental model are `stuff`, `map_reduce`, and `refine`.
@@ -244,7 +236,7 @@ The value of `RetrievalQA` in 2026 is mostly pedagogical. It is one of the clear
 
 LCEL starts in `langchain_core.runnables.base.py`. The `Runnable` abstraction defines the common execution surface: `invoke`, `ainvoke`, `batch`, `abatch`, `stream`, `astream`, plus input and output schema reflection. Then `Runnable.__or__()` reveals the heart of the language in one short method: `self | other` returns `RunnableSequence(self, coerce_to_runnable(other))`. So the pipe operator is not special syntax for “call the next function.” It is a constructor for a runnable sequence whose output feeds the next step.
 
-![LCEL pipe operator building a sequence](../../assets/rag-deep-dive/05/05-02-lcel-runnable-sequence-composition.en.png)
+![LCEL pipe operator building a sequence](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-02-lcel-runnable-sequence-composition.en.png)
 
 *LCEL pipe operator building a sequence*
 
@@ -301,7 +293,7 @@ chain = (
 
 The code is compact enough to hide what is really happening. Two source-level details matter. First, when a dict enters LCEL composition, `coerce_to_runnable(...)` wraps it as `RunnableParallel`. Second, `RunnablePassthrough()` is just the identity runnable. So the first line is really saying: take the same input question, send it to multiple branches at once, let one branch build `context`, let another preserve the original `question`, then merge those branch outputs back into one dictionary.
 
-![Parallel split into context and question](../../assets/rag-deep-dive/05/05-03-lcel-rag-parallel-passthrough-flow.en.png)
+![Parallel split into context and question](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-03-lcel-rag-parallel-passthrough-flow.en.png)
 
 *Parallel split into context and question*
 
@@ -385,7 +377,7 @@ The most important shift is conceptual. In LCEL, retrieval is not a hidden phase
 
 Sooner or later, plain string output stops being enough. Production RAG systems usually need to return the answer together with sources, IDs, scores, or diagnostic fields. The base `prompt | llm | parser` pattern discards most of that state because the chain narrows toward one final string. The tool that solves this in LCEL is `RunnablePassthrough.assign()` from `langchain_core.runnables.passthrough.py`.
 
-![Assign enriching answer output with sources](../../assets/rag-deep-dive/05/05-04-passthrough-assign-output-enrichment.en.png)
+![Assign enriching answer output with sources](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-04-passthrough-assign-output-enrichment.en.png)
 
 *Assign enriching answer output with sources*
 
@@ -483,7 +475,7 @@ if __name__ == "__main__":
 
 The execution-model difference becomes sharpest with streaming and batching. `RetrievalQA` is built around `_call()` and `_acall()`. It runs retrieval, runs the combine-documents chain, and returns only after the answer is fully assembled. It can optionally return source documents, but it does not expose a first-class surface for streaming intermediate answer chunks through the chain interface.
 
-![Streaming chunks propagating through runnable steps](../../assets/rag-deep-dive/05/05-05-lcel-streaming-chunk-propagation.en.png)
+![Streaming chunks propagating through runnable steps](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-05-lcel-streaming-chunk-propagation.en.png)
 
 *Streaming chunks propagating through runnable steps*
 
@@ -558,14 +550,47 @@ In a real system, `fake_streaming_llm` would be replaced by a streaming chat mod
 That is why the practical recommendation in 0.2.x is fairly clear. `RetrievalQA` remains useful for understanding the older assembly model and for reading a compact source path. But once you care about richer outputs, schema-aware chaining, streaming UX, or large-scale evaluation, LCEL is the better default.
 
 Episodes 1 through 4 decomposed the layers and showed where information can be lost. Episode 5 puts those layers back together and shows that chain structure is not an implementation detail. The way documents are routed, preserved, flattened, streamed, and returned determines how trustworthy and operable the final RAG application will be. In Episode 6, we will move from assembly to evaluation: how to measure whether this chain is actually good, where to place quality gates, and how to catch failure before users do.
+
+---
+
+## Answering the Opening Questions
+
+- **Which boundaries do classic APIs like `RetrievalQA` hide, and which boundaries does LCEL expose?**
+  Classic APIs assemble quickly but can hide prompt and combine-chain choices; LCEL is more verbose but makes every boundary visible in code.
+
+- **What becomes easier to debug when retriever, prompt, llm, and parser are wired directly?**
+  Direct wiring lets you log retrieved documents, prompt inputs, model output, and parser output separately.
+
+- **Where should the result shape be fixed so source documents are not lost after assembly?**
+  Fix the final result shape—such as a dictionary or Pydantic model containing both answer and source_documents—so citations survive the chain.
+
+<!-- toc:begin -->
+## In this series
+
+- [RAG Deep Dive (1/6): Document Loading and Chunking — Inside LangChain TextSplitter](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): Embeddings and the Vector Index — Inside FAISS IndexFlatL2](./02-embeddings-and-vector-index.md)
+- [RAG Deep Dive (3/6): Retriever Design — VectorStoreRetriever and MMR](./03-retriever-design.md)
+- [RAG Deep Dive (4/6): Prompt Construction and Context Injection — Inside PromptTemplate](./04-prompt-construction-and-context-injection.md)
+- **RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL (current)**
+- RAG Deep Dive (6/6): Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
+
+<!-- toc:end -->
+
 ---
 
 ## References
 
-1. [`langchain/chains/retrieval_qa/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
-2. [`langchain/chains/question_answering/chain.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/question_answering/chain.py)
-3. [`langchain/chains/combine_documents/stuff.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)
-4. [`langchain_core/runnables/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/base.py)
-5. [`langchain_core/runnables/passthrough.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/passthrough.py)
-6. [`langchain_core/output_parsers/string.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/output_parsers/string.py)
-7. [`langchain/chains/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/base.py)
+### Official Docs
+
+- [LangChain retrieval concept guide](https://python.langchain.com/docs/concepts/retrieval/)
+- [LangChain Expression Language overview](https://python.langchain.com/docs/concepts/lcel/)
+- [LangChain `RunnablePassthrough` API reference](https://python.langchain.com/api_reference/core/runnables/langchain_core.runnables.passthrough.RunnablePassthrough.html)
+- [LangChain `StrOutputParser` API reference](https://python.langchain.com/api_reference/core/output_parsers/langchain_core.output_parsers.string.StrOutputParser.html)
+
+### Source Code
+
+- [LangChain `RetrievalQA` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
+- [LangChain QA chain loader source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/question_answering/chain.py)
+- [LangChain `StuffDocumentsChain` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)
+- [LangChain runnable base source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/base.py)
+- [LangChain `RunnablePassthrough` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/passthrough.py)

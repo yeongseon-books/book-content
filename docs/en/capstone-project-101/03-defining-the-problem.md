@@ -1,10 +1,10 @@
 ---
 series: capstone-project-101
 episode: 3
-title: Defining the Problem
-status: content-ready
+title: "Capstone Project 101 (3/10): Defining the Problem"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,27 @@ tags:
   - Scope
   - Beginner
 seo_description: A beginner-friendly tour of defining a capstone problem covering statements, users, value, assumptions, and metrics.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Defining the Problem
+# Capstone Project 101 (3/10): Defining the Problem
 
-> Capstone Project 101 series (3/10)
+When the problem statement is weak, the team keeps changing solutions without knowing what it is optimizing for. Features multiply while the explanation gets thinner.
 
-<!-- a-grade-intro:begin -->
+A good problem statement becomes the project's anchor. Requirements, MVP scope, demo emphasis, and success metrics all need to trace back to it.
 
-**Core question**: *Why* does an *unclear problem* make the *solution shake*?
+This is post 3 in the Capstone Project 101 series. It separates feature talk from problem definition and shows how to build a problem card with users, assumptions, and metrics.
 
-> If the *problem* becomes a *moving target*, *progress* gets *redefined* too.
 
-<!-- a-grade-intro:end -->
+![capstone project 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/03/03-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 3 flow overview*
+> A problem statement earns its clarity by testing against real usage patterns. Good problems narrow toward specific users and specific pain.
+
+## Questions to Keep in Mind
+
+- Why does an unclear problem statement destabilize the solution?
+- How is a problem definition different from feature description?
+- How much detail do users and assumptions need?
 
 ## What You Will Learn
 
@@ -42,17 +49,28 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-*Problem definition* decides *half* of *project quality*.
+A clear statement lets the team ask the same question whenever a new feature appears: does this directly help solve the stated problem? Without that filter, every idea starts to look equally important.
 
-## Concept at a Glance
+Writing assumptions and metrics next to the problem also strengthens the eventual demo and retrospective. The team can compare what it believed at kickoff with what it later observed.
 
-```mermaid
-flowchart LR
-    O[Observation] --> S[Statement]
-    S --> U[User]
-    U --> V[Value]
-    V --> M[Measure]
+## Practical artifact: a problem card
+
+A short problem card can dramatically improve solution discussions. The fields below are the minimum useful set.
+
+```text
+Observation: students spend too much time manually checking course schedule conflicts right before registration
+Primary users: freshmen and double-major students
+Problem statement: users cannot confirm schedule conflicts within 30 seconds before course registration
+Core assumption: timetable data can be entered through text or CSV without special setup
+Success metric: a first-time user confirms conflicts within 30 seconds
 ```
+
+## What to validate first
+
+- Make sure the statement does not begin as a solution pitch.
+- Narrow the primary user group instead of writing everyone.
+- Pull hidden assumptions into the document before implementation starts.
+- Prefer measurable values such as time, accuracy, or completion rate.
 
 ## Key Terms
 
@@ -72,33 +90,23 @@ flowchart LR
 
 ### Step 1 — Observation
 
-```python
-obs = "schedule conflicts during course registration"
-```
+Start with a concrete observation, such as schedule conflicts during course registration.
 
 ### Step 2 — User
 
-```python
-user = "freshmen plus double-major students"
-```
+Name the primary users explicitly: freshmen and double-major students.
 
 ### Step 3 — Value
 
-```python
-value = "spot conflicts fast"
-```
+Describe the value in outcome language: help users spot conflicts quickly.
 
 ### Step 4 — Assumption
 
-```python
-assume = "users can paste timetables as text"
-```
+Pull the key assumption into the open: users can paste timetables as text.
 
 ### Step 5 — Metric
 
-```python
-metric = "conflict found within 30s"
-```
+Tie the goal to a measurable threshold: a conflict should be found within 30 seconds.
 
 ## What to Notice in This Code
 
@@ -141,11 +149,22 @@ The *first section* of a PRD is the *problem statement*.
 
 ## Wrap-up and Next Steps
 
-Next post: *Organizing Requirements*.
+Problem definition is the decision anchor for the whole project. Once users, assumptions, and metrics are written down together, later requirement and MVP cuts become much easier to justify. The next post turns that anchor into an actual requirements document.
+
+## Answering the Opening Questions
+
+- **Why does an unclear problem statement destabilize the solution?**
+  - The article treats Defining the Problem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How is a problem definition different from feature description?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How much detail do users and assumptions need?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What is a Capstone Project](./01-what-is-capstone.md)
-- [Choosing a Topic](./02-choosing-a-topic.md)
+## In this series
+
+- [Capstone Project 101 (1/10): What is a Capstone Project](./01-what-is-capstone.md)
+- [Capstone Project 101 (2/10): Choosing a Topic](./02-choosing-a-topic.md)
 - **Defining the Problem (current)**
 - Organizing Requirements (upcoming)
 - Splitting Team Roles (upcoming)
@@ -154,11 +173,14 @@ Next post: *Organizing Requirements*.
 - Schedule Management (upcoming)
 - Building Presentation Materials (upcoming)
 - Project Retrospective (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+### Official docs and practical guides
+
+- [Atlassian requirements guide](https://www.atlassian.com/agile/product-management/requirements)
+- [Working Backwards](https://www.workingbackwards.com/)
 - [The Mom Test](http://momtestbook.com/)
-- [Working Backwards - Amazon](https://www.workingbackwards.com/)
-- [PRD Template - Atlassian](https://www.atlassian.com/agile/product-management/requirements)
-- [Inspired - Marty Cagan](https://svpg.com/inspired-how-to-create-products-customers-love/)
+- [Inspired — Marty Cagan](https://svpg.com/inspired-how-to-create-products-customers-love/)

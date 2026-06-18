@@ -1,10 +1,10 @@
 ---
 series: serverless-101
 episode: 7
-title: Queue and Event-driven Architecture
+title: "Serverless 101 (7/10): Queue and Event-driven Architecture"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,23 @@ seo_description: A beginner-friendly tour of queues and event-driven architectur
 last_reviewed: '2026-05-04'
 ---
 
-# Queue and Event-driven Architecture
+# Serverless 101 (7/10): Queue and Event-driven Architecture
 
-> Serverless 101 series (7/10)
+As systems grow, what gets heavy first is often not the code but the connections between services. A synchronous chain can look simple on a quiet day and turn brittle as soon as one dependency slows down or fails.
 
-<!-- a-grade-intro:begin -->
+Queues and event buses help because they separate responsibilities in both time and failure scope. In a serverless system, that separation is often what keeps a short function from turning into a long, fragile request path.
 
-**Core question**: how do you connect *services* without *direct calls*?
+This is post 7 in the Serverless 101 series.
 
-> *Queues* and *event buses* *decouple* *producers* and *consumers* across *time and space*.
 
-<!-- a-grade-intro:end -->
+![serverless 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/07/07-01-concept-at-a-glance.en.png)
+*serverless 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Queue and Event-driven Architecture?
+- Which signal should the example or diagram make visible for Queue and Event-driven Architecture?
+- What failure should be prevented first when Queue and Event-driven Architecture reaches a real system?
 
 ## What You Will Learn
 
@@ -42,16 +48,11 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-A *synchronous call chain* fails *whole* when *one node* fails. *Async messaging* provides *resilience*.
+When an order API directly calls payment, email, analytics, and inventory in sequence, one slow dependency stretches the whole response path. In a serverless environment, that also means more timeout risk, wider failure blast radius, and less flexibility about retries.
 
-## Concept at a Glance
+Async messaging changes that shape. It lets producers publish facts and lets consumers move at their own speed, with their own retry policy and their own failure handling.
 
-```mermaid
-flowchart LR
-    Producer["producer"] --> Queue["queue / topic"]
-    Queue --> C1["consumer A"]
-    Queue --> C2["consumer B"]
-```
+The key value here is not that everything becomes asynchronous. It is that producers and consumers no longer need to know each other's internals. That lower coupling is what makes fan-out, isolated retries, and independent evolution practical.
 
 ## Key Terms
 
@@ -158,24 +159,45 @@ Domain teams (*orders, billing, analytics*) are *loosely coupled* through an *ev
 
 ## Wrap-up and Next Steps
 
+Event-driven design is valuable because it separates time, responsibility, and failure handling. The best result is not “more messaging.” It is a system where independent work can stay independent under load and under failure.
+
 Next, we cover *Observability*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Queue and Event-driven Architecture?**
+  - The article treats Queue and Event-driven Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Queue and Event-driven Architecture?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Queue and Event-driven Architecture reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
-- [Function as a Service](./02-function-as-a-service.md)
-- [Trigger and Event](./03-trigger-and-event.md)
-- [Cold Start](./04-cold-start.md)
-- [Scaling](./05-scaling.md)
-- [State Management](./06-state-management.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
+- [Serverless 101 (2/10): Function as a Service](./02-function-as-a-service.md)
+- [Serverless 101 (3/10): Trigger and Event](./03-trigger-and-event.md)
+- [Serverless 101 (4/10): Cold Start](./04-cold-start.md)
+- [Serverless 101 (5/10): Scaling](./05-scaling.md)
+- [Serverless 101 (6/10): State Management](./06-state-management.md)
 - **Queue and Event-driven Architecture (current)**
 - Observability (upcoming)
 - Cost (upcoming)
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [SQS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)
-- [SNS](https://docs.aws.amazon.com/sns/latest/dg/welcome.html)
-- [EventBridge](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html)
-- [Event-driven architecture](https://martinfowler.com/articles/201701-event-driven.html)
+### Official Docs
+
+- [Amazon SQS developer guide](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)
+- [Amazon SNS developer guide](https://docs.aws.amazon.com/sns/latest/dg/welcome.html)
+- [Amazon EventBridge overview](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html)
+
+### Patterns and Related Reading
+
+- [Event-driven architecture (Martin Fowler)](https://martinfowler.com/articles/201701-event-driven.html)
+- [Serverless patterns collection](https://serverlessland.com/patterns)
+- [AWS serverless samples (GitHub)](https://github.com/aws-samples/serverless-patterns)

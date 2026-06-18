@@ -1,0 +1,5 @@
+flowchart TD
+  Client["Client"] --> LB["Azure Load Balancer"]
+  LB --> Envoy["Envoy Edge Proxy"]
+  Envoy --> Svc["Kubernetes Service"]
+  Svc --> Pod["App Pod"]

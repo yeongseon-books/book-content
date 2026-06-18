@@ -1,10 +1,10 @@
 ---
 series: capstone-project-101
 episode: 2
-title: Choosing a Topic
-status: content-ready
+title: "Capstone Project 101 (2/10): Choosing a Topic"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,27 @@ tags:
   - Scope
   - Beginner
 seo_description: A beginner-friendly tour of choosing a capstone topic covering criteria, candidate matrix, scoring, and final pick.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Choosing a Topic
+# Capstone Project 101 (2/10): Choosing a Topic
 
-> Capstone Project 101 series (2/10)
+It is easy to generate impressive ideas. It is much harder to find an idea a student team can actually carry through one semester with a convincing demo.
 
-<!-- a-grade-intro:begin -->
+A good capstone topic is not the flashiest topic. It is the one your team can explain, scope, build, and present without collapsing under delivery risk.
 
-**Core question**: *What* does a *good topic* look like, and *how* do you pick one?
+This is post 2 in the Capstone Project 101 series. It explains how to compare candidate topics and how to shrink an attractive idea into a semester-sized project.
 
-> A topic that is *small*, *measurable*, and *within your team's reach* is a *good topic*.
 
-<!-- a-grade-intro:end -->
+![capstone project 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/02/02-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 2 flow overview*
+> Choosing well means balancing fresh ideas against the time constraint. The best topic is one where a demoable result appears within weeks, not months.
+
+## Questions to Keep in Mind
+
+- What qualities make a topic strong enough for a capstone?
+- How do you separate a trendy idea from a deliverable one?
+- Which shared criteria should the team use when comparing options?
 
 ## What You Will Learn
 
@@ -42,17 +49,29 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-If the *topic* shakes, the *remaining semester* shakes.
+When the topic is fuzzy, later requirements and scheduling become unstable too. Oversized ideas keep producing scope fights because nobody agreed on the real delivery boundary.
 
-## Concept at a Glance
+A shared comparison method makes those conversations faster. Instead of arguing from preference, the team can discuss impact, feasibility, risk, and demo clarity using the same rubric.
 
-```mermaid
-flowchart LR
-    I[Ideas] --> F[Filter]
-    F --> M[Matrix]
-    M --> S[Score]
-    S --> P[Pick]
+## Practical artifact: a topic comparison matrix
+
+Keeping at least three candidates and scoring them on the same axes quickly reveals whether the team has a decision or just a favorite idea.
+
+```text
+Candidate | User pain | Impact | Feasibility | Data access | Demo clarity
+Schedule conflict checker | High | 5 | 5 | 4 | 5
+Mood diary recommender | Medium | 3 | 4 | 3 | 3
+Campus navigation app | Medium | 4 | 2 | 2 | 4
+
+Conclusion: the schedule conflict checker is the smallest option with the clearest demo payoff.
 ```
+
+## What to validate first
+
+- Check that the scoring axes are not duplicates in disguise.
+- Keep late-breaking risks such as data access or integration friction as separate axes.
+- Write one or two sentences next to the final pick so the score table does not become context-free.
+- Preserve rejected candidates as fallback options for later scope changes.
 
 ## Key Terms
 
@@ -72,33 +91,23 @@ flowchart LR
 
 ### Step 1 — Candidates
 
-```python
-ideas = ["schedule_checker", "mood_diary", "campus_map"]
-```
+Start the comparison with at least three candidates such as `schedule_checker`, `mood_diary`, and `campus_map`.
 
 ### Step 2 — Score axes
 
-```python
-axes = ["impact", "feasibility", "interest"]
-```
+Split the score axes into distinct criteria such as `impact`, `feasibility`, and `interest`.
 
 ### Step 3 — Score table
 
-```python
-score = {"schedule_checker": [4, 5, 4], "mood_diary": [3, 4, 5], "campus_map": [4, 3, 3]}
-```
+For example, you might score `schedule_checker` as `(4, 5, 4)`, `mood_diary` as `(3, 4, 5)`, and `campus_map` as `(4, 3, 3)` so the reasoning stays visible.
 
 ### Step 4 — Totals
 
-```python
-total = {k: sum(v) for k, v in score.items()}
-```
+Summarize the totals by adding each candidate's scores, but keep in mind that totals are only a quick comparison aid.
 
 ### Step 5 — Pick
 
-```python
-pick = max(total, key=total.get)
-```
+You can describe the final pick as the candidate with the highest total, but also leave one or two sentences explaining why it won.
 
 ## What to Notice in This Code
 
@@ -141,10 +150,21 @@ Product *priority meetings* use *similar matrices*.
 
 ## Wrap-up and Next Steps
 
-Next post: *Defining the Problem*.
+Topic selection is a delivery decision, not a popularity contest. When you score candidates by shared criteria and choose the option with the fastest demo payoff, later scoping becomes much easier. The next post turns that topic into a sharp problem statement.
+
+## Answering the Opening Questions
+
+- **What qualities make a topic strong enough for a capstone?**
+  - The article treats Choosing a Topic as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do you separate a trendy idea from a deliverable one?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which shared criteria should the team use when comparing options?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What is a Capstone Project](./01-what-is-capstone.md)
+## In this series
+
+- [Capstone Project 101 (1/10): What is a Capstone Project](./01-what-is-capstone.md)
 - **Choosing a Topic (current)**
 - Defining the Problem (upcoming)
 - Organizing Requirements (upcoming)
@@ -154,11 +174,14 @@ Next post: *Defining the Problem*.
 - Schedule Management (upcoming)
 - Building Presentation Materials (upcoming)
 - Project Retrospective (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [The Mom Test](http://momtestbook.com/)
-- [Jobs to be Done](https://strategyn.com/jobs-to-be-done/)
-- [How to Get Startup Ideas - Paul Graham](http://paulgraham.com/startupideas.html)
+### Official docs and practical guides
+
 - [Atlassian Decision Matrix](https://www.atlassian.com/work-management/project-management/decision-matrix)
+- [The Mom Test](http://momtestbook.com/)
+- [Jobs to Be Done overview](https://strategyn.com/jobs-to-be-done/)
+- [How to Get Startup Ideas — Paul Graham](http://paulgraham.com/startupideas.html)

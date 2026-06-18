@@ -1,0 +1,7 @@
+flowchart LR
+    A["한국어 system 메시지\n역할 + 언어 + 길이"] --> D["Groq chat.completions.create"]
+    B["user 질문\n벡터 검색과 키워드 검색 차이"] --> D
+    C["temperature=0.3\nmax_completion_tokens=300"] --> D
+    D --> E["choices[0].message.content"]
+    E --> F["한국어 3~5문장 설명"]
+    F --> G["나중에 Solar / HyperCLOVA로\n호출 계층만 교체"]

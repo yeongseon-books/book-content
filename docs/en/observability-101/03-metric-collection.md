@@ -1,10 +1,10 @@
 ---
 series: observability-101
 episode: 3
-title: Collecting and Visualizing Metrics
-status: content-ready
+title: "Observability 101 (3/10): Collecting and Visualizing Metrics"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,28 +17,35 @@ tags:
   - Grafana
   - Monitoring
 seo_description: Build your first metric pipeline with the Prometheus pull model, exporters, and Grafana dashboards from one Python service.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Collecting and Visualizing Metrics
+# Observability 101 (3/10): Collecting and Visualizing Metrics
 
-> Observability 101 series (3/10)
+It is easy to say metrics matter and still have no reliable path from application code to a graph an engineer can trust. A number in memory is not observability yet. Someone has to expose it, scrape it, store it, and query it correctly.
 
-<!-- a-grade-intro:begin -->
+Once you understand that path, Prometheus and Grafana stop looking like tools you install and start looking like parts of one measurement pipeline.
 
-**Core question**: How are metrics *collected*, and how do they *become a graph*?
+This is post 3 in the Observability 101 series.
 
-> *Prometheus *pulls* exporters; Grafana *draws* what Prometheus stored.*
 
-<!-- a-grade-intro:end -->
+![observability 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/03/03-01-concept-at-a-glance.en.png)
+*observability 101 chapter 3 flow overview*
+> Collecting and Visualizing Metrics is about the boundary decision, not the tool choice.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- *Pull* vs *push* models
-- *Exporters* and the `/metrics` endpoint
-- A one-line *Prometheus* config
-- Your first *Grafana* dashboard
-- Five common pitfalls
+- What boundary should you inspect first when applying Collecting and Visualizing Metrics?
+- Which signal should the example or diagram make visible for Collecting and Visualizing Metrics?
+- What failure should be prevented first when Collecting and Visualizing Metrics reaches a real system?
+
+## Questions this article answers
+
+- How does a metric get collected and turned into a graph?
+- What is the difference between pull and push collection models?
+- What role does the `/metrics` endpoint play?
+- How does PromQL turn raw metrics into operational questions?
+- What should a good first dashboard show?
 
 ## Why It Matters
 
@@ -46,14 +53,7 @@ A metric pipeline is the *starting line* of all observability. The moment the fi
 
 > *What you do not measure *does not exist*.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    App["app + /metrics"] --> Prom["Prometheus (pull)"]
-    Prom --> TSDB["time-series DB"]
-    TSDB --> Graf["Grafana"]
-```
+Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms
 
@@ -118,6 +118,25 @@ docker run -d --name graf -p 3000:3000 grafana/grafana
 # Panel: rate(http_requests_total[1m])
 ```
 
+## How to Verify the Pipeline End to End
+
+The pipeline fails more often at the seams than in the code itself, so verify each hop explicitly.
+
+```bash
+# 1) The application exposes metrics
+curl -s http://localhost:8000/metrics | grep http_requests_total
+
+# 2) Prometheus sees the target as healthy
+curl -s http://localhost:9090/api/v1/targets | grep '"health":"up"'
+```
+
+```text
+Expected output:
+- `/metrics` contains `http_requests_total`.
+- The Prometheus target shows `up`.
+- Grafana renders a non-zero `rate(http_requests_total[1m])` line.
+```
+
 ## What to Notice in This Code
 
 - Prometheus *pulls*; the app *exposes*.
@@ -161,9 +180,20 @@ Most companies start with *Prometheus + Grafana* and grow into *Thanos / Mimir* 
 
 Once metrics flow, *the system speaks in graphs*. Next: *structured logging*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Collecting and Visualizing Metrics?**
+  - The article treats Collecting and Visualizing Metrics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Collecting and Visualizing Metrics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Collecting and Visualizing Metrics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
-- [Metrics, Logs, and Traces](./02-metric-log-trace.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
+- [Observability 101 (2/10): Metrics, Logs, and Traces](./02-metric-log-trace.md)
 - **Collecting and Visualizing Metrics (current)**
 - Structured Logging (upcoming)
 - Distributed Tracing Basics (upcoming)
@@ -172,6 +202,7 @@ Once metrics flow, *the system speaks in graphs*. Next: *structured logging*.
 - SLI and SLO Basics (upcoming)
 - Cost and Cardinality (upcoming)
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,10 +1,10 @@
 ---
 series: testing-101
 episode: 9
-title: Running Tests in CI
+title: "Testing 101 (9/10): Running Tests in CI"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,26 @@ seo_description: Automate tests with GitHub Actions and speed them up using matr
 last_reviewed: '2026-05-04'
 ---
 
-# Running Tests in CI
+# Testing 101 (9/10): Running Tests in CI
 
-> Testing 101 series (9/10)
+A local green run is useful, but it is still only one machine, one dependency cache, and one engineer’s environment. Teams get into trouble when they treat that as sufficient evidence for everyone else, especially once multiple Python versions, operating systems, or contributors are involved.
 
-<!-- a-grade-intro:begin -->
+Continuous Integration exists to turn “works on my laptop” into a shared standard. The point is not just automation—it is consistent automation under conditions the whole team can trust.
 
-**Core question**: If your tests pass *only on your laptop*, did they really *pass*?
+This is post 9 in the Testing 101 series. Here we use GitHub Actions to build a practical CI path, then look at the operational details that keep the pipeline fast enough to enforce and informative enough to debug.
 
-> CI applies *the same standard to every commit*. It is *the safety net for the whole team*.
+> CI is where personal confidence becomes organizational evidence.
 
-<!-- a-grade-intro:end -->
+
+![testing 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/09/09-01-concept-at-a-glance.en.png)
+*testing 101 chapter 9 flow overview*
+> CI transforms "works on my machine" from an anecdote into a requirement.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Running Tests in CI?
+- Which signal should the example or diagram make visible for Running Tests in CI?
+- What failure should be prevented first when Running Tests in CI reaches a real system?
 
 ## What You Will Learn
 
@@ -47,15 +56,7 @@ Local environments *differ from person to person*. *CI* validates *every PR* in 
 > Tests without CI are tests that *passed by accident*.
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Push["git push"] --> Trigger["GitHub Actions trigger"]
-    Trigger --> Setup["Python and cache setup"]
-    Setup --> Run["Run pytest"]
-    Run --> Report["Upload results and coverage"]
-```
-
+Continuous Integration runs tests automatically on every commit and PR in a controlled environment, catching environment-specific failures, dependency version mismatches, and test order dependencies that local runs would miss, turning test results into organizational evidence rather than individual confidence.
 ## Key Terms
 
 - **CI**: *Continuous Integration*. *Auto-validate* every commit.
@@ -149,6 +150,20 @@ pytest -n auto             # parallel across CPU cores
 4. **Printing *secrets to the log*.** Never do `echo $SECRET`.
 5. **Build time exceeds *10 minutes* and you ignore it.** Aim for *under 5 minutes* with parallelism and caching.
 
+## Verification Points
+
+1. Compare the local command you trust with the command CI runs. If they differ, the meaning of a green build is already diluted.
+2. Measure runtime with and without dependency caching so you know whether the optimization is actually worth the complexity.
+3. Compare a single all-in-one job with split unit/integration/E2E jobs and inspect the feedback time difference.
+
+**Expected output:** the default PR path should finish within a few minutes, and the logs should tell you exactly which stage failed without additional guesswork.
+
+## Failure Signals and First Checks
+
+- CI-only flakes usually point to order dependence, timing assumptions, or real external resources.
+- A stale cache can keep broken dependency changes hidden until much later.
+- Secrets in logs turn a test pipeline problem into a security incident.
+
 ## How This Shows Up in Production
 
 Large teams *split* their suites into a *unit job* (1-2 minutes), an *integration job* (5 minutes), and an *E2E job* (15 minutes, nightly). PRs only require *unit and integration*; *E2E* runs after merge during the night.
@@ -178,22 +193,38 @@ Large teams *split* their suites into a *unit job* (1-2 minutes), an *integratio
 
 CI is *the safety net for the whole team*. In the next post we tie everything together into a *test strategy*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Running Tests in CI?**
+  - The article treats Running Tests in CI as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Running Tests in CI?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Running Tests in CI reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
-- [Integration Test](./03-integration-test.md)
-- [E2E Test](./04-e2e-test.md)
-- [Test Doubles](./05-test-double.md)
-- [Mock and Stub](./06-mock-and-stub.md)
-- [Test Coverage](./07-test-coverage.md)
-- [Regression Test](./08-regression-test.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
+- [Testing 101 (3/10): Integration Test](./03-integration-test.md)
+- [Testing 101 (4/10): E2E Test](./04-e2e-test.md)
+- [Testing 101 (5/10): Test Double](./05-test-double.md)
+- [Testing 101 (6/10): Mock and Stub](./06-mock-and-stub.md)
+- [Testing 101 (7/10): Test Coverage](./07-test-coverage.md)
+- [Testing 101 (8/10): Regression Test](./08-regression-test.md)
 - **Running Tests in CI (current)**
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [GitHub Actions docs](https://docs.github.com/en/actions)
+### Official Docs
+- [GitHub Actions documentation](https://docs.github.com/en/actions)
+- [actions/setup-python](https://github.com/actions/setup-python)
+- [Caching dependencies to speed up workflows](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows)
+
+### Practical Reading
 - [pytest-xdist](https://pytest-xdist.readthedocs.io/)
 - [Martin Fowler — Continuous Integration](https://martinfowler.com/articles/continuousIntegration.html)
-- [Google Testing Blog — Flaky Tests](https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html)

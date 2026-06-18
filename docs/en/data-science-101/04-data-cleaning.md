@@ -1,10 +1,10 @@
 ---
 series: data-science-101
 episode: 4
-title: Data Cleaning
-status: content-ready
+title: "Data Science 101 (4/10): Data Cleaning"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,36 @@ tags:
   - Quality
   - Beginner
 seo_description: A 5-step guide to spotting and fixing missing values, duplicates, outliers, and type mismatches in real-world tabular data
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Data Cleaning
+# Data Science 101 (4/10): Data Cleaning
 
-> Data Science 101 series (4/10)
+Cleaning is where data projects quietly win or lose. Most teams do not fail because the final model was mathematically weak. They fail because dates were still strings, duplicates were silently kept, or a fill rule changed the distribution without anybody noticing.
 
-<!-- a-grade-intro:begin -->
+That is why cleaning should feel less like “tidying up” and more like quality control. You are not polishing data for presentation. You are deciding which evidence is safe enough to carry into EDA, metrics, and models.
 
-**Core question**: In what *order* should we find and fix *missing values, duplicates, outliers, and type mismatches*?
+This is post 4 in the Data Science 101 series. In this chapter, we turn the messy middle of tabular work into a repeatable sequence for types, duplicates, missingness, outliers, and validation.
 
-> *80% of the time goes into cleaning — good cleaning makes the other 20% *real* analysis.*
 
-<!-- a-grade-intro:end -->
+![data science 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/04/04-01-concept-at-a-glance.en.png)
+*data science 101 chapter 4 flow overview*
+> At its core, Data Cleaning is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Data Cleaning?
+- Which signal should the example or diagram make visible for Data Cleaning?
+- What failure should be prevented first when Data Cleaning reaches a real system?
+
+## Questions This Post Answers
+
+- Which quality problems should you inspect first in tabular data?
+- Why do type fixes, missingness, duplicates, and outliers need different treatment?
+- How do simple fill rules distort later analysis if you apply them blindly?
+- What should a cleaning report capture before you move on?
+
+> Cleaning is the stage where you decide which rows are trustworthy enough to become evidence.
 
 ## What You Will Learn
 
@@ -46,16 +62,7 @@ last_reviewed: '2026-05-04'
 
 > *Cleaning is the *insurance policy* of analysis.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Raw["Raw Data"] --> Type["Fix Types"]
-    Type --> Dup["Drop Duplicates"]
-    Dup --> Null["Handle Missing"]
-    Null --> Out["Detect Outliers"]
-    Out --> Clean["Clean Data"]
-```
+The key boundary in this episode is between the concept itself and how it operates in a real system. You need to know where the data comes in, where the decision happens, and what signal must be recorded.
 
 ## Key Terms
 
@@ -122,6 +129,8 @@ report = {
 print(report)
 ```
 
+**Expected output:** a validation report with remaining row count, null counts by column, and the outlier rate after cleaning.
+
 ## What to Notice in This Code
 
 - *Fixing types* is the starting point of all cleaning.
@@ -165,10 +174,21 @@ Teams test cleaning steps with tools like *Great Expectations*. CI runs *data-qu
 
 Cleaning is *quiet labor* that holds up *every conclusion* you will draw. Next we move to *EDA* — exploring the cleaned data.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Data Cleaning?**
+  - The article treats Data Cleaning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Data Cleaning?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Data Cleaning reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Data Science?](./01-what-is-data-science.md)
-- [Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
-- [Data Collection](./03-data-collection.md)
+## In this series
+
+- [Data Science 101 (1/10): What Is Data Science?](./01-what-is-data-science.md)
+- [Data Science 101 (2/10): Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
+- [Data Science 101 (3/10): Data Collection](./03-data-collection.md)
 - **Data Cleaning (current)**
 - Exploratory Data Analysis (upcoming)
 - Visualization (upcoming)
@@ -176,6 +196,7 @@ Cleaning is *quiet labor* that holds up *every conclusion* you will draw. Next w
 - Evaluation (upcoming)
 - Result Interpretation (upcoming)
 - End-to-End Data Project Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

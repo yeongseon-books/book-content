@@ -1,10 +1,10 @@
 ---
 series: computer-science-major-101
 episode: 2
-title: Understanding First Year Subjects
-status: content-ready
+title: "Computer Science Major 101 (2/10): Understanding First Year Subjects"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,30 @@ tags:
   - Programming
   - Beginner
 seo_description: A beginner-friendly tour of first year CS subjects covering calculus, linear algebra, discrete math, and intro programming.
-last_reviewed: '2026-05-04'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
-# Understanding First Year Subjects
+# Computer Science Major 101 (2/10): Understanding First Year Subjects
 
 > Computer Science Major 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Why do first year CS subjects *focus* on *math* and *intro programming*?
 
 > Because *foundation strength* must be built in *one year* before upper courses pile on top.
 
-<!-- a-grade-intro:end -->
+This is post 2 in the Computer Science Major 101 series.
+
+
+![computer science major 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/02/02-01-first-year-foundation-map.en.png)
+*computer science major 101 chapter 2 flow overview*
+> First-year subjects are not obstacles to 'real' CS—they are the ground floor. Each hour spent on calculus, linear algebra, discrete math, and intro programming saves you days of rework in upper courses.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Understanding First Year Subjects?
+- Which signal should the example or diagram make visible for Understanding First Year Subjects?
+- What failure should be prevented first when Understanding First Year Subjects reaches a real system?
 
 ## What You Will Learn
 
@@ -45,15 +55,7 @@ last_reviewed: '2026-05-04'
 Year-one *foundations* underlie *algorithms*, *AI*, and *systems* — every later course.
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    C[Calculus] --> L[Linear Algebra]
-    L --> D[Discrete Math]
-    D --> P[Programming]
-    P --> N[Next Year]
-```
-
+First-year courses establish the *pace*, *language*, and *thinking habits* you will carry forward. They are not prerequisites—they are ground-builders.
 ## Key Terms
 
 - **calculus**: math of *continuous* change.
@@ -143,8 +145,19 @@ If your *algebra* and *logic* shake during code review, *upper work* also collap
 
 Next post: *Data Structures and Algorithms*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Understanding First Year Subjects?**
+  - The article treats Understanding First Year Subjects as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Understanding First Year Subjects?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Understanding First Year Subjects reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
+## In this series
+
+- [Computer Science Major 101 (1/10): What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
 - **Understanding First Year Subjects (current)**
 - Data Structures and Algorithms (upcoming)
 - Understanding Systems Subjects (upcoming)
@@ -154,6 +167,7 @@ Next post: *Data Structures and Algorithms*.
 - How to Study Computer Science (upcoming)
 - Build Your Portfolio (upcoming)
 - Skills to Have Before Graduation (upcoming)
+
 <!-- toc:end -->
 
 ## References

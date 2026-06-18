@@ -1,10 +1,10 @@
 ---
 series: data-warehouse-101
 episode: 3
-title: Fact and Dimension
-status: content-ready
+title: "Data Warehouse 101 (3/10): Fact and Dimension"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,35 @@ tags:
   - Modeling
   - Analytics
 seo_description: The roles of fact and dimension tables, why we separate measures from attributes, and the base unit of analytical modeling.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Fact and Dimension
+# Data Warehouse 101 (3/10): Fact and Dimension
 
-> Data Warehouse 101 series (3/10)
+Most analytical questions hide the same structure: how much happened, and by which slice do you want to explain it? The moment you mix those two jobs in one wide table, every later change becomes more expensive than it needs to be.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Data Warehouse 101 series.
 
-**Core question**: Why do we *separate measures from attributes*? What *breaks* if we put them together?
+In this post, we split measures from attributes on purpose. That separation is what keeps aggregations stable, lets context evolve without rewriting history, and gives the warehouse a reusable modeling vocabulary.
 
-> *Fact tables hold *how much*. Dimension tables hold *what, who, when*.*
 
-<!-- a-grade-intro:end -->
+![data warehouse 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/03/03-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 3 flow overview*
+> A fact table records immutable events; dimension tables define how to view them. This separation makes schema changes cheaper and queries more readable.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Fact and Dimension?
+- Which signal should the example or diagram make visible for Fact and Dimension?
+- What failure should be prevented first when Fact and Dimension reaches a real system?
+
+## Questions this article answers
+
+- What do fact tables and dimension tables each hold?
+- What do you gain by separating measures from descriptive attributes?
+- Why do you need to define the grain first in an analytical model?
+- Why do surrogate keys and conformed dimensions appear so often in warehouse design?
+- What is the first sentence you should write before you start OLAP modeling?
 
 ## What You Will Learn
 
@@ -46,14 +61,7 @@ Analytical questions almost always read as *how much (measure)* by *which slice 
 
 > *Split measures from attributes. Together they slow each other down.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Fact["fact_orders (amount, qty)"] --> DimUser["dim_user"]
-    Fact --> DimProduct["dim_product"]
-    Fact --> DimDate["dim_date"]
-```
+This picture shows how Fact and Dimension tables work together inside a warehouse. The key is not to memorize the definitions, but to see which table records events and which records context.
 
 ## Key Terms
 
@@ -168,9 +176,20 @@ E-commerce ships *fact_orders, fact_payments, fact_refunds* and *shares* dim_use
 
 Splitting facts and dimensions is the *starting point* of analytical modeling. Next, we cover the *star schema* — the most common shape.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Fact and Dimension?**
+  - The article treats Fact and Dimension as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Fact and Dimension?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Fact and Dimension reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
-- [OLTP and OLAP](./02-oltp-and-olap.md)
+## In this series
+
+- [Data Warehouse 101 (1/10): What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
+- [Data Warehouse 101 (2/10): OLTP and OLAP](./02-oltp-and-olap.md)
 - **Fact and Dimension (current)**
 - Star Schema (upcoming)
 - Partition and Clustering (upcoming)
@@ -179,6 +198,7 @@ Splitting facts and dimensions is the *starting point* of analytical modeling. N
 - Data Mart (upcoming)
 - Performance Optimization (upcoming)
 - Warehouse Design Example (upcoming)
+
 <!-- toc:end -->
 
 ## References

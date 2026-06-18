@@ -1,10 +1,10 @@
 ---
 series: incident-response-101
 episode: 3
-title: Initial Response
-status: content-ready
+title: "Incident Response 101 (3/10): Initial Response"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,57 +16,52 @@ tags:
   - Response
   - OnCall
   - Operations
-seo_description: A beginner-friendly guide to initial incident response covering the five-minute rule, stabilization, impact estimation, roles, and channels
-last_reviewed: '2026-05-04'
+seo_description: Learn what a response team should do in the first minutes of an incident, from ack and triage to stabilization and comms.
+last_reviewed: '2026-05-15'
 ---
 
-# Initial Response
+# Incident Response 101 (3/10): Initial Response
 
-> Incident Response 101 series (3/10)
+The first few minutes after an alert feel both compressed and chaotic. Data is incomplete, pressure is high, and different people start pulling toward diagnosis, rollback, communication, and ownership at the same time.
 
-<!-- a-grade-intro:begin -->
+Teams that survive this window well do not start with perfect answers. They start with structure: acknowledge the page, estimate impact, open one channel, assign roles, and buy time with stabilization.
 
-**Core question**: In the *first five minutes* after an *alert*, *what* should you do?
+This is post 3 in the Incident Response 101 series. This post breaks down that first-response sequence so the team can stop the bleeding before it tries to explain every detail.
 
-> *Initial response* focuses on *stabilization* and *role assignment*.
 
-<!-- a-grade-intro:end -->
+![incident response 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/03/03-01-diagram-at-a-glance.en.png)
+*incident response 101 chapter 3 flow overview*
+> Initial response prioritizes stabilization over diagnosis. The cost of delay is real; the cost of a wrong direction is usually recoverable.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *five-minute rule*
-- *Stabilization first*
-- *Impact estimation*
-- *Role assignment*
-- *Channel setup*
+- What should happen first after a page is acknowledged?
+- Why is stabilization usually more urgent than diagnosis?
+- How much impact estimation is enough for the first update?
 
-## Why It Matters
+## Why this topic matters
 
-The actions in the *first five minutes* determine the *whole outcome*.
+The most expensive minutes in an incident are often the earliest ones. If everyone starts investigating independently, the team loses both speed and a shared picture of the problem.
 
-## Concept at a Glance
+A strong first-response routine creates enough order to keep the incident legible. Once ownership, communication, and stabilization are in place, deeper diagnosis becomes much more effective.
 
-```mermaid
-flowchart LR
-    Page["page"] --> Ack["ack"]
-    Ack --> Triage["triage"]
-    Triage --> Channel["open channel"]
-    Channel --> Roles["assign roles"]
-```
+## Diagram at a glance
+
+The response path is intentionally simple. Acknowledge ownership, triage the rough severity, open one channel, and assign roles before the room grows noisy.
 
 ## Key Terms
 
-- **ack**: *acknowledging* a page.
-- **triage**: *sorting* and *prioritizing*.
-- **stabilize**: *stop the bleeding*.
-- **channel**: a *dedicated collaboration space*.
-- **role**: a *defined responsibility*.
+- **ack**: acknowledging a page.
+- **triage**: sorting and prioritizing.
+- **stabilize**: stop the bleeding.
+- **channel**: a dedicated collaboration space.
+- **role**: a defined responsibility.
 
 ## Before/After
 
-**Before**: start with *diagnosis*.
+**Before**: start with diagnosis.
 
-**After**: start with *stabilization*.
+**After**: start with stabilization.
 
 ## Hands-on: Five-Minute Checklist
 
@@ -107,50 +102,76 @@ def stabilize(actions):
 
 ## What to Notice in This Code
 
-- *Ack* marks the start of *ownership*.
-- Express *impact* with *numbers*.
-- The *role* set has *three axes*.
+- Ack marks the start of ownership.
+- Express impact with numbers.
+- The role set has three axes.
 
 ## Five Common Mistakes
 
-1. **Starting with *diagnosis*.**
-2. **The *IC* doing the *hands-on work*.**
-3. ***Scattering* across channels.**
-4. **Skipping *customer comms*.**
-5. **Acting *without records*.**
+1. **Starting with diagnosis.**
+2. **The IC doing the hands-on work.**
+3. **Scattering across channels.**
+4. **Skipping customer comms.**
+5. **Acting without records.**
 
 ## How This Shows Up in Production
 
-*PagerDuty ack* → *auto-created Slack channel* → *Statuspage draft* — all *automated*.
+PagerDuty ack → auto-created Slack channel → Statuspage draft — all automated.
 
 ## How a Senior Engineer Thinks
 
-- *Time* is the *enemy*.
-- *Stabilization* is the *top priority*.
-- *Roles* are *fixed*.
-- *Recording* happens *in parallel*.
-- *Action* beats *perfection*.
+- Time is the enemy.
+- Stabilization is the top priority.
+- Roles are fixed.
+- Recording happens in parallel.
+- Action beats perfection.
+
+## Example: an operator log for the first ten minutes
+
+A compact response log makes it easy to review whether the team established structure before it started chasing detailed diagnosis.
+
+```text
+09:01 page acknowledged by primary on-call
+09:03 error rate confirmed at 18%, checkout path affected
+09:04 #inc-payments channel opened
+09:05 IC / ops / comms roles assigned
+09:07 rollback started
+09:10 status page investigation notice published
+```
+
+This kind of log is short, but it preserves the difference between “we were investigating” and “we had actually established command.”
 
 ## Checklist
 
-- [ ] *Ack policy*.
-- [ ] *Channel automation*.
-- [ ] *Role cards*.
-- [ ] *Stabilization action list*.
+- [ ] Ack policy.
+- [ ] Channel automation.
+- [ ] Role cards.
+- [ ] Stabilization action list.
 
 ## Practice Problems
 
-1. Define *ack* in one line.
-2. Define *triage* in one line.
-3. Define *stabilize* in one line.
+1. Define ack in one line.
+2. Define triage in one line.
+3. Define stabilize in one line.
 
 ## Wrap-up and Next Steps
 
-Next, we cover *communication*.
+Next, we cover communication.
+
+## Answering the Opening Questions
+
+- **What should happen first after a page is acknowledged?**
+  - The article treats Initial Response as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is stabilization usually more urgent than diagnosis?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How much impact estimation is enough for the first update?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What is an Incident?](./01-what-is-incident.md)
-- [Severity Classification](./02-severity.md)
+## In this series
+
+- [Incident Response 101 (1/10): What is an Incident?](./01-what-is-incident.md)
+- [Incident Response 101 (2/10): Severity Classification](./02-severity.md)
 - **Initial Response (current)**
 - Communication (upcoming)
 - Writing the Timeline (upcoming)
@@ -159,11 +180,16 @@ Next, we cover *communication*.
 - Postmortem (upcoming)
 - Prevention (upcoming)
 - Building an Incident Runbook (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Incident Response Process - PagerDuty](https://response.pagerduty.com/during/during_an_incident/)
+### Official Docs
+- [Responding During an Incident - PagerDuty](https://response.pagerduty.com/during/during_an_incident/)
 - [Managing Incidents - Google SRE Book](https://sre.google/sre-book/managing-incidents/)
-- [Incident Triage - Atlassian](https://www.atlassian.com/incident-management/incident-response)
-- [On-Call Best Practices](https://increment.com/on-call/)
+- [Incident response process - Atlassian](https://www.atlassian.com/incident-management/incident-response)
+- [Statuspage incident communication guide](https://www.atlassian.com/software/statuspage/incident-communication)
+
+### Example source
+- [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)

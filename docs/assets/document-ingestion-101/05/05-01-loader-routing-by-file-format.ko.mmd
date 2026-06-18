@@ -1,0 +1,8 @@
+flowchart TD
+  A["수집된 파일"] --> B{"확장자 확인"}
+  B -->|PDF| C["PDF Loader"]
+  B -->|DOCX| D["Word Loader"]
+  B -->|CSV| E["CSV Loader"]
+  C --> F["공통 파이프라인"]
+  D --> F
+  E --> F

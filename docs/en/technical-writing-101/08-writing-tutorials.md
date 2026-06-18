@@ -1,10 +1,10 @@
 ---
 series: technical-writing-101
 episode: 8
-title: Writing Tutorials
-status: content-ready
+title: "Technical Writing 101 (8/10): Writing Tutorials"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,43 +16,36 @@ tags:
   - Learning
   - HandsOn
   - Beginner
-seo_description: A beginner-friendly tour of writing a tutorial that simply works when the reader follows it step by step.
-last_reviewed: '2026-05-04'
+seo_description: Write tutorials with short verified steps, recovery notes, and a fast first success that keeps readers moving.
+last_reviewed: '2026-05-15'
 ---
 
-# Writing Tutorials
+# Technical Writing 101 (8/10): Writing Tutorials
 
-> Technical Writing 101 series (8/10)
+Writers often respond to uncertainty by adding more explanation. Tutorial readers usually need the opposite. They need a short path, clear checkpoints, and quick recovery when one step fails.
 
-<!-- a-grade-intro:begin -->
+A tutorial earns trust by making success predictable. Each step should leave behind a visible proof, and each likely failure should have at least one short recovery note. That is what keeps a hands-on chapter from turning into a lecture transcript.
 
-**Core question**: How do you make a *tutorial* that simply *works* when the reader *follows* it?
+This is post 8 in the Technical Writing 101 series. It turns tutorials into verified step-by-step paths instead of broad conceptual overviews.
 
-> Every *step* must be *verified*.
 
-<!-- a-grade-intro:end -->
+![technical writing 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/08/08-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 8 flow overview*
+> A tutorial step is only strong when it leaves behind a checkpoint the reader can verify before moving on.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Where a tutorial sits in *Diátaxis*
-- Stating *prerequisites*
-- Designing a *small win*
-- *Error recovery* notes
-- The *wrap-up* and *next step*
+- Where a tutorial sits in *Diátaxis?
+- Stating *prerequisites?
+- Designing a *small win?
 
 ## Why It Matters
 
 A *first success* creates the will to keep *learning*.
 
-## Concept at a Glance
+> Mental model: every tutorial step needs a checkpoint the reader can verify before moving on.
 
-```mermaid
-flowchart LR
-    P[Prereq] --> S[Step]
-    S --> W[Win]
-    W --> N[Next]
-```
-
+Tutorials differ from reference docs because they prioritize momentum and small wins over completeness. Each step should reveal visible proof of progress and include a recovery path for the most likely failure.
 ## Key Terms
 
 - **tutorial**: A *learning* oriented post.
@@ -66,6 +59,32 @@ flowchart LR
 **Before**: "Let us learn about *FastAPI*." (lecture)
 
 **After**: "*Run Hello World in five minutes*." (tutorial)
+
+## Make every tutorial step behave like a test case
+
+A tutorial is easier to trust when each step leaves behind a visible checkpoint. For a FastAPI hello-world, that can look like this.
+
+```bash
+cat > main.py <<'PY'
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"hello": "world"}
+PY
+
+fastapi dev main.py
+```
+
+**Expected output:**
+
+```text
+Uvicorn running on http://127.0.0.1:8000
+```
+
+Recovery notes matter too. If the reader sees `fastapi: command not found`, tell them to rerun `python3 -m pip install "fastapi[standard]"` and retry. That single line often keeps the tutorial self-contained instead of sending the reader into search results.
 
 ## Hands-on: A Five Minute Tutorial
 
@@ -147,17 +166,29 @@ Great libraries finish their *official tutorial* in *under five minutes*.
 
 The next post is *Blog vs Documentation*.
 
+## Answering the Opening Questions
+
+- **Where a tutorial sits in *Diátaxis?**
+  - The article treats Writing Tutorials as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Stating *prerequisites?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Designing a *small win?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
-- [Title and Structure](./03-title-and-structure.md)
-- [Explaining Concepts](./04-explaining-concepts.md)
-- [Explaining Example Code](./05-explaining-example-code.md)
-- [Using Figures and Tables](./06-using-figures-and-tables.md)
-- [Writing the README](./07-writing-the-readme.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): Title and Structure](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): Explaining Concepts](./04-explaining-concepts.md)
+- [Technical Writing 101 (5/10): Explaining Example Code](./05-explaining-example-code.md)
+- [Technical Writing 101 (6/10): Using Figures and Tables](./06-using-figures-and-tables.md)
+- [Technical Writing 101 (7/10): Writing the README](./07-writing-the-readme.md)
 - **Writing Tutorials (current)**
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

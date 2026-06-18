@@ -1,11 +1,11 @@
 ---
-title: Comparing embedding models
+title: "RAG Evaluation and Benchmarking 101 (3/6): Comparing embedding models"
 series: rag-benchmark-101
 episode: 3
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -17,23 +17,24 @@ tags:
 - MTEB
 - Latency
 last_reviewed: '2026-05-01'
-seo_description: Embedding comparison rests on the one-variable-at-a-time principle.
+seo_description: Compare embedding models on your data. Learn to balance hit rate, MRR, latency, and index costs using one-variable benchmarking.
 ---
 
-# Comparing embedding models
+# RAG Evaluation and Benchmarking 101 (3/6): Comparing embedding models
 
-## Questions this post answers
+Embedding comparison is only credible when you change one variable at a time. Keep the corpus, queries, and top-k fixed, and the score gap starts to reflect the embedding model instead of the test setup.
 
-![Questions this post answers](../../assets/rag-benchmark-101/03/03-01-questions-this-post-answers.en.png)
+This is the 3rd article in the RAG Evaluation and Benchmarking 101 series.
 
-*Questions this post answers*
-
-- What do you see when you run `all-MiniLM-L6-v2` and `paraphrase-MiniLM-L3-v2` on the same query set?
-- Why is hit rate alone insufficient for embedding model comparison?
-- How do you tell whether speed or accuracy is the bottleneck?
-- Why can MTEB leaderboard scores disagree with what you measure on your own data?
-
+![Fixed-corpus embedding comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-01-fixed-corpus-embedding-comparison-struct.en.png)
+*Fixed-corpus embedding comparison structure*
 > Comparing embedding models is not about which one is "smarter". It is about which one **places relevant documents earlier in the same retrieval pipeline**.
+
+## Questions to Keep in Mind
+
+- Why is it risky to choose an embedding model from leaderboard scores alone?
+- What conditions must stay fixed when only the model changes over the same corpus and queries?
+- How should you judge a model that improves quality but increases latency or cost?
 
 ## Why this matters
 
@@ -49,7 +50,7 @@ The benchmark in this post is small, but it produces numbers measured on your da
 
 Embedding comparison rests on the **one-variable-at-a-time** principle.
 
-```
+```text
 [fixed] corpus  +  [fixed] QUERIES  +  [fixed] k
                   │
                   ▼
@@ -82,7 +83,7 @@ Smaller models have lower dimensions (e.g. 384) and lower latency. Larger models
 
 **After**: Both models run on the same corpus and queries. The result is a one-line table:
 
-```
+```text
 model                    hit@3  MRR   avg_lat_ms  index_build_s
 all-MiniLM-L6-v2         1.00   0.83  6.2         3.1
 paraphrase-MiniLM-L3-v2  0.67   0.50  4.8         2.4
@@ -124,14 +125,10 @@ def benchmark_model(model_name: str):
 
 ### Step 2 — Run two models
 
-![Fixed-corpus embedding comparison structure](../../assets/rag-benchmark-101/03/03-01-fixed-corpus-embedding-comparison-struct.en.png)
-
-*Fixed-corpus embedding comparison structure*
-
 The runnable code lives in `rag-benchmark-101/en/03-embedding-comparison/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/03-embedding-comparison
+cd en/03-embedding-comparison
 python3 main.py
 ```
 
@@ -146,7 +143,7 @@ print(json.dumps(results, indent=2))
 
 ### Step 3 — Compare results
 
-![Quality and latency comparison axes](../../assets/rag-benchmark-101/03/03-02-quality-and-latency-comparison-axes.en.png)
+![Quality and latency comparison axes](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-02-quality-and-latency-comparison-axes.en.png)
 
 *Quality and latency comparison axes*
 
@@ -164,7 +161,7 @@ index_build_s = round(time.perf_counter() - t0, 2)
 
 ## Common mistakes
 
-![One-variable-at-a-time experiment boundary](../../assets/rag-benchmark-101/03/03-03-one-variable-at-a-time-experiment-bounda.en.png)
+![One-variable-at-a-time experiment boundary](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-03-one-variable-at-a-time-experiment-bounda.en.png)
 
 *One-variable-at-a-time experiment boundary*
 
@@ -184,7 +181,7 @@ index_build_s = round(time.perf_counter() - t0, 2)
 
 ## Checklist
 
-![Speed, quality, and cost selection flow](../../assets/rag-benchmark-101/03/03-04-speed-quality-and-cost-selection-flow.en.png)
+![Speed, quality, and cost selection flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-04-speed-quality-and-cost-selection-flow.en.png)
 
 *Speed, quality, and cost selection flow*
 
@@ -206,15 +203,26 @@ This post kept the retriever fixed and varied only the embedding model, comparin
 
 Episode 4 applies the same thinking to vector DB selection: FAISS, Chroma, pgvector — same loop, different store.
 
+## Answering the Opening Questions
+
+- **Why is it risky to choose an embedding model from leaderboard scores alone?**
+  Leaderboards do not measure your documents, language mix, query distribution, latency target, or infrastructure constraints.
+
+- **What conditions must stay fixed when only the model changes over the same corpus and queries?**
+  Keep corpus, chunking, query set, gold labels, k, VectorDB settings, and metric code fixed while changing only the embedding model.
+
+- **How should you judge a model that improves quality but increases latency or cost?**
+  Use an explicit decision table to weigh quality gain against latency, infrastructure cost, and reindexing cost. The highest score is not always the best product choice.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Understanding RAG evaluation metrics](./01-evaluation-metrics.md)
-- [Measuring retrieval performance](./02-retrieval-benchmarking.md)
-- **Comparing embedding models (current)**
-- VectorDB selection criteria (upcoming)
-- End-to-end RAG pipeline evaluation (upcoming)
-- Completing the RAG Benchmark (upcoming)
+- [RAG Evaluation and Benchmarking 101 (1/6): Understanding RAG evaluation metrics](./01-evaluation-metrics.md)
+- [RAG Evaluation and Benchmarking 101 (2/6): Measuring retrieval performance](./02-retrieval-benchmarking.md)
+- **RAG Evaluation and Benchmarking 101 (3/6): Comparing embedding models (current)**
+- RAG Evaluation and Benchmarking 101 (4/6): VectorDB selection criteria (upcoming)
+- RAG Evaluation and Benchmarking 101 (5/6): End-to-end RAG pipeline evaluation (upcoming)
+- RAG Evaluation and Benchmarking 101 (6/6): Completing the RAG benchmark (upcoming)
 
 <!-- toc:end -->
 

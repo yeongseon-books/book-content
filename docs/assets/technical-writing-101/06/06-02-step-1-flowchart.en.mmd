@@ -1,0 +1,5 @@
+flowchart TD
+    A["Start"] --> B{"Check Question"}
+    B -->|Yes| C["Proceed Next Step"]
+    B -->|No| D["Report Error & Stop"]
+    C --> E["Complete"]

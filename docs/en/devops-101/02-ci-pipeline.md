@@ -1,10 +1,10 @@
 ---
 series: devops-101
 episode: 2
-title: CI Pipeline
-status: content-ready
+title: "DevOps 101 (2/10): CI Pipeline"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,28 +17,35 @@ tags:
   - Automation
   - Pipeline
 seo_description: How to design and build a CI pipeline that automates build, test, lint, and security checks for every pull request.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# CI Pipeline
+# DevOps 101 (2/10): CI Pipeline
 
-> DevOps 101 series (2/10)
+A pull request without a reliable CI pipeline is still a guess. Reviewers can catch logic issues, but they should not be the only layer standing between a typo, a broken import, or a vulnerable dependency and your main branch.
 
-<!-- a-grade-intro:begin -->
+A strong CI pipeline turns quality rules into an executable contract. Every PR sees the same checks in the same order, so the team argues less about process and spends more time fixing real failures.
 
-**Core question**: Do you have *one pipe* that applies *the same checks* to *every PR*?
+This is post 2 in the DevOps 101 series. Here we focus on the first hard feedback gate in the DevOps loop: how to design CI so it fails fast, explains itself clearly, and earns the team's trust.
 
-> A CI pipeline is *the team's bar*. The *passing line is encoded*.
 
-<!-- a-grade-intro:end -->
+![devops 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/02/02-01-concept-at-a-glance.en.png)
+*devops 101 chapter 2 flow overview*
+> A CI pipeline decides *what to verify*, *when*, and *how long to wait*—so quality depends on *system defaults*, not reviewer diligence.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The definition and stages of a *CI pipeline*
-- *Separation of responsibility* per stage (build/test/lint/scan)
-- Designing for *fast feedback*
-- Clear signals for *failed builds*
-- Five common pitfalls
+- What boundary should you inspect first when applying CI Pipeline?
+- Which signal should the example or diagram make visible for CI Pipeline?
+- What failure should be prevented first when CI Pipeline reaches a real system?
+
+## Questions this article answers
+
+- How is a *CI pipeline* different from simple *test automation*?
+- Why should *build*, *test*, *lint*, and *scan* be combined into one *flow*?
+- In what order should you design a pipeline to deliver *fast feedback*?
+- What does it take for a *failed build* to send a clear signal to the whole team?
+- What are the common ways *CI* still breaks down in day-to-day work even after adoption?
 
 ## Why It Matters
 
@@ -46,16 +53,7 @@ Tests alone are not enough. *Lint, type checks, and security scans* must be bund
 
 > A PR without CI is *wishful thinking*.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Push["push/PR"] --> Lint["lint"]
-    Lint --> Build["build"]
-    Build --> Test["test"]
-    Test --> Scan["security scan"]
-    Scan --> Pass["green check"]
-```
+A CI pipeline is an automated sequence of checks that run every time code is pushed. It should be *fast* (fail early), *clear* (report exactly what broke), and *consistent* (same rules apply to everyone).
 
 ## Key Terms
 
@@ -175,8 +173,19 @@ Large monorepos apply *impact analysis* to build and test only the *changed pack
 
 A CI pipeline is *the encoded passing line*. In the next post we cover how to *deploy* the *passed code* *safely*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying CI Pipeline?**
+  - The article treats CI Pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for CI Pipeline?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when CI Pipeline reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is DevOps?](./01-what-is-devops.md)
+## In this series
+
+- [DevOps 101 (1/10): What Is DevOps?](./01-what-is-devops.md)
 - **CI Pipeline (current)**
 - CD and Deployment Strategies (upcoming)
 - Environments and Configuration (upcoming)
@@ -186,6 +195,7 @@ A CI pipeline is *the encoded passing line*. In the next post we cover how to *d
 - Logging and Analysis (upcoming)
 - Incident Response and On-Call (upcoming)
 - An Operable DevOps Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

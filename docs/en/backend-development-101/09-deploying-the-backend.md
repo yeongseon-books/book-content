@@ -1,10 +1,10 @@
 ---
 series: backend-development-101
 episode: 9
-title: Deploying the Backend
-status: content-ready
+title: "Backend Development 101 (9/10): Deploying the Backend"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,46 +17,30 @@ tags:
   - DevOps
   - Python
 seo_description: Use Docker, environment variables, healthchecks, and rolling updates to ship a Python backend safely to production.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Deploying the Backend
+# Backend Development 101 (9/10): Deploying the Backend
 
-> Backend Development 101 series (9/10)
+The reason code works on your laptop and fails in production is usually not the code alone. It is the difference in operating system, dependencies, secrets, networking, and startup assumptions that never got frozen into something reproducible.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Backend Development 101 series. Here, we treat deployment as a reproducibility problem and use Docker, environment variables, healthchecks, and rolling updates to make backend delivery predictable.
 
-**Core question**: Why does "it works on my laptop" so often *break* in production?
 
-> Production has different OS, dependencies, secrets, and networks. Deployment is the work of *freezing* those differences in code.
+![backend development 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 9 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The pieces that make up a deployment environment
-- How a Dockerfile creates a *reproducible environment*
-- How to manage env vars and secrets
-- What healthchecks and readiness probes do
-- The basic idea behind zero-downtime deployment
+- The pieces that make up a deployment environment?
+- How a Dockerfile creates a *reproducible environment?
+- How to manage env vars and secrets?
 
 ## Why It Matters
 
 When deploys become *scary*, release frequency drops, and rare deploys carry *more change* and *more risk*. Making deploys boring is one of the most senior things you can do.
 
 > A great deploy has *no drama*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Code["Source"] --> Build["Build"]
-    Build --> Image["Container image"]
-    Image --> Reg["Registry"]
-    Reg --> Run["Runner"]
-    Run --> LB["Load balancer"]
-    LB --> Users["Users"]
-```
 
 Code becomes an *image*; the image runs the same way *everywhere*.
 
@@ -152,6 +136,16 @@ healthcheck:
 
 The key is to *prove the new version is healthy* before traffic moves.
 
+## Verification points
+
+**Expected output:** `docker build` should produce the same runnable image from the same Dockerfile, `/healthz` should return `{"status": "ok"}`, and traffic should move only after the new version passes its healthcheck.
+
+### First failure modes to check
+
+- If the container exits immediately, inspect the `CMD` path and port binding first.
+- If behavior changes across environments, secrets or config may still be baked into the image.
+- If errors spike during rollout, confirm traffic is not shifting before healthchecks succeed.
+
 ## What to Notice in This Code
 
 - Secrets *do not* go inside the image.
@@ -196,22 +190,39 @@ Most teams use *Docker + GitHub Actions + an orchestrator (Kubernetes/ECS)*. A m
 
 Deployment is a *reproducibility* problem. In the final chapter, we tie all the layers together into a *production-ready backend structure*.
 
+## Answering the Opening Questions
+
+- **The pieces that make up a deployment environment?**
+  - The article treats Deploying the Backend as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How a Dockerfile creates a *reproducible environment?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to manage env vars and secrets?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Backend Development?](./01-what-is-backend-development.md)
-- [Building an HTTP Server](./02-building-an-http-server.md)
-- [Routing and Controllers](./03-routing-and-controllers.md)
-- [The Service Layer](./04-service-layer.md)
-- [The Database Layer](./05-database-layer.md)
-- [Authentication and Authorization](./06-auth-and-authorization.md)
-- [Logging and Error Handling](./07-logging-and-error-handling.md)
-- [Testing the Backend](./08-testing-the-backend.md)
+## In this series
+
+- [Backend Development 101 (1/10): What Is Backend Development?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): Building an HTTP Server](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing and Controllers](./03-routing-and-controllers.md)
+- [Backend Development 101 (4/10): The Service Layer](./04-service-layer.md)
+- [Backend Development 101 (5/10): The Database Layer](./05-database-layer.md)
+- [Backend Development 101 (6/10): Authentication and Authorization](./06-auth-and-authorization.md)
+- [Backend Development 101 (7/10): Logging and Error Handling](./07-logging-and-error-handling.md)
+- [Backend Development 101 (8/10): Testing the Backend](./08-testing-the-backend.md)
 - **Deploying the Backend (current)**
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+### Official Docs
+
 - [Docker get-started](https://docs.docker.com/get-started/)
-- [The Twelve-Factor App](https://12factor.net/)
 - [Kubernetes probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
 - [GitHub Actions for Python](https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python)
+
+### Further Reading
+
+- [The Twelve-Factor App](https://12factor.net/)

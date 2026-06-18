@@ -1,36 +1,42 @@
 ---
 series: developer-career-101
 episode: 7
-title: Settling into the First Job
-status: content-ready
+title: "Developer Career 101 (7/10): Settling into the First Job"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
 language: en
 tags:
-  - Career
-  - FirstJob
-  - Onboarding
-  - Junior
-  - Beginner
-seo_description: A beginner-friendly tour of the first ninety days at your first developer job.
-last_reviewed: '2026-05-04'
+- Career
+- FirstJob
+- Onboarding
+- Junior
+- Beginner
+seo_description: A beginner-friendly tour of the first ninety days at your first developer
+  job.
+last_reviewed: '2026-05-14'
 ---
 
-# Settling into the First Job
+# Developer Career 101 (7/10): Settling into the First Job
 
-> Developer Career 101 series (7/10)
+The first developer job often creates pressure to prove yourself immediately. Most teams are not looking for instant mastery in the first ninety days. They are looking for how fast you learn the context, how clearly you ask for help, and whether you can turn that help into small reliable contributions.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Developer Career 101 series.
 
-**Core question**: What do you do in the *first ninety days* to last for the long run?
 
-> Ask, record, and ship small contributions.
+![developer career 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/07/07-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 7 flow overview*
+> Your first job is about proving you can complete assigned work well and learning how your team works, not proving you are the smartest person in the room.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What should a new developer focus on during the first ninety days?
+- Why do questions, notes, and feedback loops matter more than pretending to know everything?
+- How can your first PR and your 1:1s build trust quickly?
 
 ## What You Will Learn
 
@@ -44,14 +50,7 @@ last_reviewed: '2026-05-04'
 
 The first impression frames the next eighteen months.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    L[Learn] --> A[Ask]
-    A --> C[Contribute]
-    C --> F[Feedback]
-```
+Your first ninety days set the tone. Prove reliability, learn fast, and expand scope gradually.
 
 ## Key Terms
 
@@ -106,6 +105,33 @@ weekly with manager, biweekly with mentor
 - next: one question per day
 ```
 
+## A simple ninety-day operating plan
+
+| Window | Priority | Useful artifact |
+| --- | --- | --- |
+| Days 0-30 | Build context and language | Team glossary, system notes |
+| Days 31-60 | Improve question quality | Question notebook, 1:1 agenda |
+| Days 61-90 | Ship small and learn fast | First PR, retro notes |
+| Entire period | Surface confusion early | Check-in rhythm and help requests |
+
+## A simple ninety-day operating plan
+
+| Window | Priority | Useful artifact |
+| --- | --- | --- |
+| Days 0-30 | Build context and language | Team glossary, system notes |
+| Days 31-60 | Improve question quality | Question notebook, 1:1 agenda |
+| Days 61-90 | Ship small and learn fast | First PR, retro notes |
+| Entire period | Surface confusion early | Check-in rhythm and help requests |
+
+## A simple ninety-day operating plan
+
+| Window | Priority | Useful artifact |
+| --- | --- | --- |
+| Days 0-30 | Build context and language | Team glossary, system notes |
+| Days 31-60 | Improve question quality | Question notebook, 1:1 agenda |
+| Days 61-90 | Ship small and learn fast | First PR, retro notes |
+| Entire period | Surface confusion early | Check-in rhythm and help requests |
+
 ## What to Notice in This Code
 
 - Questions accelerate learning.
@@ -149,22 +175,34 @@ Many companies use ninety-day goals and a first PR as official onboarding metric
 
 Next post covers *Side Projects and Learning*.
 
+## Answering the Opening Questions
+
+- **What should a new developer focus on during the first ninety days?**
+  - The article treats Settling into the First Job as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do questions, notes, and feedback loops matter more than pretending to know everything?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How can your first PR and your 1:1s build trust quickly?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Developer Career](./01-what-is-developer-career.md)
-- [Understanding Roles](./02-understanding-roles.md)
-- [Building a Learning Plan](./03-learning-plan.md)
-- [Resume and Portfolio](./04-resume-and-portfolio.md)
-- [Preparing for Coding Interviews](./05-coding-interview.md)
-- [System Design Interviews](./06-system-design-interview.md)
+## In this series
+
+- [Developer Career 101 (1/10): What Is a Developer Career](./01-what-is-developer-career.md)
+- [Developer Career 101 (2/10): Understanding Roles](./02-understanding-roles.md)
+- [Developer Career 101 (3/10): Building a Learning Plan](./03-learning-plan.md)
+- [Developer Career 101 (4/10): Resume and Portfolio](./04-resume-and-portfolio.md)
+- [Developer Career 101 (5/10): Preparing for Coding Interviews](./05-coding-interview.md)
+- [Developer Career 101 (6/10): System Design Interviews](./06-system-design-interview.md)
 - **Settling into the First Job (current)**
 - Side Projects and Learning (upcoming)
 - Mentoring and Networking (upcoming)
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
 - [The First 90 Days](https://hbr.org/books/watkins)
-- [Stripe Engineering Onboarding](https://stripe.com/blog/engineering-principles)
-- [Will Larson — Onboarding](https://lethain.com/onboarding-checklist/)
-- [Psychological Safety](https://rework.withgoogle.com/blog/five-keys-to-a-successful-google-team/)
+- [Will Larson — Onboarding checklist](https://lethain.com/onboarding-checklist/)
+- [GitHub Docs — Pull requests](https://docs.github.com/en/pull-requests)
+- [re:Work — Psychological safety](https://rework.withgoogle.com/guides/understanding-team-effectiveness/steps/introduction/)

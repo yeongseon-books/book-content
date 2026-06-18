@@ -1,0 +1,4 @@
+flowchart TD
+  Error["앱에서 500 오류 발생"] --> DaprLog["Dapr 로그: 컴포넌트 연결 거부됨"]
+  DaprLog --> Investigate["Azure Service Bus 연결 수정"]
+  Investigate --> Resolved["장애 해결됨"]

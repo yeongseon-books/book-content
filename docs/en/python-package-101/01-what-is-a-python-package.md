@@ -1,11 +1,11 @@
 ---
-title: What Is a Python Package?
+title: "Python Package 101 (1/10): What Is a Python Package?"
 series: python-package-101
 episode: 1
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,29 +17,25 @@ tags:
 - Import
 - pip
 - Library
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: A Python package bundles reusable code for sharing. Everything you
   import is a package.
 ---
 
-# What Is a Python Package?
+# Python Package 101 (1/10): What Is a Python Package?
 
-> Python Package 101 series (1/10)
+As soon as a Python project stops fitting in one file, you start importing code across modules. That is usually the point where packaging stops feeling optional and starts shaping how you share and maintain code.
 
----
+This is the first post in the Python Package 101 series. Here we define modules, packages, and distributions, trace what `pip install` actually installs, and set the baseline for the rest of the series.
 
-<!-- a-grade-intro:begin -->
+![Python Package 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/01/01-01-mental-model.en.png)
+*Python Package 101 chapter 1 flow overview*
 
-## Key Questions
+## Questions to Keep in Mind
 
 - What is the difference between a module and a package?
 - What happens when you run `import requests`?
 - What does `pip install` actually install?
-- Why should you turn your code into a package?
-
-> A Python package bundles reusable code for sharing. Everything you `import` is a package.
-
-<!-- a-grade-intro:end -->
 
 ## What you will learn
 
@@ -259,19 +255,28 @@ At first, packaging feels like overhead. In reality, a single `pyproject.toml` i
 
 The next post covers **project structure** — src layout and pyproject.toml.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- **What Is a Python Package? (current)**
-- Project Structure — src layout and pyproject.toml (upcoming)
-- Dependency Management — venv, pip, uv, requirements (upcoming)
-- Building Packages — wheel and sdist (upcoming)
-- Publishing to PyPI — from TestPyPI to production (upcoming)
-- Versioning and Releases (upcoming)
-- CLI Packages (upcoming)
-- Type Hints and Static Analysis (upcoming)
-- Documentation — README, MkDocs, API Reference (upcoming)
-- Production Package Template (upcoming)
+- **What is the difference between a module and a package?**
+  - The article treats What Is a Python Package? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What happens when you run `import requests`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What does `pip install` actually install?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- **Python Package 101 (1/10): What Is a Python Package? (current)**
+- Python Package 101 (2/10): Project Structure — src layout and pyproject.toml (upcoming)
+- Python Package 101 (3/10): Dependency Management — venv, pip, uv, requirements (upcoming)
+- Python Package 101 (4/10): Building Packages — wheel and sdist (upcoming)
+- Python Package 101 (5/10): Publishing to PyPI — from TestPyPI to production (upcoming)
+- Python Package 101 (6/10): Versioning and Releases (upcoming)
+- Python Package 101 (7/10): CLI Packages (upcoming)
+- Python Package 101 (8/10): Type Hints and Static Analysis (upcoming)
+- Python Package 101 (9/10): Documentation — README, MkDocs, API Reference (upcoming)
+- Python Package 101 (10/10): Production Package Template (upcoming)
 
 <!-- toc:end -->
 

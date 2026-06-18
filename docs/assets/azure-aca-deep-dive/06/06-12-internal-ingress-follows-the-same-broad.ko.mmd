@@ -1,0 +1,4 @@
+flowchart TD
+  VNetClient["VNet 클라이언트"] --> ILB["내부 로드 밸런서"]
+  ILB --> Envoy["Envoy 프록시"]
+  Envoy --> Pod["앱 파드"]

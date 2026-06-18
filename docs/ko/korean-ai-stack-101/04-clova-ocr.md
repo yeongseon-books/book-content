@@ -1,12 +1,12 @@
 ---
-title: CLOVA OCR API로 문서 텍스트 추출
+title: "Korean AI Stack 101 (4/6): CLOVA OCR API로 문서 텍스트 추출"
 series: korean-ai-stack-101
 episode: 4
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -16,97 +16,100 @@ tags:
 - NaverCloud
 - DocumentAI
 - Python
-last_reviewed: '2026-05-01'
-seo_description: OCR 파이프라인은 4단계로 분해됩니다.
+last_reviewed: '2026-05-12'
+seo_description: 쓸 만한 OCR 결과는 평문이 아니라, 의미 있는 줄로 다시 조립한 구조화된 추출 결과입니다.
 ---
 
-# CLOVA OCR API로 문서 텍스트 추출
+# Korean AI Stack 101 (4/6): CLOVA OCR API로 문서 텍스트 추출
 
-## 핵심 질문
+한국어 검색과 RAG 파이프라인은 검색 단계보다 훨씬 앞에서 무너지는 경우가 많습니다. 시작점이 스캔 문서, 영수증, 휴대폰 사진인 경우가 많기 때문입니다. OCR이 의미 있는 한 줄을 잘못 쪼개면, 뒤의 임베딩과 랭킹도 그 손상을 그대로 물려받습니다.
 
-CLOVA OCR API를 어떻게 운영해야 한국어 문서 추출 정확도와 비용을 잡을 수 있을까요?
+이 글은 Korean AI Stack 101 시리즈의 4번째 글입니다. 여기서는 CLOVA OCR 응답을 줄 단위 텍스트로 재구성해, 검색 코퍼스에 안전하게 넣을 수 있는 형태로 만드는 과정을 다룹니다.
 
-이 글은 그 질문에 답하기 위해 CLOVA OCR의 핵심 결정과 운영 함정을 살펴봅니다.
+![Korean AI Stack 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-core-flow.ko.png)
+*Korean AI Stack 101 4장 흐름 개요*
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-이 글에서는 한국어 영수증·세금계산서 같은 문서 이미지를 CLOVA OCR API로 처리하고, 그 결과를 BGE-M3 코퍼스에 넣을 수 있는 형태까지 정리합니다. 앞 글이 텍스트 코퍼스를 다국어로 검색하는 단계였다면, 이번 글은 그 코퍼스에 들어갈 원천 데이터를 OCR로 만들어 내는 단계입니다.
+- OCR을 붙일 때는 텍스트 정확도부터 봐야 할까요, 아니면 응답 구조부터 봐야 할까요?
+- bounding box와 `lineBreak` 힌트는 후처리에서 왜 그렇게 중요할까요?
+- 실제 API 키가 없어도 OCR 파이프라인의 대부분을 왜 검증할 수 있을까요?
 
-OCR을 별도 글로 다루는 이유는 분명합니다. 한국어 사내 검색의 절반은 PDF·스캔 이미지·휴대폰 사진에서 시작합니다. OCR 단계에서 줄바꿈 한 번이 어긋나면 "공급가액 45,000원"이 "공급가액"과 "45,000원"으로 쪼개진 채 인덱싱되어 의미 검색이 실패합니다. CLOVA OCR은 한국어에 특화돼 있어 인식 정확도는 높은 편이지만, 진짜 어려운 일은 응답 JSON을 줄·문단·표 단위로 다시 조립하는 후처리에 있습니다. 이번 예제는 실제 키 없이도 돌아가도록 mock 응답을 기본값으로 사용해, 후처리 로직을 먼저 손에 익히도록 구성했습니다.
+## 왜 이 단계가 중요한가
 
-## Mental Model
+이 글은 한국어 문서 이미지, 영수증, 세금계산서, 스캔 양식을 CLOVA OCR API로 처리하고, 그 결과를 앞 글의 BGE-M3 코퍼스에 바로 넣을 수 있는 모양으로 정리합니다. 앞 글이 텍스트 코퍼스 검색을 다뤘다면, 이번 글은 그 텍스트를 처음 만들어 내는 단계입니다.
 
-OCR 파이프라인은 4단계로 분해됩니다.
+OCR을 별도 단계로 다뤄야 하는 이유는 명확합니다. 한국 기업 검색의 절반은 PDF, 스캔 이미지, 휴대폰 사진에서 시작합니다. OCR이 “공급가액 45,000원”을 “공급가액”과 “45,000원”으로 잘못 나누면, 의미 검색은 처음부터 실패합니다. CLOVA OCR은 한국어 토큰 인식 자체는 강한 편입니다. 진짜 일은 응답 JSON을 다시 줄, 문단, 표 셀로 조립하는 후처리에 있습니다. 이 글은 실제 키 없이도 그 로직을 검증할 수 있도록 번들된 mock 응답을 기본값으로 사용합니다.
 
+## 멘탈 모델
+
+OCR 파이프라인은 네 단계로 분해됩니다.
+
+```text
+[document image / PDF]
+       |
+       v
+[CLOVA OCR API call]  --> JSON payload (fields, bbox, confidence, lineBreak)
+       |
+       v
+[post-process: reconstruct lines / paragraphs / tables]  <-- format checks
+       |
+       v
+[clean text + meta] --> BGE-M3 / RAG corpus
 ```
-[문서 이미지/PDF]
-       |
-       v
-[CLOVA OCR API call]  --> 응답 JSON (fields, bbox, confidence, lineBreak)
-       |
-       v
-[후처리: 줄/문단/표 재구성]  <-- 정합성 검증, 숫자/날짜 패턴 확인
-       |
-       v
-[clean text + meta] --> BGE-M3 / RAG 코퍼스
-```
 
-핵심은 세 가지입니다.
+가장 중요한 것은 세 가지입니다.
 
-- **API는 fields 배열을 반환할 뿐**: 줄바꿈·문단·표 같은 구조는 응답의 `lineBreak`와 좌표에서 직접 만들어 내야 합니다.
-- **confidence는 절대 진실이 아님**: 0.99도 틀릴 수 있고, 0.85도 맞을 수 있습니다. 임계값보다 분포를 봐야 합니다.
-- **mock-first 개발이 안전**: 키 없이도 응답 JSON 형식을 코드로 재현할 수 있어, CI에서도 동일하게 검증 가능합니다.
+- **API는 `fields` 배열만 돌려줍니다**: 줄바꿈, 문단, 표 구조는 `lineBreak`와 좌표를 바탕으로 직접 복원해야 합니다.
+- **confidence는 진실이 아닙니다**: 0.99인 토큰도 틀릴 수 있고, 0.85인 토큰도 맞을 수 있습니다. 절대 임계값보다 분포를 보는 편이 낫습니다.
+- **mock-first가 더 안전합니다**: 응답 JSON 형식은 키 없이도 코드 안에서 재현할 수 있으므로, CI에서 후처리를 결정적으로 검증할 수 있습니다.
 
-추가로 알아야 할 것:
+추가로 두 가지를 더 기억하면 좋습니다.
 
-- CLOVA OCR은 General OCR과 Template OCR 두 갈래가 있습니다. 영수증·세금계산서는 Template, 자유 양식 문서는 General.
-- 응답에는 `inferText`, `inferConfidence`, `boundingPoly`, `lineBreak`가 들어옵니다. 이 글은 가장 자주 쓰는 `inferText` + `lineBreak` 조합에 집중합니다.
+- CLOVA OCR에는 두 갈래가 있습니다. General OCR은 자유 양식 문서용이고, Template OCR은 영수증이나 신분증처럼 구조가 고정된 문서용입니다.
+- 각 field에는 `inferText`, `inferConfidence`, `boundingPoly`, `lineBreak`가 들어 있습니다. 이 글은 가장 자주 쓰는 `inferText` + `lineBreak` 조합에 집중합니다.
+
+> 멘탈 모델을 짧게 말하면 이렇습니다. OCR API는 텍스트를 완성해서 주는 서비스가 아니라, 줄과 표를 다시 만들 재료를 구조화해 주는 서비스입니다.
 
 ## 핵심 개념
 
 | 항목 | 의미 |
 | --- | --- |
-| CLOVA OCR | NAVER Cloud Platform의 한국어 특화 OCR API |
-| General OCR | 자유 양식 문서용. 위치·줄 정보를 모두 반환 |
-| Template OCR | 영수증·신분증 등 양식이 정해진 문서용. 필드명까지 자동 매핑 |
+| CLOVA OCR | NAVER Cloud Platform의 한국어 지향 OCR API |
+| General OCR | 자유 양식 문서용. 좌표와 줄 메타데이터를 반환 |
+| Template OCR | 영수증, ID처럼 고정 양식 문서용. 선언된 필드명에 자동 매핑 |
 | `inferText` | 인식된 텍스트 토큰 |
-| `inferConfidence` | 인식 신뢰도 (0-1) |
+| `inferConfidence` | 인식 confidence (0-1) |
 | `boundingPoly` | 토큰의 4점 좌표 |
-| `lineBreak` | 이 토큰이 줄의 끝인지 여부 (boolean) |
-| Mock response | 실제 호출 없이 같은 형식의 JSON을 코드로 만들어 후처리만 검증 |
+| `lineBreak` | 이 토큰이 한 줄을 닫는지 나타내는 불리언 |
+| Mock response | API 호출 없이도 같은 응답 구조를 흉내 내는 코드 기반 JSON |
 
-## Before vs. After
+## 적용 전후 비교
 
-**Before** — 응답 JSON을 그대로 코퍼스에 넣으면 `inferText`가 토큰별로 흩어져 인덱싱됩니다. 검색은 "공급가액"과 "45,000원"을 별도 문서로 다루며, "공급가액 45,000원"이라는 의미 단위가 사라집니다.
+**Before** — raw payload를 그대로 인덱싱하면 각 `inferText` 토큰이 개별 조각으로 코퍼스에 들어갑니다. 검색은 “공급가액”과 “45,000원”을 별도 문서처럼 다뤄서 “공급가액 45,000원”이라는 의미 단위를 잃어버립니다.
 
-**After** — `lineBreak`를 따라 줄을 재구성한 뒤 코퍼스에 넣으면 다음과 같이 동작합니다.
+**After** — 먼저 `lineBreak`를 따라 줄을 복원하면 코퍼스는 이렇게 바뀝니다.
 
 ```python
-# 후처리 결과 (한 줄당 한 문서)
+# 사후 처리된 출력(문서당 한 줄)
 '공급가액 45,000원'      # confidence min: 0.994
 '부가세 4,500원'          # confidence min: 0.991
 '합계 49,500원'           # confidence min: 0.989
 ```
 
-핵심은 (1) 의미 단위로 묶여 있어 BGE-M3 검색이 올바른 줄을 끌어 올린다, (2) 줄별 최소 confidence를 같이 저장해 후속 검토가 가능하다, (3) raw payload도 함께 보관해 언제든 재처리할 수 있다는 것입니다.
+중요한 점은 세 가지입니다. 첫째, 줄이 의미 단위로 묶여 있어 BGE-M3가 올바른 줄을 검색할 수 있습니다. 둘째, 줄별 최소 confidence를 보존하면 후속 검토 우선순위를 만들 수 있습니다. 셋째, raw payload를 남겨 두면 나중에 OCR 모델을 교체해도 재처리가 단순합니다.
 
-## 핵심 흐름
+## 왜 mock payload부터 시작할까
 
-![핵심 흐름](../../assets/korean-ai-stack-101/04/04-01-core-flow.ko.png)
+![최소 실행 예제](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-minimal-runnable-example.ko.png)
 
-*핵심 흐름*
+*최소 실행 예제*
 
-## 왜 mock 응답부터 다루는가
-
-![mock 응답으로 OCR 후처리를 검증하는 흐름](../../assets/korean-ai-stack-101/04/04-01-mock.ko.png)
-
-*mock 응답으로 OCR 후처리를 검증하는 흐름*
-
-OCR 연동의 난점은 API 호출 자체보다 응답 후처리에 있습니다. 표 셀 순서가 뒤바뀌거나 줄바꿈이 어긋나는 문제는 mock 응답만으로도 충분히 재현할 수 있습니다. mock부터 시작하면 CI에서 같은 입력으로 매번 같은 후처리 결과를 검증할 수 있고, 실제 키가 추가됐을 때 변경 지점이 "응답을 어디서 가져오는가" 한 줄로 좁혀집니다.
+OCR 연동의 대부분은 API 호출 이후에서 아픕니다. 팀들은 인증보다 행 순서가 꼬이거나 줄이 잘못 합쳐지는 문제를 먼저 만납니다. mock payload를 코드 안에 먼저 재현하면, CI가 같은 입력을 항상 같은 방식으로 검증할 수 있고, 실제 키가 생겼을 때도 달라지는 부분은 응답을 받아 오는 한 줄뿐입니다.
 
 ## 단계별 실습
 
-### 1단계 — Mock 응답 정의
+### 단계 1 — 모의 응답 정의
 
 ```python
 MOCK_RESPONSE = {
@@ -125,13 +128,12 @@ MOCK_RESPONSE = {
 }
 ```
 
-실제 키가 생기면 이 dict를 만드는 부분만 `requests.post(...).json()`으로 바꿉니다.
+실제 키가 생기면 dict를 만드는 부분만 `requests.post(...).json()`으로 바꾸면 됩니다.
 
-### 2단계 — 줄 단위 재구성
+### 단계 2 — 라인 재구성
+![이 코드에서 주목할 점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-02-what-to-notice-in-this-code.ko.png)
 
-![최소 실행 예제](../../assets/korean-ai-stack-101/04/04-02-diagram.ko.png)
-
-*최소 실행 예제*
+*이 코드에서 주목할 점*
 
 ```python
 def reconstruct_lines(payload):
@@ -154,9 +156,9 @@ for line in lines:
     print(f"{line['min_confidence']:.3f}  {line['text']}")
 ```
 
-`lineBreak`를 따라 토큰을 묶고, 줄별 최소 confidence를 같이 들고 다닙니다. 이 단순한 함수 하나가 표·영수증 후처리의 90%를 처리합니다.
+`lineBreak` 기준으로 토큰을 묶고, 줄별 최소 confidence를 함께 들고 갑니다. 이 작은 함수 하나가 영수증과 계산서 후처리의 대부분을 감당합니다.
 
-### 3단계 — 숫자·금액 검증 규칙
+### 단계 3 — 숫자 및 금액 검증
 
 ```python
 import re
@@ -167,12 +169,12 @@ for line in lines:
     tokens = line['text'].split()
     amounts = [t for t in tokens if AMOUNT_RE.match(t)]
     if not amounts and ('원' in line['text']):
-        print('WARN 금액 형식 의심:', line['text'])
+        print('WARN suspicious amount format:', line['text'])
 ```
 
-OCR은 "45,000원"을 "45.000원"으로 인식하는 일이 종종 있습니다. confidence 임계값보다 도메인 정규식이 훨씬 정확한 경고가 됩니다.
+OCR은 “45,000원”을 “45.000원”으로 잘못 읽기도 합니다. 이런 버그는 confidence 임계값보다 도메인 정규식이 더 잘 잡습니다.
 
-### 4단계 — 코퍼스용 dict로 정리
+### 단계 4 — 코퍼스 문서로 변환
 
 ```python
 def to_corpus_doc(image_id, lines):
@@ -187,9 +189,9 @@ doc = to_corpus_doc('receipt_001', lines)
 print(doc)
 ```
 
-raw payload 경로를 같이 저장하면, 후속 OCR 모델 교체 시 재처리가 단순해집니다. 텍스트만 들고 있으면 무엇으로부터 만들어졌는지 잃어버립니다.
+텍스트 옆에 raw payload 경로를 함께 저장해 두면 OCR 모델이 바뀌었을 때 재처리가 쉬워집니다. 텍스트만 저장하면 출처를 잃어버립니다.
 
-### 5단계 — 실제 API 호출로 교체 (선택)
+### 단계 5 — 실제 API 호출로 교체 (선택)
 
 ```python
 import os, requests
@@ -203,74 +205,290 @@ def call_clova_ocr(image_path):
     return requests.post(url, headers=headers, files=files, data=data).json()
 ```
 
-mock과 같은 형태의 dict를 반환하므로, 1-4단계 코드는 그대로 재사용됩니다.
+반환 형식은 mock dict와 같으므로 1~4단계 로직은 그대로 재사용됩니다.
 
-## 이 코드에서 봐야 할 것
+## 이 코드에서 먼저 봐야 할 점
 
-![이 코드에서 봐야 할 것](../../assets/korean-ai-stack-101/04/04-03-diagram-2.ko.png)
-
-*이 코드에서 봐야 할 것*
-
-- `inferText`만 보지 않고 **`lineBreak`도 같이** 봅니다. 이 한 가지가 표·영수증 후처리 정확도를 좌우합니다.
-- confidence는 줄별 최소값으로 모아 두면 후속 단계에서 재검토 우선순위가 자연스럽게 나옵니다.
-- raw payload와 후처리 결과를 함께 저장하는 습관이 모델 교체 시 가장 큰 자산이 됩니다.
-- 실제 API 키가 있더라도 mock 응답 기반 테스트를 함께 유지하면 CI가 항상 결정적으로 동작합니다.
+- `inferText`만큼이나 `lineBreak`를 꼼꼼히 봐야 합니다. 이 습관 하나가 영수증과 표 정확도를 크게 바꿉니다.
+- 줄별 최소 confidence는 자연스러운 재검토 큐를 만듭니다.
+- raw payload와 후처리 텍스트를 함께 저장하는 습관이 이후 모델 교체 때 가장 큰 자산이 됩니다.
+- 실제 키를 붙인 뒤에도 mock 기반 테스트를 CI에 남겨 두면 빌드가 결정적으로 유지됩니다.
 
 ## 자주 하는 실수
 
-![실무에서 헷갈리는 지점](../../assets/korean-ai-stack-101/04/04-04-diagram-3.ko.png)
+![엔지니어가 헷갈리는 지점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.ko.png)
 
-*실무에서 헷갈리는 지점*
+*엔지니어가 헷갈리는 지점*
 
-- **OCR 정확도가 높으면 RAG도 좋아진다는 가정** — 토큰 정확도와 의미 단위 정확도는 다른 문제입니다. 줄 재구성이 틀리면 99% OCR도 무용지물.
-- **confidence 절대 임계값 사용** — 0.95 같은 절대값은 모델 버전에 따라 의미가 달라집니다. 분포의 하위 5%를 검토하는 편이 안전합니다.
-- **PDF와 이미지 OCR을 같은 코드로 처리** — PDF는 텍스트 레이어가 있을 수 있어 OCR보다 `pdfplumber`가 빠르고 정확합니다. 먼저 텍스트 레이어 유무를 검사합니다.
-- **raw payload를 버리고 텍스트만 저장** — OCR 모델을 교체하거나 후처리 로직을 고칠 때 처음부터 다시 호출해야 합니다. 비용·시간 모두 큽니다.
-- **다중 컬럼 문서를 단일 줄로 처리** — 좌표(`boundingPoly`) 없이 `lineBreak`만 따르면 좌측·우측 컬럼이 한 줄로 합쳐집니다. 컬럼 구분이 필요하면 x좌표 기준으로 그룹핑합니다.
-- **mock 응답을 production 코드 경로 안에 둠** — 환경 변수로 분기하지 않으면 실수로 mock이 production에서 동작합니다. `os.environ.get('CLOVA_OCR_MODE', 'mock')` 같은 명시적 스위치를 둡니다.
+- **OCR 정확도가 높으면 RAG도 좋아질 거라고 믿는 것** — 토큰 정확도와 의미 단위 정확도는 다릅니다. 줄 복원이 틀리면 99% OCR도 소용없습니다.
+- **절대 confidence 임계값을 쓰는 것** — 0.95라는 숫자는 모델 버전에 따라 의미가 달라집니다. 하위 5% 분포를 보는 편이 안전합니다.
+- **PDF와 이미지 OCR을 같은 방식으로 처리하는 것** — PDF에는 실제 텍스트 레이어가 있을 수 있습니다. 그때는 `pdfplumber`가 더 빠르고 정확합니다.
+- **raw payload를 버리는 것** — 나중에 모델을 바꾸면 처음부터 다시 호출해야 합니다. 비용과 시간이 모두 큽니다.
+- **다중 컬럼 문서를 한 줄로 합치는 것** — `boundingPoly`를 보지 않으면 좌우 컬럼이 섞입니다. 컬럼이 중요하면 x좌표 기준 그룹핑이 필요합니다.
+- **mock 경로가 production에 섞이는 것** — 환경 변수 스위치 없이 두면 mock 데이터가 실서비스 경로로 새어 나올 수 있습니다. `os.environ.get('CLOVA_OCR_MODE', 'mock')` 같은 분기가 필요합니다.
 
 ## 실무 적용
 
-- **두 단 OCR**: General OCR로 페이지 전체를 뽑고, 영수증·신분증 같은 영역만 Template OCR로 다시 처리하면 비용과 정확도가 모두 균형을 잡습니다.
-- **PDF 분기**: `pdfplumber`로 텍스트 레이어를 먼저 시도하고, 실패한 페이지만 OCR로 보냅니다. 비용이 70% 이상 줄어드는 경우가 많습니다.
-- **재처리 큐**: confidence 분포 하위 5%인 줄에 `needs_review` 태그를 달아 사람 검수 큐로 보냅니다. 절대 임계값 알람보다 운영 효율이 좋습니다.
-- **표 재구성**: `boundingPoly`의 y좌표로 행을 묶고 x좌표로 열을 정렬하면 표 셀이 정확히 복원됩니다. `lineBreak`만으로는 부족합니다.
-- **이미지 전처리**: 회전·기울기 보정과 흑백 변환을 OCR 호출 전에 수행하면 confidence 평균이 0.05-0.1 오릅니다. `opencv-python` 한 줄짜리 전처리도 효과 큽니다.
-- **모니터링**: 매일 처리량, 평균 confidence, 줄 재구성 실패율 세 지표를 대시보드에 둡니다. 모델 업데이트 직후 분포가 어떻게 흔들리는지 한눈에 보입니다.
-
-## 실무에서는 이렇게 생각한다
-
-OCR는 "인식률 몇 %"보다 "후처리에 얼마나 손이 가는가"가 실제 비용을 결정합니다. API 인식률이 95%라도, 나머지 5%의 오류가 테이블 구조를 깨뜨리거나 숫자를 바꾸면 전수 검수가 필요해집니다. 문서 유형별로 후처리 로직을 분리하는 것이 장기적으로 유지보수 비용을 줄입니다.
-
-CLOVA OCR는 한국어에 강하지만, 글로벌 서비스는 아닙니다. 해외 문서가 섹이는 파이프라인이라면 Google Document AI나 Azure Document Intelligence와 병행하는 것도 고려해야 합니다. OCR 서비스는 vendor lock-in이 상대적으로 적으므로, 추상화 레이어를 두면 교체가 비교적 쉽습니다.
+- **두 단계 OCR**: 전체 페이지는 General OCR로 읽고, 영수증이나 신분증처럼 특정 구역은 Template OCR로 다시 돌리면 정확도와 비용 균형이 좋아집니다.
+- **PDF 분기**: `pdfplumber`를 먼저 시도하고, 텍스트 레이어가 없는 페이지에만 OCR을 적용하면 비용을 크게 줄일 수 있습니다.
+- **재처리 큐**: confidence 하위 5% 줄에 `needs_review` 태그를 달아 사람 검수로 보내면 절대 임계값 알람보다 훨씬 실용적입니다.
+- **표 복원**: `boundingPoly`의 y좌표로 행을 묶고 x좌표로 열을 정렬하면 표 구조가 살아납니다. `lineBreak`만으로는 부족합니다.
+- **이미지 전처리**: 기울기 보정, 노이즈 제거, 이진화를 OCR 전에 수행하면 평균 confidence가 눈에 띄게 올라갑니다.
+- **모니터링**: 일별 처리량, 평균 confidence, 재구성 실패율을 대시보드로 보면 모델 변경 여파를 빨리 감지할 수 있습니다.
 
 ## 체크리스트
 
-- [ ] raw OCR payload와 후처리 결과를 함께 저장한다.
-- [ ] `lineBreak`, 좌표, confidence 중 무엇을 쓸지 먼저 정한다.
-- [ ] 숫자·금액·날짜 필드는 별도 검증 규칙(정규식)을 둔다.
-- [ ] 임베딩 단계로 넘기기 전에 줄 또는 문단 재구성을 확인한다.
-- [ ] mock-first 테스트가 CI에 포함돼 있다.
+- [ ] raw payload와 후처리 텍스트를 함께 저장합니다.
+- [ ] downstream에서 `lineBreak`, 좌표, confidence 중 무엇이 필요한지 정했습니다.
+- [ ] 금액, 날짜, 식별자에 전용 정규식 검증을 붙였습니다.
+- [ ] 임베딩 단계로 넘기기 전에 줄 또는 문단 재구성을 먼저 검증했습니다.
+- [ ] mock-first 테스트를 CI에 넣었습니다.
 
-## 정리 · 다음 글
+## 연습 문제
 
-CLOVA OCR 예제의 핵심은 응답 구조에 대한 이해를 텍스트 추출보다 먼저 두는 것입니다. `lineBreak`를 따라 줄을 묶고, 줄별 confidence를 보존하고, raw payload를 같이 저장하는 세 가지 작은 약속만 지켜도 OCR이 RAG 코퍼스에 안전하게 들어갑니다. 이 단계가 깔끔해야 다음 글에서 생성 API에 어떤 문맥을 넘기는지가 분명해집니다.
+1. mock 응답에 세 줄을 더 추가하고, `lineBreak: False`가 연속으로 두 번 나오는 케이스를 넣어 보세요. 재구성 함수가 어떻게 동작하는지 보고 보강 방안을 적어 보세요.
+2. `boundingPoly`가 채워진 mock 응답을 만들고, x좌표 기준으로 좌우 컬럼을 나누는 함수를 작성해 보세요.
+3. PDF 페이지에 대해 먼저 `pdfplumber`를 시도하고, 텍스트 레이어가 없을 때만 mock CLOVA 호출로 떨어지는 래퍼 함수를 작성해 보세요.
 
-다음 글(5편)에서는 HyperCLOVA X와 Solar API를 다룹니다. 이번 글에서 정리한 OCR 텍스트 또는 BGE-M3 검색 결과를 한국어 LLM에 넘길 때 어떤 prompt 패턴이 안전한지, API 호출 코드와 함께 살펴봅니다.
+## OCR 후처리 파이프라인을 함수 경계로 분리하기
+
+실무에서는 OCR 품질 이슈가 한 번에 섞여 들어옵니다. 줄 복원 실패, 숫자 포맷 오류, 컬럼 병합 오류가 동시에 보이면 원인 파악이 늦어집니다. 아래처럼 함수 경계를 먼저 나누면 실패 지점을 로그로 분리할 수 있습니다.
+
+```python
+def extract_fields(payload):
+    for image in payload.get('images', []):
+        for field in image.get('fields', []):
+            yield {
+                'text': field.get('inferText', ''),
+                'confidence': float(field.get('inferConfidence', 0.0)),
+                'line_break': bool(field.get('lineBreak', False)),
+                'poly': field.get('boundingPoly', {}),
+            }
+
+def reconstruct_lines_from_fields(fields):
+    lines = []
+    cur_text, cur_conf = [], []
+    for f in fields:
+        cur_text.append(f['text'])
+        cur_conf.append(f['confidence'])
+        if f['line_break']:
+            lines.append({'text': ' '.join(cur_text), 'min_conf': min(cur_conf)})
+            cur_text, cur_conf = [], []
+    if cur_text:
+        lines.append({'text': ' '.join(cur_text), 'min_conf': min(cur_conf)})
+    return lines
+
+def validate_lines(lines):
+    errors = []
+    for i, line in enumerate(lines):
+        if len(line['text']) < 2:
+            errors.append((i, 'too_short'))
+        if '원' in line['text'] and not any(ch.isdigit() for ch in line['text']):
+            errors.append((i, 'amount_without_digits'))
+    return errors
+```
+
+이렇게 분리해 두면 API 공급자를 바꿔도 후처리 핵심은 유지됩니다. General OCR, Template OCR, 다른 OCR 엔진을 섞을 때 특히 효과가 큽니다.
+
+## 한국어 문서용 벤치마크 항목 정의
+
+OCR은 정답률 하나로 품질을 판단하면 운영에서 자주 실패합니다. 한국어 문서에서는 최소한 아래 지표를 별도로 기록하는 편이 좋습니다.
+
+| 지표 | 정의 | 권장 목표(초기) | 주의점 |
+| --- | --- | --- | --- |
+| Line reconstruction accuracy | 사람이 기대하는 줄 단위와 일치한 비율 | 0.93+ | 토큰 정확도와 별개 지표 |
+| Amount format pass rate | 금액 정규식 통과 비율 | 0.98+ | 통화 기호/콤마 규칙 문서화 필요 |
+| Date normalization pass rate | 날짜 표준화 성공 비율 | 0.95+ | `2026.05.01`, `2026-05-01` 동시 지원 |
+| Low-confidence review ratio | 재검토 큐로 간 비율 | 0.05~0.15 | 너무 낮으면 누락, 너무 높으면 비용 증가 |
+
+이 표를 대시보드로 연결하면 OCR 모델 버전 업그레이드의 효과를 훨씬 객관적으로 볼 수 있습니다.
+
+## production 설정 예시: OCR ingestion 워커
+
+OCR은 대개 비동기 배치로 운영됩니다. 요청당 처리 시간이 길고 외부 API 의존성이 있기 때문입니다.
+
+```yaml
+worker:
+  name: ocr-ingestion-worker
+  concurrency: 8
+  queue: docs-ocr
+
+clova:
+  mode: real
+  endpoint: https://example.apigw.ntruss.com/custom/v1/12345/abcd/general
+  timeout_seconds: 15
+  max_retries: 3
+  retry_backoff_seconds: [1, 2, 4]
+
+postprocess:
+  line_min_conf_threshold: 0.82
+  amount_regex: '^[0-9,]+원$'
+  keep_raw_payload: true
+  raw_payload_bucket: s3://ocr-raw-prod
+
+output:
+  cleaned_bucket: s3://ocr-clean-prod
+  corpus_topic: rag-corpus-update
+
+monitoring:
+  error_rate_alert_threshold: 0.03
+  p95_latency_ms_alert_threshold: 12000
+```
+
+`keep_raw_payload`는 비용이 들더라도 유지하는 편이 좋습니다. 품질 이슈가 생겼을 때 재호출 없이 재처리할 수 있기 때문입니다.
+
+## OCR 결과를 임베딩 친화 형태로 만드는 예시
+
+BGE-M3나 KoSimCSE로 넘길 때는 줄 텍스트만 던지기보다 최소 메타데이터를 함께 붙여 두는 편이 장기 운영에 유리합니다.
+
+```python
+def to_embedding_records(doc_id, lines, source='clova-ocr'):
+    records = []
+    for i, line in enumerate(lines):
+        records.append({
+            'chunk_id': f'{doc_id}#L{i:03d}',
+            'text': line['text'],
+            'meta': {
+                'doc_id': doc_id,
+                'source': source,
+                'line_no': i,
+                'min_confidence': round(line['min_conf'], 4),
+            },
+        })
+    return records
+```
+
+이 구조를 쓰면 검색 결과에서 곧바로 원본 줄 번호를 보여 줄 수 있고, 신뢰도 낮은 줄만 필터링하는 정책도 쉽게 만들 수 있습니다.
+
+## 좌표 기반 컬럼 복원 예시
+
+세금계산서, 명세서처럼 2열 이상 문서는 `lineBreak`만으로 복원이 불완전할 수 있습니다. 좌표를 함께 사용한 최소 예시는 아래와 같습니다.
+
+```python
+def left_x(field):
+    vertices = field.get('boundingPoly', {}).get('vertices', [])
+    if not vertices:
+        return 0
+    return min(v.get('x', 0) for v in vertices)
+
+def split_two_columns(fields, boundary_x=540):
+    left_col, right_col = [], []
+    for f in fields:
+        if left_x(f) < boundary_x:
+            left_col.append(f)
+        else:
+            right_col.append(f)
+    return left_col, right_col
+```
+
+문서 레이아웃이 고정된 서비스에서는 이 간단한 분리만으로도 줄 병합 오류를 크게 줄일 수 있습니다.
+
+## OCR 품질 회귀를 막는 테스트 세트 구성
+
+OCR 파이프라인은 모델 버전이나 전처리 변경에 민감합니다. 작은 테스트 세트를 고정해 두고 정량 검증을 붙이면 회귀를 빠르게 차단할 수 있습니다.
+
+```python
+EVAL_CASES = [
+    {
+        'name': 'receipt_simple',
+        'expected_lines': ['공급가액 45,000원', '부가세 4,500원', '합계 49,500원'],
+    },
+    {
+        'name': 'invoice_with_date',
+        'expected_lines': ['작성일자 2026-05-01', '청구 금액 120,000원'],
+    },
+]
+
+def line_exact_match_rate(pred_lines, expected_lines):
+    pred_set = set(pred_lines)
+    exp_set = set(expected_lines)
+    return len(pred_set & exp_set) / len(exp_set)
+```
+
+정확히 같은 줄이 몇 퍼센트 재현되는지 보는 지표는 단순하지만 강력합니다. 특히 영수증/계산서처럼 정형 문서에서 유용합니다.
+
+## 금액/날짜 정규화 유틸리티
+
+한국어 문서에서는 숫자 형식 정규화가 검색 품질과 바로 연결됩니다. 같은 금액이라도 `45,000원`, `45000원`, `45.000원`이 섞이면 검색 hit가 분산됩니다.
+
+```python
+import re
+
+AMOUNT_PATTERNS = [
+    re.compile(r'^(\d{1,3}(,\d{3})+)원$'),
+    re.compile(r'^(\d+)원$'),
+]
+
+DATE_PATTERNS = [
+    re.compile(r'^(\d{4})\.(\d{2})\.(\d{2})$'),
+    re.compile(r'^(\d{4})-(\d{2})-(\d{2})$'),
+]
+
+def normalize_amount(token: str) -> str:
+    clean = token.replace('.', '').replace(',', '')
+    if clean.endswith('원'):
+        num = clean[:-1]
+        if num.isdigit():
+            return f"{int(num):,}원"
+    return token
+
+def normalize_date(token: str) -> str:
+    for pat in DATE_PATTERNS:
+        m = pat.match(token)
+        if m:
+            y, mm, dd = m.groups()
+            return f'{y}-{mm}-{dd}'
+    return token
+```
+
+이 정규화는 화려하지 않지만, 임베딩 코퍼스에서 같은 의미 단위를 동일 문자열로 맞춰 주는 기반 역할을 합니다.
+
+## 운영 배치의 실패 복구 전략
+
+OCR 호출은 네트워크 오류, 용량 제한, 일시적 5xx 응답을 자주 만납니다. 큐 기반 배치에서는 실패 재처리 정책을 먼저 정의해야 전체 처리량이 안정됩니다.
+
+| 실패 유형 | 재시도 정책 | DLQ 전환 기준 |
+| --- | --- | --- |
+| timeout | 1s, 2s, 4s 백오프 재시도 | 3회 실패 시 DLQ |
+| 429 | 긴 백오프(5s+) + 지터 | 5회 실패 시 DLQ |
+| 5xx | 짧은 백오프 재시도 | 3회 실패 시 DLQ |
+| payload parse error | 재시도 금지 | 즉시 DLQ |
+
+```python
+def next_retry_delay(attempt, reason):
+    if reason == 'rate_limit':
+        return min(30, 5 * (2 ** attempt))
+    return min(10, 1 * (2 ** attempt))
+```
+
+이 정도 정책만 있어도 대량 문서 처리에서 워커 정체를 크게 줄일 수 있습니다.
+
+## 정리
+
+CLOVA OCR 예제의 가치는 텍스트 정확도보다 먼저 응답 구조를 이해하게 만든다는 데 있습니다. `lineBreak`로 줄을 묶고, 줄별 confidence를 보존하고, raw payload를 함께 저장하는 세 가지 약속만 지켜도 OCR 결과를 RAG 코퍼스에 훨씬 안전하게 넣을 수 있습니다. 이 단계가 정리되어 있어야 다음 글에서 생성 API에 어떤 문맥을 넘길지 차분하게 판단할 수 있습니다.
+
+다음 글에서는 5편 HyperCLOVA X와 Solar API를 다룹니다. OCR 텍스트나 BGE-M3 검색 결과를 한국어 LLM에 넘길 때 어떤 호출 계약과 프롬프트 패턴이 안전한지 구체적인 API 코드와 함께 봅니다.
+
+## 처음 질문으로 돌아가기
+
+- **OCR을 붙일 때는 텍스트 정확도부터 봐야 할까요, 아니면 응답 구조부터 봐야 할까요?**
+  - 이 글의 기준에서는 응답 구조를 먼저 봐야 합니다. 토큰 하나하나가 잘 읽혀도 `공급가액`과 `45,000원`이 서로 다른 줄이나 다른 문서 조각처럼 남으면 검색과 RAG가 바로 무너집니다. 그래서 `fields`를 줄 단위 텍스트로 다시 묶는 후처리가 OCR 정확도만큼 중요하다고 설명했습니다.
+- **bounding box와 `lineBreak` 힌트는 후처리에서 왜 그렇게 중요할까요?**
+  - `lineBreak`는 어떤 토큰들이 한 줄을 이루는지 알려 주고, bounding box는 컬럼이나 표 셀처럼 좌우 구조를 복원할 때 기준이 됩니다. 영수증과 계산서에서는 이 힌트가 없으면 금액, 날짜, 항목명이 서로 다른 행으로 섞일 수 있습니다. 즉 OCR 응답 JSON은 평문이 아니라 줄과 레이아웃을 다시 만들 재료라는 뜻입니다.
+- **실제 API 키가 없어도 OCR 파이프라인의 대부분을 왜 검증할 수 있을까요?**
+  - 실제로 자주 깨지는 부분이 인증보다 후처리 로직이기 때문입니다. mock payload만 있어도 줄 재구성, 금액 정규식 검증, confidence 집계, 코퍼스 변환 같은 핵심 경로를 결정적으로 테스트할 수 있습니다. 실제 키가 생겨도 바뀌는 것은 응답을 받아 오는 앞단이고, 뒤쪽 로직은 그대로 재사용됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
-- [KoSimCSE로 문장 유사도 구현하기](./02-kosimcse-similarity.md)
-- [BGE-M3 다국어 임베딩 실전](./03-bge-m3-multilingual.md)
-- **CLOVA OCR API로 문서 텍스트 추출 (현재 글)**
-- HyperCLOVA X와 Solar API 사용하기 (예정)
-- 한국어 RAG 파이프라인 조합하기 (예정)
+- [Korean AI Stack 101 (1/6): 한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
+- [Korean AI Stack 101 (2/6): KoSimCSE로 문장 유사도 구현하기](./02-kosimcse-similarity.md)
+- [Korean AI Stack 101 (3/6): BGE-M3 다국어 임베딩 실전](./03-bge-m3-multilingual.md)
+- **Korean AI Stack 101 (4/6): CLOVA OCR API로 문서 텍스트 추출 (현재 글)**
+- Korean AI Stack 101 (5/6): HyperCLOVA X와 Solar API 사용하기 (예정)
+- Korean AI Stack 101 (6/6): 한국어 RAG 파이프라인 조합하기 (예정)
 
 <!-- toc:end -->
-
----
 
 ## 참고 자료
 
@@ -278,3 +496,5 @@ CLOVA OCR 예제의 핵심은 응답 구조에 대한 이해를 텍스트 추출
 - [CLOVA OCR API guide](https://api.ncloud-docs.com/docs/ai-application-service-ocr-ocr)
 - [pdfplumber](https://github.com/jsvine/pdfplumber)
 - [OCR post-processing patterns](https://cloud.google.com/document-ai/docs/process-documents-client-libraries)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/korean-ai-stack-101/ko/04-clova-ocr)

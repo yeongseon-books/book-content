@@ -1,10 +1,10 @@
 ---
 series: calculus-for-ml-101
 episode: 1
-title: What Is a Derivative
-status: content-ready
+title: "Calculus for ML 101 (1/10): What Is a Derivative"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,40 @@ tags:
   - Math
   - Beginner
 seo_description: A beginner-friendly tour of derivatives, rate of change, tangent lines, limits, and numerical differentiation for ML
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is a Derivative
+# Calculus for ML 101 (1/10): What Is a Derivative
 
-> Calculus for ML 101 series (1/10)
+When people first meet derivatives, they often memorize rules before they build a working mental model. In ML, that order tends to fail quickly. The useful question is simpler: if you nudge a parameter a little, does the loss go up or down, and how sharply?
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Calculus for ML 101 series.
 
-**Core question**: When we say an ML model *learns*, what *exactly* is happening through *calculus*?
+In this post, we'll connect average rate of change, tangent lines, limits, and numerical differentiation into one practical picture. Once that picture is clear, a gradient stops looking like a mysterious number and starts looking like a directional signal for training.
 
-> A *derivative* is a *rate of change*, and *training* uses derivatives of *loss* to pick a *direction*.
+> A derivative is not mainly about symbol manipulation. It is the local signal that tells you how a function reacts near the point where you are standing.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![calculus for ml 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 1 flow overview*
 
-- The *intuition* behind a derivative
-- *Rate of change* and the *tangent line*
-- The role of *limits*
-- *Numerical differentiation*
-- The *link to ML*
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is a Derivative?
+- Which signal should the example or diagram make visible for What Is a Derivative?
+- What failure should be prevented first when What Is a Derivative reaches a real system?
+
+## Questions this article answers
+
+- Why is learning in ML directly tied to derivatives?
+- What is the difference between average rate of change and instantaneous rate of change, and why does that distinction matter?
+- What is the most practical way to relate the slope of a tangent line to the derivative?
+- Why are limits indispensable in the definition of a derivative?
+- When is numerical differentiation useful, and how much should you trust it?
 
 ## Why It Matters
 
 *Gradient descent*, *backprop*, and *learning rate* are all defined on top of derivatives.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    F[Function] --> S[Slope]
-    S --> L[Limit]
-    L --> D[Derivative]
-    D --> M[ML Training]
-```
 
 ## Key Terms
 
@@ -149,7 +147,18 @@ Updating *model weights* using the *loss gradient* is the *core loop* of every M
 
 Next post: *Functions and Slope*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is a Derivative?**
+  - The article treats What Is a Derivative as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is a Derivative?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is a Derivative reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Derivative (current)**
 - Functions and Slope (upcoming)
 - Partial Derivatives (upcoming)
@@ -160,6 +169,7 @@ Next post: *Functions and Slope*.
 - Optimization (upcoming)
 - Backpropagation Intuition (upcoming)
 - Calculus in Deep Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,0 +1,13 @@
+flowchart LR
+    Loop["Feedback loop state\nattempt count + failure history"] --> Attempts["Max attempts\nstop after 3–5 tries"]
+    Loop --> Cost["Cumulative cost limit\nreuse token and cost caps"]
+    Loop --> Repeat["Repetition detection\nsame failure repeats N times"]
+
+    Attempts --> Continue["Continue only when all three safeguards stay green"]
+    Cost --> Continue
+    Repeat --> Continue
+    Continue --> Escalate["Otherwise escalate\nhand the task to a human"]
+
+    style Loop fill:#f3e5f5,stroke:#7b1fa2
+    style Continue fill:#e8f5e9,stroke:#388e3c
+    style Escalate fill:#fff8e1,stroke:#f9a825

@@ -1,10 +1,10 @@
 ---
 series: algorithms-python-101
 episode: 6
-title: Dynamic Programming Basics
+title: "Algorithms with Python 101 (6/10): Dynamic Programming Basics"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,23 @@ seo_description: Learn top-down and bottom-up dynamic programming in Python with
 last_reviewed: '2026-05-04'
 ---
 
-# Dynamic Programming Basics
+# Algorithms with Python 101 (6/10): Dynamic Programming Basics
 
-> Algorithms with Python 101 Series (6/10)
+Some problems stay hopelessly slow if you solve the same subproblem again and again. Dynamic programming matters because it turns that waste into reusable work.
 
-<!-- a-grade-intro:begin -->
+This topic also shows up constantly in interviews and competitive programming, but the real value is learning to recognize overlapping subproblems and reusable state.
 
-**Key Question**: How can you find the optimal answer without repeating the same computation?
+This is post 6 in the Algorithms with Python 101 series. Here, we'll introduce dynamic programming through memoization, tabulation, and a set of classic Python examples.
 
-> Dynamic programming (DP) breaks a problem into smaller sub-problems and stores each result to eliminate redundant computation. This article covers top-down (memoization) and bottom-up (tabulation) approaches with hands-on examples.
 
-<!-- a-grade-intro:end -->
+![Algorithms with Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/06/06-01-concept-overview.en.png)
+*Algorithms with Python 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Dynamic Programming Basics?
+- Which signal should the example or diagram make visible for Dynamic Programming Basics?
+- What failure should be prevented first when Dynamic Programming Basics reaches a real system?
 
 ## What You Will Learn
 
@@ -51,7 +57,7 @@ DP is the most frequently tested category in coding interviews. Learning the pat
 
 > DP applies when a problem has optimal substructure AND overlapping sub-problems
 
-```
+```text
 Fibonacci fib(5) — redundant computation in naive recursion:
 fib(5) → fib(4) + fib(3)
           fib(4) → fib(3) + fib(2)   ← fib(3) repeated
@@ -102,7 +108,6 @@ def fibonacci(n):
 ```python
 from functools import lru_cache
 
-
 @lru_cache(maxsize=None)
 def fib_top_down(n: int) -> int:
     """Top-down Fibonacci — O(n)."""
@@ -140,7 +145,6 @@ def fib_bottom_up(n: int) -> int:
     return dp[n]
 
 print(fib_bottom_up(50))  # 12586269025
-
 
 def fib_optimized(n: int) -> int:
     """Space-optimized Fibonacci — O(n), O(1) space."""
@@ -254,6 +258,13 @@ You rarely implement DP from scratch in production, but DP thinking is invaluabl
 
 In coding interviews, when you see a DP problem, define the recurrence first and implement bottom-up. Top-down is more intuitive but risks stack overflow.
 
+## How to decide whether a problem is really DP
+
+- If the same computation repeats across requests, records, or subtrees, caching or a DP formulation is worth testing first.
+- If the current answer depends on a small, well-defined set of previous states, you can often convert the problem into a table or rolling-state update.
+- If the state space explodes or inputs change continuously in real time, a greedy heuristic or approximation may be cheaper to operate than a full DP table.
+- Before coding, write down the state, recurrence, and base cases in plain language. That usually exposes bugs earlier than the implementation does.
+
 ## Checklist
 
 - [ ] Explain the two conditions for applying DP
@@ -272,17 +283,29 @@ In coding interviews, when you see a DP problem, define the recurrence first and
 
 Dynamic programming eliminates redundant computation, turning exponential problems into polynomial ones. The key is defining the recurrence relation. In the next article, we explore graph traversal with BFS and DFS.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Dynamic Programming Basics?**
+  - The article treats Dynamic Programming Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Dynamic Programming Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Dynamic Programming Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Algorithms?](./01-what-are-algorithms.md)
-- [Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
-- [Linear Search and Binary Search](./03-linear-and-binary-search.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
-- [Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
+## In this series
+
+- [Algorithms with Python 101 (1/10): What Are Algorithms?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
+- [Algorithms with Python 101 (3/10): Linear Search and Binary Search](./03-linear-and-binary-search.md)
+- [Algorithms with Python 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
+- [Algorithms with Python 101 (5/10): Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
 - **Dynamic Programming Basics (current)**
 - Graph Traversal — BFS and DFS (upcoming)
 - Shortest Path Basics (upcoming)
 - Greedy Algorithms (upcoming)
 - Coding Test Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

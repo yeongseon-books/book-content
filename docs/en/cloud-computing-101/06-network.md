@@ -1,10 +1,10 @@
 ---
 series: cloud-computing-101
 episode: 6
-title: Network
-status: content-ready
+title: "Cloud Computing 101 (6/10): Network"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,33 @@ tags:
   - Security
   - AWS
 seo_description: VPC, subnets, security groups, and load balancers — the core of cloud networking explained with boto3 examples for beginners.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Network
+# Cloud Computing 101 (6/10): Network
 
-> Cloud Computing 101 series (6/10)
+Cloud networking looks simple until you have to change it. VPCs, subnets, security groups, NACLs, and load balancers all sound like pieces of the same thing, but they solve different boundary problems at different layers.
 
-<!-- a-grade-intro:begin -->
+A VPC is your network boundary. Inside, subnets partition the address space. Security groups and network ACLs filter traffic. Load balancers distribute it. VPN and Direct Connect bring on-prem into the picture. Networking often stays abstract until something breaks, then becomes very real.
 
-**Core question**: Why do VPCs, subnets, and security groups all exist *separately*?
+This is post 6 in the Cloud Computing 101 series.
 
-> *Cloud networking works in four layers — isolate (VPC), place (subnets), allow (SG/NACL), distribute (LB).*
+In this post, we'll use a four-step mental model — isolate, place, allow, distribute — to make the core cloud networking pieces easier to reason about.
 
-<!-- a-grade-intro:end -->
+> Cloud networking is mostly boundary design: isolate with VPCs, place with subnets, define trust with SGs and NACLs, and shape traffic with load balancers.
 
-## What You Will Learn
+
+![cloud computing 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 6 flow overview*
+> Good network design prevents failures from cascading and makes debugging possible when things break.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Network?
+- Which signal should the example or diagram make visible for Network?
+- What failure should be prevented first when Network reaches a real system?
+
+## Questions This Chapter Answers
 
 - VPCs vs subnets
 - Security Groups vs NACLs
@@ -43,16 +54,6 @@ last_reviewed: '2026-05-04'
 ## Why It Matters
 
 Network design is the hardest decision to undo later. The first hour shapes the next several years.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Internet["internet"] --> ALB["load balancer"]
-    ALB --> Public["public subnet"]
-    Public --> Private["private subnet"]
-    Private --> DB["database"]
-```
 
 ## Key Terms
 
@@ -126,6 +127,26 @@ def describe(sg_id):
 - 0.0.0.0/0 is an explicit statement of public exposure.
 - SGs are stateful; NACLs are stateless.
 
+## How to Verify This Example
+
+The real test here is whether trust boundaries are encoded correctly. A database security group should trust the application security group, not a broad CIDR range that is harder to reason about and easier to misuse later.
+
+```bash
+aws ec2 describe-security-groups --group-ids sg-xxxxxxxx sg-yyyyyyyy
+```
+
+**Expected output:**
+
+- The app security group should show inbound `443` rules.
+- The DB security group should show port `5432` scoped to the application SG reference.
+- If the database group exposes `0.0.0.0/0`, the design intent is already compromised.
+
+### Where teams usually get stuck
+
+- NAT only solves outbound routing. It does not magically make inbound exposure safe.
+- Public and private subnet separation should be reflected in both route tables and SG rules.
+- CIDR planning should leave room for future AZ growth and VPC peering decisions.
+
 ## Five Common Mistakes
 
 1. **Opening SSH to 0.0.0.0/0.**
@@ -163,17 +184,29 @@ The ALB sits in public subnets. App servers live in private subnets. RDS sits in
 
 Once the wires are in, the question becomes *who* may use them. The next post covers Identity and Security.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Network?**
+  - The article treats Network as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Network?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Network reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region and Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
-- [Storage](./05-storage.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region and Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
+- [Cloud Computing 101 (5/10): Storage](./05-storage.md)
 - **Network (current)**
 - Identity and Security (upcoming)
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

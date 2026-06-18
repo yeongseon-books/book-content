@@ -1,5 +1,5 @@
 ---
-title: Document text extraction with CLOVA OCR API
+title: "Korean AI Stack 101 (4/6): Document text extraction with CLOVA OCR API"
 series: korean-ai-stack-101
 episode: 4
 language: en
@@ -17,23 +17,23 @@ tags:
 - DocumentAI
 - Python
 last_reviewed: '2026-05-01'
-seo_description: The OCR pipeline has four stages.
+seo_description: Master Korean document text extraction with CLOVA OCR. Learn to post-process JSON, reconstruct lines, and handle confidence scores for RAG.
 ---
 
-# Document text extraction with CLOVA OCR API
+# Korean AI Stack 101 (4/6): Document text extraction with CLOVA OCR API
 
-## Questions this post answers
+Korean search and RAG pipelines often fail long before retrieval because the source material starts as scans, receipts, or photographed documents. If OCR breaks a meaningful line into the wrong pieces, every downstream embedding and ranking decision inherits that damage.
+
+This is the fourth post in the Korean AI Stack 101 series. Here, we turn CLOVA OCR responses into line-level text that can safely enter a retrieval corpus.
+
+![Korean AI Stack 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-core-flow.en.png)
+*Korean AI Stack 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
 
 - When you add OCR, should you inspect text accuracy first, or response structure first?
 - Why do bounding boxes and `lineBreak` hints matter so much in post-processing?
 - Why can you validate most of the OCR pipeline even without a real API key?
-- Why must OCR output be reshaped before it enters embedding or RAG steps?
-
-> The first useful OCR output is not plain text. It is a structured extraction payload that still has to be reassembled into meaningful lines.
-
-> Korean AI Stack 101 (3/6)
-
-Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/04-clova-ocr)
 
 ## Why this matters
 
@@ -45,7 +45,7 @@ OCR deserves its own stage because half of Korean enterprise search begins with 
 
 The OCR pipeline has four stages.
 
-```
+```text
 [document image / PDF]
        |
        v
@@ -97,15 +97,9 @@ Two more facts:
 
 What matters: (1) lines are bound at the meaning level so BGE-M3 retrieval lifts the right line, (2) per-line minimum confidence is preserved for downstream review, and (3) the raw payload is kept around so the pipeline can be reprocessed at any time.
 
-## Core flow
-
-![Core flow](../../assets/korean-ai-stack-101/04/04-01-core-flow.en.png)
-
-*Core flow*
-
 ## Why start from a mock payload
 
-![Minimal runnable example](../../assets/korean-ai-stack-101/04/04-01-minimal-runnable-example.en.png)
+![Minimal runnable example](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-minimal-runnable-example.en.png)
 
 *Minimal runnable example*
 
@@ -136,7 +130,7 @@ Once a real key is available, swap the dict construction for `requests.post(...)
 
 ### Step 2 — Reconstruct lines
 
-![What to notice in this code](../../assets/korean-ai-stack-101/04/04-02-what-to-notice-in-this-code.en.png)
+![What to notice in this code](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-02-what-to-notice-in-this-code.en.png)
 
 *What to notice in this code*
 
@@ -198,10 +192,6 @@ Storing the raw payload path beside the text keeps reprocessing simple when the 
 
 ### Step 5 — Swap in the real API call (optional)
 
-![Where engineers get confused](../../assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.en.png)
-
-*Where engineers get confused*
-
 ```python
 import os, requests
 
@@ -224,6 +214,10 @@ Returns the same shape as the mock dict, so steps 1-4 stay unchanged.
 - Even with a real key in place, keeping the mock test in CI makes the build deterministic.
 
 ## Common mistakes
+
+![Where engineers get confused](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.en.png)
+
+*Where engineers get confused*
 
 - **Assuming higher OCR accuracy means better RAG** — token accuracy and meaning-unit accuracy are different problems. Bad line reconstruction defeats 99% OCR.
 - **Using absolute confidence thresholds** — a 0.95 cutoff means different things across model versions. Prefer reviewing the bottom 5% of the score distribution.
@@ -261,15 +255,24 @@ The value of the CLOVA OCR example is that it puts response-shape understanding 
 
 The next article (episode 5) covers HyperCLOVA X and Solar API. We will look at safe prompt patterns when handing OCR text or BGE-M3 retrieval results to a Korean LLM, with concrete API call code.
 
+## Answering the Opening Questions
+
+- **When you add OCR, should you inspect text accuracy first, or response structure first?**
+  - The article treats Document text extraction with CLOVA OCR API as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do bounding boxes and `lineBreak` hints matter so much in post-processing?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why can you validate most of the OCR pipeline even without a real API key?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
-- [Building sentence similarity search with KoSimCSE](./02-kosimcse-similarity.md)
-- [BGE-M3 multilingual embedding in practice](./03-bge-m3-multilingual.md)
-- **Document text extraction with CLOVA OCR API (current)**
-- Using HyperCLOVA X and Solar API (upcoming)
-- Assembling a Korean RAG pipeline (upcoming)
+- [Korean AI Stack 101 (1/6): Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
+- [Korean AI Stack 101 (2/6): Building sentence similarity search with KoSimCSE](./02-kosimcse-similarity.md)
+- [Korean AI Stack 101 (3/6): BGE-M3 multilingual embedding in practice](./03-bge-m3-multilingual.md)
+- **Korean AI Stack 101 (4/6): Document text extraction with CLOVA OCR API (current)**
+- Korean AI Stack 101 (5/6): Using HyperCLOVA X and Solar API (upcoming)
+- Korean AI Stack 101 (6/6): Assembling a Korean RAG pipeline (upcoming)
 
 <!-- toc:end -->
 

@@ -1,0 +1,4 @@
+flowchart TD
+  Rule["Scale Rule"] --> Identity["Managed Identity / Secret"]
+  Identity --> Auth["TriggerAuthentication"]
+  Auth --> External["External Service (Auth Success)"]

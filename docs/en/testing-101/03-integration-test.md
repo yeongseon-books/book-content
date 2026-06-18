@@ -1,10 +1,10 @@
 ---
 series: testing-101
 episode: 3
-title: Integration Test
+title: "Testing 101 (3/10): Integration Test"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,26 @@ seo_description: Definition and hands-on for integration tests that exercise mul
 last_reviewed: '2026-05-04'
 ---
 
-# Integration Test
+# Testing 101 (3/10): Integration Test
 
-> Testing 101 series (3/10)
+A fully green unit-test suite can still leave you staring at a production 500. The reason is simple: most incidents do not live *inside* one function. They live at the seams where HTTP handlers, services, repositories, and databases have to agree on shape, timing, and state.
 
-<!-- a-grade-intro:begin -->
+Integration tests exist to exercise those seams on purpose. They cost more than unit tests, but they catch the exact kinds of contract drift that only appear once components start touching each other.
 
-**Core question**: All your unit tests pass — *why does it still break* in the real environment?
+This is post 3 in the Testing 101 series. Here we show what integration tests verify, when to use a real DB or HTTP layer, and how to keep the suite useful without turning every PR into a long wait.
 
-> An integration test verifies *what happens when several parts work together*. Each part may be correct, yet *fitting them together* exposes the real problem.
+> Unit tests validate parts in isolation. Integration tests validate whether the assembled path still behaves like one coherent system.
 
-<!-- a-grade-intro:end -->
+
+![testing 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/03/03-01-concept-at-a-glance.en.png)
+*testing 101 chapter 3 flow overview*
+> Integration tests verify that the contract between modules stays intact as they evolve.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Integration Test?
+- Which signal should the example or diagram make visible for Integration Test?
+- What failure should be prevented first when Integration Test reaches a real system?
 
 ## What You Will Learn
 
@@ -47,14 +56,7 @@ Most bugs live at *the seams* — DB schema, API contracts, authorization checks
 > Unit tests look at *parts*; integration tests look at *the assembly*.
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    HTTP["HTTP route"] --> Service["Service"]
-    Service --> Repo["Repository"]
-    Repo --> DB[("Real DB (test)")]
-```
-
+Integration tests exercise two or more modules working together: typically a handler calling a service calling a repository, or a service calling an external API, running against a real or temporary database to catch schema mismatches and state transitions that unit tests cannot see.
 ## Key Terms
 
 - **Integration test**: a test that exercises *two or more components* *together*.
@@ -173,6 +175,20 @@ pytest -m slow         # nightly
 4. **Mocking *down to the DB*.** That is *not an integration test*.
 5. **Testing *only happy paths*.** Failure cases prevent more *expensive bugs*.
 
+## Verification Points
+
+1. After the first `POST /users`, query the test database and confirm that the row truly exists. An HTTP 200 alone does not prove persistence worked.
+2. Decide what duplicate-email failure should look like in your system and narrow the assertion to that policy. Leaving `400`, `409`, and `500` all acceptable hides regressions.
+3. Run both `pytest -m "not slow"` and `pytest -m slow` so you know the fast PR path and the heavier verification path are genuinely separated.
+
+**Expected output:** the happy path should confirm both response and persistence, and the duplicate path should be pinned to one deliberate failure policy.
+
+## Failure Signals and First Checks
+
+- If the suite can point at a production DB by accident, stop and fix isolation before doing anything else.
+- If tests fail only when reordered, the reset or seeding strategy is still leaking state.
+- If the status-code assertion is too broad, a real regression may stay green.
+
 ## How This Shows Up in Production
 
 Most backend teams stand up a *real DB* with combinations like *Postgres + testcontainers*. External APIs are usually replaced by *VCR or mock servers*.
@@ -202,9 +218,20 @@ Most backend teams stand up a *real DB* with combinations like *Postgres + testc
 
 Integration tests show what happens *when parts are connected*. The next post climbs further up to *E2E tests* that include the user-facing screen.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Integration Test?**
+  - The article treats Integration Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Integration Test?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Integration Test reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
 - **Integration Test (current)**
 - E2E Test (upcoming)
 - Test Double (upcoming)
@@ -213,11 +240,16 @@ Integration tests show what happens *when parts are connected*. The next post cl
 - Regression Test (upcoming)
 - Running Tests in CI (upcoming)
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [FastAPI — TestClient](https://fastapi.tiangolo.com/tutorial/testing/)
+### Official Docs
+- [FastAPI testing guide](https://fastapi.tiangolo.com/tutorial/testing/)
+- [SQLAlchemy Session basics](https://docs.sqlalchemy.org/en/20/orm/session_basics.html)
+- [pytest markers](https://docs.pytest.org/en/stable/example/markers.html)
+
+### Practical Reading
 - [Testcontainers](https://testcontainers.com/)
 - [Martin Fowler — Integration Test](https://martinfowler.com/bliki/IntegrationTest.html)
-- [pytest — markers](https://docs.pytest.org/en/stable/example/markers.html)

@@ -1,0 +1,4 @@
+flowchart TD
+  KEDA["KEDA Operator"] -->|Generates| HPA["Horizontal Pod Autoscaler"]
+  HPA -->|Watches Metrics| Metrics["Metrics API"]
+  HPA -->|Adjusts| Deploy["Deployment/ReplicaSet"]

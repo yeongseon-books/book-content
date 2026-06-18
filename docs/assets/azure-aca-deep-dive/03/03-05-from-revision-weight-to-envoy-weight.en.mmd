@@ -1,0 +1,5 @@
+flowchart TD
+  ARM["ARM API (Weight Config)"] --> ControlPlane["ACA Control Plane"]
+  ControlPlane --> EnvoyConfig["xDS Configuration"]
+  EnvoyConfig --> Envoy["Envoy Proxy (Data Plane)"]
+  Envoy -- "Routes traffic" --> Revisions["App Revisions"]

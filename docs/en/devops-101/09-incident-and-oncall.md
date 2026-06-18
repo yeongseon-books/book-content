@@ -1,10 +1,10 @@
 ---
 series: devops-101
 episode: 9
-title: Incident Response and On-Call
-status: content-ready
+title: "DevOps 101 (9/10): Incident Response and On-Call"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,28 +17,35 @@ tags:
   - SRE
   - Postmortem
 seo_description: Severity levels, on-call rotations, runbooks, and blameless postmortems. The operations playbook that reduces incidents.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Incident Response and On-Call
+# DevOps 101 (9/10): Incident Response and On-Call
 
-> DevOps 101 series (9/10)
+Incidents rarely become chaotic because the engineers are weak. They become chaotic because roles are unclear, runbooks are missing, and the same person tries to diagnose, mitigate, communicate, and document at the same time.
 
-<!-- a-grade-intro:begin -->
+A good incident process reduces cognitive load before the alert even fires. Severity levels, on-call rotations, incident commanders, and postmortems give the team a repeatable way to recover under pressure.
 
-**Core question**: When a page fires at 3 AM, *who does what, and how*?
+This is post 9 in the DevOps 101 series. In this chapter, we turn incident response into an operational system with severity definitions, runbooks, escalation rules, and blameless follow-up.
 
-> *Incidents will happen.* The difference is *how fast and how calmly* you recover.
 
-<!-- a-grade-intro:end -->
+![devops 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/09/09-01-concept-at-a-glance.en.png)
+*devops 101 chapter 9 flow overview*
+> On-call teaches a team to *trust each other* and *learn together*—when both happen, incidents become *feedback*, not *blame*.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- How to classify *severity (SEV)*
-- How to design an *on-call rotation*
-- How to write a *runbook*
-- How to run a *blameless postmortem*
-- The meaning of *MTTR/MTTD*
+- What boundary should you inspect first when applying Incident Response and On-Call?
+- Which signal should the example or diagram make visible for Incident Response and On-Call?
+- What failure should be prevented first when Incident Response and On-Call reaches a real system?
+
+## Questions this article answers
+
+- When an *alert* fires at *3 AM*, who should do what first?
+- How should teams define incident *severity (SEV)* levels so everyone responds with the same language?
+- Why is an *on-call rotation* an operating design decision rather than just a schedule?
+- How do *runbooks* and the *incident commander* role change real recovery speed?
+- How does a *blameless postmortem* actually connect to preventing recurrence?
 
 ## Why It Matters
 
@@ -46,15 +53,7 @@ Incidents are an *organizational* problem more than a *technical* one. Without *
 
 > *Process* is a substitute for *memory*.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Alert["alert"] --> OnCall["on-call engineer"]
-    OnCall --> Runbook["runbook"]
-    Runbook --> Mitigate["mitigation"]
-    Mitigate --> Postmortem["blameless postmortem"]
-```
+On-call means someone is ready to *respond to failures*. Good on-call systems are *on-duty* (not always awake), *supported* (team responds together), and *learned from* (postmortems prevent repeats).
 
 ## Key Terms
 
@@ -131,6 +130,32 @@ IC = decision maker. Does NOT fix things directly.
 - Prevention: add flag-validation checklist to PR template
 ```
 
+## The First 15 Minutes Set the Direction
+
+Incident response is often decided less by deep expertise than by the order of actions in the first few minutes. Without a shared sequence, teams may perform technically correct work while still stretching recovery time through confusion.
+
+```text
+0-3m   Acknowledge the page, assign SEV, open the incident channel
+3-5m   Start the runbook, check recent deploys and config changes
+5-8m   Estimate customer impact and possible mitigations
+8-12m  Assign an IC, split roles, decide on external communication
+12-15m Execute mitigation or escalate further
+```
+
+This order helps because it separates technical recovery from coordination. The engineer debugging the system should not also be the only person maintaining shared situational awareness.
+
+## What Good Postmortems Produce
+
+The quality of a postmortem is visible in its outputs, not just its tone. A strong postmortem leaves at least three things behind: a reproducible timeline, a prevention or detection improvement, and action items with owners and deadlines.
+
+If the root cause was a bad feature-flag default, for example, the system should change in concrete ways:
+
+- add a flag-validation checkbox to the PR template
+- include default-flag validation in smoke tests
+- review existing flag defaults within a fixed time window
+
+That is how incidents become system improvement instead of archived storytelling.
+
 ## What to Notice in This Code
 
 - We *fix the system and the process*, not the person.
@@ -174,17 +199,29 @@ Mature teams attach a *runbook URL* to every alert so on-call engineers start th
 
 Incident response is a combined *technical and organizational* skill. The final post wraps the whole DevOps flow into a single picture.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Incident Response and On-Call?**
+  - The article treats Incident Response and On-Call as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Incident Response and On-Call?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Incident Response and On-Call reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is DevOps?](./01-what-is-devops.md)
-- [The CI Pipeline](./02-ci-pipeline.md)
-- [CD and Deployment Strategies](./03-cd-and-deployment.md)
-- [Environments and Configuration](./04-environments-and-config.md)
-- [Infrastructure as Code](./05-infrastructure-as-code.md)
-- [Containers and Builds](./06-containers-and-build.md)
-- [Monitoring and Alerting](./07-monitoring-and-alerting.md)
-- [Logging and Analysis](./08-logging-and-analysis.md)
+## In this series
+
+- [DevOps 101 (1/10): What Is DevOps?](./01-what-is-devops.md)
+- [DevOps 101 (2/10): CI Pipeline](./02-ci-pipeline.md)
+- [DevOps 101 (3/10): CD and Deployment Strategies](./03-cd-and-deployment.md)
+- [DevOps 101 (4/10): Environments and Configuration](./04-environments-and-config.md)
+- [DevOps 101 (5/10): Infrastructure as Code](./05-infrastructure-as-code.md)
+- [DevOps 101 (6/10): Containers and Build](./06-containers-and-build.md)
+- [DevOps 101 (7/10): Monitoring and Alerting](./07-monitoring-and-alerting.md)
+- [DevOps 101 (8/10): Logging and Analysis](./08-logging-and-analysis.md)
 - **Incident Response and On-Call (current)**
 - An Operable DevOps Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,10 +1,10 @@
 ---
 series: computer-science-101
 episode: 8
-title: Databases
-status: content-ready
+title: "Computer Science 101 (8/10): Databases"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,34 @@ tags:
   - Transactions
   - ACID
 seo_description: How databases store, query, and protect data — focused on indexes and transactions, as part of the CS 101 series.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Databases
+# Computer Science 101 (8/10): Databases
 
-> Computer Science 101 series (8/10)
+Finding one row out of millions in milliseconds is rarely about the SQL sentence alone. It is about the data structures, execution plan, and locking behavior hidden underneath that sentence. That is why so many production incidents end up tracing back to the database layer.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Computer Science 101 series.
 
-**Key question**: How can a database find a single row out of hundreds of millions in 1 ms?
+In this article, we'll connect SQL, indexes, execution plans, and ACID transactions so that database behavior stops feeling like a black box.
 
-> A database stores large amounts of data permanently and lets many users read and write it safely at the same time. SQL is the standard language for working with that data, indexes are the data structures that make lookups fast, and transactions keep data consistent. This article covers SQL basics, how indexes work, ACID transactions, and the performance traps you'll meet most often.
 
-<!-- a-grade-intro:end -->
+![Computer Science 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/08/08-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Databases?
+- Which signal should the example or diagram make visible for Databases?
+- What failure should be prevented first when Databases reaches a real system?
+
+## Questions This Article Answers
+
+- How does a database store large amounts of data and still answer quickly?
+- Why can an index change lookup time so dramatically?
+- What is the gap between a SQL statement and the plan the DB actually executes?
+- What failures do transactions and ACID protect you from?
+- Why do N+1 queries and long transactions so often become production incidents?
 
 ## What You Will Learn
 
@@ -48,21 +62,7 @@ Most service incidents start at the database. A single slow query can paralyze t
 
 Queries are short, but deep algorithms sit behind them.
 
-## Concept at a Glance
-
 > An index is like the index in a book. Instead of skimming every page, you jump straight to the right one through the index.
-
-```text
-Without an index:  SELECT * FROM users WHERE email = 'a@b.com'
-  -> scan every row (Full Table Scan)  -- O(n)
-
-With a B-Tree index
-  -> binary search through the tree    -- O(log n)
-
-For 1,000,000 rows
-  - full scan : about 1,000,000 comparisons
-  - B-Tree    : about 20 comparisons
-```
 
 ## Key Terms
 
@@ -187,6 +187,8 @@ cur.execute("SELECT COUNT(*) FROM big WHERE k = ?", (target,)).fetchone()
 print(f"after  index: {time.perf_counter() - start:.6f}s")
 ```
 
+**Expected output:** `after index` should be much faster than `before index`, and `EXPLAIN QUERY PLAN` should confirm that the index is used.
+
 ### Step 4: Inspect with EXPLAIN QUERY PLAN
 
 ```python
@@ -207,7 +209,6 @@ cur.executemany(
 )
 conn.commit()
 
-
 def transfer(src: int, dst: int, amount: int) -> None:
     """Atomic transfer between two accounts — both succeed or both fail."""
     try:
@@ -218,7 +219,6 @@ def transfer(src: int, dst: int, amount: int) -> None:
     except Exception:
         conn.rollback()
         raise
-
 
 transfer(1, 2, 300)
 print(cur.execute("SELECT * FROM accounts").fetchall())
@@ -277,17 +277,29 @@ A database stores data permanently and keeps it consistent under concurrent acce
 
 The next article looks at how we keep all of these systems reliable and maintainable over time — software engineering.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Databases?**
+  - The article treats Databases as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Databases?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Databases reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
-- [Computation and Programs](./02-computation-and-programs.md)
-- [Data Representation](./03-data-representation.md)
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
-- [Computer Architecture](./05-computer-architecture.md)
-- [Operating Systems](./06-operating-systems.md)
-- [Networks](./07-networks.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): Computation and Programs](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): Data Representation](./03-data-representation.md)
+- [Computer Science 101 (4/10): Algorithms and Complexity](./04-algorithms-and-complexity.md)
+- [Computer Science 101 (5/10): Computer Architecture](./05-computer-architecture.md)
+- [Computer Science 101 (6/10): Operating Systems](./06-operating-systems.md)
+- [Computer Science 101 (7/10): Networks](./07-networks.md)
 - **Databases (current)**
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References

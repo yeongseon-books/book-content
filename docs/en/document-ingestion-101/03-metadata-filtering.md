@@ -1,11 +1,11 @@
 ---
-title: Metadata design and filtering
+title: "Document Ingestion 101 (3/6): Metadata design and filtering"
 series: document-ingestion-101
 episode: 3
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,40 +14,34 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: Metadata is not decoration around the text; it is the first index
   that shrinks the candidate set.
 ---
 
-# Metadata design and filtering
+# Document Ingestion 101 (3/6): Metadata design and filtering
 
-## Questions this post answers
+Good retrieval is not only about semantic similarity. In production, engineers also need explicit ways to narrow results by scope, source, and time window before ranking becomes useful.
 
-- Which retrieval conditions cannot be solved by embedding similarity alone?
-- How should you design LangChain Document metadata for later filtering?
-- What does the `filter` parameter look like in a FAISS search flow?
+This is the third post in the Document Ingestion 101 series. Here, we design a practical metadata shape and show how filtering changes retrieval behavior in a visible way.
 
+![Retrieval metadata schema flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-01-metadata-schema-design.en.png)
+*Retrieval metadata schema flow*
 > Metadata is not decoration around the text; it is the first index that shrinks the candidate set.
 
-Example code: `/root/Github/document-ingestion-101/en/03-metadata-filtering/main.py`
+## Questions to Keep in Mind
 
-![Questions this post answers](../../assets/document-ingestion-101/03/03-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-One of the most common RAG mistakes is mixing “similar meaning” with “allowed scope.” Quarter, source, and category usually need structured filtering, not just vector similarity.
-
-This example loads three tiny documents into FAISS and changes the `filter` parameter by category and quarter so the retrieval behavior is explicit.
+- Why should metadata schema be designed during ingestion rather than after embedding?
+- How do filters change the candidate set before vector similarity search?
+- What breaks in retrieval and citation when required metadata is missing?
 
 ## Metadata schema design
 
-![Retrieval metadata schema flow](../../assets/document-ingestion-101/03/03-01-metadata-schema-design.en.png)
-
-*Retrieval metadata schema flow*
 The schema is less about collecting many fields and more about keeping the few keys that actually shrink the candidate set.
 
 ## How filters narrow the candidate set
 
-![Filtered retrieval candidate flow](../../assets/document-ingestion-101/03/03-02-how-filters-narrow-the-candidate-set.en.png)
+![Filtered retrieval candidate flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-02-how-filters-narrow-the-candidate-set.en.png)
 
 *Filtered retrieval candidate flow*
 Even when multiple chunks are semantically similar, filters stabilize retrieval by narrowing scope before ranking.
@@ -133,8 +127,7 @@ def main() -> None:
     for doc in vectorstore.similarity_search(query, k=3, filter={'category': 'marketing'}):
         print(doc.metadata['title'], doc.metadata['quarter'], '-', doc.page_content)
 
-    print('
-[filter=quarter:2024Q4]')
+    print('\n[filter=quarter:2024Q4]')
     for doc in vectorstore.similarity_search(query, k=3, filter={'quarter': '2024Q4'}):
         print(doc.metadata['title'], doc.metadata['category'], '-', doc.page_content)
 
@@ -164,7 +157,7 @@ Q4 infrastructure cost engineering - ...
 
 ### How similarity and filters combine
 
-![Similarity and filter processing flow](../../assets/document-ingestion-101/03/03-01-how-similarity-and-filters-combine.en.png)
+![Similarity and filter processing flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-01-how-similarity-and-filters-combine.en.png)
 
 *Similarity and filter processing flow*
 Similarity and filtering work best as separate stages with a visible order, not as one opaque retrieval step.
@@ -177,7 +170,7 @@ Similarity and filtering work best as separate stages with a visible order, not 
 
 ### How source tracking supports audits
 
-![Source tracking and audit path](../../assets/document-ingestion-101/03/03-02-how-source-tracking-supports-audits.en.png)
+![Source tracking and audit path](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-02-how-source-tracking-supports-audits.en.png)
 
 *Source tracking and audit path*
 When an answer looks wrong, source and scope metadata usually explain the failure faster than the chunk text alone.
@@ -193,18 +186,37 @@ When an answer looks wrong, source and scope metadata usually explain the failur
 - [ ] Field names stay consistent between document creation and retrieval.
 - [ ] You trimmed the schema to fields that are operationally useful.
 
+## Answering the Opening Questions
+
+- **Why should metadata schema be designed during ingestion rather than after embedding?**
+  Fields such as source, doc_type, date, and owner must be assigned during ingestion so every chunk and index shares the same filter contract.
+
+- **How do filters change the candidate set before vector similarity search?**
+  Filters reduce the document candidate set before similarity scoring, preventing unrelated records from competing in the top results.
+
+- **What breaks in retrieval and citation when required metadata is missing?**
+  Missing metadata makes scoped retrieval, citation, page reference, and version tracking unreliable.
+
 <!-- toc:begin -->
 ## In this series
 
-- [PDF parsing and text extraction](./01-pdf-parsing.md)
-- [Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
-- **Metadata design and filtering (current)**
-- Incremental indexing — updating only changed documents (upcoming)
-- Multi-format document pipeline (upcoming)
-- Completing the document ingestion pipeline (upcoming)
+- [Document Ingestion 101 (1/6): PDF parsing and text extraction](./01-pdf-parsing.md)
+- [Document Ingestion 101 (2/6): Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
+- **Document Ingestion 101 (3/6): Metadata design and filtering (current)**
+- Document Ingestion 101 (4/6): Incremental indexing — updating only changed documents (upcoming)
+- Document Ingestion 101 (5/6): Multi-format document pipeline (upcoming)
+- Document Ingestion 101 (6/6): Completing the document ingestion pipeline (upcoming)
 
 <!-- toc:end -->
 
 ## References
 
-- https://python.langchain.com/docs/integrations/vectorstores/faiss/
+### Official docs
+
+- [LangChain FAISS integration guide](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
+- [LangChain Document object concepts](https://python.langchain.com/docs/concepts/documents/)
+
+### Verification-friendly sources
+
+- [FAISS documentation](https://faiss.ai/)
+- [FAISS GitHub repository](https://github.com/facebookresearch/faiss)

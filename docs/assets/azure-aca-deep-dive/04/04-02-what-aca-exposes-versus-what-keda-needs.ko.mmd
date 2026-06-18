@@ -1,0 +1,22 @@
+flowchart TD
+  subgraph ACA["ACA 사용자 지정 리소스"]
+    Rule["스케일 규칙"]
+  end
+  subgraph K8s["Kubernetes/KEDA"]
+    SO["ScaledObject"]
+    Trigger["트리거 인증"]
+  end
+  Rule --> SO
+  Rule --> Trigger
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

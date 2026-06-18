@@ -1,7 +1,7 @@
 ---
 episode: 7
 language: ko
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 series: python-dbapi-101
 status: publish-ready
 tags:
@@ -13,54 +13,54 @@ tags:
 - PEP 249
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
-title: PEP 249 예외 계층과 SQLite 에러 처리
+title: "Python DB-API 101 (7/10): PEP 249 예외 계층과 SQLite 에러 처리"
 seo_description: 예외 클래스는 운영 의사결정의 신호다. retry할지, 4xx로 돌려줄지, 즉시 fail할지를 클래스 하나로 표현할
   수 있어야 한다.
 ---
 
-# PEP 249 예외 계층과 SQLite 에러 처리
+# Python DB-API 101 (7/10): PEP 249 예외 계층과 SQLite 에러 처리
 
 데이터베이스 코드에서 가장 자주 보는 줄은 `try/except Exception`입니다. 모든 예외를 한 곳에서 잡고 로그만 남기는 방식은 짧게는 편하지만, 운영 환경에서는 "되돌릴 수 없는 데이터 손상"과 "잠깐 기다리면 풀리는 락 충돌"을 같은 무게로 다루게 됩니다. PEP 249는 바로 이 문제를 해결하기 위해 8개의 표준 예외 클래스를 정의했고, `sqlite3`는 SQLite 엔진이 돌려주는 에러 코드를 그 계층에 매핑합니다.
 
 이 글은 그 매핑 표를 외우게 하려는 글이 아닙니다. "이 예외가 발생했을 때 retry해도 되는가?", "트랜잭션을 롤백해야 하는가, 그대로 두어도 되는가?"라는 운영 의사결정을 코드로 표현할 수 있도록, 예외 계층을 의사결정 트리로 다시 읽어 보겠습니다.
 
-![PEP 249 예외 계층과 SQLite 에러 처리](../../assets/python-dbapi-101/07/07-01-pep-249-exception-hierarchy-and-sqlite-e.ko.png)
+이 글은 Python DB-API 101 시리즈의 일곱 번째 글입니다.
+
+![PEP 249 예외 계층과 SQLite 에러 처리](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-01-pep-249-exception-hierarchy-and-sqlite-e.ko.png)
 
 *PEP 249 예외 계층과 SQLite 에러 처리*
 
-## 이 글에서 다룰 문제
+![Python DB-API 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-02-mental-model-an-exception-is-a-signal-ab.ko.png)
+*Python DB-API 101 7장 흐름 개요*
 
-운영 중인 서비스에서 `OperationalError: database is locked`가 보일 때, 흔한 대응은 두 가지입니다. (1) 모든 SQL을 try/except로 감싸고 무조건 retry, (2) 에러를 사용자에게 그대로 전달. 두 방식 모두 잘못입니다.
+## 먼저 던지는 질문
 
-(1)을 선택하면 `IntegrityError`처럼 절대 retry해서는 안 되는 예외까지 반복하면서 트랜잭션이 영구적으로 잠기고, (2)를 선택하면 일시적인 락 충돌 한 번 때문에 전체 요청이 실패합니다. 정답은 "예외 클래스에 따라 다르게 처리"하는 것이고, 이를 위해서는 예외 계층이 코드 안에 명시적으로 드러나야 합니다.
-
-또 한 가지, `sqlite3`의 예외 메시지는 영어 문장이라 패턴 매칭으로 분기하는 코드가 흔히 보입니다(`if "locked" in str(e)`). 이 코드는 SQLite 버전이 올라가 메시지 문구가 바뀌면 한 번에 무너집니다. 예외 클래스와 `sqlite_errorcode`로 분기하는 습관이 필요한 이유입니다.
+- `IntegrityError`, `OperationalError`, `ProgrammingError`를 만나면 retry, 4xx 응답, 즉시 실패를 어떻게 나눠야 할까요?
+- 같은 `OperationalError` 안에서도 `SQLITE_BUSY`, `SQLITE_LOCKED`, `SQLITE_CORRUPT`를 왜 따로 봐야 할까요?
+- retry 데코레이터를 붙일 때 왜 `with conn:` 트랜잭션 전체를 함수 안에 넣어야 할까요?
 
 ## Mental Model: 예외는 "이 에러를 어떻게 다뤄야 하는가"의 신호
 
-![Mental Model - 예외는 에러 처리 방향의 신호](../../assets/python-dbapi-101/07/07-02-mental-model-an-exception-is-a-signal-ab.ko.png)
-
-*Mental Model - 예외는 에러 처리 방향의 신호*
 > 예외 클래스는 운영 의사결정의 신호다. retry할지, 4xx로 돌려줄지, 즉시 fail할지를 클래스 하나로 표현할 수 있어야 한다.
 
 PEP 249의 예외 계층을 운영 관점으로 다시 그리면 다음과 같습니다.
 
-```
+```text
 Exception
-└── Warning            (경고 - 보통 무시 가능)
-└── Error              (모든 데이터베이스 에러의 루트)
-    ├── InterfaceError (드라이버 자체의 버그/오용 - 코드 수정 필요)
-    └── DatabaseError  (DB 엔진이 돌려준 에러)
-        ├── DataError          (데이터 형식/범위 오류 - 입력 검증 필요)
-        ├── OperationalError   (일시적 또는 환경적 문제 - retry 후보)
-        ├── IntegrityError     (UNIQUE/FK/CHECK 위반 - 절대 retry 금지)
-        ├── InternalError      (드라이버 내부 상태 오류 - 연결 폐기)
-        ├── ProgrammingError   (SQL 문법/파라미터 오류 - 코드 버그)
-        └── NotSupportedError  (지원하지 않는 기능 - 코드 수정 필요)
+└── Warning             (warning - usually safe to ignore)
+└── Error               (root of all DB errors)
+    ├── InterfaceError  (driver itself misused - code bug)
+    └── DatabaseError   (engine returned an error)
+        ├── DataError           (data type/range - validate input)
+        ├── OperationalError    (transient or environmental - retry candidate)
+        ├── IntegrityError      (UNIQUE/FK/CHECK violation - never retry)
+        ├── InternalError       (driver internal state corrupted - drop connection)
+        ├── ProgrammingError    (bad SQL or params - code bug)
+        └── NotSupportedError   (feature not supported - code change)
 ```
 
 세 가지 카테고리로 묶으면 의사결정이 단순해집니다.
@@ -75,7 +75,7 @@ Exception
 
 ## 핵심 개념: SQLite 에러 코드와 PEP 249 매핑
 
-![핵심 개념: SQLite 에러 코드와 PEP 249 매핑](../../assets/python-dbapi-101/07/07-03-core-concept-sqlite-error-codes-and-the.ko.png)
+![핵심 개념: SQLite 에러 코드와 PEP 249 매핑](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-03-core-concept-sqlite-error-codes-and-the.ko.png)
 
 *핵심 개념: SQLite 에러 코드와 PEP 249 매핑*
 SQLite는 결과 코드를 두 단계로 정의합니다. **Primary result code**(`SQLITE_BUSY`, `SQLITE_CONSTRAINT`)와 **Extended result code**(`SQLITE_BUSY_RECOVERY`, `SQLITE_CONSTRAINT_UNIQUE`)입니다. `sqlite3` 모듈은 primary code를 보고 PEP 249 예외 클래스로 매핑합니다.
@@ -107,7 +107,7 @@ except sqlite3.Error as exc:
 
 3.11 미만에서는 `exc.args[0]` 문자열을 파싱하는 외에는 방법이 없으므로, 운영 코드에서는 가능한 한 3.11+를 권장합니다.
 
-## Before / After: 예외 처리 안티패턴 vs 권장 패턴
+## 적용 전과 후: 예외 처리 안티패턴 vs 권장 패턴
 
 ### Before: 모든 예외를 같은 방식으로 처리
 
@@ -145,12 +145,10 @@ def create_user(conn: sqlite3.Connection, email: str) -> UserId:
         conn.commit()
         return UserId(cur.lastrowid)
     except sqlite3.IntegrityError as exc:
-        # UNIQUE/FK/CHECK 위반 - 사용자 입력 문제
         if exc.sqlite_errorname == "SQLITE_CONSTRAINT_UNIQUE":
             raise DuplicateEmail(email) from exc
         raise
     except sqlite3.OperationalError as exc:
-        # BUSY/LOCKED 같은 일시적 문제만 transient로 분류
         if exc.sqlite_errorname in {
             "SQLITE_BUSY", "SQLITE_BUSY_TIMEOUT", "SQLITE_LOCKED"
         }:
@@ -162,7 +160,7 @@ def create_user(conn: sqlite3.Connection, email: str) -> UserId:
 
 ## 단계별 실습: 안전한 retry 데코레이터 만들기
 
-![단계별 실습: 안전한 retry 데코레이터 만들기](../../assets/python-dbapi-101/07/07-04-step-by-step-building-a-safe-retry-decor.ko.png)
+![단계별 실습: 안전한 retry 데코레이터 만들기](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-04-step-by-step-building-a-safe-retry-decor.ko.png)
 
 *단계별 실습: 안전한 retry 데코레이터 만들기*
 ### 1단계: 예외 분류 헬퍼 작성
@@ -194,7 +192,8 @@ def is_retryable(exc: BaseException) -> bool:
 import functools
 import random
 import time
-from typing import Callable, TypeVar, ParamSpec
+from collections.abc import Callable
+from typing import TypeVar, ParamSpec
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -226,7 +225,7 @@ def retry_on_transient(
 ```python
 @retry_on_transient(max_attempts=5)
 def transfer(conn: sqlite3.Connection, src: int, dst: int, amount: int) -> None:
-    with conn:  # context manager가 commit/rollback 처리
+    with conn:  # context manager handles commit/rollback
         conn.execute(
             "UPDATE accounts SET balance = balance - ? WHERE id = ?", (amount, src)
         )
@@ -291,8 +290,8 @@ async def handle_duplicate_email(_, exc: DuplicateEmail):
 
 @app.exception_handler(TransientDBError)
 async def handle_transient(_, exc: TransientDBError):
-    # retry 데코레이터가 이미 max_attempts 만큼 시도한 뒤이므로
-    # 여기서는 503으로 응답하고 클라이언트에게 재시도를 요청
+    # 재시도 데코레이터가 이미 최대 시도 횟수를 소진했습니다.
+    # 클라이언트에 대기를 지시합니다; 여기서 다시 루프하지 마세요.
     raise HTTPException(
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         detail="database temporarily unavailable",
@@ -319,28 +318,63 @@ def post_user(payload: UserCreate, conn=Depends(get_conn)):
 - [ ] retry 횟수와 최종 결과가 로그/메트릭으로 남는가?
 - [ ] `ProgrammingError`는 알림 시스템으로 즉시 전달되는가?
 
-## 정리와 다음 글
+## 심화 앵커: 예외를 운영 정책으로 매핑하는 고정 함수
 
+예외를 메시지 문자열로 분기하면 정책이 흔들립니다. 클래스와 SQLite 코드로 분기하는 고정 함수를 두면 팀 전체의 대응이 일관됩니다.
+
+```python
+import sqlite3
+
+def classify(exc: BaseException) -> tuple[bool, str]:
+    if isinstance(exc, sqlite3.IntegrityError):
+        return (False, "business-rule")
+    if isinstance(exc, sqlite3.OperationalError):
+        name = getattr(exc, "sqlite_errorname", "")
+        if name in {"SQLITE_BUSY", "SQLITE_BUSY_TIMEOUT", "SQLITE_LOCKED"}:
+            return (True, "transient")
+    if isinstance(exc, sqlite3.ProgrammingError):
+        return (False, "code-bug")
+    return (False, "fatal")
+```
+
+```text
+IntegrityError -> retry 금지, 4xx 또는 도메인 오류
+OperationalError(BUSY/LOCKED) -> 제한적 retry
+ProgrammingError -> 즉시 수정 대상
+```
+
+구조화 로그 필드(`error.class`, `error.sqlite_name`, `retry.attempt`)를 고정하면 예외 비율의 추세를 대시보드에서 바로 추적할 수 있습니다.
+
+## 정리
 - PEP 249 예외 계층을 "코드 버그 / 비즈니스 규칙 / 일시적 환경 문제"로 다시 묶으면 의사결정이 단순해집니다.
 - `sqlite3`는 SQLite 에러 코드를 PEP 249 클래스로 매핑하지만, 같은 `OperationalError` 안에도 retry 대상과 비대상이 섞여 있어 `sqlite_errorname`까지 봐야 합니다.
 - retry는 BUSY/LOCKED 계열에만 적용하고, `IntegrityError`는 도메인 예외로 변환해 4xx로 돌려줍니다.
 - 트랜잭션은 retry 단위 안에 두고, `max_attempts`와 jitter를 반드시 설정합니다.
 
-다음 글에서는 connection 자체를 다룹니다. SQLite의 thread-safety 모드, `check_same_thread`, per-thread vs shared connection, 그리고 FastAPI에서의 connection 관리 패턴을 살펴보겠습니다.
+다음 글에서는 connection 자체를 다룹니다. SQLite의 thread-safety 모드, `check_same_thread`, per-thread vs shared connection, 그리고 FastAPI에서의 connection 관리 패턴을 봅니다.
+
+## 처음 질문으로 돌아가기
+
+- **`IntegrityError`, `OperationalError`, `ProgrammingError`를 만나면 retry, 4xx 응답, 즉시 실패를 어떻게 나눠야 할까요?**
+  - 글은 PEP 249 예외를 운영 의사결정 관점에서 다시 묶어 `IntegrityError`는 비즈니스 규칙 위반, `OperationalError`는 일부만 재시도 후보, `ProgrammingError`와 `InterfaceError`는 코드 버그로 분리했습니다. 그래서 `create_user()` 예제는 UNIQUE 위반을 `DuplicateEmail`로 바꾸고, 일시적 락 문제만 `TransientDBError`로 올려 호출자가 다른 응답을 선택하게 했습니다.
+- **같은 `OperationalError` 안에서도 `SQLITE_BUSY`, `SQLITE_LOCKED`, `SQLITE_CORRUPT`를 왜 따로 봐야 할까요?**
+  - 본문 표는 BUSY와 LOCKED가 같은 클래스에 묶여도 대응은 재시도 후보이고, CORRUPT는 `DatabaseError`로 복구 절차를 타야 한다는 점을 강조했습니다. 그래서 Python 3.11+의 `sqlite_errorname`, `sqlite_errorcode`를 읽어야 retry 가능한 락 경합과 복구가 필요한 손상을 정확히 가를 수 있습니다.
+- **retry 데코레이터를 붙일 때 왜 `with conn:` 트랜잭션 전체를 함수 안에 넣어야 할까요?**
+  - 글의 `transfer()` 예제는 `with conn:` 블록 전체를 retry 대상 함수 안에 넣어 실패 시 트랜잭션을 처음부터 다시 열도록 구성했습니다. 일부 `execute()`나 `commit()`만 따로 재시도하면 이미 바뀐 상태와 안 바뀐 상태가 섞일 수 있으므로, retry 단위는 항상 원자적 transaction 단위여야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
-- [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
-- [Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- [Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
-- [Row factory와 type adapter (sqlite3, PEP 249)](./06-row-factories-adapters.md)
-- **PEP 249 예외 계층과 SQLite 에러 처리 (현재 글)**
-- SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
-- aiosqlite로 비동기 SQLite 다루기 (예정)
-- SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
+- [Python DB-API 101 (1/10): 왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Python DB-API 101 (5/10): Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- **Python DB-API 101 (7/10): PEP 249 예외 계층과 SQLite 에러 처리 (현재 글)**
+- Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
+- Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기 (예정)
+- Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
 
 <!-- toc:end -->
 
@@ -351,3 +385,5 @@ def post_user(payload: UserCreate, conn=Depends(get_conn)):
 - [SQLite Result and Error Codes](https://www.sqlite.org/rescode.html)
 - [SQLite: File Locking and Concurrency](https://www.sqlite.org/lockingv3.html)
 - [What's New in Python 3.11 — sqlite3](https://docs.python.org/3/whatsnew/3.11.html#sqlite3)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-dbapi-101/ko)

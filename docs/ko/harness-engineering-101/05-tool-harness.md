@@ -1,12 +1,12 @@
 ---
-title: Tool Harness — Agent가 사용할 도구를 안전하게 설계하기
+title: "Harness Engineering 101 (5/10): Tool Harness — Agent가 사용할 도구를 안전하게 설계하기"
 series: harness-engineering-101
 episode: 5
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,37 +14,52 @@ tags:
 - Harness
 - Tool Design
 - Sandboxing
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: 도구는 Agent의 손과 발입니다. 잘못 설계한 도구는 데이터를 망가뜨리거나 비용을 폭발시킵니다.
 ---
 
-# Tool Harness — Agent가 사용할 도구를 안전하게 설계하기
+# Harness Engineering 101 (5/10): Tool Harness — Agent가 사용할 도구를 안전하게 설계하기
+에이전트가 실제 일을 하려면 결국 도구를 써야 합니다. 데이터베이스를 읽고, 파일을 쓰고, API를 호출하고, 코드를 실행하는 순간부터 모델은 텍스트 생성기가 아니라 작업 수행기가 됩니다.
+문제는 바로 이 지점에서 대부분의 사고가 시작된다는 데 있습니다. 잘못 설계된 도구 하나가 모델 품질보다 더 큰 장애 원인이 되기 쉽습니다. 인터페이스가 모호하면 틀린 인자를 만들고, 부수효과가 숨어 있으면 초안 작성 요청이 실제 발송으로 이어집니다.
+Tool Harness는 단순히 함수 목록을 나열하는 작업이 아닙니다. 에이전트가 올바르게 호출하기 쉬운 인터페이스, 잘못 호출해도 사고가 적은 실행 방식, 실패했을 때 다음 행동을 결정할 수 있는 에러 모델을 설계하는 일입니다.
+강한 기능보다 좁고 정직한 인터페이스가 더 중요하다는 점이 이 글의 중심입니다.
 
-> Harness Engineering 101 시리즈 (5/10)
+![Tool Harness - Agent가 사용할 도구를 안전하게 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.ko.png)
+*Tool Harness - Agent가 사용할 도구를 안전하게 설계하기*
+> Tool Harness의 품질은 agent가 도구를 쓸 수 있는지가 아니라, 잘못 쓰기 어려운지에서 드러납니다.
 
+## 먼저 던지는 질문
+
+- Tool Harness는 agent가 도구를 올바르게 쓰기 쉽도록 어떤 표면을 만들어야 할까요?
+- schema, idempotency, actionable error는 각각 어떤 운영 문제를 줄일까요?
+- 위험한 tool을 sandbox 안에 넣으려면 어떤 경계가 필요할까요?
+
+## 왜 이 글이 중요한가
+에이전트의 행동 범위는 결국 도구의 행동 범위입니다. 좋은 프롬프트와 제약을 갖춘 시스템도 도구가 모호하거나 과도한 권한을 갖고 있으면 한 번의 호출로 쉽게 무너집니다.
+두 번째로 중요한 이유는 재시도입니다. 네트워크 오류와 타임아웃이 잦은 환경에서는 같은 도구가 반복 호출되기 쉽고, idempotency가 없으면 곧바로 중복 실행 사고로 이어집니다.
+세 번째 이유는 디버깅 비용입니다. 사람이 읽기에도 모호한 에러 메시지는 에이전트에게는 거의 무의미합니다. 무엇이 실패했고 왜 실패했고 다음에 무엇을 해야 하는지가 드러나야 feedback loop가 제대로 돕니다.
+## 핵심 관점
+사람용 API도 그렇지만, 에이전트용 도구는 더더욱 좋은 기본값과 좁은 책임이 중요합니다. 에이전트는 도구 이름, 설명, 스키마, 에러 메시지에서 거의 모든 판단을 끌어옵니다.
+좋은 Tool Harness는 두 가지를 동시에 달성해야 합니다. 정상 경로에서는 쉽게 쓰이고, 오류 경로에서는 덜 위험해야 합니다. single responsibility, structured output, idempotency, sandboxing이 모두 여기에 연결됩니다.
+도구는 많을수록 좋은 것이 아니라 좁고 정직할수록 좋습니다. 하나의 범용 도구에 옵션을 다 몰아넣는 순간 schema는 약해지고 승인과 검증 경계도 흐려집니다.
+> 에이전트용 도구는 강한 기능보다 좁고 정직한 인터페이스가 더 중요합니다. 잘 쓰기 쉬워야 하고, 잘못 써도 망가지기 어렵게 설계되어야 합니다.
+## 핵심 개념
 도구는 Agent의 손과 발입니다. 잘못 설계한 도구는 데이터를 망가뜨리거나 비용을 폭발시킵니다. Tool Harness는 Agent가 사용할 도구를 안전하고 예측 가능하게 설계하는 일입니다.
 
----
-
-![Tool Harness - Agent가 사용할 도구를 안전하게 설계하기](../../assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.ko.png)
-
-*Tool Harness - Agent가 사용할 도구를 안전하게 설계하기*
-
-## 도구는 Agent의 손과 발입니다
+### 도구는 Agent의 손과 발입니다
 
 Agent의 능력은 도구가 결정합니다. 도구가 없으면 Agent는 텍스트를 생성하는 모델일 뿐입니다. DB 조회, 파일 쓰기, API 호출, 코드 실행이 모두 도구입니다. Agent의 행동 범위는 정확히 도구의 범위입니다.
 
-문제는 도구를 잘못 설계하면 Agent의 모든 동작이 흔들린다는 점입니다. 도구 schema가 모호하면 Agent는 잘못된 인자를 보냅니다. 도구가 너무 powerful하면 한 번의 호출로 시스템을 망칠 수 있습니다. 도구의 에러 메시지가 불친절하면 Agent는 같은 실수를 반복합니다.
+문제는 도구를 잘못 설계하면 Agent의 모든 동작이 흔들린다는 데 있습니다. 도구 schema가 모호하면 Agent는 잘못된 인자를 보냅니다. 도구가 너무 powerful하면 한 번의 호출로 시스템을 망칠 수 있습니다. 도구의 에러 메시지가 불친절하면 Agent는 같은 실수를 반복합니다.
 
 Tool Harness는 Agent가 사용할 도구를 안전하고 예측 가능하게 설계하는 원칙입니다. 이번 글에서는 도구 설계의 5가지 원칙, 안전한 schema 설계, 그리고 도구 에러를 Agent가 이해할 수 있게 만드는 방법을 다룹니다.
 
----
+### 좋은 도구의 5가지 원칙
 
-## 좋은 도구의 5가지 원칙
-
-![좋은 도구의 5가지 원칙](../../assets/harness-engineering-101/05/05-02-five-principles-of-a-good-tool.ko.png)
+![좋은 도구의 5가지 원칙](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-02-five-principles-of-a-good-tool.ko.png)
 
 *좋은 도구의 5가지 원칙*
+
 도구를 설계할 때 지켜야 할 다섯 가지가 있습니다.
 
 **1. Single responsibility**: 도구 하나는 한 가지 일만 합니다. `manage_user`가 아니라 `create_user`, `delete_user`, `update_user_email`로 분리합니다.
@@ -61,14 +76,14 @@ Tool Harness는 Agent가 사용할 도구를 안전하고 예측 가능하게 �
 from pydantic import BaseModel, Field
 from typing import Literal
 
-# Bad — 책임이 너무 많음
+# 나쁜 예 — 책임이 너무 많습니다
 def manage_user(action: str, user_id: str, **kwargs):
-    """사용자를 관리합니다."""
+    """Manage a user."""
     ...
 
-# Good — 단일 책임, 명확한 schema
+# 좋음 — 단일 책임, 명시적 스키마
 class CreateUserInput(BaseModel):
-    email: str = Field(..., description="유효한 이메일")
+    email: str = Field(..., description="A valid email address")
     name: str = Field(..., min_length=1, max_length=100)
     role: Literal["admin", "user", "guest"]
 
@@ -78,15 +93,13 @@ class CreateUserOutput(BaseModel):
     status: Literal["created", "already_exists"]
 
 def create_user(input: CreateUserInput) -> CreateUserOutput:
-    """새 사용자를 생성합니다. 같은 이메일이 이미 있으면 already_exists를 반환합니다."""
+    """Create a new user. Returns already_exists if the email already exists."""
     ...
 ```
 
 다섯 원칙 중 하나라도 빠지면 Agent의 행동이 예측 불가능해집니다.
 
----
-
-## Schema 설계의 정밀도
+### Schema 설계의 정밀도
 
 도구의 input schema는 Agent에게 사용 설명서입니다. 모호한 schema는 모호한 호출을 만듭니다.
 
@@ -103,16 +116,16 @@ from pydantic import BaseModel, Field, model_validator
 from typing import Literal
 
 class SendNotificationInput(BaseModel):
-    """알림을 발송합니다."""
+    """Send a notification."""
     channel: Literal["email", "sms", "push"] = Field(
         ...,
-        description="발송 채널. email은 이메일 주소가 필요, sms는 전화번호가 필요.",
+        description="Send channel. email needs an email address; sms needs a phone number.",
     )
-    recipient: str = Field(..., description="수신자 식별자 (channel에 따라 다름)")
-    template_id: str = Field(..., pattern=r"^TPL-\d{4}$", description="TPL-0001 형식")
+    recipient: str = Field(..., description="Recipient identifier (varies by channel)")
+    template_id: str = Field(..., pattern=r"^TPL-\d{4}$", description="Format: TPL-0001")
     variables: dict[str, str] = Field(
         default_factory=dict,
-        description="템플릿 변수. 예: {'name': '홍길동', 'order_id': '12345'}",
+        description="Template variables. Example: {'name': 'Alice', 'order_id': '12345'}",
     )
 
     @model_validator(mode="after")
@@ -126,13 +139,12 @@ class SendNotificationInput(BaseModel):
 
 이런 schema는 두 가지 효과가 있습니다. (1) Agent가 호출 전에 잘못된 인자를 만들 확률이 줄어듭니다. (2) 잘못된 호출이 즉시 거부되어 부작용이 발생하지 않습니다.
 
----
+### Idempotency Key 패턴
 
-## Idempotency Key 패턴
-
-![Idempotency Key 패턴](../../assets/harness-engineering-101/05/05-03-the-idempotency-key-pattern.ko.png)
+![Idempotency Key 패턴](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-03-the-idempotency-key-pattern.ko.png)
 
 *Idempotency Key 패턴*
+
 Agent는 재시도를 자주 합니다. 네트워크 오류, 타임아웃, "확인이 안 됨" 같은 이유로 같은 도구를 두 번 호출할 수 있습니다. Idempotent하지 않은 도구는 두 번 실행되어 사고를 만듭니다.
 
 해결책은 idempotency key입니다. Agent가 호출 시 고유 키를 보내고, 서버는 같은 키의 호출을 중복 실행하지 않습니다.
@@ -143,7 +155,7 @@ from dataclasses import dataclass
 
 @dataclass
 class IdempotencyStore:
-    """idempotency key별 결과를 저장합니다."""
+    """Stores results per idempotency key."""
     _cache: dict[str, dict] = None
 
     def __post_init__(self):
@@ -157,25 +169,25 @@ class IdempotencyStore:
         return result
 
 def create_charge(amount: int, currency: str, idempotency_key: str, store: IdempotencyStore) -> dict:
-    """결제를 생성합니다. 같은 idempotency_key로는 한 번만 실행됩니다."""
+    """Create a charge. Same idempotency_key runs only once."""
     def _do_charge():
-        # 실제 결제 API 호출
-        return {"charge_id": "ch_" + hashlib.sha256(idempotency_key.encode()).hexdigest()[:12], "amount": amount}
+        return {
+            "charge_id": "ch_" + hashlib.sha256(idempotency_key.encode()).hexdigest()[:12],
+            "amount": amount,
+        }
     return store.get_or_run(idempotency_key, _do_charge)
 
-# Agent는 task당 고유한 key를 사용합니다
+# 에이전트는 작업별 고유 키를 사용합니다
 store = IdempotencyStore()
 key = "task-abc123-charge-001"
 r1 = create_charge(1000, "USD", key, store)
 r2 = create_charge(1000, "USD", key, store)
-assert r1 == r2  # 같은 결과, 한 번만 실행
+assert r1 == r2  # Same result, executed once
 ```
 
 idempotency key는 도구 호출 단계 뿐 아니라 task 단계에서도 적용됩니다. 같은 task가 두 번 실행되어도 같은 결과가 나오게 합니다.
 
----
-
-## Actionable Error 설계
+### Actionable Error 설계
 
 Agent가 도구 호출에 실패하면 다음에 무엇을 해야 할지 결정해야 합니다. 에러 메시지가 "Internal Server Error"라면 Agent는 같은 호출을 그대로 재시도합니다. 메시지가 명확하면 Agent는 인자를 고쳐서 다시 시도합니다.
 
@@ -187,6 +199,7 @@ Agent가 도구 호출에 실패하면 다음에 무엇을 해야 할지 결정�
 
 ```python
 from enum import Enum
+from dataclasses import dataclass
 
 class ErrorCode(Enum):
     INVALID_INPUT = "invalid_input"
@@ -198,10 +211,10 @@ class ErrorCode(Enum):
 @dataclass
 class ToolError(Exception):
     code: ErrorCode
-    what: str  # 무엇이 실패했는가
-    why: str  # 왜 실패했는가
-    how: str  # 어떻게 고치는가 (Agent가 다음에 할 행동)
-    retryable: bool  # 같은 입력으로 재시도 가능한가
+    what: str
+    why: str
+    how: str
+    retryable: bool
 
     def to_agent_message(self) -> str:
         return f"""Tool call failed.
@@ -220,7 +233,6 @@ def get_user(user_id: str) -> dict:
             how="Call list_users to find a valid user_id, or check the format.",
             retryable=False,
         )
-    # ... lookup logic
     raise ToolError(
         code=ErrorCode.NOT_FOUND,
         what=f"user not found: {user_id}",
@@ -232,13 +244,12 @@ def get_user(user_id: str) -> dict:
 
 `retryable` 플래그는 중요합니다. Agent가 retryable=False 에러를 받으면 즉시 다른 접근을 시도합니다. retryable=True면 backoff 후 재시도합니다.
 
----
+### 위험한 도구의 Sandboxing
 
-## 위험한 도구의 Sandboxing
-
-![위험한 도구의 Sandboxing](../../assets/harness-engineering-101/05/05-04-sandboxing-dangerous-tools.ko.png)
+![위험한 도구의 Sandboxing](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-04-sandboxing-dangerous-tools.ko.png)
 
 *위험한 도구의 Sandboxing*
+
 코드 실행, 파일 시스템 접근, 임의의 shell 명령은 매우 강력하고 매우 위험합니다. 이런 도구는 sandboxing 없이 노출하면 안 됩니다.
 
 세 가지 격리 기법을 사용합니다.
@@ -250,11 +261,10 @@ def get_user(user_id: str) -> dict:
 ```python
 import subprocess
 import tempfile
-import os
 from pathlib import Path
 
 def execute_python_safely(code: str, timeout: float = 5.0) -> dict:
-    """격리된 환경에서 Python 코드를 실행합니다."""
+    """Execute Python code in an isolated environment."""
     with tempfile.TemporaryDirectory() as tmpdir:
         script_path = Path(tmpdir) / "script.py"
         script_path.write_text(code)
@@ -264,11 +274,11 @@ def execute_python_safely(code: str, timeout: float = 5.0) -> dict:
                 capture_output=True,
                 text=True,
                 timeout=timeout,
-                cwd=tmpdir,  # 작업 디렉터리 격리
-                env={"PATH": "/usr/bin:/bin"},  # 최소 환경 변수
+                cwd=tmpdir,  # Isolated working directory
+                env={"PATH": "/usr/bin:/bin"},  # Minimal env
             )
             return {
-                "stdout": result.stdout[:10_000],  # 출력 크기 제한
+                "stdout": result.stdout[:10_000],  # Cap output size
                 "stderr": result.stderr[:10_000],
                 "exit_code": result.returncode,
             }
@@ -284,56 +294,125 @@ def execute_python_safely(code: str, timeout: float = 5.0) -> dict:
 
 더 강한 격리는 컨테이너(gVisor, Firecracker), WebAssembly 런타임을 사용합니다. production agent에서 임의 코드 실행을 노출한다면 최소한 컨테이너 격리는 필수입니다.
 
----
+### Tool Registration Manifest와 계약 검증
 
-## Common Mistakes
+도구가 10개를 넘기 시작하면 코드만 보고 어떤 도구가 어느 환경에서 노출되는지 파악하기 어려워집니다. 이 시점부터는 등록 정보를 manifest로 분리하고, 부수효과 여부와 approval 요구 조건을 명시적으로 선언하는 편이 안전합니다.
 
-**1. 도구 이름이 동작을 숨깁니다.**
+```yaml
+# tools.yaml
+tools:
+  - name: lookup_order
+    version: v1
+    side_effect: none
+    idempotent: true
+    requires_approval: false
+    input_schema: LookupOrderInput
+  - name: issue_refund
+    version: v2
+    side_effect: write
+    idempotent: true
+    requires_approval: true
+    approval_rule: amount_ge_100
+    input_schema: IssueRefundInput
+  - name: send_customer_email
+    version: v1
+    side_effect: external_send
+    idempotent: false
+    requires_approval: true
+    approval_rule: always
+    input_schema: SendEmailInput
+```
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ToolManifest:
+    name: str
+    version: str
+    side_effect: str
+    idempotent: bool
+    requires_approval: bool
+    input_schema: str
+
+def validate_manifest(m: ToolManifest) -> None:
+    if m.side_effect in {"write", "external_send"} and not m.requires_approval:
+        raise ValueError(f"dangerous tool must require approval: {m.name}")
+    if m.name.startswith("send_") and m.side_effect != "external_send":
+        raise ValueError(f"send_* tool must declare external_send side effect: {m.name}")
+```
+
+manifest validation을 부팅 단계에 넣어 두면 새 발송 도구를 추가하면서 approval gate를 빼먹는 실수를 배포 전에 차단할 수 있습니다.
+
+추가로 도구 버저닝 전략도 중요합니다. 입력 스키마가 바뀌면 같은 이름으로 덮어쓰기보다 `issue_refund_v1`, `issue_refund_v2`처럼 병행 운영 기간을 두는 편이 안전합니다. Agent가 학습한 호출 패턴은 즉시 바뀌지 않기 때문에, 버전 전환 기간에 trajectory 테스트와 shadow 실행을 함께 돌려 호환성을 확인해야 합니다.
+
+실전에서는 deprecation 정책도 반드시 필요합니다. 예를 들어 v1 도구를 30일간 read-only 모드로 남기고 경고 이벤트를 발행하면, 남아 있는 호출 경로를 추적한 뒤 안전하게 제거할 수 있습니다. Tool Harness는 새 도구를 추가하는 속도보다, 오래된 도구를 안전하게 퇴역시키는 능력에서 성숙도가 갈립니다.
+
+도구 문서화도 운영 품질에 직접 영향을 줍니다. 각 도구별로 입력 예시 2개(정상/실패), 예상 에러 코드, 재시도 가능 여부를 같은 형식으로 남기면 신규 엔지니어가 빠르게 디버깅할 수 있습니다. Agent가 이해하는 스키마와 사람이 이해하는 운영 문서가 일치할수록 장애 대응 속도가 빨라집니다.
+
+### 흔한 실수
+
 `process_order`가 결제까지 한다면 이름에 그것이 드러나야 합니다. `charge_and_fulfill_order` 같은 이름이 정직합니다.
 
-**2. 한 도구에 너무 많은 옵션을 넣습니다.**
 `manage_user(action="create"|"delete"|"update", ...)`처럼 dispatcher 도구는 schema가 약해지고 Agent가 잘못된 조합을 만듭니다. 도구를 분리합니다.
 
-**3. Idempotency를 무시합니다.**
 재시도가 흔한 환경에서 idempotent하지 않은 도구는 중복 결제, 중복 이메일, 중복 알림을 만듭니다.
 
-**4. 에러 메시지가 너무 짧습니다.**
 "Bad request"는 Agent에게 정보가 0입니다. What/Why/How를 모두 포함합니다.
 
-**5. 위험한 도구를 그대로 노출합니다.**
 shell 실행, 파일 쓰기, 무제한 HTTP 호출은 sandboxing 없이는 production에서 사고로 이어집니다.
+## 흔히 헷갈리는 지점
+- 도구 이름이 대충 의미만 전달해도 모델이 알아서 잘 쓸 것이라고 기대하기 쉽지만, 이름과 설명이 곧 사용 설명서입니다.
+- 옵션이 많을수록 범용적이라 좋다고 느끼기 쉽지만, dispatcher형 도구는 에이전트가 잘못된 조합을 만들기 가장 쉽습니다.
+- 재시도는 네트워크 문제일 뿐이라고 생각하기 쉽지만, 에이전트 환경에서는 정상 흐름에서도 반복 호출이 자주 발생합니다.
+- 짧은 에러 메시지가 깔끔해 보일 수 있지만, 에이전트에게는 거의 정보가 없습니다.
+- 위험한 도구도 내부 네트워크에서만 쓰니 괜찮다고 생각하기 쉽지만, 무제한 셸과 파일 접근은 내부 사고를 가장 크게 만듭니다.
+## 운영 체크리스트
+- [ ] 각 도구가 하나의 책임만 가지는지 확인합니다.
+- [ ] 입력 스키마에 의미, 제약, 필드 의존성을 모두 표현합니다.
+- [ ] 쓰기·발송·결제 계열 도구에는 idempotency key를 적용합니다.
+- [ ] What/Why/How/retryable을 포함한 구조화된 ToolError를 표준화합니다.
+- [ ] 코드 실행과 파일/네트워크 접근 도구는 샌드박스 없이는 노출하지 않습니다.
+## 정리
+Tool Harness는 도구 개수를 늘리는 기술이 아니라, 에이전트가 올바르게 쓰기 쉬운 인터페이스를 설계하는 기술입니다. 좁은 책임, 강한 스키마, idempotency, 행동 가능한 에러, 격리가 갖춰져야 도구는 생산성을 올리는 요소가 됩니다.
+실무에서는 모델보다 도구가 더 자주 사고를 냅니다. 모델은 잘못 생각할 수 있지만, 시스템을 망가뜨리는 것은 결국 그 생각을 실행하는 도구입니다. 그래서 도구 설계는 프롬프트보다 더 보수적이어야 합니다.
+다음 글에서는 Test Harness를 다룹니다. 에이전트가 작업을 끝냈다고 말하는 것과 실제로 끝난 것은 다르기 때문에, 이제 완료 조건을 테스트로 고정해야 합니다.
 
----
+## 처음 질문으로 돌아가기
 
-## 핵심 요약
-
-- 좋은 도구는 단일 책임, idempotency, 명시적 부작용, 구조화된 출력, actionable error의 5원칙을 따릅니다.
-- Schema는 단순 타입이 아니라 의미, 제약, 의존성을 모두 표현해야 Agent가 정확하게 호출할 수 있습니다.
-- Idempotency key 패턴으로 재시도 시 중복 실행을 막습니다.
-- 에러는 What/Why/How를 모두 포함하고 retryable 플래그로 Agent의 다음 행동을 안내합니다.
-- 코드 실행과 파일/네트워크 접근 같은 위험한 도구는 process, filesystem, network 격리를 모두 적용합니다.
+- **Tool Harness는 agent가 도구를 올바르게 쓰기 쉽도록 어떤 표면을 만들어야 할까요?**
+  - 도구 이름, 설명, 입력 schema, 출력 형식, 오류 메시지가 모두 agent의 선택과 복구를 돕도록 좁고 분명해야 합니다.
+- **schema, idempotency, actionable error는 각각 어떤 운영 문제를 줄일까요?**
+  - schema는 잘못된 인자를 줄이고, idempotency는 반복 실행 피해를 줄이며, actionable error는 agent가 다음 조치를 고르게 합니다.
+- **위험한 tool을 sandbox 안에 넣으려면 어떤 경계가 필요할까요?**
+  - 허용 명령, 파일·네트워크 권한, timeout, dry-run, audit log, rollback 가능성을 sandbox 경계로 고정해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Harness Engineering이란 무엇인가?](./01-what-is-harness-engineering.md)
-- [Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기](./02-task-harness.md)
-- [Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기](./03-context-harness.md)
-- [Constraint Harness — 규칙, 경계, 금지 행동 정의하기](./04-constraint-harness.md)
-- **Tool Harness — Agent가 사용할 도구를 안전하게 설계하기 (현재 글)**
-- Test Harness — 완료 조건을 테스트로 고정하기 (예정)
-- Feedback Loop — 실패를 고치게 만드는 반복 구조 (예정)
-- Approval Gate — 사람 승인이 필요한 지점 설계하기 (예정)
-- Observability — Agent 작업을 추적하고 재현하기 (예정)
-- Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
+- [Harness Engineering 101 (1/10): Harness Engineering이란 무엇인가?](./01-what-is-harness-engineering.md)
+- [Harness Engineering 101 (2/10): Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기](./02-task-harness.md)
+- [Harness Engineering 101 (3/10): Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기](./03-context-harness.md)
+- [Harness Engineering 101 (4/10): Constraint Harness — 규칙, 경계, 금지 행동 정의하기](./04-constraint-harness.md)
+- **Harness Engineering 101 (5/10): Tool Harness — Agent가 사용할 도구를 안전하게 설계하기 (현재 글)**
+- Harness Engineering 101 (6/10): Test Harness — 완료 조건을 테스트로 고정하기 (예정)
+- Harness Engineering 101 (7/10): Feedback Loop — 실패를 고치게 만드는 반복 구조 (예정)
+- Harness Engineering 101 (8/10): Approval Gate — 사람 승인이 필요한 지점 설계하기 (예정)
+- Harness Engineering 101 (9/10): Observability — Agent 작업을 추적하고 재현하기 (예정)
+- Harness Engineering 101 (10/10): Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
+### 공식 문서
 
 - [Anthropic — Tool Use Best Practices](https://docs.anthropic.com/en/docs/build-with-claude/tool-use)
 - [OpenAI — Function Calling Guide](https://platform.openai.com/docs/guides/function-calling)
 - [Stripe — Idempotent Requests](https://docs.stripe.com/api/idempotent_requests)
 - [gVisor — Sandboxed Container Runtime](https://gvisor.dev/docs/)
+### 관련 시리즈
+
+- [LangGraph 101 — 멀티 에이전트 시스템](../langgraph-101/05-multi-agent.md)
+- [AI Safety & Guardrails 101 — 운영 가드레일 시스템 구축](../ai-safety-guardrails-101/10-production-guardrail-system.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/harness-engineering-101/ko/05-tool-harness)

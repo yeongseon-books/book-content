@@ -1,10 +1,10 @@
 ---
 series: serverless-101
 episode: 8
-title: Observability
+title: "Serverless 101 (8/10): Observability"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,23 @@ seo_description: A beginner-friendly tour of serverless observability covering l
 last_reviewed: '2026-05-04'
 ---
 
-# Observability
+# Serverless 101 (8/10): Observability
 
-> Serverless 101 series (8/10)
+Serverless systems are short-lived and distributed. One user request may cross multiple functions, queues, and data stores before it finishes. That is why “just look at the logs” stops working earlier than many teams expect.
 
-<!-- a-grade-intro:begin -->
+Observability is the discipline that turns those short-lived hops into something you can still debug. In serverless, that means connecting logs, metrics, and traces well enough that you can reconstruct what happened after the fact.
 
-**Core question**: how do you know *where* and *why* a *function* was slow?
+This is post 8 in the Serverless 101 series.
 
-> *Logs, metrics, and distributed traces* — all three legs — make *serverless* *debuggable*.
 
-<!-- a-grade-intro:end -->
+![serverless 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/08/08-01-concept-at-a-glance.en.png)
+*serverless 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Observability?
+- Which signal should the example or diagram make visible for Observability?
+- What failure should be prevented first when Observability reaches a real system?
 
 ## What You Will Learn
 
@@ -42,17 +48,11 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-Functions are *short and distributed*; one viewpoint is not enough. You need *connectable signals*.
+In a long-lived server process, one log stream can sometimes carry enough context. In a serverless system, execution hops between environments and often crosses asynchronous boundaries. If you do not preserve correlation across those boundaries, you are left with symptoms but not a path.
 
-## Concept at a Glance
+Observability is also a cost design problem. What you log, how long you retain it, where you sample traces, and which metrics power alerts all change both your debugging speed and your bill.
 
-```mermaid
-flowchart LR
-    Logs["logs"] --> Hub["observability hub"]
-    Metrics["metrics"] --> Hub
-    Traces["traces"] --> Hub
-    Hub --> Alert["alerts"]
-```
+The point is not to collect three disconnected signal types. The point is to connect them so a single slow request can be traced through logs, metrics, and spans without guesswork.
 
 ## Key Terms
 
@@ -121,6 +121,27 @@ def handler(event, ctx):
     COLD = False
 ```
 
+## Verification Workflow
+
+Once the basics are wired in, verify that the signals can answer a real question end to end.
+
+```text
+request_id=8d6...
+correlation_id=ord-2026-05-12-001
+cold=true
+duration_ms=842
+downstream=db
+```
+
+**Output:** one request should be traceable across the edge function, queue consumer, and downstream call with the same correlation key.
+
+If you cannot answer these four questions quickly, the instrumentation is still too weak:
+
+- Which request failed first?
+- Was the delay caused by cold start or downstream latency?
+- Which function retried, and how many times?
+- Did the alert point to an actionable symptom or just to noise?
+
 ## What to Notice in This Code
 
 - *Structured logs* enable *aggregation*.
@@ -164,22 +185,40 @@ A standard like *OpenTelemetry* unifies the *three signals* into *one backend* v
 
 Next, we cover *Cost*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Observability?**
+  - The article treats Observability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Observability?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Observability reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
-- [Function as a Service](./02-function-as-a-service.md)
-- [Trigger and Event](./03-trigger-and-event.md)
-- [Cold Start](./04-cold-start.md)
-- [Scaling](./05-scaling.md)
-- [State Management](./06-state-management.md)
-- [Queue and Event-driven Architecture](./07-queue-and-event-driven.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
+- [Serverless 101 (2/10): Function as a Service](./02-function-as-a-service.md)
+- [Serverless 101 (3/10): Trigger and Event](./03-trigger-and-event.md)
+- [Serverless 101 (4/10): Cold Start](./04-cold-start.md)
+- [Serverless 101 (5/10): Scaling](./05-scaling.md)
+- [Serverless 101 (6/10): State Management](./06-state-management.md)
+- [Serverless 101 (7/10): Queue and Event-driven Architecture](./07-queue-and-event-driven.md)
 - **Observability (current)**
 - Cost (upcoming)
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [OpenTelemetry](https://opentelemetry.io/docs/)
-- [AWS X-Ray](https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html)
+### Official Docs
+
+- [OpenTelemetry documentation](https://opentelemetry.io/docs/)
+- [AWS X-Ray developer guide](https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html)
 - [CloudWatch Logs Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html)
+
+### Patterns and Code
+
 - [Distributed tracing in serverless](https://aws.amazon.com/blogs/compute/instrumenting-distributed-systems-for-operational-visibility/)
+- [AWS Powertools for Lambda Python (GitHub)](https://github.com/aws-powertools/powertools-lambda-python)

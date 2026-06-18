@@ -1,11 +1,11 @@
 ---
-title: PII Detection and Redaction
+title: "AI Safety & Guardrails 101 (4/10): PII Detection and Redaction"
 series: ai-safety-guardrails-101
 episode: 4
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,16 +14,28 @@ tags:
 - PII
 - Presidio
 - GDPR
-last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (4/10)
+last_reviewed: '2026-05-14'
+seo_description: Protect user privacy and maintain GDPR compliance by redacting PII in LLM inputs and outputs using Microsoft Presidio and reversible tokenization.
 ---
 
-# PII Detection and Redaction
+# AI Safety & Guardrails 101 (4/10): PII Detection and Redaction
 
 > AI Safety & Guardrails 101 Series (4/10)
 
----
-## Section 1
+LLM applications handle personal data in both directions. Users send sensitive information into the model, and other people's data can leak back out through logs, context, or responses.
+
+This is post 4 in the AI Safety & Guardrails 101 series. It defines the PII surface area first, then walks through detection and redaction patterns that hold up in production.
+
+
+![section 1: PII categories](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/04/04-01-section-1-pii-categories.en.png)
+*section 1: PII categories*
+> The core of PII protection is not simply hiding data; it is separating what the model may see from what the system must retain.
+
+## Questions to Keep in Mind
+
+- Why must PII protection separate what is sent to the model from what is stored internally?
+- Where are regex, Presidio, and reversible tokenization each useful?
+- What leak appears if outbound responses are not checked again?
 
 ## "Did You Mask the Email?"
 
@@ -231,6 +243,14 @@ Provider zero-data-retention options (OpenAI Enterprise, Azure OpenAI) reduce pr
 4. **PII in logs** — debug logs are the most common leak surface. Mask before logging too.
 5. **Not disclosing foreign LLM providers** — direct GDPR / privacy-law violation.
 
+## Operational Checklist
+
+- [ ] Detect structured PII with regex and unstructured PII with NER.
+- [ ] Decide up front whether plain masking or reversible tokenization fits the endpoint.
+- [ ] Re-scan outbound responses before they reach the user.
+- [ ] Keep raw PII out of general logs and caches.
+- [ ] Document retention, deletion, and provider-disclosure rules with legal review.
+
 ---
 
 ## Key Takeaways
@@ -240,9 +260,43 @@ Provider zero-data-retention options (OpenAI Enterprise, Azure OpenAI) reduce pr
 - **Reversible tokenization** lets the model reason about entities consistently.
 - An **outbound re-check** catches leaks from RAG and system prompts.
 - Apply a **compliance checklist** (minimization, consent, deletion right, DPA) from day one.
+
+---
+
+## Answering the Opening Questions
+
+- **Why must PII protection separate what is sent to the model from what is stored internally?**
+  - Send only minimized tokens or masked values to the model while keeping originals in access-controlled storage to reduce blast radius.
+- **Where are regex, Presidio, and reversible tokenization each useful?**
+  - Regex is a fast starting point, Presidio helps with richer entity detection, and reversible tokenization fits workflows that need later restoration.
+- **What leak appears if outbound responses are not checked again?**
+  - The model may reconstruct or echo private data from context, so outbound re-checks are needed before the user sees the response.
+<!-- toc:begin -->
+## In this series
+
+- [AI Safety & Guardrails 101 (1/10): Why AI Safety Matters](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection Defense](./02-prompt-injection-defense.md)
+- [AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation](./03-output-filtering.md)
+- **AI Safety & Guardrails 101 (4/10): PII Detection and Redaction (current)**
+- AI Safety & Guardrails 101 (5/10): Jailbreak Detection (upcoming)
+- AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection (upcoming)
+- AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks (upcoming)
+- AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (upcoming)
+- AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)
+- AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
-- [Microsoft Presidio](https://microsoft.github.io/presidio/)
-- [GDPR Article 4 — Definitions](https://gdpr.eu/article-4-definitions/)
-- [HIPAA — Privacy Rule Summary](https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html)
-- [OpenAI — Enterprise Privacy](https://openai.com/enterprise-privacy)
+### Official Docs
+
+- [Microsoft Presidio documentation](https://microsoft.github.io/presidio/)
+- [GDPR Article 4 — Definitions](https://gdpr-info.eu/art-4-gdpr/)
+- [HIPAA Privacy Rule summary (HHS)](https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html)
+- [OpenAI Enterprise privacy commitments](https://openai.com/enterprise-privacy)
+- [Azure OpenAI data, privacy, and security](https://learn.microsoft.com/azure/ai-foundry/responsible-ai/openai/data-privacy)
+
+### Verification-Friendly Sources
+
+- [Presidio Analyzer Python API](https://microsoft.github.io/presidio/api/analyzer_python/)

@@ -1,11 +1,11 @@
 ---
-title: Why Alembic, and getting to alembic init
+title: "Alembic 101 (1/10): Why Alembic, and getting to alembic init"
 series: alembic-101
 episode: 1
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,20 +16,26 @@ tags:
 - SQLAlchemy
 - Migration
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: Alembic is git for your database schema. Each migration file is a
   commit, the alembic_version table is the current HEAD pointer, upgrade head is…
 ---
 
-# Why Alembic, and getting to alembic init
+# Alembic 101 (1/10): Why Alembic, and getting to alembic init
 
-## What you will learn
+When a team first meets Alembic, the real question is not the command syntax but why raw SQL files stop scaling. Once schema history depends on memory instead of revision history, deploys and rollbacks turn into guesswork.
 
-- What problem a "migration tool" actually solves
-- Why `Base.metadata.create_all` is not enough for production
-- Alembic's core concepts: revision, head, version table
-- How to scaffold a project with `alembic init`
-- The two or three traps you usually hit on a SQLite-based Alembic setup
+This is the first post in the Alembic 101 series. Here we will frame why Alembic exists and what `alembic init` actually sets up.
+
+
+![alembic 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.en.png)
+*alembic 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What problem a "migration tool" actually solves?
+- Why `Base.metadata.create_all` is not enough for production?
+- Alembic's core concepts: revision, head, version table?
 
 ## Why this matters
 
@@ -42,6 +48,8 @@ Alembic is the migration tool by SQLAlchemy's author, and it treats this problem
 > Alembic is **git for your database schema**. Each migration file is a commit, the `alembic_version` table is the current HEAD pointer, `upgrade head` is fast-forward, and `downgrade -1` is a one-step reset.
 
 Once that analogy lands, almost every command makes sense. `revision` creates a new commit, `merge` reconciles two heads, and `stamp` is like `git reset` — it changes HEAD without touching the working tree.
+
+### Diagram: how revision history reaches the database
 
 ## Core concepts
 
@@ -167,6 +175,16 @@ sqlite3 app.db "SELECT * FROM alembic_version;"
 
 Seeing that single row in `alembic_version` makes the model click. That table is the reference point for every migration command.
 
+## Verification routine
+
+```bash
+alembic history
+alembic current
+sqlite3 app.db "SELECT version_num FROM alembic_version;"
+```
+
+**Expected output:** the latest revision appears in `alembic history`, and `alembic current` points at the same hash returned from `alembic_version`.
+
 ## Common mistakes
 
 - **Starting production with `create_all`.** Adopting Alembic later means an extra step of stamping the current schema as the first revision. Use Alembic from day one if you can.
@@ -204,12 +222,35 @@ Alembic boils down to one analogy: it is git for your database schema. Once you 
 
 The next episode opens up `env.py`. We will wire it to your model metadata, read the DB URL safely from the environment, and look at what online vs offline mode actually means.
 
-## References
+## Answering the Opening Questions
 
-- Alembic: Tutorial — https://alembic.sqlalchemy.org/en/latest/tutorial.html
-- Alembic: Configuration — https://alembic.sqlalchemy.org/en/latest/config.html
-- SQLAlchemy: MetaData — https://docs.sqlalchemy.org/en/20/core/metadata.html
-- SQLite Documentation — https://www.sqlite.org/docs.html
+- **What problem a "migration tool" actually solves?**
+  - The article treats Why Alembic, and getting to alembic init as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why `Base.metadata.create_all` is not enough for production?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Alembic's core concepts: revision, head, version table?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
+## In this series
+
+- **Why Alembic, and getting to alembic init (current)**
+- env.py and target_metadata: wiring models to migrations (upcoming)
+- Your first revision: writing upgrade and downgrade by hand (upcoming)
+- autogenerate: the line between what it catches and what it misses (upcoming)
+- branches and merges: combining revisions made in parallel (upcoming)
+- Data migrations: separating schema changes from data changes (upcoming)
+- Online and offline modes: previewing DDL with --sql and handling SQLite batch (upcoming)
+- Downgrade strategy: when to write it for real and when to forbid it (upcoming)
+- Deploy ordering and blue/green: synchronizing schema and application code safely (upcoming)
+- Production and team workflow: PR, CI, monitoring, and incident response (upcoming)
+
 <!-- toc:end -->
+
+## References
+
+- [sqlalchemy/alembic GitHub repository](https://github.com/sqlalchemy/alembic)
+- [Alembic: Tutorial](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
+- [Alembic: Configuration](https://alembic.sqlalchemy.org/en/latest/config.html)
+- [SQLAlchemy: MetaData](https://docs.sqlalchemy.org/en/20/core/metadata.html)
+- [SQLite Documentation](https://www.sqlite.org/docs.html)

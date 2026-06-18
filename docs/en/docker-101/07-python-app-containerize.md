@@ -1,10 +1,10 @@
 ---
 series: docker-101
 episode: 7
-title: Containerizing a Python App
-status: content-ready
+title: "Docker 101 (7/10): Containerizing a Python App"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,32 @@ tags:
   - Uvicorn
   - PID1
 seo_description: Containerize a FastAPI app to production grade with Dockerfile, healthcheck, non-root user, and proper PID 1 signal handling.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Containerizing a Python App
+# Docker 101 (7/10): Containerizing a Python App
 
-> Docker 101 series (7/10)
+A Python app running inside a container is not the same thing as a production-ready Python container. The difference shows up when the process receives SIGTERM during deployment, when healthchecks ask whether the app is really ready, and when a compromised process should not be running as root.
 
-<!-- a-grade-intro:begin -->
+Those details are easy to skip because the app still starts without them. They only become visible when a deployment drains live traffic, a container hangs on shutdown, or an orchestrator keeps restarting something that looked healthy on a laptop.
 
-**Core question**: What do you actually have to handle to containerize a *FastAPI app* at *production grade*?
+This is post 7 in the Docker 101 series. It turns a simple FastAPI example into an operationally credible container by focusing on PID 1, signals, healthchecks, and least-privilege execution.
 
-> *Python containerization becomes *real* the moment you handle *PID 1, signals, healthcheck, and non-root*.*
 
-<!-- a-grade-intro:end -->
+![docker 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/07/07-01-concept-at-a-glance.en.png)
+*docker 101 chapter 7 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Containerizing *FastAPI + uvicorn*
-- *Signal handling at PID 1* (SIGTERM)
-- Adding a *healthcheck*
-- *Non-root user* and permissions
-- Five common pitfalls
+- Containerizing *FastAPI + uvicorn?
+- Signal handling at PID 1* (SIGTERM)?
+- Adding a *healthcheck?
 
 ## Why It Matters
 
 *Python in a container* often *fails to receive SIGTERM*, breaking *graceful shutdown*. This is a common cause of *deploy incidents*.
 
 > *PID 1 in a container needs to be a *small init* or a process with *correct signal handling*.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Build["Dockerfile (slim, deps cache)"] --> Run["uvicorn app:app"]
-    Run --> HC["healthcheck"]
-    HC --> Sig["graceful SIGTERM"]
-```
 
 ## Key Terms
 
@@ -138,6 +127,16 @@ docker stop api    # sends SIGTERM, uvicorn drains in-flight requests
 docker logs api | tail
 ```
 
+### Verify right after you run it
+
+- `curl http://localhost:8000/healthz` should return `{"status":"ok"}`, and `docker stop api` should produce graceful shutdown logs rather than a forced termination pattern.
+- It is also worth checking `docker exec api id` once to confirm the process is not running as root.
+
+### If it does not work, check this first
+
+- If the container exits immediately, confirm that `tini` is actually installed in the image and not just referenced in `ENTRYPOINT`.
+- If the healthcheck keeps failing, verify that uvicorn is bound to `0.0.0.0:8000` and that `/healthz` exists exactly as declared.
+
 ## What to Notice in This Code
 
 - *Deps -> code* ordering for *cache efficiency*.
@@ -181,22 +180,40 @@ In real deployments, *Gunicorn + Uvicorn worker*, *prometheus-fastapi-instrument
 
 The real difficulty of Python containers is *signals and healthcheck*. Next, we run *with a database*.
 
+## Answering the Opening Questions
+
+- **Containerizing *FastAPI + uvicorn?**
+  - The article treats Containerizing a Python App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Signal handling at PID 1* (SIGTERM)?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Adding a *healthcheck?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
-- [Images and Containers](./02-image-and-container.md)
-- [Writing a Dockerfile](./03-dockerfile.md)
-- [Volumes and Networks](./04-volume-and-network.md)
-- [Docker Compose](./05-docker-compose.md)
-- [Environment Variables and Configuration](./06-env-and-config.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Images and Containers](./02-image-and-container.md)
+- [Docker 101 (3/10): Writing a Dockerfile](./03-dockerfile.md)
+- [Docker 101 (4/10): Volumes and Networks](./04-volume-and-network.md)
+- [Docker 101 (5/10): Docker Compose](./05-docker-compose.md)
+- [Docker 101 (6/10): Environment Variables and Configuration](./06-env-and-config.md)
 - **Containerizing a Python App (current)**
 - Running with a Database (upcoming)
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References
+
+### Official docs
 
 - [FastAPI in containers](https://fastapi.tiangolo.com/deployment/docker/)
 - [Uvicorn deployment](https://www.uvicorn.org/deployment/)
 - [tini - a tiny init for containers](https://github.com/krallin/tini)
 - [Dockerfile HEALTHCHECK](https://docs.docker.com/engine/reference/builder/#healthcheck)
+
+### Verification and troubleshooting
+
+- [Docker stop signal behavior](https://docs.docker.com/reference/cli/docker/container/stop/)

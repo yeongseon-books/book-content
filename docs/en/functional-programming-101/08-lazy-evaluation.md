@@ -1,10 +1,10 @@
 ---
 series: functional-programming-101
 episode: 8
-title: Lazy Evaluation and Generators
+title: "Functional Programming 101 (8/10): Lazy Evaluation and Generators"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,23 @@ seo_description: Build memory-efficient data processing pipelines using generato
 last_reviewed: '2026-05-04'
 ---
 
-# Lazy Evaluation and Generators
+# Functional Programming 101 (8/10): Lazy Evaluation and Generators
 
-> Functional Programming 101 Series (8/10)
+The first time a dataset stops fitting comfortably in memory, lazy evaluation stops looking like an abstract FP idea and starts looking like an operational survival skill. Log files, event exports, and large CSVs punish designs that insist on building every intermediate list up front.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Functional Programming 101 series.
 
-**Key Question**: Can you process data without loading everything into memory at once?
+Lazy evaluation means deferring computation until a consumer actually asks for the next value. In Python, generators and the iterator protocol turn that idea into a practical way to keep memory stable while data keeps moving.
 
-> Lazy evaluation is a strategy that defers computation until the moment a value is actually needed. Python's generators are the primary tool for lazy evaluation, enabling memory-efficient data processing. This article covers how generators work and how to build lazy pipelines with itertools.
 
-<!-- a-grade-intro:end -->
+![Functional Programming 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png)
+*Functional Programming 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Lazy Evaluation and Generators?
+- Which signal should the example or diagram make visible for Lazy Evaluation and Generators?
+- What failure should be prevented first when Lazy Evaluation and Generators reaches a real system?
 
 ## What You Will Learn
 
@@ -50,14 +56,6 @@ Python's `range()`, `map()`, `filter()`, and file objects all use lazy evaluatio
 ## Concept Overview
 
 > Eager vs Lazy Evaluation
-
-```
-Eager Evaluation               Lazy Evaluation
-─────────────────             ─────────────────
-[1, 4, 9, 16, 25]            (waiting to compute...)
-Everything in memory          Produces one value at a time
-list()                        generator / iterator
-```
 
 ## Key Concepts
 
@@ -101,7 +99,6 @@ def countdown(n: int):
         yield n
         n -= 1
 
-
 # create a generator object
 gen = countdown(5)
 print(type(gen))  # <class 'generator'>
@@ -130,7 +127,6 @@ print(type(squares_list))  # <class 'list'>
 squares_gen = (x ** 2 for x in range(10))
 print(type(squares_gen))  # <class 'generator'>
 
-
 # memory comparison
 import sys
 
@@ -150,7 +146,6 @@ print(f"Total: {total:,}")
 ```python
 from itertools import count, islice
 
-
 # infinite generator
 def fibonacci():
     a, b = 0, 1
@@ -158,11 +153,9 @@ def fibonacci():
         yield a
         a, b = b, a + b
 
-
 # take only what you need with islice
 fib_10 = list(islice(fibonacci(), 10))
 print(fib_10)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
-
 
 # infinite counter
 def natural_numbers():
@@ -183,7 +176,6 @@ print(squares)  # [1, 4, 9, 16, 25]
 
 ```python
 from itertools import chain, takewhile, dropwhile, accumulate, groupby
-
 
 # chain: concatenate multiple iterables
 combined = list(chain([1, 2], [3, 4], [5, 6]))
@@ -212,19 +204,21 @@ for key, group in groupby(data):
 ### Step 5: Building a Lazy Pipeline
 
 ```python
+from itertools import chain
+from pathlib import Path
 from typing import Iterator
 
-
-def read_lines(text: str) -> Iterator[str]:
-    """Yields lines from a text block."""
-    for line in text.strip().split("\n"):
-        yield line.strip()
+def read_lines(path: Path) -> Iterator[str]:
+    """Yields lines from a CSV file one at a time."""
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            yield line.rstrip("\n")
 
 def parse_csv(lines: Iterator[str]) -> Iterator[dict]:
     """Converts CSV lines into dictionaries."""
-    headers = next(lines).split(",")
+    headers = [header.strip() for header in next(lines).split(",")]
     for line in lines:
-        values = line.split(",")
+        values = [value.strip() for value in line.split(",")]
         yield dict(zip(headers, values))
 
 def filter_by_score(records: Iterator[dict], min_score: int) -> Iterator[dict]:
@@ -238,29 +232,64 @@ def format_output(records: Iterator[dict]) -> Iterator[str]:
     for r in records:
         yield f"{r['name']}: {r['score']} points"
 
-
-# run the pipeline — every stage is lazy
-csv_text = """name,score
-Alice,85
-Bob,92
-Charlie,78
-Diana,95
-Eve,60"""
-
-pipeline = format_output(
-    filter_by_score(
-        parse_csv(read_lines(csv_text)),
-        min_score=80,
-    )
+# create a tiny sample file so the pipeline behaves like a real stream
+sample_path = Path("scores.csv")
+sample_path.write_text(
+    "\n".join(
+        [
+            "name,score",
+            "Alice,85",
+            "Bob,92",
+            "Charlie,78",
+            "Diana,95",
+            "Eve,60",
+        ]
+    ),
+    encoding="utf-8",
 )
 
-# consume results one at a time
-for line in pipeline:
-    print(line)
-# Alice: 85 points
-# Bob: 92 points
-# Diana: 95 points
+try:
+    # keep stage handles separate so you can inspect them in isolation
+    lines_stage = read_lines(sample_path)
+    header = next(lines_stage)
+    print(f"Header preview: {header}")
+
+    pipeline = format_output(
+        filter_by_score(
+            parse_csv(chain([header], lines_stage)),
+            min_score=80,
+        )
+    )
+
+    # consume results one at a time
+    for line in pipeline:
+        print(line)
+    # Alice: 85 points
+    # Bob: 92 points
+    # Diana: 95 points
+
+    print(list(pipeline))
+    # []
+finally:
+    sample_path.unlink(missing_ok=True)
 ```
+
+#### Expected output
+
+```text
+Header preview: name,score
+Alice: 85 points
+Bob: 92 points
+Diana: 95 points
+[]
+```
+
+#### If your result differs, inspect this first
+
+- Make sure the header really comes through as `name,score`. If you skip or corrupt the first line, the parser will not find the `score` column.
+- Confirm the threshold check uses `>= 80`. If it becomes `> 80`, `Alice` disappears.
+- Verify newline stripping still happens with `rstrip("\n")` or equivalent. Otherwise names or scores can keep trailing whitespace.
+- The final `print(list(pipeline))` should be `[]`. That empty list confirms the generator was exhausted after the first full pass.
 
 ## What to Notice in This Code
 
@@ -311,17 +340,29 @@ In production, the effective pattern is to compose each pipeline stage as a gene
 
 Lazy evaluation defers computation to the moment values are needed, keeping memory usage constant. Python's generators and `itertools` are the core tools for building lazy pipelines. The next article covers combining small functions into complex transformations: **function composition and pipelines**.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Lazy Evaluation and Generators?**
+  - The article treats Lazy Evaluation and Generators as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Lazy Evaluation and Generators?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Lazy Evaluation and Generators reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Functional Programming?](./01-what-is-fp.md)
-- [Pure Functions and Side Effects](./02-pure-functions.md)
-- [Immutable Data](./03-immutable-data.md)
-- [Higher-Order Functions](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [Closures and Partial Application](./06-closure-and-partial.md)
-- [Recursion and Tail Calls](./07-recursion.md)
+## In this series
+
+- [Functional Programming 101 (1/10): What Is Functional Programming?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): Pure Functions and Side Effects](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): Immutable Data](./03-immutable-data.md)
+- [Functional Programming 101 (4/10): Higher-Order Functions](./04-higher-order-functions.md)
+- [Functional Programming 101 (5/10): map, filter, reduce](./05-map-filter-reduce.md)
+- [Functional Programming 101 (6/10): Closures and Partial Application](./06-closure-and-partial.md)
+- [Functional Programming 101 (7/10): Recursion and Tail Calls](./07-recursion.md)
 - **Lazy Evaluation and Generators (current)**
-- [Function Composition and Pipelines](./09-function-composition.md)
-- [Balancing OOP and Functional Programming](./10-oop-and-fp-balance.md)
+- Function Composition and Pipelines (upcoming)
+- Balancing OOP and Functional Programming (upcoming)
+
 <!-- toc:end -->
 
 ## References

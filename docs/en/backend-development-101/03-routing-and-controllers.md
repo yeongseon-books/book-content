@@ -1,10 +1,10 @@
 ---
 series: backend-development-101
 episode: 3
-title: Routing and Controllers
-status: content-ready
+title: "Backend Development 101 (3/10): Routing and Controllers"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,44 +17,30 @@ tags:
   - REST
   - Python
 seo_description: Split routers from controllers and learn the difference between path, query, and body parameters so your backend stays clean as it grows.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Routing and Controllers
+# Backend Development 101 (3/10): Routing and Controllers
 
-> Backend Development 101 series (3/10)
+A single file feels fine when your API only has a few endpoints. Once features start stacking up, though, the real problem is not line count but the constant question of where each new path, validation rule, and response shape should live.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Backend Development 101 series. Here, we split routers from controllers, separate path, query, and body parameters, and build the first structure that still reads cleanly after the endpoint count grows.
 
-**Core question**: When a server has a hundred endpoints, how do you keep the code *clean*?
 
-> The router decides *the address*; the controller *receives input and delegates to the next layer*. Splitting these two responsibilities lets the code organize itself.
+![backend development 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/03/03-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 3 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The difference between routers and controllers
-- The difference between path, query, and body parameters
-- How to design REST-style endpoints
-- How to split a FastAPI app with `APIRouter`
-- What controllers should and should *not* do
+- The difference between routers and controllers?
+- The difference between path, query, and body parameters?
+- How to design REST-style endpoints?
 
 ## Why It Matters
 
 In a tiny project, a single file works. As endpoints grow, that single file *becomes hell*. Splitting layers from day one makes "where does this code go?" obvious for every new feature.
 
 > Good structure removes the question of *where to put code*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Req["Request"] --> Router["Router"]
-    Router --> Ctrl["Controller"]
-    Ctrl --> Service["Service"]
-    Service --> Repo["Repository"]
-```
 
 Routers are the *map*, controllers are the *front desk*, services are the *experts*.
 
@@ -182,6 +168,16 @@ class UserController:
 
 Controllers stay *thin* — validate, then delegate.
 
+## Verification points
+
+**Expected output:** `/users/10` should return `{"id": 10}`, and `GET /users?active=false&limit=5` should echo the filter values in JSON.
+
+### First failure modes to check
+
+- A wrong path-parameter type should produce `422`, which is the framework doing its validation job.
+- If split routers do not show up, check `include_router()` before changing any business code.
+- When a controller starts growing, make sure only input mapping and service delegation remain there.
+
 ## What to Notice in This Code
 
 - Use path for *identity*, query for *filtering*.
@@ -226,9 +222,20 @@ Large backends have one router directory per domain (`routers/orders.py`, `route
 
 Routers are the *map*; controllers are the *front desk*. Next, we open the door behind the desk — the Service Layer that holds the *business rules*.
 
+## Answering the Opening Questions
+
+- **The difference between routers and controllers?**
+  - The article treats Routing and Controllers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The difference between path, query, and body parameters?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to design REST-style endpoints?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Backend Development?](./01-what-is-backend-development.md)
-- [Building an HTTP Server](./02-building-an-http-server.md)
+## In this series
+
+- [Backend Development 101 (1/10): What Is Backend Development?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): Building an HTTP Server](./02-building-an-http-server.md)
 - **Routing and Controllers (current)**
 - The Service Layer (upcoming)
 - The Database Layer (upcoming)
@@ -237,11 +244,17 @@ Routers are the *map*; controllers are the *front desk*. Next, we open the door 
 - Testing the Backend (upcoming)
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+### Official Docs
+
 - [FastAPI Path operations](https://fastapi.tiangolo.com/tutorial/path-params/)
 - [FastAPI APIRouter](https://fastapi.tiangolo.com/tutorial/bigger-applications/)
-- [REST API Tutorial](https://restfulapi.net/)
 - [Pydantic Models](https://docs.pydantic.dev/latest/concepts/models/)
+
+### Further Reading
+
+- [REST API Tutorial](https://restfulapi.net/)

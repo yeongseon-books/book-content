@@ -1,10 +1,10 @@
 ---
 series: frontend-development-101
 episode: 9
-title: Build Tools and Bundling
+title: "Frontend Development 101 (9/10): Build Tools and Bundling"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,21 @@ seo_description: Vite, esbuild, tree shaking, and bundle analysis — an introdu
 last_reviewed: '2026-05-04'
 ---
 
-# Build Tools and Bundling
+# Frontend Development 101 (9/10): Build Tools and Bundling
 
-> Frontend Development 101 series (9/10)
+During development, frontend code lives as dozens or hundreds of separate files. Browsers do not consume that source tree directly. Something has to resolve the import graph, transform the syntax, split the output, and emit files that are fast to download and easy to cache. That "something" is the build toolchain.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Frontend Development 101 series. Here we treat build tools as a performance layer, not just as developer convenience. The shape of the bundle is one of the clearest predictors of how quickly a user sees and uses the first screen.
 
-**Core question**: How do the *hundreds* of files we write turn into the *one or two* files the browser actually downloads?
 
-> Build tools *collect modules, compress them, and split them*. The shape of that output decides the *user experience*.
+![frontend development 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 9 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Build Tools and Bundling?
+- Which signal should the example or diagram make visible for Build Tools and Bundling?
+- What failure should be prevented first when Build Tools and Bundling reaches a real system?
 
 ## What You Will Learn
 
@@ -45,16 +49,6 @@ last_reviewed: '2026-05-04'
 Bundle size is paid *directly* by your users. A 1MB bundle is *eight seconds of white screen* on a 3G connection. If you do not understand the build tool, you will not understand *why your product gets heavy*.
 
 > A good bundle is *small, cacheable, and split*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Src["src/*.{js,ts,jsx}"] --> Resolver["Module resolver"]
-    Resolver --> Trans["Transformer (Babel/SWC/esbuild)"]
-    Trans --> Bundle["Bundler"]
-    Bundle --> Out["dist/*.js + assets"]
-```
 
 ## Key Terms
 
@@ -131,6 +125,16 @@ VITE_API_URL=https://api.example.com
 const url = import.meta.env.VITE_API_URL;
 ```
 
+## Verification
+
+- Run `npm run build` and confirm that `dist/assets` contains hashed output files rather than raw source names.
+- Run the bundle analyzer and identify the largest module so you have a concrete optimization target before tuning anything else.
+
+## If It Fails, Check This First
+
+- If `import.meta.env` is undefined, confirm the `VITE_` prefix and the location of `.env.production`.
+- If the bundle is unexpectedly large, inspect full-library imports, large images, and source-map exposure before chasing smaller details.
+
 ## What to Notice in This Code
 
 - The dev server serves *ESM directly*, so *startup is fast*.
@@ -175,22 +179,38 @@ Most new projects use a *Vite + esbuild + SWC* stack. Larger monorepos are gradu
 
 Build tools decide *how fast the first screen the user sees becomes interactive*. In the final post we will pull every concept so far into *a small frontend app*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Build Tools and Bundling?**
+  - The article treats Build Tools and Bundling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Build Tools and Bundling?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Build Tools and Bundling reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
-- [HTML and CSS Basics](./02-html-and-css-basics.md)
-- [JavaScript Basics](./03-javascript-basics.md)
-- [Components and State](./04-components-and-state.md)
-- [Routing and Pages](./05-routing-and-pages.md)
-- [API Calls and Async](./06-api-calls-and-async.md)
-- [Forms and Validation](./07-forms-and-validation.md)
-- [Styling and Design Systems](./08-styling-and-design-system.md)
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML and CSS Basics](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript Basics](./03-javascript-basics.md)
+- [Frontend Development 101 (4/10): Components and State](./04-components-and-state.md)
+- [Frontend Development 101 (5/10): Routing and Pages](./05-routing-and-pages.md)
+- [Frontend Development 101 (6/10): API Calls and Async](./06-api-calls-and-async.md)
+- [Frontend Development 101 (7/10): Forms and Validation](./07-forms-and-validation.md)
+- [Frontend Development 101 (8/10): Styling and Design Systems](./08-styling-and-design-system.md)
 - **Build Tools and Bundling (current)**
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Vite docs](https://vitejs.dev/)
-- [esbuild docs](https://esbuild.github.io/)
-- [web.dev: Reduce JavaScript payloads](https://web.dev/reduce-javascript-payloads-with-tree-shaking/)
+### Official Docs
+- [Vite guide](https://vite.dev/guide/)
+- [esbuild documentation](https://esbuild.github.io/)
+- [web.dev: Tree shaking and code splitting](https://web.dev/reduce-javascript-payloads-with-tree-shaking/)
+
+### Verification and Further Reading
 - [Bundlephobia](https://bundlephobia.com/)
+- [rollup-plugin-visualizer](https://github.com/btd/rollup-plugin-visualizer)

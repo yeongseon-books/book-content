@@ -1,11 +1,11 @@
 ---
-title: Image Captioning and OCR Pipelines
+title: "Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines"
 series: multimodal-ai-101
 episode: 4
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -16,15 +16,27 @@ tags:
 - Tesseract
 - PaddleOCR
 - Document AI
-last_reviewed: '2026-05-03'
-seo_description: 'Two requests show up constantly in production multimodal systems:'
+last_reviewed: '2026-05-14'
+seo_description: Build efficient image captioning and OCR pipelines. Learn about BLIP, Tesseract, PaddleOCR, and hybrid VLM workflows for multimodal systems.
 ---
 
-# Image Captioning and OCR Pipelines
+# Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines
 
-> Multimodal AI 101 series (4/10)
+Teams new to document and screenshot understanding often think OCR is the whole problem. In practice, OCR gives you strings, but it does not preserve scene meaning, emphasis, layout hierarchy, or the fact that two nearby labels belonged to the same visual unit.
 
----
+This is post 4 in the Multimodal AI 101 series.
+
+Here we treat captioning and OCR as complementary stages rather than competing tools, then build the hybrid pipeline that most real systems end up shipping.
+
+
+![Multimodal AI 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/04/04-01-ocr-vlm-hybrid-pipeline.en.png)
+*Multimodal AI 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
+
+- Why does "extract the text and move on" fail on receipts, screenshots, and structured documents?
+- When should you use a lightweight captioner, and when does a full VLM call earn its cost?
+- How do Tesseract, PaddleOCR, and cloud document APIs differ in real operating terms?
 
 ## "Doesn't pulling text out of an image cover it?"
 
@@ -177,7 +189,7 @@ Cost runs around USD 0.05-0.065 per page. At 1M pages per month, self-hosted Pad
 
 The pattern that works in practice has five stages.
 
-```
+```text
 [Image]
    |
    v
@@ -260,6 +272,14 @@ BLIP captions are short and generic ("a person sitting"). They lack the context 
 
 Card numbers on receipts, phone numbers on business cards, and ID numbers on passport photos are all readable by OCR. Run a PII filter on caption/OCR output (see ai-data-preparation-101 Episode 4).
 
+## Operations checklist
+
+- [ ] We normalize rotation and resolution before OCR or captioning starts
+- [ ] We load the correct language pack or model weights for the actual document language
+- [ ] We route low-confidence OCR output to fallback or review instead of trusting it blindly
+- [ ] We do not reuse raw BLIP output as final accessibility or SEO text without review
+- [ ] We re-run PII filtering after OCR and caption text have been generated
+
 ## Key Takeaways
 
 - Image captioning needs both fast BLIP-family models and reasoning-strong VLMs. Split by task character.
@@ -267,6 +287,34 @@ Card numbers on receipts, phone numbers on business cards, and ID numbers on pas
 - In production, a fast-OCR -> layout -> VLM hybrid pipeline is best for both cost and accuracy.
 - Verify EXIF rotation, language weights, confidence thresholds, alt-text post-processing, and PII filters before going live.
 - Episode 5 covers how to index OCR/caption output into a vector DB for multimodal RAG.
+
+---
+
+## Answering the Opening Questions
+
+- **Why does "extract the text and move on" fail on receipts, screenshots, and structured documents?**
+  - The article treats Image Captioning and OCR Pipelines as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When should you use a lightweight captioner, and when does a full VLM call earn its cost?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do Tesseract, PaddleOCR, and cloud document APIs differ in real operating terms?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Multimodal AI 101 (1/10): Why Multimodal AI Matters](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
+- [Multimodal AI 101 (3/10): Vision-Language Model Architecture](./03-vlm-architecture.md)
+- **Image Captioning and OCR Pipelines (current)**
+- Multimodal RAG: Searching Images and Text Together (upcoming)
+- Audio Processing and Whisper STT (upcoming)
+- Text-to-Image with Diffusion (upcoming)
+- Multimodal Embeddings and Cross-modal Search (upcoming)
+- Video Understanding - From Frame Sampling to Video-LLaVA (upcoming)
+- Building a Production Multimodal Application (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [Li et al. - BLIP: Bootstrapping Language-Image Pre-training](https://arxiv.org/abs/2201.12086)

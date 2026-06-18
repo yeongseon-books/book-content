@@ -1,10 +1,10 @@
 ---
 series: clean-code-101
 episode: 2
-title: Naming
-status: content-ready
+title: "Clean Code 101 (2/10): Naming"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,44 +18,43 @@ tags:
   - Refactoring
   - SoftwareEngineering
 seo_description: Six signals of a good name, naming variables vs functions vs classes, and the most common naming mistakes.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Naming
+# Clean Code 101 (2/10): Naming
 
-> Clean Code 101 series (2/10)
+Bad names waste time before any logic is understood. A reviewer pauses at `data`, guesses what it means, and rereads the same block twice.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Clean Code 101 series.
 
-**Core question**: How much shorter does a good name make your code?
+Here we will look at the signals of a strong name, how variable, function, and class names play different roles, and how domain language lowers search and review cost.
 
-> A good name removes half of the comments. And it makes a single grep accurate.
 
-<!-- a-grade-intro:end -->
+![clean code 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/02/02-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 2 flow overview*
+> Good names eliminate the need for explanation and make search, review, and documentation easier at the same time.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Six signals of a good name
-- The differences between variable, function, and class names
-- Bringing domain terms into code
-- The most common naming mistakes
-- A safe procedure for renaming
+- What boundary should you inspect first when applying Naming?
+- Which signal should the example or diagram make visible for Naming?
+- What failure should be prevented first when Naming reaches a real system?
+
+## Questions this article answers
+
+- What signals tell you a name is actually a good one?
+- How should variable, function, and class names differ in the role they play?
+- How do you bring domain language into code without making it sound forced?
+- What naming mistakes show up again and again in real codebases?
+- What is the safest order for a rename?
+
+> Good names do not make code shorter. They make intent visible sooner.
 
 ## Why It Matters
 
 Names are the most-read element of code. Pick a wrong one and you keep saying it forever.
 
 > A searchable name is the start of maintainability.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    I["Intent"] --> N["Name"]
-    N --> S["Search"]
-    N --> R["Read"]
-    N --> D["Doc"]
-```
 
 The name lifts intent into view.
 
@@ -135,6 +134,23 @@ customer_balance_cents           # domain names can be long
 
 Narrow scope: short. Wide scope: precise.
 
+## How to Verify This in a Real Codebase
+
+```bash
+ruff check app/ --select N
+python -m pytest -q tests/test_naming_examples.py
+```
+
+**Expected output**
+
+- Inconsistent naming patterns and weak abbreviations surface first.
+- After a rename, tests should stay green without behavior drift.
+
+## Failure Modes to Watch
+
+- Renaming only types while leaving domain language muddy.
+- Verifying the declaration but missing the full set of call sites.
+
 ## What to Notice in This Code
 
 - The name creates meaning at the call site.
@@ -179,8 +195,19 @@ Mature teams keep a domain glossary in the repo and enforce consistency in PRs. 
 
 Naming is the single highest-leverage readability tool. Next we shrink the unit those names point at — small functions.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Naming?**
+  - The article treats Naming as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Naming?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Naming reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
 - **Naming (current)**
 - Small Functions (upcoming)
 - Simplifying Conditionals (upcoming)
@@ -190,6 +217,7 @@ Naming is the single highest-leverage readability tool. Next we shrink the unit 
 - Testable Code (upcoming)
 - Refactoring Basics (upcoming)
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -198,3 +226,5 @@ Naming is the single highest-leverage readability tool. Next we shrink the unit 
 - [Domain-Driven Design — Eric Evans](https://www.oreilly.com/library/view/domain-driven-design-tackling/0321125215/)
 - [Google Style Guide — Naming](https://google.github.io/styleguide/pyguide.html#316-naming)
 - [PEP 8 — Naming Conventions](https://peps.python.org/pep-0008/#naming-conventions)
+- [Ruff pep8-naming rules](https://docs.astral.sh/ruff/rules/#pep8-naming-n)
+- [PEP 8 naming conventions](https://peps.python.org/pep-0008/#naming-conventions)

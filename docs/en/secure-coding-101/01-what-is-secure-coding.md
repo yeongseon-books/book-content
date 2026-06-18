@@ -1,10 +1,10 @@
 ---
 series: secure-coding-101
 episode: 1
-title: What Is Secure Coding?
+title: "Secure Coding 101 (1/10): What Is Secure Coding?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,30 @@ tags:
   - DevSecOps
   - AppSec
 seo_description: A practical introduction to secure coding — threat modeling, OWASP Top 10, and the daily habits that keep your code safe under attack.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is Secure Coding?
+# Secure Coding 101 (1/10): What Is Secure Coding?
 
-> Secure Coding 101 series (1/10)
+A feature can behave exactly as intended in happy-path testing and still fail the first time someone sends hostile input, replays a token, or calls an API out of order. In practice, many security incidents begin not with exotic cryptography failures but with ordinary development shortcuts: trusting a payload too early, logging a secret, or skipping a permission check in one code path.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Secure Coding 101 series.
 
-**Core question**: Code is not finished when the *feature works*. It is finished when it *survives an attacker*. How do we close that gap?
+Here, we will treat secure coding not as a final review step but as a development habit that keeps the attack surface small from the first route handler to the final audit log. That mental model matters because the rest of the series builds on it: input validation, authentication, authorization, storage, browser defense, dependency hygiene, and logging only make sense when you see them as one connected system.
 
-> *Secure coding is the daily habit of *shrinking the attack surface* without slowing the feature down.*
+> Secure coding is not a coating you apply after the feature ships. It is the daily habit of shrinking the attack surface while keeping the system predictable under stress.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![secure coding 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/01/01-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Secure Coding??
+- Which signal should the example or diagram make visible for What Is Secure Coding??
+- What failure should be prevented first when What Is Secure Coding? reaches a real system?
+
+## Questions This Chapter Answers
 
 - What *secure coding* means and *why* it matters
 - The idea of a *threat model* and how to apply it
@@ -45,17 +53,6 @@ last_reviewed: '2026-05-04'
 Most security incidents are *known patterns* repeated. *Skipped input validation*. *Secrets in code*. *No permission check*. Secure coding is not *exotic cryptography* — it is a small, daily set of rules.
 
 > *Security is not a *coating on top* of the feature. It is *part of the structure*.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    User["User input"] --> Validate["Validation"]
-    Validate --> Logic["App logic"]
-    Logic --> Storage["Storage (encrypted)"]
-    Logic --> Logs["Safe logs"]
-    Auth["AuthN / AuthZ"] --> Logic
-```
 
 ## Key Terms
 
@@ -159,7 +156,18 @@ Most teams begin with a *threat-modeling workshop*. They draw a *data-flow diagr
 
 Secure coding is a *habit*. The next post goes deep on the place that leaks most often: *input validation*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Secure Coding??**
+  - The article treats What Is Secure Coding? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Secure Coding??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Secure Coding? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Secure Coding? (current)**
 - Input Validation (upcoming)
 - Authentication and Session (upcoming)
@@ -170,6 +178,7 @@ Secure coding is a *habit*. The next post goes deep on the place that leaks most
 - XSS and CSRF Defense (upcoming)
 - Managing Dependency Vulnerabilities (upcoming)
 - Safe Logging and Audit (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -178,3 +187,4 @@ Secure coding is a *habit*. The next post goes deep on the place that leaks most
 - [OWASP Secure Coding Practices Quick Reference](https://owasp.org/www-pdf-archive/OWASP_SCP_Quick_Reference_Guide_v2.pdf)
 - [Microsoft Threat Modeling](https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool)
 - [Google — Secure by Design](https://security.googleblog.com/2024/01/secure-by-design.html)
+- [CISA and International Partners — Shifting the Balance of Cybersecurity Risk](https://www.cisa.gov/resources-tools/resources/shifting-balance-cybersecurity-risk-principles-and-approaches-secure-design)

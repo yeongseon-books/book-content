@@ -1,11 +1,11 @@
 ---
-title: Handling streaming responses — real-time output
+title: "LLM App Foundations 101 (6/6): Handling streaming responses — real-time output"
 series: llm-app-foundations-101
 episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -15,27 +15,18 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-01'
-seo_description: 'Example code: github.com/yeongseon-books/llm-app-foundations-101'
+seo_description: Enhance user experience by implementing real-time LLM output with streaming, incremental rendering, and efficient async response handling.
 ---
 
-# Handling streaming responses — real-time output
+# LLM App Foundations 101 (6/6): Handling streaming responses — real-time output
 
-> LLM App Foundations 101 (6/6)
-
-Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/06-streaming-responses)
-
-The diagram below shows the basic event flow of a streamed response.
-
-![Handling streaming responses: real-time output](../../assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.en.png)
-
-*Handling streaming responses: real-time output*
 One of the easiest ways to make an LLM application feel slow is to treat it like an ordinary blocking API call. The server sends a prompt, waits in silence, and only returns once the entire answer is finished. The feature works, but the experience feels worse than it needs to. A user stares at a blank box for several seconds and has no idea whether the model is thinking, the network is stalled, or the app is broken.
 
 That is the real value of streaming. It does not magically reduce the model's total generation time. What it changes is visibility. The first partial output can reach the user quickly, the UI can start rendering immediately, and long answers stop feeling like dead time. In practice, that difference matters a lot. A five-second wait with no feedback feels suspicious. A five-second wait where text starts appearing after a few hundred milliseconds feels responsive.
 
 Streaming also changes how you think about the response itself. Without streaming, a completion is one object with one final text field. With streaming, the answer becomes a sequence of chunks. Each chunk may contain new text, metadata, or just a signal that generation is ending. Once you start building chat UIs, drafting tools, or browser-based copilots, that event-oriented model becomes much more natural than waiting for one large string.
 
-This post closes the series by building that mental model with the Groq Python SDK. We will cover seven things:
+This is the final post in the LLM App Foundations 101 series. Here, we close the series by building that mental model with the Groq Python SDK. We will cover seven things:
 
 - why blocking calls create UX friction
 - how Groq streaming works with `stream=True` and `for chunk in stream:`
@@ -49,13 +40,15 @@ The main idea is simple: **streaming does not make the model smarter or faster, 
 
 ---
 
-## Questions this chapter answers
+![Handling streaming responses: real-time output](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.en.png)
+*Handling streaming responses: real-time output*
+> Streaming exposes generation as a sequence of events, not as a faster final answer.
 
-- What is the real mechanism by which streaming reduces perceived latency?
-- What is the smallest Groq SDK call that opens a streaming response?
-- What is the safe pattern to pull only text tokens out of each chunk?
-- Where do synchronous and asynchronous streaming diverge in practice?
-- When piping a stream through FastAPI, how do you handle headers and backpressure?
+## Questions to Keep in Mind
+
+- Does streaming finish the answer sooner, or show the generation flow earlier?
+- How do you read text, finish signals, and usage from chunks?
+- How does a FastAPI server relay the model stream to a user?
 
 ## Why streaming matters
 
@@ -96,7 +89,7 @@ That distinction is worth keeping in mind throughout this article. Streaming is 
 
 ## The smallest Groq streaming example
 
-![Stream chunks arriving before full completion](../../assets/llm-app-foundations-101/06/06-01-the-smallest-groq-streaming-example.en.png)
+![Stream chunks arriving before full completion](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-the-smallest-groq-streaming-example.en.png)
 
 *Stream chunks arriving before full completion*
 With the Groq SDK, streaming starts with one parameter: `stream=True`. Instead of receiving one completed response object, you receive an iterable stream of chunks.
@@ -142,7 +135,7 @@ You usually want all three, not just the first one.
 
 ## Extracting text from each chunk
 
-![Chunk fields for text finish and usage](../../assets/llm-app-foundations-101/06/06-02-extracting-text-from-each-chunk.en.png)
+![Chunk fields for text finish and usage](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-02-extracting-text-from-each-chunk.en.png)
 
 *Chunk fields for text finish and usage*
 In chat streaming, the text you usually want to render lives in `chunk.choices[0].delta.content`. Not every chunk contains visible text, so your loop should treat missing content as normal.
@@ -189,7 +182,7 @@ There is also an important defensive habit here: always expect some chunks to co
 
 ## Streaming versus sync and async patterns
 
-![Sync and async streaming execution comparison](../../assets/llm-app-foundations-101/06/06-03-streaming-versus-sync-and-async-patterns.en.png)
+![Sync and async streaming execution comparison](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-03-streaming-versus-sync-and-async-patterns.en.png)
 
 *Sync and async streaming execution comparison*
 Streaming and async are related in practice, but they are not the same concept.
@@ -256,7 +249,7 @@ If you keep those boundaries clear, the decision becomes much easier. Pick strea
 
 ## Reading token usage during or after streaming
 
-![Final chunk usage and fallback aggregation](../../assets/llm-app-foundations-101/06/06-04-reading-token-usage-during-or-after-stre.en.png)
+![Final chunk usage and fallback aggregation](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-04-reading-token-usage-during-or-after-stre.en.png)
 
 *Final chunk usage and fallback aggregation*
 In non-streaming responses, reading usage is straightforward: check `completion.usage` after the request finishes. Streaming changes the timing. Intermediate chunks often contain only incremental deltas, while usage metadata usually appears at the end.
@@ -392,7 +385,7 @@ The downstream consumer here could be almost anything: a moderation layer, a tra
 
 ## Relaying the stream through FastAPI
 
-![FastAPI relaying chunks to the browser](../../assets/llm-app-foundations-101/06/06-05-relaying-the-stream-through-fastapi.en.png)
+![FastAPI relaying chunks to the browser](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-05-relaying-the-stream-through-fastapi.en.png)
 
 *FastAPI relaying chunks to the browser*
 In a browser-based product, your frontend usually should not call the model provider directly. The server remains the right place for API keys, authentication, prompt policy, logging, and usage tracking. That means the server needs to receive the provider stream and relay it onward.
@@ -467,15 +460,26 @@ In this post, we covered why blocking LLM calls create avoidable UX friction, ho
 - [ ] You wrote both synchronous and `async for` versions of the stream consumer
 - [ ] Your FastAPI route uses `StreamingResponse` with explicit `media_type` and termination
 
+## Answering the Opening Questions
+
+- Does streaming finish the answer sooner, or show the generation flow earlier?
+  - Streaming mainly shows partial output earlier. The model still generates the answer, but the user sees chunks while generation continues.
+
+- How do you read text, finish signals, and usage from chunks?
+  - Accumulate delta text from chunks, then read finish signals and usage from the final provider-specific chunk or a fallback accounting path.
+
+- How does a FastAPI server relay the model stream to a user?
+  - FastAPI wraps the upstream model chunks in a server-side stream, such as `StreamingResponse`, and forwards them to the browser or client.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LLM API first call — sending your first request](./01-llm-api-first-call.md)
-- [Understanding tokens — cost, limits, and context windows](./02-understanding-tokens.md)
-- [Prompt engineering basics — system, user, and assistant roles](./03-prompt-engineering-basics.md)
-- [Few-shot and chain-of-thought — steering better answers](./04-few-shot-and-cot.md)
-- [Managing conversation state — building a multi-turn chatbot](./05-conversation-state.md)
-- **Handling streaming responses — real-time output (current)**
+- [LLM App Foundations 101 (1/6): LLM API first call — sending your first request](./01-llm-api-first-call.md)
+- [LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows](./02-understanding-tokens.md)
+- [LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles](./03-prompt-engineering-basics.md)
+- [LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers](./04-few-shot-and-cot.md)
+- [LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot](./05-conversation-state.md)
+- **LLM App Foundations 101 (6/6): Handling streaming responses — real-time output (current)**
 
 <!-- toc:end -->
 

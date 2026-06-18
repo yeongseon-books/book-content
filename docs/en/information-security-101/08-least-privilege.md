@@ -1,10 +1,10 @@
 ---
 series: information-security-101
 episode: 8
-title: Least Privilege
+title: "Information Security 101 (8/10): Least Privilege"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,26 @@ seo_description: A short, code-first guide to least privilege, IAM policies, RBA
 last_reviewed: '2026-05-04'
 ---
 
-# Least Privilege
+# Information Security 101 (8/10): Least Privilege
 
 > Information Security 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Why is "convenient extra access" so dangerous?
 
 > Least privilege defines your blast radius when an incident happens.
 
-<!-- a-grade-intro:end -->
+This is post 8 in the Information Security 101 series.
+
+
+![information security 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/08/08-01-big-picture.en.png)
+*information security 101 chapter 8 flow overview*
+> Least privilege is not about giving fewer permissions. It is about asking "does this user/service need this permission right now in this context?" at every access decision.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Least Privilege?
+- Which signal should the example or diagram make visible for Least Privilege?
+- What failure should be prevented first when Least Privilege reaches a real system?
 
 ## What You Will Learn
 
@@ -46,8 +55,6 @@ last_reviewed: '2026-05-04'
 You cannot always prevent compromise, but you can always shrink the blast radius. Least privilege determines the cost of any incident.
 
 > Privileges are not granted; they are loaned.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -191,17 +198,29 @@ AWS layers SCP + IAM + Resource Policy + Permission Boundary. Kubernetes layers 
 
 Least privilege defines the cost of an incident. Next we look at what makes incidents detectable in the first place — logging and audit.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Least Privilege?**
+  - The article treats Least Privilege as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Least Privilege?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Least Privilege reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Information Security?](./01-what-is-information-security.md)
-- [Authentication and Authorization](./02-authentication-and-authorization.md)
-- [Cryptography and Hashes](./03-cryptography-and-hash.md)
-- [TLS and Certificates](./04-tls-and-certificates.md)
-- [Web Security Basics](./05-web-security-basics.md)
-- [SQL Injection and XSS](./06-sql-injection-and-xss.md)
-- [Secret Management](./07-secret-management.md)
+## In this series
+
+- [Information Security 101 (1/10): What Is Information Security?](./01-what-is-information-security.md)
+- [Information Security 101 (2/10): Authentication and Authorization](./02-authentication-and-authorization.md)
+- [Information Security 101 (3/10): Cryptography and Hashing](./03-cryptography-and-hash.md)
+- [Information Security 101 (4/10): TLS and Certificates](./04-tls-and-certificates.md)
+- [Information Security 101 (5/10): Web Security Basics](./05-web-security-basics.md)
+- [Information Security 101 (6/10): SQL Injection and XSS](./06-sql-injection-and-xss.md)
+- [Information Security 101 (7/10): Secret Management](./07-secret-management.md)
 - **Least Privilege (current)**
 - Logging and Audit (upcoming)
 - Incident Response (upcoming)
+
 <!-- toc:end -->
 
 ## References

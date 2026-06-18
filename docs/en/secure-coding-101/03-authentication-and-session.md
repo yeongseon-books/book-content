@@ -1,10 +1,10 @@
 ---
 series: secure-coding-101
 episode: 3
-title: Authentication and Session
+title: "Secure Coding 101 (3/10): Authentication and Session"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,30 @@ tags:
   - JWT
   - SecureCoding
 seo_description: Password hashing, session cookies, JWT trade-offs, MFA, and a five-step playbook for a safe authentication flow.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Authentication and Session
+# Secure Coding 101 (3/10): Authentication and Session
 
-> Secure Coding 101 series (3/10)
+When authentication fails, every permission layered on top of it fails with it. Weak password hashing, overly long-lived tokens, missing cookie flags, and login flows that reveal whether an account exists all create quiet failures that often stay invisible until the first takeover or credential-stuffing wave lands.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Secure Coding 101 series.
 
-**Core question**: When a request asks *who are you*, how should the *code answer* without leaking?
+Here, we will separate two concerns that are easy to blur together: proving who the user is and remembering that proof safely on later requests. Once you keep those apart, the trade-offs between session cookies and JWTs, logout design, MFA placement, and rate limiting become much easier to reason about.
 
-> *Authentication confirms identity. The session remembers it. Both leak quietly when you are not looking.*
+> Authentication proves identity. Session management preserves that proof across requests. Both need explicit failure handling, not just a happy-path login screen.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![secure coding 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 3 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Authentication and Session?
+- Which signal should the example or diagram make visible for Authentication and Session?
+- What failure should be prevented first when Authentication and Session reaches a real system?
+
+## Questions This Chapter Answers
 
 - The difference between *authentication* and *authorization*
 - The principles of *password hashing*
@@ -45,16 +53,6 @@ last_reviewed: '2026-05-04'
 When auth leaks, *every permission leaks*. The most common incidents are *weak hashing*, *session fixation*, and *secret leakage*.
 
 > *Auth is the *door*. The session is the *hallway badge*.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Login["Login"] --> Verify["Verify password (hash)"]
-    Verify --> Issue["Issue session"]
-    Issue --> Cookie["Cookie (HttpOnly, Secure)"]
-    Cookie --> Request["Subsequent requests"]
-```
 
 ## Key Terms
 
@@ -115,6 +113,26 @@ def can_attempt(user_id):
     return n <= 5
 ```
 
+## Failure signals and what to verify first
+
+The auth path usually looks healthy until a real incident starts. That is why it helps to define the first checks ahead of time.
+
+```text
+Symptom: users say they were logged out unexpectedly
+First checks:
+1. cookie max_age / expiry changes
+2. session-store eviction or Redis restart
+3. clock skew across app nodes
+
+Symptom: login errors spike after deployment
+First checks:
+1. password-hash library version change
+2. missing secret used for cookie signing
+3. MFA callback or email provider failure
+```
+
+This kind of runbook turns "auth is broken" into a bounded investigation. In production, that shortens recovery time more than another generic best-practice bullet ever will.
+
 ## What to Notice in This Code
 
 - A safe hash is *intentionally slow*.
@@ -158,9 +176,20 @@ Most teams hash with *Argon2id* or *bcrypt*, combine *short-lived session cookie
 
 Auth answers *who*. Next we answer *what may they do* — *authorization and permissions*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Authentication and Session?**
+  - The article treats Authentication and Session as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Authentication and Session?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Authentication and Session reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Secure Coding?](./01-what-is-secure-coding.md)
-- [Input Validation](./02-input-validation.md)
+## In this series
+
+- [Secure Coding 101 (1/10): What Is Secure Coding?](./01-what-is-secure-coding.md)
+- [Secure Coding 101 (2/10): Input Validation](./02-input-validation.md)
 - **Authentication and Session (current)**
 - Authorization and Permissions (upcoming)
 - Safe Data Storage (upcoming)
@@ -169,6 +198,7 @@ Auth answers *who*. Next we answer *what may they do* — *authorization and per
 - XSS and CSRF Defense (upcoming)
 - Managing Dependency Vulnerabilities (upcoming)
 - Safe Logging and Audit (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -177,3 +207,4 @@ Auth answers *who*. Next we answer *what may they do* — *authorization and per
 - [OWASP Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
 - [Argon2 — RFC 9106](https://datatracker.ietf.org/doc/rfc9106/)
 - [NIST 800-63B — Digital Identity](https://pages.nist.gov/800-63-3/sp800-63b.html)
+- [MDN — Secure cookie configuration](https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/Cookies)

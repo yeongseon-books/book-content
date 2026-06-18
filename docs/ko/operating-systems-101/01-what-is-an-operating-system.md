@@ -1,12 +1,12 @@
 ---
 series: operating-systems-101
 episode: 1
-title: 운영체제란 무엇인가?
-status: content-ready
+title: "Operating Systems 101 (1/10): 운영체제란 무엇인가?"
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -17,23 +17,31 @@ tags:
   - 기초
   - 커널
   - 추상화
-seo_description: 운영체제의 정의와 역할, 커널과 사용자 모드, 추상화로서의 OS를 정리합니다.
-last_reviewed: '2026-05-04'
+seo_description: 운영체제의 정의와 역할, 커널과 사용자 모드, 핵심 추상화를 정리합니다.
+last_reviewed: '2026-05-15'
 ---
 
-# 운영체제란 무엇인가?
+# Operating Systems 101 (1/10): 운영체제란 무엇인가?
 
-> Operating Systems 101 시리즈 (1/10)
+운영체제를 처음 배우면 보통 커널, 시스템 콜, 드라이버 같은 용어부터 만납니다. 그런데 운영 환경에서 더 자주 마주치는 질문은 따로 있습니다. 왜 같은 코드가 어떤 서버에서는 느리고, 어떤 환경에서는 파일을 못 열고, 어떤 순간에는 메모리 부족으로 죽는가입니다.
 
+이 질문을 풀려면 운영체제를 교과서 속 배경지식이 아니라, 매 순간 CPU·메모리·디스크를 대신 조정하는 실행 환경으로 봐야 합니다. 이 글에서는 그 출발점을 잡겠습니다.
 
-## 이 글에서 다룰 문제
+이 글은 Operating Systems 101 시리즈의 첫 번째 글입니다.
 
-OS는 평소에 보이지 않습니다. 그래서 문제가 생기기 전까지는 그 존재를 잊기 쉽습니다. 그러나 메모리 부족, 좀비 프로세스, 파일 디스크립터 누수, 갑자기 느려지는 디스크, 막힌 네트워크 — 운영 환경에서 마주치는 거의 모든 시스템 문제는 결국 OS와 어떻게 대화하는지의 문제입니다. OS의 큰 그림을 알면, 에러 메시지가 막연한 "시스템 오류"가 아니라 추적 가능한 신호로 보입니다.
+![Operating Systems 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/01/01-01-diagram.ko.png)
+*Operating Systems 101 1장 흐름 개요*
 
-> 응용 프로그램은 OS 위에 얹혀 있고, OS는 하드웨어 위에 얹혀 있습니다. 이 두 경계를 건너는 비용을 모르면 성능도 안정성도 설명할 수 없습니다.
+## 먼저 던지는 질문
 
-## 전체 흐름
+- 운영체제는 정확히 어떤 문제를 해결하려고 존재할까요?
+- 커널 모드와 사용자 모드는 왜 굳이 분리되어 있을까요?
+- 프로세스, 파일, 소켓 같은 추상화는 실제로 무엇을 감추고 있을까요?
+
+## 기본 모델
 > 운영체제는 사용자 프로그램과 하드웨어 사이에 위치하는 소프트웨어 계층입니다. 위로는 응용 프로그램에게 시스템 콜을 통해 단순한 인터페이스를 제공하고, 아래로는 CPU 스케줄링, 메모리 할당, 디바이스 드라이버, 파일 시스템을 통해 하드웨어를 직접 다룹니다.
+
+### 운영체제가 끼어드는 위치
 
 ```text
 +---------------------------------------------+
@@ -52,9 +60,9 @@ OS는 평소에 보이지 않습니다. 그래서 문제가 생기기 전까지�
 +---------------------------------------------+
 ```
 
-## Before / After
+## 같은 코드를 다르게 읽는 법
 
-**Before — "OS는 그냥 컴퓨터를 켜 주는 것":**
+**이전 관점 — "운영체제는 그냥 컴퓨터를 켜 주는 것":**
 
 ```python
 with open("data.txt") as f:
@@ -63,25 +71,25 @@ with open("data.txt") as f:
 
 이 세 줄이 실행되려면, 누군가는 디스크의 어느 블록에 `data.txt`가 있는지 찾고, 디스크 컨트롤러에 명령을 내리고, 결과를 메모리에 옮기고, 그 메모리를 우리 프로세스가 읽을 수 있도록 매핑해야 합니다.
 
-**After — "OS가 매 줄마다 일하고 있다"는 모델:**
+**바꿔서 보면 — "운영체제가 매 줄마다 일하고 있다"는 모델:**
 
 ```text
-open()  → 시스템 콜 → 커널이 파일 시스템에서 inode를 찾고
-                    → 파일 디스크립터를 사용자 공간에 돌려줌
-read()  → 시스템 콜 → 디스크 드라이버에 I/O 요청
-                    → 데이터가 커널 버퍼 → 사용자 버퍼로 복사
-print() → 시스템 콜 (write to stdout)
-                    → 터미널 디바이스 드라이버로 전달
+open()  -> system call -> kernel walks the file system, finds the inode
+                       -> hands a file descriptor back to user space
+read()  -> system call -> queues an I/O request to the disk driver
+                       -> data flows: kernel buffer -> user buffer
+print() -> system call (write to stdout)
+                       -> handed to the terminal device driver
 ```
 
 세 줄짜리 파이썬 코드는 사실 시스템 콜의 연속입니다.
 
-## 단계별로 따라하기
+## 단계별로 확인하기
 
 ### 1단계: 시스템 콜 추적해 보기
 
 ```bash
-# Linux: strace로 파이썬 한 줄이 만드는 시스템 콜 보기
+# Linux: see exactly which syscalls one Python line triggers
 strace -e trace=openat,read,write,close \
     python3 -c "open('data.txt').read()"
 ```
@@ -91,7 +99,6 @@ strace -e trace=openat,read,write,close \
 ### 2단계: 사용자 모드와 커널 모드 시간 측정
 
 ```bash
-# 같은 작업을 user time과 system time으로 분리
 /usr/bin/time -v python3 -c "
 with open('/etc/hosts') as f:
     for _ in range(100000):
@@ -101,43 +108,43 @@ with open('/etc/hosts') as f:
 
 `User time`은 우리 코드가 사용자 모드에서 쓴 시간, `System time`은 커널이 우리를 위해 쓴 시간입니다. I/O가 많은 프로그램일수록 `System time`이 늘어납니다.
 
-### 3단계: 프로세스가 OS에게서 받은 자원 확인
+### 3단계: 프로세스가 운영체제에게서 받은 자원 확인
 
 ```python
 import os, resource
 
-print(f"PID            : {os.getpid()}")
-print(f"부모 PID        : {os.getppid()}")
-print(f"열 수 있는 fd 한계: {resource.getrlimit(resource.RLIMIT_NOFILE)}")
-print(f"가상 메모리 한계 : {resource.getrlimit(resource.RLIMIT_AS)}")
+print(f"PID                  : {os.getpid()}")
+print(f"Parent PID           : {os.getppid()}")
+print(f"Open file limit      : {resource.getrlimit(resource.RLIMIT_NOFILE)}")
+print(f"Virtual memory limit : {resource.getrlimit(resource.RLIMIT_AS)}")
 ```
 
 PID는 OS가 나에게 부여한 식별자, fd 한계와 메모리 한계는 OS가 강제하는 제약입니다. 우리는 OS가 나눠 준 몫 안에서만 살 수 있습니다.
 
-### 4단계: `/proc`로 커널이 우리를 어떻게 보는지 들여다보기
+### 4단계: 프로세스 정보 파일로 현재 상태 들여다보기
 
 ```bash
-# 자기 자신의 커널 측 정보
+# Kernel-side view of this process
 cat /proc/self/status | head -20
-# 자기 자신이 열어 둔 파일 디스크립터 목록
+# File descriptors currently open
 ls -l /proc/self/fd
 ```
 
 리눅스에서 `/proc`는 커널이 가진 정보를 파일처럼 노출하는 가상 파일 시스템입니다. 커널은 우리 프로세스에 대한 메타데이터(상태, 메모리 사용량, 열린 파일)를 모두 알고 있습니다.
 
-### 5단계: OS 없는 세상을 상상해 보기
+### 5단계: 운영체제 없는 세상을 상상해 보기
 
 ```text
-[OS 없음]                        [OS 있음]
-- 모든 앱이 직접 디스크 섹터 접근   - open()/read()로 파일 추상화
-- 두 앱이 같은 메모리를 덮어씀       - 가상 메모리로 격리
-- 한 앱이 CPU를 영원히 점유          - 스케줄러가 시간 분배
-- 디바이스마다 따로 코드 작성        - 드라이버로 단일 인터페이스
+[No OS]                              [With OS]
+- Apps poke disk sectors directly    - open()/read() abstract files
+- Apps overwrite each other's RAM    - virtual memory isolates them
+- One app monopolizes the CPU         - scheduler shares CPU time
+- Each app ships device-specific code - drivers expose one interface
 ```
 
 OS의 가치는 이 둘의 차이입니다. 우리가 평소 느끼는 "그냥 잘 돌아간다"는 감각은 모두 이 추상화 위에 서 있습니다.
 
-## 이 코드에서 주목할 점
+## 여기서 먼저 볼 점
 
 - 모든 파일 작업은 사실 시스템 콜의 연속입니다
 - 사용자 모드와 커널 모드 사이의 전환은 비용이 있습니다
@@ -154,7 +161,7 @@ OS의 가치는 이 둘의 차이입니다. 우리가 평소 느끼는 "그냥 �
 | 모든 OS가 동일하다고 가정 | 리눅스 코드가 윈도우에서 실패 | OS별 시스템 콜 차이를 안다 |
 | 에러 코드를 "그냥 실패"로 처리 | 디버깅 정보 손실 | errno와 시스템 콜 매뉴얼을 본다 |
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 본다
 
 - 백엔드 운영: `top`, `htop`, `iostat`로 OS가 보고하는 자원 사용률 분석
 - 컨테이너 트러블슈팅: `strace`로 컨테이너 내부 시스템 콜 디버깅
@@ -170,27 +177,136 @@ OS의 가치는 이 둘의 차이입니다. 우리가 평소 느끼는 "그냥 �
 - [ ] `strace`나 `/proc`로 OS와 대화할 수 있다
 - [ ] OS가 주는 자원에는 한계가 있고, 한계는 조정 가능하다는 감각을 갖고 있는가
 
-## 정리 및 다음 단계
+## 연습 문제
+
+1. `strace -c python3 your_script.py`를 실행해서 가장 많이 호출된 시스템 콜 세 개를 적고, 각 호출이 무엇을 하는지 한 문단으로 설명해 보세요.
+2. `ulimit -n`으로 파일 디스크립터 한도를 확인한 뒤, 파일을 반복해서 여는 작은 스크립트를 만들어 어떤 에러가 나는지 직접 확인해 보세요.
+3. `/proc/self/status`에서 `VmRSS`, `Threads`, `State`를 읽고, 각 필드가 지금 프로세스의 어떤 상태를 말하는지 자기 말로 정리해 보세요.
+
+## 마무리와 다음 글
 
 운영체제는 하드웨어 위에 얹혀 자원을 관리하고, 응용 프로그램에게 깔끔한 추상화를 제공하는 소프트웨어 계층입니다. 사용자 모드와 커널 모드의 분리, 시스템 콜이라는 정해진 통로, 그리고 프로세스라는 추상화 — 이 세 가지가 OS를 이해하는 출발점입니다.
 
 다음 글에서는 OS가 만들어 주는 가장 기본적인 추상화인 프로세스를 자세히 봅니다. 프로세스는 무엇으로 구성되어 있고, 스레드와는 어떻게 다른지, 그리고 새 프로세스는 어떻게 만들어지는지를 따라갑니다.
 
+## 시스템 관찰 지표와 커널 동작의 연결
+
+### run queue와 CPU 사용률을 함께 읽기
+CPU 사용률이 낮다고 항상 여유가 있는 것은 아닙니다. run queue 길이가 길고 I/O wait가 높으면 병목이 디스크나 네트워크일 수 있습니다.
+
+```bash
+vmstat 1
+mpstat -P ALL 1
+iostat -xz 1
+```
+
+세 도구를 같이 보면 CPU 바운드인지 I/O 바운드인지 분리할 수 있습니다. 운영체제 관점에서 중요한 것은 단일 지표가 아니라 지표 간 관계입니다.
+
+### 페이지 폴트와 메모리 압박 해석
+메모리 문제는 OOM 직전에야 드러나는 경우가 많습니다. 아래 지표를 주기적으로 보면 이상 징후를 조기에 잡을 수 있습니다.
+
+- major page fault 증가: 디스크에서 페이지를 자주 끌어오는 상태
+- swap in/out 급증: 워킹셋이 물리 메모리를 초과한 상태
+- reclaim 스레드 활동 증가: 커널이 메모리 회수에 과도한 시간을 쓰는 상태
+
+애플리케이션이 GC를 쓰는 런타임이라면, 힙 크기 조정과 객체 생존 시간 최적화가 커널 메모리 압박을 완화하는 직접 수단이 됩니다.
+
+### 시스템 콜 추적으로 성능 병목 찾기
+`strace`는 느리지만 원인 파악에는 매우 강력합니다. 호출 빈도와 지연 구간을 보면 어떤 API 사용이 비효율적인지 확인할 수 있습니다.
+
+```bash
+strace -f -c -p <pid>
+```
+
+요약표에서 `read`, `write`, `futex`, `epoll_wait` 비중이 높게 나오면 각각 I/O, 락 경합, 이벤트 대기 구조를 의심할 수 있습니다. 이후 애플리케이션 코드에서 버퍼 크기, 락 범위, 이벤트 루프 타임아웃을 조정하는 식으로 대응합니다.
+
+### 스케줄링과 우선순위 튜닝 주의점
+`nice`와 `ionice`는 빠른 응급처치지만, 남용하면 전체 시스템 공정성을 해칠 수 있습니다. 특정 작업의 우선순위를 올리면 다른 서비스의 tail latency가 악화될 수 있기 때문입니다.
+
+운영 환경에서는 다음 원칙을 권장합니다. 첫째, 우선순위 조정은 임시 대응으로 제한합니다. 둘째, 조정 전후 지표를 캡처해 회귀를 확인합니다. 셋째, 근본 원인은 워크로드 분리, 큐 제어, 배치 시간 분산으로 해결합니다. 운영체제 기능은 문제를 숨기는 도구가 아니라 구조를 개선하기 위한 관측/제어 도구입니다.
+
+## 운영자가 바로 써먹는 관찰 루틴
+
+운영체제 개념을 실제 점검 루틴으로 바꾸면 장애 분석 속도가 크게 빨라집니다. 아래 루틴은 CPU, 메모리, 파일 디스크립터, 프로세스 상태를 같은 시간축에서 관찰하도록 설계했습니다.
+
+### `/proc` 출력으로 현재 프로세스 해부하기
+
+```bash
+PID=$(pgrep -f "python3 app.py" | head -n 1)
+cat /proc/$PID/status | grep -E "Name|State|Threads|VmRSS|VmSize|voluntary_ctxt_switches|nonvoluntary_ctxt_switches"
+ls -l /proc/$PID/fd | wc -l
+cat /proc/$PID/limits | grep -E "open files|max user processes"
+```
+
+```text
+Name:   python3
+State:  S (sleeping)
+Threads:        12
+VmRSS:  182340 kB
+VmSize: 1042200 kB
+voluntary_ctxt_switches:        154233
+nonvoluntary_ctxt_switches:     3211
+```
+
+이 출력만으로도 "CPU 바운드인가", "I/O 대기가 긴가", "fd 누수가 있는가"를 1차 분류할 수 있습니다. 중요한 점은 지표를 개별 숫자로 보지 않고, 같은 시각의 관계로 보는 것입니다.
+
+### 메모리 레이아웃을 사고 도구로 쓰기
+
+```text
+낮은 주소
++-------------------------+
+| text / rodata           |  코드, 상수
++-------------------------+
+| data / bss              |  전역 변수
++-------------------------+
+| heap                    |  동적 할당, 객체
+|           ↑             |
+|           |             |
+|           |             |
+|           ↓             |
+| stack                   |  함수 호출 프레임
++-------------------------+
+높은 주소
+```
+
+메모리 문제를 만났을 때 이 그림으로 "어느 영역이 커지는가"를 먼저 고르면 디버깅 범위가 줄어듭니다. 파이썬 서비스라면 힙 증가와 스레드 증가(스택 증가)를 함께 확인해야 합니다.
+
+### 시스템 콜 추적으로 병목 구간 분리
+
+```bash
+strace -f -tt -T -e trace=read,write,openat,close,futex,epoll_wait -p "$PID"
+```
+
+`futex` 체류 시간이 길면 락 경합, `read`/`write`가 매우 짧은 호출로 과다하면 버퍼링 부족, `epoll_wait` 비중이 크면 I/O 대기 중심 workload일 가능성이 큽니다. 운영체제 관점에서는 코드 줄 수보다 "호출 패턴"이 먼저 보입니다.
+
+## 처음 질문으로 돌아가기
+
+- **운영체제는 정확히 어떤 문제를 해결하려고 존재할까요?**
+  - 운영체제는 응용 프로그램이 CPU, 메모리, 디스크를 직접 다루지 않아도 되게 하면서, 동시에 여러 프로그램이 같은 하드웨어를 안전하게 나눠 쓰도록 만드는 계층입니다. `open()`과 `read()` 뒤에서 inode 탐색, 디스크 I/O, 버퍼 복사, 스케줄링이 이어지고, `/proc`와 rlimit 예제처럼 각 프로세스에 자원 한계와 관찰 창을 함께 제공합니다.
+- **커널 모드와 사용자 모드는 왜 굳이 분리되어 있을까요?**
+  - 사용자 프로그램이 디스크 블록이나 다른 프로세스 메모리를 직접 건드리게 두면 시스템 전체가 쉽게 망가집니다. 그래서 파일 열기나 stdout 쓰기 같은 작업은 시스템 콜로만 커널에 요청하게 하고, 그 대가로 `System time`과 모드 전환 비용을 치르는 구조를 둡니다.
+- **프로세스, 파일, 소켓 같은 추상화는 실제로 무엇을 감추고 있을까요?**
+  - 파일은 디스크 블록과 inode 구조를, 프로세스는 PID·메모리 맵·열린 파일 집합을, 소켓은 네트워크 장치와 커널 버퍼를 감춘 추상화입니다. 파이썬의 짧은 `open(...).read()` 코드가 사실은 파일 디스크립터 반환, 커널 버퍼 복사, 터미널 드라이버 호출로 풀린다는 점이 그 대표적인 예입니다.
+
 <!-- toc:begin -->
+## 시리즈 목차
+
 - **운영체제란 무엇인가? (현재 글)**
 - 프로세스와 스레드 (예정)
 - 스케줄링 (예정)
-- 동시성과 race condition (예정)
-- lock, mutex, semaphore (예정)
+- 동시성과 경쟁 상태 (예정)
+- 락, 뮤텍스, 세마포어 (예정)
 - 메모리 관리 (예정)
 - 가상 메모리 (예정)
 - 파일 시스템 (예정)
 - 시스템 콜 (예정)
 - 컨테이너와 운영체제 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
+- [Operating Systems 101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/operating-systems-101/ko)
 - [Tanenbaum & Bos — Modern Operating Systems](https://www.pearson.com/store/p/modern-operating-systems/P100000869539)
 - [Silberschatz, Galvin, Gagne — Operating System Concepts](https://www.os-book.com/)
 - [Linux man-pages project](https://man7.org/linux/man-pages/)

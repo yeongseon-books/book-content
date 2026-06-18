@@ -1,10 +1,10 @@
 ---
 series: api-design-101
 episode: 7
-title: Designing Error Responses
-status: content-ready
+title: "API Design 101 (7/10): Designing Error Responses"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,27 @@ tags:
   - Validation
   - Backend
 seo_description: A practical guide to error responses for REST APIs — RFC 7807 problem+json envelopes, error codes, and validation error shapes.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Designing Error Responses
+# API Design 101 (7/10): Designing Error Responses
 
-> API Design 101 series (7/10)
+Success responses can stay quiet for a long time even when they are mediocre. Error responses cannot. The moment they drift, support tickets multiply, client exception logic forks, and logs stop telling one coherent story.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the API Design 101 series.
 
-**Core question**: What should an error response *contain* so that clients can branch precisely and humans can read and understand it?
+Here, we treat errors as first-class contract design. Status codes, machine-readable codes, validation details, and trace IDs have to work together if you want debugging speed without leaking the wrong information.
 
-> A *status code + a stable body shape + a stable error code*.
 
-<!-- a-grade-intro:end -->
+![api design 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/07/07-01-concept-at-a-glance.en.png)
+*api design 101 chapter 7 flow overview*
+> A good error response tells the client not just that something failed, but why, and what it can do about it.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The four parts of an error response
-- RFC 7807 `application/problem+json`
-- How to express validation errors
-- Separating human messages from machine codes
-- Balancing security and debuggability
+- The four parts of an error response?
+- RFC 7807 `application/problem+json`?
+- How to express validation errors?
 
 ## Why It Matters
 
@@ -47,15 +46,7 @@ There is one success path and *hundreds of error paths*. If the shape is inconsi
 
 > A good error response cuts *debugging time*.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    R["request"] --> H["handler"]
-    H -->|"bad input"| V["422 + problem+json"]
-    H -->|"not allowed"| F["403 + problem+json"]
-    H -->|"internal"| S["500 + problem+json"]
-```
+That stable shape lets clients keep one parser and branch cleanly on `status`, `code`, and `errors[]` instead of reverse-engineering a different payload for each endpoint.
 
 ## Key Terms
 
@@ -127,7 +118,7 @@ Wrap *per-field* failures in `errors[]`.
 
 ### Step 3 — Stable error codes
 
-```
+```text
 user.not_found
 order.payment_required
 order.already_paid
@@ -190,6 +181,12 @@ Stripe's error object (`type`, `code`, `param`, `message`) has become the de fac
 - Always review the user-visible message — for both security and UX.
 - Document the most common errors *near the top* of the docs.
 
+## Verification Signals and Failure Modes
+
+- **Expected output:** Validation failures should include per-field `errors[]`, auth failures should return stable `code` values, and server failures should carry a traceable `trace_id`.
+- **First check:** If one endpoint returns a plain string for 404 while another returns JSON, the shared envelope is not actually shared yet.
+- **Failure mode:** Leak sensitive information in `detail` or omit trace IDs, and both supportability and security posture degrade at the same time.
+
 ## Checklist
 
 - [ ] Do all errors share the *same envelope*?
@@ -208,17 +205,29 @@ Stripe's error object (`type`, `code`, `param`, `message`) has become the de fac
 
 Error responses are the API's *second face*. The next episode brings every promise into one place — OpenAPI and Swagger.
 
+## Answering the Opening Questions
+
+- **The four parts of an error response?**
+  - The article treats Designing Error Responses as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **RFC 7807 `application/problem+json`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to express validation errors?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
-- [REST Basics](./02-rest-basics.md)
-- [Resource Design](./03-resource-design.md)
-- [HTTP Methods and Status Codes](./04-http-methods-and-status.md)
-- [Request and Response Schemas](./05-request-and-response-schema.md)
-- [Pagination and Filtering](./06-pagination-and-filtering.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
+- [API Design 101 (2/10): REST Basics](./02-rest-basics.md)
+- [API Design 101 (3/10): Resource Design](./03-resource-design.md)
+- [API Design 101 (4/10): HTTP Methods and Status Codes](./04-http-methods-and-status.md)
+- [API Design 101 (5/10): Request and Response Schemas](./05-request-and-response-schema.md)
+- [API Design 101 (6/10): Pagination and Filtering](./06-pagination-and-filtering.md)
 - **Designing Error Responses (current)**
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

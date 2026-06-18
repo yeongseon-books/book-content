@@ -1,10 +1,10 @@
 ---
 series: statistics-101
 episode: 6
-title: Confidence Interval
+title: "Statistics 101 (6/10): Confidence Interval"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,25 +20,24 @@ seo_description: What a 95 percent confidence interval really means, common misc
 last_reviewed: '2026-05-04'
 ---
 
-# Confidence Interval
+# Statistics 101 (6/10): Confidence Interval
 
-> Statistics 101 series (6/10)
+The phrase “95% confidence interval” shows up everywhere in statistical reporting, but it is also one of the most frequently misread phrases in the field. Many readers hear it as “there is a 95% probability the true value is inside this interval,” even though classical confidence intervals do not mean that.
 
-<!-- a-grade-intro:begin -->
+Confidence belongs to the procedure that generated the interval, not to the one interval you happen to be looking at. Keeping that distinction clear prevents a lot of later confusion about significance, uncertainty, and effect interpretation.
 
-**Core question**: What does a *95% confidence interval* actually mean? Does it mean *the population mean has a 95% chance* of being inside?
+This is post 6 in the Statistics 101 series. Here we will pin down what a 95% confidence interval actually means, why small samples push us toward the t-distribution, and when bootstrap intervals are the more natural fallback.
 
-> *Confidence is in the procedure, not in the value.*
 
-<!-- a-grade-intro:end -->
+![statistics 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/06/06-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 6 flow overview*
+> A confidence interval transforms *uncertainty* into a *range*—a way to communicate what you know and don't know.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *true meaning* of a *95% CI*
-- The *t-distribution* and *small samples*
-- *Asymmetric CIs* via the *bootstrap*
-- A 5-step CI exercise
-- Five common mistakes
+- What does a 95% confidence interval really mean?
+- Why should we switch to the t-distribution on small samples?
+- What can we use when the distribution is skewed?
 
 ## Why It Matters
 
@@ -47,14 +46,7 @@ Confidence intervals are the *most common tool* for showing uncertainty — and 
 > *A 95% CI is the *hit rate of the method*, not the probability of *this* particular interval.*
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Sample["Sample"] --> SE["Standard Error"]
-    SE --> Critical["t / z critical value"]
-    Critical --> CI["Confidence Interval"]
-```
-
+Rather than reporting a single number, a confidence interval says: *"I am 95% confident the true value lies between X and Y."* It quantifies the gap between your sample and the population.
 ## Key Terms
 
 - **Confidence Interval**: an interval such that, if the *procedure* were repeated infinitely, *95% of intervals* would contain the parameter.
@@ -87,6 +79,8 @@ t_crit = stats.t.ppf(0.975, df)
 print("t*:", t_crit)
 ```
 
+**Expected output:** for a sample size of 64, `t*` should land near `2.0`. On smaller samples it will be a bit larger than 1.96.
+
 ### Step 3 — SE and margin of error
 
 ```python
@@ -101,6 +95,8 @@ mean = sample.mean()
 print(f"95% CI: [{mean - moe:.2f}, {mean + moe:.2f}]")
 ```
 
+**Expected output:** something like `95% CI: [95.xx, 104.xx]`, which turns a point estimate into an interval you can actually discuss.
+
 ### Step 5 — Bootstrap
 
 ```python
@@ -109,6 +105,8 @@ rng = default_rng(0)
 boots = [rng.choice(sample, len(sample), replace=True).mean() for _ in range(2000)]
 print("Bootstrap CI:", np.percentile(boots, [2.5, 97.5]))
 ```
+
+**Expected output:** two percentile boundaries in an array. They should be close to, but not necessarily identical to, the t-based interval.
 
 ## What to Notice in This Code
 
@@ -153,17 +151,29 @@ A/B test results, regression coefficients, effect sizes — every *inference rep
 
 Confidence intervals are the tool for *visualizing uncertainty*. The next episode covers *hypothesis testing* — asking *whether a difference exists*.
 
+## Answering the Opening Questions
+
+- **What does a 95% confidence interval really mean?**
+  - The article treats Confidence Interval as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should we switch to the t-distribution on small samples?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What can we use when the distribution is skewed?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
-- [Distributions](./03-distributions.md)
-- [Sample and Population](./04-sample-and-population.md)
-- [Estimation](./05-estimation.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): Distributions](./03-distributions.md)
+- [Statistics 101 (4/10): Sample and Population](./04-sample-and-population.md)
+- [Statistics 101 (5/10): Estimation](./05-estimation.md)
 - **Confidence Interval (current)**
 - Hypothesis Testing (upcoming)
 - Correlation and Regression (upcoming)
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,11 +1,11 @@
 ---
-title: Retriever — document search and context injection
+title: "LangChain 101 (3/6): Retriever — document search and context injection"
 series: langchain-101
 episode: 3
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -19,24 +19,26 @@ seo_description: A Retriever does not store knowledge by itself; it turns a ques
   into the subset of documents worth showing the model.
 ---
 
-# Retriever — document search and context injection
+# LangChain 101 (3/6): Retriever — document search and context injection
 
-## Questions this post answers
+RAG quality is often decided before the model writes a single token. If retrieval brings back the wrong chunks, prompt tuning rarely saves the answer, so the search boundary deserves attention first.
 
-- Why does LangChain separate a Retriever from the underlying VectorStore
-- What input and output contract does `as_retriever()` expose inside a chain
-- How should retrieved documents be formatted before they enter the prompt
-- How much of RAG quality is determined before the LLM is even called
+This is the third post in the LangChain 101 series. It covers Retrievers, VectorStores, and the basic pattern for injecting retrieved context into an LLM prompt.
 
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-02-the-flow-at-a-glance.en.png)
+*The flow at a glance*
 > A Retriever does not store knowledge by itself; it turns a question into the subset of documents worth showing the model.
 
-![Questions this post answers](../../assets/langchain-101/03/03-01-questions-this-post-answers.en.png)
+## Questions to Keep in Mind
 
-*Questions this post answers*
+- How does a Retriever turn VectorStore results into LLM context?
+- When retrieval is empty or wrong, what should you inspect before blaming the model?
+- What metadata must be saved and reloaded with a VectorStore?
+
 ## Minimal runnable example
 
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
 embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
@@ -56,70 +58,19 @@ print(retriever.invoke("What does a Retriever do?")[0].page_content)
 
 <!-- injected-output:end -->
 
-## What to notice in this code
-
-- The embedding model turns text into vectors, while the Retriever exposes a query-to-documents interface.
-- The rest of the chain only needs to know `question -> list[Document]`.
-- Retrieved output is not yet prompt-ready; you still need a formatting step.
-- In RAG systems, retrieval quality often matters more than prompt wording at the start.
-
-## Where engineers get confused
-
-- Building a VectorStore does not automatically give you a usable RAG chain.
-- Raising `k` is not always better; it often adds noise as well as recall.
-- A Retriever does not answer the question. It selects context for the model.
-
-## Checklist
-
-- [ ] I can explain the difference between a VectorStore and a Retriever
-- [ ] I can turn `list[Document]` into a context string for a prompt
-- [ ] I can connect a Retriever to an LCEL chain
-
-LangChain 101 (3/6)
-
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/03-retriever)
-
-## Questions this post answers
-
-- How does a Retriever relate to a VectorStore?
-- Which search parameters matter after calling `as_retriever()`?
-- What should you watch when turning retrieved documents into prompt context?
-- Where does the retriever sit inside a basic RAG chain?
-
-> A Retriever is LangChain's search boundary: it selects relevant documents for a question and hands the next chain step the context needed to answer.
-
-## The flow at a glance
-
-![The flow at a glance](../../assets/langchain-101/03/03-02-the-flow-at-a-glance.en.png)
-
-*The flow at a glance*
-A Retriever accepts a query and returns a list of relevant documents. LangChain defines the Retriever interface around a single method: `get_relevant_documents(query)`. Whatever search system sits behind it — FAISS, Chroma, Elasticsearch — the chain uses it the same way.
-
-This post builds a FAISS-based Retriever, connects it to a prompt, and assembles the basic form of a RAG pattern.
-
-Topics:
-
-- creating a FAISS VectorStore and Retriever
-- `as_retriever()` and its search parameters
-- connecting a Retriever to a chain
-- injecting retrieved documents as context
-- combining multiple documents into one context string
-
----
-
 ## Creating a FAISS VectorStore
 
-![Documents turning into a vector index](../../assets/langchain-101/03/03-01-creating-a-faiss-vectorstore.en.png)
+![Documents turning into a vector index](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-01-creating-a-faiss-vectorstore.en.png)
 
 *Documents turning into a vector index*
 LangChain's `FAISS` class wraps the FAISS index behind a VectorStore interface. Pass a list of text strings and an embedding model — the class handles the rest.
 
 ```bash
-pip install langchain langchain-community faiss-cpu sentence-transformers langchain-groq
+pip install langchain langchain-community langchain-huggingface faiss-cpu sentence-transformers langchain-groq
 ```
 
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
 embedding_model = HuggingFaceEmbeddings(
@@ -157,14 +108,14 @@ print(f"index vector count: {vectorstore.index.ntotal}")
 
 ## Creating a Retriever
 
-![Similarity mmr threshold search paths](../../assets/langchain-101/03/03-02-creating-a-retriever.en.png)
+![Similarity mmr threshold search paths](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-02-creating-a-retriever.en.png)
 
 *Similarity mmr threshold search paths*
 `as_retriever()` wraps the VectorStore in the Retriever interface.
 
 ```python
 retriever = vectorstore.as_retriever(
-    search_type="similarity",  # default: cosine similarity
+    search_type="similarity",  # default top-k search; FAISS defaults to L2 distance
     search_kwargs={"k": 3},    # number of results to return
 )
 
@@ -176,9 +127,11 @@ for i, doc in enumerate(docs):
 
 Three `search_type` options are available:
 
-- `"similarity"`: cosine similarity, returns top k results
+- `"similarity"`: plain top-k retrieval; in the default FAISS path this uses L2 distance unless you configure a different metric
 - `"mmr"`: maximal marginal relevance — balances relevance and diversity
 - `"similarity_score_threshold"`: returns only documents above a similarity threshold
+
+`encode_kwargs={"normalize_embeddings": True}` makes the embedding vectors unit length, so L2 ranking and cosine-style ranking often become close in practice. But that normalization does **not** change the FAISS default itself: unless you configure a different distance strategy, the backend still searches with `IndexFlatL2`.
 
 ```python
 # MMR — prioritize diversity
@@ -192,7 +145,7 @@ retriever_mmr = vectorstore.as_retriever(
 
 ## Connecting a Retriever to a chain
 
-![Retrieved documents becoming prompt context](../../assets/langchain-101/03/03-03-connecting-a-retriever-to-a-chain.en.png)
+![Retrieved documents becoming prompt context](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-03-connecting-a-retriever-to-a-chain.en.png)
 
 *Retrieved documents becoming prompt context*
 The standard RAG pattern: retrieve relevant documents, inject them as context, pass to the LLM.
@@ -200,7 +153,7 @@ The standard RAG pattern: retrieve relevant documents, inject them as context, p
 ```python
 import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -295,11 +248,11 @@ The key is the chain input dict:
 
 ## Saving and reloading a VectorStore
 
-![Saving and reloading index lifecycle](../../assets/langchain-101/03/03-04-saving-and-reloading-a-vectorstore.en.png)
+![Saving and reloading index lifecycle](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-04-saving-and-reloading-a-vectorstore.en.png)
 
 *Saving and reloading index lifecycle*
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
 embedding_model = HuggingFaceEmbeddings(
@@ -369,15 +322,26 @@ The Retriever interface abstracts whatever search system sits behind it. The `co
 
 The next post covers Tool Calling — how an LLM can call external functions and incorporate their results into its response.
 
+## Answering the Opening Questions
+
+- **How does a Retriever turn VectorStore results into LLM context?**
+  A Retriever returns Documents from the VectorStore and passes them as context text or document objects that the chain can consume.
+
+- **When retrieval is empty or wrong, what should you inspect before blaming the model?**
+  Inspect the embedding model, query text, top_k, filters, and retrieved source text before blaming the LLM. Bad context produces bad answers.
+
+- **What metadata must be saved and reloaded with a VectorStore?**
+  Persist document ids, source text, metadata, embedding model, index version, and storage paths so reloaded results remain interpretable.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LangChain introduction — LCEL and the Runnable interface](./01-lcel-runnable-basics.md)
-- [Prompt and LLM chain — assembling your first chain](./02-prompt-llm-chain.md)
-- **Retriever — document search and context injection (current)**
-- Tool calling — connecting external tools (upcoming)
-- Streaming — handling real-time output (upcoming)
-- Putting it together — a complete chain in one file (upcoming)
+- [LangChain 101 (1/6): LangChain introduction — LCEL and the Runnable interface](./01-lcel-runnable-basics.md)
+- [LangChain 101 (2/6): Prompt and LLM chain — assembling your first chain](./02-prompt-llm-chain.md)
+- **LangChain 101 (3/6): Retriever — document search and context injection (current)**
+- LangChain 101 (4/6): Tool calling — connecting external tools (upcoming)
+- LangChain 101 (5/6): Streaming — handling real-time output (upcoming)
+- LangChain 101 (6/6): Putting it together — a complete chain in one file (upcoming)
 
 <!-- toc:end -->
 

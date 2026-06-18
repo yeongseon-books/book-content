@@ -1,11 +1,11 @@
 ---
-title: Audit Logging and Compliance
+title: "AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance"
 series: ai-safety-guardrails-101
 episode: 9
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,16 +14,28 @@ tags:
 - Audit Logging
 - Compliance
 - GDPR
-last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (9/10)
+last_reviewed: '2026-05-14'
+seo_description: Maintain decision traceability and compliance with GDPR and HIPAA through immutable audit logs, hash chains, and secure PII-separated storage.
 ---
 
-# Audit Logging and Compliance
+# AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance
 
 > AI Safety & Guardrails 101 Series (9/10)
 
----
-## Section 1
+In an LLM system, audit logs are not just verbose application logs. They are the record you rely on later for compliance, incident review, and decision traceability.
+
+This is post 9 in the AI Safety & Guardrails 101 series. It lays out what an audit log has to preserve and why its schema, access model, and retention rules differ from ordinary app logging.
+
+
+![Audit logging and compliance flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/09/09-01-big-picture.en.png)
+*Audit logging and compliance flow*
+> An audit log is not more logging; it is evidence that lets you reconstruct who did what and why.
+
+## Questions to Keep in Mind
+
+- How must audit logs differ from ordinary debug logs to support compliance?
+- What evidence is preserved by PII masking, append-only storage, and decision rationale?
+- What must be fixed in the log schema to produce automatic compliance reports?
 
 ## Why Audit Logs Differ From Application Logs
 
@@ -218,9 +230,51 @@ Send the report monthly to security, compliance, and leadership. Anomalies show 
 - Enforce append-only with WORM storage or hash chains, not just policy.
 - Capture decision rationale (query, chunks, params, guardrail decisions) so replay and regulatory response are possible.
 - Automate retention deletion and log the deletions themselves to preserve audit integrity.
+
+## Operational Checklist
+
+- [ ] Keep audit schema and application-log schema in different stores.
+- [ ] Store raw prompts and responses only in a short-retention encrypted store.
+- [ ] Enforce append-only integrity with WORM controls, hash chains, or both.
+- [ ] Log retrieval context, model parameters, and guardrail decisions for replay.
+- [ ] Audit every retention-driven deletion and user-requested erasure.
+
+---
+
+## Answering the Opening Questions
+
+- **How must audit logs differ from ordinary debug logs to support compliance?**
+  - They must be hard to tamper with, have fixed required fields, control access to private data, and follow retention and deletion policies.
+- **What evidence is preserved by PII masking, append-only storage, and decision rationale?**
+  - PII masking reduces exposure, append-only storage protects integrity, and decision rationale explains allow/block or approval decisions.
+- **What must be fixed in the log schema to produce automatic compliance reports?**
+  - Request id, actor, action, policy decision, tool call, masked fields, timestamps, retention class, and rationale must be fixed fields.
+<!-- toc:begin -->
+## In this series
+
+- [AI Safety & Guardrails 101 (1/10): Why AI Safety Matters](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection Defense](./02-prompt-injection-defense.md)
+- [AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation](./03-output-filtering.md)
+- [AI Safety & Guardrails 101 (4/10): PII Detection and Redaction](./04-pii-detection-redaction.md)
+- [AI Safety & Guardrails 101 (5/10): Jailbreak Detection](./05-jailbreak-detection.md)
+- [AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection](./06-toxicity-bias-detection.md)
+- [AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks](./07-hallucination-guardrails.md)
+- [AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention](./08-rate-limiting-abuse-prevention.md)
+- **AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance (current)**
+- AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
-- [GDPR - Article 30: Records of processing activities](https://gdpr-info.eu/art-30-gdpr/)
-- [HIPAA Security Rule - Audit controls](https://www.hhs.gov/hipaa/for-professionals/security/index.html)
-- [SOC 2 - Trust Services Criteria](https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services)
-- [AWS S3 Object Lock - Compliance mode](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html)
+### Official Docs
+
+- [GDPR Article 30 — Records of processing activities](https://gdpr-info.eu/art-30-gdpr/)
+- [HIPAA Security Rule — audit controls](https://www.hhs.gov/hipaa/for-professionals/security/index.html)
+- [AICPA SOC 2 Trust Services Criteria](https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services)
+- [AWS S3 Object Lock — compliance mode](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html)
+- [Microsoft Learn — Azure Storage immutable blobs](https://learn.microsoft.com/azure/storage/blobs/immutable-policy-configure-version-scope)
+
+### Verification-Friendly Sources
+
+- [ClickHouse documentation — immutable event pipelines](https://clickhouse.com/docs/en/cloud/bestpractices/using-materialized-views)

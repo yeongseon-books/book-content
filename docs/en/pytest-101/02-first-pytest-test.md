@@ -1,10 +1,10 @@
 ---
 series: pytest-101
 episode: 2
-title: Writing Your First pytest Test
+title: "pytest 101 (2/10): Writing Your First pytest Test"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,21 +16,29 @@ tags:
   - Test Writing
   - Test Discovery
   - Project Structure
-seo_description: Set up a pytest project structure and write your first tests.
+seo_description: Learn pytest discovery rules, project layout with the src directory, and how to execute specific tests using node IDs and keyword filtering.
 last_reviewed: '2026-05-04'
 ---
 
-# Writing Your First pytest Test
+# pytest 101 (2/10): Writing Your First pytest Test
+
+This is post 2 in the pytest 101 series.
 
 > pytest 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: How does pytest automatically find test files and functions?
 
 > pytest uses the `test_` prefix convention to auto-discover files and functions. This article covers project layout, writing tests, and using various execution options.
 
-<!-- a-grade-intro:end -->
+
+![pytest 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/02/02-01-big-picture.en.png)
+*pytest 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Writing Your First pytest Test?
+- Which signal should the example or diagram make visible for Writing Your First pytest Test?
+- What failure should be prevented first when Writing Your First pytest Test reaches a real system?
 
 ## What You Will Learn
 
@@ -51,7 +59,7 @@ When test structure is consistent across a team project, new members know where 
 
 > test discovery = the mechanism by which pytest automatically locates test files and functions
 
-```
+```text
 project/
 ├── src/
 │   └── myapp/
@@ -260,10 +268,21 @@ In practice, the `src/` layout is used to clearly separate production code from 
 
 ## Summary and Next
 
-You've learned pytest's test discovery rules and project structure. The `test_` prefix and `src/` layout are the foundation. Next, we'll dive deep into `assert` patterns and exception testing.
+You've learned pytest's test discovery rules and project structure. The `test_` prefix and `src/` layout are the foundation. Next, we'll cover `assert` patterns and exception testing in depth.
+
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Writing Your First pytest Test?**
+  - The article treats Writing Your First pytest Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Writing Your First pytest Test?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Writing Your First pytest Test reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [Why Write Tests?](./01-why-write-tests.md)
+## In this series
+
+- [pytest 101 (1/10): Why Write Tests?](./01-why-write-tests.md)
 - **Writing Your First pytest Test (current)**
 - Assert and Exception Testing (upcoming)
 - Understanding Fixtures (upcoming)
@@ -273,6 +292,7 @@ You've learned pytest's test discovery rules and project structure. The `test_` 
 - Coverage and Test Quality (upcoming)
 - Test Automation with GitHub Actions (upcoming)
 - Writing Testable Code (upcoming)
+
 <!-- toc:end -->
 
 ## References

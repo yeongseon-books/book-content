@@ -1,10 +1,10 @@
 ---
 series: testing-101
 episode: 7
-title: Test Coverage
+title: "Testing 101 (7/10): Test Coverage"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,26 @@ seo_description: Line, branch, and function coverage explained, how to measure w
 last_reviewed: '2026-05-04'
 ---
 
-# Test Coverage
+# Testing 101 (7/10): Test Coverage
 
-> Testing 101 series (7/10)
+Ask a team how much they tested, and someone will usually answer with a percentage. That number is useful—but only up to the point where people start mistaking execution for verification. A line can run without the test proving anything meaningful about it.
 
-<!-- a-grade-intro:begin -->
+Coverage helps when it reveals blind spots. It hurts when it becomes a vanity metric that rewards shallow tests and distracts from risky branches or exception paths.
 
-**Core question**: *How much* did you test? Is 100% *enough*?
+This is post 7 in the Testing 101 series. Here we separate line, branch, and function coverage, run `pytest-cov`, and focus on how to turn a report into better decisions rather than prettier dashboards.
 
-> Coverage is a *measurement tool*. The moment it becomes *a target* it loses meaning.
+> Coverage is a dashboard light. It tells you where to inspect, not what conclusion to declare.
 
-<!-- a-grade-intro:end -->
+
+![testing 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/07/07-01-concept-at-a-glance.en.png)
+*testing 101 chapter 7 flow overview*
+> Coverage is a diagnostic tool that reveals blind spots — not a scorecard that proves correctness.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Test Coverage?
+- Which signal should the example or diagram make visible for Test Coverage?
+- What failure should be prevented first when Test Coverage reaches a real system?
 
 ## What You Will Learn
 
@@ -47,14 +56,7 @@ If you do not know *where tests reach*, incidents happen in the *blind spots*. A
 > Coverage is a *compass*, not a *map*.
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Code["Production code"] --> Cov["Coverage tool"]
-    Cov --> Report["Line/branch report"]
-    Report --> Action["Add tests for gaps"]
-```
-
+Coverage measures which lines, branches, and functions tests execute, using tools like pytest-cov, and reveals untested code paths—branches, exception handlers, edge cases—that manual inspection might miss, though high percentage coverage can hide shallow tests.
 ## Key Terms
 
 - **Line coverage**: ratio of *executed lines / total lines*.
@@ -144,6 +146,20 @@ pytest --cov=src
 4. **Ignoring *branch coverage*.** Testing only one side of an if-else still gives *100% line*.
 5. **Holding *new code and legacy code* to the *same gate*.** Improvement becomes hard.
 
+## Verification Points
+
+1. Run `pytest --cov=src --cov-report=term-missing` and inspect two or three uncovered lines in the source itself. The point is to read the gap, not just the percentage.
+2. Re-run the same suite with `--cov-branch` and compare the numbers. The distance between line and branch coverage usually teaches more than the headline percentage.
+3. Add a small new exception path and confirm that the coverage report notices it. That is how you verify the CI gate is watching real change.
+
+**Expected output:** the report should make missing branches and exception paths more visible than the total percentage alone.
+
+## Failure Signals and First Checks
+
+- High line coverage with recurring incidents often means weak assertions or missing branch checks.
+- Measuring generated files or migrations together with core logic inflates the number and lowers the signal.
+- If one hard gate blocks both new and legacy code indiscriminately, teams often start gaming the metric instead of improving it.
+
 ## How This Shows Up in Production
 
 Most teams aim for *70\~85% on production code*. Core domain stays *high*; adapters and UI sit *lower*. Many add a separate gate on *patch coverage* (coverage of changed lines).
@@ -173,17 +189,29 @@ Most teams aim for *70\~85% on production code*. Core domain stays *high*; adapt
 
 Coverage is a *health signal*, not *health itself*. The next post covers *regression tests* — making sure the same bug *does not come back*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Test Coverage?**
+  - The article treats Test Coverage as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Test Coverage?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Test Coverage reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
-- [Integration Test](./03-integration-test.md)
-- [E2E Test](./04-e2e-test.md)
-- [Test Double](./05-test-double.md)
-- [Mock and Stub](./06-mock-and-stub.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
+- [Testing 101 (3/10): Integration Test](./03-integration-test.md)
+- [Testing 101 (4/10): E2E Test](./04-e2e-test.md)
+- [Testing 101 (5/10): Test Double](./05-test-double.md)
+- [Testing 101 (6/10): Mock and Stub](./06-mock-and-stub.md)
 - **Test Coverage (current)**
 - Regression Test (upcoming)
 - Running Tests in CI (upcoming)
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References

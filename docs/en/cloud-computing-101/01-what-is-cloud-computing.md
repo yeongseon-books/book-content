@@ -1,10 +1,10 @@
 ---
 series: cloud-computing-101
 episode: 1
-title: What is Cloud Computing?
-status: content-ready
+title: "Cloud Computing 101 (1/10): What is Cloud Computing?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,33 @@ tags:
   - DevOps
   - Networking
 seo_description: A practical primer on cloud computing — five core characteristics, on-prem vs cloud, the major providers, and the shared responsibility model.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# What is Cloud Computing?
+# Cloud Computing 101 (1/10): What is Cloud Computing?
 
-> Cloud Computing 101 series (1/10)
+Buying servers used to be the default. Teams had to order hardware, rack it, wire the network, install the operating system, and only then start building the service itself. Cloud changed that sequence by turning infrastructure into something you can request in minutes.
 
-<!-- a-grade-intro:begin -->
+Cloud provides five key characteristics: on-demand self-service provisioning, broad network access, resource pooling across tenants, elastic scaling, and measured service. Together, they form an operating model that shifts cost structure and responsibility.
 
-**Core question**: Why did we stop buying servers and start *renting computing power* over the internet?
+This is the first post in the Cloud Computing 101 series.
 
-> *Cloud computing rents compute, storage, and network on demand and bills only for what you use.*
+In this post, we'll build the mental model that makes later topics like service models, regions, networking, security, and cost control easier to reason about.
 
-<!-- a-grade-intro:end -->
+> Cloud computing is an operating model: rent compute, storage, and network on demand, then manage cost and responsibility as deliberately as performance.
 
-## What You Will Learn
+
+![cloud computing 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/01/01-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 1 flow overview*
+> The key insight is that cloud cost and risk depend on what you decide to do inside it, not just signing up for it.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What is Cloud Computing??
+- Which signal should the example or diagram make visible for What is Cloud Computing??
+- What failure should be prevented first when What is Cloud Computing? reaches a real system?
+
+## Questions This Chapter Answers
 
 - The five essential characteristics of cloud
 - On-premises vs cloud
@@ -43,17 +54,6 @@ last_reviewed: '2026-05-04'
 ## Why It Matters
 
 You can launch a global service with *zero up-front capital*. The trade-off is that you must understand *cost* and *responsibility boundaries* from day one.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    User["user"] --> Net["internet"]
-    Net --> CSP["cloud provider"]
-    CSP --> Compute["compute"]
-    CSP --> Storage["storage"]
-    CSP --> Network["network"]
-```
 
 ## Key Terms
 
@@ -117,6 +117,27 @@ print(upload("my-test-bucket-2026", "hello.txt", b"hi cloud"))
 - Clients are reusable — create once, call many times.
 - Bucket names are globally unique across all of AWS.
 
+## How to Verify This Example
+
+The point of the S3 example is not that the API call returns without throwing. The point is that you can confirm the bucket and object actually exist. That habit matters early because cloud workflows fail most often at the credential, region, and naming layers before the code itself gets interesting.
+
+```bash
+aws s3 ls
+aws s3 ls s3://my-test-bucket-2026
+```
+
+**Expected output:**
+
+- The first command should show the bucket you just created.
+- The second command should show `hello.txt` inside that bucket.
+- If both are empty, check credentials, active profile, region, and bucket-name uniqueness before you change the Python code.
+
+### Where beginners usually get stuck
+
+- `BucketAlreadyExists` usually means the bucket name is globally taken, not that your code is malformed.
+- `AccessDenied` is often a credential or profile issue before it is a boto3 issue.
+- Cleanup matters: even tiny learning resources turn into long-lived cost when no one deletes them.
+
 ## Five Common Mistakes
 
 1. **Doing daily work as the root account.**
@@ -154,7 +175,18 @@ Startups begin on AWS Free Tier, scale with Auto Scaling Groups when traffic gro
 
 Cloud is a *model*, not a technology. The next post draws the lines between IaaS, PaaS, and SaaS.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What is Cloud Computing??**
+  - The article treats What is Cloud Computing? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What is Cloud Computing??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What is Cloud Computing? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What is Cloud Computing? (current)**
 - IaaS, PaaS, SaaS (upcoming)
 - Region and Availability Zone (upcoming)
@@ -165,6 +197,7 @@ Cloud is a *model*, not a technology. The next post draws the lines between IaaS
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

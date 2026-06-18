@@ -1,36 +1,42 @@
 ---
 series: developer-career-101
 episode: 3
-title: Building a Learning Plan
-status: content-ready
+title: "Developer Career 101 (3/10): Building a Learning Plan"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
 language: en
 tags:
-  - Career
-  - Learning
-  - Plan
-  - Habits
-  - Beginner
-seo_description: A beginner-friendly tour of running a sustainable learning plan in quarters and weeks.
-last_reviewed: '2026-05-04'
+- Career
+- Learning
+- Plan
+- Habits
+- Beginner
+seo_description: A beginner-friendly tour of running a sustainable learning plan in
+  quarters and weeks.
+last_reviewed: '2026-05-14'
 ---
 
-# Building a Learning Plan
+# Developer Career 101 (3/10): Building a Learning Plan
 
-> Developer Career 101 series (3/10)
+Most developers do not struggle because learning resources are unavailable. They struggle because books, courses, and repos pile up faster than calendar time, so learning turns into a backlog of intentions instead of a repeatable system.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Developer Career 101 series.
 
-**Core question**: How do you keep *learning* sustainable inside a busy life?
 
-> Quarterly goals, a weekly routine, and measurable outputs.
+![developer career 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/03/03-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 3 flow overview*
+> Learning plans matter most when paired with concrete projects that exercise the full cycle: requirements, design, implementation, test, and deployment feedback.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What structure keeps learning sustainable during a busy quarter?
+- How should quarterly goals and weekly time blocks connect to each other?
+- How do you choose books, courses, and codebases without drowning in input?
 
 ## What You Will Learn
 
@@ -44,14 +50,7 @@ last_reviewed: '2026-05-04'
 
 Learning without a plan disperses.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Q[Quarter Goal] --> W[Weekly Plan]
-    W --> O[Output]
-    O --> R[Retro]
-```
+Effective learning connects theory to projects. You learn by doing: build, ship, gather feedback, iterate.
 
 ## Key Terms
 
@@ -106,6 +105,36 @@ Sat 09:00-11:00 (120 min)
 - next quarter: async/await depth
 ```
 
+## Operating criteria for a sustainable plan
+
+| Item | Strong version | Common failure |
+| --- | --- | --- |
+| Quarterly goal | Outcome and deadline fit in one sentence | "Study X" with no finish line |
+| Weekly routine | Day, hour, and duration are on the calendar | "I'll do it when I have time" |
+| Inputs | A book, a course, and a real codebase play different roles | Too many similar beginner materials |
+| Output | A repo, post, demo, or talk can be shown to someone else | Learning stays private and unverifiable |
+| Retro | Includes completion rate plus blockers | Ends as vague feelings only |
+
+## Operating criteria for a sustainable plan
+
+| Item | Strong version | Common failure |
+| --- | --- | --- |
+| Quarterly goal | Outcome and deadline fit in one sentence | "Study X" with no finish line |
+| Weekly routine | Day, hour, and duration are on the calendar | "I'll do it when I have time" |
+| Inputs | A book, a course, and a real codebase play different roles | Too many similar beginner materials |
+| Output | A repo, post, demo, or talk can be shown to someone else | Learning stays private and unverifiable |
+| Retro | Includes completion rate plus blockers | Ends as vague feelings only |
+
+## Operating criteria for a sustainable plan
+
+| Item | Strong version | Common failure |
+| --- | --- | --- |
+| Quarterly goal | Outcome and deadline fit in one sentence | "Study X" with no finish line |
+| Weekly routine | Day, hour, and duration are on the calendar | "I'll do it when I have time" |
+| Inputs | A book, a course, and a real codebase play different roles | Too many similar beginner materials |
+| Output | A repo, post, demo, or talk can be shown to someone else | Learning stays private and unverifiable |
+| Retro | Includes completion rate plus blockers | Ends as vague feelings only |
+
 ## What to Notice in This Code
 
 - Goals manifest as outputs.
@@ -149,9 +178,20 @@ Even PIPs and promotions are evaluated against quarterly goals plus outputs.
 
 Next post covers *Resume and Portfolio*.
 
+## Answering the Opening Questions
+
+- **What structure keeps learning sustainable during a busy quarter?**
+  - The article treats Building a Learning Plan as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should quarterly goals and weekly time blocks connect to each other?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do you choose books, courses, and codebases without drowning in input?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Developer Career](./01-what-is-developer-career.md)
-- [Understanding Roles](./02-understanding-roles.md)
+## In this series
+
+- [Developer Career 101 (1/10): What Is a Developer Career](./01-what-is-developer-career.md)
+- [Developer Career 101 (2/10): Understanding Roles](./02-understanding-roles.md)
 - **Building a Learning Plan (current)**
 - Resume and Portfolio (upcoming)
 - Preparing for Coding Interviews (upcoming)
@@ -160,11 +200,12 @@ Next post covers *Resume and Portfolio*.
 - Side Projects and Learning (upcoming)
 - Mentoring and Networking (upcoming)
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Atomic Habits](https://jamesclear.com/atomic-habits)
-- [Deep Work](https://www.calnewport.com/books/deep-work/)
-- [Deliberate Practice](https://www.psychologytoday.com/us/basics/deliberate-practice)
-- [OKR Examples](https://www.whatmatters.com/)
+- [James Clear — Atomic Habits](https://jamesclear.com/atomic-habits)
+- [Cal Newport — Deep Work](https://www.calnewport.com/books/deep-work/)
+- [Harvard Business Review — The Making of an Expert](https://hbr.org/2007/07/the-making-of-an-expert)
+- [Measure What Matters — OKR examples](https://www.whatmatters.com/resources/okr-examples)

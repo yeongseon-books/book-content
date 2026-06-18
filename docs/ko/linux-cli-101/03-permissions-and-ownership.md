@@ -1,13 +1,13 @@
 ---
-title: 권한과 소유자 이해하기
+title: "Linux CLI 101 (3/10): 권한과 소유자 이해하기"
 series: linux-cli-101
 episode: 3
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,36 +17,34 @@ tags:
 - chown
 - Security
 - File System
-last_reviewed: '2026-05-04'
-seo_description: Linux 파일 권한은 자물쇠 세 개가 달린 문과 같습니다. 주인, 같은 팀, 나머지 사람 각각에게 다른 열쇠를 줍니다.
+last_reviewed: '2026-05-12'
+seo_description: Linux 권한과 소유자, chmod와 chown의 기본 감각을 정리합니다.
 ---
 
-# 권한과 소유자 이해하기
-
-> Linux CLI 101 시리즈 (3/10)
-
----
-
-
-## 이 글에서 다룰 문제
+# Linux CLI 101 (3/10): 권한과 소유자 이해하기
 
 서버에서 스크립트를 실행하려고 `./deploy.sh`를 입력하면 "Permission denied"가 나옵니다. 파일은 분명 존재하는데 왜 실행이 안 될까요? 실행 권한(x)이 없기 때문입니다.
 
-> 웹 서버가 설정 파일을 읽지 못해 502 에러를 반환합니다. 파일이 존재하는데도 "No such file" 비슷한 에러가 나옵니다. 원인은 디렉터리의 실행 권한(x)이 없어서 해당 경로에 진입 자체가 불가능한 것입니다.
+![Linux CLI 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/03/03-01-big-picture.ko.png)
+*Linux CLI 101 3장 흐름 개요*
 
-권한 문제는 개발자가 서버에서 가장 자주 만나는 문제 중 하나이며, 이해하지 못하면 매번 `chmod 777`로 때우다가 보안 사고를 만듭니다.
+## 먼저 던지는 질문
 
-## Mental Model
+- `r`, `w`, `x` 권한은 파일과 디렉터리에서 각각 어떻게 다르게 동작할까요?
+- 소유자, 그룹, 그 외 사용자 구분을 왜 알아야 할까요?
+- `chmod`와 `chown`은 각각 무엇을 바꾸는 명령일까요?
+
+## 머릿속에 먼저 그릴 그림
 
 > 파일 권한은 자물쇠 세 개가 달린 문입니다. 주인(owner)용, 같은 팀(group)용, 나머지(others)용 자물쇠가 각각 있고, 각 자물쇠에는 읽기(r), 쓰기(w), 실행(x) 세 가지 열쇠가 있습니다.
 
 ```text
 -rwxr-xr--
 │└┬┘└┬┘└┬┘
-│ │  │  └── others: r-- (읽기만)
-│ │  └── group:  r-x (읽기+실행)
-│ └── owner:  rwx (읽기+쓰기+실행)
-└── 파일 유형 (-: 일반파일, d: 디렉터리)
+│ │  │  └── others: r-- (read only)
+│ │  └── group:  r-x (read+execute)
+│ └── owner:  rwx (read+write+execute)
+└── file type (-: regular file, d: directory)
 ```
 
 ## 핵심 개념
@@ -58,14 +56,14 @@ seo_description: Linux 파일 권한은 자물쇠 세 개가 달린 문과 같�
 | x | 실행 | 1 | 프로그램 실행 | 디렉터리 진입(cd) |
 | - | 권한 없음 | 0 | — | — |
 
-## Before / After
+## 전과 후
 
 **Before (권한을 모를 때)**
 
 ```bash
 ./deploy.sh
 # bash: ./deploy.sh: Permission denied
-chmod 777 deploy.sh    # "안 되면 777" — 보안 구멍
+chmod 777 deploy.sh    # "Just 777 if it doesn't work" — security hole
 ```
 
 **After (권한을 이해할 때)**
@@ -73,15 +71,15 @@ chmod 777 deploy.sh    # "안 되면 777" — 보안 구멍
 ```bash
 ls -l deploy.sh
 # -rw-r--r-- 1 user team 512 May 4 deploy.sh
-# → 실행 권한(x)이 없음
+# -> execute permission (x) is missing
 
-chmod u+x deploy.sh   # owner에게만 실행 권한 추가
-./deploy.sh            # 정상 실행
+chmod u+x deploy.sh   # Add execute permission for owner only
+./deploy.sh            # Runs successfully
 ```
 
 ## 단계별 실습
 
-### Step 1. 권한 확인하기
+### 1단계. 권한 확인하기
 
 ```bash
 cd ~/practice/linux-cli
@@ -90,7 +88,7 @@ ls -l secret.txt
 # -rw-r--r-- 1 user user 0 May  4 10:00 secret.txt
 ```
 
-### Step 2. 숫자 방식으로 권한 변경
+### 2단계. 숫자 방식으로 권한 변경
 
 ```bash
 chmod 644 secret.txt     # owner: rw-, group: r--, others: r--
@@ -102,34 +100,34 @@ ls -l secret.txt
 
 숫자 계산: r=4, w=2, x=1을 더합니다. `755` = `rwx`(7) + `r-x`(5) + `r-x`(5).
 
-### Step 3. 기호 방식으로 권한 변경
+### 3단계. 기호 방식으로 권한 변경
 
 ```bash
-chmod u+x secret.txt     # owner에 실행 추가
-chmod g-r secret.txt     # group에서 읽기 제거
-chmod o=r secret.txt     # others를 읽기만으로 설정
-chmod a+r secret.txt     # 모두(all)에게 읽기 추가
+chmod u+x secret.txt     # Add execute for owner
+chmod g-r secret.txt     # Remove read from group
+chmod o=r secret.txt     # Set others to read only
+chmod a+r secret.txt     # Add read for all
 ls -l secret.txt
 ```
 
-### Step 4. 디렉터리 권한
+### 4단계. 디렉터리 권한
 
 ```bash
 mkdir testdir
-chmod 700 testdir        # owner만 접근 가능
+chmod 700 testdir        # Only owner can access
 ls -ld testdir
 # drwx------ 2 user user 4096 May  4 10:00 testdir
 ```
 
-### Step 5. 소유자 변경
+### 5단계. 소유자 변경
 
 ```bash
-# 소유자 변경은 root 권한이 필요합니다
+# Changing ownership requires root privileges
 sudo chown root:root secret.txt
 ls -l secret.txt
 # -rwxr--r-- 1 root root 0 May  4 10:00 secret.txt
 
-sudo chown user:user secret.txt   # 원래대로 복원
+sudo chown user:user secret.txt   # Restore original
 ```
 
 ## 이 코드에서 봐야 할 것
@@ -141,11 +139,11 @@ sudo chown user:user secret.txt   # 원래대로 복원
 
 ## 자주 하는 실수
 
-### 실수 1. "안 되면 chmod 777"로 해결한다
+### 실수 1. 권한 문제를 과하게 열어서 해결한다
 
 777은 모든 사용자에게 모든 권한을 주는 것입니다. 웹 서버 파일에 777을 주면 아무나 파일을 수정할 수 있는 보안 취약점이 됩니다. 최소 권한 원칙을 따르세요.
 
-### 실수 2. 디렉터리의 x 권한을 간과한다
+### 실수 2. 디렉터리 실행 권한의 의미를 놓친다
 
 디렉터리에서 `x`는 "진입 허용"입니다. `r`만 있고 `x`가 없으면 `ls`로 목록은 보이지만 `cd`로 들어갈 수 없습니다. 파일에 접근하려면 경로상의 모든 디렉터리에 `x`가 있어야 합니다.
 
@@ -156,13 +154,13 @@ sudo chown user:user secret.txt   # 원래대로 복원
 ### 실수 4. 재귀 권한 변경에서 파일과 디렉터리를 구분하지 않는다
 
 ```bash
-chmod -R 755 project/   # 모든 파일에 실행 권한이 붙음 — 위험
-# 올바른 방법:
-find project/ -type d -exec chmod 755 {} \;   # 디렉터리만
-find project/ -type f -exec chmod 644 {} \;   # 파일만
+chmod -R 755 project/   # All files get execute permission — dangerous
+# Correct approach:
+find project/ -type d -exec chmod 755 {} \;   # Directories only
+find project/ -type f -exec chmod 644 {} \;   # Files only
 ```
 
-### 실수 5. umask를 모른 채 파일을 만든다
+### 실수 5. 기본 권한 마스크를 모른 채 파일을 만든다
 
 새 파일의 기본 권한은 `umask`로 결정됩니다. `umask 022`이면 파일은 644, 디렉터리는 755로 만들어집니다. `umask 077`이면 owner만 접근 가능합니다.
 
@@ -188,7 +186,13 @@ find project/ -type f -exec chmod 644 {} \;   # 파일만
 - [ ] 디렉터리의 `x` 권한이 "진입"을 의미한다는 것을 안다
 - [ ] `chmod 777`을 쓰면 안 되는 이유를 설명할 수 있다
 
-## 정리 · 다음 글
+## 연습 문제
+
+1. 빈 파일 하나를 만든 뒤 `ls -l`로 현재 권한을 확인하고, `chmod 600`, `chmod 644`, `chmod 755`를 차례로 적용해 차이를 기록해 보세요.
+2. 디렉터리 하나를 만들고 `chmod 700`과 `chmod 755`를 바꿔 가며 접근 가능 범위를 설명해 보세요.
+3. `chown`이 왜 보통 `sudo`와 함께 쓰이는지 한 문단으로 정리해 보세요.
+
+## 정리와 다음 글
 
 - Linux 파일 권한은 owner/group/others × r/w/x의 3×3 구조입니다.
 - 숫자 방식(644, 755)은 전체를 설정하고, 기호 방식(u+x)은 부분을 변경합니다.
@@ -198,14 +202,257 @@ find project/ -type f -exec chmod 644 {} \;   # 파일만
 
 다음 글에서는 **파일 내용을 확인하는 명령어** — `cat`, `less`, `head`, `tail`을 다룹니다.
 
+## 자동화 품질을 높이는 셸 체크포인트
+
+### 입력 검증과 종료 코드 계약
+셸 스크립트가 팀 도구가 되려면 실패 방식이 예측 가능해야 합니다. 인자 검증과 종료 코드 계약을 명시하면 CI와 운영 스크립트가 안전하게 연동됩니다.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <log_dir> <keyword>"
+}
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 64
+fi
+
+log_dir="$1"
+keyword="$2"
+
+if [ ! -d "$log_dir" ]; then
+  echo "directory not found: $log_dir"
+  exit 66
+fi
+
+if grep -R --line-number "$keyword" "$log_dir" >/tmp/match.out; then
+  echo "match found"
+  exit 0
+else
+  echo "no match"
+  exit 1
+fi
+```
+
+여기서 `64`, `66` 같은 종료 코드는 호출자에게 실패 원인을 분류해 전달합니다. 사람이 읽는 메시지와 기계가 읽는 코드가 분리되어 있으면 자동화 파이프라인에서 분기 처리하기 쉽습니다.
+
+### 파이프라인 병목 찾기
+복잡한 파이프라인은 체감만으로 병목을 찾기 어렵습니다. 각 단계 앞뒤에 타임스탬프를 찍거나 임시 파일에 분리 저장해 어느 단계가 느린지 확인합니다.
+
+```bash
+time grep -R "ERROR" /var/log/myapp > /tmp/step1.txt
+time cut -d' ' -f1-8 /tmp/step1.txt > /tmp/step2.txt
+time sort /tmp/step2.txt | uniq -c | sort -nr > /tmp/step3.txt
+```
+
+이 방식은 단순하지만 효과가 큽니다. 어떤 단계가 CPU 중심인지 I/O 중심인지 빠르게 감을 잡을 수 있고, 이후 `awk` 대체, 병렬화, 입력 축소 같은 최적화 방향을 정하기 쉬워집니다.
+
+### 재사용 가능한 함수형 스니펫
+긴 스크립트에서도 기능 단위를 함수로 분리하면 테스트와 유지보수가 쉬워집니다.
+
+```bash
+collect_pids() {
+  pgrep -f "$1" || true
+}
+
+kill_gracefully() {
+  local pid="$1"
+  kill -TERM "$pid"
+  sleep 2
+  kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" || true
+}
+```
+
+함수 단위로 쪼개면 시나리오별 검증이 가능해집니다. 예를 들어 종료 신호가 정상 처리되는지, 남은 프로세스가 있는지, 재시작 로직이 중복 실행되는지 등을 독립적으로 점검할 수 있습니다.
+
+## 실무 시나리오: 권한 사고를 예방하는 운영 기준
+
+권한 문제는 "명령이 안 된다"에서 끝나지 않고, 서비스 장애와 보안 사고로 이어집니다. 실무에서는 파일 접근 실패를 기능 버그로 오해하는 경우가 많습니다. 그래서 운영자는 애플리케이션 로그를 보기 전에 권한 모델부터 확인합니다.
+
+```bash
+namei -l /opt/my-app/current/conf/app.env
+
+# 예상 출력
+# f: /opt/my-app/current/conf/app.env
+# drwxr-xr-x root   root   /
+# drwxr-xr-x root   root   opt
+# drwxr-xr-x deploy deploy my-app
+# lrwxrwxrwx deploy deploy current -> /opt/my-app/releases/prod-20260521
+# drwxr-xr-x deploy deploy conf
+# -rw-r----- deploy deploy app.env
+```
+
+경로 구성 요소 중 하나라도 실행 권한(`x`)이 없으면 파일에 접근할 수 없습니다. `namei -l`은 이 문제를 단계별로 보여주기 때문에 권한 디버깅에서 매우 효율적입니다.
+
+### 숫자 권한과 의미를 연결하기
+
+`chmod 640`, `750` 같은 숫자를 기계적으로 외우기보다 "누가 읽고, 누가 실행하는가"로 해석해야 합니다.
+
+```bash
+chmod 640 /opt/my-app/current/conf/app.env
+chmod 750 /opt/my-app/current/bin/start.sh
+ls -l /opt/my-app/current/conf/app.env /opt/my-app/current/bin/start.sh
+
+# 예상 출력
+# -rw-r----- 1 deploy deploy 512 May 21 13:22 /opt/my-app/current/conf/app.env
+# -rwxr-x--- 1 deploy deploy 824 May 21 13:20 /opt/my-app/current/bin/start.sh
+```
+
+이 설정은 소유자에게 실행/읽기 권한을 주고, 그룹에는 필요한 최소 권한만 부여합니다. `others`를 닫아두면 실수로 민감 정보가 노출되는 경우를 줄일 수 있습니다.
+
+### setuid/setgid/sticky bit를 운영 관점으로 이해하기
+
+특수 비트는 시험 문제가 아니라 운영 정책과 직결됩니다.
+
+```bash
+# 공유 디렉터리에서 파일 소유 그룹을 고정
+chmod 2775 /srv/shared
+
+# /tmp 같은 공용 디렉터리 보호
+chmod 1777 /tmp
+
+ls -ld /srv/shared /tmp
+# drwxrwsr-x 2 deploy ops 4096 May 21 13:30 /srv/shared
+# drwxrwxrwt 20 root root 4096 May 21 12:00 /tmp
+```
+
+`2775`의 `2`는 setgid로, 해당 디렉터리에서 생성되는 파일이 디렉터리 그룹을 따르게 합니다. 팀 공동 작업에서 그룹 일관성을 유지할 때 유용합니다.
+
+### ACL로 최소권한을 세밀하게 적용하기
+
+기본 권한 비트만으로 부족하면 ACL을 사용합니다.
+
+```bash
+setfacl -m u:jenkins:rX /opt/my-app/current/conf
+setfacl -m u:jenkins:r-- /opt/my-app/current/conf/app.env
+getfacl /opt/my-app/current/conf/app.env
+
+# 예상 출력 일부
+# user::rw-
+# user:jenkins:r--
+# group::r--
+# mask::r--
+# other::---
+```
+
+CI 계정에 필요한 읽기 권한만 주면 배포 자동화는 유지하면서 보안 노출을 줄일 수 있습니다.
+
+### 권한 변경 자동화 스크립트 예시
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+target="/opt/my-app/releases/prod-20260521"
+
+chown -R deploy:deploy "$target"
+find "$target" -type d -exec chmod 755 {} \;
+find "$target" -type f -name '*.sh' -exec chmod 750 {} \;
+find "$target" -type f ! -name '*.sh' -exec chmod 640 {} \;
+
+# 비밀 파일은 더 엄격하게
+chmod 600 "$target/conf/secrets.env"
+```
+
+이 스크립트의 목적은 "권한을 잘 맞춘다"가 아니라, **항상 같은 규칙을 재현**하는 것입니다. 수동 변경을 줄이면 환경 간 차이가 줄고, 장애 원인 추적이 빨라집니다.
+
+### systemd 서비스 계정과 권한 일치시키기
+
+서비스가 어떤 사용자로 실행되는지와 파일 권한이 맞지 않으면 시작 직후 실패합니다.
+
+```ini
+# /etc/systemd/system/my-app.service
+[Service]
+User=deploy
+Group=deploy
+WorkingDirectory=/opt/my-app/current
+ExecStart=/opt/my-app/current/bin/start.sh
+EnvironmentFile=/opt/my-app/current/conf/app.env
+```
+
+설정 후에는 아래처럼 로그를 확인합니다.
+
+```bash
+systemctl daemon-reload
+systemctl restart my-app
+journalctl -u my-app -n 20 --no-pager
+```
+
+여기서 `Permission denied`가 보이면 코드보다 먼저 권한 체계를 확인하는 것이 맞습니다.
+
+## 실전 점검 로그 예시
+
+아래 예시는 실제 운영에서 자주 보는 "점검 출력 형태"를 축약한 것입니다. 중요한 것은 특정 명령을 그대로 복사하는 것이 아니라, 출력을 근거로 다음 판단을 연결하는 습관입니다.
+
+```bash
+# 서비스 상태 + 최근 오류를 한 번에 수집
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager   | grep -E 'ERROR|CRITICAL|timeout|Failed'   | tail -n 20
+
+# 예상 출력
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# 프로세스/포트/파일 핸들 점검
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# 예상 출력 예시
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+이런 출력들을 시계열로 저장해 두면 재발 시 비교가 쉬워지고, "지금이 평소와 어떻게 다른가"를 빠르게 설명할 수 있습니다. 결국 CLI 실무 역량은 명령 자체보다 **증거 기반 판단 루틴**을 안정적으로 반복하는 능력입니다.
+
+### 운영 메모: 실패 후 복구 순서
+
+실패가 발생했을 때는 "원인 추정 -> 즉시 재시작"보다 "상태 확인 -> 증거 수집 -> 최소 조치" 순서가 안전합니다.
+
+```bash
+systemctl status my-api --no-pager | sed -n '1,12p'
+journalctl -u my-api -n 50 --no-pager | grep -E 'ERROR|CRITICAL|timeout|Failed' || true
+```
+
+상태와 로그를 먼저 남겨 두면, 재시작 후 증거가 사라져도 회고와 재발 방지 작업을 진행할 수 있습니다.
+
+### 운영 메모: 변경 후 검증 체크
+
+권한/조회/환경값 변경 직후에는 기능 테스트만 하지 말고 시스템 레벨 검증을 함께 수행합니다.
+
+```bash
+whoami
+hostname
+systemctl is-active my-api
+journalctl -u my-api -n 20 --no-pager
+```
+
+짧은 검증 루틴이라도 매번 남기면, 장애 발생 시 "무엇을 언제 바꿨는지"를 빠르게 복원할 수 있습니다.
+
+## 처음 질문으로 돌아가기
+
+- **`r`, `w`, `x` 권한은 파일과 디렉터리에서 각각 어떻게 다르게 동작할까요?**
+  - 파일에서는 `r`이 내용 읽기, `w`가 수정, `x`가 실행이고, 디렉터리에서는 `r`이 목록 확인, `w`가 생성·삭제, `x`가 진입을 뜻합니다. 그래서 `drwx------`처럼 디렉터리에 `x`가 없으면 목록이 보여도 `cd`로 들어갈 수 없고, `namei -l`로 경로 단계별 권한을 확인해야 접근 실패 원인을 찾을 수 있습니다.
+- **소유자, 그룹, 그 외 사용자 구분을 왜 알아야 할까요?**
+  - `-rwxr-xr--`는 owner, group, others에 서로 다른 권한을 주기 위한 구조라서, 누가 파일을 읽고 수정하고 실행할지 정책을 분리할 수 있습니다. 실무 예시의 `app.env`를 `640`, `start.sh`를 `750`으로 둔 이유도 서비스 계정과 팀 사용자에게 필요한 범위만 열고 나머지는 닫기 위해서입니다.
+- **`chmod`와 `chown`은 각각 무엇을 바꾸는 명령일까요?**
+  - `chmod`는 `644`, `755`, `u+x`처럼 권한 비트를 바꾸고, `chown`은 `deploy:deploy`처럼 파일의 소유자와 그룹 자체를 바꿉니다. 배포 디렉터리에서 `chown -R deploy:deploy` 후 디렉터리와 `*.sh` 파일에 다른 `chmod`를 적용한 예시가 두 명령의 역할 차이를 잘 보여 줍니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [CLI와 Shell이란 무엇인가?](./01-what-is-cli-and-shell.md)
-- [파일과 디렉터리 다루기](./02-files-and-directories.md)
+- [Linux CLI 101 (1/10): CLI와 Shell이란 무엇인가?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): 파일과 디렉터리 다루기](./02-files-and-directories.md)
 - **권한과 소유자 이해하기 (현재 글)**
-- cat, less, head, tail (예정)
-- grep, find, xargs (예정)
+- cat, less, head, tail — 파일 내용 보기 (예정)
+- grep, find, xargs — 검색의 삼총사 (예정)
 - pipe와 redirection (예정)
 - 프로세스 확인과 종료 (예정)
 - 환경변수와 PATH (예정)
@@ -220,3 +467,5 @@ find project/ -type f -exec chmod 644 {} \;   # 파일만
 - [GNU Coreutils - chmod](https://www.gnu.org/software/coreutils/manual/html_node/chmod-invocation.html)
 - [OWASP - Principle of Least Privilege](https://owasp.org/www-community/Access_Control)
 - [Linux man page - chmod, chown](https://man7.org/linux/man-pages/)
+
+- book-examples (linux-cli-101): https://github.com/yeongseon-books/book-examples/tree/main/linux-cli-101/ko

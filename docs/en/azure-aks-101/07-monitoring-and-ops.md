@@ -1,11 +1,11 @@
 ---
-title: Monitoring and ops — Container Insights, logs, alerts
+title: "Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts"
 series: azure-aks-101
 episode: 7
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -15,10 +15,10 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
-seo_description: Azure Kubernetes Service 101 series (7/7)
+seo_description: Learn how to operate and monitor AKS using Container Insights, KQL queries, and Prometheus-style metrics for effective day-2 operations.
 ---
 
-# Monitoring and ops — Container Insights, logs, alerts
+# Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts
 
 > Azure Kubernetes Service 101 series (7/7)
 
@@ -26,13 +26,19 @@ AKS is not done once deployment works. That is when operations starts. Why are p
 
 This final post is a 101-level operations map for AKS: what Container Insights gives you, where KQL fits, why kube-state-metrics matters, and where alerts should live.
 
----
+This is the final post in the Azure Kubernetes Service 101 series. Here, we tie the earlier cluster, traffic, and scaling model together from an observability and day-2 operations perspective.
+
+![azure kubernetes service 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.en.png)
+*azure kubernetes service 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Monitoring and ops — Container Insights, logs, alerts?
+- Which signal should the example or diagram make visible for Monitoring and ops — Container Insights, logs, alerts?
+- What failure should be prevented first when Monitoring and ops — Container Insights, logs, alerts reaches a real system?
 
 ## The operations view in one diagram
 
-![Operations observability across logs and metrics](../../assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.en.png)
-
-*Operations observability across logs and metrics*
 The useful split is between two telemetry paths.
 
 - **log path**: Log Analytics, Container Insights, KQL
@@ -153,7 +159,7 @@ Those are more useful operations questions than a raw CPU graph on its own becau
 
 ## Where alerts should live
 
-![Layered structure for operations alerts](../../assets/azure-aks-101/07/07-02-where-alerts-should-live.en.png)
+![Layered structure for operations alerts](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/07/07-02-where-alerts-should-live.en.png)
 
 *Layered structure for operations alerts*
 Good alerting is layered. CPU over 80% by itself is rarely a complete operations strategy.
@@ -261,16 +267,25 @@ This is the final part of the Azure Kubernetes Service 101 series. The earlier p
 - [ ] Set the policy for audit logs and API-server logs
 - [ ] Wrote a runbook for the incidents that actually recur
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Monitoring and ops — Container Insights, logs, alerts?**
+  - The article treats Monitoring and ops — Container Insights, logs, alerts as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Monitoring and ops — Container Insights, logs, alerts?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Monitoring and ops — Container Insights, logs, alerts reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
-- [Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
-- [Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
-- [Pod, Deployment, Service — the three ways you express a workload](./04-pod-deployment-service.md)
-- [Networking and Ingress — the path in and out of the cluster](./05-networking-and-ingress.md)
-- [Scaling — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
-- **Monitoring and ops — Container Insights, logs, alerts (current)**
+- [Azure Kubernetes Service 101 (1/7): What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
+- [Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
+- [Azure Kubernetes Service 101 (3/7): Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
+- [Azure Kubernetes Service 101 (4/7): Pod, Deployment, Service — the three ways you express a workload](./04-pod-deployment-service.md)
+- [Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster](./05-networking-and-ingress.md)
+- [Azure Kubernetes Service 101 (6/7): Scaling — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
+- **Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts (current)**
 
 <!-- toc:end -->
 

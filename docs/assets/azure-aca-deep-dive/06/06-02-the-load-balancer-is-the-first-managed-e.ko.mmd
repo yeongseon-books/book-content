@@ -1,0 +1,4 @@
+flowchart TD
+  PublicIP["공용 IP 주소"] --> ALB["Azure 로드 밸런서 (관리형)"]
+  ALB --> Nodes["AKS 워커 노드"]
+  Nodes --> Envoy["Envoy 프록시"]

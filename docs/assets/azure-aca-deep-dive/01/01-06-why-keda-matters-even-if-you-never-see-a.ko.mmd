@@ -1,0 +1,7 @@
+flowchart LR
+    subgraph KEDA["KEDA 아키텍처"]
+        Scaler["이벤트 소스 (예: Service Bus)"] --> Metrics["메트릭 어댑터"]
+        Metrics --> Controller["KEDA 컨트롤러"]
+        Controller --> HPA["Horizontal Pod Autoscaler (HPA)"]
+        HPA --> Pods["앱 레플리카 (파드)"]
+    end

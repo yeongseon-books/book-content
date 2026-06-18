@@ -1,10 +1,10 @@
 ---
 series: testing-101
 episode: 5
-title: Test Double
+title: "Testing 101 (5/10): Test Double"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,26 @@ seo_description: A clear walkthrough of Stub, Fake, Spy, Mock, and Dummy — wha
 last_reviewed: '2026-05-04'
 ---
 
-# Test Double
+# Testing 101 (5/10): Test Double
 
-> Testing 101 series (5/10)
+The moment you start writing unit tests seriously, real dependencies show up: email delivery, payment APIs, clocks, databases, queues. Calling all of them for every test makes the suite slow, noisy, and hard to trust. Replacing them is necessary. Replacing them carelessly is how false confidence starts.
 
-<!-- a-grade-intro:begin -->
+“Test double” is the umbrella term, but the umbrella hides important differences. Returning a canned answer, recording a call, and behaving like a lightweight real implementation are not the same job.
 
-**Core question**: Can we *verify behavior* without *really calling* the DB or external API?
+This is post 5 in the Testing 101 series. Here we separate Dummy, Stub, Spy, Mock, and Fake, and focus on choosing the lightest double that still proves the behavior you actually care about.
 
-> Test doubles swap *real dependencies* for *stand-ins*. Each kind has *a different role*.
+> A good double reduces external cost without distorting the contract you are trying to verify.
 
-<!-- a-grade-intro:end -->
+
+![testing 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/05/05-01-concept-at-a-glance.en.png)
+*testing 101 chapter 5 flow overview*
+> The right test double is the lightest one that still isolates the dependency without distorting the contract you want to prove.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Test Double?
+- Which signal should the example or diagram make visible for Test Double?
+- What failure should be prevented first when Test Double reaches a real system?
 
 ## What You Will Learn
 
@@ -46,13 +55,7 @@ Tests must be *fast and deterministic*. Calling a real payment API is *slow and 
 > Used well: *fast trust*. Used poorly: *false trust*.
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    SUT["System under test"] --> Double["Test Double"]
-    Double -.->|replaces| Real[("Real dependency")]
-```
-
+Test doubles stand in for external dependencies (email services, payment APIs, clocks, databases, queues) and come in five flavors: Dummy (passed but unused), Stub (returns canned answers), Spy (records calls), Mock (verifies interactions), and Fake (lightweight real implementation).
 ## Key Terms (Meszaros' five)
 
 - **Dummy**: a placeholder object that is *only passed around*.
@@ -151,6 +154,20 @@ class InMemoryUserRepo:
 4. **Verifying only the *call count* of a Spy.** Also check *the result*.
 5. **Building a Stub *where a Dummy* would do.** *Wasted effort*.
 
+## Verification Points
+
+1. Check whether `FakeMailer` follows the same method name and argument shape as the real mailer. A fake that drifts from the real contract only buys test-only confidence.
+2. Write the same scenario once with a Stub/Fake and once with a Mock, then compare which version explains the behavior more directly.
+3. When using a Spy or Mock, inspect not only the call count but also the final outcome. The interaction can look right while the result is still wrong.
+
+**Expected output:** the double-based version should run much faster than the real dependency path while still making the verified behavior easier—not harder—to read.
+
+## Failure Signals and First Checks
+
+- If the fake no longer matches the real contract, production-only bugs are waiting for you.
+- If every test needs a long Mock setup, you are probably asserting implementation details.
+- If a Dummy would suffice, introducing a Spy or Mock only adds noise.
+
 ## How This Shows Up in Production
 
 Most unit tests get by with just *Stubs and Fakes*. *Mocks* are reserved for cases where *the interaction itself* is the thing being verified (sending email, calling payments, ...).
@@ -180,17 +197,29 @@ Most unit tests get by with just *Stubs and Fakes*. *Mocks* are reserved for cas
 
 Test doubles *tame external dependencies*. The next post zooms into the two most common kinds — *Mock and Stub*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Test Double?**
+  - The article treats Test Double as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Test Double?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Test Double reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
-- [Integration Test](./03-integration-test.md)
-- [E2E Test](./04-e2e-test.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
+- [Testing 101 (3/10): Integration Test](./03-integration-test.md)
+- [Testing 101 (4/10): E2E Test](./04-e2e-test.md)
 - **Test Double (current)**
 - Mock and Stub (upcoming)
 - Test Coverage (upcoming)
 - Regression Test (upcoming)
 - Running Tests in CI (upcoming)
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References

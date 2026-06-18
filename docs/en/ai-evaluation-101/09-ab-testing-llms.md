@@ -1,11 +1,11 @@
 ---
-title: A/B Testing LLMs — Which Prompt Is Better?
+title: "AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better?"
 series: ai-evaluation-101
 episode: 9
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,24 +14,31 @@ tags:
 - A/B Testing
 - Statistics
 - Win Rate
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: How do you decide which of two prompts is better? This post covers
   paired comparison, win rate, statistical significance, and sample size…
 ---
 
-# A/B Testing LLMs — Which Prompt Is Better?
+# AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better?
 
-> AI Evaluation 101 Series (9/10)
+How do you decide which of two prompts is better?
 
-How do you decide which of two prompts is better? This post covers paired comparison, win rate, statistical significance, and sample size calculation — the practical side of LLM A/B testing.
+This is post 9 in the AI Evaluation 101 series. Here we cover paired comparison, win rate, statistical significance, and sample size calculation — the practical side of LLM A/B testing.
 
----
-![A/B testing LLMs - which prompt is Better](../../assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.en.png)
 
+![A/B testing LLMs - which prompt is Better](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.en.png)
 *A/B testing LLMs - which prompt is Better*
+> The goal of LLM A/B testing is not to pick what looks better; it is to produce evidence that one option is better.
+
+## Questions to Keep in Mind
+
+- Why must LLM A/B testing be a statistical decision instead of “it looks better”?
+- What decisions do win rate, sample size, and statistical significance each support?
+- What guardrail metrics reduce user risk in online A/B tests?
+
 ## "Looks Better" Is Not Evidence
 
-!["Looks Better" is not evidence](../../assets/ai-evaluation-101/09/09-01-looks-better-is-not-evidence.en.png)
+!["Looks Better" is not evidence](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-looks-better-is-not-evidence.en.png)
 
 *"Looks Better" is not evidence*
 When a new prompt or model rolls in, the typical evaluation goes:
@@ -51,7 +58,7 @@ A/B testing applies two variants (A and B) to the same inputs and decides which 
 
 ## Pairwise Comparison and Win Rate
 
-![Pairwise comparison and win rate](../../assets/ai-evaluation-101/09/09-03-pairwise-comparison-and-win-rate.en.png)
+![Pairwise comparison and win rate](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-03-pairwise-comparison-and-win-rate.en.png)
 
 *Pairwise comparison and win rate*
 Reuse the pairwise judge from Ep4. For each input, get a response from model A and model B, and ask the judge which is better.
@@ -114,7 +121,7 @@ def ab_test(questions: list[str], model_a: str, model_b: str) -> dict:
 
 ## Sample Size — How Many to Evaluate
 
-![Sample size - how many to evaluate](../../assets/ai-evaluation-101/09/09-04-sample-size-how-many-to-evaluate.en.png)
+![Sample size - how many to evaluate](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-04-sample-size-how-many-to-evaluate.en.png)
 
 *Sample size - how many to evaluate*
 10 samples at 60% vs 40% could easily be chance. 1000 samples at the same ratio is decisive. The required sample size depends on the **effect size** you want to detect.
@@ -156,7 +163,7 @@ When you build the eval dataset, decide your **target effect size first** and si
 
 ## Statistical Significance — Two-Proportion Z-Test
 
-![Statistical significance - Two-Proportion Z-Test](../../assets/ai-evaluation-101/09/09-05-statistical-significance-two-proportion.en.png)
+![Statistical significance - Two-Proportion Z-Test](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-05-statistical-significance-two-proportion.en.png)
 
 *Statistical significance - Two-Proportion Z-Test*
 To compare win rates, use a **two-proportion z-test**. The null hypothesis is that the two models win at the same rate; check the p-value.
@@ -300,9 +307,51 @@ Three days mixes novelty effects and weekday cycles. **Minimum 1 week, 2 weeks r
 - Online A/B uses real production traffic. **Run for at least 1-2 weeks.**
 
 The next post covers **continuous evaluation in production** — sampling live traffic, drift detection.
+
+---
+
+## Operational checklist
+
+- [ ] Swap answer order in pairwise judging so position bias does not fake a winner.
+- [ ] Compute sample size from the effect you want to detect before running the test.
+- [ ] Report tie rate alongside win rate because high ties often mean the variants are effectively equivalent.
+- [ ] Require both statistical significance and practical effect size before switching variants.
+- [ ] Run online experiments long enough to cover weekday and weekend behavior.
+
+## Answering the Opening Questions
+
+- **Why must LLM A/B testing be a statistical decision instead of “it looks better”?**
+  - LLM outputs vary and human impressions are biased, so without samples and effect size you may mistake chance for improvement.
+- **What decisions do win rate, sample size, and statistical significance each support?**
+  - Win rate shows which candidate wins more often, sample size tells how much evidence is needed, and significance estimates whether the result is likely random.
+- **What guardrail metrics reduce user risk in online A/B tests?**
+  - Track complaint rate, latency, cost, safety violations, and fallback rate so a quality win does not create user risk.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
+- [AI Evaluation 101 (5/10): Designing Rubric-Based Scoring](./05-rubric-based-scoring.md)
+- [AI Evaluation 101 (6/10): Evaluating RAG Systems](./06-rag-evaluation.md)
+- [AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses](./07-agent-evaluation.md)
+- [AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today](./08-regression-testing.md)
+- **AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (current)**
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
+### Official docs
+
 - [statsmodels — proportions_ztest](https://www.statsmodels.org/stable/generated/statsmodels.stats.proportion.proportions_ztest.html)
+- [statsmodels — proportion_effectsize](https://www.statsmodels.org/stable/generated/statsmodels.stats.proportion.proportion_effectsize.html)
+- [SciPy — ttest_ind](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html)
+
+### Books and papers
+
 - [Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences](https://www.routledge.com/Statistical-Power-Analysis-for-the-Behavioral-Sciences/Cohen/p/book/9780805802832)
 - [Kohavi, Tang, Xu — Trustworthy Online Controlled Experiments (2020)](https://experimentguide.com/)
 - [Chatbot Arena — Crowdsourced LLM A/B (Chiang et al., 2024)](https://arxiv.org/abs/2403.04132)

@@ -1,13 +1,13 @@
 ---
-title: SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기
+title: "SQLAlchemy 101 (2/10): SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기"
 series: sqlalchemy-101
 episode: 2
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,35 +17,34 @@ tags:
 - MetaData
 - Schema
 - SQLite
-last_reviewed: '2026-05-03'
-seo_description: MetaData는 schema의 카탈로그입니다. application이 알고 있는 모든 Table 정의를 담아 두는
-  컨테이너이고, 그…
+last_reviewed: '2026-05-12'
+seo_description: MetaData, Table, Column으로 스키마를 Python 객체로 모델링하는 방법을 설명합니다
 ---
 
-# SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기
+# SQLAlchemy 101 (2/10): SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기
 
-> SQLAlchemy 101 시리즈 (2/10)
+테이블 설계를 문자열 SQL로만 관리하면 애플리케이션 코드와 실제 스키마가 언제 어긋났는지 늦게 알아차리기 쉽습니다. 컬럼 이름 하나를 바꿨는데 런타임에서야 `no such column`이 터지는 식입니다.
 
----
+이 글은 SQLAlchemy 101 시리즈의 두 번째 글입니다. 여기서는 `MetaData`, `Table`, `Column`, 타입 시스템을 통해 스키마를 Python 객체로 다루는 방법을 정리합니다.
 
-1편에서 우리는 Engine과 Connection이 무엇인지, 그리고 raw SQL을 `text()`로 어떻게 실행하는지 보았습니다. 그런데 raw SQL만 쓸 거라면 SQLAlchemy를 쓰는 의미가 절반쯤 사라집니다. SQLAlchemy의 진짜 매력은 schema 자체를 Python 객체로 표현하고, 그 객체로 SQL을 빌드하고, 동일한 schema 정의로 여러 데이터베이스를 지원하는 데 있습니다.
+1편에서 `Engine`과 `Connection`이 실행 경로를 맡는다는 점을 봤다면, 이번에는 그 위에 올릴 스키마 명세를 다룹니다. 이 객체들은 3편의 `select`와 `insert`의 재료가 되고, 4편 이후 ORM 모델이 어떤 Core 구조 위에 올라가는지도 자연스럽게 이어 줍니다.
 
-이 글은 SQLAlchemy Core의 핵심인 `MetaData`, `Table`, `Column`, 그리고 type system을 다룹니다. 여기서 만들어 둔 schema 객체는 3편의 select/insert/update/delete의 재료가 되고, 4편 이후 ORM의 `mapped_column`으로 자연스럽게 이어집니다. ORM만 쓸 사람이라도 이 layer를 이해해야 migration이나 reflection 같은 도구를 다룰 수 있습니다.
-
-![SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](../../assets/sqlalchemy-101/02/02-01-sqlalchemy-core-modeling-schema-as-pytho.ko.png)
+![SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-01-sqlalchemy-core-modeling-schema-as-pytho.ko.png)
 
 *SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기*
-## 핵심 질문
 
-Core의 MetaData·Table·Column을 왜 ORM 이전에 익혀야 할까요?
+![SQLAlchemy 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-02-why-this-matters.ko.png)
+*SQLAlchemy 101 2장 흐름 개요*
+> SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-이 글은 그 질문에 답하기 위해 Core 스키마 모델의 핵심 결정과 운영 함정을 살펴봅니다.
+## 먼저 던지는 질문
 
-## 이 글에서 다룰 문제
+- `MetaData`는 어떤 역할을 하고 왜 스키마 카탈로그라고 부를까요?
+- `Table`과 `Column`을 Python 객체로 두면 어떤 실수가 줄어들까요?
+- SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요?
 
-![핵심 개념](../../assets/sqlalchemy-101/02/02-02-why-this-matters.ko.png)
+## 왜 중요한가
 
-*핵심 개념*
 raw SQL로 schema를 관리하면 한 가지 큰 문제가 생깁니다. application code 안의 INSERT/SELECT 문에 적힌 컬럼 이름이 실제 schema와 어긋나도 컴파일 시점에 알 수 없습니다. 운영 중에 갑자기 `no such column` 같은 오류가 발생하고, IDE는 컬럼 이름 자동완성도 해주지 못합니다.
 
 SQLAlchemy Core는 schema를 Python 객체로 들고 있기 때문에 그 객체를 통해 SQL을 빌드할 수 있습니다. 컬럼 이름이 typo라면 import 시점에 `AttributeError`로 잡히고, IDE는 `users.c.name`을 자동완성합니다. 같은 정의가 Alembic의 autogenerate, Pandas의 `read_sql`, FastAPI의 SQL 빌딩에 그대로 재사용됩니다.
@@ -54,16 +53,16 @@ SQLAlchemy Core는 schema를 Python 객체로 들고 있기 때문에 그 객체
 
 마지막으로 `MetaData`는 Alembic의 `target_metadata`로 그대로 들어가서 migration 자동 생성의 기준이 됩니다. 이 글의 schema 정의가 alembic-101 시리즈의 출발점이 됩니다.
 
-## Mental Model
+## 멘탈 모델
 
-![Mental model](../../assets/sqlalchemy-101/02/02-03-mental-model.ko.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-03-mental-model.ko.png)
 
-*Mental model*
+*멘탈 모델*
 `MetaData`는 schema의 **카탈로그**입니다. application이 알고 있는 모든 `Table` 정의를 담아 두는 컨테이너이고, 그 컨테이너를 통째로 Engine에 던지면 schema가 만들어지거나 비교됩니다.
 
 > MetaData는 application의 schema 명세서다. Table은 그 명세서의 한 페이지이고, Column은 페이지 안의 한 줄이다. Engine이 없으면 MetaData는 그저 in-memory 명세서일 뿐이고, MetaData가 없으면 Engine은 무엇을 만들어야 할지 알지 못한다.
 
-```
+```text
                     MetaData (in-memory catalog)
                          │
         ┌────────────────┼────────────────┐
@@ -91,7 +90,7 @@ Core 단계에서는 다음 흐름이 핵심입니다.
 
 ## 핵심 개념
 
-![핵심 개념](../../assets/sqlalchemy-101/02/02-04-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-04-core-concepts.ko.png)
 
 *핵심 개념*
 ### MetaData
@@ -250,9 +249,9 @@ print([c.name for c in users.columns])
 
 전체 schema를 한 번에 reflect하려면 `metadata.reflect(bind=engine)`을 씁니다. legacy 데이터베이스를 점진적으로 SQLAlchemy로 옮길 때 유용합니다.
 
-## Before-After
+## 이전 방식과 개선 방식
 
-### Before: 문자열 SQL로 schema 관리
+### 이전: 문자열 SQL로 스키마 관리
 
 ```python
 DDL = """
@@ -270,10 +269,10 @@ with engine.begin() as conn:
 # 다른 곳에서 INSERT
 conn.execute(text("INSERT INTO users(name, emai, created_at) VALUES (:n, :e, :c)"),
              {"n": "Alice", "e": "alice@example.com", "c": "..."})
-# typo (emai)는 런타임에 OperationalError로 발견된다.
+# typo (emai)는 파티션에 OperationalError로 발견됩니다.
 ```
 
-### After: MetaData + Table
+### 개선 후: MetaData + Table
 
 ```python
 from sqlalchemy import MetaData, Table, Column, Integer, String, DateTime, insert
@@ -295,14 +294,14 @@ metadata.create_all(engine)
 
 with engine.begin() as conn:
     conn.execute(insert(users).values(name="Alice", email="alice@example.com"))
-    # users.c.emai → AttributeError를 IDE/런타임 양쪽에서 즉시 알려준다
+    # users.c.emai → AttributeError IDE/런타임 자체에서 즉시 알려줍니다.
 ```
 
 이제 컬럼 이름 typo는 schema 정의 시점이나 IDE 자동완성에서 잡힙니다. `users.c.name`을 통해 컬럼을 참조할 수 있고, 같은 schema 객체를 select/insert/update에 모두 재사용합니다.
 
 ## 단계별 실습
 
-![단계별 실습](../../assets/sqlalchemy-101/02/02-05-step-by-step-practice.ko.png)
+![단계별 실습](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-05-step-by-step-practice.ko.png)
 
 *단계별 실습*
 ### 1단계: schema 모듈 만들기
@@ -421,7 +420,7 @@ print([(c.name, c.type) for c in users_r.columns])
 
 실무 application에서는 `MetaData`를 단일 모듈에 두고, `Table` 정의를 도메인별로 분리해서 import합니다.
 
-```
+```text
 app/
   db/
     __init__.py        # metadata, engine, get_conn
@@ -441,31 +440,40 @@ Production에서는 `metadata.create_all`을 직접 부르지 않고 Alembic mig
 - [ ] `MetaData`를 module-level 단일 instance로 두었다
 - [ ] `naming_convention`을 첫 단계부터 적용했다
 - [ ] 모든 `Column`에 `nullable` 의도를 명시했다
-- [ ] `String(n)` vs `Text` 선택 기준을 가지고 있다 (길이 제한 의도 vs 무제한)
+- [ ] `String(n)` vs `Text` 선택 기준이 분명하다 (길이 제한 의도 vs 무제한)
 - [ ] `default`와 `server_default` 중 하나만 사용한다
 - [ ] SQLite에서 `ForeignKey(ondelete=...)`를 쓸 때 `PRAGMA foreign_keys = ON`을 함께 적용했다
 - [ ] 복합 제약은 `UniqueConstraint`/`Index`로 명시적으로 선언했다
 - [ ] 필요시 `autoload_with=engine`으로 reflection이 가능하다는 것을 안다
 
-## 정리·다음 글
+## 정리와 다음 글
 
 이 글에서 우리는 SQLAlchemy Core의 schema layer를 만났습니다. `MetaData`는 application 전체 schema의 카탈로그이고, `Table`/`Column`은 그 카탈로그의 항목이며, generic type system은 SQLite의 affinity 모델 위에서 동작합니다. `create_all`/`drop_all`로 빠르게 schema를 부트스트랩할 수 있고, reflection으로 기존 데이터베이스를 SQLAlchemy 세계로 끌어올 수 있습니다.
 
 다음 글에서는 이 schema 객체로 본격적으로 SQL을 빌드합니다. `select()`, `insert()`, `update()`, `delete()`의 2.x style을 다루고, `Result`와 `Row`를 다루는 법을 정리합니다. 그 다음 4편부터 ORM이 등장하는데, 거기서 보게 될 `mapped_column`은 사실 이 글의 `Column`과 거의 같은 객체입니다.
 
+## 처음 질문으로 돌아가기
+
+- **`MetaData`는 어떤 역할을 하고 왜 스키마 카탈로그라고 부를까요?**
+  - `MetaData`는 `users`, `posts`, `memberships` 같은 `Table` 정의를 한곳에 모아 두는 in-memory 카탈로그이기 때문에 그렇게 부릅니다. 그래서 `metadata.create_all(engine)` 한 번으로 전체 스키마를 만들 수 있고, Alembic에서는 같은 객체가 `target_metadata`가 되어 마이그레이션 기준선 역할까지 맡습니다.
+- **`Table`과 `Column`을 Python 객체로 두면 어떤 실수가 줄어들까요?**
+  - 문자열 SQL만 쓸 때는 `emai` 같은 오타를 운영 중 `OperationalError`로 늦게 발견하지만, `users.c.email`처럼 객체로 접근하면 IDE 자동완성과 `AttributeError`로 더 빨리 잡힙니다. `UniqueConstraint`, `Index`, `ForeignKey("users.id")` 같은 제약도 같은 정의 안에 모이므로 스키마 의도가 흩어지지 않습니다.
+- **SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요?**
+  - `String(100)`, `DateTime`, `JSON` 같은 generic type을 SQLAlchemy가 dialect별 DDL로 풀어 주기 때문에 같은 모델을 SQLite와 다른 DB에서 같은 방식으로 다룰 수 있습니다. 다만 본문이 짚었듯이 SQLite는 affinity 모델이라 `String(100)`도 길이를 강제하지 않으므로, 길이 검증은 애플리케이션이나 `CHECK` 제약으로 별도로 보강해야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
-- **SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기 (현재 글)**
-- SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기 (예정)
-- ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기 (예정)
-- Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (예정)
-- ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
-- 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
-- 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
-- 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
-- production 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
+- [SQLAlchemy 101 (1/10): SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
+- **SQLAlchemy 101 (2/10): SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기 (현재 글)**
+- SQLAlchemy 101 (3/10): SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기 (예정)
+- SQLAlchemy 101 (4/10): ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기 (예정)
+- SQLAlchemy 101 (5/10): Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (예정)
+- SQLAlchemy 101 (6/10): ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
+- SQLAlchemy 101 (7/10): 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
+- SQLAlchemy 101 (8/10): 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
+- SQLAlchemy 101 (9/10): 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
+- SQLAlchemy 101 (10/10): 프로덕션 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
 
 <!-- toc:end -->
 
@@ -476,3 +484,5 @@ Production에서는 `metadata.create_all`을 직접 부르지 않고 Alembic mig
 - [SQLAlchemy 2.x - Constraints and Indexes](https://docs.sqlalchemy.org/en/20/core/constraints.html)
 - [SQLAlchemy 2.x - Reflecting Database Objects](https://docs.sqlalchemy.org/en/20/core/reflection.html)
 - [SQLite Datatypes In SQLite Version 3](https://www.sqlite.org/datatype3.html)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sqlalchemy-101/ko)

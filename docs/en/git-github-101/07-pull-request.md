@@ -16,23 +16,27 @@ targets:
   hashnode: true
   medium: true
   mkdocs: true
-  tistory: true
-title: Collaborating with Pull Requests - From Branch to Review to Main
+  tistory: false
+title: "Git & GitHub 101 (7/10): Collaborating with Pull Requests - From Branch to Review to Main"
 seo_description: A Pull Request is not a plain merge; it is a place to "propose merging
   your branch into main and host the review and discussion that surrounds that…
 ---
 
-# Collaborating with Pull Requests - From Branch to Review to Main
+# Git & GitHub 101 (7/10): Collaborating with Pull Requests - From Branch to Review to Main
 
-## What you will learn
+Once a second person is involved, a branch is no longer just your workspace. It becomes a proposal, and the Pull Request is the place where that proposal is explained, reviewed, and either accepted or sent back for another pass.
 
-- What a Pull Request (PR) really is, and how it differs from a plain `git merge`
-- The order of operations: feature branch, commit, push, open PR
-- How to respond to review comments by adding more commits to the same branch
-- How to merge the PR and update your local `main` afterward
-- How to keep PRs small enough that reviewers actually look at them
+This is the seventh post in the Git & GitHub 101 series. Here, we follow one change from feature branch to review to merge on `main`.
 
-By the end you will be able to take a feature branch like `feature/release-notes`, open a PR, get it reviewed, merge it, and clean up locally - end to end, by yourself.
+
+![Git & GitHub 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/07/07-01-mental-model.en.png)
+*Git & GitHub 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
+
+- What a Pull Request (PR) really is, and how it differs from a plain `git merge`?
+- The order of operations: feature branch, commit, push, open PR?
+- How to respond to review comments by adding more commits to the same branch?
 
 ## Why this matters
 
@@ -51,9 +55,6 @@ Once PRs become routine, three habits follow naturally:
 > A Pull Request is not a plain merge; it is a place to "propose merging your branch into main and host the review and discussion that surrounds that proposal".
 A PR is a request: "Please accept my branch as a proposal against `main`." The request has a title, a description, a list of changed files, and a comment thread.
 
-![Mental model](../../assets/git-github-101/07/07-01-mental-model.en.png)
-
-*Mental model*
 The diagram reads like this:
 
 1. Locally you create `feature/release-notes` on top of `main` and stack commits on it.
@@ -266,25 +267,36 @@ This article ran through one full PR cycle. The recap:
 
 The next article zooms in on something you saw in the PR body: `Closes #42`. That is GitHub Issues, and along with Projects, it is how teams keep a record of what to do, not just what was done.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What is Git? Version Control Fundamentals](./01-what-is-git.md)
-- [Your First Commit: init, add, commit](./02-first-commit.md)
-- [Inspecting Changes: status, diff, log](./03-status-diff-log.md)
-- [Understanding Branches: Diverging and Switching](./04-branch-basics.md)
-- [Merging Branches and Resolving Conflicts](./05-merge-and-conflict.md)
-- [Creating a GitHub Repository: remote, push, pull](./06-github-repository.md)
-- **Collaborating with Pull Requests (current)**
-- [Tracking Work with Issues and Projects](./08-issue-and-project.md)
-- Writing Good Commit Messages (upcoming)
-- Real-World Workflow at a Glance (upcoming)
+- **What a Pull Request (PR) really is, and how it differs from a plain `git merge`?**
+  - The article treats Collaborating with Pull Requests - From Branch to Review to Main as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The order of operations: feature branch, commit, push, open PR?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to respond to review comments by adding more commits to the same branch?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Git & GitHub 101 (1/10): What is Git? Version control fundamentals](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): Your first commit - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (3/10): Reading change history - status, diff, log](./03-status-diff-log.md)
+- [Git & GitHub 101 (4/10): Branch basics - create, switch, and compare](./04-branch-basics.md)
+- [Git & GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together](./05-merge-and-conflict.md)
+- [Git & GitHub 101 (6/10): Creating a GitHub repository - remote, push, and pull in one go](./06-github-repository.md)
+- **Collaborating with Pull Requests - From Branch to Review to Main (current)**
+- Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)
+- Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)
+- Building a real-world Git workflow: from issue to release in one cycle (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- GitHub Docs, "About pull requests": <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests>
-- GitHub Docs, "Creating a pull request": <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request>
-- GitHub Docs, "Reviewing changes in pull requests": <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests>
-- GitHub Docs, "About protected branches": <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches>
-- Git docs, `git switch`: <https://git-scm.com/docs/git-switch>
+- [GitHub Docs — About pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) — Formally defines a PR as a proposal, review space, and merge conversation rather than just a merge action.
+- [GitHub Docs — Creating a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) — Maps directly to the step where the branch is pushed and opened with a title and body.
+- [GitHub Docs — Reviewing changes in pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests) — Backs up the workflow for review comments, approvals, and requested changes.
+- [GitHub Docs — About pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests#draft-pull-requests) — Explains when draft PRs are appropriate and what changes when they become ready for review.
+- [GitHub Docs — About merge methods on GitHub](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github) — Covers the PR-side differences between merge commits, squash merges, and rebase merges.
+- [GitHub Docs — About protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches) — Provides the policy context behind direct commits to `main` being blocked in team repositories.

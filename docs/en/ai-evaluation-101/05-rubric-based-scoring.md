@@ -1,11 +1,11 @@
 ---
-title: Designing Rubric-Based Scoring
+title: "AI Evaluation 101 (5/10): Designing Rubric-Based Scoring"
 series: ai-evaluation-101
 episode: 5
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,24 +14,31 @@ tags:
 - Rubric
 - Multi-Dimensional
 - JSON Output
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are far
   more useful than a single 1-5 score.
 ---
 
-# Designing Rubric-Based Scoring
+# AI Evaluation 101 (5/10): Designing Rubric-Based Scoring
 
-> AI Evaluation 101 Series (5/10)
+Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are far more useful than a single 1-5 score.
 
-Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are far more useful than a single 1-5 score. This post covers defining evaluation dimensions, writing anchors for each, and aggregating scores.
+This is post 5 in the AI Evaluation 101 series. Here we cover defining evaluation dimensions, writing anchors for each, and aggregating scores.
 
----
-![Designing Rubric-Based scoring](../../assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.en.png)
 
+![Designing Rubric-Based scoring](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.en.png)
 *Designing Rubric-Based scoring*
+> The value of a rubric is not prettier scoring; it is showing which part of the output failed.
+
+## Questions to Keep in Mind
+
+- What failure location is hidden when LLM quality is reduced to one score?
+- How should good rubric dimensions be separated so they do not overlap?
+- What risk is missed when rubric scores are aggregated only by the mean?
+
 ## The Limits of Single Scores
 
-![The limits of single scores](../../assets/ai-evaluation-101/05/05-02-the-limits-of-single-scores.en.png)
+![The limits of single scores](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-02-the-limits-of-single-scores.en.png)
 
 *The limits of single scores*
 Ep4 covered single scoring: one number from 1 to 5. But what does "3" actually mean? It could be 3 because the facts are wrong, or 3 because the tone is off. **A single score does not tell you what is broken.**
@@ -51,7 +58,7 @@ Now you can pinpoint weakness: "Correctness 5, Tone 2."
 
 ## Defining Rubric Dimensions — A Four-Step Process
 
-![Defining rubric dimensions - A Four-Step process](../../assets/ai-evaluation-101/05/05-03-defining-rubric-dimensions-a-four-step-p.en.png)
+![Defining rubric dimensions - A Four-Step process](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-03-defining-rubric-dimensions-a-four-step-p.en.png)
 
 *Defining rubric dimensions - A Four-Step process*
 A good rubric is not improvised. Use these four steps.
@@ -113,7 +120,7 @@ Beyond 10 dimensions the judge cannot grade consistently. **Stick to 3-5 core on
 
 ## Putting the Rubric Into the Judge Prompt
 
-![Putting the rubric into the judge prompt](../../assets/ai-evaluation-101/05/05-04-putting-the-rubric-into-the-judge-prompt.en.png)
+![Putting the rubric into the judge prompt](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-04-putting-the-rubric-into-the-judge-prompt.en.png)
 
 *Putting the rubric into the judge prompt*
 Extend the Ep4 single-score prompt with the rubric.
@@ -172,7 +179,7 @@ Forcing `response_format={"type": "json_object"}` almost eliminates parse failur
 
 ## Aggregating Scores — The Mean Is Not the Answer
 
-![Aggregating scores - the mean is not the answer](../../assets/ai-evaluation-101/05/05-05-aggregating-scores-the-mean-is-not-the-a.en.png)
+![Aggregating scores - the mean is not the answer](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-05-aggregating-scores-the-mean-is-not-the-a.en.png)
 
 *Aggregating scores - the mean is not the answer*
 How do you collapse per-dimension scores into one number? The common mistake is **plain averaging**, which hides weakness.
@@ -284,6 +291,41 @@ If Helpfulness and Completeness correlate at 0.95 they are one dimension. **Merg
 - Measure Cohen's kappa **per dimension** and rewrite anchors for any dimension below 0.6.
 
 The next post covers RAG pipeline evaluation — retrieval, faithfulness, answer relevance.
+
+---
+
+## Operational checklist
+
+- [ ] Keep the rubric to 3-5 dimensions that map to actual user value.
+- [ ] Write concrete 1, 3, and 5 anchors for every dimension.
+- [ ] Check correlations so duplicate dimensions do not distort the score.
+- [ ] Add hard fail thresholds for safety-critical dimensions like correctness.
+- [ ] Review per-dimension agreement with humans before trusting the rubric at scale.
+
+## Answering the Opening Questions
+
+- **What failure location is hidden when LLM quality is reduced to one score?**
+  - You lose whether correctness is high but grounding is weak, or safety passes while completeness fails. The total score hides the repair target.
+- **How should good rubric dimensions be separated so they do not overlap?**
+  - Each dimension should ask one judgment question and include observable criteria with anchors for score levels.
+- **What risk is missed when rubric scores are aggregated only by the mean?**
+  - A good mean can hide a low safety or factuality dimension. Critical dimensions need minimum thresholds, not just averages.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
+- **AI Evaluation 101 (5/10): Designing Rubric-Based Scoring (current)**
+- AI Evaluation 101 (6/10): Evaluating RAG Systems (upcoming)
+- AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (upcoming)
+- AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)
+- AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [Liu et al. (2023). G-Eval — NLG Evaluation using GPT-4 with Better Human Alignment](https://arxiv.org/abs/2303.16634)

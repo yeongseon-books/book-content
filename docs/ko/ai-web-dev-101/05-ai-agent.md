@@ -1,9 +1,9 @@
 ---
-title: AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기
+title: "AI Web Development 101 (5/7): AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기"
 series: ai-web-dev-101
 episode: 5
 language: ko
-status: needs-update
+status: publish-ready
 targets:
   tistory: true
   medium: false
@@ -15,58 +15,53 @@ tags:
 - 웹 개발
 - Python
 - Tutorial
-last_reviewed: '2026-04-29'
-seo_description: 지금까지 만든 AI는 텍스트만 주고받았습니다. 질문을 던지면 학습한 데이터를 바탕으로 그럴싸한 답변을 내놓는 식이었죠.
-  그런데 만약 AI가…
+last_reviewed: '2026-05-14'
+seo_description: Tool Use와 Function Calling으로 모델이 외부 함수를 호출하는 구조를 이해하고 간단한 에이전트를 구현합니다.
 ---
 
-# AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기
+# AI Web Development 101 (5/7): AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기
 
-> AI 웹 개발 입문 시리즈 (5/7)
+지금까지 만든 AI는 텍스트만 주고받았습니다. 질문을 던지면 그럴듯한 답을 내놓지만, 실제 날씨를 확인하거나 계산을 하거나 외부 시스템을 조회하는 일은 직접 하지 못했습니다. 실서비스에서 한 단계 더 나아가려면 모델이 필요할 때 도구를 꺼내 쓰는 구조가 필요합니다.
 
-지금까지 만든 AI는 텍스트만 주고받았습니다. 질문을 던지면 학습한 데이터를 바탕으로 그럴싸한 답변을 내놓는 식이었죠. 그런데 만약 AI가 직접 날씨 API를 호출하거나, 데이터베이스를 검색하거나, 계산기를 쓸 수 있다면 어떨까요?
+여기서는 Tool Use를 중심으로 AI가 외부 기능을 호출하는 흐름을 봅니다.
 
-단순히 말만 잘하는 인공지능이 아니라, 필요한 상황에 직접 도구를 꺼내 쓰는 '일 잘하는 비서'가 되는 셈입니다. 오늘은 AI가 스스로 판단하고 외부 기능을 실행하는 **AI 에이전트**의 핵심 원리와 구현 방법을 알아보겠습니다.
+![AI Web Development 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/assistant-vs-agent.ko.png)
+*AI Web Development 101 5장 흐름 개요*
 
----
+## 먼저 던지는 질문
 
+- 일반 챗봇과 에이전트는 무엇이 다를까요?
+- Tool Use 또는 Function Calling은 어떤 계약으로 동작할까요?
+- 모델은 어떻게 “이 함수를 실행해 달라”고 요청할까요?
 
-## AI 에이전트가 뭔가요?
+## 챗봇과 에이전트의 차이
 
-우리가 흔히 쓰는 챗봇과 '에이전트'는 무엇이 다를까요? 가장 큰 차이는 **판단**과 **행동**입니다.
+일반 챗봇은 질문을 이해하고 텍스트를 생성합니다. 반면 에이전트는 목표를 달성하기 위해 어떤 정보가 더 필요한지 판단하고, 필요하면 외부 도구를 호출한 뒤 그 결과를 바탕으로 다시 답을 만듭니다.
 
-- **일반 챗봇**: 사용자의 질문을 이해하고 텍스트 응답을 생성합니다. 가진 지식 안에서만 답할 수 있습니다.
-- **AI 에이전트**: 사용자의 목표를 달성하기 위해 어떤 단계가 필요한지 스스로 계획을 세웁니다. 필요하다면 외부 도구(API, DB, 웹 검색 등)를 사용해 정보를 가져오고, 그 결과를 바탕으로 최종 답변을 완성합니다.
+- 일반 챗봇: 가진 지식 안에서 답을 생성합니다.
+- AI 에이전트: 외부 API, 데이터베이스, 계산기, 검색 도구 같은 기능을 상황에 맞게 호출합니다.
 
-쉽게 비유하자면, 챗봇은 "오늘 날씨 어때?"라는 질문에 "어제 예보로는 맑다고 들었어요"라고 답하는 친구라면, 에이전트는 **"잠시만요, 기상청 사이트에서 실시간 날씨를 확인해 드릴게요"**라고 말하며 직접 스마트폰을 꺼내 검색하는 비서와 같습니다.
+예를 들어 “오늘 서울 날씨 알려줘”라는 질문에서 일반 챗봇은 학습된 일반 지식 범위 안에서 답하려고 들 수 있습니다. 에이전트는 여기서 멈추지 않고 “실시간 날씨를 확인해야 한다”는 판단을 내린 뒤, 실제 도구 호출 요청을 보냅니다.
 
-![챗봇과 AI 에이전트의 차이](../../assets/ai-web-dev-101/05/assistant-vs-agent.ko.png)
+## Tool Use는 어떻게 동작하나
 
-*챗봇과 AI 에이전트의 차이*
+Tool Use 또는 Function Calling의 구조는 의외로 단순합니다.
 
----
+1. 개발자가 모델에게 사용 가능한 도구 목록을 알려 줍니다.
+2. 모델은 사용자 질문을 보고 어떤 도구가 필요한지 판단합니다.
+3. 모델은 함수를 직접 실행하지 않고, “이 함수에 이 인자를 넣어 실행해 달라”는 요청을 보냅니다.
+4. 애플리케이션이 실제 함수를 실행합니다.
+5. 실행 결과를 다시 모델에게 전달하면, 모델이 최종 답을 만듭니다.
 
-## Tool Use (Function Calling)란?
+실행 주체는 모델이 아니라 애플리케이션입니다. 모델은 제안하고, 애플리케이션은 검증하고, 실제로 실행합니다. 이 경계가 있어야 보안과 통제를 유지할 수 있습니다.
 
-AI가 도구를 사용하게 만드는 기술을 보통 **Tool Use** 또는 **Function Calling**이라고 부릅니다. 원리는 생각보다 단순합니다.
-
-1. 개발자가 AI에게 사용 가능한 **도구 목록**(함수의 이름, 설명, 파라미터 정보)을 전달합니다.
-2. AI는 사용자의 질문을 듣고 "지금 내 지식으로는 부족한데, 이 도구를 쓰면 답할 수 있겠어"라고 판단합니다.
-3. AI는 직접 함수를 실행하는 대신, **"이 함수를 이런 값(파라미터)으로 실행해 줘"**라는 요청을 우리에게 보냅니다.
-4. 우리(애플리케이션)가 실제로 그 함수를 실행하고 결과값을 다시 AI에게 전달합니다.
-5. AI는 그 결과값을 읽고 사용자에게 최종 답변을 드립니다.
-
-여기서 핵심은 **AI가 상황에 맞춰 어떤 도구를 쓸지 스스로 고른다**는 점입니다.
-
-![모델 판단과 함수 실행이 오가는 도구 호출 흐름](../../assets/ai-web-dev-101/05/function-calling-cycle.ko.png)
+![모델 판단과 함수 실행이 오가는 도구 호출 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/function-calling-cycle.ko.png)
 
 *모델 판단과 함수 실행이 오가는 도구 호출 흐름*
 
----
+## OpenAI 도구 명세의 기본 구조
 
-## OpenAI Function Calling 기본 구조
-
-OpenAI API에서는 `tools`라는 파라미터를 통해 AI에게 도구를 알려줍니다. 함수의 구조를 JSON 스키마 형식으로 정의해서 넘겨주면 됩니다.
+OpenAI API에서는 `tools` 파라미터로 함수 목록을 전달합니다. 함수 이름, 설명, 파라미터 구조를 JSON 스키마 비슷한 형태로 넣어 주면 됩니다.
 
 ```python
 tools = [
@@ -90,17 +85,15 @@ tools = [
 ]
 ```
 
-이제 이 구조를 바탕으로 실제 작동하는 에이전트를 만들어 보겠습니다.
+모델은 함수 코드 자체를 읽는 것이 아니라, 이 설명과 파라미터 계약을 읽고 판단합니다. 그래서 `description`이 빈약하면 엉뚱한 도구를 고르거나 잘못된 인자를 만들 가능성이 높아집니다.
 
----
+## 실습 1: 날씨 조회 에이전트
 
-## 실습 1: 날씨 조회 에이전트 만들기
-
-실제 날씨 API 연동은 복잡할 수 있으니, 간단한 가짜 함수를 만들어 실습해 보겠습니다.
+실제 날씨 API 대신, 동작 원리만 보여 주는 작은 예제로 시작하겠습니다.
 
 ### 1. 도구 정의하기
 
-먼저 파이썬 함수와 이를 AI에게 설명할 스키마를 준비합니다.
+아래 코드는 실제 파이썬 함수와 모델에 전달할 도구 명세를 함께 준비합니다.
 
 ```python
 import ast
@@ -153,9 +146,9 @@ tools = [
 ]
 ```
 
-### 2. AI에게 질문하고 판단 결과 받기
+### 2. 모델의 판단 받기
 
-사용자가 "서울 날씨 알려줘"라고 물었을 때, AI가 어떻게 반응하는지 확인해 봅시다.
+이제 사용자 질문을 보내고, 모델이 실제로 도구 호출이 필요하다고 판단하는지 확인합니다.
 
 ```python
 from openai import OpenAI
@@ -177,9 +170,9 @@ if tool_calls:
     print(f"AI의 판단: {tool_calls[0].function.name} 함수를 호출해야 함!")
 ```
 
-### 3. 함수 실행 및 결과 전달
+### 3. 함수 실행과 결과 전달
 
-AI는 함수 호출 '요청'만 보냅니다. 실제 실행은 우리 코드가 담당합니다.
+모델은 여기서 함수를 직접 실행하지 않습니다. 대신 어떤 함수와 어떤 인자를 써야 하는지 알려 주고, 실제 실행은 우리가 맡습니다.
 
 ```python
 if tool_calls:
@@ -211,15 +204,11 @@ if tool_calls:
     # 출력 예시: "현재 서울의 날씨는 25도로 맑은 상태입니다."
 ```
 
-어떻게 작동하는지, 어떤 식으로 응답이 오는지 감이 잡히시나요? AI가 직접 함수를 실행하는 게 아니라, '나 대신 이 함수 좀 실행해 줘'라고 우리에게 요청을 보내는 과정이 핵심입니다.
+이 구조를 보면 에이전트의 본질이 선명해집니다. 모델이 전부를 하는 것이 아니라, 모델은 판단과 조립을 맡고 실제 외부 행동은 애플리케이션이 수행합니다.
 
----
+## 실습 2: 여러 도구를 쓰는 루프
 
-## 실습 2: 계산기 + 환율 변환기 (멀티 툴 사용)
-
-에이전트의 진짜 강력함은 여러 도구를 함께 쓸 때 나옵니다. "100달러를 원화로 환전하면 얼마야? 그리고 거기서 10% 수수료를 뺀 금액도 알려줘"라는 복잡한 요청을 처리해 볼까요?
-
-이번에는 루프(반복문)를 활용해 AI가 필요한 만큼 도구를 호출할 수 있도록 만들어 보겠습니다.
+에이전트가 진짜 에이전트처럼 보이는 순간은 도구를 한 번만 쓰는 경우보다, 여러 단계를 이어서 해결할 때입니다. 예를 들어 환율을 조회한 뒤 계산기로 수수료를 빼는 작업은 한 번의 함수 호출로 끝나지 않습니다.
 
 ```python
 def get_exchange_rate(from_currency, to_currency):
@@ -318,55 +307,248 @@ prompt = "100달러를 원화로 환전하고, 거기서 10% 수수료를 뺀 �
 print(f"최종 답변: {run_agent(prompt)}")
 ```
 
-AI는 이 과정을 통해 먼저 환율을 조회하고, 그 결과를 바탕으로 수식을 만들어 계산기를 두드린 뒤 우리에게 최종 금액을 알려줍니다. 여러 도구를 순차적으로 혹은 한꺼번에 호출하며 문제를 해결하는 흐름을 한눈에 볼 수 있습니다.
+이 예제에서 모델은 먼저 환율 도구를 쓰고, 그 결과를 바탕으로 계산기 도구를 다시 호출한 뒤 최종 답을 조립할 수 있습니다. 즉, 한 번의 도구 호출이 아니라 판단 → 실행 → 관찰 → 재판단 루프를 돌게 됩니다.
 
-![여러 도구를 순차적으로 사용하는 에이전트](../../assets/ai-web-dev-101/05/multi-tool-example-flow.ko.png)
+![여러 도구를 순차적으로 사용하는 에이전트](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/multi-tool-example-flow.ko.png)
 
 *여러 도구를 순차적으로 사용하는 에이전트*
 
----
+## 에이전트 루프를 읽는 법
 
-## 에이전트 루프 이해하기
+에이전트 루프는 보통 다음 순서로 이해하면 됩니다.
 
-에이전트가 동작하는 과정을 정리하면 다음과 같은 순환 구조를 가집니다. 이를 **에이전트 루프(Agent Loop)**라고 부릅니다.
+1. 사용자 입력
+2. 모델의 판단
+3. 도구 실행 요청
+4. 애플리케이션의 실제 실행
+5. 실행 결과 관찰
+6. 완료 또는 다음 단계 반복
 
-1. **사용자 입력**: "이 작업을 해줘."
-2. **생각 (Reasoning)**: AI가 현재 상태를 파악하고 어떤 도구가 필요한지 결정합니다.
-3. **행동 (Action)**: AI가 도구 호출을 요청하고, 애플리케이션이 이를 실행합니다.
-4. **관찰 (Observation)**: 도구의 실행 결과를 AI가 전달받습니다.
-5. **완료 또는 반복**: 결과가 충분하면 답변을 마무리하고, 부족하면 다시 2번으로 돌아가 다음 단계를 진행합니다.
+이 흐름이 있으면 모델은 마치 스스로 문제를 해결하는 것처럼 보입니다. 하지만 실제로는 각 단계가 명시된 프로토콜로 이어져 있을 뿐입니다. 이 점을 분명히 이해해야 디버깅도 쉬워집니다.
 
-이 루프 덕분에 AI는 스스로 문제를 해결해 나가는 '지능'을 가진 것처럼 보이게 됩니다.
-
-![판단과 실행이 반복되는 에이전트 루프](../../assets/ai-web-dev-101/05/agent-loop-overview.ko.png)
+![판단과 실행이 반복되는 에이전트 루프](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/agent-loop-overview.ko.png)
 
 *판단과 실행이 반복되는 에이전트 루프*
 
----
+## 실제 서비스에서 꼭 조심할 점
 
-## 에이전트를 만들 때 주의할 점
+에이전트는 편리하지만, 일반 챗봇보다 위험 반경도 넓습니다. 특히 아래 다섯 가지는 초반부터 안전장치로 넣어 두는 편이 좋습니다.
 
-똑똑한 에이전트를 만들려면 다음 항목을 기억하세요.
+1. 도구 설명 품질: 모델은 `description`을 보고 판단하므로 언제 써야 하는지 분명히 적어야 합니다.
+2. 무한 루프 방지: 최대 반복 횟수를 정해 두지 않으면 같은 도구를 계속 호출할 수 있습니다.
+3. 인자 검증과 권한 범위: LLM이 만든 인자를 그대로 실행하지 말고 allowlist, 타입 검사, 범위 검사를 먼저 거칩니다.
+4. 타임아웃과 재시도 한도: 외부 API 실패가 전체 루프를 붙잡지 않게 해야 합니다.
+5. 비용 관리: 도구가 늘어나면 모델 호출 횟수도 늘어나므로 지연과 비용이 함께 증가합니다.
 
-1. **도구 설명이 핵심입니다**: AI는 함수 코드 자체를 보는 게 아니라 여러분이 작성한 `description`을 보고 판단합니다. "이 함수는 언제 써야 하는지", "인자는 무엇을 의미하는지"를 아주 명확하게 설명해야 엉뚱한 실수를 하지 않습니다.
-2. **무한 루프 방지**: AI가 답을 찾지 못하고 계속 같은 도구만 호출하는 경우가 생길 수 있습니다. 최대 반복 횟수(예: 5회)를 정해두어 안전장치를 마련해야 합니다.
-3. **인자 검증과 권한 범위**: LLM이 만든 도구 인자는 항상 검증해야 합니다. 허용된 함수만 실행하고, 파일 쓰기·결제·삭제처럼 부작용이 큰 작업은 사용자 확인 단계를 두는 편이 안전합니다.
-4. **타임아웃과 재시도 한도**: 외부 API나 DB를 호출하는 도구는 타임아웃을 두고, 실패 시 재시도 횟수도 제한해야 합니다. 그래야 에이전트가 느리게 매달리거나 같은 실패를 반복하지 않습니다.
-5. **비용 관리**: 에이전트는 한 번의 답변을 위해 여러 번 API를 호출합니다. 루프가 길어질수록 비용과 지연 시간(Latency)이 늘어날 수 있다는 점을 고려해야 합니다.
-
-![도구 사용 권한과 안전 경계](../../assets/ai-web-dev-101/05/tool-permission-boundary.ko.png)
+![도구 사용 권한과 안전 경계](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/tool-permission-boundary.ko.png)
 
 *도구 사용 권한과 안전 경계*
 
----
+## 체크리스트
 
-## 마무리하며
+- [ ] 도구 설명과 파라미터 명세를 충분히 적었다.
+- [ ] 모델이 만든 인자를 실행 전에 검증한다.
+- [ ] 최대 반복 횟수와 타임아웃 한도를 정했다.
+- [ ] 부작용이 큰 도구는 권한 경계를 따로 둔다.
 
-오늘은 AI에게 손과 발을 달아주는 **Tool Use**와 **에이전트**의 개념을 배웠습니다. 이제 여러분의 AI는 단순히 아는 체하는 것을 넘어, 직접 API를 두드리고 데이터를 찾아오는 실질적인 능력을 갖추게 되었습니다.
+## 도구 호출 루프를 명시적으로 구현하기
 
-다음 시간에는 지금까지 배운 내용을 총동원해서, 실제로 사용자에게 가치 있는 기능을 제공하는 **AI 웹 서비스**를 직접 구축해 보겠습니다.
----
+에이전트의 핵심은 "모델이 판단하고, 시스템이 실행하고, 다시 모델이 정리하는" 반복 루프입니다. 이 루프를 코드로 명시하지 않으면 장애 시 원인 파악이 거의 불가능해집니다. 아래 예시는 OpenAI 도구 호출의 가장 작은 운영형 패턴입니다.
+
+```python
+from openai import OpenAI
+import json
+
+client = OpenAI()
+
+TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "도시 이름으로 현재 날씨를 조회합니다.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "city": {"type": "string"}
+                },
+                "required": ["city"]
+            }
+        }
+    }
+]
+
+def run_agent(question: str) -> str:
+    messages = [{"role": "user", "content": question}]
+    for _ in range(3):
+        resp = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages,
+            tools=TOOLS,
+            tool_choice="auto",
+        )
+        msg = resp.choices[0].message
+        messages.append(msg.model_dump())
+
+        if not msg.tool_calls:
+            return msg.content or ""
+
+        for tool_call in msg.tool_calls:
+            args = json.loads(tool_call.function.arguments)
+            if tool_call.function.name == "get_weather":
+                result = {"city": args["city"], "temperature": "22C", "condition": "맑음"}
+            else:
+                result = {"error": "unknown tool"}
+
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": json.dumps(result, ensure_ascii=False),
+            })
+
+    return "도구 호출 반복 한도를 초과했습니다."
+```
+
+핵심은 `for _ in range(3)`처럼 반복 상한을 두는 것입니다. 상한이 없으면 비정상 호출이 무한 루프로 번질 수 있습니다.
+
+## 프롬프트 템플릿: 도구 사용 정책을 문장으로 고정
+
+모델이 불필요하게 도구를 남용하지 않게 하려면 정책을 프롬프트에 명시해야 합니다.
+
+```text
+당신은 한국어 업무 도우미입니다.
+도구 사용 정책:
+- 사실 조회가 필요한 경우에만 도구를 호출합니다.
+- 계산은 내부 추론 대신 계산 도구를 우선 사용합니다.
+- 도구 결과에 오류 필드가 있으면 사용자에게 원인을 설명하고 재시도 옵션을 제시합니다.
+최종 답변 형식:
+1) 결론
+2) 근거
+3) 다음 행동
+```
+
+정책이 없으면 같은 질문에도 모델이 도구를 쓰거나 안 쓰는 편차가 커집니다.
+
+## RAG와 에이전트를 결합하는 방식
+
+실무에서는 에이전트가 먼저 검색 도구를 호출하고, 필요하면 추가 도구를 이어서 호출하는 흐름이 자주 쓰입니다. 예를 들어 "장애 원인 분석" 질문이라면 문서 검색, 로그 조회, 상태 페이지 조회가 순차적으로 필요할 수 있습니다.
+
+```python
+TOOLS = [search_docs_tool, get_service_status_tool, summarize_incident_tool]
+```
+
+이때 중요한 것은 도구 간 의존성을 모델에게 맡기지 않고, 오케스트레이션 레이어에서 최소한의 순서를 강제하는 것입니다. 예를 들어 검색 결과가 비어 있으면 상태 페이지 조회를 건너뛰게 하는 식입니다.
+
+## LangChain AgentExecutor 예시
+
+프레임워크를 쓰면 반복 루프를 줄일 수 있습니다. 다만 추상화가 높아질수록 로그 설계가 더 중요해집니다.
+
+```python
+from langchain_openai import ChatOpenAI
+from langchain.agents import initialize_agent, AgentType
+
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+agent = initialize_agent(
+    tools=my_tools,
+    llm=llm,
+    agent=AgentType.OPENAI_FUNCTIONS,
+    verbose=True,
+)
+
+result = agent.invoke({"input": "서울 오늘 비 와? 오면 우산 추천해줘"})
+```
+
+`verbose=True` 로그를 그대로 운영에 쓰기보다는, 구조화된 이벤트 로그로 변환해 저장하는 편이 추후 분석에 유리합니다.
+
+## 평가 지표: 정답률보다 호출 품질을 먼저 본다
+
+에이전트 품질을 볼 때 단순 정답률만 보면 중요한 문제를 놓칩니다. 아래 지표를 함께 봐야 합니다.
+
+- 도구 선택 정확도: 필요한 도구를 올바르게 고른 비율
+- 도구 인자 정확도: 스키마 검증 통과율
+- 평균 호출 횟수: 과도한 체인 여부
+- 호출 실패 복구율: 도구 오류 후 정상 답변 복귀 비율
+- 응답 종료율: 루프 상한 도달 전 정상 종료 비율
+
+이 지표를 수집하면 "정답은 맞지만 비용이 과한 에이전트"를 빠르게 찾아낼 수 있습니다.
+
+## 도구 스키마 변경 시 회귀 테스트
+
+도구 파라미터를 조금만 바꿔도 에이전트 동작이 크게 흔들릴 수 있습니다. 예를 들어 `city`를 `city_name`으로 바꾸면 모델이 이전 이름을 계속 호출할 수 있습니다. 따라서 스키마 변경은 반드시 회귀 테스트와 함께 진행해야 합니다.
+
+```python
+TEST_QUESTIONS = [
+    "서울 날씨 알려줘",
+    "부산 현재 기온 알려줘",
+    "도쿄 날씨와 우산 필요 여부 알려줘",
+]
+```
+
+테스트 결과에서 도구 호출 실패율이 급증하면 프롬프트의 도구 설명과 예시 입력을 함께 업데이트해야 합니다.
+
+## 배포 전 에이전트 시뮬레이션 시나리오
+
+에이전트는 정상 경로보다 예외 경로에서 더 자주 깨집니다. 배포 전에는 다음 시나리오를 자동으로 돌려야 합니다.
+
+1. 도구가 정상 응답을 반환하는 경우
+2. 도구가 시간 초과되는 경우
+3. 도구가 스키마에 없는 필드를 반환하는 경우
+4. 모델이 존재하지 않는 도구를 호출하려는 경우
+
+```python
+def safe_tool_dispatch(name, args):
+    if name not in TOOL_REGISTRY:
+        return {"error": "tool_not_found", "name": name}
+    try:
+        return TOOL_REGISTRY[name](**args)
+    except TimeoutError:
+        return {"error": "tool_timeout"}
+    except Exception as exc:
+        return {"error": "tool_exception", "detail": str(exc)}
+```
+
+이렇게 방어 코드를 두면 에이전트가 실패하더라도 사용자에게 설명 가능한 오류를 전달할 수 있습니다.
+
+## 정리
+
+에이전트는 “더 똑똑한 챗봇”이라기보다, 모델이 외부 도구를 필요에 따라 호출하는 실행 루프를 가진 시스템입니다.
+
+- Tool Use의 핵심은 모델이 실행을 직접 하지 않고, 함수 호출 요청을 만든다는 사실입니다.
+- 애플리케이션은 그 요청을 검증하고 실제로 수행한 뒤 결과를 다시 모델에 넘깁니다.
+- 여러 도구를 이어 쓰는 루프가 붙으면 에이전트다운 행동이 나타납니다.
+- 실서비스에서는 권한, 검증, 반복 한도, 비용 통제가 필수입니다.
+
+다음 글에서는 지금까지 만든 AI 기능을 실제 사용자에게 보여 줄 수 있도록 배포와 운영 관점으로 넘어가겠습니다.
+
+## 처음 질문으로 돌아가기
+
+- **일반 챗봇과 에이전트는 무엇이 다를까요?**
+  - 일반 챗봇은 가진 지식 안에서 텍스트를 생성하지만, 에이전트는 `get_weather`, `get_exchange_rate`, `calculate` 같은 외부 도구를 필요에 따라 호출해 답을 조립합니다. 본문에서 "서울 날씨는 어때?"와 "100달러를 원화로 환전하고 10% 수수료를 빼 달라" 예제를 나눈 이유도 바로 이 차이를 보여 주기 위해서였습니다. 즉 에이전트의 핵심은 더 많은 말을 하는 것이 아니라, 필요한 외부 행동을 루프 안으로 가져오는 데 있습니다.
+- **Tool Use 또는 Function Calling은 어떤 계약으로 동작할까요?**
+  - 계약은 `tools` 배열 안의 `name`, `description`, `parameters`, `required` 스키마로 정의됩니다. 모델은 이 명세를 보고 `tool_calls`를 만들어 낼 뿐이고, 실제 실행은 애플리케이션이 `json.loads(tool_call.function.arguments)` 후 allowlist와 타입 검사를 거쳐 수행합니다. 그래서 `description`이 빈약하거나 스키마 이름이 바뀌면 정답률보다 먼저 호출 품질이 흔들린다고 이 글에서 강조했습니다.
+- **모델은 어떻게 “이 함수를 실행해 달라”고 요청할까요?**
+  - 모델은 함수를 직접 실행하지 않고 `response.choices[0].message.tool_calls` 안에 함수 이름과 인자를 담아 요청합니다. 애플리케이션은 그 요청을 받아 `messages.append({"role": "tool", ...})`로 결과를 다시 붙이고, 다음 `client.chat.completions.create(...)` 호출에서 최종 답변을 얻습니다. `for _ in range(3)`이나 `for i in range(5)`처럼 반복 상한을 둔 것도 이 요청-실행-재판단 루프가 무한히 돌지 않게 하려는 장치였습니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [AI Web Development 101 (1/7): AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기](./01-hello-ai-api.md)
+- [AI Web Development 101 (2/7): 프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술](./02-prompt-engineering.md)
+- [AI Web Development 101 (3/7): AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현](./03-ai-chatbot.md)
+- [AI Web Development 101 (4/7): RAG 입문 — 내 데이터로 답하는 AI 만들기](./04-rag-intro.md)
+- **AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기 (현재 글)**
+- AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기 (예정)
+- AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법 (예정)
+
+<!-- toc:end -->
 
 ## 참고 자료
-- [OpenAI Function Calling Guide](https://platform.openai.com/docs/guides/function-calling)
-- [JSON Schema Documentation](https://json-schema.org/)
+- [AI Web Development 101 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/ai-web-dev-101/ko)
+
+- [OpenAI: Function calling guide](https://platform.openai.com/docs/guides/function-calling) — `tools`, `tool_choice`, `tool_calls` 응답 흐름의 정식 명세
+- [OpenAI: Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs) — 도구 스키마와 응답 스키마를 JSON Schema로 강제하는 방법
+- [OpenAI Cookbook: function calling and tools](https://cookbook.openai.com/topic/tools) — 실제 도구 호출 루프 코드 예제
+- [Anthropic: Tool use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — 동일한 도구 호출 패턴을 다른 모델 공급자가 어떻게 정의하는지 비교용
+- [LangGraph: Agent runtime](https://langchain-ai.github.io/langgraph/concepts/agentic_concepts/) — 직접 짠 루프 대신 프레임워크가 제공하는 에이전트 런타임의 구성 요소
+- [JSON Schema specification](https://json-schema.org/specification.html) — `parameters` 스키마 작성에 필요한 키워드와 검증 규칙

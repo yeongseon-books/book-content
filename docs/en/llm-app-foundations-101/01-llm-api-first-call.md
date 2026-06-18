@@ -1,11 +1,11 @@
 ---
-title: LLM API first call — sending your first request
+title: "LLM App Foundations 101 (1/6): LLM API first call — sending your first request"
 series: llm-app-foundations-101
 episode: 1
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -19,22 +19,13 @@ seo_description: '!Authentication rate limit and retry branches The SDK handles 
   headers, JSON serialization, response parsing, and typed errors.'
 ---
 
-# LLM API first call — sending your first request
+# LLM App Foundations 101 (1/6): LLM API first call — sending your first request
 
-> LLM App Foundations 101 (1/6)
-
-Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/01-llm-api-first-call)
-
-The diagram below shows the smallest round trip behind a first LLM API call.
-
-![LLM API first call: sending your first request](../../assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.en.png)
-
-*LLM API first call: sending your first request*
 The first confusing thing about LLM application development is not the model. It is the boundary between your code and the model service. A chat UI makes the whole thing feel magical, but the runtime reality is plain: your application sends an HTTP request and receives a JSON response. That round trip is the foundation.
 
 That is why Post 01 starts here. If you do not understand what goes into the request body, what comes back in the response, and where token usage shows up, every later feature feels blurry.
 
-In this post, we will build that first call with the Groq API. The setup is intentionally small. You need one environment variable, `GROQ_API_KEY`, and the official Python SDK, `groq`. The model for every example in this article is `llama-3.1-8b-instant`.
+This is the first post in the LLM App Foundations 101 series. Here, we will build that first call with the Groq API. The setup is intentionally small. You need one environment variable, `GROQ_API_KEY`, and the official Python SDK, `groq`. The model for every example in this article is `llama-3.1-8b-instant`.
 
 We will cover seven things:
 
@@ -50,17 +41,19 @@ The main idea is simple: **an LLM app begins with request and response structure
 
 ---
 
-## Questions this chapter answers
+![LLM API first call: sending your first request](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.en.png)
+*LLM API first call: sending your first request*
+> The first call is not magic; it is a remote contract you can inspect field by field.
 
-- What request-response shape is an LLM API call, underneath the SDK?
-- How do you provision a Groq API key and keep it out of source code?
-- How do you extract the body, token usage, and model name from `client.chat.completions.create()`?
-- How do synchronous and asynchronous patterns differ in code shape and use case?
-- When the first call fails, do you suspect authentication, the model id, or the message format first?
+## Questions to Keep in Mind
+
+- What request-response shape sits underneath the SDK call?
+- When the first call fails, should you inspect authentication, the model id, or the message format first?
+- Where do you read the response body, token usage, and model name?
 
 ## What an LLM API is
 
-![JSON request and response flow](../../assets/llm-app-foundations-101/01/01-01-what-an-llm-api-is.en.png)
+![JSON request and response flow](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-what-an-llm-api-is.en.png)
 
 *JSON request and response flow*
 An LLM API is still an API. The transport is HTTP. The payload is usually JSON. Your code sends input to a remote service, and that service sends structured output back.
@@ -187,7 +180,7 @@ At this point, you have everything you need for a first request.
 
 ## Sending your first request
 
-![Client setup and first call chain](../../assets/llm-app-foundations-101/01/01-02-sending-your-first-request.en.png)
+![Client setup and first call chain](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-02-sending-your-first-request.en.png)
 
 *Client setup and first call chain*
 Start with the smallest successful program. The code below sends one request in synchronous style and prints only the generated text. This block is self-contained.
@@ -233,7 +226,7 @@ Do not focus on the exact wording of the answer. The important result is structu
 
 ## Inspecting the response object
 
-![Completion object fields and branches](../../assets/llm-app-foundations-101/01/01-03-inspecting-the-response-object.en.png)
+![Completion object fields and branches](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-03-inspecting-the-response-object.en.png)
 
 *Completion object fields and branches*
 Many beginners stop after printing the answer text. That is fine for a smoke test, but it is not enough for a working application. You also need token usage, model identity, and the overall response shape.
@@ -349,7 +342,7 @@ print(completion.choices[0].finish_reason)        # "stop", "length", or "tool_c
 
 ## Why the HTTP mental model still matters
 
-![Authentication rate limit and retry branches](../../assets/llm-app-foundations-101/01/01-04-why-the-http-mental-model-still-matters.en.png)
+![Authentication rate limit and retry branches](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-04-why-the-http-mental-model-still-matters.en.png)
 
 *Authentication rate limit and retry branches*
 The SDK handles authentication headers, JSON serialization, response parsing, and typed errors. It does not remove the network boundary.
@@ -367,7 +360,7 @@ This is the real value of seeing the first call clearly. You stop treating the m
 
 ## Synchronous and asynchronous patterns
 
-![Sync waits and async gather comparison](../../assets/llm-app-foundations-101/01/01-05-synchronous-and-asynchronous-patterns.en.png)
+![Sync waits and async gather comparison](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-05-synchronous-and-asynchronous-patterns.en.png)
 
 *Sync waits and async gather comparison*
 Python gives you two common ways to call an LLM API: synchronous code and asynchronous code.
@@ -562,15 +555,26 @@ In the next post, we will stay close to the same API call and zoom in on token a
 - [ ] You printed `choices[0].message.content`, `usage.total_tokens`, and `model` from the response
 - [ ] You ran the same call once synchronously and once asynchronously
 
+## Answering the Opening Questions
+
+- What request-response shape sits underneath the SDK call?
+  - The SDK call wraps a remote API contract: model and messages go out, while generated text, usage, and metadata come back.
+
+- When the first call fails, should you inspect authentication, the model id, or the message format first?
+  - Start with authentication and key placement, then narrow the failure to the model id and message shape.
+
+- Where do you read the response body, token usage, and model name?
+  - Read text from `choices[0].message.content`, token accounting from `usage`, and the actual model from `model`.
+
 <!-- toc:begin -->
 ## In this series
 
-- **LLM API first call — sending your first request (current)**
-- Understanding tokens — cost, limits, and context windows (upcoming)
-- Prompt engineering basics — system, user, and assistant roles (upcoming)
-- Few-shot and chain-of-thought — steering better answers (upcoming)
-- Managing conversation state — building a multi-turn chatbot (upcoming)
-- Handling streaming responses — real-time output (upcoming)
+- **LLM App Foundations 101 (1/6): LLM API first call — sending your first request (current)**
+- LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows (upcoming)
+- LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles (upcoming)
+- LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers (upcoming)
+- LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot (upcoming)
+- LLM App Foundations 101 (6/6): Handling streaming responses — real-time output (upcoming)
 
 <!-- toc:end -->
 
@@ -582,3 +586,7 @@ In the next post, we will stay close to the same API call and zoom in on token a
 - [Groq Python SDK](https://github.com/groq/groq-python)
 - [Groq API reference](https://console.groq.com/docs/api-reference)
 - [Groq models](https://console.groq.com/docs/models)
+
+### Related Series
+
+- [LLM API Production 101](../llm-api-production-101/01-structured-output.md) — picks up where this series ends. After first calls, tokens, and basic prompting, that series tackles structured output, tool calling, streaming, and retries — the problems you hit once the toy demo has to actually serve users.

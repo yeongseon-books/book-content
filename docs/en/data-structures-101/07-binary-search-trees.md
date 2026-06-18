@@ -1,10 +1,10 @@
 ---
 series: data-structures-101
 episode: 7
-title: Binary Search Trees
+title: "Data Structures 101 (7/10): Binary Search Trees"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,23 @@ seo_description: How a binary search tree achieves average O(log n), why the wor
 last_reviewed: '2026-05-04'
 ---
 
-# Binary Search Trees
+# Data Structures 101 (7/10): Binary Search Trees
 
-> Data Structures 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
+This is the seventh post in the Data Structures 101 series.
 
 **Core question**: When you need fast search over sorted data and fast insert and delete at the same time, which data structure should you reach for?
 
 > A binary search tree (BST) is a binary tree with one simple rule: the left child is smaller than its parent and the right child is larger. That single rule gives you average O(log n) search, insert, and delete. But when the tree leans to one side, performance collapses to O(n), which is why production systems use balanced variants such as AVL or red-black trees. This article walks through how a BST works, where it breaks, and why balanced trees exist.
 
-<!-- a-grade-intro:end -->
+
+![data structures 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/07/07-01-bst-balanced-vs-skewed.en.png)
+*data structures 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Binary Search Trees?
+- Which signal should the example or diagram make visible for Binary Search Trees?
+- What failure should be prevented first when Binary Search Trees reaches a real system?
 
 ## What You Will Learn
 
@@ -46,23 +52,9 @@ BSTs are the foundation of database indexes, file system metadata, memory alloca
 
 > Sorted plus search plus insert plus delete, all at O(log n), is a property that almost only the BST family delivers.
 
-## Concept at a Glance
-
 > A BST is a "sorted tree". Every node maintains an invariant: the entire left subtree is smaller than the node, and the entire right subtree is larger. That invariant lets you discard half the data at every step, which is what makes average O(log n) search possible.
 
-```text
-Balanced BST (height 2)        Skewed BST (height 4)
-        50                          10
-       /  \                          \
-      30   70                        20
-     / \   / \                        \
-    20 40 60 80                       30
-                                       \
-                                       40
-                                        \
-                                        50
-Search O(log n)                Search O(n)
-```
+### BST balanced vs skewed
 
 ## Key Terms
 
@@ -106,7 +98,6 @@ class BSTNode:
         self.left = None
         self.right = None
 
-
 def insert(root, key):
     if root is None:
         return BSTNode(key)
@@ -115,7 +106,6 @@ def insert(root, key):
     elif key > root.key:
         root.right = insert(root.right, key)
     return root
-
 
 root = None
 for v in [50, 30, 70, 20, 40, 60, 80]:
@@ -134,7 +124,6 @@ def search(root, key):
         root = root.left if key < root.key else root.right
     return False
 
-
 print(search(root, 40))   # True
 print(search(root, 99))   # False
 ```
@@ -151,7 +140,6 @@ def inorder(node):
     print(node.key, end=" ")
     inorder(node.right)
 
-
 inorder(root)   # 20 30 40 50 60 70 80
 ```
 
@@ -164,7 +152,6 @@ def find_min(node):
     while node.left is not None:
         node = node.left
     return node
-
 
 def delete(root, key):
     if root is None:
@@ -185,7 +172,6 @@ def delete(root, key):
         root.right = delete(root.right, successor.key)
     return root
 
-
 root = delete(root, 30)
 inorder(root)   # 20 40 50 60 70 80
 ```
@@ -195,33 +181,61 @@ Delete splits into three cases based on the number of children, and the two-chil
 ### Step 5: The tragedy of an unbalanced BST
 
 ```python
-# Inserting sorted input produces a tree that leans entirely to one side
-import time
+from random import Random
 
-skewed = None
-for v in range(10_000):
-    skewed = insert(skewed, v)
+def build_bst(values):
+    root = None
+    for value in values:
+        root = insert(root, value)
+    return root
 
-start = time.perf_counter()
-search(skewed, 9999)
-print(f"Skewed BST search: {(time.perf_counter() - start) * 1e6:.0f} us")
+def tree_height(node):
+    if node is None:
+        return -1
+    return 1 + max(tree_height(node.left), tree_height(node.right))
 
-# Shuffling restores natural balance
-import random
+def search_steps(root, key):
+    steps = 0
+    while root is not None:
+        steps += 1
+        if key == root.key:
+            return steps
+        root = root.left if key < root.key else root.right
+    return steps
 
-values = list(range(10_000))
-random.shuffle(values)
+values = list(range(31))
+shuffled_values = values[:]
+Random(42).shuffle(shuffled_values)
 
-balanced = None
-for v in values:
-    balanced = insert(balanced, v)
+skewed = build_bst(values)
+less_skewed = build_bst(shuffled_values)
+target = values[-1]
 
-start = time.perf_counter()
-search(balanced, 9999)
-print(f"Balanced BST search: {(time.perf_counter() - start) * 1e6:.0f} us")
+skewed_height = tree_height(skewed)
+less_skewed_height = tree_height(less_skewed)
+skewed_steps = search_steps(skewed, target)
+less_skewed_steps = search_steps(less_skewed, target)
+
+print({
+    "skewed_height": skewed_height,
+    "shuffled_height": less_skewed_height,
+    "skewed_steps": skewed_steps,
+    "shuffled_steps": less_skewed_steps,
+})
+
+shape_check = (
+    skewed_height == len(values) - 1
+    and less_skewed_height < skewed_height
+    and less_skewed_steps < skewed_steps
+)
+print(f"shape check passed: {shape_check}")
+
+# Expected shape:
+# {'skewed_height': 30, 'shuffled_height': <much smaller>, 'skewed_steps': 31, 'shuffled_steps': <smaller>}
+# shape check passed: True
 ```
 
-If you feed sorted data straight in, the BST degenerates into a linked list. That limitation is exactly why balanced trees (AVL, red-black) were invented.
+If you feed sorted data straight in, the BST degenerates into a linked list. The verification above checks shape directly, not just timing noise. If the gap does not appear, you probably shuffled incorrectly, introduced balancing logic by accident, or counted search steps incorrectly.
 
 ## Notable Points
 
@@ -276,17 +290,29 @@ A binary search tree turns one simple invariant into average O(log n) search, in
 
 The next article looks at the heap, a data structure specialised for fast access to the maximum or minimum value. It is the standard implementation of a priority queue. The heap is simpler than a BST but optimised for a narrower workload.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Binary Search Trees?**
+  - The article treats Binary Search Trees as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Binary Search Trees?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Binary Search Trees reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
-- [Linked Lists](./03-linked-lists.md)
-- [Stacks and Queues](./04-stacks-and-queues.md)
-- [Hash Tables](./05-hash-tables.md)
-- [Trees](./06-trees.md)
+## In this series
+
+- [Data Structures 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
+- [Data Structures 101 (3/10): Linked Lists](./03-linked-lists.md)
+- [Data Structures 101 (4/10): Stacks and Queues](./04-stacks-and-queues.md)
+- [Data Structures 101 (5/10): Hash Tables](./05-hash-tables.md)
+- [Data Structures 101 (6/10): Trees](./06-trees.md)
 - **Binary Search Trees (current)**
 - Heaps (upcoming)
 - Graphs (upcoming)
 - Choosing Data Structures (upcoming)
+
 <!-- toc:end -->
 
 ## References

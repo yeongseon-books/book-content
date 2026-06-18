@@ -1,11 +1,11 @@
 ---
-title: Prompt and LLM chain — assembling your first chain
+title: "LangChain 101 (2/6): Prompt and LLM chain — assembling your first chain"
 series: langchain-101
 episode: 2
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -19,20 +19,22 @@ seo_description: A prompt chain is not string concatenation with extra steps; it
   a typed conversion from app inputs into model-ready messages.
 ---
 
-# Prompt and LLM chain — assembling your first chain
+# LangChain 101 (2/6): Prompt and LLM chain — assembling your first chain
 
-## Questions this post answers
+Once LCEL makes sense, the next question is where the real chain logic actually lives. In practice, that usually means prompt construction, output parsing, and the small input-shaping decisions that determine whether the rest of the pipeline stays readable.
 
-- How do `system` and `human` messages divide responsibility in `ChatPromptTemplate`
-- How should you model prompts that need multiple input variables
-- When is `StrOutputParser` enough, and when do you need structured parsing
-- How do you forward part of the input unchanged through a chain
+This is the second post in the LangChain 101 series. It shows how prompt templates, parsers, and passthrough steps turn LCEL basics into a practical first chain.
 
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-02-the-flow-at-a-glance.en.png)
+*The flow at a glance*
 > A prompt chain is not string concatenation with extra steps; it is a typed conversion from app inputs into model-ready messages.
 
-![Questions this post answers](../../assets/langchain-101/02/02-01-questions-this-post-answers.en.png)
+## Questions to Keep in Mind
 
-*Questions this post answers*
+- How is ChatPromptTemplate different from plain string formatting?
+- How do multiple prompt variables and parsers change chain input and output shapes?
+- Which failures should fallback hide, and which failures should remain visible?
+
 ## Minimal runnable example
 
 ```python
@@ -58,58 +60,9 @@ print(chain.invoke({"audience": "junior backend engineers", "topic": "PromptTemp
 
 <!-- injected-output:end -->
 
-## What to notice in this code
-
-- Variables are managed at the template layer instead of through manual string assembly.
-- The `system` message sets behavior while the `human` message carries the request.
-- Adding a parser makes downstream steps deal with a plain string instead of an `AIMessage`.
-- You can adjust prompt structure without rewriting the rest of the chain.
-
-## Where engineers get confused
-
-- `ChatPromptTemplate` is both a formatter and a message builder.
-- Without an output parser, many examples return `AIMessage`, not text.
-- `RunnablePassthrough` forwards the current input; it does not magically merge unrelated state.
-
-## Checklist
-
-- [ ] I can explain the roles of `system`, `human`, and `ai` messages
-- [ ] I can build a prompt template with multiple variables
-- [ ] I understand how the parser changes the chain's output type
-
-LangChain 101 (2/6)
-
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/02-prompt-llm-chain)
-
-## Questions this post answers
-
-- How is `ChatPromptTemplate` different from plain string formatting?
-- Why separate prompt, LLM, and output parser into distinct steps?
-- What input shape should you keep when a chain has multiple variables?
-- Where should fallbacks sit in a prompt-to-model pipeline?
-
-> A prompt chain is the smallest useful LCEL pipeline: turn structured input into messages, call the model, then parse the result into an application-friendly output.
-
-## The flow at a glance
-
-![The flow at a glance](../../assets/langchain-101/02/02-02-the-flow-at-a-glance.en.png)
-
-*The flow at a glance*
-Post 1 established the LCEL structure. This post builds on it with the patterns that appear most often in real code: multi-variable prompt templates, output parser selection, and passing values through a chain unchanged.
-
-Topics:
-
-- the message roles in `ChatPromptTemplate`
-- building prompts with multiple variables
-- choosing between `StrOutputParser` and `JsonOutputParser`
-- using `RunnablePassthrough` to forward inputs unchanged
-- testing a completed chain
-
----
-
 ## ChatPromptTemplate structure
 
-![System human ai message roles](../../assets/langchain-101/02/02-01-chatprompttemplate-structure.en.png)
+![System human ai message roles](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-01-chatprompttemplate-structure.en.png)
 
 *System human ai message roles*
 `ChatPromptTemplate` constructs conversation-style prompts and renders them into the message format the LLM expects.
@@ -202,7 +155,7 @@ Placeholder names like `{language}` and `{question}` must match the keys in the 
 
 ## Prompts with multiple variables
 
-![Multiple variables into one prompt](../../assets/langchain-101/02/02-02-prompts-with-multiple-variables.en.png)
+![Multiple variables into one prompt](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-02-prompts-with-multiple-variables.en.png)
 
 *Multiple variables into one prompt*
 More complex tasks need more template variables. Pass them all in the same dict.
@@ -247,7 +200,7 @@ print(result)
 
 ## StrOutputParser vs JsonOutputParser
 
-![String parser and JSON parser outputs](../../assets/langchain-101/02/02-03-stroutputparser-vs-jsonoutputparser.en.png)
+![String parser and JSON parser outputs](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-03-stroutputparser-vs-jsonoutputparser.en.png)
 
 *String parser and JSON parser outputs*
 Output parsers convert the LLM response into the format you need.
@@ -349,7 +302,7 @@ print(result)
 
 ## Adding a fallback to a chain
 
-![Primary failure and fallback switch](../../assets/langchain-101/02/02-04-adding-a-fallback-to-a-chain.en.png)
+![Primary failure and fallback switch](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-04-adding-a-fallback-to-a-chain.en.png)
 
 *Primary failure and fallback switch*
 `.with_fallbacks()` runs an alternative chain when the primary call fails.
@@ -406,8 +359,10 @@ print(result)
     ```python
     try:
         # Code that might raise an exception
+        pass
     except ExceptionType:
         # Code to handle the exception
+        pass
     ```
 
     Here's an example:
@@ -480,15 +435,26 @@ You can now build prompt templates with multiple variables, select the right out
 
 The next post connects a Retriever to a chain and uses retrieved document chunks as context for the LLM.
 
+## Answering the Opening Questions
+
+- **How is ChatPromptTemplate different from plain string formatting?**
+  ChatPromptTemplate builds role-aware messages, not just one formatted string, and keeps variable handling inside the chain boundary.
+
+- **How do multiple prompt variables and parsers change chain input and output shapes?**
+  Input becomes a dictionary with multiple keys, while the parser turns the model response object into a string, JSON value, or another application type.
+
+- **Which failures should fallback hide, and which failures should remain visible?**
+  Fallback can mask transient provider failures, but contract errors and parser failures should stay visible in logs.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LangChain introduction — LCEL and the Runnable interface](./01-lcel-runnable-basics.md)
-- **Prompt and LLM chain — assembling your first chain (current)**
-- Retriever — document search and context injection (upcoming)
-- Tool calling — connecting external tools (upcoming)
-- Streaming — handling real-time output (upcoming)
-- Putting it together — a complete chain in one file (upcoming)
+- [LangChain 101 (1/6): LangChain introduction — LCEL and the Runnable interface](./01-lcel-runnable-basics.md)
+- **LangChain 101 (2/6): Prompt and LLM chain — assembling your first chain (current)**
+- LangChain 101 (3/6): Retriever — document search and context injection (upcoming)
+- LangChain 101 (4/6): Tool calling — connecting external tools (upcoming)
+- LangChain 101 (5/6): Streaming — handling real-time output (upcoming)
+- LangChain 101 (6/6): Putting it together — a complete chain in one file (upcoming)
 
 <!-- toc:end -->
 

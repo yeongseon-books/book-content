@@ -1,0 +1,33 @@
+flowchart TD
+    subgraph Pipeline["6-Stage Data Pipeline Architecture"]
+        direction TD
+        
+        I["Raw Data Sources"] --> S1
+        
+        subgraph S_Ingest["Stage 1: Ingest"]
+            S1["Aggregate JSON/CSV<br/>Add ingestion timestamp"]
+        end
+        
+        subgraph S_Clean["Stage 2: Clean & Dedup"]
+            S2["Remove whitespace<br/>Filter short text<br/>Drop exact duplicates"]
+        end
+        
+        subgraph S_PII["Stage 3: PII Redaction"]
+            S3["Analyze entities (Presidio)<br/>Anonymize sensitive text"]
+        end
+        
+        subgraph S_Qual["Stage 4: Quality Filter"]
+            S4["Word count validation<br/>Heuristic quality checks"]
+        end
+        
+        subgraph S_Chunk["Stage 5: Tokenize & Chunk"]
+            S5["Recursive text chunking<br/>Fit LLM context window"]
+        end
+        
+        subgraph S_Split["Stage 6: Split & Version"]
+            S6["Train/Val/Test split<br/>DVC artifact tracking"]
+        end
+        
+        S1 --> S2 --> S3 --> S4 --> S5 --> S6
+        S6 --> O["Versioned Parquet Artifacts<br/>& Manifests"]
+    end

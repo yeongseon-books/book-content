@@ -1,7 +1,7 @@
 ---
 episode: 1
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -13,45 +13,34 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
-title: What is an embedding — converting text into vectors
-seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
+  tistory: false
+title: "Vector Search 101 (1/6): What is an embedding — converting text into vectors"
+seo_description: Learn how text embeddings transform natural language into numeric vectors to enable semantic search, machine-readable meaning, and vector similarity.
 ---
 
-# What is an embedding — converting text into vectors
-
-> Vector Search 101 (1/6)
-
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/01-what-is-embedding)
+# Vector Search 101 (1/6): What is an embedding — converting text into vectors
 
 Search engines have compared keywords for decades. A user types "python async", and the engine checks how often those words appear in each document and where. This works well when the query and the document share exact terms, but it breaks down when meaning is preserved while wording changes. "Handling concurrency in Python" and "Python async programming" mean the same thing, but a keyword engine may not connect them.
 
 Embeddings approach the problem differently. They convert text into numeric vectors so that semantically similar sentences end up geometrically close in a high-dimensional space. The distance between those vectors becomes a proxy for meaning. That property makes keyword-free, meaning-based retrieval possible.
 
-This post focuses on the concept and intuition behind embeddings. Code is minimal. We will cover five things:
+This is the first post in the Vector Search 101 series.
 
-- what embeddings are and why they emerged
-- how meaning is represented as distance in vector space
-- how embedding models learn that representation
-- a first hands-on example that produces real vectors
-- where embeddings fall short and what to watch for
+This post focuses on the concept and intuition behind embeddings. Code stays minimal, but we still build real vectors and read real similarity scores.
 
-![Keyword search and embedding search contrast](../../assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png)
-
+![Keyword search and embedding search contrast](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png)
 *Keyword search and embedding search contrast*
----
+> An embedding is not a format for storing text. It is a representation that makes meaning comparable by distance.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- What is an embedding mathematically, and why convert text into a numeric vector at all?
-- How do word, sentence, and document embeddings actually differ?
-- How do accuracy and cost shift as embedding dimensionality grows?
-- Why does the same text produce different vectors across models?
-- How do you measure whether your embeddings are any good?
+- When keyword search misses documents with the same meaning but different wording, what is missing?
+- What does it actually mean for two embedding vectors to be close?
+- When choosing a first embedding model, which limits should you check before tuning anything else?
 
 ## The ceiling of keyword search
 
-![Keyword search and embedding search contrast](../../assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.en.png)
+![Keyword search and embedding search contrast](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.en.png)
 
 *Keyword search and embedding search contrast*
 Traditional search ranks results by term frequency and position. TF-IDF and BM25 are the canonical examples. These methods are fast, interpretable, and accurate when the query shares vocabulary with the document.
@@ -70,12 +59,12 @@ Embeddings reframe the problem. Instead of asking "does this document contain th
 
 ## Vector space intuition
 
-![Text entering vector space flow](../../assets/vector-search-101/01/01-02-vector-space-intuition.en.png)
+![Text entering vector space flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-02-vector-space-intuition.en.png)
 
 *Text entering vector space flow*
 An embedding model converts text into a fixed-length array of floating-point numbers. With `sentence-transformers/all-MiniLM-L6-v2`, every input — regardless of length — becomes a 384-dimensional vector. Models with 768 or 1536 dimensions are also common.
 
-```
+```text
 "Python async programming"       → [0.12, -0.34, 0.87, ..., 0.05]  (384 numbers)
 "handling concurrency in Python" → [0.14, -0.31, 0.85, ..., 0.07]  (384 numbers)
 "homemade dog treats recipe"     → [-0.63, 0.77, -0.12, ..., 0.44] (384 numbers)
@@ -85,7 +74,7 @@ Think of these numbers as coordinates in a high-dimensional space. Sentences wit
 
 The most common distance measure is cosine similarity. It ignores vector magnitude and compares direction only, which makes it relatively stable across inputs of different lengths.
 
-```
+```text
 cosine similarity = (A · B) / (|A| × |B|)
 ```
 
@@ -95,7 +84,7 @@ The value ranges from -1 to 1. Closer to 1 means more similar; 0 means unrelated
 
 ## How embedding models learn
 
-![Positive and negative pair training structure](../../assets/vector-search-101/01/01-03-how-embedding-models-learn.en.png)
+![Positive and negative pair training structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-03-how-embedding-models-learn.en.png)
 
 *Positive and negative pair training structure*
 An embedding model is trained to place semantically similar sentence pairs close together and unrelated pairs far apart. The dominant training paradigm is contrastive learning.
@@ -113,7 +102,7 @@ The model updates its parameters to reduce the vector distance between positive 
 
 ## Creating your first vectors
 
-![Three sentence encoding execution path](../../assets/vector-search-101/01/01-04-creating-your-first-vectors.en.png)
+![Three sentence encoding execution path](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-04-creating-your-first-vectors.en.png)
 
 *Three sentence encoding execution path*
 Running the code once is faster than re-reading the theory. Install `sentence-transformers` and encode three sentences.
@@ -180,13 +169,82 @@ print(f"[0] vs [2] (unrelated):       {cosine_similarity(embeddings[0], embeddin
 
 <!-- injected-output:end -->
 
-"Python async programming" and "handling concurrency in Python" score 0.81 despite sharing no common words. "Homemade dog treats" scores 0.05. These numbers are the foundation of vector search: rank documents by their cosine similarity to the query vector and return the top results.
+"Python async programming" and "handling concurrency in Python" score highly despite sharing no exact words. "Homemade dog treats" lands near zero. These numbers are the foundation of vector search: rank documents by their cosine similarity to the query vector and return the top results.
+
+---
+
+## How ranking changes on a tiny corpus
+
+One similarity score is useful, but ranking behavior is what matters in practice. Put keyword overlap next to embedding similarity for the same query, and the reason vector search matters becomes easier to see.
+
+```python
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+def keyword_overlap_score(query: str, document: str) -> int:
+    query_terms = set(query.lower().split())
+    doc_terms = set(document.lower().split())
+    return len(query_terms & doc_terms)
+
+query = "python async programming"
+documents = [
+    "Python async programming patterns for web APIs",
+    "Handling concurrency in Python with asyncio tasks",
+    "Beginner recipe for homemade dog treats",
+    "Distributed tracing for Java microservices",
+]
+
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+query_vector = model.encode(query)
+doc_vectors = model.encode(documents)
+
+results = []
+for document, vector in zip(documents, doc_vectors):
+    results.append(
+        {
+            "document": document,
+            "keyword_overlap": keyword_overlap_score(query, document),
+            "cosine": cosine_similarity(query_vector, vector),
+        }
+    )
+
+for item in sorted(results, key=lambda x: (-x["keyword_overlap"], -x["cosine"])):
+    print(
+        f"keyword={item['keyword_overlap']} cosine={item['cosine']:.4f} | {item['document']}"
+    )
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    keyword=3 cosine=0.8551 | Python async programming patterns for web APIs
+    keyword=1 cosine=0.6934 | Handling concurrency in Python with asyncio tasks
+    keyword=0 cosine=0.0848 | Distributed tracing for Java microservices
+    keyword=0 cosine=0.0124 | Beginner recipe for homemade dog treats
+
+<!-- injected-output:end -->
+
+The second document shares almost none of the query vocabulary, yet the embedding score is still strong. That is the practical value of semantic retrieval: useful matches survive wording changes.
+
+## A fast sanity check for embedding quality
+
+Once a model is wired in, the next question is usually "is 0.69 good or bad?" The fastest answer is not a benchmark suite. It is a small hand-built evaluation set drawn from the actual product vocabulary.
+
+- Pick 5–10 query-document pairs that mean the same thing with different wording.
+- Add 5 exact-string queries where identifiers must survive intact.
+- Add a few clearly unrelated pairs and verify their scores stay low.
+- Read the top 3 results for each query and mark whether they are genuinely useful.
+
+That small pass tells you whether the model is directionally right or whether you should stop and rethink model choice before tuning chunking and indexing.
 
 ---
 
 ## Where embeddings fall short
 
-![Limits with exact strings and long documents](../../assets/vector-search-101/01/01-05-where-embeddings-fall-short.en.png)
+![Limits with exact strings and long documents](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-05-where-embeddings-fall-short.en.png)
 
 *Limits with exact strings and long documents*
 Embeddings are not a universal replacement for keyword search. Several situations favor the older approach.
@@ -231,15 +289,26 @@ The next post moves from concept to practice. We will use `HuggingFaceEmbeddings
 - [ ] Sanity-checked quality by computing similarity on a few hand-picked pairs
 - [ ] Wrote a reindex procedure for when the embedding model changes
 
+## Answering the Opening Questions
+
+- **When keyword search misses documents with the same meaning but different wording, what is missing?**
+  What is missing is a representation of meaning, not another keyword rule. Embeddings provide that representation by mapping text into vectors that can be compared geometrically.
+
+- **What does it actually mean for two embedding vectors to be close?**
+  Close means the vectors have a small distance or similar direction under the chosen metric, which the system treats as a proxy for semantic similarity.
+
+- **When choosing a first embedding model, which limits should you check before tuning anything else?**
+  Check dimensionality, token limit, language support, and model version first because those values define quality limits and reindexing cost.
+
 <!-- toc:begin -->
 ## In this series
 
-- **What is an embedding — converting text into vectors (current)**
-- HuggingFace embeddings in practice — creating your first vectors with sentence-transformers (upcoming)
-- Cosine similarity and vector search — computing sentence distances (upcoming)
-- FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)
-- Chunking strategies — how to split long documents (upcoming)
-- Vector search pipeline — from document ingestion to query (upcoming)
+- **Vector Search 101 (1/6): What is an embedding — converting text into vectors (current)**
+- Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers (upcoming)
+- Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances (upcoming)
+- Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)
+- Vector Search 101 (5/6): Chunking strategies — how to split long documents (upcoming)
+- Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query (upcoming)
 
 <!-- toc:end -->
 
@@ -250,4 +319,9 @@ The next post moves from concept to practice. We will use `HuggingFaceEmbeddings
 - [sentence-transformers documentation](https://www.sbert.net/)
 - [all-MiniLM-L6-v2 model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 - [MTEB leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
+- [Sentence Transformers pretrained models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html)
 - [The Illustrated Word2Vec — Jay Alammar](https://jalammar.github.io/illustrated-word2vec/)
+
+### Related Series
+
+- [RAG Deep Dive](../rag-deep-dive/01-document-loading-and-chunking.md) — shows how the embeddings and ANN indexes from this series get assembled inside a full RAG pipeline. Read it next if you care more about the "documents → chunks → retrieval → answer" flow than the search engine itself.

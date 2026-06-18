@@ -1,7 +1,7 @@
 ---
 episode: 4
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -13,41 +13,30 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
-title: FAISS fundamentals — fast approximate nearest-neighbor search
-seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
+  tistory: false
+title: "Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search"
+seo_description: Implement fast approximate nearest-neighbor search with FAISS to handle large-scale vector collections with high accuracy and low latency.
 ---
 
-# FAISS fundamentals — fast approximate nearest-neighbor search
-
-> Vector Search 101 (4/6)
-
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/04-faiss-fundamentals)
+# Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search
 
 Once documents number in the thousands or tens of thousands, NumPy brute-force search slows down. Comparing a query against 100,000 vectors of dimension 384 requires 38.4 million multiplications per query. At that scale, search latency climbs into the hundreds of milliseconds or higher, which is too slow for interactive applications.
 
 FAISS (Facebook AI Similarity Search) was built for this problem. It supports approximate nearest-neighbor (ANN) search that trades a small accuracy cost for a large speed gain. It handles billion-scale vector collections and runs fast on both CPU and GPU.
 
-This post covers five things:
+This is post 4 in the Vector Search 101 series.
 
-- installing FAISS and choosing an index type
-- exact search with `IndexFlatL2` and `IndexFlatIP`
-- saving an index to disk and reloading it
-- running real queries against a small corpus
-- how to choose between index types
+This post covers the baseline FAISS workflow you need before tuning larger ANN deployments.
 
-![FAISS index type comparison structure](../../assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.en.png)
-
+![FAISS index type comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.en.png)
 *FAISS index type comparison structure*
----
+> The best way to understand FAISS is not as a smarter database, but as a compute engine dedicated to vector search.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- When is each of FAISS IndexFlat, IVF, and HNSW the right pick?
-- What is the accuracy/latency tradeoff between exact search and ANN?
-- Which index types need training, and how do you train them?
-- What gotchas appear when persisting and reloading a FAISS index?
-- For which workloads does GPU FAISS beat CPU FAISS, and vice versa?
+- Where does a simple loop over vectors stop being good enough?
+- What assumption should decide between IndexFlatIP and IndexFlatL2?
+- When saving and reloading an index, how do vectors and metadata stay aligned?
 
 ## Installation
 
@@ -63,7 +52,7 @@ Replace `faiss-cpu` with `faiss-gpu` if a compatible GPU is available.
 
 ## Understanding index types
 
-![FAISS index type comparison structure](../../assets/vector-search-101/04/04-01-understanding-index-types.en.png)
+![FAISS index type comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-understanding-index-types.en.png)
 
 *FAISS index type comparison structure*
 FAISS supports many index types, each with different speed-accuracy tradeoffs. Two are essential at the start.
@@ -78,7 +67,7 @@ Larger deployments use approximate indexes like `IndexIVFFlat` or `IndexHNSWFlat
 
 ## Exact search with IndexFlatIP
 
-![Flow from embeddings to index creation](../../assets/vector-search-101/04/04-02-exact-search-with-indexflatip.en.png)
+![Flow from embeddings to index creation](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-02-exact-search-with-indexflatip.en.png)
 
 *Flow from embeddings to index creation*
 The standard pattern for text retrieval: normalized vectors plus inner-product index.
@@ -133,7 +122,7 @@ FAISS requires `float32` arrays. Without the explicit `dtype=np.float32` cast, N
 
 ## Running queries
 
-![Query to FAISS result path](../../assets/vector-search-101/04/04-03-running-queries.en.png)
+![Query to FAISS result path](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-03-running-queries.en.png)
 
 *Query to FAISS result path*
 ```python
@@ -314,7 +303,7 @@ Both indexes return the correct ranking. For text retrieval, `IndexFlatIP` with 
 
 ## Choosing an index
 
-![float64 input error path](../../assets/vector-search-101/04/04-04-choosing-an-index.en.png)
+![float64 input error path](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-04-choosing-an-index.en.png)
 
 *float64 input error path*
 | Index | Accuracy | Speed | Memory | Typical scale |
@@ -341,15 +330,26 @@ The next post covers chunking. We will look at how chunk size, overlap, and spli
 - [ ] Tuned nprobe/ef from measurements, not from defaults
 - [ ] Added metrics for vector count, dimension, and memory footprint
 
+## Answering the Opening Questions
+
+- **Where does a simple loop over vectors stop being good enough?**
+  A brute-force loop becomes expensive as vector count and dimensionality grow because every query compares against every stored vector.
+
+- **What assumption should decide between IndexFlatIP and IndexFlatL2?**
+  Use IndexFlatIP when normalized vectors should behave like cosine ranking, and IndexFlatL2 when coordinate distance is the intended metric.
+
+- **When saving and reloading an index, how do vectors and metadata stay aligned?**
+  Persist the row-id mapping together with document ids, source text, and metadata so reloaded search results point to the same records.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is an embedding — converting text into vectors](./01-what-is-embedding.md)
-- [HuggingFace embeddings in practice — creating your first vectors with sentence-transformers](./02-huggingface-embeddings.md)
-- [Cosine similarity and vector search — computing sentence distances](./03-cosine-similarity.md)
-- **FAISS fundamentals — fast approximate nearest-neighbor search (current)**
-- Chunking strategies — how to split long documents (upcoming)
-- Vector search pipeline — from document ingestion to query (upcoming)
+- [Vector Search 101 (1/6): What is an embedding — converting text into vectors](./01-what-is-embedding.md)
+- [Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers](./02-huggingface-embeddings.md)
+- [Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances](./03-cosine-similarity.md)
+- **Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search (current)**
+- Vector Search 101 (5/6): Chunking strategies — how to split long documents (upcoming)
+- Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query (upcoming)
 
 <!-- toc:end -->
 

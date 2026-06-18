@@ -1,58 +1,52 @@
 ---
 series: containers-101
 episode: 6
-title: Network
-status: content-ready
+title: "Containers 101 (6/10): Network"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
 language: en
 tags:
-  - Containers
-  - Docker
-  - Networking
-  - Bridge
-  - DevOps
-seo_description: Container network modes (bridge, host, overlay) and DNS-based service discovery — explained with hands-on docker network examples.
-last_reviewed: '2026-05-04'
+- Containers
+- Docker
+- Networking
+- Bridge
+- DevOps
+seo_description: Container network modes (bridge, host, overlay) and DNS-based service
+  discovery — explained with hands-on docker network examples.
+last_reviewed: '2026-05-15'
 ---
 
-# Network
+# Containers 101 (6/10): Network
 
-> Containers 101 series (6/10)
+Container networking can look like a matter of ports and IP addresses. In practice, restart and rescheduling pressure make name-based discovery and boundary design much more important than memorizing one static address.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Containers 101 series.
 
-**Core question**: How do containers on the same host find each other by *name*?
+In this chapter, we compare bridge, host, overlay, and none, then explain why user-defined networks and DNS names are the stable foundation behind both Compose and Kubernetes.
 
-> *Container networking is mode selection (bridge, host, overlay) plus DNS-based service discovery.*
+> Stable container networking starts with names and boundaries, not with memorized IP addresses.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![containers 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/06/06-01-concept-at-a-glance.en.png)
+*containers 101 chapter 6 flow overview*
+> Container networking is not just about port mapping; it is about choosing which containers can see each other and how traffic flows between them.
 
-- The bridge / host / overlay / none modes
-- Container-to-container DNS
-- Publish (-p) vs expose
-- User-defined networks
-- Five common pitfalls
+## Questions to Keep in Mind
+
+- The bridge / host / overlay / none modes?
+- Container-to-container DNS?
+- Publish (-p) vs expose?
 
 ## Why It Matters
 
 Both Compose and Kubernetes ride on top of these abstractions. Get the basics right and the rest is easy.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Host["host"] --> Bridge["bridge"]
-    Bridge --> C1["web"]
-    Bridge --> C2["db"]
-    C1 -. dns .-> C2
-```
+bridge mode isolates containers on a virtual network. host mode runs the container with the host network stack (no isolation, higher performance). overlay spreads containers across multiple hosts. DNS lets containers find each other by service name.
 
 ## Key Terms
 
@@ -126,6 +120,24 @@ def cleanup(net):
 - User-defined networks beat the default bridge.
 - `-p` only when you actually want external exposure.
 
+## Quick verification and failure signals
+
+```bash
+docker network create app-net
+docker run -d --name db --network app-net -e POSTGRES_PASSWORD=secret postgres:16
+docker run --rm --network app-net busybox nslookup db
+docker network inspect app-net
+```
+
+**Expected output:**
+- `nslookup db` resolves through the user-defined network DNS.
+- `docker network inspect` shows the attached container membership.
+
+**Check first if it fails:**
+- If name resolution fails, verify both containers are on the same network.
+- If outside access fails, inspect published ports and the app bind address together.
+- If host mode is involved, check port collisions and firewall policy first.
+
 ## Five Common Mistakes
 
 1. **Using the default bridge — no DNS.**
@@ -163,17 +175,29 @@ Compose creates a per-project user-defined network. Kubernetes uses a CNI to giv
 
 Once connectivity is solved, the next question is *where to keep images*. The next post covers Registry.
 
+## Answering the Opening Questions
+
+- **The bridge / host / overlay / none modes?**
+  - The article treats Network as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Container-to-container DNS?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Publish (-p) vs expose?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Container?](./01-what-is-a-container.md)
-- [Image and Layer](./02-image-and-layer.md)
-- [Runtime](./03-runtime.md)
-- [Dockerfile](./04-dockerfile.md)
-- [Volume](./05-volume.md)
+## In this series
+
+- [Containers 101 (1/10): What is a Container?](./01-what-is-a-container.md)
+- [Containers 101 (2/10): Image and Layer](./02-image-and-layer.md)
+- [Containers 101 (3/10): Runtime](./03-runtime.md)
+- [Containers 101 (4/10): Dockerfile](./04-dockerfile.md)
+- [Containers 101 (5/10): Volume](./05-volume.md)
 - **Network (current)**
 - Registry (upcoming)
 - Container Security (upcoming)
 - Containers vs VMs (upcoming)
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References

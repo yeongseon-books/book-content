@@ -1,13 +1,13 @@
 ---
-title: 왜 Python인가, 그리고 설치와 venv
+title: "Python 101 (1/10): 왜 Python인가, 그리고 설치와 venv"
 series: python-101
 episode: 1
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,25 +17,28 @@ tags:
 - python-installation
 - package-management
 - developer-setup
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: Python은 한 대의 컴퓨터에 여러 개가 동시에 존재할 수 있고, 각 프로젝트는 자기만의 Python을 하나씩 들고
   있어야 합니다.
 ---
 
-# 왜 Python인가, 그리고 설치와 venv
+# Python 101 (1/10): 왜 Python인가, 그리고 설치와 venv
 
+Python은 한 대의 컴퓨터에 여러 개가 동시에 존재할 수 있고, 각 프로젝트는 자기만의 Python을 하나씩 들고 있어야 합니다.
 
-## 이 글에서 다룰 문제
+이 글은 Python 101 시리즈의 첫 번째 글입니다.
 
-Python을 시작할 때 가장 흔히 만나는 문제는 문법이 아니라 **환경**입니다.
+![Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/01/01-01-mental-model.ko.png)
+*Python 101 1장 흐름 개요*
+> 왜 Python인가, 그리고 설치와 venv의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-처음 하루는 잘 돌아가던 코드가 다음 날 갑자기 깨집니다. 회사 노트북에서는 동작하는 스크립트가 동료의 노트북에서는 import error를 냅니다. `pip install`을 실행했는데 권한 오류가 납니다. 이런 문제의 거의 모든 원인은 한 가지입니다 — **system Python에 직접 패키지를 설치하고 있는 것**.
+## 먼저 던지는 질문
 
-system Python은 운영체제 자체가 사용하는 Python입니다. macOS의 일부 도구, Linux의 `apt`, 여러 시스템 스크립트가 그 Python을 신뢰하고 그 위에서 돌아갑니다. 거기에 패키지를 설치하거나 업그레이드하면 OS의 어떤 도구가 망가질지 예측할 수 없습니다. 그래서 제대로 된 Python 사용자는 **system Python에는 절대 손대지 않습니다.** 대신 프로젝트마다 독립된 Python 환경을 만들어서 그 안에서만 패키지를 설치합니다. 이것이 venv입니다.
+- 왜 system Python과 프로젝트용 `.venv`를 분리해야 하고, 그 경계는 어떤 명령으로 바로 확인할 수 있을까요?
+- 활성화가 정말 성공했다는 사실을 `which python`, `sys.executable`, `pip --version` 출력에서 어떻게 읽어야 할까요?
+- `sudo pip install`, 버전 없는 `python3 -m venv`, `.venv/` 커밋 같은 실수는 왜 재현성과 협업을 망가뜨릴까요?
 
-venv를 처음부터 습관으로 만들면, 앞으로 만날 의존성 충돌, 버전 차이, "내 컴퓨터에서는 되는데" 문제의 80%가 사라집니다.
-
-## Mental Model
+## 멘탈 모델
 
 > Python은 한 대의 컴퓨터에 여러 개가 동시에 존재할 수 있고, 각 프로젝트는 자기만의 Python을 하나씩 들고 있어야 합니다.
 
@@ -45,22 +48,7 @@ venv를 처음부터 습관으로 만들면, 앞으로 만날 의존성 충돌, 
 - project Python (venv): 프로젝트 폴더 안에 만든 사본입니다. 여기에만 패키지를 설치합니다.
 - 프로젝트가 10개면 venv도 10개가 됩니다. 서로 영향을 주지 않습니다.
 
-![Mental Model](../../assets/python-101/01/01-01-mental-model.ko.png)
-
-*Mental Model*
 system Python은 OS의 영역, 각 venv는 프로젝트의 영역입니다. 개발자는 venv만 활성화해서 그 안에서 작업합니다.
-
-```mermaid
-flowchart LR
-    OS["운영체제"] --> SYS["system Python"]
-    SYS --> Tools["OS 도구 / apt / brew"]
-    Dev["개발자"] --> P1["프로젝트 A (.venv)"]
-    Dev --> P2["프로젝트 B (.venv)"]
-    Dev --> P3["프로젝트 C (.venv)"]
-    P1 --> Pkg1["requests 2.20"]
-    P2 --> Pkg2["requests 2.32"]
-    P3 --> Pkg3["django 5.0"]
-```
 
 ## 핵심 개념
 
@@ -88,14 +76,14 @@ venv는 Python 표준 라이브러리에 내장된 도구입니다. `python3.12 
 
 `pip`는 Python의 패키지 관리자입니다. `pip install requests`처럼 사용하면 활성화된 venv의 `site-packages/`에 패키지를 설치합니다. `pip freeze > requirements.txt`로 현재 설치 상태를 파일로 저장하고, 다른 사람은 `pip install -r requirements.txt`로 같은 환경을 재현합니다. 이것이 협업과 배포의 기본 단위입니다.
 
-## Before / After
+## 전후 비교
 
 **Before — system Python에 직접 설치한 경우**
 
 ```bash
 $ pip install requests
 ERROR: Could not install packages due to an EnvironmentError: [Errno 13] Permission denied
-$ sudo pip install requests   # 절대 하지 마세요
+$ sudo pip install requests   # please don't
 ```
 
 `sudo pip install`은 일시적으로 동작하는 듯 보이지만, system Python을 오염시킵니다. 다음 OS 업데이트나 brew 명령이 실패할 수 있습니다.
@@ -140,7 +128,7 @@ py -3.12 --version
 
 ```bash
 sudo apt update
-sudo apt install python3 python3-venv     # 배포판이 기본 제공하는 Python 3
+sudo apt install python3 python3-venv     # whichever Python 3 your distro ships
 python3 --version
 ```
 
@@ -218,8 +206,8 @@ import sys
 import platform
 
 print(f"Hello from Python {sys.version_info.major}.{sys.version_info.minor}")
-print(f"실행 환경: {platform.system()} {platform.release()}")
-print(f"인터프리터 경로: {sys.executable}")
+print(f"Running on: {platform.system()} {platform.release()}")
+print(f"Interpreter path: {sys.executable}")
 ```
 
 실행:
@@ -231,7 +219,7 @@ Running on: Darwin 23.x.x
 Interpreter path: /Users/me/hello-python/.venv/bin/python
 ```
 
-이 출력이 나오면 venv 안의 Python이 정상적으로 코드를 실행하고 있다는 뜻입니다. 외부 의존성이 없으므로 Wi-Fi가 끊긴 상태에서도 동일하게 동작합니다.
+이 출력이 나오면 venv 안의 Python이 정상적으로 코드를 실행하고 있습니다. 외부 의존성이 없으므로 Wi-Fi가 끊긴 상태에서도 동일하게 동작합니다.
 
 ### 6) 패키지 설치와 requirements.txt
 
@@ -265,7 +253,7 @@ pip install -r requirements.txt
 $
 ```
 
-프롬프트에서 `(.venv)`가 사라집니다. system 환경으로 돌아왔다는 뜻입니다.
+프롬프트에서 `(.venv)`가 사라지고 system 환경으로 돌아갑니다.
 
 ## 이 코드에서 주목할 점
 
@@ -273,7 +261,6 @@ $
 - `which python` (Windows는 `where python`) — 활성화의 "진짜 검증"입니다. 프롬프트만 보고 안심하지 않고 명령으로 확인합니다.
 - `pip freeze > requirements.txt` — 출력이 `requests==2.32.3`처럼 정확한 버전으로 박힙니다. 이것은 의도된 동작이며, 미래의 "갑자기 깨진다" 사고를 막는 첫 단계입니다.
 - `import sys; print(sys.executable)` — venv 격리를 코드 수준에서 검증합니다. 셸이 거짓말할 수 있어도, Python 자체가 가리키는 인터프리터 경로는 거짓말할 수 없습니다.
-
 
 ## 자주 하는 실수
 
@@ -295,18 +282,18 @@ shell에서 `python`을 쳤을 때 어떤 Python이 나올지 예측할 수 없�
 **6. `python3 -m venv` 대신 `python3.12 -m venv` 사용**
 시스템에 Python 3.10과 3.12가 같이 깔려 있으면 `python3`이 어느 쪽을 가리키는지 모호합니다. **venv를 만들 때는 항상 버전을 명시**해서 `python3.12 -m venv .venv`처럼 쓰세요. 만들고 나면 그 venv는 영원히 그 버전에 묶입니다.
 
-## 실무 패턴
+## 실무에서는 이렇게 생각합니다
 
 **1. 프로젝트 폴더 표준 구조**
 
 새 프로젝트를 시작할 때 항상 같은 모양으로 만듭니다:
 
-```
+```text
 hello-python/
-├── .venv/              # git에 안 올림
-├── .gitignore          # .venv/ 와 __pycache__/ 포함
-├── requirements.txt    # 직접 설치한 핵심 패키지
-├── requirements-dev.txt # 개발 도구 (pytest, ruff 등)
+├── .venv/              # not committed
+├── .gitignore          # includes .venv/ and __pycache__/
+├── requirements.txt    # runtime dependencies
+├── requirements-dev.txt # dev tools (pytest, ruff, etc.)
 └── src/
     └── hello.py
 ```
@@ -340,6 +327,129 @@ hello-python/
 - [ ] `pip install`로 설치한 뒤 `pip freeze > requirements.txt`로 저장했다
 - [ ] 새 폴더에서 `pip install -r requirements.txt`로 환경을 재현해 보았다
 
+## 다음 글
+
+다음 글에서는 변수, 타입, 연산자를 다룹니다. Python의 동적 타입이 무엇을 의미하는지, type hint가 왜 필요한지, 정수·실수·문자열·bool·None이 어떻게 다르게 동작하는지 짚어 봅니다.
+
+## 실전 앵커: 설치 직후에 바로 보는 실행 환경과 인터프리터 내부
+
+입문자가 가장 많이 겪는 문제는 문법이 아니라 실행 환경 불일치입니다. VS Code에서 실행한 결과와 터미널에서 실행한 결과가 다르면, 코드 자체보다 먼저 인터프리터 경로를 확인해야 합니다. 아래 점검 루틴을 팀 온보딩 문서에 넣어 두면 초반 시행착오를 크게 줄일 수 있습니다.
+
+```bash
+python --version
+which python
+python -c "import sys; print(sys.executable)"
+python -c "import site; print(site.getsitepackages())"
+```
+
+실제 출력 예시는 다음처럼 해석합니다.
+
+```text
+$ python --version
+Python 3.12.4
+
+$ which python
+~/.pyenv/shims/python
+
+$ python -c "import sys; print(sys.executable)"
+~/.pyenv/versions/3.12.4/bin/python
+```
+
+여기서 중요한 포인트는 `which python`과 `sys.executable`이 논리적으로 같은 런타임을 가리키는지입니다. 다르면 쉘 alias, IDE 인터프리터 설정, 가상환경 활성화 순서를 먼저 의심합니다.
+
+CPython 관점에서도 설치 확인은 단순 버전 확인으로 끝나지 않습니다. 다음 한 줄은 현재 런타임의 구현체와 GIL 정보를 함께 확인하게 해 줍니다.
+
+```python
+import platform
+import sys
+
+print(platform.python_implementation())
+print(sys.version)
+print(sys.getswitchinterval())
+```
+
+`platform.python_implementation()`이 `CPython`이면, 우리가 이 시리즈에서 설명하는 참조 카운트(reference counting) 기반 메모리 관리 모델을 그대로 적용해서 이해할 수 있습니다. `sys.getswitchinterval()`은 스레드 전환 간격으로, GIL이 있는 CPython에서 CPU-bound 코드가 왜 선형 확장되지 않는지를 설명할 때 자주 쓰는 단서입니다.
+
+REPL에서도 메모리 모델을 짧게 체험할 수 있습니다.
+
+```pycon
+>>> import sys
+>>> a = []
+>>> sys.getrefcount(a)
+2
+>>> b = a
+>>> sys.getrefcount(a)
+3
+>>> del b
+>>> sys.getrefcount(a)
+2
+```
+
+`getrefcount` 값이 1씩 더 크게 보이는 이유는 함수 호출 인자 자체가 임시 참조를 만들기 때문입니다. 이런 작은 관찰이 나중에 함수 인자 전달, 얕은 복사/깊은 복사, 객체 수명 주기를 이해할 때 큰 차이를 만듭니다.
+
+패키지 설치까지 확장하면 표준 점검표는 아래처럼 정리할 수 있습니다.
+
+| 점검 항목 | 확인 명령 | 기대 결과 | 실패 시 대응 |
+|---|---|---|---|
+| 인터프리터 버전 | `python --version` | 3.11+ | pyenv/설치 버전 재선택 |
+| pip 연결 | `python -m pip --version` | 같은 python 경로 | `python -m pip` 방식 고정 |
+| venv 활성화 | `echo $VIRTUAL_ENV` | 경로 출력 | `source .venv/bin/activate` |
+| 인코딩 | `python -c "import sys; print(sys.getdefaultencoding())"` | utf-8 | 쉘 locale/터미널 설정 점검 |
+
+입문 단계에서 이 표를 귀찮아하면 이후 모든 디버깅 비용이 커집니다. 반대로 처음 한 번만 정확히 정렬해 두면, 시리즈 후반의 모듈/패키지, 테스트, 배포 주제를 훨씬 안정적으로 따라갈 수 있습니다.
+
+### 추가 실습: 환경 불일치를 5분 안에 찾는 체크리스트
+
+설치가 끝난 뒤 바로 프로젝트를 시작하기 전에, 아래 명령을 한 번 실행해 두면 이후 오류의 절반을 예방할 수 있습니다.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install ipython
+python -c "import sys, platform; print(sys.executable); print(platform.platform())"
+```
+
+출력으로 확보해야 하는 사실은 세 가지입니다. 첫째, 실행 파일 경로가 프로젝트 내부 가상환경인지. 둘째, pip가 같은 경로의 python에 연결되는지. 셋째, 운영체제/아키텍처 정보가 팀 문서와 일치하는지입니다.
+
+```text
+$ python -m pip --version
+pip 25.0 from /project/.venv/lib/python3.12/site-packages/pip (python 3.12)
+```
+
+이런 확인을 루틴으로 만들면 "왜 제 컴퓨터에서만 안 돼요"라는 질문이 훨씬 줄어듭니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
 ## 정리
 
 - system Python은 OS의 영역입니다. 절대 `pip install`하지 않습니다.
@@ -348,17 +458,38 @@ hello-python/
 - `pip freeze > requirements.txt`로 환경을 문서화하고, 동료는 `pip install -r requirements.txt`로 재현합니다.
 - venv 안에서는 `python`을 그대로 써도 좋지만, 활성화 전에는 항상 `python3`을 사용합니다.
 
-## 다음 글
+## 처음 질문으로 돌아가기
 
-다음 글에서는 변수, 타입, 연산자를 다룹니다. Python의 동적 타입이 무엇을 의미하는지, type hint가 왜 필요한지, 정수·실수·문자열·bool·None이 어떻게 다르게 동작하는지 짚어 봅니다.
+- **왜 system Python과 프로젝트용 `.venv`를 분리해야 하고, 그 경계는 어떤 명령으로 바로 확인할 수 있을까요?**
+  - 이 글은 OS가 쓰는 system Python과 프로젝트가 따로 들고 가는 `.venv`를 분리해야 패키지 충돌과 권한 문제를 피할 수 있다고 설명했습니다. `python3.12 -m venv .venv`로 환경을 만든 뒤 `which python` 또는 Windows의 `where python`으로 경로가 프로젝트 내부를 가리키는지 바로 확인하는 흐름이 핵심입니다.
+- **활성화가 정말 성공했다는 사실을 `which python`, `sys.executable`, `pip --version` 출력에서 어떻게 읽어야 할까요?**
+  - 프롬프트의 `(.venv)` 표시는 힌트일 뿐이고, 진짜 검증은 세 명령이 모두 `.venv` 안 경로를 가리키는지 보는 것입니다. 본문에서는 `hello.py`의 `Interpreter path` 출력과 `pip --version`, `pip freeze > requirements.txt` 결과까지 묶어 인터프리터·패키지 설치 위치·재현 가능성을 함께 확인했습니다.
+- **`sudo pip install`, 버전 없는 `python3 -m venv`, `.venv/` 커밋 같은 실수는 왜 재현성과 협업을 망가뜨릴까요?**
+  - `sudo pip install`은 system Python을 오염시키고, 버전이 모호한 명령으로 만든 venv는 팀마다 다른 인터프리터를 물고 들어올 수 있습니다. `.venv/`는 컴퓨터마다 다른 바이너리 묶음이므로 커밋 대상이 아니며, 협업은 `requirements.txt`와 명시된 Python 버전으로 맞추는 것이 이 글의 결론입니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
+- **왜 Python인가, 그리고 설치와 venv (현재 글)**
+- 변수, 타입, 연산자 (예정)
+- 문자열과 포매팅 (예정)
+- list, tuple, set, dict (예정)
+- 제어 흐름: if, for, while, comprehension (예정)
+- 함수와 인자: def, args, kwargs, default, lambda (예정)
+- 모듈과 패키지: import, __init__, __name__ (예정)
+- 파일 I/O와 예외 처리 (예정)
+- 클래스와 객체: 데이터와 동작을 함께 묶기 (예정)
+- 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
-- Python 공식 문서 — venv: https://docs.python.org/3/library/venv.html
-- Python 공식 문서 — pip user guide: https://pip.pypa.io/en/stable/user_guide/
-- PEP 405 — Python Virtual Environments: https://peps.python.org/pep-0405/
-- Python.org 다운로드: https://www.python.org/downloads/
-- Real Python — Python Virtual Environments Primer: https://realpython.com/python-virtual-environments-a-primer/
+- [Python 공식 문서 — venv](https://docs.python.org/3/library/venv.html) — `python -m venv`, 활성화 스크립트, 격리 원리를 직접 확인할 수 있습니다.
+- [PEP 405 — Python Virtual Environments](https://peps.python.org/pep-0405/) — venv가 `sys.prefix`와 site-packages를 어떻게 분리하는지 배경 설명을 제공합니다.
+- [pip User Guide](https://pip.pypa.io/en/stable/user_guide/) — `python -m pip`, `-r requirements.txt`, `pip freeze` 같은 실무 명령의 기준 문서입니다.
+- [Python Packaging User Guide — Install packages in a virtual environment using pip and venv](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) — 프로젝트별 `.venv` 생성·활성화·설치 흐름을 단계별로 정리합니다.
+- [Python.org Downloads](https://www.python.org/downloads/) — 공식 설치 경로와 지원 버전 확인에 적합합니다.
+- [Python 공식 문서 — Using Python on Windows](https://docs.python.org/3/using/windows.html) — Windows에서 `python`/`py` 명령, 설치 관리자, venv 사용 규칙을 확인할 수 있습니다.
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)

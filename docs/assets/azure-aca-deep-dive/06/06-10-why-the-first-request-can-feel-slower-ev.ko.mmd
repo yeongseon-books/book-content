@@ -1,0 +1,5 @@
+flowchart TD
+  Req["첫 요청"] --> Envoy["Envoy 프록시"]
+  Envoy --> DNS["DNS / 디스커버리 조회"]
+  DNS --> TLS["연결 설정"]
+  TLS --> App["앱이 요청 수신"]

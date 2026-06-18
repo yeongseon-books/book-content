@@ -1,11 +1,11 @@
 ---
-title: 'Functions and arguments: def, args, kwargs, default, lambda'
+title: "Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda"
 series: python-101
 episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -22,18 +22,21 @@ seo_description: 'A function signature is a contract: what the caller must suppl
   and what the function returns.'
 ---
 
-# Functions and arguments: def, args, kwargs, default, lambda
+# Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda
 
-## What you will learn
+A function signature is a contract: what the caller must supply and what the function returns. Argument forms, plus `/` and `*`, let you make that contract clearer and harder to misuse.
 
-By the end of this chapter you will be able to explain and code the following:
+This post is the 6th article in the Python 101 series. This is the point in the series where reusable code turns into explicit interfaces.
 
-- How to define a function with `def` and control what `return` hands back
-- The five argument forms — positional, keyword, default, `*args`, `**kwargs` — and how they bind at call time
-- How positional-only (`/`) and keyword-only (`*`) markers shape an API
-- The mutable default argument trap and a safe replacement pattern
-- Where `lambda` fits and where it does not
-- How to add light type hints to a function signature to document intent
+
+![Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/06/06-01-mental-model.en.png)
+*Python 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- How to define a function with `def` and control what `return` hands back?
+- The five argument forms — positional, keyword, default, `*args`, `**kwargs` — and how they bind at call time?
+- How positional-only (`/`) and keyword-only (`*`) markers shape an API?
 
 ## Why it matters
 
@@ -48,9 +51,6 @@ There is one more reason: the mutable default argument trap is one of the most c
 > A function signature is a contract: what the caller must supply and what the function returns. The five argument forms and the `/` and `*` markers tune how strict that contract is.
 Lay the function signature out on a page, and the call-time rules line up in your head.
 
-![Mental model](../../assets/python-101/06/06-01-mental-model.en.png)
-
-*Mental model*
 Three rules carry most of the weight.
 
 1. **Arguments bind at call time and the body runs on top of that binding.** The signature is an interface that promises "this is the name and shape I will accept".
@@ -199,7 +199,7 @@ Run these in the REPL. Lines starting with `>>>` are inputs; the lines below are
 
 1. **Reproduce the mutable default trap.**
 
-```python
+```text
 >>> def buggy(item, items=[]):
 ...     items.append(item)
 ...     return items
@@ -213,7 +213,7 @@ Run these in the REPL. Lines starting with `>>>` are inputs; the lines below are
 
 The same list object is shared across calls. The safe pattern is:
 
-```python
+```text
 >>> def safe(item, items=None):
 ...     items = items if items is not None else []
 ...     items.append(item)
@@ -228,7 +228,7 @@ The same list object is shared across calls. The safe pattern is:
 
 2. **Collect arguments with `*args` and `**kwargs`.**
 
-```python
+```text
 >>> def show(*args, **kwargs):
 ...     print("args =", args)
 ...     print("kwargs =", kwargs)
@@ -239,7 +239,7 @@ kwargs = {'x': 10}
 
 Unpacking on the call side uses the same notation:
 
-```python
+```text
 >>> def add3(a, b, c):
 ...     return a + b + c
 >>> nums = [1, 2, 3]
@@ -252,7 +252,7 @@ Unpacking on the call side uses the same notation:
 
 3. **Lock the signature with positional-only and keyword-only.**
 
-```python
+```text
 >>> def make_url(host, /, *, scheme="https", path="/"):
 ...     return f"{scheme}://{host}{path}"
 >>> make_url("example.com")
@@ -269,7 +269,7 @@ TypeError: make_url() got some positional-only arguments passed as keyword argum
 
 4. **Use `lambda` as a sort key.**
 
-```python
+```text
 >>> users = [{"name": "ada", "score": 71}, {"name": "bob", "score": 92}]
 >>> sorted(users, key=lambda u: u["score"], reverse=True)
 [{'name': 'bob', 'score': 92}, {'name': 'ada', 'score': 71}]
@@ -359,13 +359,36 @@ Both patterns reappear in the next chapter, where modules and packages introduce
 
 The next chapter covers modules and packages — `import`, `__init__.py`, and `__name__` — and shows how functions are exposed and hidden across module boundaries.
 
+## Answering the Opening Questions
+
+- **How to define a function with `def` and control what `return` hands back?**
+  - The article treats Functions and arguments: def, args, kwargs, default, lambda as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The five argument forms — positional, keyword, default, `*args`, `**kwargs` — and how they bind at call time?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How positional-only (`/`) and keyword-only (`*`) markers shape an API?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- [Python 101 (1/10): Why Python, and how to install and use venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): Variables, types, and operators](./02-variables-types-operators.md)
+- [Python 101 (3/10): Strings and formatting](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): Control flow: if, for, while, comprehension](./05-control-flow.md)
+- **Functions and arguments: def, args, kwargs, default, lambda (current)**
+- Modules and packages: import, __init__, __name__ (upcoming)
+- File I/O and exception handling (upcoming)
+- Classes and objects: bundling data with behavior (upcoming)
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- Python tutorial — Defining Functions: https://docs.python.org/3/tutorial/controlflow.html#defining-functions
-- Python docs — Function Definitions: https://docs.python.org/3/reference/compound_stmts.html#function-definitions
-- PEP 3102 — Keyword-Only Arguments: https://peps.python.org/pep-3102/
-- PEP 570 — Python Positional-Only Parameters: https://peps.python.org/pep-0570/
-- PEP 484 — Type Hints: https://peps.python.org/pep-0484/
+- [Python tutorial — More on Defining Functions](https://docs.python.org/3/tutorial/controlflow.html) — Practical overview of defaults, keyword arguments, `*args`, `**kwargs`, and `lambda`.
+- [Python docs — Compound Statements](https://docs.python.org/3/reference/compound_stmts.html) — Formal reference for function definitions, parameter kinds, and `return` behavior.
+- [Python docs — Expressions](https://docs.python.org/3/reference/expressions.html) — Documents `lambda` as an expression form and clarifies its limitations.
+- [PEP 3102 — Keyword-Only Arguments](https://peps.python.org/pep-3102/) — Design rationale for forcing options to be passed by name.
+- [PEP 570 — Python Positional-Only Parameters](https://peps.python.org/pep-0570/) — Explains the `/` separator and its API design benefits.
+- [PEP 484 — Type Hints](https://peps.python.org/pep-0484/) — Standard basis for annotating function signatures with types.

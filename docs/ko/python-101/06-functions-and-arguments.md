@@ -1,13 +1,13 @@
 ---
-title: '함수와 인자: def, args, kwargs, default, lambda'
+title: "Python 101 (6/10): 함수와 인자: def, args, kwargs, default, lambda"
 series: python-101
 episode: 6
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,45 +17,38 @@ tags:
 - keyword-only
 - lambda
 - type-hints
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: 함수 시그니처는 "호출자가 무엇을 줘야 하고, 함수가 무엇을 돌려주는가"의 계약이며, 다섯 인자 형태와 /·* 구분자는
   그 계약의 강도를…
 ---
 
-# 함수와 인자: def, args, kwargs, default, lambda
+# Python 101 (6/10): 함수와 인자: def, args, kwargs, default, lambda
+
+함수 시그니처는 호출자가 무엇을 넘겨야 하고 함수가 무엇을 돌려주는지 정의하는 계약입니다. 인자 형태와 `/`, `*` 구분자는 그 계약을 더 엄격하고 읽기 좋게 만드는 도구입니다.
+
+이 글은 Python 101 시리즈의 여섯 번째 글입니다.
 
 
-## 이 글에서 다룰 문제
+![Python 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/06/06-01-mental-model.ko.png)
+*Python 101 6장 흐름 개요*
+> 함수와 인자: def, args, kwargs, default, lambda의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-함수는 코드를 묶는 가장 작은 단위입니다. 분기와 루프를 함수로 잘라 두면 같은 일을 반복하지 않게 되고, 테스트와 변경의 단위도 함수가 됩니다. 그런데 Python 함수는 인자를 다루는 방식이 풍부한 편이라 처음에는 어디서 어떤 형태를 써야 하는지 헷갈립니다. positional만 쓰면 호출이 순서에 묶이고, 기본값을 잘못 쓰면 호출 사이에 상태가 새고, `*args`와 `**kwargs`를 남발하면 시그니처가 불투명해집니다.
+## 먼저 던지는 질문
 
-이 글은 다섯 가지 인자 형태를 한 장에 정리해, 함수 시그니처를 의도적으로 설계할 수 있도록 돕습니다. 다음 글의 모듈·패키지에서 함수가 모듈 경계를 넘어 호출되기 시작하면 시그니처가 곧 공개 인터페이스가 되므로, 그 전에 짚고 가는 편이 좋습니다.
+- 긴 positional 호출을 keyword-only 시그니처로 바꾸면 호출부가 어떻게 달라질까요?
+- `*args`, `**kwargs`, unpacking은 함수 호출과 wrapper에서 어떤 모양으로 묶이고 다시 펼쳐질까요?
+- mutable 기본값, 빠진 `return`, 과도한 `lambda`는 왜 함수 계약을 흐리게 만들까요?
 
-또 한 가지, mutable 기본값 함정은 입문자가 가장 자주 빠지는 함수 관련 버그입니다. 한 번 정확히 이해해 두면 같은 실수를 반복하지 않습니다.
-
-## Mental Model
+## 멘탈 모델
 
 > 함수 시그니처는 "호출자가 무엇을 줘야 하고, 함수가 무엇을 돌려주는가"의 계약이며, 다섯 인자 형태와 `/`·`*` 구분자는 그 계약의 강도를 단계별로 조절하는 도구입니다.
 함수 시그니처를 다음과 같이 한 장에 펼쳐 두면 호출 규칙이 머릿속에서 정렬됩니다.
 
-![Mental Model](../../assets/python-101/06/06-01-mental-model.ko.png)
-
-*Mental Model*
 세 가지 핵심 규칙입니다.
 
 1. **인자는 호출 시점에 묶이고, 본문은 그 묶음 위에서 실행**됩니다. 시그니처는 "어떤 이름으로 어떻게 받을지"를 미리 약속해 둔 인터페이스입니다.
 2. **시그니처 안의 순서는 정해져 있습니다.** positional-only → positional/keyword → `*args` 또는 `*` → keyword-only → `**kwargs`. 이 순서를 어기면 `SyntaxError`가 납니다.
 3. **기본값은 함수 정의 시점에 한 번 평가**됩니다. 그래서 mutable 객체를 기본값으로 쓰면 호출 사이에 그 객체가 공유됩니다.
-
-```mermaid
-flowchart TB
-    Q1{"인자가 진짜 가변 길이인가?"} -->|아니오| Q2{"옵션인가, 핵심 인자인가?"}
-    Q1 -->|예| Var["*args / **kwargs"]
-    Q2 -->|핵심| Q3{"순서가 의미를 가지나?"}
-    Q2 -->|옵션| KW["keyword-only (* 뒤)"]
-    Q3 -->|예| Pos["positional-only (/ 앞)"]
-    Q3 -->|아니오| Both["positional/keyword 둘 다"]
-```
 
 *시그니처 설계 결정 트리: 인자의 의미가 시그니처 형태를 결정합니다.*
 
@@ -83,9 +76,9 @@ print(f(2, 3))   # 5
 def greet(name, message):
     return f"{message}, {name}"
 
-greet("ada", "hello")             # positional
+greet("ada", "hello")               # positional
 greet(name="ada", message="hello")  # keyword
-greet("ada", message="hello")       # 혼합 (positional이 keyword 앞)
+greet("ada", message="hello")       # mixed (positional first)
 ```
 
 혼합 호출에서는 positional 인자가 keyword 인자보다 먼저 와야 합니다. 시그니처가 길어질수록 호출부에서 keyword를 쓰는 편이 각 값의 의미를 더 분명하게 드러냅니다.
@@ -98,9 +91,9 @@ greet("ada", message="hello")       # 혼합 (positional이 keyword 앞)
 def power(base, exp=2):
     return base ** exp
 
-power(3)        # 9
-power(3, 3)     # 27
-power(3, exp=4) # 81
+power(3)          # 9
+power(3, 3)       # 27
+power(3, exp=4)   # 81
 ```
 
 기본값이 있는 인자는 시그니처 뒤쪽에 모입니다. 그래야 positional 호출이 자연스럽게 들어맞습니다.
@@ -155,7 +148,7 @@ def label(score: int) -> str:
 
 함수 단위로 입력과 출력의 타입을 적어 두는 것만으로 호출부의 오해가 크게 줄어듭니다.
 
-## Before-After
+## 전후 비교
 
 같은 동작을 "장황한 시그니처" → "의도가 분명한 시그니처"로 다시 써 봅니다. 사용자 정보를 받아 인사말을 만드는 함수입니다.
 
@@ -201,7 +194,7 @@ REPL에서 차례대로 실행해 봅니다. `>>>`가 붙은 줄은 입력, 아�
 
 1. **mutable 기본값 함정을 직접 확인합니다.**
 
-```python
+```text
 >>> def buggy(item, items=[]):
 ...     items.append(item)
 ...     return items
@@ -215,7 +208,7 @@ REPL에서 차례대로 실행해 봅니다. `>>>`가 붙은 줄은 입력, 아�
 
 호출 사이에 같은 리스트가 공유되고 있습니다. 안전한 패턴은 다음과 같습니다.
 
-```python
+```text
 >>> def safe(item, items=None):
 ...     items = items if items is not None else []
 ...     items.append(item)
@@ -230,7 +223,7 @@ REPL에서 차례대로 실행해 봅니다. `>>>`가 붙은 줄은 입력, 아�
 
 2. **`*args`와 `**kwargs`로 인자를 모아 봅니다.**
 
-```python
+```text
 >>> def show(*args, **kwargs):
 ...     print("args =", args)
 ...     print("kwargs =", kwargs)
@@ -241,7 +234,7 @@ kwargs = {'x': 10}
 
 unpacking으로 다시 펼치는 것도 같은 표시법을 씁니다.
 
-```python
+```text
 >>> def add3(a, b, c):
 ...     return a + b + c
 >>> nums = [1, 2, 3]
@@ -254,7 +247,7 @@ unpacking으로 다시 펼치는 것도 같은 표시법을 씁니다.
 
 3. **keyword-only와 positional-only로 시그니처를 잠급니다.**
 
-```python
+```text
 >>> def make_url(host, /, *, scheme="https", path="/"):
 ...     return f"{scheme}://{host}{path}"
 >>> make_url("example.com")
@@ -271,7 +264,7 @@ TypeError: make_url() got some positional-only arguments passed as keyword argum
 
 4. **`lambda`를 정렬 키로 사용합니다.**
 
-```python
+```text
 >>> users = [{"name": "ada", "score": 71}, {"name": "bob", "score": 92}]
 >>> sorted(users, key=lambda u: u["score"], reverse=True)
 [{'name': 'bob', 'score': 92}, {'name': 'ada', 'score': 71}]
@@ -307,7 +300,7 @@ TypeError: make_url() got some positional-only arguments passed as keyword argum
 6. **scope 혼동.**
    함수 안에서 모듈 전역 변수를 단순히 읽는 것은 가능하지만, 같은 이름에 새 값을 대입하면 함수 안의 지역 변수가 됩니다. 진짜 전역을 바꾸고 싶다면 `global` 키워드를 명시합니다. 다만 이 패턴은 가능하면 피하고, 값을 인자로 받고 결과를 반환하는 형태로 다시 짭니다.
 
-## 실무
+## 실무에서는 이렇게 생각합니다
 
 실무에서는 함수 시그니처가 곧 공개 API가 됩니다. 두 가지 패턴을 짚어 둡니다.
 
@@ -355,13 +348,181 @@ def with_logging(fn):
 
 다음 글에서는 모듈과 패키지를 다룹니다. `import`, `__init__.py`, `__name__`을 정리하고, 함수 묶음을 모듈 경계 너머에서 어떻게 노출하고 숨기는지 살핍니다.
 
+## 실전 앵커: 함수 경계 설계, 인자 계약, 디버깅 흐름
+
+함수는 재사용 단위이면서 동시에 버그 격리 단위입니다. 초급 단계에서 특히 중요한 것은 "무엇을 받고 무엇을 보장하는가"를 코드 형태로 명확히 두는 것입니다.
+
+```python
+def calculate_total(price: int, quantity: int, discount: float = 0.0) -> int:
+    if quantity < 0:
+        raise ValueError('quantity must be >= 0')
+    subtotal = price * quantity
+    return int(subtotal * (1 - discount))
+```
+
+위 함수는 타입 힌트, 기본값, 예외 조건이 함께 명시되어 있어서 호출자가 계약을 빠르게 이해할 수 있습니다.
+
+가변 인자와 키워드 인자는 로깅/래퍼 함수에서 자주 쓰입니다.
+
+```python
+def debug_call(name, *args, **kwargs):
+    print('call:', name)
+    print('args:', args)
+    print('kwargs:', kwargs)
+```
+
+`*args`, `**kwargs`를 남용하면 인터페이스가 흐려질 수 있으므로, 외부 공개 API에서는 명시적 인자 이름을 우선하고 래퍼 계층에서만 제한적으로 사용하는 편이 좋습니다.
+
+성능 관찰도 짧게 해보겠습니다.
+
+```python
+import timeit
+
+def f_pos(a, b, c):
+    return a + b + c
+
+def f_kw(*, a, b, c):
+    return a + b + c
+
+pos_t = timeit.timeit('f_pos(1,2,3)', globals=globals(), number=3_000_000)
+kw_t = timeit.timeit('f_kw(a=1,b=2,c=3)', globals=globals(), number=3_000_000)
+print(pos_t, kw_t)
+```
+
+키워드 전달이 약간 느릴 수 있지만, 호출 가독성과 실수 방지 효과가 크기 때문에 운영 코드에서는 충분히 가치가 있습니다.
+
+클로저와 스코프도 반드시 체감해 두어야 합니다.
+
+```python
+def make_multiplier(factor):
+    def mul(x):
+        return x * factor
+    return mul
+
+mul3 = make_multiplier(3)
+print(mul3(10))
+```
+
+`factor`는 외부 함수가 끝난 뒤에도 내부 함수가 참조합니다. 이 메커니즘이 데코레이터의 기반입니다.
+
+디버깅은 `pdb`로 인자 값을 확인하면 빠릅니다.
+
+```python
+import pdb
+
+def parse_age(text):
+    pdb.set_trace()
+    return int(text.strip())
+
+parse_age(' 42 ')
+```
+
+`p text`, `p repr(text)`, `n` 순서로 보면 변환 전후가 분명히 보입니다.
+
+마지막으로 패키징 관점의 함수 분리 예시를 보겠습니다. CLI 엔트리포인트는 입력/출력만 처리하고 핵심 로직은 별도 함수로 분리해야 테스트가 쉬워집니다.
+
+```python
+def run(argv):
+    # 파싱
+    # 검증
+    return main_logic(argv)
+```
+
+이 분리 원칙은 이후 모듈/패키지, 테스트 자동화 단계에서 그대로 재사용됩니다.
+
+### 추가 실습: 함수 시그니처를 통한 오용 방지
+
+초기 API 설계에서 positional-only(` / `), keyword-only(`*`)를 적절히 쓰면 호출 실수를 많이 줄일 수 있습니다.
+
+```python
+def divide(a, b, /, *, ndigits=2):
+    return round(a / b, ndigits)
+
+print(divide(10, 3, ndigits=3))
+```
+
+이 함수는 피연산자 순서를 위치 인자로 강제하고, 반올림 자릿수는 이름으로만 받습니다. 팀 코드에서 의도가 명확해집니다.
+
+문서화는 길게 쓰기보다 도크스트링에 입력/출력/예외를 짧게 명시하는 편이 효과적입니다.
+
+```python
+def parse_port(text: str) -> int:
+    """문자열 포트를 정수로 변환합니다.
+
+    Raises:
+        ValueError: 1~65535 범위를 벗어나면 발생
+    """
+    port = int(text)
+    if not (1 <= port <= 65535):
+        raise ValueError('invalid port')
+    return port
+```
+
+함수 단위에서 계약이 명확하면 모듈 경계를 넘어가도 디버깅이 단순해집니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
+## 처음 질문으로 돌아가기
+
+- **긴 positional 호출을 keyword-only 시그니처로 바꾸면 호출부가 어떻게 달라질까요?**
+  - 본문은 `make_greeting("ada", "en", True, ">> ", "!")`처럼 의미를 추적해야 하는 호출을 `make_greeting("ada", lang="en", formal=True, prefix=">> ", suffix="!")`로 바꾸었습니다. `*` 뒤 인자를 keyword-only로 두면 boolean 자리 인자와 옵션 순서 혼동이 줄어들고, 시그니처 자체가 사용 설명서 역할을 하게 됩니다.
+- **`*args`, `**kwargs`, unpacking은 함수 호출과 wrapper에서 어떤 모양으로 묶이고 다시 펼쳐질까요?**
+  - `show(1, 2, x=10)` 예제에서는 남는 positional 인자가 tuple인 `args`로, keyword 인자가 dict인 `kwargs`로 묶이는 모습을 직접 확인했습니다. 이어서 `add3(*nums)`, `add3(**kw)`, 그리고 `wrapper(*args, **kwargs)` 패턴을 통해 같은 표기가 전달과 재호출 양쪽에서 대칭적으로 쓰인다는 점을 보여 주었습니다.
+- **mutable 기본값, 빠진 `return`, 과도한 `lambda`는 왜 함수 계약을 흐리게 만들까요?**
+  - `buggy(item, items=[])`는 호출 사이에 같은 리스트를 공유해서 함수가 매번 새 결과를 만든다는 기대를 깨뜨리고, 빠진 `return`은 호출부에 조용히 `None`을 흘려보냅니다. 또한 `lambda`는 한 줄짜리 변환에 적합하므로, 본문이 설명했듯 로직이 길어지면 이름 있는 `def`로 옮겨야 계약과 의도가 선명하게 남습니다.
+
 <!-- toc:begin -->
+## 시리즈 목차
+
+- [Python 101 (1/10): 왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- [Python 101 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): 제어 흐름: if, for, while, comprehension](./05-control-flow.md)
+- **함수와 인자: def, args, kwargs, default, lambda (현재 글)**
+- 모듈과 패키지: import, __init__, __name__ (예정)
+- 파일 I/O와 예외 처리 (예정)
+- 클래스와 객체: 데이터와 동작을 함께 묶기 (예정)
+- 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
-- Python 공식 튜토리얼 — Defining Functions: https://docs.python.org/3/tutorial/controlflow.html#defining-functions
-- Python 공식 문서 — Function Definitions: https://docs.python.org/3/reference/compound_stmts.html#function-definitions
-- PEP 3102 — Keyword-Only Arguments: https://peps.python.org/pep-3102/
-- PEP 570 — Python Positional-Only Parameters: https://peps.python.org/pep-0570/
-- PEP 484 — Type Hints: https://peps.python.org/pep-0484/
+- [Python 공식 튜토리얼 — More on Defining Functions](https://docs.python.org/3/tutorial/controlflow.html) — 기본값, keyword 인자, `*args`, `**kwargs`, `lambda`까지 함수 설계 전반을 다룹니다.
+- [Python 공식 문서 — Compound Statements](https://docs.python.org/3/reference/compound_stmts.html) — 함수 정의 문법, parameter kind, `return`의 언어 명세를 확인할 수 있습니다.
+- [Python 공식 문서 — Expressions](https://docs.python.org/3/reference/expressions.html) — `lambda`가 표현식으로 어떻게 정의되는지 설명합니다.
+- [PEP 3102 — Keyword-Only Arguments](https://peps.python.org/pep-3102/) — `*` 뒤 인자를 keyword-only로 강제하는 설계 배경입니다.
+- [PEP 570 — Python Positional-Only Parameters](https://peps.python.org/pep-0570/) — `/` 구분자의 의미와 API 안정성 이유를 설명합니다.
+- [PEP 484 — Type Hints](https://peps.python.org/pep-0484/) — 시그니처에 타입 힌트를 붙이는 표준 근거입니다.
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)

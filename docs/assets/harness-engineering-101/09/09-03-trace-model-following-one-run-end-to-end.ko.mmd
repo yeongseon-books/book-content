@@ -1,0 +1,15 @@
+flowchart TB
+    루트["trace 7a3f...\nspan: agent.run (12.3s, $0.04)"]
+    루트 --> 계획["span: llm.plan\n1.2s, $0.01"]
+    루트 --> 검색["span: tool.search\n0.8s"]
+    루트 --> 종합["span: llm.synthesize\n2.1s, $0.02"]
+    루트 --> 발송["span: tool.send_email\n0.3s"]
+
+    계획 --> 질문["계획 단계\n모델이 먼저 무엇을 판단했는가?"]
+    검색 --> 조회["검색 단계\n어느 도구 호출이 느리거나 틀렸는가?"]
+    종합 --> 비용급증["추론 단계\n어디서 비용이 튀었는가?"]
+    발송 --> 외부행동["실행 단계\n어떤 외부 행동이 실제로 일어났는가?"]
+
+    style 루트 fill:#f3e5f5,stroke:#7b1fa2
+    style 발송 fill:#e8f5e9,stroke:#388e3c
+    style 비용급증 fill:#fff8e1,stroke:#f9a825

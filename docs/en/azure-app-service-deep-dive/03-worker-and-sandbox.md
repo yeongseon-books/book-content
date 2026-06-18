@@ -1,11 +1,11 @@
 ---
-title: Workers and the sandbox — where user code actually runs
+title: "Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs"
 series: azure-app-service-deep-dive
 episode: 3
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,12 +14,15 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-04-29'
-seo_description: Microsoft doesn't publicly document the full implementation details
-  of the App Service Front-End, Worker, and File Server layers.
+last_reviewed: '2026-05-15'
+seo_description: Compare the Windows App Service sandbox with Linux container boundaries to debug worker execution failures faster.
 ---
 
-# Workers and the sandbox — where user code actually runs
+# Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs
+
+“Works locally, fails in App Service” is often not a mystery inside your framework. It is usually a boundary problem: Windows code runs under a sandbox, while Linux apps live inside a container contract with different limits and startup rules.
+
+This is the third post in the Azure App Service Deep Dive series.
 
 ## Source Version
 
@@ -50,21 +53,17 @@ Linux containers work,
 but Windows code apps do not.
 All of those symptoms start here.
 
----
+![azure app service deep dive chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.en.png)
+*azure app service deep dive chapter 3 flow overview*
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Inside what sandbox does the Worker process run, and what does that sandbox actually block?
 - How do sandbox restrictions appear in file system, network, and process spawning?
 - When a worker dies, who starts healing on what signal?
-- What does Always On mean beyond a simple 'process keepalive'?
-- What is the first rule for writing sandbox-friendly code?
 
 ## The two worker models that matter
 
-![Windows and Linux worker execution boundaries](../../assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.en.png)
-
-*Windows and Linux worker execution boundaries*
 “Worker” is one platform term.
 The execution boundary under it differs by OS and hosting mode.
 
@@ -92,7 +91,7 @@ The public sandbox material is especially explicit about two constraints.
   which means most User32/GDI32 calls,
   are heavily restricted
 
-![w3wp.exe inside the App Service sandbox](../../assets/azure-app-service-deep-dive/03/03-02-windows-w3wp-exe-under-the-app-service-s.en.png)
+![w3wp.exe inside the App Service sandbox](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-02-windows-w3wp-exe-under-the-app-service-s.en.png)
 
 *w3wp.exe inside the App Service sandbox*
 That single diagram explains the starting point for “why does this PDF or imaging library fail only on Windows App Service?”
@@ -141,7 +140,7 @@ the operational boundary to care about is this one:
 - readiness affects when traffic starts
 - persistent storage depends on `/home` mount behavior
 
-![Linux app running inside one container](../../assets/azure-app-service-deep-dive/03/03-01-linux-the-container-is-the-execution-bou.en.png)
+![Linux app running inside one container](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-01-linux-the-container-is-the-execution-bou.en.png)
 
 *Linux app running inside one container*
 On Linux,
@@ -164,10 +163,10 @@ one setting changes the meaning of `/home` dramatically.
 
 That gives you two very different operational pictures.
 
-![Shared home mount versus local container layer](../../assets/azure-app-service-deep-dive/03/03-02-when-websites-enable-app-service-storage.en.png)
+![Shared home mount versus local container layer](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-02-when-websites-enable-app-service-storage.en.png)
 
 *Shared home mount versus local container layer*
-![Shared home mount versus local container layer](../../assets/azure-app-service-deep-dive/03/03-05-when-websites-enable-app-service-storage-2.en.png)
+![Shared home mount versus local container layer](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-05-when-websites-enable-app-service-storage-2.en.png)
 
 *Shared home mount versus local container layer*
 If you miss this distinction,
@@ -212,7 +211,7 @@ the sandbox is also a quality-of-service mechanism.
 Multiple customer apps share worker infrastructure.
 The platform needs limits so that one app cannot consume or expose shared components in ways that harm others.
 
-![Sandbox limits protecting isolation and fair sharing](../../assets/azure-app-service-deep-dive/03/03-06-the-sandbox-is-a-security-feature-and-a.en.png)
+![Sandbox limits protecting isolation and fair sharing](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-06-the-sandbox-is-a-security-feature-and-a.en.png)
 
 *Sandbox limits protecting isolation and fair sharing*
 That makes the restrictions easier to reason about.
@@ -302,6 +301,36 @@ ls /home/site/wwwroot
 cat /home/LogFiles/eventlog.xml 2>/dev/null | tail -40
 ```
 
+### Return the runtime boundary before guessing at the bug
+
+When an app behaves differently on App Service than it does locally, it helps to print the execution surface first. This small Flask endpoint exposes worker identity, storage mode, and port contract in one response.
+
+```python
+from flask import Flask, jsonify
+import os
+import socket
+
+app = Flask(__name__)
+
+@app.get("/diag/runtime")
+def diag_runtime():
+    return jsonify(
+        hostname=socket.gethostname(),
+        instance_id=os.environ.get("WEBSITE_INSTANCE_ID", "unknown"),
+        site_name=os.environ.get("WEBSITE_SITE_NAME", "unknown"),
+        storage=os.environ.get("WEBSITES_ENABLE_APP_SERVICE_STORAGE", "unset"),
+        port=os.environ.get("PORT", "unset"),
+    )
+```
+
+```bash
+az webapp config appsettings list -n my-app -g my-rg \
+  --query "[?name=='WEBSITES_ENABLE_APP_SERVICE_STORAGE' || name=='WEBSITES_PORT' || name=='PORT'].{name:name,value:value}" \
+  -o table
+```
+
+**Expected output:** if a Linux custom container shows `WEBSITES_ENABLE_APP_SERVICE_STORAGE=false`, `/home` should not be treated like durable shared storage. If `PORT` or `WEBSITES_PORT` is wrong, the startup contract becomes the first suspect, not the application framework.
+
 ## Operational checklist
 
 - [ ] Added sandbox-forbidden calls (child processes, raw sockets) to the code-review rules
@@ -310,15 +339,24 @@ cat /home/LogFiles/eventlog.xml 2>/dev/null | tail -40
 - [ ] Minimised Kudu/SCM access privileges
 - [ ] Run separate alerts on worker process memory and CPU metrics
 
+## Answering the Opening Questions
+
+- **Inside what sandbox does the Worker process run, and what does that sandbox actually block?**
+  - The article treats Workers and the sandbox — where user code actually runs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do sandbox restrictions appear in file system, network, and process spawning?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When a worker dies, who starts healing on what signal?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
-- [Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
-- **Workers and the sandbox — where user code actually runs (current)**
-- Deployment and Kudu — build, sync, release from the inside (upcoming)
-- Scaling internals — how Scale Out decisions become new workers (upcoming)
-- Cold start and warmup — why the first request is expensive (upcoming)
+- [Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
+- [Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
+- **Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs (current)**
+- Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside (upcoming)
+- Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers (upcoming)
+- Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive (upcoming)
 
 <!-- toc:end -->
 

@@ -1,10 +1,10 @@
 ---
 series: computer-networks-101
 episode: 4
-title: DNS
-status: content-ready
+title: "Computer Networks 101 (4/10): DNS"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,28 @@ tags:
   - Caching
   - TTL
 seo_description: How a domain name turns into an IP address — the DNS hierarchy, recursive resolvers, record types, and what TTL really means in production.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# DNS
+# Computer Networks 101 (4/10): DNS
 
 > Computer Networks 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: When you type `example.com` in a browser, how do those letters turn into exactly one IP address so a packet can leave?
 
 > DNS is a "name to address" translation system. It is not a single server but a worldwide hierarchy — root, TLD, authoritative — with resolvers and caches in between so the same query is not repeated. That caching is both the source of the Internet's speed and the source of its most frequent incidents.
 
-<!-- a-grade-intro:end -->
+This is post 4 in the Computer Networks 101 series.
+
+
+![computer networks 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/04/04-01-concept-at-a-glance.en.png)
+*computer networks 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying DNS?
+- Which signal should the example or diagram make visible for DNS?
+- What failure should be prevented first when DNS reaches a real system?
 
 ## What You Will Learn
 
@@ -46,18 +54,7 @@ Half of "the Internet does not work" turns out to be DNS, and a large share of t
 
 > "It's always DNS" — a joke among operators that is more than half true.
 
-## Concept at a Glance
-
 > A client asks the OS stub resolver, which usually asks the ISP or company recursive resolver. The recursive resolver walks root → TLD → authoritative, finds the answer, and caches it for the TTL.
-
-```text
-browser
-  └─ stub resolver (OS)
-       └─ recursive resolver (ISP / 8.8.8.8 / 1.1.1.1)
-            ├─ root server      (".")
-            ├─ TLD server       (".com")
-            └─ authoritative    ("example.com.")
-```
 
 ## Key Terms
 
@@ -199,17 +196,29 @@ DNS is the Internet's phone book and the caching system behind half of operation
 
 Next we look at the message we actually send to the IP we found — HTTP and HTTPS.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying DNS?**
+  - The article treats DNS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for DNS?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when DNS reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Network?](./01-what-is-a-network.md)
-- [IP and Subnet](./02-ip-and-subnet.md)
-- [TCP and UDP](./03-tcp-and-udp.md)
+## In this series
+
+- [Computer Networks 101 (1/10): What Is a Network?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP and Subnet](./02-ip-and-subnet.md)
+- [Computer Networks 101 (3/10): TCP and UDP](./03-tcp-and-udp.md)
 - **DNS (current)**
 - HTTP and HTTPS (upcoming)
-- TLS basics (upcoming)
+- TLS Basics (upcoming)
 - Routing and NAT (upcoming)
 - Load Balancer (upcoming)
-- WebSocket and real-time (upcoming)
-- Debugging network problems (upcoming)
+- WebSocket and Real-Time Communication (upcoming)
+- Debugging Network Problems (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -16,28 +16,32 @@ targets:
   hashnode: true
   medium: true
   mkdocs: true
-  tistory: true
-title: 'SQLite Connection Management: thread-safety, check_same_thread, and Pooling'
+  tistory: false
+title: "Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling"
 seo_description: A SQLite connection is not the client/server connection you know
   from PostgreSQL or MySQL. There is no separate process.
 ---
 
-# SQLite Connection Management: thread-safety, check_same_thread, and Pooling
+# Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling
 
 Unlike most databases, SQLite has no separate server process. A connection is just a file handle, and transaction locks are expressed in the filesystem. That simplicity is why SQLite shows up everywhere from embedded apps to mid-sized web services, but it also pushes connection-management decisions back onto the application developer.
 
 "Can I share one connection across all threads?" "Should I open a new one per thread?" "How do I hold a connection in an async framework like FastAPI?" This post answers those questions in order.
 
-![SQLite connection Management: thread-safety, check_same_thread, and pooling](../../assets/python-dbapi-101/08/08-01-sqlite-connection-management-thread-safe.en.png)
+This is the 8th article in the Python DB-API 101 series.
+
+![SQLite connection Management: thread-safety, check_same_thread, and pooling](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-01-sqlite-connection-management-thread-safe.en.png)
 
 *SQLite connection Management: thread-safety, check_same_thread, and pooling*
-## Questions this post answers
+
+![python db-api 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-02-mental-model-a-connection-is-a-file-hand.en.png)
+*python db-api 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
 
 - What are SQLite's three thread-safety modes (single, multi, serialized) and how do you check which one you have?
 - What does `sqlite3.connect(check_same_thread=True)` actually protect against, and what becomes risky when you flip it to False?
 - When is per-thread vs shared connection appropriate?
-- Why does a large connection pool (PostgreSQL-style) not fit SQLite well?
-- How should you hold a SQLite connection in FastAPI?
 
 ## Why this matters
 
@@ -47,9 +51,6 @@ The right answer is to verify the thread-safety mode your build offers and pick 
 
 ## Mental Model: a connection is a file handle
 
-![Mental Model: a connection is a file handle](../../assets/python-dbapi-101/08/08-02-mental-model-a-connection-is-a-file-hand.en.png)
-
-*Mental Model: a connection is a file handle*
 > A SQLite connection is not the client/server connection you know from PostgreSQL or MySQL. There is no separate process. The lock is a filesystem lock, and the connection object is essentially a file handle plus cache plus transaction state.
 
 This model decides several things:
@@ -63,25 +64,33 @@ Once you internalize this, "pool connections to save handshake cost" becomes a s
 
 ## Core Concepts
 
-![Core concepts](../../assets/python-dbapi-101/08/08-03-core-concepts.en.png)
+![Core concepts](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-03-core-concepts.en.png)
 
 *Core concepts*
 ### SQLite's three thread-safety modes
 
-The SQLite C library is compiled in one of three modes:
+The SQLite C library is compiled in one of three native modes:
 
-- **Single-thread (0)**: no thread concurrency at all. Embedded only.
-- **Multi-thread (1)**: separate connections in separate threads is fine. Sharing one connection between threads is not.
-- **Serialized (2)**: even one connection can be shared across threads safely; an internal mutex serializes calls.
+- **Single-thread**: no thread concurrency at all. Embedded only.
+- **Multi-thread**: separate connections in separate threads is fine. Sharing one connection between threads is not.
+- **Serialized**: even one connection can be shared across threads safely; an internal mutex serializes calls.
 
-Python's `sqlite3` exposes the active mode:
+Those native mode names are not the same numbering as Python's DB-API `sqlite3.threadsafety` value. Python exposes this DB-API mapping instead:
+
+- **0** -> SQLite single-thread
+- **1** -> SQLite multi-thread
+- **3** -> SQLite serialized
+
+The SQLite compile-time `SQLITE_THREADSAFE` numbers are different again (`0`, `2`, `1` in that same order).
+
+Python's `sqlite3` exposes the DB-API value like this:
 
 ```python
 import sqlite3
-print(sqlite3.threadsafety)  # 0, 1, 2, or 3
+print(sqlite3.threadsafety)  # 0, 1, or 3
 ```
 
-Most distros report `1` or `3`. In Python 3.11+, `3` means `serialized` and you can share a connection across threads safely.
+Most distros report `1` or `3`. In Python 3.11+, `3` maps to SQLite's `serialized` mode; `1` maps to `multi-thread`, which still does not mean one connection should be shared across threads.
 
 ### What `check_same_thread` actually does
 
@@ -98,7 +107,7 @@ def worker():
 threading.Thread(target=worker).start()
 ```
 
-Setting `check_same_thread=False` removes the Python guard. From that point on safety depends entirely on which thread-safety mode the underlying SQLite C library was compiled with. So `check_same_thread=False` alone is **not** enough. You need `sqlite3.threadsafety >= 1` and you must guarantee at the code level that only one thread uses a given connection at a time.
+Setting `check_same_thread=False` removes the Python guard. From that point on safety depends entirely on which thread-safety mode the underlying SQLite C library was compiled with. So `check_same_thread=False` alone is **not** enough. If you intend to share one connection across threads, first verify that `sqlite3.threadsafety == 3`. Otherwise keep the safer rule: do not share one connection across threads.
 
 ### Per-thread vs shared
 
@@ -106,7 +115,7 @@ Setting `check_same_thread=False` removes the Python guard. From that point on s
 |----------|------|------|-----|
 | New connection per request | Simplest. Boundary aligns with request. | Connection churn (cheap in SQLite, but not zero) | Short requests, low concurrency |
 | Per-thread connection (`threading.local`) | Reused within a thread. Keeps the `check_same_thread` guard. | Connection count grows with thread pool | Traditional WSGI/Flask |
-| Single shared connection | Smallest footprint | Requires `serialized` mode + `check_same_thread=False`; writes serialize anyway | Embedded, single worker |
+| Single shared connection | Smallest footprint | Requires `sqlite3.threadsafety == 3` + `check_same_thread=False`; writes serialize anyway | Embedded, single worker |
 | External async pool (`aiosqlite`) | Plays nicely with coroutines | Single-writer model still applies | FastAPI/aiohttp |
 
 ### Why a big connection pool does not fit SQLite
@@ -165,7 +174,7 @@ A new connection per request, WAL so readers do not block writers, and `busy_tim
 
 ## Step by Step: holding SQLite safely in FastAPI
 
-![Step by Step: holding SQLite safely in FastAPI](../../assets/python-dbapi-101/08/08-04-step-by-step-holding-sqlite-safely-in-fa.en.png)
+![Step by Step: holding SQLite safely in FastAPI](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-04-step-by-step-holding-sqlite-safely-in-fa.en.png)
 
 *Step by Step: holding SQLite safely in FastAPI*
 ### Step 1. Inspect the environment
@@ -235,14 +244,19 @@ FastAPI calls the generator per dependency injection, so each request gets its o
 ```python
 @app.post("/users", status_code=201)
 def create_user(payload: UserCreate, db: sqlite3.Connection = Depends(get_db)):
-    with db:  # context manager handles BEGIN/COMMIT
+    db.execute("BEGIN IMMEDIATE")
+    try:
         cur = db.execute(
             "INSERT INTO users(email) VALUES (?)", (payload.email,)
         )
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
     return {"id": cur.lastrowid}
 ```
 
-`with db:` defines the transaction boundary. Exceptions roll it back; success commits. With `isolation_level=None` you keep the freedom to issue `BEGIN IMMEDIATE` explicitly when you want a writer lock up front.
+Because `open_conn()` sets `isolation_level=None`, SQLite stays in autocommit mode until you issue `BEGIN ...` yourself. Here `BEGIN IMMEDIATE` defines the write transaction boundary, `commit()` closes it on success, and `rollback()` handles exceptions.
 
 ### Step 5. Simulate concurrent writes
 
@@ -250,8 +264,16 @@ def create_user(payload: UserCreate, db: sqlite3.Connection = Depends(get_db)):
 import concurrent.futures, sqlite3
 
 def writer(i):
-    with open_conn() as conn:
+    conn = open_conn()
+    try:
+        conn.execute("BEGIN IMMEDIATE")
         conn.execute("INSERT INTO log(msg) VALUES (?)", (f"msg-{i}",))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 with concurrent.futures.ThreadPoolExecutor(max_workers=20) as ex:
     list(ex.map(writer, range(200)))
@@ -328,19 +350,28 @@ Reads stay on per-request connections. Thanks to WAL, readers do not wait on the
 
 The next post leaves the synchronous world and moves to `aiosqlite`. We will look at how to hold connections and transactions inside asyncio, and how this composes with FastAPI's async paths.
 
+## Answering the Opening Questions
+
+- **What are SQLite's three thread-safety modes (single, multi, serialized) and how do you check which one you have?**
+  - The article treats SQLite Connection Management: thread-safety, check_same_thread, and Pooling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does `sqlite3.connect(check_same_thread=True)` actually protect against, and what becomes risky when you flip it to False?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When is per-thread vs shared connection appropriate?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
-- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
-- [Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- [Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
-- [Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
-- [PEP 249 Exception Hierarchy and SQLite Error Handling](./07-error-handling-exception-hierarchy.md)
-- **SQLite Connection Management: thread-safety, check_same_thread, and Pooling (current)**
-- Asynchronous SQLite with aiosqlite (upcoming)
-- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+- [Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- [Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling](./07-error-handling-exception-hierarchy.md)
+- **Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling (current)**
+- Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite (upcoming)
+- Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
 
 <!-- toc:end -->
 

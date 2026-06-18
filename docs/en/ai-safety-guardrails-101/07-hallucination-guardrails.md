@@ -1,11 +1,11 @@
 ---
-title: Hallucination Guardrails — Grounding Checks
+title: "AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks"
 series: ai-safety-guardrails-101
 episode: 7
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,16 +14,28 @@ tags:
 - Hallucination
 - RAG
 - Grounding
-last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (7/10)
+last_reviewed: '2026-05-14'
+seo_description: Reduce LLM hallucinations in RAG systems by implementing grounding checks, claim extraction, and NLI-based verification against source context.
 ---
 
-# Hallucination Guardrails — Grounding Checks
+# AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks
 
 > AI Safety & Guardrails 101 Series (7/10)
 
----
-## Section 1
+People use "hallucination" for any confident mistake, but production guardrails need a tighter target. In RAG systems, the practical question is whether the answer is actually grounded in the provided evidence.
+
+This is post 7 in the AI Safety & Guardrails 101 series. It focuses on closed-domain hallucinations and the grounding checks that catch them reliably.
+
+
+![what grounding actually means](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/07/07-01-what-grounding-actually-means.en.png)
+*what grounding actually means*
+> To reduce hallucination, treat an answer as a set of verifiable claims, not as one fluent paragraph.
+
+## Questions to Keep in Mind
+
+- Why should a hallucination guardrail inspect claims instead of the whole answer at once?
+- What do claim extraction, entailment checks, and citation format each verify?
+- When evidence is weak, should the answer be blocked, revised, or held?
 
 ## The Trap in the Word "Hallucination"
 
@@ -212,6 +224,41 @@ Example targets: claim recall 0.90, precision 0.85, average latency under 800 ms
 - Order checks by cost: claim extraction, NLI first pass, LLM judge only for the grey zone.
 - Enforce citation format so chunk-ID matching can verify source grounding automatically.
 - Track claim-level precision and recall on public and internal regression sets to tune thresholds with data.
+
+## Operational Checklist
+
+- [ ] Require a stable citation format in every grounded answer.
+- [ ] Decompose answers into atomic claims before semantic verification.
+- [ ] Reserve the judge model for grey-zone claims to control cost.
+- [ ] Choose a fallback policy for failed grounding before launch.
+- [ ] Track claim precision, recall, latency, and cost on regression sets.
+
+---
+
+## Answering the Opening Questions
+
+- **Why should a hallucination guardrail inspect claims instead of the whole answer at once?**
+  - One answer can contain both supported and unsupported claims, so claim-level checks locate what must be fixed.
+- **What do claim extraction, entailment checks, and citation format each verify?**
+  - Claim extraction identifies what to verify, entailment checks whether evidence supports it, and citation format makes evidence traceable.
+- **When evidence is weak, should the answer be blocked, revised, or held?**
+  - Block high-risk unsupported claims, revise overconfident wording when evidence exists, and hold or escalate ambiguous cases.
+<!-- toc:begin -->
+## In this series
+
+- [AI Safety & Guardrails 101 (1/10): Why AI Safety Matters](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection Defense](./02-prompt-injection-defense.md)
+- [AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation](./03-output-filtering.md)
+- [AI Safety & Guardrails 101 (4/10): PII Detection and Redaction](./04-pii-detection-redaction.md)
+- [AI Safety & Guardrails 101 (5/10): Jailbreak Detection](./05-jailbreak-detection.md)
+- [AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection](./06-toxicity-bias-detection.md)
+- **AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks (current)**
+- AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (upcoming)
+- AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)
+- AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [TruthfulQA: Measuring How Models Mimic Human Falsehoods](https://arxiv.org/abs/2109.07958)

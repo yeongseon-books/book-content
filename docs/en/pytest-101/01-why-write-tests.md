@@ -1,10 +1,10 @@
 ---
 series: pytest-101
 episode: 1
-title: Why Write Tests?
+title: "pytest 101 (1/10): Why Write Tests?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,21 +16,29 @@ tags:
   - Testing
   - Software Quality
   - Test Automation
-seo_description: Learn how testing improves development productivity and code quality with pytest.
+seo_description: Testing with pytest enhances productivity and provides a safety net for refactoring. Learn with practical Python examples and the test pyramid.
 last_reviewed: '2026-05-04'
 ---
 
-# Why Write Tests?
+# pytest 101 (1/10): Why Write Tests?
+
+This is the first post in the pytest 101 series.
 
 > pytest 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: Does writing tests slow down development?
 
 > Tests don't slow you down — they remove the fear of change and ultimately speed you up. This article explains why tests matter, what kinds exist, and why pytest is the go-to tool for Python testing.
 
-<!-- a-grade-intro:end -->
+
+![pytest 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/01/01-01-big-picture.en.png)
+*pytest 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Why Write Tests??
+- Which signal should the example or diagram make visible for Why Write Tests??
+- What failure should be prevented first when Why Write Tests? reaches a real system?
 
 ## What You Will Learn
 
@@ -51,7 +59,7 @@ In production environments, deploying without tests means incident root-cause an
 
 > Test = code that automatically verifies your code behaves as expected
 
-```
+```text
 [Manual Testing]           [Automated Testing]
   Human runs code            Code runs code
   Repetition cost ↑          Repetition cost ≈ 0
@@ -156,7 +164,7 @@ pytest test_calculator.py -v
 
 Output:
 
-```
+```text
 test_calculator.py::test_add PASSED
 test_calculator.py::test_add_negative PASSED
 test_calculator.py::test_divide PASSED
@@ -213,7 +221,18 @@ In practice, teams invest 20–30% of total development time in writing tests. T
 
 Tests are a safety net for code changes. pytest lets you write tests with a single `assert` statement. In the next article, we'll walk through writing your first pytest test from scratch.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Why Write Tests??**
+  - The article treats Why Write Tests? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Why Write Tests??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Why Write Tests? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **Why Write Tests? (current)**
 - Writing Your First pytest Test (upcoming)
 - Assert and Exception Testing (upcoming)
@@ -224,6 +243,7 @@ Tests are a safety net for code changes. pytest lets you write tests with a sing
 - Coverage and Test Quality (upcoming)
 - Test Automation with GitHub Actions (upcoming)
 - Writing Testable Code (upcoming)
+
 <!-- toc:end -->
 
 ## References

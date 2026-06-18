@@ -1,11 +1,11 @@
 ---
-title: "grep, find, xargs — The Search Trio"
+title: "Linux CLI 101 (5/10): grep, find, xargs — The Search Trio"
 series: linux-cli-101
 episode: 5
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,36 +17,26 @@ tags:
 - xargs
 - Search
 - CLI
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: grep is a detective that finds text inside file contents, and find
   is a search party that locates files by name and attributes.
 ---
 
-# grep, find, xargs — The Search Trio
+# Linux CLI 101 (5/10): grep, find, xargs — The Search Trio
 
-> Linux CLI 101 series (5/10)
+Once a project stops fitting in your head, search becomes a workflow, not a convenience. You need to answer questions like "Where is this called?", "Which logs changed today?", and "Which matching files should I delete?" without opening everything one by one.
 
----
+This is post 5 in the Linux CLI 101 series.
 
-<!-- a-grade-intro:begin -->
 
-## Key Questions
+![Linux CLI 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/05/05-01-mental-model.en.png)
+*Linux CLI 101 chapter 5 flow overview*
 
-- How do you find lines containing a specific string across thousands of files?
-- What is the difference between content search (grep) and filename search (find)?
-- Why is xargs needed, and how does it differ from a pipe?
-- Can you use grep effectively without regular expressions?
+## Questions to Keep in Mind
 
-> grep is a detective that finds text inside file contents, and find is a search party that locates files by name and attributes.
-
-<!-- a-grade-intro:end -->
-
-## What you will learn
-
-- Searching for strings inside files with `grep`
-- Finding files by name, size, and modification time with `find`
-- Passing search results as arguments to other commands with `xargs`
-- Combining all three commands to automate real-world tasks
+- Searching for strings inside files with `grep`?
+- Finding files by name, size, and modification time with `find`?
+- Passing search results as arguments to other commands with `xargs`?
 
 ## Why it matters
 
@@ -223,6 +213,13 @@ Running grep on images or executables produces garbled output. Restrict file typ
 
 In practice, many teams use `ripgrep (rg)` which is faster than `grep`, and `fd` which is faster than `find`. But learning the standard commands first is necessary to appreciate the alternatives, and the standard commands have one undeniable advantage — they are installed on every server.
 
+## When it breaks, check these first
+
+- If you get no matches at all, shrink the scope first. Run `grep -n "TODO" one-file.txt` before going recursive so you can tell whether the pattern is wrong or the path is wrong.
+- If `find` behaves strangely, check your quoting. `find . -name *.py` lets the shell expand `*.py` too early; `find . -name "*.py"` keeps the pattern where it belongs.
+- If filenames with spaces break downstream commands, switch to `-print0` and `xargs -0` before doing anything destructive. This matters most when the next step is `rm`, `mv`, or `chmod`.
+- If grep output is noisy or slow, limit the target set with options like `--include="*.py"` or `--exclude-dir=.git`. In real codebases, controlling scope is usually the first optimization.
+
 ## Checklist
 
 - [ ] You can search for strings across a project with `grep -rn`
@@ -247,14 +244,23 @@ In practice, many teams use `ripgrep (rg)` which is faster than `grep`, and `fd`
 
 The next post covers **pipes and redirection** — connecting commands and redirecting input/output.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
-- [Permissions and Ownership](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- **grep, find, xargs (current)**
+- **Searching for strings inside files with `grep`?**
+  - The article treats grep, find, xargs — The Search Trio as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Finding files by name, size, and modification time with `find`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Passing search results as arguments to other commands with `xargs`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): Permissions and Ownership](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents](./04-viewing-files.md)
+- **grep, find, xargs — The Search Trio (current)**
 - Pipes and Redirection (upcoming)
 - Process Management (upcoming)
 - Environment Variables and PATH (upcoming)

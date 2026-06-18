@@ -5,7 +5,7 @@ episode: 2
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -25,6 +25,8 @@ seo_description: '"Why is my app returning a 502 error?" "Response times suddenl
 
 To answer these questions, you need to understand the **complete journey of a request reaching your app**. In this post, we'll walk through the Azure App Service Request Lifecycle step by step.
 
+This is the second post in the Azure App Service 101 series. Here, the focus is on tracing where a request can stall, fail, or recover before it ever becomes an app-level bug.
+
 ---
 
 > The request lifecycle in App Service is a chain of stable hops; latency lives in the warm-up step in the middle.
@@ -41,13 +43,13 @@ To answer these questions, you need to understand the **complete journey of a re
 
 A user's HTTP request passes through these layers before reaching your app:
 
-```
+```text
 Client → DNS → Azure Load Balancer → App Service Frontend → Worker Instance → App Process
 ```
 
 Issues can occur at each stage, resulting in different error messages.
 
-![Request path from client to app](../../assets/azure-app-service-101/02/01-full-request-lifecycle.en.png)
+![Request path from client to app](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/02/01-full-request-lifecycle.en.png)
 
 *Request path from client to app*
 
@@ -90,7 +92,7 @@ The App Service Frontend performs these roles:
 | Access Restriction Evaluation | IP restrictions, auth checks |
 | Instance Selection | Routes to healthy Worker |
 
-![Frontend routing and rejection checks](../../assets/azure-app-service-101/02/02-frontend-routing-decision.en.png)
+![Frontend routing and rejection checks](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/02/02-frontend-routing-decision.en.png)
 
 *Frontend routing and rejection checks*
 
@@ -169,7 +171,7 @@ Finally, the request reaches your app code!
 
 Responses travel back in reverse order:
 
-```
+```text
 App → Worker → Frontend → Load Balancer → Client
 ```
 
@@ -225,7 +227,7 @@ Frontend distributes traffic across healthy instances by default.
 
 You can pin specific clients to the same instance:
 
-```
+```text
 Client A ─(Affinity Cookie)─→ Instance 2
 Client B ─(Affinity Cookie)─→ Instance 1
 ```
@@ -261,7 +263,7 @@ Health Check determines whether an instance is **eligible** to receive traffic.
 | Unhealthy | Removed from the routing pool |
 | Recovering | Re-included after probes pass |
 
-![Instance state changes from health checks](../../assets/azure-app-service-101/02/03-health-check-state-machine.en.png)
+![Instance state changes from health checks](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/02/03-health-check-state-machine.en.png)
 
 *Instance state changes from health checks*
 
@@ -270,16 +272,16 @@ Health Check determines whether an instance is **eligible** to receive traffic.
 ```python
 @app.route('/health')
 def health():
- # 1. Keep it lightweight
- # 2. Check only dependencies critical for traffic handling
- # 3. Avoid slow external calls
- 
- try:
- # Simple check of critical dependencies
- db.execute("SELECT 1")
- return {"status": "healthy"}, 200
- except Exception as e:
- return {"status": "unhealthy", "reason": str(e)}, 503
+    # 1. Keep it lightweight
+    # 2. Check only dependencies critical for traffic handling
+    # 3. Avoid slow external calls
+
+    try:
+        # Simple check of critical dependencies
+        db.execute("SELECT 1")
+        return {"status": "healthy"}, 200
+    except Exception as e:
+        return {"status": "unhealthy", "reason": str(e)}, 503
 ```
 
 ---
@@ -337,7 +339,7 @@ az webapp log tail \
 
 ## Common Failure Patterns
 
-![Status codes mapped to failure layers](../../assets/azure-app-service-101/02/04-failure-pattern-map.en.png)
+![Status codes mapped to failure layers](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/02/04-failure-pattern-map.en.png)
 
 *Status codes mapped to failure layers*
 

@@ -1,10 +1,10 @@
 ---
 series: data-science-career-101
 episode: 5
-title: SQL and Analytics Interviews
-status: content-ready
+title: "Data Science Career 101 (5/10): SQL and Analytics Interviews"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,27 @@ tags:
   - Interview
   - Beginner
 seo_description: A beginner-friendly tour of patterns for SQL and analytics interviews.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# SQL and Analytics Interviews
+# Data Science Career 101 (5/10): SQL and Analytics Interviews
 
-> Data Science Career 101 series (5/10)
+Many candidates prepare for SQL interviews as if they were grammar exams. They memorize JOIN types, aggregation syntax, and window functions, but they still struggle once the interviewer asks, “What exactly are you counting?” or “How would you explain this result to a product manager?”
 
-<!-- a-grade-intro:begin -->
+That gap exists because SQL interviews are usually reasoning interviews in disguise. The query matters, but so do the assumptions behind it: the metric definition, the NULL behavior, the time boundary, and the interpretation that turns a result set into an insight.
 
-**Core question**: How do you prepare for SQL and analytics interviews?
+This is post 5 in the Data Science Career 101 series.
 
-> Decompose the question, JOIN, aggregate, window, interpret.
 
-<!-- a-grade-intro:end -->
+![data science career 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/05/05-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 5 flow overview*
+> In SQL interviews, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
+## Questions to Keep in Mind
+
+- What do SQL and analytics interviews actually evaluate beyond syntax?
+- How should you break a business question into query steps?
+- What are the recurring patterns around JOINs, aggregation, windows, and funnels?
 
 ## What You Will Learn
 
@@ -42,17 +49,11 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-SQL is the lingua franca of every data role.
+SQL is the shared language across most data roles, which is why interviewers use it to observe more than database fluency.
 
-## Concept at a Glance
+They are also watching how you define the metric, whether you surface assumptions, and whether you can tell the difference between “I got a number” and “I understand what this number means.”
 
-```mermaid
-flowchart LR
-    Q[Question] --> S[SQL]
-    S --> R[Result]
-    R --> I[Insight]
-```
-
+SQL questions are less about syntax and more about question decomposition. A good SQL answer shows you break the problem into smaller steps and explain your reasoning at each stage.
 ## Key Terms
 
 - **JOIN**: Combining tables.
@@ -69,6 +70,7 @@ flowchart LR
 
 ## Hands-on: Five Question Patterns
 
+Most SQL interview questions follow five recurring patterns. The faster you recognize the pattern, the faster you can plan your solution.
 ### Step 1 — Single-Table Aggregation
 
 ```sql
@@ -131,7 +133,9 @@ SELECT SUM(s1), SUM(s2), SUM(s3) FROM steps;
 
 ## How This Shows Up in Production
 
-Analytics interviews typically pair one SQL problem with one case.
+Analytics interviews commonly pair one SQL problem with one interpretation or case-style follow-up because real work almost never stops at query execution.
+
+In production, the important part is often the sentence after the query: what changed, whether the result is trustworthy, and what should be checked next.
 
 ## How a Senior Engineer Thinks
 
@@ -156,24 +160,38 @@ Analytics interviews typically pair one SQL problem with one case.
 
 ## Wrap-up and Next Steps
 
-Next post covers *The ML Interview*.
+The strongest answers in SQL interviews feel structured before they feel clever. They define the metric, make the query readable, call out the edge cases, and close with a compact interpretation that points to the next useful question.
+
+The next post applies the same problem-first thinking to machine learning interviews.
+
+## Answering the Opening Questions
+
+- **What do SQL and analytics interviews actually evaluate beyond syntax?**
+  - The article treats SQL and Analytics Interviews as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should you break a business question into query steps?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What are the recurring patterns around JOINs, aggregation, windows, and funnels?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What Is a Data Career](./01-what-is-data-career.md)
-- [Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
-- [Designing the Learning Path](./03-learning-path.md)
-- [The Data Portfolio](./04-data-portfolio.md)
+## In this series
+
+- [Data Science Career 101 (1/10): What Is a Data Career](./01-what-is-data-career.md)
+- [Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
+- [Data Science Career 101 (3/10): Designing the Learning Path](./03-learning-path.md)
+- [Data Science Career 101 (4/10): The Data Portfolio](./04-data-portfolio.md)
 - **SQL and Analytics Interviews (current)**
 - The ML Interview (upcoming)
 - The Case Interview (upcoming)
 - Settling into the First Data Job (upcoming)
 - Building Domain Expertise (upcoming)
 - The Path to Senior in Data (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Mode SQL Tutorial](https://mode.com/sql-tutorial/)
-- [LeetCode SQL](https://leetcode.com/studyplan/top-sql-50/)
-- [Window Functions](https://www.postgresql.org/docs/current/tutorial-window.html)
-- [Trustworthy Online Controlled Experiments](https://experimentguide.com/)
+- [Mode - SQL Tutorial](https://mode.com/sql-tutorial/)
+- [LeetCode - Top SQL 50](https://leetcode.com/studyplan/top-sql-50/)
+- [PostgreSQL Documentation - Window Functions Tutorial](https://www.postgresql.org/docs/current/tutorial-window.html)
+- [Ron Kohavi et al. - Trustworthy Online Controlled Experiments](https://experimentguide.com/)

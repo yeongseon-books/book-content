@@ -1,10 +1,10 @@
 ---
 series: oop-101
 episode: 1
-title: What Is Object-Oriented Programming?
-status: content-ready
+title: "Object-Oriented Programming 101 (1/10): What Is Object-Oriented Programming?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,28 @@ tags:
   - Programming Paradigm
   - Classes
 seo_description: Understand the core idea of object-oriented programming and how it differs from procedural code with practical Python examples.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is Object-Oriented Programming?
+# Object-Oriented Programming 101 (1/10): What Is Object-Oriented Programming?
+
+This is the first post in the Object-Oriented Programming 101 series.
 
 > Object-Oriented Programming 101 Series (1/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: Why does organizing programs around "objects" make code easier to maintain?
 
 > Programming paradigms define how we structure code. Procedural programming centers on functions; object-oriented programming bundles data and behavior into objects. This article explains what OOP is, why it emerged, and when it is the right choice.
 
-<!-- a-grade-intro:end -->
+
+![Object-Oriented Programming 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/01/01-01-big-picture.en.png)
+*Object-Oriented Programming 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Object-Oriented Programming??
+- Which signal should the example or diagram make visible for What Is Object-Oriented Programming??
+- What failure should be prevented first when What Is Object-Oriented Programming? reaches a real system?
 
 ## What You Will Learn
 
@@ -51,7 +59,7 @@ Most modern languages — Python, Java, C++, C# — support OOP. Frameworks and 
 
 > Procedural vs Object-Oriented
 
-```
+```text
 Procedural                     Object-Oriented
 ┌────────────────────┐        ┌────────────────────┐
 │ Function A         │        │ Object A           │
@@ -128,7 +136,6 @@ class Dog:
 
     def __repr__(self) -> str:
         return f"Dog(name={self.name!r}, breed={self.breed!r})"
-
 
 my_dog = Dog("Buddy", "Golden Retriever")
 print(my_dog.bark())  # Buddy says woof!
@@ -287,17 +294,29 @@ In practice, the question "Should this be a class?" comes up often. The answer u
 
 OOP bundles data and behavior into a single unit to make code structure clear. In the next article, we will explore classes and instances in greater depth.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Object-Oriented Programming??**
+  - The article treats What Is Object-Oriented Programming? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Object-Oriented Programming??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Object-Oriented Programming? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Object-Oriented Programming? (current)**
-- [Classes and Instances](./02-classes-and-instances.md)
-- [Encapsulation](./03-encapsulation.md)
-- [Inheritance](./04-inheritance.md)
-- [Polymorphism](./05-polymorphism.md)
-- [Abstraction](./06-abstraction.md)
-- [Composition vs Inheritance](./07-composition-vs-inheritance.md)
-- [SOLID Principles Basics](./08-solid-principles.md)
-- [OOP Design Example](./09-oop-design-example.md)
-- [When to Avoid OOP](./10-when-to-avoid-oop.md)
+- Classes and Instances (upcoming)
+- Encapsulation (upcoming)
+- Inheritance (upcoming)
+- Polymorphism (upcoming)
+- Abstraction (upcoming)
+- Composition vs Inheritance (upcoming)
+- SOLID Principles Basics (upcoming)
+- OOP Design Example (upcoming)
+- When to Avoid OOP (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,10 +1,10 @@
 ---
 series: machine-learning-101
 episode: 10
-title: The ML Project Workflow
-status: content-ready
+title: "Machine Learning 101 (10/10): The ML Project Workflow"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,45 +17,28 @@ tags:
   - MLOps
   - Beginner
 seo_description: From problem framing to data, modeling, evaluation, deployment, and monitoring, the full ML project workflow with sklearn Pipeline in code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# The ML Project Workflow
+# Machine Learning 101 (10/10): The ML Project Workflow
 
-> Machine Learning 101 series (10/10)
+Many ML projects die after the notebook victory lap. The score looked good, the demo worked, and then the real system exposed everything the notebook had hidden: missing reproducibility, scattered preprocessing, undefined monitoring, and no clear path from experiment to deployment.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Machine Learning 101 series. Here we will connect problem framing, data preparation, modeling, evaluation, deployment, and monitoring into one workflow so the model score becomes only one checkpoint in a larger loop.
 
-**Core question**: If accuracy is everything, why do 90% of ML projects fail to ship?
 
-> *ML success means completing the loop from problem framing to monitoring, not just maximizing a score.*
+![machine learning 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/10/10-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 10 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The seven-step ML workflow
-- How `Pipeline` glues preprocessing and model
-- Reproducibility and model cards
-- Why post-deployment monitoring matters
-- Five common pitfalls
+- Why do so many ML projects fail even after promising offline scores?
+- Why should problem definition, data, modeling, deployment, and monitoring be treated as one loop?
+- How does `Pipeline` protect you from preprocessing leakage?
 
 ## Why It Matters
 
 A 0.95 score in a notebook is worth zero if the model never reaches users. Owning the full loop is what creates impact.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    P["1.problem"] --> D["2.data"]
-    D --> F["3.feature"]
-    F --> M["4.model"]
-    M --> E["5.evaluate"]
-    E --> Dep["6.deploy"]
-    Dep --> Mon["7.monitor"]
-    Mon --> P
-```
 
 ## Key Terms
 
@@ -118,11 +101,19 @@ fresh = Xte + np.random.normal(0, 0.1, Xte.shape)
 print("drifted:", loaded.score(fresh, yte))
 ```
 
+**Expected output:** the saved pipeline should reload and reproduce the same test score, while the drifted input score should usually fall. That gap is a simple but useful reminder that deployment success depends on watching the input distribution, not just archiving the model artifact.
+
 ## What to Notice in This Code
 
 - `Pipeline` blocks preprocessing leakage at the source.
 - `joblib` enables reproducible deployment.
 - Even small input noise drops the score, illustrating drift.
+
+## Read the first failure signal this way
+
+- If the production score drops right after deployment, compare live preprocessing with the training pipeline before blaming the model weights.
+- If nobody can reproduce the shipped result from a clean environment, the workflow is broken even if the notebook was convincing.
+- If monitoring only tracks latency and uptime, you still do not know whether the model is healthy.
 
 ## Five Common Mistakes
 
@@ -161,17 +152,29 @@ Recommendation, fraud detection, and search teams compete on how well they autom
 
 Congratulations — you finished Machine Learning 101. Continue with Model Evaluation 101 and MLOps 101 for deeper material.
 
+## Answering the Opening Questions
+
+- **Why do so many ML projects fail even after promising offline scores?**
+  - The article treats The ML Project Workflow as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should problem definition, data, modeling, deployment, and monitoring be treated as one loop?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How does `Pipeline` protect you from preprocessing leakage?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
-- [Linear Regression](./04-linear-regression.md)
-- [Logistic Regression](./05-logistic-regression.md)
-- [Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
-- [Clustering](./07-clustering.md)
-- [Overfitting and Regularization](./08-overfitting-and-regularization.md)
-- [Model Evaluation](./09-model-evaluation.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
+- [Machine Learning 101 (4/10): Linear Regression](./04-linear-regression.md)
+- [Machine Learning 101 (5/10): Logistic Regression](./05-logistic-regression.md)
+- [Machine Learning 101 (6/10): Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
+- [Machine Learning 101 (7/10): Clustering](./07-clustering.md)
+- [Machine Learning 101 (8/10): Overfitting and Regularization](./08-overfitting-and-regularization.md)
+- [Machine Learning 101 (9/10): Model Evaluation](./09-model-evaluation.md)
 - **The ML Project Workflow (current)**
+
 <!-- toc:end -->
 
 ## References

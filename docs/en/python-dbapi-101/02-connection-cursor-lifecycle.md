@@ -1,5 +1,5 @@
 ---
-title: Connection and Cursor Lifecycle
+title: "Python DB-API 101 (2/10): Connection and Cursor Lifecycle"
 series: python-dbapi-101
 episode: 2
 language: en
@@ -22,33 +22,27 @@ seo_description: The two core DB-API objects are connection and cursor. Their na
   are plain, but mishandling their lifecycle leads to connection leaks, locks, and…
 ---
 
-# Connection and Cursor Lifecycle
-
-> Python DB-API 101 series (2/10)
-
----
+# Python DB-API 101 (2/10): Connection and Cursor Lifecycle
 
 The two core DB-API objects are connection and cursor. Their names are plain, but mishandling their lifecycle leads to connection leaks, locks, and race conditions. This episode covers how each is created, used, and closed; the context-manager patterns that keep them safe; and the lifecycle pitfalls that bite most often.
 
-<!-- a-grade-intro:begin -->
+This is the 2nd article in the Python DB-API 101 series.
 
-![Connection and cursor lifecycle](../../assets/python-dbapi-101/02/02-01-connection-and-cursor-lifecycle.en.png)
+![Connection and cursor lifecycle](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/02/02-01-connection-and-cursor-lifecycle.en.png)
 
 *Connection and cursor lifecycle*
-## Key Questions
+
+![python db-api 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/02/02-02-1-what-a-connection-is.en.png)
+*python db-api 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
 
 - What are the distinct responsibilities of Connection vs Cursor?
 - How does the `with` context manager protect connection and cursor resources?
 - What is the trade-off between opening a new connection per call vs reusing one?
-- What symptoms appear when you forget to close?
-
-<!-- a-grade-intro:end -->
 
 ## 1. What a Connection Is
 
-![What a connection is](../../assets/python-dbapi-101/02/02-02-1-what-a-connection-is.en.png)
-
-*What a connection is*
 A connection is a single communication channel between the application and the database. It wraps a TCP socket (PostgreSQL, MySQL) or a file handle (SQLite), and one connection holds one transaction context.
 
 ```python
@@ -85,7 +79,7 @@ In SQLite (single file), a cursor is essentially a thin wrapper. In PostgreSQL, 
 
 ## 3. Safe Use with Context Managers
 
-![Safe use with context managers](../../assets/python-dbapi-101/02/02-03-3-safe-use-with-context-managers.en.png)
+![Safe use with context managers](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/02/02-03-3-safe-use-with-context-managers.en.png)
 
 *Safe use with context managers*
 Manual close is easy to forget. Python's `with` statement is the safer route.
@@ -148,7 +142,7 @@ cur2.execute("SELECT id FROM orders")
 
 ## 5. Reusing vs Reopening a Connection
 
-![Reusing vs reopening a connection](../../assets/python-dbapi-101/02/02-04-5-reusing-vs-reopening-a-connection.en.png)
+![Reusing vs reopening a connection](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/02/02-04-5-reusing-vs-reopening-a-connection.en.png)
 
 *Reusing vs reopening a connection*
 Opening a fresh connection per query reads cleanly but is expensive.
@@ -245,19 +239,28 @@ The next episode walks through `execute()`, `executemany()`, and the `fetchone()
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **What are the distinct responsibilities of Connection vs Cursor?**
+  - The article treats Connection and Cursor Lifecycle as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How does the `with` context manager protect connection and cursor resources?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What is the trade-off between opening a new connection per call vs reusing one?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
-- **Connection and Cursor Lifecycle (current)**
-- execute, executemany, and Fetch Patterns (upcoming)
-- Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)
-- Transactions and isolation levels (sqlite3, PEP 249) (upcoming)
-- Row factories and type adapters (sqlite3, PEP 249) (upcoming)
-- PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
-- SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
-- Asynchronous SQLite with aiosqlite (upcoming)
-- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+- [Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- **Python DB-API 101 (2/10): Connection and Cursor Lifecycle (current)**
+- Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns (upcoming)
+- Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)
+- Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249) (upcoming)
+- Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249) (upcoming)
+- Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
+- Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
+- Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite (upcoming)
+- Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
 
 <!-- toc:end -->
 

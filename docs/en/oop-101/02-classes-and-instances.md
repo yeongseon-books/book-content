@@ -1,10 +1,10 @@
 ---
 series: oop-101
 episode: 2
-title: Classes and Instances
+title: "Object-Oriented Programming 101 (2/10): Classes and Instances"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,25 @@ seo_description: Master Python class constructors, instance methods, class metho
 last_reviewed: '2026-05-04'
 ---
 
-# Classes and Instances
+# Object-Oriented Programming 101 (2/10): Classes and Instances
+
+This is post 2 in the Object-Oriented Programming 101 series.
 
 > Object-Oriented Programming 101 Series (2/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: How should you design classes and work with instances effectively?
 
 > A class is the blueprint; an instance is the actual object built from it. This article covers constructors, instance methods, class methods, static methods, and Python's special dunder methods — the building blocks of any class.
 
-<!-- a-grade-intro:end -->
+
+![Object-Oriented Programming 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/02/02-01-big-picture.en.png)
+*Object-Oriented Programming 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Classes and Instances?
+- Which signal should the example or diagram make visible for Classes and Instances?
+- What failure should be prevented first when Classes and Instances reaches a real system?
 
 ## What You Will Learn
 
@@ -51,7 +59,7 @@ Python's dunder methods let you integrate custom classes seamlessly with built-i
 
 > Anatomy of a class
 
-```
+```text
 Class
 ├── class variable
 ├── __init__()       → instance initialization
@@ -286,17 +294,29 @@ Since Python 3.7, consider `dataclasses` first. They reduce boilerplate while st
 
 A class is composed of constructors, instance methods, class methods, static methods, and dunder methods. Understanding each component lets you design clean, Pythonic classes. In the next article, we explore encapsulation — protecting a class's internal state.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Classes and Instances?**
+  - The article treats Classes and Instances as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Classes and Instances?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Classes and Instances reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Object-Oriented Programming?](./01-what-is-oop.md)
+## In this series
+
+- [Object-Oriented Programming 101 (1/10): What Is Object-Oriented Programming?](./01-what-is-oop.md)
 - **Classes and Instances (current)**
-- [Encapsulation](./03-encapsulation.md)
-- [Inheritance](./04-inheritance.md)
-- [Polymorphism](./05-polymorphism.md)
-- [Abstraction](./06-abstraction.md)
-- [Composition vs Inheritance](./07-composition-vs-inheritance.md)
-- [SOLID Principles Basics](./08-solid-principles.md)
-- [OOP Design Example](./09-oop-design-example.md)
-- [When to Avoid OOP](./10-when-to-avoid-oop.md)
+- Encapsulation (upcoming)
+- Inheritance (upcoming)
+- Polymorphism (upcoming)
+- Abstraction (upcoming)
+- Composition vs Inheritance (upcoming)
+- SOLID Principles Basics (upcoming)
+- OOP Design Example (upcoming)
+- When to Avoid OOP (upcoming)
+
 <!-- toc:end -->
 
 ## References

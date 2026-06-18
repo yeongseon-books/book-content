@@ -1,10 +1,10 @@
 ---
 series: data-warehouse-101
 episode: 8
-title: Data Mart
-status: content-ready
+title: "Data Warehouse 101 (8/10): Data Mart"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,35 @@ tags:
   - Domain
   - Analytics
 seo_description: What a data mart is, how it differs from a warehouse, and why teams keep small domain-specific analytical zones.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Data Mart
+# Data Warehouse 101 (8/10): Data Mart
 
-> Data Warehouse 101 series (8/10)
+One warehouse rarely means one shared language. Sales, finance, and operations may start from the same source data, but they read it through different questions, different permissions, and different levels of aggregation.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Data Warehouse 101 series.
 
-**Core question**: With a big *warehouse*, why also build *small marts*? Should *sales* and *finance* really see the *same view*?
+In this post, we look at data marts as the layer that translates common warehouse assets into domain-ready analytical surfaces. The key is to narrow the interface without breaking the shared definitions underneath.
 
-> *A mart is a small analytical zone, restated in the team's vocabulary.*
 
-<!-- a-grade-intro:end -->
+![data warehouse 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/08/08-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 8 flow overview*
+> A data mart is a specialized warehouse for one department or purpose. The central definitions stay consistent; each mart adds only what it needs.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Data Mart?
+- Which signal should the example or diagram make visible for Data Mart?
+- What failure should be prevented first when Data Mart reaches a real system?
+
+## Questions this article answers
+
+- How is a data mart different from the warehouse itself?
+- Why separate organization-wide shared data from team-specific analytical space?
+- What gets better when you reflect domain vocabulary directly in the data model?
+- What role do conformed dimensions play across multiple marts?
+- Why do access boundaries and self-service analysis matter so much in mart design?
 
 ## What You Will Learn
 
@@ -46,16 +61,7 @@ A warehouse holds *org-wide common data*. But *sales, finance, and ops* speak *d
 
 > *Common in the warehouse, domain in the mart.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    DW["Warehouse (Conformed)"] --> SalesMart["Sales Mart"]
-    DW --> FinanceMart["Finance Mart"]
-    DW --> OpsMart["Ops Mart"]
-    SalesMart --> SalesBI["Sales Dashboard"]
-    FinanceMart --> FinanceBI["Finance Dashboard"]
-```
+This picture shows how a data mart fits between the central warehouse and specific teams. The key is not to memorize mart types, but to see how specialization coexists with centralized definitions.
 
 ## Key Terms
 
@@ -168,17 +174,29 @@ dbt's *marts/* folder is split *by domain*. Sales, finance, product, and marketi
 
 A mart is a *thin bridge* between the team and the data. Next, we cover *performance optimization patterns*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Data Mart?**
+  - The article treats Data Mart as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Data Mart?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Data Mart reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
-- [OLTP and OLAP](./02-oltp-and-olap.md)
-- [Fact and Dimension](./03-fact-and-dimension.md)
-- [Star Schema](./04-star-schema.md)
-- [Partition and Clustering](./05-partition-and-clustering.md)
-- [ETL and ELT](./06-etl-and-elt.md)
-- [BI and Dashboard](./07-bi-and-dashboard.md)
+## In this series
+
+- [Data Warehouse 101 (1/10): What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
+- [Data Warehouse 101 (2/10): OLTP and OLAP](./02-oltp-and-olap.md)
+- [Data Warehouse 101 (3/10): Fact and Dimension](./03-fact-and-dimension.md)
+- [Data Warehouse 101 (4/10): Star Schema](./04-star-schema.md)
+- [Data Warehouse 101 (5/10): Partition and Clustering](./05-partition-and-clustering.md)
+- [Data Warehouse 101 (6/10): ETL and ELT](./06-etl-and-elt.md)
+- [Data Warehouse 101 (7/10): BI and Dashboard](./07-bi-and-dashboard.md)
 - **Data Mart (current)**
 - Performance Optimization (upcoming)
 - Warehouse Design Example (upcoming)
+
 <!-- toc:end -->
 
 ## References

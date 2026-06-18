@@ -1,10 +1,10 @@
 ---
 series: api-design-101
 episode: 4
-title: HTTP Methods and Status Codes
-status: content-ready
+title: "API Design 101 (4/10): HTTP Methods and Status Codes"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,27 @@ tags:
   - StatusCodes
   - Backend
 seo_description: A backend junior's reference for picking GET/POST/PUT/PATCH/DELETE and the right 2xx, 4xx, and 5xx status code for each response.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# HTTP Methods and Status Codes
+# API Design 101 (4/10): HTTP Methods and Status Codes
 
-> API Design 101 series (4/10)
+Two APIs can expose the same feature and still feel radically different to a client. In one, the next action is obvious. In the other, the client has to re-interpret whether the call really succeeded, whether a retry is safe, or whether the user can fix the error.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the API Design 101 series.
 
-**Core question**: Which method should you use, and which status code should you return — what is the *criterion* for those two decisions?
+Here, we treat HTTP methods and status codes as the client-side branching model of the API. The method communicates intent, and the status code tells the caller what happened in a way that retries, caching, and error handling can trust.
 
-> *Idempotency* and the *meaning of the result*.
 
-<!-- a-grade-intro:end -->
+![api design 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/04/04-01-concept-at-a-glance.en.png)
+*api design 101 chapter 4 flow overview*
+> The power of HTTP methods and status codes is that clients do not need to parse response bodies to know what happened — the code tells the story.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The meaning of GET / POST / PUT / PATCH / DELETE
-- Safe vs idempotent operations
-- The 2xx / 3xx / 4xx / 5xx families
-- The twelve status codes you will use most
-- A method × status mapping table
+- The meaning of GET / POST / PUT / PATCH / DELETE?
+- Safe vs idempotent operations?
+- The 2xx / 3xx / 4xx / 5xx families?
 
 ## Why It Matters
 
@@ -47,20 +46,7 @@ Methods and status codes drive the *branching logic* on the client. Return the w
 
 > A status code is not a *number*. It is a *contract*.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Req["request"] --> M{"method"}
-    M -->|"GET"| Read["read"]
-    M -->|"POST"| Create["create / action"]
-    M -->|"PUT/PATCH"| Update["update"]
-    M -->|"DELETE"| Remove["delete"]
-    Read --> S{"status"}
-    Create --> S
-    Update --> S
-    Remove --> S
-```
+Clients make retry, caching, and UX decisions from that pair first. If you design them separately, the syntax may still be valid HTTP, but the integration experience becomes fragile very quickly.
 
 ## Key Terms
 
@@ -74,14 +60,14 @@ flowchart LR
 
 **Before (intent unclear)**
 
-```
+```http
 POST /users/42/update   200 OK   {"ok": true}
 POST /users/42/delete   200 OK   {"ok": true}
 ```
 
 **After (method × status)**
 
-```
+```http
 PATCH  /users/42   200 OK
 DELETE /users/42   204 No Content
 ```
@@ -198,6 +184,12 @@ Look at GitHub's responses — method × status reads almost like a textbook: 20
 - Pick from standard codes; resist inventing new ones.
 - Put the *detailed reason* in the body, in a consistent shape.
 
+## Verification Signals and Failure Modes
+
+- **Expected output:** Creation should read as `201 + Location`, successful deletion as `204`, and a missing resource as `404` without extra explanation.
+- **First check:** If similar failures bounce randomly between `400`, `409`, and `422`, the client contract is already ambiguous.
+- **Failure mode:** Collapse every success into `200 OK`, and retries, SDK exceptions, and cache behavior all start depending on body parsing instead of protocol signals.
+
 ## Checklist
 
 - [ ] Does creation return 201 + Location?
@@ -216,10 +208,21 @@ Look at GitHub's responses — method × status reads almost like a textbook: 20
 
 Methods and status codes are a pair. The next episode looks at the data flowing between them — request and response schemas.
 
+## Answering the Opening Questions
+
+- **The meaning of GET / POST / PUT / PATCH / DELETE?**
+  - The article treats HTTP Methods and Status Codes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Safe vs idempotent operations?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The 2xx / 3xx / 4xx / 5xx families?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
-- [REST Basics](./02-rest-basics.md)
-- [Resource Design](./03-resource-design.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
+- [API Design 101 (2/10): REST Basics](./02-rest-basics.md)
+- [API Design 101 (3/10): Resource Design](./03-resource-design.md)
 - **HTTP Methods and Status Codes (current)**
 - Request and Response Schemas (upcoming)
 - Pagination and Filtering (upcoming)
@@ -227,6 +230,7 @@ Methods and status codes are a pair. The next episode looks at the data flowing 
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

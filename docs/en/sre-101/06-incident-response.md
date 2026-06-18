@@ -1,10 +1,10 @@
 ---
 series: sre-101
 episode: 6
-title: Incident Response
+title: "SRE 101 (6/10): Incident Response"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,34 @@ tags:
   - OnCall
   - Operations
 seo_description: A beginner-friendly guide to incident response covering definitions, severity levels, roles, communications, and closure procedures
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Incident Response
+# SRE 101 (6/10): Incident Response
 
-> SRE 101 series (6/10)
+When an outage starts, the technical problem is only half the problem. The other half is human coordination: who decides priorities, who works the fix, who updates customers, and who keeps the timeline coherent enough for later learning.
 
-<!-- a-grade-intro:begin -->
+Teams that decide those things during the outage usually lose time in confusion. Teams that decide them beforehand recover faster because the response structure is already available when stress is highest.
 
-**Core question**: When an *outage hits*, how should the *team* *move*?
+This is post 6 in the SRE 101 series. Here we treat incident response as a team system with roles, severity levels, communication rules, and explicit closure criteria.
 
-> *Incident response* is a *team activity* with fixed *roles* and a fixed *order*.
 
-<!-- a-grade-intro:end -->
+![sre 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/06/06-01-concept-at-a-glance.en.png)
+*sre 101 chapter 6 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *definition* of an *incident*
-- *Severity* classification
-- *Roles* and *responsibilities*
-- *Communication* channels
-- *Closure* and *handover*
+- Why does incident response depend so heavily on team structure instead of only on technical skill?
+- Why should severity be defined by impact rather than intuition?
+- What should an Incident Commander do directly, and what should they deliberately avoid doing?
 
-## Why It Matters
+## Why this topic matters
 
-*Chaos* magnifies *impact*.
+Chaos magnifies impact. A technically recoverable issue can become a prolonged incident when decisions stall and communication lags behind the actual state of the system.
 
-## Concept at a Glance
+The response process also shapes trust. Customers, leadership, and the team itself all experience the incident through the quality of updates, coordination, and follow-through.
 
-```mermaid
-flowchart LR
-    Detect["detect"] --> Triage["triage"]
-    Triage --> Mitigate["mitigate"]
-    Mitigate --> Resolve["resolve"]
-    Resolve --> PM["postmortem"]
-```
+> Incident response is a team activity with fixed roles and a fixed order.
 
 ## Key Terms
 
@@ -152,17 +144,29 @@ def can_close(mitigated, customer_impact_zero):
 
 Next, we cover *postmortems*.
 
+## Answering the Opening Questions
+
+- **Why does incident response depend so heavily on team structure instead of only on technical skill?**
+  - The article treats Incident Response as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should severity be defined by impact rather than intuition?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What should an Incident Commander do directly, and what should they deliberately avoid doing?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is SRE?](./01-what-is-sre.md)
-- [Reliability](./02-reliability.md)
-- [SLI, SLO, SLA](./03-sli-slo-sla.md)
-- [Error Budget](./04-error-budget.md)
-- [Monitoring](./05-monitoring.md)
+## In this series
+
+- [SRE 101 (1/10): What is SRE?](./01-what-is-sre.md)
+- [SRE 101 (2/10): Reliability](./02-reliability.md)
+- [SRE 101 (3/10): SLI, SLO, SLA](./03-sli-slo-sla.md)
+- [SRE 101 (4/10): Error Budget](./04-error-budget.md)
+- [SRE 101 (5/10): Monitoring](./05-monitoring.md)
 - **Incident Response (current)**
 - Postmortem (upcoming)
 - Reducing Toil (upcoming)
 - Capacity Planning (upcoming)
 - Building Operable Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

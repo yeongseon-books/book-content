@@ -1,0 +1,21 @@
+flowchart TD
+  Ingress["수신(Ingress)"]
+  subgraph Labels["레이블 라우팅"]
+    L_Req["v2.app.ext로 요청"] --> L_Rev2["리비전 2 (레이블: v2)"]
+  end
+  subgraph Weights["가중치 라우팅"]
+    W_Req["app.ext로 요청"] -- "80%" --> W_Rev1["리비전 1 (가중치: 80)"]
+    W_Req -- "20%" --> W_Rev2["리비전 2 (가중치: 20)"]
+  end
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

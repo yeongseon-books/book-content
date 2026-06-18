@@ -1,0 +1,9 @@
+flowchart LR
+    S1["Production trace sampling"] --> D["Evaluation dataset"]
+    S2["Failure case collection"] --> D
+    S3["Hand-crafted adversarial cases"] --> D
+
+    S1 --> S1A["Reflects real distributions"]
+    S2 --> S2A["Replays repeated failures"]
+    S3 --> S3A["Intentionally probes weaknesses"]
+    D --> O["Coverage for realism regressions and safety"]

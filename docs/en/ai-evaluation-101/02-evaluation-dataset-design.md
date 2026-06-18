@@ -1,11 +1,11 @@
 ---
-title: Designing Evaluation Datasets
+title: "AI Evaluation 101 (2/10): Designing Evaluation Datasets"
 series: ai-evaluation-101
 episode: 2
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,24 +14,31 @@ tags:
 - LLM
 - Dataset
 - Quality
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: A good evaluation dataset mirrors production traffic distribution
   while including enough edge cases.
 ---
 
-# Designing Evaluation Datasets
+# AI Evaluation 101 (2/10): Designing Evaluation Datasets
 
-> AI Evaluation 101 Series (2/10)
+A good evaluation dataset mirrors production traffic distribution while including enough edge cases.
 
-A good evaluation dataset mirrors production traffic distribution while including enough edge cases. This post covers the principles for designing a starter eval set of 50-200 examples and how to collect the data.
+This is post 2 in the AI Evaluation 101 series. Here we cover the principles for designing a starter eval set of 50-200 examples and how to collect the data.
 
----
-![Designing evaluation datasets](../../assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.en.png)
 
+![Designing evaluation datasets](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.en.png)
 *Designing evaluation datasets*
+> An evaluation dataset is not an exam paper for the model; it is a compressed sample of what the product actually meets.
+
+## Questions to Keep in Mind
+
+- Why should a good evaluation dataset be an operating sample rather than a model exam?
+- How should representative cases and failure cases be mixed to reveal real quality changes?
+- What judgment becomes blurry when the eval set is not version-controlled?
+
 ## What Makes a Good Evaluation Dataset?
 
-![What makes a good evaluation Dataset](../../assets/ai-evaluation-101/02/02-02-what-makes-a-good-evaluation-dataset.en.png)
+![What makes a good evaluation Dataset](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-02-what-makes-a-good-evaluation-dataset.en.png)
 
 *What makes a good evaluation Dataset*
 A good eval set satisfies two things at once.
@@ -57,7 +64,7 @@ Adding `category` explicitly lets you "look at edge case scores separately." Loo
 
 ## Where Do You Source the Data?
 
-![Where do you source the Data](../../assets/ai-evaluation-101/02/02-03-where-do-you-source-the-data.en.png)
+![Where do you source the Data](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-03-where-do-you-source-the-data.en.png)
 
 *Where do you source the Data*
 Combine three sources.
@@ -96,7 +103,7 @@ A domain expert hand-writes cases they suspect will break — prompt injection, 
 
 ## How Many Cases Do You Need?
 
-![How many cases do you Need](../../assets/ai-evaluation-101/02/02-04-how-many-cases-do-you-need.en.png)
+![How many cases do you Need](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-04-how-many-cases-do-you-need.en.png)
 
 *How many cases do you Need*
 The size depends on the purpose.
@@ -112,7 +119,7 @@ Start at 10-30, add 5-10 from production each week, and you reach 200 within thr
 
 ## Labeling — How Do You Fill `expected`?
 
-![Labeling - how do you fill expected](../../assets/ai-evaluation-101/02/02-05-labeling-how-do-you-fill-expected.en.png)
+![Labeling - how do you fill expected](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-05-labeling-how-do-you-fill-expected.en.png)
 
 *Labeling - how do you fill expected*
 There are three labeling styles, and you can use different ones per case.
@@ -194,9 +201,50 @@ Pinning the version into the filename is a good habit: `evals/customer-support/v
 - Save as JSONL, commit to git, pin the version into the filename.
 
 The next post covers deterministic metrics — when Exact Match, F1, BLEU, and ROUGE help, and when they hurt.
+
+---
+
+## Operational checklist
+
+- [ ] Sample real production traces instead of relying only on hand-written examples.
+- [ ] Keep regression cases from past incidents in the dataset permanently.
+- [ ] Tag each case with a category so you can slice scores by risk type.
+- [ ] Pick the labeling style per case instead of forcing exact match everywhere.
+- [ ] Version the dataset file so model comparisons stay reproducible.
+
+## Answering the Opening Questions
+
+- **Why should a good evaluation dataset be an operating sample rather than a model exam?**
+  - The score can represent product risk only when real traffic shape and incident history are included. Artificial examples drift away from production quality.
+- **How should representative cases and failure cases be mixed to reveal real quality changes?**
+  - Use frequent requests for baseline quality and past failures plus edge cases for regression risk. Too much of either hides either the average or the danger.
+- **What judgment becomes blurry when the eval set is not version-controlled?**
+  - You lose the ability to tell whether the model improved or the dataset changed, so historical score comparisons become unreliable.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- **AI Evaluation 101 (2/10): Designing Evaluation Datasets (current)**
+- AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE (upcoming)
+- AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models (upcoming)
+- AI Evaluation 101 (5/10): Designing Rubric-Based Scoring (upcoming)
+- AI Evaluation 101 (6/10): Evaluating RAG Systems (upcoming)
+- AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (upcoming)
+- AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)
+- AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
+### Official docs
+
+- [OpenAI Evals](https://github.com/openai/evals)
+- [LangSmith — Evaluation concepts](https://docs.smith.langchain.com/evaluation/concepts)
+- [Weights & Biases Weave — Evaluation datasets](https://weave-docs.wandb.ai/guides/evaluation/)
+
+### Additional reading
+
 - [Hamel Husain — Your AI product needs evals](https://hamel.dev/blog/posts/evals/)
-- [OpenAI — Evals framework](https://github.com/openai/evals)
-- [LangSmith — Dataset best practices](https://docs.smith.langchain.com/evaluation/concepts)
 - [Eugene Yan — Building eval datasets](https://eugeneyan.com/writing/evals/)

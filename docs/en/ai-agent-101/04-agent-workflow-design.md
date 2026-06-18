@@ -1,5 +1,5 @@
 ---
-title: Agent Workflow Design
+title: "AI Agent 101 (4/10): Agent Workflow Design"
 series: ai-agent-101
 episode: 4
 language: en
@@ -15,37 +15,34 @@ tags:
 - Workflow
 - Planning
 - Task Decomposition
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-15'
 seo_description: To perform complex tasks, agents must break work into steps, execute
   each step in order, and verify results. This process is called a workflow.
 ---
 
-# Agent Workflow Design
-
-> AI Agent 101 Series (4/10)
+# AI Agent 101 (4/10): Agent Workflow Design
 
 To perform complex tasks, agents must break work into steps, execute each step in order, and verify results. This process is called a workflow. It's not just about calling tools—it's about designing "what to do in what order to achieve the goal."
 
 Representative workflow patterns include ReAct (Reasoning + Acting), Plan-and-Execute, and Reflexion. Each pattern has pros and cons depending on task characteristics, and agent designers must choose patterns that match the task type.
 
-This article covers major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.
+This is post 4 in the AI Agent 101 series. Here we cover major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.
 
----
+![Draw the control flow before you tune the prompt](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png)
+*Draw the control flow before you tune the prompt*
+> A workflow is not just a name for a reasoning style; it is the control structure that decides action order and stopping conditions.
 
-<!-- a-grade-intro:begin -->
+## Questions to Keep in Mind
 
-## Key Questions
-
-- When does each of ReAct, Plan-and-Execute, and Reflexion shine?
-- How do you decide the right granularity of decomposed steps?
-- Where should state live inside a workflow?
-- What validation must happen before pushing a workflow to production?
-
-<!-- a-grade-intro:end -->
+- What flow should be drawn before prompt tuning when you choose an agent workflow?
+- Which failure conditions make ReAct, Plan-and-Execute, or Reflexion a better fit?
+- Where should state and validation live inside a workflow if you want it to be operable?
 
 ## Key Workflow Patterns
 
-Agents need systematic workflows to handle complex tasks. Let's explore the main patterns.
+Agents need systematic workflows to handle complex tasks. This section covers the main patterns.
+
+### Draw the control flow before you tune the prompt
 
 ### ReAct (Reasoning + Acting)
 
@@ -73,7 +70,7 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -> str:
     for step in range(max_steps):
         # Request next action from LLM
         response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4.1",
             messages=messages,
             tools=tools,
             tool_choice="auto"
@@ -142,7 +139,7 @@ def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
     """
     
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4.1",
         messages=[{"role": "user", "content": plan_prompt}]
     )
     
@@ -177,7 +174,7 @@ def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
     """
     
     final_response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4.1",
         messages=[{"role": "user", "content": summary_prompt}]
     )
     
@@ -243,7 +240,7 @@ def reflexion_agent(user_query: str, tools: List[Dict], max_retries: int = 3) ->
         """
         
         reflection_response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4.1",
             messages=[{"role": "user", "content": reflection_prompt}]
         )
         
@@ -284,7 +281,7 @@ In production, these patterns are often combined. For example, use Plan-and-Exec
 
 ## Task Decomposition Strategy
 
-Breaking complex tasks into smaller steps is key to workflow design. Let's explore effective decomposition strategies.
+Breaking complex tasks into smaller steps is key to workflow design. The strategies below outline effective decomposition approaches.
 
 ### Top-Down Decomposition
 
@@ -309,7 +306,7 @@ def decompose_task_topdown(task: str) -> List[Dict[str, Any]]:
     """
     
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4.1",
         messages=[{"role": "user", "content": prompt}]
     )
     
@@ -355,7 +352,7 @@ def decompose_task_bottomup(task: str, available_tools: List[str]) -> List[str]:
     """
     
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4.1",
         messages=[{"role": "user", "content": prompt}]
     )
     
@@ -437,7 +434,7 @@ def dynamic_decomposition(task: str, initial_context: Dict) -> str:
         """
         
         response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4.1",
             messages=[{"role": "user", "content": next_step_prompt}]
         )
         
@@ -1320,32 +1317,34 @@ else:
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **What flow should be drawn before prompt tuning when you choose an agent workflow?**
+  - Draw how planning, execution, observation, validation, and replanning connect after the goal arrives. Without that flow, prompt changes are temporary patches.
+- **Which failure conditions make ReAct, Plan-and-Execute, or Reflexion a better fit?**
+  - ReAct fits iterative tool exploration, Plan-and-Execute fits long multi-step work, and Reflexion fits tasks where failures must be inspected before retrying.
+- **Where should state and validation live inside a workflow if you want it to be operable?**
+  - State should be the minimal execution record passed between stages, and validation should sit at the boundary that allows the next action or stops the run.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- [Context Engineering](./02-context-engineering.md)
-- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
-- **Agent Workflow Design (current)**
-- Memory and State (upcoming)
-- Multi-Agent Systems (upcoming)
-- Agent Evaluation (upcoming)
-- Error Handling and Reliability (upcoming)
-- Production Operations (upcoming)
-- Building Your First Agent (upcoming)
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): Context Engineering](./02-context-engineering.md)
+- [AI Agent 101 (3/10): Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- **AI Agent 101 (4/10): Agent Workflow Design (current)**
+- AI Agent 101 (5/10): Memory and State (upcoming)
+- AI Agent 101 (6/10): Multi-Agent Systems (upcoming)
+- AI Agent 101 (7/10): Agent Evaluation (upcoming)
+- AI Agent 101 (8/10): Error Handling and Reliability (upcoming)
+- AI Agent 101 (9/10): Production Operations (upcoming)
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 
 ## References
 
-1. **ReAct: Synergizing Reasoning and Acting in Language Models** - https://arxiv.org/abs/2210.03629  
-   Yao et al.'s ReAct pattern paper. Presents theoretical background and experimental results for alternating reasoning and acting.
-
-2. **LangGraph Documentation** - https://langchain-ai.github.io/langgraph/  
-   LangChain's workflow construction framework. Covers state management and graph-based workflow design methods.
-
-3. **Reflexion: Language Agents with Verbal Reinforcement Learning** - https://arxiv.org/abs/2303.11366  
-   Agent performance improvement through self-reflection. Explains mechanisms for learning from failures.
-
-4. **AutoGPT Architecture** - https://github.com/Significant-Gravitas/AutoGPT  
-   Real implementation example of Plan-and-Execute pattern. Shows autonomous agent task decomposition and execution strategies.
+- [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)
+- [Plan-and-Solve Prompting: Improving Zero-Shot Chain-of-Thought Reasoning by Large Language Models](https://arxiv.org/abs/2305.04091)
+- [Reflexion: Language Agents with Verbal Reinforcement Learning](https://arxiv.org/abs/2303.11366)
+- [LangGraph overview](https://langchain-ai.github.io/langgraph/)

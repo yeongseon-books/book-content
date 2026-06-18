@@ -1,10 +1,10 @@
 ---
 series: compilers-101
 episode: 5
-title: symbol table and scope
+title: "Compilers 101 (5/10): symbol table and scope"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,25 @@ seo_description: A symbol table is the compiler's memory. Build one yourself and
 last_reviewed: '2026-05-04'
 ---
 
-# symbol table and scope
+# Compilers 101 (5/10): symbol table and scope
 
 > Compilers 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: The `x` inside a function and the `x` outside are different variables. How does the compiler tell them apart?
 
 > A symbol table is the compiler's memory of "which name points to which declaration." Nested scope and shadowing are expressed directly by the shape of this data structure.
 
-<!-- a-grade-intro:end -->
+This is post 5 in the Compilers 101 series.
+
+
+![compilers 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/05/05-01-big-picture.en.png)
+*compilers 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying symbol table and scope?
+- Which signal should the example or diagram make visible for symbol table and scope?
+- What failure should be prevented first when symbol table and scope reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 The previous post's analyzer used a single dictionary as its environment. Real languages have many scopes — functions, blocks, classes, modules. How you design the symbol table IS the language's visibility rules.
 
 > You must answer "is this variable visible here?" in one step.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart TB
@@ -144,17 +150,31 @@ a.exit()
 
 ```python
 # 4_function.py
+def visit(stmt, analyzer):
+    kind, name = stmt
+    if kind == "LET":
+        analyzer.current().define(name, "local")
+
 def visit_function(name, params, body, analyzer):
     analyzer.current().define(name, "fn")
     analyzer.enter()
-    for p in params:
-        analyzer.current().define(p, "param")
-    for stmt in body:
-        visit(stmt, analyzer)
-    analyzer.exit()
+    try:
+        for p in params:
+            analyzer.current().define(p, "param")
+        for stmt in body:
+            visit(stmt, analyzer)
+        print(analyzer.current().resolve("arg"))  # param
+        print(analyzer.current().resolve("tmp"))  # local
+    finally:
+        analyzer.exit()
+
+a = Analyzer()
+visit_function("add_one", ["arg"], [("LET", "tmp")], a)
+print(a.current().resolve("add_one"))  # fn
+print(a.current().resolve("tmp"))      # None
 ```
 
-Make a new scope on function entry, put the parameters in it, analyze the body. Close the scope when the function ends.
+Make a new scope on function entry, put the parameters in it, analyze the body, then close the scope when the function ends. This version is self-contained: it includes the minimal `visit(...)` helper and a tiny body, so you can verify that `arg` and `tmp` are visible inside the function while `tmp` disappears after the scope closes.
 
 ### Step 5 — Storing locations for go-to-definition
 
@@ -217,22 +237,34 @@ The central data structure of an LSP server is the symbol table. "Find all refer
 
 The symbol table is the memory the compiler uses to answer "what is this name?" The next post looks at how the analyzed AST gets turned into a simpler form — intermediate representation.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying symbol table and scope?**
+  - The article treats symbol table and scope as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for symbol table and scope?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when symbol table and scope reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Compiler?](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
-- [parsing and AST](./03-parsing-and-ast.md)
-- [semantic analysis](./04-semantic-analysis.md)
+## In this series
+
+- [Compilers 101 (1/10): What Is a Compiler?](./01-what-is-a-compiler.md)
+- [Compilers 101 (2/10): lexical analysis](./02-lexical-analysis.md)
+- [Compilers 101 (3/10): parsing and AST](./03-parsing-and-ast.md)
+- [Compilers 101 (4/10): semantic analysis](./04-semantic-analysis.md)
 - **symbol table and scope (current)**
 - intermediate representation (upcoming)
 - optimization basics (upcoming)
 - code generation (upcoming)
 - JIT vs AOT (upcoming)
-- building a tiny interpreter (upcoming)
+- Building a Tiny Interpreter (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Symbol table (Wikipedia)](https://en.wikipedia.org/wiki/Symbol_table)
-- [Scope (Wikipedia)](https://en.wikipedia.org/wiki/Scope_(computer_science))
-- [Crafting Interpreters — Resolving and Binding](https://craftinginterpreters.com/resolving-and-binding.html)
-- [LSP — Document Symbols](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_documentSymbol)
+- Alfred V. Aho, Monica S. Lam, Ravi Sethi, Jeffrey D. Ullman, *Compilers: Principles, Techniques, and Tools* (2nd ed.), Section 2.7 “Symbol Tables”.
+- [Shriram Krishnamurthi, *Programming Languages: Application and Interpretation* (3rd ed.)](https://www.plai.org/) — environment-model and static-scope coverage.
+- [Robert Nystrom, *Crafting Interpreters* — Chapter 11 “Resolving and Binding”](https://craftinginterpreters.com/resolving-and-binding.html)
+- Keith D. Cooper, Linda Torczon, *Engineering a Compiler* (2nd ed.), name-analysis and semantic-environment chapters.

@@ -1,10 +1,10 @@
 ---
 series: software-design-101
 episode: 3
-title: Modules and Boundaries
+title: "Software Design 101 (3/10): Modules and Boundaries"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,28 @@ tags:
   - Encapsulation
   - PackageDesign
 seo_description: Define a module, design small public APIs, hide volatile decisions, and build deep modules with clear boundaries.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Modules and Boundaries
+# Software Design 101 (3/10): Modules and Boundaries
 
-> Software Design 101 series (3/10)
+A code base can have many files and still have weak module boundaries. If callers must understand the internals to use a module safely, the boundary is mostly theater.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Software Design 101 series.
 
-**Core question**: What makes a module boundary good?
+In this post, we focus on deep modules, small public surfaces, and information hiding. The practical question is how to keep internal changes inside the module instead of leaking them into every caller.
 
-> A small surface area and the absence of leaks from internal changes to external callers.
+> A strong boundary lets the caller know less while still getting more useful work done.
 
-<!-- a-grade-intro:end -->
+
+![software design 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/03/03-01-concept-at-a-glance.en.png)
+*software design 101 chapter 3 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Modules and Boundaries?
+- Which signal should the example or diagram make visible for Modules and Boundaries?
+- What failure should be prevented first when Modules and Boundaries reaches a real system?
 
 ## What You Will Learn
 
@@ -46,15 +54,6 @@ last_reviewed: '2026-05-04'
 Module boundaries are walls that contain change. Good walls keep changes on one side from leaking to the other.
 
 > A good boundary permits ignorance.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    P["Public API"] -. small .-> M["Module"]
-    M -. deep .-> I["Internal"]
-    I --> R["Rich behavior"]
-```
 
 Small surface, deep interior.
 
@@ -142,6 +141,33 @@ Internal changes do not break the external contract.
 
 Direction reinforces the boundary.
 
+## Quick Verification
+
+Pick one module and write down its public symbols separately from its internal helpers. That single inventory usually exposes whether the boundary is doing any real work.
+
+```python
+__all__ = [
+    "read_file",
+    "read_chunk",
+    "open_file",
+    "close_file",
+]
+```
+
+**Expected output:** if callers truly need only one or two entry points, the rest are candidates to hide behind the boundary.
+
+Then inspect data exposure as well. More leaks come from returning internal structures directly than from having one extra function.
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| Internal refactors force caller changes | Check whether the public API exposes too much procedure |
+| External code knows your internal dict layout | Check whether internal models escaped without DTOs |
+| There are many modules but little abstraction value | Check whether you created only shallow modules |
+
+The best boundaries let callers know little and still get meaningful work done.
+
 ## What to Notice in This Code
 
 - The surface is small and intentional.
@@ -186,9 +212,20 @@ Great libraries (e.g., `requests`) have a tiny surface and a deep interior. Easy
 
 Good boundaries contain change. Next we look at another weapon a boundary carries: dependency direction.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Modules and Boundaries?**
+  - The article treats Modules and Boundaries as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Modules and Boundaries?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Modules and Boundaries reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
-- [Separation of Concerns](./02-separation-of-concerns.md)
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): Separation of Concerns](./02-separation-of-concerns.md)
 - **Modules and Boundaries (current)**
 - Dependency Direction (upcoming)
 - Interfaces and Abstraction (upcoming)
@@ -197,6 +234,7 @@ Good boundaries contain change. Next we look at another weapon a boundary carrie
 - Reducing Change Impact (upcoming)
 - Design Principles (upcoming)
 - Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -205,3 +243,8 @@ Good boundaries contain change. Next we look at another weapon a boundary carrie
 - [A Philosophy of Software Design — Deep Modules](https://web.stanford.edu/~ouster/cgi-bin/aposd.php)
 - [Effective Java — API Design](https://www.oracle.com/technical-resources/articles/java/bloch-effective-08-qa.html)
 - [Domain-Driven Design — Bounded Context](https://martinfowler.com/bliki/BoundedContext.html)
+
+### Practical Docs
+
+- [The Python Tutorial — Modules](https://docs.python.org/3/tutorial/modules.html)
+- [Python Reference — import statement](https://docs.python.org/3/reference/simple_stmts.html#import)

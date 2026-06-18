@@ -1,10 +1,10 @@
 ---
 series: web-development-101
 episode: 4
-title: HTTP and APIs
-status: content-ready
+title: "Web Development 101 (4/10): HTTP and APIs"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,24 @@ tags:
   - REST
   - Networking
 seo_description: The shape of HTTP requests and responses — methods, status codes, headers, and JSON APIs explained for new web developers with runnable examples.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# HTTP and APIs
+# Web Development 101 (4/10): HTTP and APIs
 
-> Web Development 101 series (4/10)
+Most web bugs eventually reduce to one question: what exactly did the client send, and what exactly did the server send back? If you cannot picture the request line, headers, body, and status code, debugging a frontend fetch call or a backend route quickly turns into guesswork.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Web Development 101 series. Here we treat HTTP as the shared contract between browser, script, and server so you can read methods, status codes, headers, and JSON payloads with much more confidence.
 
-**Core question**: What do clients and servers actually *send* each other?
 
-> A request (method, URL, headers, body) and a response (status, headers, body). That is *all* of HTTP.
+![web development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.en.png)
+*web development 101 chapter 4 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The shape of HTTP requests and responses
-- Methods (GET/POST/PUT/DELETE) and status codes
-- The role of headers
-- Calling and parsing JSON APIs
-- The difference between an API and a page request
+- The shape of HTTP requests and responses?
+- Methods (GET/POST/PUT/DELETE) and status codes?
+- The role of headers?
 
 ## Why It Matters
 
@@ -47,15 +43,17 @@ Half of web work is *building and reading HTTP messages*. If you cannot picture 
 
 > HTTP is *a protocol made of plain text*.
 
-## Concept at a Glance
+Keep this frame in mind while reading every example in the chapter: the client sends method, URL, headers, and possibly a body; the server answers with status, headers, and a body. Everything else is detail layered on top.
 
-```mermaid
-flowchart LR
-    Client["Client"] -->|"GET /users/1"| Server["Server"]
-    Server -->|"200 OK + JSON"| Client
-```
+### What to verify yourself
 
-One line of request, one line of response.
+- Run `curl -v https://httpbin.org/get` and inspect the raw request and response lines.
+- Send both GET and POST requests to the same service and compare how the method changes behavior.
+- Confirm that a JSON API returns `Content-Type: application/json` before parsing the body.
+
+**Expected output:** The method changes server intent, and JSON endpoints advertise that intent through both status codes and headers.
+
+**Failure mode to watch for:** If every failure still returns 200, clients lose a reliable error boundary. If `Content-Type` is ignored, HTML and JSON can be parsed the wrong way.
 
 ## Key Terms
 
@@ -183,10 +181,21 @@ Most mobile and web apps talk to servers as *JSON over HTTP*. GraphQL and gRPC a
 
 HTTP is *a contract made of plain text*. Next, we look at the two sides of that contract — Frontend and Backend.
 
+## Answering the Opening Questions
+
+- **The shape of HTTP requests and responses?**
+  - The article treats HTTP and APIs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Methods (GET/POST/PUT/DELETE) and status codes?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The role of headers?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
-- [The Browser and the DOM](./03-browser-and-dom.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): The Browser and the DOM](./03-browser-and-dom.md)
 - **HTTP and APIs (current)**
 - Frontend and Backend (upcoming)
 - Authentication and Sessions (upcoming)
@@ -194,11 +203,16 @@ HTTP is *a contract made of plain text*. Next, we look at the two sides of that 
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [HTTP overview (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview)
-- [HTTP methods (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
-- [HTTP status codes (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
-- [httpbin (request/response service)](https://httpbin.org/)
+### Official Docs
+- [HTTP overview (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview)
+- [HTTP request methods (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods)
+- [HTTP response status codes (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status)
+
+### Verification Resources
+- [httpbin](https://httpbin.org/)
+- [HTTP Semantics (RFC 9110)](https://www.rfc-editor.org/rfc/rfc9110)

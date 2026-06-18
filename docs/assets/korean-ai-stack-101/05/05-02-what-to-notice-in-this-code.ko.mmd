@@ -1,0 +1,8 @@
+flowchart TD
+    A["response_format = json_object"] --> D["JSON 출력 강제"]
+    B["system 메시지에\n명시적 스키마"] --> D
+    C["temperature = 0.0"] --> E["출력 흔들림 감소"]
+    D --> F["json.loads() 파싱"]
+    F --> G["summary / keywords 키 확인"]
+    E --> G
+    G --> H["형식 검증 후에만\n후속 파이프라인으로 전달"]

@@ -7,6 +7,10 @@ on:
       - "content/**"
       - "series.yaml"
       - ".sisyphus/medium/**"
+      - ".sisyphus/style/**"
+      - "Makefile"
+      - "mkdocs.yml"
+      - ".github/workflows/content-pipeline.yml"
       - "scripts/**"
   pull_request:
     branches: [master]
@@ -14,6 +18,10 @@ on:
       - "content/**"
       - "series.yaml"
       - ".sisyphus/medium/**"
+      - ".sisyphus/style/**"
+      - "Makefile"
+      - "mkdocs.yml"
+      - ".github/workflows/content-pipeline.yml"
       - "scripts/**"
 
 jobs:

@@ -1,0 +1,4 @@
+flowchart TD
+  Client["클라이언트 요청 (HTTPS)"] --> TLS["Envoy에서 TLS 종료"]
+  TLS --> Cleartext["평문 (HTTP)으로 앱에 전달"]
+  Cleartext --> App["컨테이너 앱"]

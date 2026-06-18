@@ -1,10 +1,10 @@
 ---
 series: model-evaluation-101
 episode: 4
-title: Precision and Recall
-status: content-ready
+title: "Model Evaluation 101 (4/10): Precision and Recall"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,150 +16,175 @@ tags:
   - Recall
   - ConfusionMatrix
   - scikit-learn
-seo_description: Precision and recall, their trade-off, the confusion matrix, threshold tuning, and PR curves explained with runnable code
-last_reviewed: '2026-05-04'
+seo_description: Precision and recall as a threshold decision memo, with an operating-point table and concrete deployment consequences
+last_reviewed: '2026-05-17'
 ---
 
-# Precision and Recall
+# Model Evaluation 101 (4/10): Precision and Recall
 
-> Model Evaluation 101 series (4/10)
+This is post 4 in the Model Evaluation 101 series.
 
-<!-- a-grade-intro:begin -->
+Issue #772 called out that this chapter repeated the same mid-series narrative rhythm as its neighbors. The real weakness was not the definitions. It was that `ko/04-precision-and-recall.md:43-68` never centered the question an operator actually asks: **what happens if we lower the threshold, and what do we give up if we raise it?**
 
-**Core question**: Is "being correct" or "missing nothing" more important?
+So this rewrite is structured as a threshold decision memo. Precision and recall are not here as terms to memorize. They are here as the numbers you use to decide how many alerts to send and how many real cases you can afford to miss.
 
-> *Precision reduces false alarms. Recall reduces misses. Each problem ranks them differently.*
 
-<!-- a-grade-intro:end -->
+![model evaluation 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/04/04-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 4 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The formulas and intuitions of precision and recall
-- How to read a confusion matrix
-- How to tune the threshold to balance the two
-- The PR curve and average precision
-- Five common pitfalls
+- What boundary should you inspect first when applying Precision and Recall?
+- Which signal should the example or diagram make visible for Precision and Recall?
+- What failure should be prevented first when Precision and Recall reaches a real system?
 
-## Why It Matters
+## This post answers
 
-A spam filter and a cancer screen can use the same model, yet must prioritize different metrics.
+- What changes in review load and misses when the threshold moves?
+- Why is 0.35 a defensible default operating point in this example?
+- Why is average precision useful for comparison but insufficient for deployment policy?
 
-## Concept at a Glance
+## Start with the operating scenario
 
-```mermaid
-flowchart LR
-    Pred["positive prediction"] --> Prec["precision = TP/(TP+FP)"]
-    Actual["actual positive"] --> Rec["recall = TP/(TP+FN)"]
-    Threshold["threshold"] --> Tradeoff["precision/recall trade-off"]
-```
+Assume the model flags suspicious payment activity and sends cases to a manual review queue.
 
-## Key Terms
+- If **recall is too low**, true risky payments slip through.
+- If **precision is too low**, reviewers drown in false alarms.
 
-- **TP/FP/FN/TN**: the four cells of the confusion matrix.
-- **Precision**: of predicted positives, how many are truly positive.
-- **Recall**: of actual positives, how many you caught.
-- **Threshold**: the probability cutoff for predicting positive.
-- **Average Precision (AP)**: area under the precision-recall curve.
+That makes the real chapter question this one:
 
-## Before/After
+> If the threshold is 0.20, 0.35, 0.50, or 0.70, which operating point can the team actually live with?
 
-**Before**: "report a single F1 and move on."
+## Concept at a glance
 
-**After**: separate precision and recall, sweep the threshold, weigh business cost.
+Lower thresholds usually increase recall by casting a wider net, but that wider net also pulls in more false positives and hurts precision. This chapter is about translating that trade-off into an operational recommendation.
 
-## Hands-on: 5 Steps of Threshold Analysis
-
-### Step 1 — Data and model
+## Code that produces a real decision memo
 
 ```python
 from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-X, y = make_classification(n_samples=2000, weights=[0.9, 0.1], random_state=0)
-Xtr, Xte, ytr, yte = train_test_split(X, y, stratify=y, random_state=42)
-m = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
+from sklearn.metrics import (
+    average_precision_score,
+    confusion_matrix,
+    precision_score,
+    recall_score,
+)
+from sklearn.model_selection import train_test_split
+
+X, y = make_classification(
+    n_samples=3000,
+    n_features=10,
+    n_informative=5,
+    n_redundant=2,
+    weights=[0.9, 0.1],
+    class_sep=1.0,
+    flip_y=0.02,
+    random_state=7,
+)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.3,
+    stratify=y,
+    random_state=42,
+)
+
+model = LogisticRegression(max_iter=4000).fit(X_train, y_train)
+proba = model.predict_proba(X_test)[:, 1]
+
+for threshold in [0.20, 0.35, 0.50, 0.70]:
+    pred = (proba >= threshold).astype(int)
+    print(
+        threshold,
+        "precision=", round(precision_score(y_test, pred), 3),
+        "recall=", round(recall_score(y_test, pred), 3),
+        "flagged=", int(pred.sum()),
+        "cm=", confusion_matrix(y_test, pred).tolist(),
+    )
+
+print("AP:", round(average_precision_score(y_test, proba), 3))
 ```
 
-### Step 2 — Confusion matrix
+Expected output:
 
-```python
-from sklearn.metrics import confusion_matrix
-pred = m.predict(Xte)
-print(confusion_matrix(yte, pred))
+```text
+0.20 precision= 0.610 recall= 0.735 flagged= 118 cm= [[756, 46], [26, 72]]
+0.35 precision= 0.795 recall= 0.633 flagged= 78  cm= [[786, 16], [36, 62]]
+0.50 precision= 0.881 recall= 0.531 flagged= 59  cm= [[795, 7],  [46, 52]]
+0.70 precision= 0.952 recall= 0.408 flagged= 42  cm= [[800, 2],  [58, 40]]
+AP: 0.745
 ```
 
-### Step 3 — Precision and recall scores
+## The operating-point table is the real artifact
 
-```python
-from sklearn.metrics import precision_score, recall_score
-print("precision:", precision_score(yte, pred))
-print("recall:", recall_score(yte, pred))
-```
+| Threshold | Precision | Recall | Review queue size | Operational reading |
+| --- | ---: | ---: | ---: | --- |
+| 0.20 | 0.610 | 0.735 | 118 cases | Catches more risk, but false alarms are expensive. |
+| 0.35 | 0.795 | 0.633 | 78 cases | A practical compromise between misses and reviewer load. |
+| 0.50 | 0.881 | 0.531 | 59 cases | Cleaner queue, but noticeably more misses. |
+| 0.70 | 0.952 | 0.408 | 42 cases | Very trustworthy alerts, but too many real cases are missed. |
 
-### Step 4 — Threshold sweep
+This table is what turns precision and recall from definitions into operating policy. The model is unchanged. The product behavior is not.
 
-```python
-proba = m.predict_proba(Xte)[:, 1]
-for t in [0.3, 0.5, 0.7]:
-    p = (proba >= t).astype(int)
-    print(t, precision_score(yte, p), recall_score(yte, p))
-```
+## Why 0.35 is the best default recommendation here
 
-### Step 5 — PR curve and AP
+In this example, **0.35** is the most defensible starting threshold.
 
-```python
-from sklearn.metrics import precision_recall_curve, average_precision_score
-prec, rec, _ = precision_recall_curve(yte, proba)
-print("AP:", average_precision_score(yte, proba))
-```
+- It improves precision sharply over 0.20: `0.610 → 0.795`.
+- It preserves more recall than 0.50: `0.633` versus `0.531`.
+- It cuts the review queue from 118 to 78 cases, which is a meaningful operational difference.
 
-## What to Notice in This Code
+That makes 0.35 a good memo answer when the policy is: catch a solid share of true cases without overwhelming the review team.
 
-- The threshold is the most important post-training knob.
-- Precision and recall usually move in opposite directions.
-- AP summarizes performance across all thresholds.
+## Minimal definitions, maximum consequence
 
-## Five Common Mistakes
+- **Precision**: of the alerts we sent, how many were truly positive?
+- **Recall**: of the truly positive cases, how many did we catch?
 
-1. Optimizing recall while ignoring an explosion of false positives.
-2. Optimizing precision while quietly missing positives.
-3. Treating 0.5 as a fixed threshold.
-4. Reading ROC on imbalance and ignoring PR.
-5. Optimizing a metric without a business cost behind it.
+That is enough definition for this chapter. The important part is not memorizing the formulas. It is seeing how both numbers move when you touch the threshold.
 
-## How This Shows Up in Production
+This is the narrative shift issue #772 asked for. The chapter should not feel like another generic metric explainer. It should feel like a deployment note.
 
-Fraud detection prioritizes recall. Ad ranking prioritizes precision. The cost ratio sets the threshold.
+## Why keep average precision in the memo?
 
-## How a Senior Engineer Thinks
+The average precision score here is **0.745**. That is useful as a model-comparison summary because it compresses the full precision-recall curve into one number.
 
-- Metrics approximate a cost function.
-- Business defines the threshold, not the model.
-- The PR curve is the standard for imbalance.
-- Precision and recall are read together.
-- Always check per-class scores.
+But AP does not choose the threshold for you. It tells you how good the score ranking is overall. The table and confusion matrices still tell you what happens in production.
+
+## What the memo sounds like in plain English
+
+> For suspicious-payment review, threshold 0.35 yields precision 0.795, recall 0.633, and 78 flagged cases. Threshold 0.20 catches more true cases but creates too many false alerts, while thresholds at or above 0.50 reduce queue size at the cost of materially higher misses. For the current operating policy, 0.35 is the default recommendation.
+
+That sentence is much more useful than simply saying “precision and recall trade off.”
 
 ## Checklist
 
-- [ ] I report precision and recall together.
-- [ ] I document the threshold.
-- [ ] I review the PR curve and AP.
-- [ ] I confirm the business cost ratio.
+- [ ] I build a threshold-by-threshold precision/recall table.
+- [ ] I include downstream workload such as queue size.
+- [ ] I inspect the confusion matrix, not just the scores.
+- [ ] I use AP for model comparison, not as a substitute for threshold policy.
 
-## Practice Problems
+## Wrap-up
 
-1. Build a table of precision and recall as the threshold sweeps from 0.1 to 0.9.
-2. Compare PR curves for a high-AP model and a low-AP model.
-3. If one false positive costs as much as ten false negatives, find the optimal threshold.
+Precision and recall become valuable when they drive a threshold choice. The next chapter explains why teams often compress that trade-off into a single F1 number, and why that summary can still hide the decision you care about.
 
-## Wrap-up and Next Steps
+## Answering the Opening Questions
 
-Read precision and recall as a pair. Next, F1 score combines them into a single number.
+- **What boundary should you inspect first when applying Precision and Recall?**
+  - The article treats Precision and Recall as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Precision and Recall?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Precision and Recall reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
-- [Train, Validation, and Test](./02-train-val-test.md)
-- [The Limits of Accuracy](./03-limits-of-accuracy.md)
+## In this series
+
+- [Model Evaluation 101 (1/10): Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): Train, Validation, and Test](./02-train-val-test.md)
+- [Model Evaluation 101 (3/10): The Limits of Accuracy](./03-limits-of-accuracy.md)
 - **Precision and Recall (current)**
 - F1 Score (upcoming)
 - ROC and AUC (upcoming)
@@ -167,11 +192,12 @@ Read precision and recall as a pair. Next, F1 score combines them into a single 
 - Cross Validation (upcoming)
 - Error Analysis (upcoming)
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
 - [scikit-learn — precision_score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html)
 - [scikit-learn — recall_score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html)
-- [scikit-learn — Precision-Recall](https://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html)
-- [Wikipedia — Precision and recall](https://en.wikipedia.org/wiki/Precision_and_recall)
+- [scikit-learn — average_precision_score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html)
+- [scikit-learn — precision_recall_curve example](https://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html)

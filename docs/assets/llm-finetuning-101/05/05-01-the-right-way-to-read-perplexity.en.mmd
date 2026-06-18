@@ -1,0 +1,18 @@
+flowchart LR
+    MeanLoss["Mean evaluation loss"] --> Exponentiate["exp(mean loss)"]
+    Exponentiate --> Perplexity["perplexity"]
+
+    Perplexity --> NoAbsolute["Do not treat the absolute value\nas a final quality verdict"]
+    Perplexity --> BeforeAfter["Compare before and after\non the same dataset"]
+    Perplexity --> Regression["Detect whether a config change\nhelped or hurt the trend"]
+
+    BeforeAfter --> Baseline["Regression baseline"]
+    Regression --> Baseline
+    NoAbsolute --> MultiSignal["Use together with a golden set,\ntask metrics, and human review"]
+    Baseline --> MultiSignal
+
+    MultiSignal --> Conclusion["Perplexity is not a universal score;\nit is a fast comparison signal"]
+
+    style MeanLoss fill:#e3f2fd,stroke:#1976d2
+    style Perplexity fill:#f3e5f5,stroke:#7b1fa2
+    style Conclusion fill:#fff8e1,stroke:#f9a825

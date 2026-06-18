@@ -1,0 +1,12 @@
+flowchart LR
+    Stack["Harness stack\nTask · Context · Constraint · Tool · Test · Feedback · Approval · Observability"] --> Production["Production Harness\npackage the stack as one deployable unit"]
+    Production --> Rollout["Gradual rollout\n1% → 10% → 50% → 100%"]
+    Production --> Rollback["Rollback\nmove back to the previous version fast"]
+    Production --> OnCall["On-call runbook\nwhat to inspect and decide during incidents"]
+    Rollout --> Safe["Operationally usable agent system"]
+    Rollback --> Safe
+    OnCall --> Safe
+
+    style Stack fill:#e3f2fd,stroke:#1976d2
+    style Production fill:#f3e5f5,stroke:#7b1fa2
+    style Safe fill:#fff8e1,stroke:#f9a825

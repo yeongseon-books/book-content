@@ -1,12 +1,12 @@
 ---
-title: PII 감지와 마스킹
+title: "AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹"
 series: ai-safety-guardrails-101
 episode: 4
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,93 +14,97 @@ tags:
 - PII
 - Presidio
 - GDPR
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: 법무팀이 가장 자주 묻는 질문입니다. LLM 애플리케이션은 두 방향에서 PII를 다룹니다.
 ---
 
-# PII 감지와 마스킹
+# AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹
 
-> AI Safety & Guardrails 101 시리즈 (4/10)
+LLM 애플리케이션은 개인정보를 한 방향으로만 다루지 않습니다. 사용자는 카드 번호, 주소, 이메일, 주민식별자 같은 정보를 입력으로 보낼 수 있고, 모델은 검색 문맥이나 로그에 있던 다른 사람의 정보를 다시 응답으로 내보낼 수도 있습니다. 그래서 PII 문제는 입력 전처리와 출력 후처리를 모두 포함합니다.
 
----
+이 주제가 까다로운 이유는 법무·보안·제품 요구가 한 지점에 겹치기 때문입니다. 최소 수집 원칙을 지켜야 하고, 사용자가 삭제를 요청하면 흔적을 지워야 하며, 동시에 모델이 문맥을 이해할 정도의 정보는 남겨 두고 싶습니다. 무조건 `<PERSON>`으로 바꾸면 개인정보는 줄어들지만, 모델 품질도 같이 무너질 수 있습니다.
 
-## Section 1
+실무에서는 이 균형을 잘 잡아야 합니다. 구조화된 PII는 빠르게 감지하고, 이름이나 주소처럼 비정형인 정보는 NER 계열로 보완하며, 필요하면 가역적 토큰화로 문맥 일관성을 유지합니다. 이 설계가 없으면 로그와 RAG, 응답 단계 어디서든 누출이 발생합니다.
 
-## "이메일은 마스킹했나요?"
+이 글에서는 PII 범위 정의부터 regex·Presidio·가역적 토큰화·출력 재검사까지 프로덕션 관점에서 정리합니다.
 
-법무팀이 가장 자주 묻는 질문입니다. LLM 애플리케이션은 두 방향에서 PII를 다룹니다.
+![PII 보호의 핵심: 모델에 보내는 정보와 보관 정보의 분리](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/04/04-01-pii.ko.png)
+*PII 보호의 핵심: 모델에 보내는 정보와 보관 정보의 분리*
+> PII 보호의 핵심은 정보를 숨기는 것이 아니라, 모델이 볼 정보와 시스템이 보관할 정보를 분리하는 것입니다.
 
-- **입력 방향**: 사용자가 자신의 신용카드 번호, 주소, 주민등록번호를 모델에 보냅니다. 모델 공급사 로그에 남거나 (privacy violation), training data에 포함될 가능성이 있습니다.
-- **출력 방향**: RAG 컨텍스트에 다른 사용자의 이메일이 들어 있어 응답에 그대로 흘러나옵니다.
+## 먼저 던지는 질문
 
-이번 글에서는 PII를 정의하고, 정규식과 Microsoft Presidio를 결합한 탐지/마스킹 파이프라인을 구현합니다. GDPR / 개인정보보호법 관점도 함께 봅니다.
+- PII 보호는 왜 모델에 보내는 정보와 내부에 보관하는 정보를 분리해야 할까요?
+- regex, Presidio, reversible tokenization은 각각 어떤 단계에서 유용할까요?
+- 응답 outbound 단계에서 다시 검사하지 않으면 어떤 유출이 생길까요?
 
-다룰 내용:
+## 왜 이 글이 중요한가
 
-- PII 카테고리와 지역별 차이 (한국 RRN, 미국 SSN)
-- 정규식 vs NER 기반 탐지의 trade-off
-- Microsoft Presidio 사용법
-- 가역적 마스킹 (decrypt 가능)과 비가역적 마스킹
-- 입력 마스킹과 출력 재검사
+PII 보호를 초기에 구조로 넣어 두면 개인정보 처리 범위가 명확해집니다. 무엇을 모델에 보내고, 무엇을 마스킹하고, 무엇을 별도 저장소에 두는지를 정하면 법무 검토와 보안 감사도 훨씬 수월해집니다. 특히 로그와 캐시, 검색 문맥을 분리하면 나중에 삭제 요청이나 침해 사고 대응이 쉬워집니다.
 
----
+반대로 PII를 나중 문제로 미루면 가장 먼저 로그가 오염됩니다. 디버그 로그에 원문 프롬프트가 남고, RAG 문맥에 있던 다른 사용자의 이메일이 응답으로 재노출되고, 해외 모델 공급사를 쓰면서 고지와 동의가 빠지는 식입니다. 이 문제는 기능 버그보다 규제 리스크로 더 크게 돌아옵니다.
 
-## Section 1 — PII 카테고리
+따라서 PII 방어는 단순한 패턴 치환이 아니라 데이터 경로 설계입니다. 입력 전에 최소화하고, 모델 앞에서 토큰화하고, 출력 후에 다시 검사하며, 저장소는 목적별로 분리해야 합니다.
 
-| 카테고리 | 한국 예시 | 글로벌 예시 |
-| --- | --- | --- |
-| 식별 번호 | 주민등록번호 (900101-1XXXXXX) | SSN, Passport |
-| 연락처 | 휴대폰 (010-XXXX-XXXX), 이메일 | 동일 |
-| 금융 | 카드번호, 계좌번호 | 동일 |
-| 주소 | 도로명/지번 주소 | Address |
-| 의료 | 진단명, 처방전 | HIPAA-protected |
-| 자격 정보 | 비밀번호, API key | 동일 |
-| 위치 | GPS 좌표 | 동일 |
+## 핵심 관점
 
-GDPR은 이름, 위치, 온라인 식별자 (cookie ID, IP)도 personal data로 봅니다. 한국 개인정보보호법은 식별번호와 민감정보 (의료, 종교, 정치성향)를 별도로 강하게 보호합니다.
+많은 팀이 개인정보 보호를 “마스킹 함수 하나”로 생각합니다. 하지만 운영에서는 그보다 더 큰 질문이 먼저입니다. 이 데이터를 정말 모델에 보내야 하는가, 로그에 남겨도 되는가, 사용자 삭제 요청이 왔을 때 어느 저장소에서 지워야 하는가입니다.
 
----
+그래서 좋은 설계는 두 축으로 움직입니다. 첫째, 탐지 정확도입니다. 구조화된 PII는 regex로 빠르게 찾고, 사람 이름·주소·의료 정보처럼 비정형인 범주는 NER 기반 도구로 보완합니다. 둘째, 표현 방식입니다. 완전 마스킹이 적합한지, 문맥 유지가 필요해 가역적 토큰화가 적합한지 결정해야 합니다.
 
-## Section 2 — 정규식 기반 탐지 (시작점)
+> PII 보호의 본질은 텍스트를 가리는 데 있지 않습니다. 개인정보가 필요한 경계를 넘지 않도록 데이터 흐름 자체를 제어하는 데 있습니다.
 
-가장 단순한 형식이 있는 PII는 정규식으로 잡습니다.
+## 핵심 개념
+
+### PII 범위를 먼저 넓게 정의해야 합니다
+
+PII는 카드 번호나 전화번호만을 의미하지 않습니다. 규제와 관할권에 따라 이름, 위치, 온라인 식별자도 개인정보로 분류됩니다.
+
+| Category | Examples |
+| --- | --- |
+| National ID | SSN, passport, EU national IDs |
+| Contact | Phone, email |
+| Financial | Credit card, bank account |
+| Address | Street address |
+| Medical | Diagnosis, prescription (HIPAA-protected in US) |
+| Credentials | Password, API key |
+| Location | GPS coordinates |
+
+GDPR은 이름, 위치, cookie ID, IP까지 개인정보로 봅니다. 건강, 종교, 정치 성향 같은 민감 정보는 대부분의 규제에서 더 강한 보호 대상입니다. 따라서 팀은 법무와 함께 “우리 제품에서 PII가 무엇인지”를 먼저 정의해야 합니다.
+
+### regex는 구조화된 PII의 빠른 출발점입니다
+
+형식이 고정된 PII는 regex가 효율적입니다.
 
 ```python
 import re
 
 PII_PATTERNS = {
-    "kr_rrn": re.compile(r"\b\d{6}[-\s]?[1-4]\d{6}\b"),  # 한국 주민등록번호
-    "kr_phone": re.compile(r"\b01[016-9][-\s]?\d{3,4}[-\s]?\d{4}\b"),
     "us_ssn": re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
+    "us_phone": re.compile(r"\b(?:\+?1[-\s.]?)?\(?\d{3}\)?[-\s.]?\d{3}[-\s.]?\d{4}\b"),
     "email": re.compile(r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b"),
     "credit_card": re.compile(r"\b(?:\d[ -]*?){13,19}\b"),
     "ipv4": re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b"),
 }
 
 def detect_pii(text: str) -> list[tuple[str, int, int, str]]:
-    """(카테고리, 시작, 끝, 값) 형태의 리스트를 반환합니다."""
+    """Returns list of (category, start, end, value)."""
     found = []
     for cat, pat in PII_PATTERNS.items():
         for m in pat.finditer(text):
             found.append((cat, m.start(), m.end(), m.group()))
     return found
 
-text = "내 번호는 010-1234-5678이고 이메일은 alice@example.com 입니다."
+text = "Reach me at 555-123-4567 or alice@example.com."
 print(detect_pii(text))
-# [('kr_phone', 6, 19, '010-1234-5678'), ('email', 27, 45, 'alice@example.com')]
+# [('us_phone', 12, 24, '555-123-4567'), ('이메일', 28, 45, 'alice@example.com')]
 ```
 
-한계:
+regex는 빠르고 explainable합니다. 다만 이름, 주소, 의료 표현처럼 형식이 고정되지 않은 정보는 잘 잡지 못합니다. 카드 번호도 Luhn 검증 없이 정규식만 쓰면 false positive가 많습니다.
 
-- 이름 ("김철수", "John Doe")은 형식이 없어 정규식으로 못 잡음
-- 주소는 너무 다양해서 정규식 어려움
-- 신용카드 정규식은 false positive가 많음 (Luhn 알고리즘으로 검증해야)
+### Presidio는 비정형 PII 탐지에 유용합니다
 
----
-
-## Section 3 — Microsoft Presidio
-
-Presidio는 NER 기반 PII 탐지/마스킹 라이브러리입니다. 정규식과 spaCy NER를 결합해 형식이 없는 PII (이름, 주소)도 탐지합니다.
+Microsoft Presidio는 regex와 NER를 결합해 비정형 PII를 더 잘 잡습니다.
 
 ```python
 from presidio_analyzer import AnalyzerEngine
@@ -109,36 +113,34 @@ from presidio_anonymizer import AnonymizerEngine
 analyzer = AnalyzerEngine()
 anonymizer = AnonymizerEngine()
 
-text = "Alice Kim called from 010-1234-5678 about her order."
+text = "Alice Kim called from 555-123-4567 about her order."
 
 results = analyzer.analyze(text=text, language="en")
-# [<RecognizerResult PERSON, 0, 9, 0.85>, <PHONE_NUMBER, 22, 35, 0.75>, ...]
+# [<RecognizerResult PERSON, 0, 9, 0.85>, <PHONE_NUMBER, 22, 34, 0.75>, ...]
 
 masked = anonymizer.anonymize(text=text, analyzer_results=results)
 print(masked.text)
-# "<PERSON> called from <PHONE_NUMBER> about her order."
+# "<PERSON>이(가) 주문에 이상한 <PHONE_NUMBER>에서 전화했습니다."
 ```
 
-한국어 지원은 spaCy 한국어 모델 또는 KoBERT 기반 NER을 함께 등록해야 합니다.
+다국어 환경에서는 언어별 spaCy 모델이나 별도 NER 모델을 등록해 보완할 수 있습니다. 회사 내부 식별자도 커스텀 recognizer로 추가합니다.
 
 ```python
 from presidio_analyzer import PatternRecognizer, Pattern
 
-kr_rrn_recognizer = PatternRecognizer(
-    supported_entity="KR_RRN",
-    patterns=[Pattern(name="rrn", regex=r"\b\d{6}[-\s]?[1-4]\d{6}\b", score=0.9)],
-    supported_language="ko",
+custom_id = PatternRecognizer(
+    supported_entity="EMPLOYEE_ID",
+    patterns=[Pattern(name="emp_id", regex=r"\bEMP-\d{6}\b", score=0.95)],
+    supported_language="en",
 )
-analyzer.registry.add_recognizer(kr_rrn_recognizer)
+analyzer.registry.add_recognizer(custom_id)
 ```
 
----
+이 접근은 사번, 주문번호, 계약번호처럼 서비스 고유 식별자가 있을 때 특히 중요합니다.
 
-## Section 4 — 가역적 마스킹 (Tokenization)
+### 단순 마스킹은 문맥을 망가뜨릴 수 있습니다
 
-단순 마스킹 (`<PHONE>`)은 모델이 같은 사람을 일관되게 다루지 못하게 합니다. 예를 들어 "Alice의 주문을 Alice에게 보내라"가 "<PERSON>의 주문을 <PERSON>에게 보내라"가 되면 모호해집니다.
-
-가역적 토큰화 (FPE — format-preserving encryption 또는 단순 mapping)를 사용합니다.
+`<PERSON>` 치환은 쉽지만, 동일 인물을 구분하지 못하게 만듭니다. “Alice의 주문을 Alice에게 보내라”가 모두 `<PERSON>`으로 바뀌면 coreference가 깨집니다. 그래서 경우에 따라 가역적 토큰화가 더 낫습니다.
 
 ```python
 import secrets
@@ -150,7 +152,7 @@ class PIITokenizer:
     reverse: dict[str, str] = field(default_factory=dict)
 
     def tokenize(self, text: str, detected: list[tuple]) -> str:
-        # end부터 거꾸로 치환 (offset 깨짐 방지)
+        # 오프셋이 유효하게 유지되도록 역순으로 반복합니다.
         for cat, start, end, value in sorted(detected, key=lambda x: -x[1]):
             if value not in self.mapping:
                 token = f"<{cat.upper()}_{secrets.token_hex(4)}>"
@@ -165,88 +167,268 @@ class PIITokenizer:
         return text
 
 tk = PIITokenizer()
-detected = detect_pii("Alice (alice@example.com) ordered. Send to alice@example.com.")
-masked = tk.tokenize("Alice (alice@example.com) ordered. Send to alice@example.com.", detected)
-# "Alice (<EMAIL_a3b2c1d0>) ordered. Send to <EMAIL_a3b2c1d0>."
-# 같은 이메일은 같은 토큰 → 모델이 동일 entity로 인식
+src = "Alice (alice@example.com) ordered. Send to alice@example.com."
+detected = detect_pii(src)
+masked = tk.tokenize(src, detected)
+# "앨리스(<EMAIL_a3b2c1d0>)가 주문했습니다. <EMAIL_a3b2c1d0>으로 보내주세요."
+# 동일한 이메일은 동일한 토큰에 매핑됩니다. → 모델은 이를 하나의 엔터티로 취급합니다.
 
 response = llm.complete(masked)
-final = tk.detokenize(response)  # 사용자에게 보내기 전 복원
+final = tk.detokenize(response)  # restore before sending to user
 ```
 
-원칙:
+운영 원칙은 세 가지입니다. 매핑은 요청 단위로만 유지할 것, 토큰에 범주 정보를 넣을 것, 동일 값에는 동일 토큰을 줄 것. 요청 간 매핑을 재사용하면 그 자체가 새로운 개인정보 저장소가 됩니다.
 
-- mapping은 **요청 단위로만** 유지 (cross-request 매핑은 PII leak 위험)
-- token은 형식 정보를 담아 모델이 처리 가능하게
-- 같은 값은 같은 token으로 → coreference 유지
+### outbound re-check가 빠지면 RAG 누출을 놓칩니다
 
----
-
-## Section 5 — 출력 재검사
-
-모델이 RAG 컨텍스트나 system prompt에서 본 PII를 응답에 포함할 수 있습니다. 출력에도 같은 detector를 돌려야 합니다.
+입력만 마스킹하고 끝내면 안 됩니다. 모델은 검색 문맥이나 시스템 프롬프트에서 본 PII를 출력할 수 있습니다. 같은 탐지기를 출력에도 다시 적용해야 합니다.
 
 ```python
 def safe_call(user_input: str, retrieved_docs: list[str]) -> str:
-    # 입력 마스킹
     user_detected = detect_pii(user_input)
     masked_input = mask_text(user_input, user_detected)
 
-    # RAG 문서도 마스킹
     masked_docs = [mask_text(d, detect_pii(d)) for d in retrieved_docs]
 
     response = llm.complete(SYSTEM_PROMPT, user=masked_input, context="\n".join(masked_docs))
 
-    # 출력 재검사 — 마스킹을 우회한 PII가 있는지
     output_detected = detect_pii(response)
     if output_detected:
         log_pii_leak(output_detected, response)
-        # 옵션 1: 차단
-        # return "응답에 개인정보가 포함되어 차단되었습니다."
-        # 옵션 2: 마스킹해서 전달
+        # Option 1: block
+        # "개인정보가 감지되어 답변이 차단되었습니다."를 반환합니다.
+        # 옵션 2: 마스크 및 통과
         response = mask_text(response, output_detected)
 
     return response
 ```
 
----
+이 단계는 특히 다중 사용자 RAG, 고객지원 검색, 내부 문서 검색에서 중요합니다. 문맥에 있던 정보가 답변으로 흘러나오는 순간 사고가 됩니다.
 
-## Section 6 — 컴플라이언스 체크리스트
+### 컴플라이언스는 구현 체크리스트와 연결되어야 합니다
 
-GDPR / 개인정보보호법 관점에서:
+기술 설계는 결국 규제 요구와 만나야 합니다. 최소한 아래 항목은 체크해야 합니다.
 
-- [ ] **수집 최소화**: 모델에 보내는 데이터에서 불필요한 PII 제거
-- [ ] **목적 명시**: 사용자에게 LLM 처리 동의 받음
-- [ ] **국외 이전 통지**: OpenAI 같은 해외 공급사 사용 시 명시
-- [ ] **삭제 권리**: 사용자가 요청하면 로그/캐시에서 삭제 가능
-- [ ] **로깅 정책**: PII가 로그에 남지 않게 (이번 시리즈 Ep9에서 자세히)
-- [ ] **DPA 체결**: 공급사와 Data Processing Agreement
-- [ ] **민감정보 별도 처리**: 의료, 종교 등은 추가 동의
+- [ ] **Minimization**: strip unneeded PII before sending to the model.
+- [ ] **Purpose disclosure**: obtain user consent for LLM processing.
+- [ ] **Cross-border notice**: disclose use of foreign providers like OpenAI.
+- [ ] **Right to delete**: support deletion from logs and caches on request.
+- [ ] **Logging policy**: ensure PII does not land in logs (covered in Ep9).
+- [ ] **DPA in place**: Data Processing Agreement signed with each provider.
+- [ ] **Sensitive categories**: extra consent for health, religion, etc.
 
-LLM API 공급사의 zero-data-retention 옵션 (OpenAI Enterprise, Azure OpenAI)을 사용하면 모델 공급사 측 보관 위험을 낮출 수 있습니다.
+해외 공급사를 쓴다면 보관 기간, zero-data-retention 옵션, 삭제 절차를 함께 검토해야 합니다. 기술 구현과 법적 고지는 분리할 수 없습니다.
 
----
+## PII 탐지 정확도를 높이는 다층 규칙
 
-## 흔한 실수
+실무에서는 regex와 NER를 결합해도 누락이 남습니다. 그래서 형식 검증과 문맥 검증을 추가해 false positive를 줄입니다.
 
-1. **정규식만으로 끝낸다** — 이름, 주소 같은 형식 없는 PII는 NER이 필요합니다.
-2. **단순 마스킹으로 토큰을 일관되게 안 한다** — `<PERSON>`이 여러 명을 가리키면 모델이 혼란스러워합니다. 가역적 토큰화를 쓰세요.
-3. **출력 재검사를 빼먹는다** — RAG 컨텍스트의 PII가 그대로 응답에 흘러나옵니다.
-4. **로그에 PII를 남긴다** — 디버깅 로그에서 PII가 새는 사고가 가장 흔합니다. 로깅 전에도 마스킹하세요.
-5. **국외 LLM 공급사 사용을 사용자에게 알리지 않는다** — GDPR / 개인정보보호법 위반입니다.
+```python
+def luhn_check(number: str) -> bool:
+    digits = [int(c) for c in number if c.isdigit()]
+    checksum = 0
+    parity = len(digits) % 2
+    for i, d in enumerate(digits):
+        if i % 2 == parity:
+            d *= 2
+            if d > 9:
+                d -= 9
+        checksum += d
+    return checksum % 10 == 0
+```
 
----
+카드번호 패턴이 잡혀도 Luhn 검증을 통과하지 않으면 차단 대신 경고로만 처리할 수 있습니다.
 
-## 핵심 요약
+## outbound 누출 시나리오와 방어
 
-- PII 처리는 **입력과 출력 양방향**에서 필요합니다.
-- 정규식은 형식이 있는 PII (전화번호, 카드번호)에 효과적이고, **Microsoft Presidio**가 NER 기반 탐지를 추가합니다.
-- **가역적 토큰화**를 사용하면 모델이 같은 entity를 일관되게 처리할 수 있습니다.
-- 출력 재검사로 RAG / system prompt를 통한 leak을 막습니다.
-- **컴플라이언스** 체크리스트 (수집 최소화, 동의, 삭제권, DPA)를 운영 초기부터 적용하세요.
+| 시나리오 | 누출 경로 | 방어 |
+| --- | --- | --- |
+| 멀티테넌트 RAG 문맥 혼입 | 다른 사용자 이메일 인용 | tenant boundary 필터 + 출력 재검사 |
+| 상담 기록 요약 | 전화번호 원문 재노출 | reversible tokenization + 복원 제한 |
+| 디버그 응답 노출 | 내부 키/토큰 포함 | credential 패턴 차단 |
+
+### Guardrails AI 기반 PII validator 예시
+
+```python
+from guardrails import Guard
+from guardrails.hub import DetectPII
+
+pii_guard = Guard().use(DetectPII, entities=["EMAIL_ADDRESS", "PHONE_NUMBER"], on_fail="fix")
+
+def redact_before_send(text: str) -> str:
+    out = pii_guard.validate(text)
+    return out.validated_output
+```
+
+## 컴플라이언스 점검 표
+
+| 항목 | 질문 | 점검 주기 |
+| --- | --- | --- |
+| 최소 수집 | 모델에 원문 PII를 꼭 보내야 하는가 | 매 릴리스 |
+| 보존 기간 | PII 저장 TTL이 정책과 일치하는가 | 주간 |
+| 삭제 권리 | 요청 후 N일 내 완전 삭제 가능한가 | 월간 |
+| 접근 통제 | PII 저장소 접근이 역할 기반인가 | 월간 |
+| 국외 이전 고지 | 공급사 및 지역 고지가 최신인가 | 분기 |
+
+이 표를 운영 체크리스트와 연결해야 준법 이슈를 조기에 잡을 수 있습니다.
+
+## 데이터 저장소 분리 설계 예시
+
+PII 처리에서 가장 자주 놓치는 부분은 저장소 경계입니다. 아래처럼 역할별 저장소를 분리하면 삭제 요청과 접근 제어가 쉬워집니다.
+
+| 저장소 | 저장 내용 | 보존 기간 | 접근 권한 |
+| --- | --- | --- | --- |
+| audit_log | 해시, 결정 코드, 타임스탬프 | 1~7년 | 보안/준법 |
+| pii_vault | 암호화 원문, 토큰 매핑 | 30~90일 | 최소 인원 |
+| analytics | 집계 지표(비식별) | 장기 | 데이터팀 |
+
+### 요청 단위 토큰 매핑 만료 처리
+
+```python
+from datetime import datetime, timedelta
+
+def expire_token_map(store, ttl_minutes: int = 30):
+    cutoff = datetime.utcnow() - timedelta(minutes=ttl_minutes)
+    store.delete_where(lambda r: r["created_at"] < cutoff)
+```
+
+요청 단위 매핑을 오래 보관하면 그 자체가 민감 데이터 저장소가 됩니다. 만료 정책을 코드로 강제해야 합니다.
+
+## 운영 사고 예시
+
+- 고객지원 에이전트가 티켓 본문에서 전화번호를 읽고 응답에 재노출
+- 내부 테스트 로그에 API 키가 평문으로 기록
+- 삭제 요청 처리 후 캐시 사본이 남아 재노출
+
+이 세 가지는 모두 "검사기 성능"보다 "저장소 경계와 수명 관리" 문제에서 발생합니다.
+
+## 운영 부록: 검증 질문
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+## 흔히 헷갈리는 지점
+
+- regex만 충분히 많이 쓰면 PII를 거의 다 잡을 수 있다고 생각하기 쉽지만, 이름과 주소 같은 비정형 정보는 놓칩니다.
+- `<PERSON>` 같은 단순 마스킹이 항상 안전하다고 보기 쉽지만, 모델 추론 품질을 크게 떨어뜨릴 수 있습니다.
+- 입력만 마스킹하면 충분하다고 생각하기 쉽지만, 실제 누출은 출력과 로그에서 더 자주 발생합니다.
+- 삭제 요청은 원문 저장소에만 적용하면 된다고 보기 쉽지만, 캐시·로그·분석 테이블도 함께 봐야 합니다.
+
+## 운영 체크리스트
+
+- 구조화된 PII용 regex와 비정형 PII용 NER 도구를 함께 운영합니다.
+- 문맥 일관성이 중요하면 요청 단위 가역적 토큰화를 적용합니다.
+- 입력, 검색 문맥, 출력, 로그를 각각 별도 PII 검사 지점으로 둡니다.
+- 해외 모델 공급사 사용 여부와 데이터 보관 정책을 사용자 고지 문구와 일치시킵니다.
+- 삭제 요청과 보존 기간 만료를 자동화한 운영 절차를 문서화합니다.
+
+## 정리
+
+PII 보호는 단일 마스킹 함수로 끝나지 않습니다. 무엇을 모델에 보내는지, 무엇을 로그에 남기는지, 무엇을 다시 복원할 수 있어야 하는지를 함께 설계해야 합니다. 이 문제를 데이터 흐름 관점으로 보면 기술 선택과 규제 대응이 훨씬 명확해집니다.
+
+실무적으로는 regex와 Presidio를 조합해 탐지 정확도를 높이고, 필요할 때는 가역적 토큰화로 문맥 품질을 유지하는 방식이 현실적입니다. 여기에 outbound re-check와 저장소 분리를 넣어야 실제 누출을 줄일 수 있습니다.
+
+더 중요한 일은 개인정보를 숨기는 것 자체보다, 개인정보가 넘어가면 안 되는 경계를 정확히 관리하는 일입니다.
+
+## 처음 질문으로 돌아가기
+
+- **PII 보호는 왜 모델에 보내는 정보와 내부에 보관하는 정보를 분리해야 할까요?**
+  - 모델에는 최소화된 token이나 masked value만 보내고, 원본은 접근 통제된 저장소에 둬야 유출 범위를 줄일 수 있습니다.
+- **regex, Presidio, reversible tokenization은 각각 어떤 단계에서 유용할까요?**
+  - regex는 빠른 시작점, Presidio는 다국어·복합 엔터티 탐지, reversible tokenization은 나중에 원본 복원이 필요한 업무에 유용합니다.
+- **응답 outbound 단계에서 다시 검사하지 않으면 어떤 유출이 생길까요?**
+  - 모델이 학습된 패턴이나 context 조각에서 개인정보를 재구성해 응답할 수 있으므로 outbound 재검사가 없으면 사용자에게 PII가 나갈 수 있습니다.
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [AI Safety & Guardrails 101 (1/10): AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection 방어](./02-prompt-injection-defense.md)
+- [AI Safety & Guardrails 101 (3/10): 출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
+- **AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹 (현재 글)**
+- AI Safety & Guardrails 101 (5/10): Jailbreak 탐지 (예정)
+- AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지 (예정)
+- AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증 (예정)
+- AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지 (예정)
+- AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스 (예정)
+- AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
+
+### 공식 문서
 
 - [Microsoft Presidio](https://microsoft.github.io/presidio/)
 - [GDPR Article 4 — Definitions](https://gdpr.eu/article-4-definitions/)
-- [한국 개인정보보호위원회 — 가이드라인](https://www.pipc.go.kr/)
+- [HIPAA — Privacy Rule Summary](https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html)
 - [OpenAI — Enterprise Privacy](https://openai.com/enterprise-privacy)
+
+### 관련 시리즈
+
+- [LLM 앱 운영 101 — LLM 앱 보안](../llm-apps-ops-101/04-security.md)
+- [감사 로깅과 컴플라이언스](./09-audit-logging-compliance.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-safety-guardrails-101/ko/04-pii-detection-redaction)

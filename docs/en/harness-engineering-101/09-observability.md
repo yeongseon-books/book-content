@@ -1,11 +1,11 @@
 ---
-title: Observability — Tracing and Replaying Agent Work
+title: "Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work"
 series: harness-engineering-101
 episode: 9
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,22 +14,29 @@ tags:
 - Harness
 - Observability
 - Tracing
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: If you cannot see what the agent did, you cannot debug it or improve
   it.
 ---
 
-# Observability — Tracing and Replaying Agent Work
+# Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work
 
-> Harness Engineering 101 Series (9/10)
+Many agent systems still preserve only the final answer string. That is enough to impress someone in a demo and almost useless when an incident starts. Once a real run includes retrieval, tool calls, retries, reflection, approval, and cost controls, the final answer alone is not an explanation.
 
-If you cannot see what the agent did, you cannot debug it or improve it. Observability is the practice of making every step of the agent traceable, recordable, and replayable.
+Operationally, the real requirement is stronger: after a bad run, you must be able to reconstruct what the agent saw, what it decided, what it called, how long each step took, and where the cost spiked.
 
----
+This is post 9 in the Harness Engineering 101 series. Here we treat observability as a replayable execution model, not as a collection of ad hoc logs.
 
-![Observability - tracing and replaying agent work](../../assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.en.png)
-
+![Observability - tracing and replaying agent work](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.en.png)
 *Observability - tracing and replaying agent work*
+> An observable agent can explain not only what it answered, but which input, context, tools, costs, and decisions produced that answer.
+
+## Questions to Keep in Mind
+
+- How should an Observability Harness let you reconstruct an agent run later?
+- What operational questions do traces, replay, and cost-latency dashboards each answer?
+- Which signals deserve alerts that wake a human?
+
 ## What Is Observability?
 
 Observability is the ability to reconstruct, from the outside, what an agent did, why it did it, and how. It is not just "leave logs around" — when an incident happens, you must be able to trace and reproduce the decision made at that moment.
@@ -57,7 +64,7 @@ A `Span` is one unit of work in the agent. One tool call, one LLM call, one refl
 
 ## What Should You Record?
 
-![What should you Record](../../assets/harness-engineering-101/09/09-02-what-should-you-record.en.png)
+![What should you Record](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-02-what-should-you-record.en.png)
 
 *What should you Record*
 You need three layers of information to make traces useful.
@@ -90,7 +97,7 @@ Note that prompt and response go into events, not attributes. Attributes are sho
 
 ## Trace Model — Following One Run End to End
 
-![Trace model - following one run end to end](../../assets/harness-engineering-101/09/09-03-trace-model-following-one-run-end-to-end.en.png)
+![Trace model - following one run end to end](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-03-trace-model-following-one-run-end-to-end.en.png)
 
 *Trace model - following one run end to end*
 A single agent run produces a trace shaped like this tree:
@@ -135,7 +142,7 @@ With this tree alone you can answer "where was it slow?", "where did the cost sp
 
 ## Replay — Reproducing a Run from Logs
 
-![Replay - reproducing a run from logs](../../assets/harness-engineering-101/09/09-04-replay-reproducing-a-run-from-logs.en.png)
+![Replay - reproducing a run from logs](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-04-replay-reproducing-a-run-from-logs.en.png)
 
 *Replay - reproducing a run from logs*
 A good trace is reproducible. You should be able to run the same step with the same input again and verify the same output comes back.
@@ -227,21 +234,38 @@ def should_alert(metrics: AgentMetrics, baseline: AgentMetrics) -> str | None:
 - Replay only works if prompts and retrieved context are stored.
 - Watch p95 (not average) latency and alert on baseline-relative spikes.
 
+## Operational checklist
+
+- [ ] Record every agent run as a trace with nested spans.
+- [ ] Store What, Why, and Cost metadata together for each critical step.
+- [ ] Preserve prompts, retrieved context, and tool inputs needed for replay.
+- [ ] Track error rate, p95 latency, and average cost per run in dashboards.
+- [ ] Page only on material baseline-relative spikes to avoid alert fatigue.
+
 The next post is Production Harness — combining the nine harnesses into a deployment pattern for real production environments.
+
+## Answering the Opening Questions
+
+- **How should an Observability Harness let you reconstruct an agent run later?**
+  - Tie request id, input, context snapshot, tool calls, intermediate decisions, cost, latency, errors, and final result into one trace.
+- **What operational questions do traces, replay, and cost-latency dashboards each answer?**
+  - Traces answer path questions, replay answers reproducibility questions, and dashboards expose trends and bottlenecks in cost, latency, and errors.
+- **Which signals deserve alerts that wake a human?**
+  - Alerts should fire for user-impacting failure spikes, runaway cost, repeated tool failures, approval bypass attempts, and rollback failures.
 
 <!-- toc:begin -->
 ## In this series
 
-- [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
-- [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
-- [Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
-- [Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
-- [Test Harness — Turning Completion Criteria into Tests](./06-test-harness.md)
-- [Feedback Loops — Building Structures That Let Agents Recover from Failure](./07-feedback-loop.md)
-- [Approval Gates — Designing Where Humans Must Approve](./08-approval-gate.md)
-- **Observability — Tracing and Replaying Agent Work (current)**
-- Production Harness — Building Operational Environments for Agents (upcoming)
+- [Harness Engineering 101 (1/10): What Is Harness Engineering?](./01-what-is-harness-engineering.md)
+- [Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
+- [Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
+- [Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
+- [Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
+- [Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests](./06-test-harness.md)
+- [Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure](./07-feedback-loop.md)
+- [Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve](./08-approval-gate.md)
+- **Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (current)**
+- Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)
 
 <!-- toc:end -->
 
@@ -249,7 +273,13 @@ The next post is Production Harness — combining the nine harnesses into a depl
 
 ## References
 
-- [OpenTelemetry — Tracing concepts](https://opentelemetry.io/docs/concepts/signals/traces/)
-- [Google SRE — Monitoring distributed systems](https://sre.google/sre-book/monitoring-distributed-systems/)
-- [LangSmith — Tracing for LLM applications](https://docs.smith.langchain.com/observability)
-- [Honeycomb — Observability engineering](https://www.honeycomb.io/blog/what-is-observability)
+### Official docs and references
+
+- [OpenTelemetry — Tracing Concepts](https://opentelemetry.io/docs/concepts/signals/traces/)
+- [Google SRE — Monitoring Distributed Systems](https://sre.google/sre-book/monitoring-distributed-systems/)
+- [LangSmith — Tracing for LLM Applications](https://docs.smith.langchain.com/observability)
+
+### Verification-friendly observability references
+
+- [Honeycomb — What Is Observability Engineering?](https://www.honeycomb.io/blog/what-is-observability)
+- [OpenAI Agents SDK — Tracing](https://openai.github.io/openai-agents-python/tracing/)

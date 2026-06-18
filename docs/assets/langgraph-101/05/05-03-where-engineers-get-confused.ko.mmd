@@ -1,0 +1,13 @@
+flowchart TD
+  A["관리자<br/>route 선택 + 대체 경로 + 종료 규칙 소유"] --> B["작업자<br/>역할별 결과만 생산"]
+  B --> C["최종 처리자<br/>사용자 응답 최종 조립"]
+  C --> D["경계 점검<br/>관리자가 답변까지 쓰면 안 됨"]
+  D --> E["경계 점검<br/>작업자가 공유 상태 전체를 수정하면 안 됨"]
+  E --> F["안정적 설계<br/>인계마다 책임 소유권 명확"]
+
+  style A fill:#e3f2fd,stroke:#1976d2
+  style B fill:#fff3e0,stroke:#f57c00
+  style C fill:#e8f5e9,stroke:#388e3c
+  style D fill:#fce4ec,stroke:#c2185b
+  style E fill:#fff8e1,stroke:#f9a825
+  style F fill:#f3e5f5,stroke:#7b1fa2

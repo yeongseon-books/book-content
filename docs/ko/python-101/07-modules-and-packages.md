@@ -1,13 +1,13 @@
 ---
-title: '모듈과 패키지: import, __init__, __name__'
+title: "Python 101 (7/10): 모듈과 패키지: import, __init__, __name__"
 series: python-101
 episode: 7
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,44 +17,34 @@ tags:
 - name-main-guard
 - relative-imports
 - namespace-packages
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: Python에서 모듈은 "한 번 실행되면 캐시되는 namespace"이고, 패키지는 "__init__.py가 있는 디렉터리로
   묶인 모듈의…
 ---
 
-# 모듈과 패키지: import, __init__, __name__
+# Python 101 (7/10): 모듈과 패키지: import, __init__, __name__
+
+Python에서 모듈은 한 번 실행되면 캐시되는 namespace이고, 패키지는 관련 모듈을 디렉터리로 묶는 단위입니다. import가 실제로 무엇을 읽고 어디에 이름을 올리는지 이해하면 구조가 한결 단순해집니다.
+
+이 글은 Python 101 시리즈의 일곱 번째 글입니다.
 
 
-## 이 글에서 다룰 문제
+![Python 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/07/07-01-mental-model.ko.png)
+*Python 101 7장 흐름 개요*
+> 모듈과 패키지: import, __init__, __name__의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-함수를 익히고 나면 코드가 길어집니다. 한 파일에 수백 줄이 쌓이면 다음 문제가 생깁니다.
+## 먼저 던지는 질문
 
-- 같은 이름의 함수와 변수가 충돌합니다.
-- 어떤 함수가 어디서 정의됐는지 찾기 어렵습니다.
-- 다른 프로젝트에서 같은 코드를 재사용하기 힘듭니다.
+- 같은 이름의 함수와 변수가 충돌합니다?
+- 어떤 함수가 어디서 정의됐는지 찾기 어렵습니다?
+- 다른 프로젝트에서 같은 코드를 재사용하기 힘듭니다?
 
-모듈과 패키지는 이런 문제를 다룰 때 가장 먼저 익히게 되는 Python 도구입니다. 파일 단위로 코드를 쪼개고, 디렉터리 단위로 묶고, 필요한 부분만 골라서 가져오는 구조를 만듭니다. CLI 스크립트, 웹 서버, 데이터 파이프라인처럼 구조가 커지는 코드에서 특히 자주 만나게 됩니다. 작은 프로젝트에서 미리 익혀두면, 큰 프로젝트로 옮겨갈 때도 익숙한 방식으로 구조를 따라가기 쉬워집니다.
-
-## Mental Model
+## 멘탈 모델
 
 > Python에서 모듈은 "한 번 실행되면 캐시되는 namespace"이고, 패키지는 "`__init__.py`가 있는 디렉터리로 묶인 모듈의 묶음"이라는 두 정의만 잡아 두면 import 동작 대부분이 같은 그림으로 설명됩니다.
 모듈은 "한 번 실행되어 namespace를 만드는 `.py` 파일"입니다. 패키지는 "그런 모듈들을 담는 디렉터리"입니다. `import`는 그 namespace를 현재 코드에 연결하는 동작입니다.
 
-![Mental Model](../../assets/python-101/07/07-01-mental-model.ko.png)
-
-*Mental Model*
-핵심은 두 가지입니다. 첫째, **모듈 코드는 처음 import될 때 위에서 아래로 한 번 실행됩니다**. 둘째, **그 결과 만들어진 namespace 객체가 캐시되어 재사용됩니다**. 두 번째 import는 파일을 다시 읽지 않고 캐시된 객체만 가져옵니다.
-
-```mermaid
-flowchart TB
-    Q1{"파일이 너무 크거나 책임이 섞였나?"} -->|아니오| Keep["한 파일 유지"]
-    Q1 -->|예| Q2{"같은 도메인 모듈이 여러 개인가?"}
-    Q2 -->|아니오| File["별도 .py 파일로 분리"]
-    Q2 -->|예| Pkg["디렉터리 + __init__.py로 패키지화"]
-    Pkg --> Q3{"외부 노출 API가 따로 있나?"}
-    Q3 -->|예| Reexport["__init__.py에서 re-export"]
-    Q3 -->|아니오| Direct["직접 import 허용"]
-```
+여기서 먼저 잡아둘 점은 두 가지입니다. 첫째, **모듈 코드는 처음 import될 때 위에서 아래로 한 번 실행됩니다**. 둘째, **그 결과 만들어진 namespace 객체가 캐시되어 재사용됩니다**. 두 번째 import는 파일을 다시 읽지 않고 캐시된 객체만 가져옵니다.
 
 *분할 결정 트리: 파일 크기와 책임 분리 기준으로 모듈/패키지 구조가 결정됩니다.*
 
@@ -83,10 +73,10 @@ myapp/
 ### 3. import 형태
 
 ```python
-import math                # math namespace 전체를 'math'로 가져오기
-from math import sqrt      # math 안의 sqrt만 현재 namespace로 가져오기
-import numpy as np         # numpy를 짧은 별칭 'np'로 사용하기
-from .sibling import foo   # 같은 패키지 안의 sibling 모듈에서 foo 가져오기
+import math                # bring in the whole math namespace as 'math'
+from math import sqrt      # bring just sqrt into the current namespace
+import numpy as np         # use a short alias 'np' for numpy
+from .sibling import foo   # import foo from a sibling module in the same package
 ```
 
 `import x`는 `x` 자체를 가져옵니다. 호출은 `x.func()`로 합니다. `from x import y`는 `y`만 가져오므로 호출이 `y()`로 짧아지지만, `y`가 어디서 왔는지 호출부에서 보이지 않습니다. 작은 프로젝트라면 둘 다 괜찮고, 코드가 커질수록 `import x` 쪽이 출처를 따라가기 쉬운 편입니다.
@@ -111,8 +101,8 @@ if __name__ == "__main__":
 
 ```python
 # myapp/db/sqlite_store.py
-from .migrations import latest_version       # 같은 db 패키지 안의 migrations
-from ..cli import parse_args                 # 한 단계 위 myapp 패키지의 cli
+from .migrations import latest_version       # migrations in the same db package
+from ..cli import parse_args                 # cli one level up, in myapp
 ```
 
 relative import는 패키지 안에서만 의미가 있습니다. 스크립트로 직접 실행하는 파일에서는 쓸 수 없습니다.
@@ -128,7 +118,7 @@ relative import는 패키지 안에서만 의미가 있습니다. 스크립트�
 
 같은 모듈 이름이 여러 곳에 있다면 `sys.path` 순서대로 먼저 발견된 쪽이 이깁니다.
 
-## Before-After
+## 전후 비교
 
 같은 결제 처리 로직이 한 파일에 모여 있을 때와, 모듈과 패키지로 정리되었을 때를 비교합니다.
 
@@ -340,14 +330,14 @@ def total(items):
 6. **`sys.path`를 본문에서 직접 조작하기.**
    `sys.path.insert(0, "...")`을 본문 곳곳에 흩어두면 import가 어디서 어떻게 풀리는지 추적이 어려워집니다. 패키지 설치(`pip install -e .`)나 `PYTHONPATH` 설정으로 푸는 편이 훨씬 안전합니다.
 
-## 실무
+## 실무에서는 이렇게 생각합니다
 
 실제 프로젝트에서 모듈과 패키지가 만나는 모습은 다음과 같습니다.
 
 - **계층 분리**: `myapp/api`, `myapp/db`, `myapp/services`처럼 책임별 하위 패키지로 나누고, 각 모듈은 자기 계층의 일만 합니다.
 - **CLI 진입점**: `python -m myapp.cli`로 실행할 수 있게 만들면 패키지 안에서 relative import가 자연스럽게 동작합니다.
 - **재사용 단위**: 외부에 공개할 함수만 `__init__.py`에서 다시 export하면 사용자는 `from myapp import do_something`처럼 짧게 쓸 수 있습니다.
-- **테스트**: 모듈 단위로 import해서 `pytest`가 함수만 골라 실행할 수 있게 합니다. 한 파일에 모든 것이 섞여 있으면 테스트도 함께 무거워집니다.
+- 테스트: 모듈 단위로 import해서 `pytest`가 함수만 골라 실행할 수 있게 합니다. 한 파일에 모든 것이 섞여 있으면 테스트도 함께 무거워집니다.
 - **설정 분리**: 환경별 설정은 별도 모듈(`config_dev.py`, `config_prod.py`)로 두고 진입점에서 골라 import합니다.
 
 이 구조는 프로젝트가 커져도 큰 틀은 비슷하게 유지되는 편입니다. 처음에 `myapp/__init__.py` 한 줄로 시작해도, 필요해지면 하위 패키지를 늘리는 방식으로 확장할 수 있습니다.
@@ -371,12 +361,186 @@ def total(items):
 
 다음 글에서는 파일 I/O와 예외 처리를 다룹니다. 모듈 단위로 정리한 코드가 외부 자원을 안전하게 다루는 방법을 살펴봅니다.
 
+## 실전 앵커: import 경로, 패키지 구조, 배포 전 점검
+
+모듈/패키지 파트의 핵심은 "내 코드가 어디에서 로드되는가"를 확실히 아는 것입니다. 아래 세 줄만으로도 대부분의 import 문제를 빠르게 좁힐 수 있습니다.
+
+```python
+import sys
+import mypkg
+
+print(sys.path)
+print(mypkg.__file__)
+```
+
+`sys.path` 앞부분에 의도치 않은 경로가 있으면 같은 이름의 모듈이 그림자처럼 먼저 로드될 수 있습니다. 특히 파일명을 `random.py`, `json.py`로 짓는 실수가 자주 발생합니다.
+
+```text
+ImportError: cannot import name 'loads' from 'json' (/project/json.py)
+```
+
+이 에러는 표준 라이브러리 `json`이 아니라 프로젝트 파일 `json.py`를 먼저 읽은 경우입니다.
+
+패키지 구조는 최소 단위부터 단정하게 시작하는 편이 좋습니다.
+
+```text
+myapp/
+  pyproject.toml
+  src/
+    myapp/
+      __init__.py
+      cli.py
+      service.py
+```
+
+`src/` 레이아웃은 테스트 중 우연한 상대경로 import를 줄여 줍니다. 설치된 패키지 기준으로 동작을 확인하기 쉬워 배포 안정성이 올라갑니다.
+
+`pyproject.toml`의 가장 작은 예시는 다음처럼 유지할 수 있습니다.
+
+```toml
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "myapp"
+version = "0.1.0"
+description = "python-101 example"
+requires-python = ">=3.11"
+```
+
+설치 후에는 엔트리포인트를 통해 import 경로를 검증합니다.
+
+```bash
+python -m pip install -e .
+python -m myapp.cli
+```
+
+표준 라이브러리 `importlib`도 함께 익혀 두면 동적 로딩 코드의 디버깅이 쉬워집니다.
+
+```python
+import importlib
+
+math_mod = importlib.import_module('math')
+print(math_mod.sqrt(16))
+```
+
+성능 관점에서는 import 비용도 측정할 수 있습니다.
+
+```python
+import timeit
+
+cold = timeit.timeit("import json", number=1000)
+print(cold)
+```
+
+대부분은 미미하지만 대규모 CLI에서 초기 체감 속도를 바꾸는 경우가 있어, 느린 의존성은 함수 내부 지연 import로 분리하기도 합니다.
+
+디버깅 루틴으로는 `pdb`보다도 `python -X importtime -c "import myapp"`가 매우 유용합니다. 어떤 모듈 import가 느린지 계층별로 확인할 수 있습니다.
+
+모듈/패키지 단원의 목표는 코드 재사용을 넘어서, 실행 환경이 바뀌어도 동일하게 로드되는 구조를 만드는 것입니다.
+
+### 추가 실습: 배포 전 import 안정성 점검 절차
+
+패키지 작업에서 "로컬에서는 되는데 서버에서 안 되는" 문제는 대부분 경로/설치 방식에서 발생합니다. 배포 전에는 아래 절차를 고정해서 확인합니다.
+
+```bash
+python -m pip uninstall -y myapp
+python -m pip install .
+python -c "import myapp, sys; print(myapp.__file__); print(sys.version)"
+```
+
+editable install(`-e`)과 일반 install 모두 테스트하면 경로 의존 버그를 빨리 찾을 수 있습니다.
+
+네임스페이스 충돌 방지도 중요합니다. 표준 라이브러리와 같은 모듈명을 피하고, `__init__.py`에서 과도한 사이드이펙트 import를 줄여야 초기화 실패를 줄일 수 있습니다.
+
+```python
+# 불량: __init__.py에서 호출
+# good: 최소 공개 심볼만 노출
+from .service import run
+```
+
+마지막으로 `python -m package.module` 실행 습관을 들이면 상대 import 오류를 줄일 수 있습니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
+### 보강 메모: 실수 줄이는 운영 습관
+
+학습 단계에서 만든 코드를 실제 프로젝트에 옮길 때는 세 가지를 같이 점검하는 편이 좋습니다. 첫째, 입력 검증 경계가 함수 시작 지점에 있는지 확인합니다. 둘째, 실패 시 사용자에게 보여 줄 메시지와 로그 메시지를 분리합니다. 셋째, 성능 판단은 추측이 아니라 `timeit` 또는 샘플 벤치마크로 남깁니다.
+
+간단한 템플릿은 다음과 같습니다.
+
+```python
+def safe_run(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        # 학습 단계에서는 원인 관찰을 우선
+        raise RuntimeError(f'실행 실패: {fn.__name__}') from e
+```
+
+또한 표준 라이브러리 문서를 읽을 때는 "모듈 개요 -> 대표 함수 3개 -> 예외 종류" 순서로 훑는 습관을 들이면 기억이 오래갑니다. 기능을 전부 외우는 것보다, 어떤 상황에서 어떤 모듈을 열어봐야 하는지 아는 것이 더 중요합니다.
+
+## 처음 질문으로 돌아가기
+
+- **같은 이름의 함수와 변수가 충돌합니다?**
+  - 모든 코드를 하나의 파일에 두면 같은 이름이 서로 덮어쓰기 쉽지만, 본문에서 본 것처럼 모듈 단위로 파일을 나누면 `mod_a.process`와 `mod_b.process`처럼 namespace로 구분됩니다. `from x import *` 대신 `import x`나 명시적 이름 import를 쓰는 습관이 충돌을 1차로 막습니다.
+- **어떤 함수가 어디서 정의됐는지 찾기 어렵습니다?**
+  - 한 파일이 비대해지면 정의 위치 추적이 어렵지만, 본문에서 강조했듯이 패키지 구조(`mypkg/auth.py`, `mypkg/billing.py` 식)로 책임을 나누면 import 경로 자체가 "어디에 있는지"를 알려 줍니다. IDE의 go-to-definition도 모듈 경계가 있어야 제대로 동작합니다.
+- **다른 프로젝트에서 같은 코드를 재사용하기 힘듭니다?**
+  - 스크립트 한 덩어리는 재사용이 어렵지만, 본문에서 본 것처럼 모듈/패키지로 분리하고 `__init__.py`에 공개 API를 명시하면 다른 프로젝트가 `pip install` 또는 sys.path 등록으로 그대로 import할 수 있습니다. `if __name__ == "__main__":` 가드까지 두면 모듈이 import용과 실행용으로 동시에 동작합니다.
+
 <!-- toc:begin -->
+## 시리즈 목차
+
+- [Python 101 (1/10): 왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- [Python 101 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): 제어 흐름: if, for, while, comprehension](./05-control-flow.md)
+- [Python 101 (6/10): 함수와 인자: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
+- **모듈과 패키지: import, __init__, __name__ (현재 글)**
+- 파일 I/O와 예외 처리 (예정)
+- 클래스와 객체: 데이터와 동작을 함께 묶기 (예정)
+- 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
-- [Python tutorial — Modules](https://docs.python.org/3/tutorial/modules.html)
-- [Python tutorial — Packages](https://docs.python.org/3/tutorial/modules.html#packages)
-- [Python reference — The import system](https://docs.python.org/3/reference/import.html)
-- [PEP 328 — Imports: Multi-Line and Absolute/Relative](https://peps.python.org/pep-0328/)
+- [Python 튜토리얼 — Modules](https://docs.python.org/3/tutorial/modules.html) — 모듈 실행, import 캐시, `sys.path` 탐색 순서를 입문 관점에서 설명합니다.
+- [Python Language Reference — The import system](https://docs.python.org/3/reference/import.html) — import가 finder/loader와 module cache를 거쳐 동작하는 방식을 공식 정의합니다.
+- [Python 공식 문서 — `__main__`](https://docs.python.org/3/library/__main__.html) — `if __name__ == "__main__"` 가드와 패키지 엔트리 포인트의 의미를 보완합니다.
+- [PEP 328 — Imports: Multi-Line and Absolute/Relative](https://peps.python.org/pep-0328/) — 절대/상대 import와 leading dot 문법의 배경입니다.
+- [PEP 420 — Implicit Namespace Packages](https://peps.python.org/pep-0420/) — `__init__.py` 없는 namespace package 개념을 확인할 수 있습니다.
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)

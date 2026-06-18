@@ -1,10 +1,10 @@
 ---
 series: calculus-for-ml-101
 episode: 10
-title: Calculus in Deep Learning
-status: content-ready
+title: "Calculus for ML 101 (10/10): Calculus in Deep Learning"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,40 @@ tags:
   - Capstone
   - Beginner
 seo_description: A capstone tour of how networks, loss, optimizers, backprop, and calculus combine into the deep learning training loop
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Calculus in Deep Learning
+# Calculus for ML 101 (10/10): Calculus in Deep Learning
 
-> Calculus for ML 101 series (10/10)
+The ideas from this series do not live in isolation. Functions and slopes, partial derivatives, gradients, the chain rule, loss functions, gradient descent, optimizers, and backpropagation all show up inside the same training loop. The goal of this final post is to put those pieces back together as one working system.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Calculus for ML 101 series.
 
-**Core question**: How does the *calculus* from this series come together in the *deep learning training loop*?
+In this post, we'll walk through the forward pass, loss computation, backward pass, optimizer update, and the operating rules around that loop. Once the full cycle is visible, calculus stops feeling like a separate math chapter and starts feeling like the control interface for learning itself.
 
-> *Networks*, *losses*, *backprop*, and *optimizers* all run on calculus inside *one cycle*.
+> In deep learning, calculus is the common language that turns prediction error into parameter movement, one training step at a time.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![calculus for ml 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 10 flow overview*
 
-- The *5 stages* of the training loop
-- *Forward pass*
-- *Loss computation*
-- *Backward pass*
-- *Weight update*
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Calculus in Deep Learning?
+- Which signal should the example or diagram make visible for Calculus in Deep Learning?
+- What failure should be prevented first when Calculus in Deep Learning reaches a real system?
+
+## Questions this article answers
+
+- What stages make up the deep learning training loop, and where does calculus appear in each one?
+- How do the forward pass and loss computation prepare the work that backward needs to do?
+- How do gradient computation and the optimizer update connect?
+- Why do practical details such as `zero_grad`, eval/train mode, and reproducibility belong inside this loop?
+- How do all the calculus ideas from this series collapse into one final picture?
 
 ## Why It Matters
 
 This *capstone* synthesizes the series and lets you implement the *common skeleton* shared by every ML training run.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    F[Forward] --> L[Loss]
-    L --> B[Backward]
-    B --> U[Update]
-    U --> F
-```
 
 ## Key Terms
 
@@ -117,6 +115,37 @@ def train(data, epochs=100, lr=0.1):
     return w, b
 ```
 
+### Step 6 — Framework code uses the same loop
+
+```python
+optimizer.zero_grad()
+pred = model(x)
+loss = criterion(pred, y)
+loss.backward()
+optimizer.step()
+```
+
+These few lines compress the entire series. `pred = model(x)` is function composition. `loss = criterion(pred, y)` makes the training objective explicit. `loss.backward()` executes the chain rule across the computation graph. `optimizer.step()` converts gradient information into real parameter movement.
+
+### Step 7 — Evaluation follows different rules
+
+```python
+with torch.no_grad():
+    pred = model(x)
+    metric = accuracy(pred, y)
+```
+
+Evaluation does not need gradients, so it should not build a backward graph. Once you see training as a forward-loss-backward-update loop, it becomes obvious why `train()`/`eval()` mode switches and `no_grad()` blocks matter. They are not framework rituals. They are part of running the loop correctly.
+
+### Step 8 — The first failure points to check
+
+- Did you forget `zero_grad()`, so stale gradients are leaking across steps?
+- Is the loss decreasing while the evaluation metric gets worse, suggesting the loss design is misaligned with the real objective?
+- Are scheduler timing, `train()`/`eval()` mode, or optimizer-step ordering inconsistent across experiments?
+- Is reproducibility weak enough that you are blaming the model architecture for what is really a training-loop configuration issue?
+
+Many training bugs come from this operating layer rather than from exotic calculus mistakes. That is why a clear loop-level mental model is so valuable.
+
 ## What to Notice in This Code
 
 - The *forward pass* yields a *prediction*.
@@ -161,19 +190,31 @@ def train(data, epochs=100, lr=0.1):
 
 ## Wrap-up and Next Steps
 
-This post wraps the *Calculus for ML 101* series. *Calculus* is the *mathematical essence* of what we mean by *deep learning learns*.
+This post wraps the *Calculus for ML 101* series. When people say a deep learning model *learns*, what they really mean is that the training loop keeps converting prediction error into gradients and then into parameter updates. Calculus is the language that makes that conversion possible.
+
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Calculus in Deep Learning?**
+  - The article treats Calculus in Deep Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Calculus in Deep Learning?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Calculus in Deep Learning reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What Is a Derivative](./01-what-is-derivative.md)
-- [Functions and Slope](./02-functions-and-slope.md)
-- [Partial Derivatives](./03-partial-derivatives.md)
-- [Gradient](./04-gradient.md)
-- [Chain Rule](./05-chain-rule.md)
-- [Loss Function](./06-loss-function.md)
-- [Gradient Descent](./07-gradient-descent.md)
-- [Optimization](./08-optimization.md)
-- [Backpropagation Intuition](./09-backpropagation-intuition.md)
+## In this series
+
+- [Calculus for ML 101 (1/10): What Is a Derivative](./01-what-is-derivative.md)
+- [Calculus for ML 101 (2/10): Functions and Slope](./02-functions-and-slope.md)
+- [Calculus for ML 101 (3/10): Partial Derivatives](./03-partial-derivatives.md)
+- [Calculus for ML 101 (4/10): Gradient](./04-gradient.md)
+- [Calculus for ML 101 (5/10): Chain Rule](./05-chain-rule.md)
+- [Calculus for ML 101 (6/10): Loss Function](./06-loss-function.md)
+- [Calculus for ML 101 (7/10): Gradient Descent](./07-gradient-descent.md)
+- [Calculus for ML 101 (8/10): Optimization](./08-optimization.md)
+- [Calculus for ML 101 (9/10): Backpropagation Intuition](./09-backpropagation-intuition.md)
 - **Calculus in Deep Learning (current)**
+
 <!-- toc:end -->
 
 ## References
@@ -182,3 +223,4 @@ This post wraps the *Calculus for ML 101* series. *Calculus* is the *mathematica
 - [PyTorch Tutorials](https://pytorch.org/tutorials/)
 - [CS231n - Convolutional Neural Networks](https://cs231n.stanford.edu/)
 - [Reproducibility - PyTorch](https://pytorch.org/docs/stable/notes/randomness.html)
+- [Zeroing out gradients in PyTorch](https://pytorch.org/tutorials/recipes/recipes/zeroing_out_gradients.html)

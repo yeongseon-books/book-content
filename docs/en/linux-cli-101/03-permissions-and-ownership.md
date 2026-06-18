@@ -1,11 +1,11 @@
 ---
-title: Permissions and Ownership
+title: "Linux CLI 101 (3/10): Permissions and Ownership"
 series: linux-cli-101
 episode: 3
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,36 +17,26 @@ tags:
 - chown
 - Security
 - File System
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: Linux file permissions are like a door with three locks. The owner,
   the group, and everyone else each get a different key.
 ---
 
-# Permissions and Ownership
+# Linux CLI 101 (3/10): Permissions and Ownership
 
-> Linux CLI 101 series (3/10)
+Permission problems often look misleading. A file is right there, but the script will not run. A config path exists, but the process still cannot read it. Until you can read `rwx` fluently, these errors feel arbitrary.
 
----
+This is post 3 in the Linux CLI 101 series.
 
-<!-- a-grade-intro:begin -->
 
-## Key Questions
+![Linux CLI 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/03/03-01-big-picture.en.png)
+*Linux CLI 101 chapter 3 flow overview*
 
-- What does `rwxr-xr--` mean?
-- Why are owner and group distinguished for a file?
-- What is the difference between `chmod 755` and `chmod u+x`?
-- How do you diagnose a "Permission denied" error?
+## Questions to Keep in Mind
 
-> File permissions are like a door with three locks. The owner, the group, and everyone else each get a different key.
-
-<!-- a-grade-intro:end -->
-
-## What you will learn
-
-- The 3x3 structure of Linux file permissions (owner/group/others x read/write/execute)
-- How to read permission strings in `ls -l` output
-- Two ways to change permissions with `chmod` (numeric and symbolic)
-- How to change ownership and group with `chown`
+- The 3x3 structure of Linux file permissions (owner/group/others x read/write/execute)?
+- How to read permission strings in `ls -l` output?
+- Two ways to change permissions with `chmod` (numeric and symbolic)?
 
 ## Why it matters
 
@@ -224,14 +214,23 @@ On the other hand, permissions that are too strict block team collaboration. A b
 
 The next post covers **viewing file contents** — `cat`, `less`, `head`, `tail`.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
+- **The 3x3 structure of Linux file permissions (owner/group/others x read/write/execute)?**
+  - The article treats Permissions and Ownership as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to read permission strings in `ls -l` output?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Two ways to change permissions with `chmod` (numeric and symbolic)?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
 - **Permissions and Ownership (current)**
-- cat, less, head, tail (upcoming)
-- grep, find, xargs (upcoming)
+- cat, less, head, tail — Viewing File Contents (upcoming)
+- grep, find, xargs — The Search Trio (upcoming)
 - Pipes and Redirection (upcoming)
 - Process Management (upcoming)
 - Environment Variables and PATH (upcoming)

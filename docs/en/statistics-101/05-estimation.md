@@ -1,10 +1,10 @@
 ---
 series: statistics-101
 episode: 5
-title: Estimation
+title: "Statistics 101 (5/10): Estimation"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,25 +20,24 @@ seo_description: How sample means turn into estimates of population means, compa
 last_reviewed: '2026-05-04'
 ---
 
-# Estimation
+# Statistics 101 (5/10): Estimation
 
-> Statistics 101 series (5/10)
+Computing a sample mean is not the end of the analysis. The more important question is how far that number might be from the true value in the population. Estimation is the part of statistics that turns that gap into something we can talk about explicitly.
 
-<!-- a-grade-intro:begin -->
+That is why a good estimate never reports only the value. It reports the value together with its uncertainty. Once the error disappears from the report, the estimate starts to look more certain than it really is.
 
-**Core question**: How *accurate* is it to estimate the *population mean* with the *sample mean*? How should we report the *error*?
+This is post 5 in the Statistics 101 series. Here we will compare point estimation and interval estimation, define standard error, and show how sample size changes the stability of an estimate.
 
-> *An estimate is a pair: value and error.*
 
-<!-- a-grade-intro:end -->
+![statistics 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/05/05-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 5 flow overview*
+> An estimate is not a guess—it is a *procedure* that produces a *best guess plus a measure of how far off it might be*.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- *Point estimation* vs *interval estimation*
-- The meaning of *standard error (SE)*
-- *Unbiased* and *consistent* estimators
-- A 5-step estimation exercise
-- Five common mistakes
+- How well can a sample mean stand in for a population mean?
+- What is the difference between point estimation and interval estimation?
+- How is standard error different from standard deviation?
 
 ## Why It Matters
 
@@ -47,15 +46,7 @@ Reporting a mean is not the end. *How close it is* must be reported *together* s
 > *An estimate always carries error with it.*
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Sample["Sample x̄"] --> Estimate["Point Estimate"]
-    Sample --> SE["Standard Error"]
-    Estimate --> Interval["Interval Estimate"]
-    SE --> Interval
-```
-
+The goal of estimation is to use your sample data to infer the *true value* in the population. But your estimate will always be *off* by some amount. The question is: how much?
 ## Key Terms
 
 - **Point Estimate**: a *single value* estimate of a parameter (x̄).
@@ -150,17 +141,29 @@ Conversion rate in A/B tests, monthly revenue averages, p95 latency — every *d
 
 Estimation is the act of *writing uncertainty as a number*. The next episode looks at the *true meaning* of a *95% CI*.
 
+## Answering the Opening Questions
+
+- **How well can a sample mean stand in for a population mean?**
+  - The article treats Estimation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What is the difference between point estimation and interval estimation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How is standard error different from standard deviation?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
-- [Distributions](./03-distributions.md)
-- [Sample and Population](./04-sample-and-population.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): Distributions](./03-distributions.md)
+- [Statistics 101 (4/10): Sample and Population](./04-sample-and-population.md)
 - **Estimation (current)**
 - Confidence Interval (upcoming)
 - Hypothesis Testing (upcoming)
 - Correlation and Regression (upcoming)
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

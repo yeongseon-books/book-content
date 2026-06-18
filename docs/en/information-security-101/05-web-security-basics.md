@@ -1,10 +1,10 @@
 ---
 series: information-security-101
 episode: 5
-title: Web Security Basics
+title: "Information Security 101 (5/10): Web Security Basics"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,26 @@ seo_description: A short, code-first introduction to same-origin policy, CORS, C
 last_reviewed: '2026-05-04'
 ---
 
-# Web Security Basics
+# Information Security 101 (5/10): Web Security Basics
 
 > Information Security 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: How does the browser protect us from other origins?
 
 > Browser security revolves around the concept of origin. Once origin clicks, CORS, CSP, and cookies all line up.
 
-<!-- a-grade-intro:end -->
+This is post 5 in the Information Security 101 series.
+
+
+![information security 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/05/05-01-big-picture.en.png)
+*information security 101 chapter 5 flow overview*
+> Web security is not about HTTPS alone. It is about ensuring that at every layer—HTTP headers, authentication checks, SQL composition, browser rendering—untrusted input cannot become a command.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Web Security Basics?
+- Which signal should the example or diagram make visible for Web Security Basics?
+- What failure should be prevented first when Web Security Basics reaches a real system?
 
 ## What You Will Learn
 
@@ -46,8 +55,6 @@ last_reviewed: '2026-05-04'
 About 80% of web security is the same handful of concepts repeated. Understanding origin and cookies blocks the bulk of CSRF and XSS exposure.
 
 > Origin is the security boundary.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -194,17 +201,29 @@ CSP is rolled out gradually with nonces or hashes. Authenticated APIs combine a 
 
 The big arc of web security is origin and cookies. Next we look at the two famous code-level vulnerabilities — SQL Injection and XSS.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Web Security Basics?**
+  - The article treats Web Security Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Web Security Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Web Security Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Information Security?](./01-what-is-information-security.md)
-- [Authentication and Authorization](./02-authentication-and-authorization.md)
-- [Cryptography and Hashes](./03-cryptography-and-hash.md)
-- [TLS and Certificates](./04-tls-and-certificates.md)
+## In this series
+
+- [Information Security 101 (1/10): What Is Information Security?](./01-what-is-information-security.md)
+- [Information Security 101 (2/10): Authentication and Authorization](./02-authentication-and-authorization.md)
+- [Information Security 101 (3/10): Cryptography and Hashing](./03-cryptography-and-hash.md)
+- [Information Security 101 (4/10): TLS and Certificates](./04-tls-and-certificates.md)
 - **Web Security Basics (current)**
 - SQL Injection and XSS (upcoming)
 - Secret Management (upcoming)
 - Least Privilege (upcoming)
 - Logging and Audit (upcoming)
 - Incident Response (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,10 +1,10 @@
 ---
 series: sre-101
 episode: 10
-title: Building Operable Systems
+title: "SRE 101 (10/10): Building Operable Systems"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,34 @@ tags:
   - Reliability
   - Engineering
 seo_description: A capstone guide to building operable systems covering observability, automation, safe change, resilience, and integrated operational design
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Building Operable Systems
+# SRE 101 (10/10): Building Operable Systems
 
-> SRE 101 series (10/10)
+Many systems treat operability as something to bolt on after the first incidents arrive. Logs are added later, rollback gets documented later, and automation only appears after people have already repeated the same painful task enough times to feel forced into it.
 
-<!-- a-grade-intro:begin -->
+That delay is expensive because operability compounds. Systems that are easy to observe, change safely, recover, and automate become easier to improve; systems that are not become progressively harder to trust.
 
-**Core question**: How do you build a system that is *operable from day one*?
+This is the final post in the SRE 101 series. It gathers the earlier ideas into one design lens: observability, safe change, resilience, and automation should be built into the system the same way functional behavior is.
 
-> *Operability* is *designed in* like a *feature*, not bolted on later.
 
-<!-- a-grade-intro:end -->
+![sre 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/10/10-01-concept-at-a-glance.en.png)
+*sre 101 chapter 10 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *definition* of *operability*
-- *Observability*, *automation*, and *safe change*
-- *Resilience* patterns
-- The *integrated* operational picture
-- A *series synthesis*
+- Why is operability a design property instead of a post-launch enhancement?
+- Why do observability, automation, safe change, and resilience need to be judged together?
+- What should a team ask first when auditing whether a system is truly operable?
 
-## Why It Matters
+## Why this topic matters
 
-A *feature* without *operability* returns as *debt*.
+A feature without operability returns as debt. It may ship successfully once, but every later change, incident, and debugging session becomes more expensive than it needed to be.
 
-## Concept at a Glance
+Strong teams therefore design the operational path on purpose. They ask not only “does this feature work?” but also “can we understand it, roll it back, recover it, and automate it?”
 
-```mermaid
-flowchart LR
-    Obs["observability"] --> Op["operable"]
-    Auto["automation"] --> Op
-    Safe["safe change"] --> Op
-    Resil["resilience"] --> Op
-    Op --> Trust["customer trust"]
-```
+> Operability should be designed in like a feature, not bolted on later.
 
 ## Key Terms
 
@@ -147,19 +138,31 @@ A *platform team* ships a *common operability* template; *product teams* focus o
 
 ## Wrap-up and Next Steps
 
-Congrats on finishing the series. Next, head into *Incident Response 101* and dive deeper into the *operations floor*.
+Congrats on finishing the series. Next, head into *Incident Response 101* and step onto the *operations floor*.
+
+## Answering the Opening Questions
+
+- **Why is operability a design property instead of a post-launch enhancement?**
+  - The article treats Building Operable Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do observability, automation, safe change, and resilience need to be judged together?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What should a team ask first when auditing whether a system is truly operable?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What is SRE?](./01-what-is-sre.md)
-- [Reliability](./02-reliability.md)
-- [SLI, SLO, SLA](./03-sli-slo-sla.md)
-- [Error Budget](./04-error-budget.md)
-- [Monitoring](./05-monitoring.md)
-- [Incident Response](./06-incident-response.md)
-- [Postmortem](./07-postmortem.md)
-- [Reducing Toil](./08-reducing-toil.md)
-- [Capacity Planning](./09-capacity-planning.md)
+## In this series
+
+- [SRE 101 (1/10): What is SRE?](./01-what-is-sre.md)
+- [SRE 101 (2/10): Reliability](./02-reliability.md)
+- [SRE 101 (3/10): SLI, SLO, SLA](./03-sli-slo-sla.md)
+- [SRE 101 (4/10): Error Budget](./04-error-budget.md)
+- [SRE 101 (5/10): Monitoring](./05-monitoring.md)
+- [SRE 101 (6/10): Incident Response](./06-incident-response.md)
+- [SRE 101 (7/10): Postmortem](./07-postmortem.md)
+- [SRE 101 (8/10): Reducing Toil](./08-reducing-toil.md)
+- [SRE 101 (9/10): Capacity Planning](./09-capacity-planning.md)
 - **Building Operable Systems (current)**
+
 <!-- toc:end -->
 
 ## References

@@ -1,11 +1,11 @@
 ---
-title: Putting it together — a complete chain in one file
+title: "LangChain 101 (6/6): Putting it together — a complete chain in one file"
 series: langchain-101
 episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,31 +14,33 @@ tags:
 - LCEL
 - Python
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: The integrated chain is not a new abstraction; it is the same Runnables
   from earlier posts lined up in input-output order.
 ---
 
-# Putting it together — a complete chain in one file
+# LangChain 101 (6/6): Putting it together — a complete chain in one file
 
-## Questions this post answers
+By the time you reach a real LangChain application, the challenge is no longer understanding each component in isolation. The real work is keeping indexing, retrieval, prompting, tool use, and output delivery separate enough that one integrated chain still stays debuggable.
 
-- How do the Runnables from the previous posts combine into one executable RAG chain
-- Where is the boundary between indexing, retrieval, prompting, and generation
-- What does the full data flow look like once streaming is added
-- Which component should you replace first when adapting the example to a real project
+This is the final post in the LangChain 101 series. It assembles the earlier pieces into one executable RAG chain without losing the boundaries that make the system maintainable.
 
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-02-the-flow-at-a-glance.en.png)
+*The flow at a glance*
 > The integrated chain is not a new abstraction; it is the same Runnables from earlier posts lined up in input-output order.
 
-![Questions this post answers](../../assets/langchain-101/06/06-01-questions-this-post-answers.en.png)
+## Questions to Keep in Mind
 
-*Questions this post answers*
+- How should one RAG chain separate document indexing from query execution?
+- What guard can run before the model call when retrieval returns nothing useful?
+- What should be recorded so streaming, chat history, and a self-contained app do not blur the structure?
+
 ## Minimal runnable example
 
 ```python
 import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -52,61 +54,13 @@ chain = ({"context": retriever | (lambda docs: docs[0].page_content), "question"
 print(chain.invoke("What is LCEL?"))
 ```
 
-## What to notice in this code
-
-- Indexing and query execution happen on different timelines, so the code should keep them separate.
-- Retriever output should be formatted before it enters the prompt.
-- `RunnablePassthrough()` preserves the user's question while other keys in the prompt dictionary are assembled.
-- When an integrated chain fails, inspecting retrieval output is usually faster than tweaking the prompt first.
-
-## Where engineers get confused
-
-- When RAG answers are weak, the retrieval stage is often the real issue rather than the prompt.
-- A complete example does not mean every stage belongs in one giant function.
-- Once conversation history is added, the chain's input schema changes and the Runnable composition changes with it.
-
-## Checklist
-
-- [ ] I can connect retriever, prompt, llm, and parser into one chain
-- [ ] I can explain the difference between indexing time and question-answering time
-- [ ] I know where to start debugging an integrated RAG chain
-
-LangChain 101 (6/6)
-
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/06-putting-it-together)
-
-## Questions this post answers
-
-- What is the minimum structure for combining the first five posts into one chain?
-- Where should you separate indexing, retrieval, prompting, and generation concerns?
-- How should multi-turn history enter the prompt?
-- How do you keep a one-file integrated example readable?
-
-> An integrated LangChain pipeline separates indexing from query-time execution, and the query path itself is still a simple retriever → prompt → llm → parser composition.
-
-## The flow at a glance
-
-![The flow at a glance](../../assets/langchain-101/06/06-02-the-flow-at-a-glance.en.png)
-
-*The flow at a glance*
-The previous five posts covered LCEL, prompt templates, Retrievers, Tool Calling, and Streaming individually. This post assembles them into one executable application: index documents, search by query, generate an answer, and stream the output.
-
-Topics:
-
-- document chunking → embedding → FAISS index
-- assembling a RAG chain with streaming output
-- multi-turn RAG with conversation history
-- a self-contained application in one file
-
----
-
 ## Document indexing pipeline
 
-![From document chunking to index build](../../assets/langchain-101/06/06-01-document-indexing-pipeline.en.png)
+![From document chunking to index build](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-01-document-indexing-pipeline.en.png)
 
 *From document chunking to index build*
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -164,9 +118,44 @@ print(f"index vector count: {vectorstore.index.ntotal}")
 
 ---
 
+## Inspect retrieval before blaming the model
+
+The fastest way to debug an integrated RAG chain is to inspect the retrieved chunks before rewriting the prompt. If the wrong documents come back, the model never had a fair chance.
+
+```python
+queries = [
+    "Where was FAISS developed?",
+    "How does vector search differ from keyword search?",
+]
+
+for query in queries:
+    print(f"\nquery: {query}")
+    hits = vectorstore.similarity_search_with_score(query, k=2)
+    for idx, (doc, score) in enumerate(hits, start=1):
+        preview = doc.page_content.replace("\n", " ")[:90]
+        print(f"  [{idx}] score={score:.4f} text={preview}...")
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    query: Where was FAISS developed?
+      [1] score=0.7851 text=FAISS is a high-speed vector search library developed at Facebook AI Research....
+      [2] score=1.1062 text=LangChain connects LLM components as a pipeline using LCEL....
+
+    query: How does vector search differ from keyword search?
+      [1] score=0.5128 text=Vector search converts text into numeric vectors for meaning-based retrieval....
+      [2] score=0.7440 text=RAG (Retrieval-Augmented Generation) combines retrieved documents with an LLM prompt....
+
+<!-- injected-output:end -->
+
+That one inspection step lets you separate three failure modes quickly: wrong top-k documents means a retrieval problem, correct documents with a bad answer means a prompt or model problem, and too many noisy documents means `k` or chunking needs work.
+
+---
+
 ## Assembling the RAG chain
 
-![Retriever prompt llm parser assembly](../../assets/langchain-101/06/06-02-assembling-the-rag-chain.en.png)
+![Retriever prompt llm parser assembly](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-02-assembling-the-rag-chain.en.png)
 
 *Retriever prompt llm parser assembly*
 ```python
@@ -208,9 +197,47 @@ rag_chain = (
 
 ---
 
+## Guard against empty or noisy context
+
+In a real application, "no useful documents found" should not look the same as "here are ten barely related chunks." Add one guardrail before the prompt so the chain can fail cleanly when retrieval quality drops.
+
+```python
+from langchain_core.runnables import RunnableLambda
+
+def format_docs_guarded(docs: list) -> str:
+    if not docs:
+        return "NO_CONTEXT_FOUND"
+
+    selected = docs[:2]
+    return "\n\n".join(doc.page_content for doc in selected)
+
+guarded_chain = (
+    {
+        "context": retriever | RunnableLambda(format_docs_guarded),
+        "question": RunnablePassthrough(),
+    }
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+print(guarded_chain.invoke("What does the corpus say about LangSmith?"))
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    The provided documents do not mention LangSmith, so I cannot answer that from this corpus.
+
+<!-- injected-output:end -->
+
+This guard looks small, but it removes one of the most common failure patterns in demo RAG apps: forcing the model to guess when the index does not actually contain the answer.
+
+---
+
 ## Running with streaming
 
-![Integrated RAG streaming execution path](../../assets/langchain-101/06/06-03-running-with-streaming.en.png)
+![Integrated RAG streaming execution path](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-03-running-with-streaming.en.png)
 
 *Integrated RAG streaming execution path*
 ```python
@@ -229,11 +256,13 @@ for question in questions:
     print()
 ```
 
+That is useful beyond UX. Running the same question once with `invoke()` and once with `stream()` proves that retrieval, prompting, and generation stayed the same while only the delivery path changed.
+
 ---
 
 ## Multi-turn RAG with conversation history
 
-![Multi turn RAG with history flow](../../assets/langchain-101/06/06-04-multi-turn-rag-with-conversation-history.en.png)
+![Multi turn RAG with history flow](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-04-multi-turn-rag-with-conversation-history.en.png)
 
 *Multi turn RAG with history flow*
 A simple RAG chain treats each question independently. To reference earlier turns, pass conversation history to the chain.
@@ -241,7 +270,7 @@ A simple RAG chain treats each question independently. To reference earlier turn
 ```python
 import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.output_parsers import StrOutputParser
@@ -317,11 +346,11 @@ print(f"[3] {turn3}")
 langchain_rag_app.py
 
 Run: python langchain_rag_app.py
-Requires: langchain langchain-community langchain-groq faiss-cpu sentence-transformers langchain-text-splitters
+Requires: langchain langchain-community langchain-huggingface langchain-groq faiss-cpu sentence-transformers langchain-text-splitters
 """
 import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -398,7 +427,9 @@ if __name__ == "__main__":
 ## What to notice in this code
 
 - Separating the indexing pipeline from the query pipeline makes document preparation costs and request-time costs easier to reason about.
+- A quick `similarity_search_with_score()` check tells you whether to debug retrieval, prompting, or generation first.
 - Even the integrated chain is still built from small LCEL pieces such as `retriever | format_docs` and `prompt | llm | parser`.
+- A small context guard is often enough to turn "hallucinate anyway" into a clean, verifiable refusal.
 - `MessagesPlaceholder` is the insertion point that lets multi-turn history enter the prompt without collapsing the structure.
 - The full application is long, but the maintainable pattern is still to split small Runnable assemblies into focused helper functions.
 
@@ -420,15 +451,26 @@ This series covered the LangChain API from first principles: LCEL and the Runnab
 
 The next series, ai-app-patterns-101, applies these components to real application patterns: chatbots, document Q&A, agents, and workflow automation.
 
+## Answering the Opening Questions
+
+- **How should one RAG chain separate document indexing from query execution?**
+  Indexing prepares documents and builds the VectorStore; query execution uses a user question to retrieve context and call the model. Their inputs and failures should stay separate.
+
+- **What guard can run before the model call when retrieval returns nothing useful?**
+  If retrieval returns nothing useful, the chain can stop with a no-evidence path or ask the user to narrow the question before calling the model.
+
+- **What should be recorded so streaming, chat history, and a self-contained app do not blur the structure?**
+  Record document version, retrieval settings, top_k results, prompt inputs, streaming state, and chat-history keys so debugging boundaries remain clear.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LangChain introduction — LCEL and the Runnable interface](./01-lcel-runnable-basics.md)
-- [Prompt and LLM chain — assembling your first chain](./02-prompt-llm-chain.md)
-- [Retriever — document search and context injection](./03-retriever.md)
-- [Tool calling — connecting external tools](./04-tool-calling.md)
-- [Streaming — handling real-time output](./05-streaming.md)
-- **Putting it together — a complete chain in one file (current)**
+- [LangChain 101 (1/6): LangChain introduction — LCEL and the Runnable interface](./01-lcel-runnable-basics.md)
+- [LangChain 101 (2/6): Prompt and LLM chain — assembling your first chain](./02-prompt-llm-chain.md)
+- [LangChain 101 (3/6): Retriever — document search and context injection](./03-retriever.md)
+- [LangChain 101 (4/6): Tool calling — connecting external tools](./04-tool-calling.md)
+- [LangChain 101 (5/6): Streaming — handling real-time output](./05-streaming.md)
+- **LangChain 101 (6/6): Putting it together — a complete chain in one file (current)**
 
 <!-- toc:end -->
 
@@ -439,3 +481,9 @@ The next series, ai-app-patterns-101, applies these components to real applicati
 - [LangChain RAG tutorial](https://python.langchain.com/docs/use_cases/question_answering/)
 - [LCEL reference](https://python.langchain.com/docs/expression_language/)
 - [MessagesPlaceholder](https://python.langchain.com/docs/modules/model_io/prompts/quick_start/#messagesplaceholder)
+- [FAISS VectorStore integration](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
+- [RecursiveCharacterTextSplitter](https://python.langchain.com/docs/how_to/recursive_text_splitter/)
+
+### Related Series
+
+- [LangGraph 101](../langgraph-101/01-graph-basics.md) — this is the natural next step once a single RAG chain grows into branching workflows, approvals, or long-lived state.

@@ -1,11 +1,11 @@
 ---
-title: Strings and formatting
+title: "Python 101 (3/10): Strings and formatting"
 series: python-101
 episode: 3
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -22,22 +22,21 @@ seo_description: In Python 3, str is an immutable sequence of Unicode code point
   and bytes is an immutable sequence of bytes.
 ---
 
-# Strings and formatting
+# Python 101 (3/10): Strings and formatting
 
-## What you will learn
+In Python 3, `str` is an immutable sequence of Unicode code points, while `bytes` is an immutable sequence of raw bytes. Keeping those two layers separate makes encoding and formatting issues much easier to reason about.
 
-By the end of this chapter you will be able to explain and code the following:
+This post is the 3rd article in the Python 101 series. This is the part of the series where text, bytes, and representation stop being interchangeable.
 
-- Why Python 3's `str` is a Unicode string and how it differs from `bytes`
-- When to reach for single, double, triple, raw, or byte literals
-- The core methods `split`, `join`, `strip`, `replace`, `find`, `startswith`
-- How slicing reads parts of a string and what it means that `str` is immutable
-- f-strings and format specs (`:>10`, `:.2f`, `:%Y-%m-%d`, `!r`) end to end
-- Where `str.format` and `%` formatting still fit, and why we prefer f-strings
-- Common encoding pitfalls (`UnicodeDecodeError`) and whitespace traps
-- Your first encounter with regular expressions through the `re` module
 
-Most examples are REPL blocks marked by `>>>` — paste them in and you will see the same output. Code blocks without `>>>` are illustrative excerpts that assume the surrounding variables already exist.
+![Python 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/03/03-01-mental-model.en.png)
+*Python 101 chapter 3 flow overview*
+
+## Questions to Keep in Mind
+
+- Why Python 3's `str` is a Unicode string and how it differs from `bytes`?
+- When to reach for single, double, triple, raw, or byte literals?
+- The core methods `split`, `join`, `strip`, `replace`, `find`, `startswith`?
 
 ## Why this matters
 
@@ -55,9 +54,6 @@ Handling strings precisely prevents these mistakes upfront, and the code becomes
 > In Python 3, `str` is an immutable sequence of Unicode code points and `bytes` is an immutable sequence of bytes. Keep those two layers separate and encoding, formatting, and regex questions all collapse into the same model.
 Python's `str` is a sequence of code points. It is abstracted at the level humans read; it only becomes `bytes` when it leaves memory for disk or the network.
 
-![Mental model](../../assets/python-101/03/03-01-mental-model.en.png)
-
-*Mental model*
 Three rules make most of the confusion disappear.
 
 1. **`str` is a sequence of Unicode code points.** It carries no encoding information.
@@ -72,7 +68,7 @@ Three rules make most of the confusion disappear.
 
 Python accepts several quote styles. They mean the same thing; you pick whichever lets you avoid escaping the quotes inside.
 
-```python
+```text
 >>> 'hello'
 'hello'
 >>> "she said \"hi\""
@@ -87,7 +83,7 @@ Python accepts several quote styles. They mean the same thing; you pick whicheve
 
 Raw strings keep backslashes as-is. Use them for Windows paths and regex.
 
-```python
+```text
 >>> path = r"C:\Users\name\file.txt"
 >>> print(path)
 C:\Users\name\file.txt
@@ -95,7 +91,7 @@ C:\Users\name\file.txt
 
 `b"..."` is a byte literal. ASCII characters can appear directly; other byte values must be written with escape sequences such as `\xFF`.
 
-```python
+```text
 >>> b"hello"
 b'hello'
 >>> b"안녕"
@@ -107,7 +103,7 @@ SyntaxError: bytes can only contain ASCII literal characters
 
 At the OS and protocol boundary the data is bytes. Many Python text APIs (such as `open(..., "r")` or `requests.Response.text`) already decode it to `str` for you. When you do work with raw bytes, assume UTF-8 and call `decode` to get a `str`.
 
-```python
+```text
 >>> data = "hi".encode("utf-8")
 >>> data
 b'hi'
@@ -125,7 +121,7 @@ Guess the encoding wrong and you hit `UnicodeDecodeError`. When unsure, try UTF-
 
 Every `str` method returns a new `str`. The original is left untouched.
 
-```python
+```text
 >>> "  hello, world  ".strip()
 'hello, world'
 >>> "user@example.com".split("@")
@@ -152,7 +148,7 @@ True
 
 `str` is a sequence, so indexing and slicing work as expected.
 
-```python
+```text
 >>> s = "Python"
 >>> s[0], s[-1]
 ('P', 'n')
@@ -164,7 +160,7 @@ True
 
 To "change" part of a string, build a new one.
 
-```python
+```text
 >>> s = "hello"
 >>> s = "H" + s[1:]
 >>> s
@@ -175,7 +171,7 @@ To "change" part of a string, build a new one.
 
 f-strings (PEP 498) are the clearest default for inline formatting. Variables and expressions go directly into braces.
 
-```python
+```text
 >>> name = "yeongseon"
 >>> count = 3
 >>> f"{name} has {count} books"
@@ -186,7 +182,7 @@ f-strings (PEP 498) are the clearest default for inline formatting. Variables an
 
 After a colon comes the format spec — alignment, width, precision, base, dates — all in one line.
 
-```python
+```text
 >>> import math
 >>> f"{math.pi:.2f}"           # two decimal places
 '3.14'
@@ -204,7 +200,7 @@ After a colon comes the format spec — alignment, width, precision, base, dates
 
 `!r` is great for debugging — it applies `repr()` so quotes show up.
 
-```python
+```text
 >>> name = "ada"
 >>> f"name={name!r}"
 "name='ada'"
@@ -212,7 +208,7 @@ After a colon comes the format spec — alignment, width, precision, base, dates
 
 Since Python 3.8, adding `=` prints both the variable name and its value. Debugging gets noticeably easier.
 
-```python
+```text
 >>> count = 3
 >>> f"{count=}"
 'count=3'
@@ -222,7 +218,7 @@ Since Python 3.8, adding `=` prints both the variable name and its value. Debugg
 
 Two older styles you will still meet in legacy code. New code prefers f-strings, but you should be able to read these.
 
-```python
+```text
 >>> "{} has {} books".format("yeongseon", 3)
 'yeongseon has 3 books'
 >>> "%s has %d books" % ("yeongseon", 3)
@@ -231,7 +227,7 @@ Two older styles you will still meet in legacy code. New code prefers f-strings,
 
 `format` accepts keyword arguments. That is useful when a template comes from outside. f-strings capture variables at the spot where they are written, so they are awkward as templates.
 
-```python
+```text
 >>> template = "{name} owes {amount}"
 >>> template.format(name="ada", amount=12000)
 'ada owes 12000'
@@ -241,7 +237,7 @@ Two older styles you will still meet in legacy code. New code prefers f-strings,
 
 The `re` module manipulates strings via patterns. A full tour deserves its own chapter, but pulling email addresses out of a sentence fits in one line.
 
-```python
+```text
 >>> import re
 >>> text = "Contact ada@example.com or bob@example.org"
 >>> re.findall(r"[\w.+-]+@[\w-]+\.[\w.-]+", text)
@@ -390,13 +386,36 @@ Build a function that takes a CSV-like line and prints a tidy aligned row. We wi
 
 The next chapter compares the four core collections — list, tuple, set, dict — and explains when to reach for each one. Mutability, order, duplicates, and hashability fit on a single page.
 
+## Answering the Opening Questions
+
+- **Why Python 3's `str` is a Unicode string and how it differs from `bytes`?**
+  - The article treats Strings and formatting as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When to reach for single, double, triple, raw, or byte literals?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The core methods `split`, `join`, `strip`, `replace`, `find`, `startswith`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- [Python 101 (1/10): Why Python, and how to install and use venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): Variables, types, and operators](./02-variables-types-operators.md)
+- **Strings and formatting (current)**
+- list, tuple, set, dict (upcoming)
+- Control flow: if, for, while, comprehension (upcoming)
+- Functions and arguments: def, args, kwargs, default, lambda (upcoming)
+- Modules and packages: import, __init__, __name__ (upcoming)
+- File I/O and exception handling (upcoming)
+- Classes and objects: bundling data with behavior (upcoming)
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- Python docs — Built-in Types `str`: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str
-- Python docs — Format Specification Mini-Language: https://docs.python.org/3/library/string.html#format-specification-mini-language
-- PEP 498 — Literal String Interpolation (f-strings): https://peps.python.org/pep-0498/
-- Python docs — `re` module: https://docs.python.org/3/library/re.html
-- Unicode HOWTO: https://docs.python.org/3/howto/unicode.html
+- [Python docs — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — Canonical reference for `str`, `bytes`, immutability, and core text methods.
+- [Unicode HOWTO](https://docs.python.org/3/howto/unicode.html) — Explains code points, encodings, and the `encode`/`decode` boundary model used throughout the chapter.
+- [Python docs — `string`](https://docs.python.org/3/library/string.html) — Documents format string syntax and the format specification mini-language behind aligned output.
+- [PEP 498 — Literal String Interpolation](https://peps.python.org/pep-0498/) — Defines f-strings, expression interpolation, and format specifier behavior.
+- [Python docs — `re`](https://docs.python.org/3/library/re.html) — Relevant for the chapter’s raw-string and backslash guidance around regular expressions.
+- [Python docs — Input and Output](https://docs.python.org/3/tutorial/inputoutput.html) — Adds official examples for `repr()`, `str()`, and text formatting in I/O contexts.

@@ -1,10 +1,10 @@
 ---
 series: github-actions-101
 episode: 10
-title: A Real-World CI/CD Pipeline
+title: "GitHub Actions 101 (10/10): A Real-World CI/CD Pipeline"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,26 @@ tags:
   - Capstone
   - ReusableWorkflow
 seo_description: A capstone that ties episodes 1-9 into one pipeline split by PR, main, and tag, standardized with reusable workflows for the whole team.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# A Real-World CI/CD Pipeline
+# GitHub Actions 101 (10/10): A Real-World CI/CD Pipeline
 
-> GitHub Actions 101 series (10/10)
+The pieces we covered one by one are all useful, but real systems do not run them in isolation. Triggers, tests, lint, artifacts, Docker, deployment, and secret handling eventually meet in one delivery path, and the quality of that composition determines whether the pipeline scales or collapses under its own weight.
 
-<!-- a-grade-intro:begin -->
+The practical question is not “how many checks can we add?” It is “how clearly can we separate responsibility?” Pull requests need fast feedback. Main needs integration and staging confidence. Tags need traceable release and production promotion. Once those roles are clear, the YAML gets simpler instead of larger.
 
-**Core question**: How do you weave *triggers, tests, lint, artifacts, Docker, deploy, and secrets* into *one pipeline*?
+This is the final post in the GitHub Actions 101 series. In this post, we will combine the earlier topics into a reusable CI/CD shape that separates PR, `main`, and tag responsibilities without losing traceability.
 
-> *A good pipeline is a *sum of small steps*. Each step stays simple; the composition is explicit.*
 
-<!-- a-grade-intro:end -->
+![github actions 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/10/10-01-concept-at-a-glance.en.png)
+*github actions 101 chapter 10 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying A Real-World CI/CD Pipeline?
+- Which signal should the example or diagram make visible for A Real-World CI/CD Pipeline?
+- What failure should be prevented first when A Real-World CI/CD Pipeline reaches a real system?
 
 ## What You Will Learn
 
@@ -45,15 +51,6 @@ last_reviewed: '2026-05-04'
 The parts you have learned only improve *DORA* (deploy frequency, lead time, change-failure rate, MTTR) when they sit *together* in one place.
 
 > *The pieces make you *fast*. The composition keeps you *fast*.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    PR["PR open"] --> Lint["lint + test + typecheck"]
-    Push["main push"] --> Build["build + docker + staging"]
-    Tag["tag push"] --> Release["release + production (approval)"]
-```
 
 ## Key Terms
 
@@ -85,8 +82,8 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ inputs.python-version }}
       - run: pip install -e ".[dev]"
@@ -152,11 +149,31 @@ jobs:
 runs:
   using: composite
   steps:
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with: { python-version: "3.12" }
     - run: pip install -e ".[dev]"
       shell: bash
 ```
+
+## What success looks like at this point
+
+| Trigger | Expected run shape | What you validate |
+| --- | --- | --- |
+| Pull request | lint, test, typecheck | feedback stays fast and blocks bad merges |
+| `main` push | build, docker, staging | the validated artifact reaches staging unchanged |
+| Tag push | release, production | the approved version is traceable all the way to prod |
+
+If your real Actions history matches that table, the responsibility split is doing its job. If pull requests are still running every heavy deployment check, or production can be triggered from an unversioned main build, the pipeline has not been separated enough yet.
+
+## When the pipeline misbehaves, narrow it in this order
+
+1. **PR feedback is too slow**: trim the reusable workflow to the checks reviewers truly need on every change, and watch for oversized matrices.
+2. **`main` is unstable**: verify that build outputs, image tags, and staging deployment all refer to the same validated artifact.
+3. **Production is risky**: confirm tag-based release, required reviewers, and rollback workflow all still exist as live controls rather than documentation promises.
+
+## Branch protection and promotion policy are half the design
+
+In practice, the workflow file is only half the story. Branch protection rules should require status checks before merge. `main` should not accept casual direct pushes. Production environments should keep reviewers and environment-scoped secrets separate from staging. If those repository-level policies are missing, even a clean YAML design will drift into unsafe operations.
 
 ## What to Notice in This Code
 
@@ -201,17 +218,29 @@ A platform team owns an *org-wide template repo* so every service shares the sam
 
 If you followed along, you can handle *95% of real-world CI/CD*. From here, deepen *runtime* and *operations* with *Docker 101*, *Kubernetes 101*, and *SRE 101*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying A Real-World CI/CD Pipeline?**
+  - The article treats A Real-World CI/CD Pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for A Real-World CI/CD Pipeline?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when A Real-World CI/CD Pipeline reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is GitHub Actions?](./01-what-is-github-actions.md)
-- [Workflows and Jobs](./02-workflow-and-job.md)
-- [Understanding Triggers](./03-triggers.md)
-- [Python Test Automation](./04-python-test-automation.md)
-- [Lint and Type Check](./05-lint-and-typecheck.md)
-- [Build Artifacts](./06-build-artifact.md)
-- [Docker Build](./07-docker-build.md)
-- [Deployment Automation](./08-deploy-automation.md)
-- [Secret Management](./09-secret-management.md)
+## In this series
+
+- [GitHub Actions 101 (1/10): What Is GitHub Actions?](./01-what-is-github-actions.md)
+- [GitHub Actions 101 (2/10): Workflows and Jobs](./02-workflow-and-job.md)
+- [GitHub Actions 101 (3/10): Understanding Triggers](./03-triggers.md)
+- [GitHub Actions 101 (4/10): Python Test Automation](./04-python-test-automation.md)
+- [GitHub Actions 101 (5/10): Lint and Type Check](./05-lint-and-typecheck.md)
+- [GitHub Actions 101 (6/10): Build Artifacts](./06-build-artifact.md)
+- [GitHub Actions 101 (7/10): Docker Build](./07-docker-build.md)
+- [GitHub Actions 101 (8/10): Deployment Automation](./08-deploy-automation.md)
+- [GitHub Actions 101 (9/10): Secret Management](./09-secret-management.md)
 - **A Real-World CI/CD Pipeline (current)**
+
 <!-- toc:end -->
 
 ## References

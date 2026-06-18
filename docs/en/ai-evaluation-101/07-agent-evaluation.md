@@ -1,11 +1,11 @@
 ---
-title: Evaluating Agents — Trajectories, Not Single Responses
+title: "AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses"
 series: ai-evaluation-101
 episode: 7
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,31 +14,38 @@ tags:
 - Agent
 - Trajectory
 - Tool Use
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Agents reach answers through multiple steps. You need to evaluate
   not just the final response but 'which tools, in what order, how many times.' This…
 ---
 
-# Evaluating Agents — Trajectories, Not Single Responses
+# AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses
 
-> AI Evaluation 101 Series (7/10)
+Agents reach answers through multiple steps. You need to evaluate not just the final response but 'which tools, in what order, how many times.'
 
-Agents reach answers through multiple steps. You need to evaluate not just the final response but 'which tools, in what order, how many times.' This post covers trajectory-level evaluation.
+This is post 7 in the AI Evaluation 101 series. Here we cover trajectory-level evaluation.
 
----
-![Evaluating agents - Trajectories, not single responses](../../assets/ai-evaluation-101/07/07-01-evaluating-agents-trajectories-not-singl.en.png)
 
+![Evaluating agents - Trajectories, not single responses](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-01-evaluating-agents-trajectories-not-singl.en.png)
 *Evaluating agents - Trajectories, not single responses*
+> Agent evaluation becomes operational only when it evaluates the path as well as the answer.
+
+## Questions to Keep in Mind
+
+- Why should agent evaluation inspect trajectory along with the single final response?
+- What operational risk is caught by tool selection, step count, and recovery metrics?
+- Which step-level signals belong on an agent evaluation dashboard?
+
 ## Why Agent Evaluation Is Different
 
-![Why agent evaluation is different](../../assets/ai-evaluation-101/07/07-02-why-agent-evaluation-is-different.en.png)
+![Why agent evaluation is different](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-02-why-agent-evaluation-is-different.en.png)
 
 *Why agent evaluation is different*
 Through Ep1-Ep6 we evaluated **single responses**: one question paired with one answer.
 
 Agents are different. An agent goes through multiple steps to complete a task.
 
-```
+```text
 User: "Email me a summary of this week's schedule"
   ↓
 Step 1: read_calendar()  → [10 meetings]
@@ -63,7 +70,7 @@ Let's go through each.
 
 ## Two Levels of Evaluation — End-to-End vs Step-Level
 
-![Two levels of evaluation - End-to-End vs Step-Level](../../assets/ai-evaluation-101/07/07-03-two-levels-of-evaluation-end-to-end-vs-s.en.png)
+![Two levels of evaluation - End-to-End vs Step-Level](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-03-two-levels-of-evaluation-end-to-end-vs-s.en.png)
 
 *Two levels of evaluation - End-to-End vs Step-Level*
 Agent evaluation has two perspectives.
@@ -114,7 +121,7 @@ def step_match_score(actual: list[dict], expected: list[dict]) -> float:
 
 ## Tool Selection — Confusion Matrix
 
-![Tool selection - confusion matrix](../../assets/ai-evaluation-101/07/07-04-tool-selection-confusion-matrix.en.png)
+![Tool selection - confusion matrix](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-04-tool-selection-confusion-matrix.en.png)
 
 *Tool selection - confusion matrix*
 Agents pick the wrong tool more often than you would think — calling `draft_email` instead of `send_email`. Treat tool selection as a classification problem.
@@ -140,7 +147,7 @@ print(classification_report(expected_tools, actual_tools))
 
 ## Trajectory Efficiency — Step Count
 
-![Trajectory efficiency - step count](../../assets/ai-evaluation-101/07/07-05-trajectory-efficiency-step-count.en.png)
+![Trajectory efficiency - step count](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-05-trajectory-efficiency-step-count.en.png)
 
 *Trajectory efficiency - step count*
 An agent that finishes in 4 steps is not the same as one that finishes in 12. Twelve steps means 3x tokens, 3x latency, and 3x failure surface.
@@ -263,9 +270,50 @@ The same task solved in 1K tokens vs 10K tokens looks identical on accuracy but 
 - Token cost and latency are production metrics on equal footing with accuracy.
 
 The next post integrates evaluation into **CI** so regressions are blocked automatically.
+
+---
+
+## Operational checklist
+
+- [ ] Track task success and trajectory metrics together, not as separate projects.
+- [ ] Measure tool confusion so prompt and tool-schema fixes are evidence-based.
+- [ ] Watch step overhead, token cost, and latency on the same dashboard as success rate.
+- [ ] Inject failures deliberately to confirm the agent retries or finds an alternative path.
+- [ ] Allow multiple valid trajectories when the task can be solved in different orders.
+
+## Answering the Opening Questions
+
+- **Why should agent evaluation inspect trajectory along with the single final response?**
+  - An agent can reach a correct-looking answer through the wrong path, or spend too much cost and risk to get a correct answer.
+- **What operational risk is caught by tool selection, step count, and recovery metrics?**
+  - Tool selection catches wrong tools, step count catches inefficiency and loops, and recovery measures whether the agent can recover after failure.
+- **Which step-level signals belong on an agent evaluation dashboard?**
+  - The dashboard should include step list, tool calls, arguments, errors, retries, cost, latency, and final success by request.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
+- [AI Evaluation 101 (5/10): Designing Rubric-Based Scoring](./05-rubric-based-scoring.md)
+- [AI Evaluation 101 (6/10): Evaluating RAG Systems](./06-rag-evaluation.md)
+- **AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (current)**
+- AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)
+- AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
-- [Yao et al. (2022). ReAct — Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)
-- [LangSmith — Agent Evaluation Patterns](https://docs.smith.langchain.com/evaluation/tutorials/agents)
-- [AgentBench — Evaluating LLMs as Agents (Liu et al., 2023)](https://arxiv.org/abs/2308.03688)
+### Official docs
+
+- [LangSmith — Agent evaluation tutorial](https://docs.smith.langchain.com/evaluation/tutorials/agents)
+- [OpenAI — Built-in tools guide](https://platform.openai.com/docs/guides/tools)
 - [scikit-learn — classification_report](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html)
+
+### Papers and background
+
+- [Yao et al. (2022). ReAct — Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)
+- [AgentBench — Evaluating LLMs as Agents (Liu et al., 2023)](https://arxiv.org/abs/2308.03688)

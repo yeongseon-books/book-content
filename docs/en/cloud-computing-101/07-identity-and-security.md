@@ -1,10 +1,10 @@
 ---
 series: cloud-computing-101
 episode: 7
-title: Identity and Security
-status: content-ready
+title: "Cloud Computing 101 (7/10): Identity and Security"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,33 @@ tags:
   - AWS
   - Architecture
 seo_description: IAM users, roles, policies, MFA, and KMS — cloud security fundamentals taught with least-privilege boto3 examples for beginners.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Identity and Security
+# Cloud Computing 101 (7/10): Identity and Security
 
-> Cloud Computing 101 series (7/10)
+Most cloud security incidents do not begin with a cinematic attack chain. They begin with ordinary mistakes: permissions that are too broad, access keys that live too long, and credentials that were easier to create than to rotate.
 
-<!-- a-grade-intro:begin -->
+IAM defines who can do what on which resources. Authentication proves who you are. Encryption protects data in transit and at rest. The shared responsibility model splits ownership: the provider secures the hardware and platform; you secure your applications, keys, and access rules.
 
-**Core question**: When and how do IAM *users* and *roles* differ in practice?
+This is post 7 in the Cloud Computing 101 series.
 
-> *Cloud security starts with least privilege, runs on role-based delegation, and protects data with encryption plus key management.*
+In this post, we'll break down users, groups, roles, policies, MFA, and KMS through the lens of least privilege and temporary credentials.
 
-<!-- a-grade-intro:end -->
+> Cloud security starts by shrinking blast radius: prefer temporary credentials, keep permissions narrow, and make encryption plus audit trails the default.
 
-## What You Will Learn
+
+![cloud computing 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 7 flow overview*
+> Security is not a feature added at the end. It is a set of boundaries you decide to enforce from the start.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Identity and Security?
+- Which signal should the example or diagram make visible for Identity and Security?
+- What failure should be prevented first when Identity and Security reaches a real system?
+
+## Questions This Chapter Answers
 
 - IAM users, groups, roles, and policies
 - The least privilege principle
@@ -43,17 +54,6 @@ last_reviewed: '2026-05-04'
 ## Why It Matters
 
 Most security incidents start with excessive permissions and forgotten keys. Solid IAM shrinks the blast radius of any single mistake.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    User["user"] --> Group["group"]
-    Group --> Policy["policy"]
-    App["app/ec2"] --> Role["role"]
-    Role --> Policy
-    Policy --> Resource["resource"]
-```
 
 ## Key Terms
 
@@ -133,6 +133,27 @@ def attach(role_name, policy_arn):
 - Keep `Resource` as narrow as possible.
 - Avoid wildcards in `Action`.
 
+## How to Verify This Example
+
+In IAM, the most useful verification step is reading the trust relationship and the attached permission scope separately. That is where the conceptual difference between roles and policies becomes operationally obvious.
+
+```bash
+aws iam get-role --role-name my-app-role
+aws iam list-attached-role-policies --role-name my-app-role
+```
+
+**Expected output:**
+
+- `AssumeRolePolicyDocument` should show `ec2.amazonaws.com` as the trusted principal.
+- The attached-policy list should include the least-privilege policy ARN you created.
+- You need both outputs to answer the two different questions: who may assume the role, and what may the role do after assumption.
+
+### Where teams usually get stuck
+
+- A permissions policy without the right trust policy creates a role that nobody can actually use.
+- `Action: *` feels fast today and expensive during every later audit.
+- Long-lived user keys become an operational liability long before they become a public incident.
+
 ## Five Common Mistakes
 
 1. **Granting `Action: *`.**
@@ -170,17 +191,29 @@ EC2 roles access S3. KMS encrypts data at rest. AWS SSO handles staff login. MFA
 
 Once permissions are right, the next question is *what is actually happening*. The next post covers Monitoring.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Identity and Security?**
+  - The article treats Identity and Security as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Identity and Security?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Identity and Security reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region and Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
-- [Storage](./05-storage.md)
-- [Network](./06-network.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region and Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
+- [Cloud Computing 101 (5/10): Storage](./05-storage.md)
+- [Cloud Computing 101 (6/10): Network](./06-network.md)
 - **Identity and Security (current)**
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

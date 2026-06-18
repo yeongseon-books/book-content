@@ -1,36 +1,42 @@
 ---
 series: developer-career-101
 episode: 2
-title: Understanding Roles
-status: content-ready
+title: "Developer Career 101 (2/10): Understanding Roles"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
 language: en
 tags:
-  - Career
-  - Roles
-  - Frontend
-  - Backend
-  - Beginner
-seo_description: A beginner-friendly tour comparing frontend, backend, data, SRE, and ML developer roles.
-last_reviewed: '2026-05-04'
+- Career
+- Roles
+- Frontend
+- Backend
+- Beginner
+seo_description: A beginner-friendly tour comparing frontend, backend, data, SRE,
+  and ML developer roles.
+last_reviewed: '2026-05-14'
 ---
 
-# Understanding Roles
+# Developer Career 101 (2/10): Understanding Roles
 
-> Developer Career 101 series (2/10)
+Saying "I want to be a developer" is still too broad to guide real decisions. Frontend, backend, data, SRE, ML, and mobile roles all ship software, but they optimize for different outcomes, carry different failure modes, and measure success with different signals.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Developer Career 101 series.
 
-**Core question**: How do you decide which developer *role* fits you?
 
-> Compare responsibilities, tools, and metrics — three axes.
+![developer career 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/02/02-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 2 flow overview*
+> The key to understanding roles is recognizing that the same title can mean different scope, responsibility, and tooling across companies and teams.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What actually differs across frontend, backend, data, SRE, ML, and mobile roles?
+- Why do responsibilities, tools, and metrics diverge so sharply under the same "developer" label?
+- How can you tell whether your current role fits you or whether a transition is worth exploring?
 
 ## What You Will Learn
 
@@ -44,16 +50,7 @@ last_reviewed: '2026-05-04'
 
 A bad role fit shortens the path to burnout.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    F[Frontend] --> B[Backend]
-    B --> D[Data]
-    D --> S[SRE]
-    S --> M[ML]
-    M --> Mo[Mobile]
-```
+Each technical role prioritizes different problems: frontend focuses on user experience, backend on stability and scale, data on accuracy and activation.
 
 ## Key Terms
 
@@ -111,6 +108,15 @@ tools: PyTorch, MLflow
 metrics: AUC, latency
 ```
 
+## Decision frame for comparing roles
+
+| Lens | Frontend | Backend | Data / SRE / ML |
+| --- | --- | --- | --- |
+| Frequent failure mode | Slow or broken user flow | Error rate, data integrity, service instability | Stale data, incident load, weak model quality |
+| What success feels like | Users move with less friction | Systems stay predictable under change | Reliability, freshness, or model quality improves measurably |
+| Evidence to inspect early | Performance metrics, design collaboration | API contracts, storage boundaries, production metrics | Pipeline shape, on-call expectations, reproducibility tooling |
+| Fit question | Do you enjoy polishing interaction details? | Do you enjoy data flow and edge cases? | Do you like operating with metrics and explicit risk? |
+
 ## What to Notice in This Code
 
 - Responsibility defines the role.
@@ -153,8 +159,19 @@ Companies recommend roughly six months of onboarding when switching roles.
 
 Next post covers *Building a Learning Plan*.
 
+## Answering the Opening Questions
+
+- **What actually differs across frontend, backend, data, SRE, ML, and mobile roles?**
+  - The article treats Understanding Roles as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do responsibilities, tools, and metrics diverge so sharply under the same "developer" label?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How can you tell whether your current role fits you or whether a transition is worth exploring?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Developer Career](./01-what-is-developer-career.md)
+## In this series
+
+- [Developer Career 101 (1/10): What Is a Developer Career](./01-what-is-developer-career.md)
 - **Understanding Roles (current)**
 - Building a Learning Plan (upcoming)
 - Resume and Portfolio (upcoming)
@@ -164,11 +181,12 @@ Next post covers *Building a Learning Plan*.
 - Side Projects and Learning (upcoming)
 - Mentoring and Networking (upcoming)
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Web Vitals](https://web.dev/vitals/)
+- [web.dev — Web Vitals](https://web.dev/vitals/)
 - [Google SRE Book](https://sre.google/books/)
-- [State of Data Engineering](https://www.lakefs.io/blog/state-of-data-engineering-2024/)
-- [MLOps Maturity](https://ml-ops.org/)
+- [MLOps Community](https://mlops.community/)
+- [roadmap.sh — Developer roadmaps](https://roadmap.sh/)

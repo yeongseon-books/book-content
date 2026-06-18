@@ -1,10 +1,10 @@
 ---
 series: computer-science-major-101
 episode: 1
-title: What Computer Science Majors Learn
-status: content-ready
+title: "Computer Science Major 101 (1/10): What Computer Science Majors Learn"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,30 @@ tags:
   - Career
   - Beginner
 seo_description: A beginner-friendly tour of the CS major map covering math, programming, systems, data, AI, and capstone projects.
-last_reviewed: '2026-05-04'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
-# What Computer Science Majors Learn
+# Computer Science Major 101 (1/10): What Computer Science Majors Learn
 
 > Computer Science Major 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: What will you *actually* learn across four years of a CS major?
 
 > Five axes — *math*, *systems*, *data*, *AI*, *projects* — form the *big picture* of the major.
 
-<!-- a-grade-intro:end -->
+This is the first post in the Computer Science Major 101 series.
+
+
+![computer science major 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/01/01-01-major-learning-map.en.png)
+*computer science major 101 chapter 1 flow overview*
+> The CS major is not a collection of topic names—it is a foundation of *math* and *programming*, layered with *systems*, *data*, *AI*, and *capstone projects*, where each layer depends on what came before.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Computer Science Majors Learn?
+- Which signal should the example or diagram make visible for What Computer Science Majors Learn?
+- What failure should be prevented first when What Computer Science Majors Learn reaches a real system?
 
 ## What You Will Learn
 
@@ -45,16 +55,7 @@ last_reviewed: '2026-05-04'
 A clear *map* keeps your *four years* from drifting.
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    M[Math] --> P[Programming]
-    P --> S[Systems]
-    S --> D[Data]
-    D --> A[AI]
-    A --> J[Project]
-```
-
+The six axes—*math*, *programming*, *systems*, *data*, *AI*, and *projects*—build on each other. Each is foundational to the next.
 ## Key Terms
 
 - **major**: your *primary* field.
@@ -144,7 +145,18 @@ Job listings are essentially a *combination* of *major courses*.
 
 Next post: *Understanding First Year Subjects*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Computer Science Majors Learn?**
+  - The article treats What Computer Science Majors Learn as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Computer Science Majors Learn?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Computer Science Majors Learn reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Computer Science Majors Learn (current)**
 - Understanding First Year Subjects (upcoming)
 - Data Structures and Algorithms (upcoming)
@@ -155,6 +167,7 @@ Next post: *Understanding First Year Subjects*.
 - How to Study Computer Science (upcoming)
 - Build Your Portfolio (upcoming)
 - Skills to Have Before Graduation (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,11 +1,11 @@
 ---
-title: Human-in-the-loop — designing for human intervention
+title: "AI App Patterns 101 (6/6): Human-in-the-loop — designing for human intervention"
 series: ai-app-patterns-101
 episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,46 +14,31 @@ tags:
 - RAG
 - Agent
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: Human-in-the-loop does not abandon automation; it inserts human judgment
   only at the points where automation is risky.
 ---
 
-# Human-in-the-loop — designing for human intervention
+# AI App Patterns 101 (6/6): Human-in-the-loop — designing for human intervention
 
-## Questions this post answers
+Better automation does not remove the need for human review; it makes the review boundary more important. Once an AI system can draft, classify, or trigger actions at scale, the real engineering work is deciding which outcomes can flow through untouched and which ones must stop for approval.
 
-- What criteria should trigger a human approval step before an AI draft is sent?
-- How can you implement a branch that escalates only low-confidence outputs to a human?
-- How do you keep a HITL demo script verifiable in automation while still modeling human review?
+This is the final post in the AI App Patterns 101 series. Here we cover how to place human judgment inside an automated pipeline without turning the whole system back into manual work.
 
+![Human review by risk level](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-01-human-review-by-risk-level.en.png)
+*Human review by risk level*
 > Human-in-the-loop does not abandon automation; it inserts human judgment only at the points where automation is risky.
 
-![Questions this post answers](../../assets/ai-app-patterns-101/06/06-01-questions-this-post-answers.en.png)
+## Questions to Keep in Mind
 
-*Questions this post answers*
-> AI App Patterns 101 (6/6)
-
-Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/06-human-in-the-loop)
-
-Full automation is not always appropriate. Handling sensitive customer data, drafting legally binding documents, or making financial decisions all require a human to review and approve the AI's output before it takes effect. Human-in-the-loop (HITL) is the pattern for inserting human judgment into an otherwise automated pipeline.
-
-Topics:
-
-- when HITL is the right choice
-- implementing approval gates
-- confidence-based auto/manual branching
-- audit logging
-
----
+- Is human-in-the-loop a fallback for weak models, or part of product design?
+- When should you use an approval gate versus a confidence-based branch?
+- What should be logged so human decisions can be audited later?
 
 ## When HITL is the right choice
 
 ### Human review by risk level
 
-![Human review by risk level](../../assets/ai-app-patterns-101/06/06-01-human-review-by-risk-level.en.png)
-
-*Human review by risk level*
 HITL adds latency and cost. Use it when the cost of an unchecked error is high.
 
 **High-stakes decisions**: money transfers, contract generation, personal data processing — anything where a mistake is expensive or irreversible.
@@ -70,7 +55,7 @@ HITL adds latency and cost. Use it when the cost of an unchecked error is high.
 
 ### Draft generation with approval gate
 
-![Draft generation with approval gate](../../assets/ai-app-patterns-101/06/06-02-draft-generation-with-approval-gate.en.png)
+![Draft generation with approval gate](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-02-draft-generation-with-approval-gate.en.png)
 
 *Draft generation with approval gate*
 The simplest HITL pattern is a blocking prompt that waits for human input before the pipeline continues.
@@ -145,7 +130,7 @@ if final_response:
 
 ### Confidence threshold routing
 
-![Confidence threshold routing](../../assets/ai-app-patterns-101/06/06-03-confidence-threshold-routing.en.png)
+![Confidence threshold routing](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-03-confidence-threshold-routing.en.png)
 
 *Confidence threshold routing*
 Ask the LLM to return a confidence score alongside its output. Route low-confidence results to a human reviewer automatically.
@@ -211,7 +196,7 @@ for text in texts:
 
 ### Review decisions with audit events
 
-![Review decisions with audit events](../../assets/ai-app-patterns-101/06/06-04-review-decisions-with-audit-events.en.png)
+![Review decisions with audit events](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-04-review-decisions-with-audit-events.en.png)
 
 *Review decisions with audit events*
 HITL systems require a record of who reviewed what and when. The audit log also becomes training data for improving the model over time.
@@ -297,7 +282,7 @@ print(f"audit log: {LOG_FILE}")
 
 ### Human feedback back into policy loop
 
-![Human feedback back into policy loop](../../assets/ai-app-patterns-101/06/06-05-human-feedback-back-into-policy-loop.en.png)
+![Human feedback back into policy loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-05-human-feedback-back-into-policy-loop.en.png)
 
 *Human feedback back into policy loop*
 - HITL does not always sit at the very end; human review can appear before classification, before sending, or before money moves.
@@ -321,15 +306,26 @@ HITL does not mean abandoning automation. High-confidence outputs flow through a
 
 This series covered six core LLM application patterns — chatbot, RAG Q&A, document assistant, agent with tools, workflow automation, and human-in-the-loop. Each pattern stands alone or composes with the others to form more complex systems.
 
+## Answering the Opening Questions
+
+- **Is human-in-the-loop a fallback for weak models, or part of product design?**
+  HITL is a product design choice for decisions with risk and accountability, not just a patch for weak models.
+
+- **When should you use an approval gate versus a confidence-based branch?**
+  Use an approval gate for explicit approval decisions such as deploy, refund, or permission changes; use confidence-based branching when only some cases need review.
+
+- **What should be logged so human decisions can be audited later?**
+  Log original input, model suggestion, confidence, branch reason, reviewer, timestamp, and final decision.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Chatbot pattern — managing conversation history and state](./01-chatbot-pattern.md)
-- [RAG Q&A pattern — document-based question answering](./02-rag-qa-pattern.md)
-- [Document assistant — summarization, extraction, classification](./03-document-assistant.md)
-- [Agent and tool pattern — autonomous tool selection](./04-agent-tool-pattern.md)
-- [Workflow automation — designing multi-step chains](./05-workflow-automation.md)
-- **Human-in-the-loop — designing for human intervention (current)**
+- [AI App Patterns 101 (1/6): Chatbot pattern — managing conversation history and state](./01-chatbot-pattern.md)
+- [AI App Patterns 101 (2/6): RAG Q&A pattern — document-based question answering](./02-rag-qa-pattern.md)
+- [AI App Patterns 101 (3/6): Document assistant — summarization, extraction, classification](./03-document-assistant.md)
+- [AI App Patterns 101 (4/6): Agent and tool pattern — autonomous tool selection](./04-agent-tool-pattern.md)
+- [AI App Patterns 101 (5/6): Workflow automation — designing multi-step chains](./05-workflow-automation.md)
+- **AI App Patterns 101 (6/6): Human-in-the-loop — designing for human intervention (current)**
 
 <!-- toc:end -->
 
@@ -337,6 +333,6 @@ This series covered six core LLM application patterns — chatbot, RAG Q&A, docu
 
 ## References
 
-- [LangGraph HITL guide](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/)
-- [Human-AI interaction design](https://arxiv.org/abs/2108.00018)
-- [Confidence calibration](https://en.wikipedia.org/wiki/Calibration_(statistics))
+- [LangGraph human-in-the-loop guide](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/)
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework)
+- [Python `json` module documentation](https://docs.python.org/3/library/json.html)

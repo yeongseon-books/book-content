@@ -1,13 +1,13 @@
 ---
-title: 'online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기'
+title: "Alembic 101 (7/10): online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기"
 series: alembic-101
 episode: 7
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,31 +17,39 @@ tags:
 - offline
 - batch
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: alembic은 두 가지 모드로 실행됩니다. online은 DB에 직접 연결해 SQL을 실행하고, offline은 DB
   없이 SQL 텍스트만…
 ---
 
-# online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기
+# Alembic 101 (7/10): online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기
 
-## 핵심 질문
+이 글은 Alembic 101 시리즈의 일곱 번째 글입니다. 여기서는 online execution, offline SQL preview, 그리고 SQLite batch mode를 하나의 운영 흐름으로 묶어 설명합니다.
 
-다운타임 없이 마이그레이션을 적용하려면 온라인·오프라인·배치 모드를 어떻게 선택해야 할까요?
+production 배포 직전에는 migration이 실제로 어떤 SQL을 내보낼지 눈으로 보고 싶을 때가 많습니다. 여기에 SQLite의 제한적인 DDL 지원까지 겹치면 offline mode와 batch mode를 같이 이해해야 합니다.
 
-이 글은 그 질문에 답하기 위해 온라인/오프라인 마이그레이션과 batch 모드의 핵심 결정과 실무 함정을 살펴봅니다.
+![Alembic 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.ko.png)
+*Alembic 101 7장 흐름 개요*
 
+## 먼저 던지는 질문
 
-## 이 글에서 다룰 문제
+- Alembic이 제공하는 두 실행 모드, online과 offline은 어떻게 다를까요?
+- `--sql`로 실제 SQL을 어떻게 미리 볼 수 있을까요?
+- DBA 리뷰용 SQL 스크립트는 어떤 흐름으로 만들까요?
 
-production 배포 전에 "이 마이그레이션이 어떤 SQL을 실행할지"를 보고 싶을 때가 있습니다. 외부 DBA의 검토를 받아야 하거나, 변경 영향이 너무 커서 PR review만으로는 안심이 안 될 때입니다. 이때 사용하는 도구가 alembic의 offline 모드입니다.
+## 왜 중요한가
 
-또 SQLite는 `ALTER TABLE`이 매우 제한적이라 모든 alembic 사용자가 batch 모드를 한 번은 배워야 합니다. 둘은 같이 익히는 편이 좋습니다.
+외부 DBA 검토가 필요하거나 변경 영향이 커서 PR 리뷰만으로는 불안할 때, migration이 실제로 어떤 SQL을 실행할지 미리 봐야 합니다. 이때 쓰는 도구가 Alembic의 offline mode입니다.
 
-## Mental Model
+또 SQLite는 `ALTER TABLE` 지원이 약하기 때문에 결국 모든 Alembic 사용자는 batch mode를 익히게 됩니다. 두 주제는 함께 배울 때 가장 이해가 빠릅니다.
 
-> alembic은 두 가지 모드로 실행됩니다. **online은 DB에 직접 연결해 SQL을 실행하고, offline은 DB 없이 SQL 텍스트만 표준출력에 찍습니다.** offline은 dry-run/검토/스크립트화를 위한 모드이고, online은 실제 적용 모드입니다.
+## 멘탈 모델
 
-`render_as_batch` 옵션을 켜면 SQLite 같은 dialect에서 `op.alter_column` 같은 호출이 내부에서 임시 테이블 + INSERT SELECT + 원본 교체로 풀립니다. batch 모드는 SQLite를 위한 alembic의 안전망입니다.
+> Alembic은 두 모드로 실행됩니다. **online은 DB에 연결해 SQL을 직접 실행하고, offline은 DB 연결 없이 SQL 텍스트를 표준 출력으로 보냅니다.** offline은 dry-run, 리뷰, 스크립트화용이고, online은 실제 적용용입니다.
+
+`render_as_batch`를 켜면 SQLite에서 `op.alter_column` 같은 호출이 내부적으로 “임시 테이블 생성 → INSERT SELECT → 이름 교체”로 확장됩니다. batch mode는 SQLite를 위한 Alembic의 안전망입니다.
+
+### 다이어그램: online, offline, batch mode의 역할 분담
 
 ## 핵심 개념
 
@@ -49,72 +57,72 @@ production 배포 전에 "이 마이그레이션이 어떤 SQL을 실행할지"�
 
 | 모드 | DB 연결 | 출력 | 용도 |
 | --- | --- | --- | --- |
-| online (기본) | 필요 | 적용 결과 로그 | 실제 마이그레이션 적용 |
-| offline (`--sql`) | 불필요 | SQL 텍스트 (stdout) | 검토, 스크립트화, dry-run |
+| online (기본) | 필요 | 적용 로그 | 실제 migration 적용 |
+| offline (`--sql`) | 불필요 | SQL 텍스트 (stdout) | 리뷰, 스크립트, dry-run |
 
 ```bash
-# online (실제 적용)
+# online (apply)
 alembic upgrade head
 
-# offline (SQL 출력만)
+# offline (SQL only)
 alembic upgrade head --sql > migration.sql
 
-# 특정 구간만
+# only a specific span
 alembic upgrade <from>:<to> --sql > step.sql
 ```
 
-`<from>:<to>` 구문이 핵심입니다. `head` 단독은 `None:head` 의미가 되어 처음부터 head까지의 SQL이 다 출력됩니다. 이미 적용된 부분을 빼고 싶으면 `<현재>:<목표>`로 명시합니다.
+여기서 반드시 기억할 문법은 `<from>:<to>`입니다. `head`만 쓰면 `None:head`로 해석되어 처음부터 head까지의 SQL이 모두 출력됩니다. 이미 적용된 구간을 빼고 싶다면 `<current>:<target>`을 명시해야 합니다.
 
-### offline 모드의 제약
+### offline mode의 제약
 
-offline은 DB가 없으므로 다음이 동작하지 않습니다.
+DB 연결이 없기 때문에 offline mode에서는 다음이 동작하지 않습니다.
 
-- `op.get_bind()` (커넥션이 없음)
+- `op.get_bind()`
 - 데이터 검증 쿼리
-- introspection을 사용하는 helper
-- 조건부 로직 (현재 row 수에 따라 분기 등)
+- introspection 기반 helper
+- row 수에 따라 분기하는 조건 로직
 
-따라서 데이터 마이그레이션은 offline 모드에서 SQL이 의미 있게 출력되지 않습니다. schema 마이그레이션 위주로 사용하는 것이 정석입니다.
+따라서 data migration은 offline mode에서 의미 있는 SQL을 내기 어렵습니다. offline은 schema migration 중심으로 쓰는 것이 맞습니다.
 
-### `--sql`로 검토 워크플로우
+### `--sql` 리뷰 워크플로우
 
 ```bash
-# 1) PR에 SQL preview 첨부
+# 1) attach an SQL preview to the PR
 alembic upgrade <prev>:head --sql > review.sql
 git add review.sql && git commit -m "ddl preview"
 
-# 2) DBA가 review.sql을 검토
+# 2) DBA reviews review.sql
 
-# 3) production 배포는 평소와 같이 online
+# 3) production deploy uses online as usual
 alembic upgrade head
 ```
 
-대규모 운영 환경에서 자주 사용하는 흐름입니다. PR에 SQL을 첨부해 두면 리뷰어가 op 호출이 아닌 실제 SQL로 영향을 평가할 수 있습니다.
+실제 운영에서는 이 흐름이 자주 쓰입니다. `op` 호출이 아니라 실제 SQL을 PR에 붙여 두면 리뷰어가 비용과 위험을 더 정확히 읽을 수 있습니다.
 
-### SQLite와 batch 모드
+### SQLite와 batch mode
 
-SQLite는 `ALTER TABLE`이 다음만 지원합니다.
+SQLite가 지원하는 `ALTER TABLE`은 다음 정도에 그칩니다.
 
 - `RENAME TABLE`
 - `RENAME COLUMN` (3.25+)
 - `ADD COLUMN`
 - `DROP COLUMN` (3.35+)
 
-따라서 type 변경, nullable 변경, default 변경, FK 추가/삭제는 직접 ALTER로 못 합니다. alembic의 `batch_alter_table`은 다음과 같이 자동으로 풀어 줍니다.
+따라서 타입 변경, nullable 변경, default 변경, FK 추가/삭제는 직접 ALTER로 처리할 수 없습니다. Alembic의 `batch_alter_table`은 이를 다음처럼 확장합니다.
 
 ```sql
-CREATE TABLE _alembic_tmp_users (...);   -- 새 schema로 임시 테이블
+CREATE TABLE _alembic_tmp_users (...);   -- temp table with the new schema
 INSERT INTO _alembic_tmp_users SELECT ... FROM users;
 DROP TABLE users;
 ALTER TABLE _alembic_tmp_users RENAME TO users;
--- 원래 인덱스/트리거 재생성
+-- recreate the original indexes/triggers
 ```
 
-이 과정 전체가 한 트랜잭션 안에서 일어나기 때문에 안전하지만, 큰 테이블에서는 시간이 걸립니다.
+이 전체 과정은 한 transaction 안에서 일어나기 때문에 안전하지만, 큰 테이블에서는 비용이 큽니다.
 
 ### `render_as_batch` 자동화
 
-`env.py`에서 SQLite일 때만 자동으로 batch 모드가 켜지게 합니다.
+`env.py`에서는 SQLite일 때만 자동으로 batch mode를 켜면 됩니다.
 
 ```python
 context.configure(
@@ -124,17 +132,17 @@ context.configure(
 )
 ```
 
-이 옵션이 있어도 명시적 `with op.batch_alter_table(...)` 컨텍스트는 여전히 권장됩니다. 의도가 명확해지고, 같은 batch 안에서 여러 alter를 묶을 수 있기 때문입니다.
+그래도 `with op.batch_alter_table(...)`를 명시적으로 쓰는 편이 좋습니다. 의도가 분명해지고, 여러 변경을 하나의 batch로 묶을 수 있기 때문입니다.
 
-## Before-After
+## 변경 전후
 
 ```sql
--- Before: SQL을 보지 않고 production에 적용
--- 결과: index drop이 누락된 채 column type 변경, 쿼리 성능 저하
+-- Before: applied to production without looking at the SQL
+-- Result: column type changed without dropping the index, query performance regresses
 ```
 
 ```bash
-# After: --sql로 미리 확인
+# After: previewed with --sql
 $ alembic upgrade <prev>:head --sql
 
 BEGIN;
@@ -145,7 +153,7 @@ CREATE INDEX ix_users_tier ON users (tier);
 COMMIT;
 ```
 
-PR에 이 SQL이 첨부되어 있었다면 리뷰어가 "DROP INDEX 후 다시 만드는 비용"을 평가할 수 있었을 겁니다. dry-run 워크플로우의 가치는 여기에 있습니다.
+이 SQL이 PR에 붙어 있었다면 “인덱스를 드롭하고 다시 만든다”는 비용을 리뷰 단계에서 바로 볼 수 있었을 것입니다. 그것이 dry-run workflow의 가치입니다.
 
 ## 단계별 실습
 
@@ -156,15 +164,15 @@ alembic upgrade head --sql > preview.sql
 cat preview.sql
 ```
 
-처음 사용 시에는 `BEGIN;` ... `COMMIT;` 블록과 `INSERT INTO alembic_version` 문장도 포함되는 것을 확인할 수 있습니다.
+처음 보면 `BEGIN;` ... `COMMIT;` 블록과 `INSERT INTO alembic_version` 문까지 포함된다는 점이 눈에 들어옵니다.
 
-### 2단계: 특정 revision 구간만
+### 2단계: 특정 revision 구간만 출력
 
 ```bash
 alembic upgrade abc123:def456 --sql > step.sql
 ```
 
-이미 production에 abc123까지 적용되어 있고 def456까지 올리고 싶을 때 사용합니다.
+production이 이미 `abc123`에 있고 `def456`까지만 올리고 싶을 때 쓰는 형태입니다.
 
 ### 3단계: SQLite batch 적용
 
@@ -177,18 +185,18 @@ def upgrade() -> None:
         batch.create_index("ix_users_tier", ["tier"])
 ```
 
-여러 변경을 한 batch로 묶으면 임시 테이블 생성/복사가 한 번에 끝납니다.
+여러 변경을 하나의 batch로 묶으면 임시 테이블 생성과 데이터 복사가 한 번만 일어납니다.
 
-### 4단계: offline에서 동작 안 하는 op 식별
+### 4단계: offline에서 동작하지 않는 연산 구분
 
 ```python
 def upgrade() -> None:
-    bind = op.get_bind()                  # offline에서는 None
-    if bind:                              # 가드 추가
+    bind = op.get_bind()                  # None in offline mode
+    if bind:                              # add a guard
         bind.execute(text("UPDATE ..."))
 ```
 
-또는 데이터 마이그레이션은 별도 revision으로 분리하고 offline 모드에서는 schema-only revision만 미리 보는 식으로 운영합니다.
+혹은 data migration을 별도 revision으로 분리하고, offline에서는 schema-only revision만 preview하는 편이 더 깔끔합니다.
 
 ### 5단계: CI에 `--sql` dry-run 추가
 
@@ -196,44 +204,367 @@ def upgrade() -> None:
 - run: alembic upgrade head --sql > /tmp/preview.sql && cat /tmp/preview.sql
 ```
 
-이 한 줄이 PR에 SQL을 자동으로 표시하는 효과를 줍니다.
+이 한 줄만으로도 모든 PR에서 SQL이 자동 출력됩니다.
+
+## 검증 루틴
+
+```bash
+alembic upgrade current:head --sql > preview.sql
+python3 - <<'PY'
+from pathlib import Path
+text = Path('preview.sql').read_text()
+print('BEGIN;' in text, 'INSERT INTO alembic_version' in text)
+PY
+```
+
+**확인할 점:** preview SQL 안에 transaction 경계와 `alembic_version` 갱신 SQL이 함께 보여야 합니다. 그래야 리뷰 대상이 실제 배포 단위와 맞아 있습니다.
 
 ## 자주 하는 실수
 
-- **`--sql head`만 실행해 처음부터 끝까지가 다 나오는 것에 당황.** `<from>:<to>` 형식을 익히세요.
-- **offline에서 데이터 마이그레이션 SQL을 기대.** offline은 schema 변경 위주로만 의미 있는 출력을 만듭니다.
-- **SQLite에서 batch 없이 alter.** "no such function ALTER" 또는 "syntax error"로 깨집니다.
-- **batch 모드의 임시 테이블 시간 무시.** 수백만 row 테이블이라면 schema add → data backfill → schema tighten 분리(6편) 패턴이 더 안전합니다.
-- **`render_as_batch=True`만 믿고 명시적 batch 컨텍스트 생략.** 의도가 모호해지고 한 batch 묶음 효과를 못 받습니다.
+- **`--sql head`를 실행하고 처음부터 끝까지 다 출력돼 놀라기.** `<from>:<to>` 구문을 익혀야 합니다.
+- **offline에서 data migration SQL까지 기대하기.** offline은 주로 schema 변경용입니다.
+- **SQLite에서 batch 없이 ALTER하기.** 지원되지 않는 문법 오류를 만납니다.
+- **batch mode의 임시 테이블 비용을 무시하기.** 큰 테이블은 6편의 schema add → data backfill → schema tighten 패턴이 더 안전합니다.
+- **`render_as_batch=True`만 믿고 explicit batch context를 생략하기.** 의도가 흐려지고 batch bundling 효과도 놓칩니다.
 
-## 실무에서 쓰는 패턴
+## 실무 패턴
 
-- **PR에 `--sql` preview 첨부.** DBA 리뷰가 필요한 환경의 표준.
-- **CI에서 `--sql`로 dry-run을 자동 출력.** 리뷰어 부담을 낮춥니다.
-- **schema 변경은 SQLite에서 항상 batch 컨텍스트로 작성.** PostgreSQL과 동작이 다르다는 사실을 명시적으로 표현.
-- **production 배포는 online + transaction.** offline에서 만든 SQL 파일을 손으로 실행하는 운영은 권장하지 않습니다(트랜잭션 경계와 alembic_version 동기화 위험).
-- **`alembic upgrade <prev>:head --sql` alias.** `make ddl-preview` 같은 단일 명령으로 정형화.
+- **PR에 `--sql` preview를 붙입니다.** DBA 리뷰가 필요한 환경에서는 사실상 표준입니다.
+- **CI가 dry-run SQL을 자동 출력합니다.** 리뷰 비용을 줄여 줍니다.
+- **SQLite schema 변경은 항상 batch context 안에 씁니다.** PostgreSQL과 동작 차이를 코드에 명시할 수 있습니다.
+- **production deploy는 online + transaction으로 수행합니다.** offline SQL 파일을 수동으로 돌리면 transaction 경계와 `alembic_version` 동기화 리스크가 생깁니다.
+- **`alembic upgrade <prev>:head --sql`을 `make ddl-preview` 같은 명령으로 고정합니다.** 팀 전체의 습관을 표준화하기 쉽습니다.
 
 ## 체크리스트
 
-- [ ] `--sql`은 `<from>:<to>` 구문으로 사용한다
-- [ ] offline에서는 데이터 마이그레이션 결과를 기대하지 않는다
-- [ ] SQLite의 `ALTER` 변경은 항상 `batch_alter_table` 컨텍스트 안에서 한다
-- [ ] PR에 SQL preview 첨부 또는 CI 자동 출력이 설정되어 있다
-- [ ] production 배포는 online으로 한다 (offline SQL 직접 실행 금지)
+- [ ] `--sql`을 쓸 때 `<from>:<to>` 구문을 이해하고 있다
+- [ ] offline mode에서 data migration 결과를 기대하지 않는다
+- [ ] SQLite의 `ALTER` 계열 변경은 항상 `batch_alter_table` 안에서 실행한다
+- [ ] SQL preview를 PR에 붙이거나 CI에서 자동 출력한다
+- [ ] production deploy는 online 모드로 수행한다
+
+## 연습 문제
+
+1. 임의의 schema 변경을 만들고 `alembic upgrade head --sql > out.sql`로 출력 구조를 확인해 보세요.
+2. SQLite에서 `op.alter_column`을 batch context 없이 실행해 오류를 관찰해 보세요.
+3. `<prev>:<head>` 구문으로 마지막 한 단계의 SQL만 뽑아 보세요.
 
 ## 정리, 다음 글
 
-online은 적용, offline은 검토. 이 두 모드의 분업이 운영 환경에서 안전성을 높여 줍니다. SQLite는 batch 모드를 항상 명시적으로 쓰는 습관을 들이세요.
+online은 적용용이고 offline은 리뷰용입니다. 이 역할 분담을 분명히 하면 운영 안전성이 크게 올라갑니다. SQLite를 쓴다면 batch mode를 항상 명시적으로 쓰는 습관을 들이는 편이 좋습니다.
 
-다음 글은 downgrade 전략입니다. 언제 downgrade를 진심으로 작성하고, 언제 의도적으로 막을지의 기준을 다룹니다.
+다음 글에서는 downgrade를 언제 진지하게 작성하고, 언제 의도적으로 막아야 하는지 다룹니다.
+
+## offline SQL 리뷰 체크포인트
+
+`--sql` 출력은 길어서 대충 넘기기 쉽습니다. 아래 항목을 고정해서 읽으면 리뷰 품질이 올라갑니다.
+
+1. transaction 경계(`BEGIN`/`COMMIT`)가 명확한가
+2. `alembic_version` 갱신 SQL이 포함됐는가
+3. 인덱스 drop/recreate 비용이 예상 가능한가
+4. lock이 긴 DDL(`ALTER TYPE`, 대형 table rewrite)이 숨어 있지 않은가
+
+```bash
+alembic upgrade <prev>:head --sql > migration-preview.sql
+```
+
+## SQLite batch 내부 동작 예시
+
+다음은 `nullable` 변경 시 Alembic이 batch 모드에서 사실상 수행하는 흐름입니다.
+
+```sql
+CREATE TABLE _alembic_tmp_users (
+  id INTEGER NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  tier VARCHAR(16) NOT NULL,
+  PRIMARY KEY (id)
+);
+INSERT INTO _alembic_tmp_users (id, email, tier)
+SELECT id, email, COALESCE(tier, 'free') FROM users;
+DROP TABLE users;
+ALTER TABLE _alembic_tmp_users RENAME TO users;
+CREATE INDEX ix_users_email ON users (email);
+```
+
+이 과정을 보면 batch mode가 단순 문법 변환이 아니라 "테이블 재작성"임을 알 수 있습니다. 따라서 테이블이 클수록 작업 시간을 따로 예측해야 합니다.
+
+## online/offline 혼합 운영 패턴
+
+실무에서는 보통 아래처럼 역할을 나눕니다.
+
+```text
+PR 단계: offline (--sql)로 SQL 리뷰
+staging: online으로 실제 적용 + smoke test
+production: online으로 단일 실행 주체가 적용
+```
+
+offline 결과만 믿고 production에서 수동 실행하는 방식은 권장되지 않습니다. `alembic_version` 동기화, 트랜잭션 경계, 실행 주체 통제가 모두 어려워지기 때문입니다.
+
+## 확장 부록: 배포/복구 실습 시나리오
+
+### 시나리오 A: add column + backfill + tighten
+
+```bash
+alembic revision -m "add users.phone nullable"
+alembic revision -m "backfill users.phone"
+alembic revision -m "tighten users.phone not null"
+alembic upgrade head
+```
+
+```sql
+SELECT COUNT(*) FROM users WHERE phone IS NULL;
+```
+
+`COUNT(*) = 0`이 아니라면 tighten 단계는 멈춰야 합니다.
+
+### 시나리오 B: 동시에 생성된 head 정리
+
+```bash
+alembic heads
+alembic merge -m "merge concurrent heads" <head1> <head2>
+alembic heads
+```
+
+merge 후 head가 하나여야 합니다.
+
+### 시나리오 C: offline SQL 승인 흐름
+
+```bash
+alembic upgrade <prev>:head --sql > review.sql
+```
+
+검토 포인트는 `DROP`, `ALTER`, 인덱스 재생성, `alembic_version` 갱신 SQL 포함 여부입니다.
+
+### 시나리오 D: incident first checks
+
+```bash
+alembic current
+alembic heads
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+애플리케이션 `/health`의 기대 버전과 DB 버전이 다르면 drift 가능성을 먼저 의심합니다.
+
+### 운영 스크립트 예시
+
+```bash
+set -euo pipefail
+alembic check
+alembic upgrade head
+alembic upgrade head --sql > /tmp/migration-preview.sql
+```
+
+### 품질 게이트 정리
+
+```text
+- autogenerate 결과 수동 검토
+- downgrade 정책 명시
+- data migration idempotency 확보
+- migration-first 배포
+- post-deploy smoke test
+```
+
+이 게이트들은 Alembic 자체 기능이라기보다 팀 운영 안전장치입니다.
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+## 처음 질문으로 돌아가기
+
+- **Alembic이 제공하는 두 실행 모드, online과 offline은 어떻게 다를까요?**
+  - online은 `alembic upgrade head`처럼 DB에 직접 연결해 SQL을 실행하고, offline은 `alembic upgrade head --sql`처럼 SQL 텍스트만 출력합니다. 하나는 적용용이고 다른 하나는 리뷰용이라는 역할 구분이 이 글의 핵심입니다.
+- **`--sql`로 실제 SQL을 어떻게 미리 볼 수 있을까요?**
+  - `alembic upgrade <from>:<to> --sql > review.sql`처럼 구간을 명시해 출력하면 됩니다. 본문이 `<from>:<to>` 문법을 강조한 이유는 `head`만 쓰면 이미 적용된 구간까지 전부 뽑혀 리뷰 대상이 흐려지기 때문입니다.
+- **DBA 리뷰용 SQL 스크립트는 어떤 흐름으로 만들까요?**
+  - PR 단계에서 `review.sql`을 붙여 DBA가 실제 DDL을 읽고, 배포 시점에는 여전히 online 모드로 `alembic upgrade head`를 실행하는 흐름이 이 글의 답입니다. 이렇게 해야 SQL preview와 `alembic_version` 갱신이 같은 배포 단위로 이어집니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Alembic 101 (1/10): 왜 Alembic인가, 그리고 init까지](./01-why-alembic-and-init.md)
+- [Alembic 101 (2/10): env.py와 target_metadata: 모델과 마이그레이션 연결](./02-env-py-and-target-metadata.md)
+- [Alembic 101 (3/10): 첫 revision: upgrade와 downgrade를 손으로 작성](./03-first-revision-upgrade-downgrade.md)
+- [Alembic 101 (4/10): autogenerate: 잡는 것과 못 잡는 것의 경계](./04-autogenerate-and-its-limits.md)
+- [Alembic 101 (5/10): branch와 merge: 동시에 만든 revision을 합치는 법](./05-branches-and-merges.md)
+- [Alembic 101 (6/10): 데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기](./06-data-migrations.md)
+- **online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기 (현재 글)**
+- downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가 (예정)
+- 배포 순서와 blue/green: schema와 application code의 안전한 동기화 (예정)
+- Production과 team workflow: PR, CI, 모니터링, 그리고 incident response (예정)
+
+<!-- toc:end -->
 
 ## 참고 자료
 
-- Alembic: Generating SQL Scripts (Offline Mode) — https://alembic.sqlalchemy.org/en/latest/offline.html
-- Alembic: Running Batch Migrations for SQLite and Other Databases — https://alembic.sqlalchemy.org/en/latest/batch.html
-- SQLite: ALTER TABLE — https://www.sqlite.org/lang_altertable.html
-- Alembic: Operation Reference — https://alembic.sqlalchemy.org/en/latest/ops.html
+- [sqlalchemy/alembic GitHub 저장소](https://github.com/sqlalchemy/alembic)
+- [Alembic: Generating SQL Scripts (Offline Mode)](https://alembic.sqlalchemy.org/en/latest/offline.html)
+- [Alembic: Running Batch Migrations for SQLite and Other Databases](https://alembic.sqlalchemy.org/en/latest/batch.html)
+- [SQLite: ALTER TABLE](https://www.sqlite.org/lang_altertable.html)
+- [Alembic: Operation Reference](https://alembic.sqlalchemy.org/en/latest/ops.html)
 
-<!-- toc:begin -->
-<!-- toc:end -->
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/alembic-101/ko/07-online-vs-offline-and-batch)

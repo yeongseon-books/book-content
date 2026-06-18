@@ -1,10 +1,10 @@
 ---
 series: machine-learning-101
 episode: 8
-title: Overfitting and Regularization
-status: content-ready
+title: "Machine Learning 101 (8/10): Overfitting and Regularization"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,28 @@ tags:
   - Ridge
   - Lasso
 seo_description: How to spot overfitting versus underfitting, the bias-variance trade-off, and how Ridge, Lasso, and ElasticNet restore generalization in practice
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Overfitting and Regularization
+# Machine Learning 101 (8/10): Overfitting and Regularization
 
-> Machine Learning 101 series (8/10)
+When the train score soars and the test score collapses, “the model is smart” is usually the wrong interpretation. More often, the model found ways to memorize noise, shortcut the split, or overreact to feature quirks that do not survive new data.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Machine Learning 101 series. Here we will diagnose underfitting versus overfitting, connect that diagnosis to the bias-variance trade-off, and use Ridge, Lasso, and related regularization tools to recover generalization.
 
-**Core question**: 99% on training and 60% on test. Is the model to blame, or the data?
 
-> *Overfitting means memorizing noise. Regularization shrinks model freedom and brings generalization back.*
+![machine learning 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 8 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The signals of overfitting and underfitting
-- The bias-variance trade-off
-- Differences between Ridge, Lasso, and ElasticNet
-- How learning curves diagnose problems
-- Five common pitfalls
+- Which signals separate overfitting from underfitting?
+- What does the bias-variance trade-off actually mean in practice?
+- How do Ridge, Lasso, and ElasticNet differ?
 
 ## Why It Matters
 
 Half of every model improvement is regularization. The more capacity a model has, the more regularization keeps it alive.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Cap["model capacity"] -->|low| Under["underfit (high bias)"]
-    Cap -->|high| Over["overfit (high variance)"]
-    Cap -->|right| Good["generalize"]
-```
 
 ## Key Terms
 
@@ -113,11 +100,19 @@ for a in np.logspace(-3, 2, 6):
     print(f"alpha={a:.3g}  R^2={s:.3f}")
 ```
 
+**Expected output:** linear, Ridge, and Lasso each produce a test score, and the alpha sweep shows that regularization strength has a real trade-off curve. If every alpha performs badly, the issue may be feature quality or model family, not only regularization.
+
 ## What to Notice in This Code
 
 - Lasso doubles as feature selection by zeroing coefficients.
 - Ridge shrinks all coefficients smoothly.
 - Choose `alpha` by cross-validation, not by guessing.
+
+## Read the first failure signal this way
+
+- If the train-test gap widens as capacity grows, regularization and data volume deserve attention before architecture changes.
+- If Lasso keeps selecting unstable feature sets, check for correlated inputs and try ElasticNet or Ridge.
+- If both train and test are weak, stop calling it overfitting and reconsider feature design or model capacity.
 
 ## Five Common Mistakes
 
@@ -156,17 +151,29 @@ Ad CTR, search ranking, and genomics rely on Lasso and ElasticNet for feature se
 
 Regularization is a core lever for generalization. Next, we cover proper model evaluation.
 
+## Answering the Opening Questions
+
+- **Which signals separate overfitting from underfitting?**
+  - The article treats Overfitting and Regularization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does the bias-variance trade-off actually mean in practice?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do Ridge, Lasso, and ElasticNet differ?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
-- [Linear Regression](./04-linear-regression.md)
-- [Logistic Regression](./05-logistic-regression.md)
-- [Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
-- [Clustering](./07-clustering.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
+- [Machine Learning 101 (4/10): Linear Regression](./04-linear-regression.md)
+- [Machine Learning 101 (5/10): Logistic Regression](./05-logistic-regression.md)
+- [Machine Learning 101 (6/10): Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
+- [Machine Learning 101 (7/10): Clustering](./07-clustering.md)
 - **Overfitting and Regularization (current)**
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

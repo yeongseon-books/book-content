@@ -1,10 +1,10 @@
 ---
 series: compilers-101
 episode: 4
-title: semantic analysis
+title: "Compilers 101 (4/10): semantic analysis"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,25 @@ seo_description: Semantic analysis checks whether the AST makes sense. Walk thro
 last_reviewed: '2026-05-04'
 ---
 
-# semantic analysis
+# Compilers 101 (4/10): semantic analysis
+
+This is post 4 in the Compilers 101 series.
 
 > Compilers 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: `x + "hello"` is syntactically fine, so why does the compiler reject it?
 
 > Semantic analysis is the step that asks "does this make sense?" of an AST that already passed syntax. It catches name resolution, type errors, and use-before-declare style mistakes.
 
-<!-- a-grade-intro:end -->
+
+![compilers 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/04/04-01-big-picture.en.png)
+*compilers 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying semantic analysis?
+- Which signal should the example or diagram make visible for semantic analysis?
+- What failure should be prevented first when semantic analysis reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 A parser can only say "are the parentheses balanced?" The case where `y` in `x = y + 1` was never declared, or where `y` is a string but you try to add `1`, is caught at the semantic stage. If this stage is weak, code that compiled cleanly dies at runtime.
 
 > Compilers earn trust through semantics, not through syntax.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -224,17 +230,29 @@ The core of a language server (LSP) lives here. "Go to definition" is name resol
 
 Semantic analysis answers the "does this make sense?" question that syntax cannot. The next post zooms into its central tools — symbol table and scope.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying semantic analysis?**
+  - The article treats semantic analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for semantic analysis?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when semantic analysis reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Compiler?](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
-- [parsing and AST](./03-parsing-and-ast.md)
+## In this series
+
+- [Compilers 101 (1/10): What Is a Compiler?](./01-what-is-a-compiler.md)
+- [Compilers 101 (2/10): lexical analysis](./02-lexical-analysis.md)
+- [Compilers 101 (3/10): parsing and AST](./03-parsing-and-ast.md)
 - **semantic analysis (current)**
 - symbol table and scope (upcoming)
 - intermediate representation (upcoming)
 - optimization basics (upcoming)
 - code generation (upcoming)
 - JIT vs AOT (upcoming)
-- building a tiny interpreter (upcoming)
+- Building a Tiny Interpreter (upcoming)
+
 <!-- toc:end -->
 
 ## References

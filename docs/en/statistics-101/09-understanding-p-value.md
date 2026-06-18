@@ -1,10 +1,10 @@
 ---
 series: statistics-101
 episode: 9
-title: Understanding p-value
+title: "Statistics 101 (9/10): Understanding p-value"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,25 +20,24 @@ seo_description: A clear definition of the p-value, the five most common misread
 last_reviewed: '2026-05-04'
 ---
 
-# Understanding p-value
+# Statistics 101 (9/10): Understanding p-value
 
-> Statistics 101 series (9/10)
+If you read enough statistical reports, you will keep running into lines like p < 0.05. The problem is that this single line is often overloaded. Some readers treat it as the probability that the hypothesis is true, others treat it as the size of the effect, and others read p > 0.05 as proof that nothing is happening.
 
-<!-- a-grade-intro:begin -->
+The p-value does none of those jobs. It only answers one question: assuming the null hypothesis is true, how surprising is the observed data?
 
-**Core question**: What does *p < 0.05* really mean? *Why* is it *misread so often*?
+This is post 9 in the Statistics 101 series. Here we will define the p-value carefully, walk through the most common misreadings, explain why p-hacking breaks the procedure, and show why effect size and confidence intervals belong next to p-value in any serious report.
 
-> *A p-value is not the probability that a hypothesis is true. It is only how surprising the data is.*
 
-<!-- a-grade-intro:end -->
+![statistics 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/09/09-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 9 flow overview*
+> The p-value is *not* the probability your result is true—it is the probability your *data* would appear this extreme if the null were true.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *precise definition* of a p-value
-- *Five common misreadings*
-- *p-hacking* and *pre-registration*
-- A 5-step p-value exercise
-- The core of the *ASA 2016 statement*
+- What does the p-value actually mean?
+- Why is it so often misread?
+- How is p-value different from effect size?
 
 ## Why It Matters
 
@@ -47,15 +46,7 @@ Most papers and reports collapse a *conclusion* into one line: *p < 0.05*. Yet *
 > *A p-value is not an answer; it is the *start of a question*.*
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    H0["H0 (null)"] --> Sample["Observed sample"]
-    Sample --> Stat["Test statistic"]
-    Stat --> P["p = P(stat >= obs | H0)"]
-    P --> Decide["Compare with alpha"]
-```
-
+A small p-value (say, p < 0.05) means your data is *unlikely* if there were no true effect. But it does not tell you the *size* of the effect, nor does it prove your hypothesis is correct.
 ## Key Terms
 
 - **p-value**: under the *assumption that H0 is true*, the probability of seeing a *result at least as extreme* as the observed one.
@@ -159,17 +150,29 @@ A/B tests, clinical trials, quality control — production reports always pair *
 
 A p-value is *not proof*; it is a *measure of surprise*. The next episode wraps everything together as a *statistical mindset*.
 
+## Answering the Opening Questions
+
+- **What does the p-value actually mean?**
+  - The article treats Understanding p-value as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is it so often misread?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How is p-value different from effect size?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
-- [Distributions](./03-distributions.md)
-- [Sample and Population](./04-sample-and-population.md)
-- [Estimation](./05-estimation.md)
-- [Confidence Interval](./06-confidence-interval.md)
-- [Hypothesis Testing](./07-hypothesis-testing.md)
-- [Correlation and Regression](./08-correlation-and-regression.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): Distributions](./03-distributions.md)
+- [Statistics 101 (4/10): Sample and Population](./04-sample-and-population.md)
+- [Statistics 101 (5/10): Estimation](./05-estimation.md)
+- [Statistics 101 (6/10): Confidence Interval](./06-confidence-interval.md)
+- [Statistics 101 (7/10): Hypothesis Testing](./07-hypothesis-testing.md)
+- [Statistics 101 (8/10): Correlation and Regression](./08-correlation-and-regression.md)
 - **Understanding p-value (current)**
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -177,4 +180,4 @@ A p-value is *not proof*; it is a *measure of surprise*. The next episode wraps 
 - [ASA Statement on p-Values (2016)](https://www.amstat.org/asa/files/pdfs/p-valuestatement.pdf)
 - [Nature — Scientists rise up against statistical significance](https://www.nature.com/articles/d41586-019-00857-9)
 - [scipy.stats — ttest_1samp](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html)
-- [Wikipedia — Misuse of p-values](https://en.wikipedia.org/wiki/Misuse_of_p-values)
+- [NIST/SEMATECH e-Handbook — Hypothesis Tests](https://www.itl.nist.gov/div898/handbook/prc/section2/prc2.htm)

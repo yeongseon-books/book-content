@@ -1,10 +1,10 @@
 ---
 series: software-engineering-101
 episode: 3
-title: Design vs Implementation
+title: "Software Engineering 101 (3/10): Design vs Implementation"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,26 @@ tags:
   - Implementation
   - Tradeoff
 seo_description: A short, code-first take on design vs implementation, capturing decisions in ADRs, and avoiding over-engineering.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Design vs Implementation
+# Software Engineering 101 (3/10): Design vs Implementation
 
-> Software Engineering 101 series (3/10)
+Sometimes you review a change and think, "The code is clean, but the structure still feels fragile." Other times the code itself is ordinary, yet the boundaries are so clear that the system looks like it will survive years of change. That difference usually comes from design quality more than implementation polish.
 
-<!-- a-grade-intro:begin -->
+Treat design and implementation as the same activity, and the important decisions disappear into the code. Responsibility boundaries, reversibility, failure handling, and trade-offs stop being explicit choices and start becoming accidental side effects. That is how teams end up with a lot of code and very little shared reasoning.
 
-**Core question**: Is "well-written code" the same as "well-designed system"?
+This is post 3 in the Software Engineering 101 series. In this chapter, we separate the questions design answers from the questions implementation answers, then use ADRs and small examples to show how to keep that boundary visible.
 
-> Design is "what"; implementation is "how". Mixing the two blurs both.
 
-<!-- a-grade-intro:end -->
+![software engineering 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 3 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Design vs Implementation?
+- Which signal should the example or diagram make visible for Design vs Implementation?
+- What failure should be prevented first when Design vs Implementation reaches a real system?
 
 ## What You Will Learn
 
@@ -46,16 +52,6 @@ last_reviewed: '2026-05-04'
 Design decisions outlive code. Bad design cannot be hidden under good code.
 
 > Code can be rewritten; the trace of decisions follows you forever.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    R["Requirement"] --> D["Design: what"]
-    D --> I["Implementation: how"]
-    I --> O["Observe"]
-    O --> D
-```
 
 Design sets the ceiling for implementation.
 
@@ -147,6 +143,28 @@ class EmailNotifier:
 
 Design must intend for observability.
 
+## A small design stress test
+
+Good design shows up when you try to change the system, not when you stare at the current diagram. Use a small change request to see whether your interfaces and ADRs actually reduce blast radius.
+
+### Verification steps
+
+1. Assume you need to add one more notifier channel to the example.
+2. Count how many files and tests would need to change.
+3. Explain the reason for the abstraction in one short ADR paragraph.
+
+**Expected output:**
+
+- New behavior can be added without rewriting every caller.
+- The ADR makes the trade-off legible to someone who did not make the original choice.
+- Observability needs remain visible instead of getting glued on at the end.
+
+### Failure modes to watch
+
+- One new implementation forces broad edits across unrelated callers.
+- The abstraction exists, but no one can still explain why it exists.
+- Future-proofing added factories and registries long before any real pressure appeared.
+
 ## What to Notice in This Code
 
 - The interface defines responsibility.
@@ -192,9 +210,20 @@ Large organizations keep ADRs in git and change them via PR. System diagrams (C4
 
 Design and implementation are different jobs done with different tools. Next we look at the last quality gate before merge — code review.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Design vs Implementation?**
+  - The article treats Design vs Implementation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Design vs Implementation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Design vs Implementation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Engineering?](./01-what-is-software-engineering.md)
-- [Understanding Requirements](./02-understanding-requirements.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): Understanding Requirements](./02-understanding-requirements.md)
 - **Design vs Implementation (current)**
 - Code Review (upcoming)
 - Testing Strategy (upcoming)
@@ -203,6 +232,7 @@ Design and implementation are different jobs done with different tools. Next we 
 - Collaboration Process (upcoming)
 - Maintenance and Tech Debt (upcoming)
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

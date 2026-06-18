@@ -1,12 +1,12 @@
 ---
 series: functional-programming-101
 episode: 7
-title: 재귀와 꼬리 호출
-status: content-ready
+title: "Functional Programming 101 (7/10): 재귀와 꼬리 호출"
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -16,54 +16,61 @@ tags:
   - 재귀
   - 꼬리 호출
   - 스택
-seo_description: 재귀 함수의 원리, 스택 오버플로우 방지, Python에서의 실용적 재귀 패턴을 다룹니다.
-last_reviewed: '2026-05-04'
+seo_description: 재귀의 종료 조건 설계와 메모이제이션을 학습하고, Python 스택 한계를 고려해 반복으로 전환하거나 트리 탐색에 적용하는 기준을 제시합니다.
+last_reviewed: '2026-05-12'
 ---
 
-# 재귀와 꼬리 호출
+# Functional Programming 101 (7/10): 재귀와 꼬리 호출
 
-> Functional Programming 101 시리즈 (7/10)
+재귀는 반복문 없이 문제를 풀게 해 주는 기법이지만, 단순히 "함수가 자기 자신을 다시 부른다" 정도로만 이해하면 실무에서는 금방 한계를 만납니다. 중요한 것은 언제 재귀가 구조를 더 잘 드러내는지, 그리고 Python에서는 어디서부터 반복으로 바꿔야 하는지를 아는 것입니다.
 
+특히 Python은 꼬리 호출 최적화(TCO)를 지원하지 않습니다. 그래서 함수형 언어에서 자연스럽게 쓰는 재귀 패턴도 Python에서는 깊이에 따라 위험해질 수 있습니다. 이 차이를 이해해야 재귀를 예쁘기만 한 코드가 아니라 안전한 도구로 사용할 수 있습니다.
 
-## 이 글에서 다룰 문제
+![Functional Programming 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/07/07-01-big-picture.ko.png)
+*Functional Programming 101 7장 흐름 개요*
 
-트리 순회, 분할 정복, 수학적 정의 등 많은 문제는 재귀로 표현하면 자연스럽습니다. 재귀를 이해하면 복잡한 구조를 다루는 알고리즘을 직관적으로 구현할 수 있습니다.
+## 먼저 던지는 질문
 
-> 재귀 = 문제를 자기 자신의 작은 버전으로 분해
+- 재귀 함수는 어떤 구조를 가져야 안전하게 동작할까요?
+- base case는 왜 항상 먼저 생각해야 할까요?
+- Python에서 꼬리 재귀는 왜 이론만큼 실용적이지 않을까요?
 
-Python은 꼬리 호출 최적화를 지원하지 않으므로 실무에서는 재귀 깊이를 인지하고, 필요하면 반복으로 변환하는 판단이 중요합니다.
+## 왜 중요한가
 
-## 핵심 개념 잡기
+트리 순회, 분할 정복, 중첩 구조 해제, 수학적 정의 같은 문제는 재귀로 표현할 때 가장 자연스럽습니다. 반복문으로도 풀 수는 있지만, 문제 구조 자체가 사라져 코드가 오히려 덜 읽힐 수 있습니다.
 
-> 재귀 호출의 흐름
+하지만 Python에서는 재귀 깊이 한계가 기본 1000이기 때문에, 구조가 재귀적이라는 이유만으로 무조건 재귀를 택하면 안 됩니다. 읽기 쉬움과 실행 안전성 사이에서 균형을 잡는 것이 실무 감각입니다.
 
-```
+## 개념 개요
+
+> 재귀를 읽을 때는 내려가는 과정보다 base case에 도달한 뒤 값이 어떻게 되돌아오는지를 보는 것이 중요합니다.
+
+```text
 factorial(4)
-  → 4 * factorial(3)
-       → 3 * factorial(2)
-            → 2 * factorial(1)
-                 → 1  (기저 조건)
-            ← 2 * 1 = 2
-       ← 3 * 2 = 6
-  ← 4 * 6 = 24
+  -> 4 * factorial(3)
+       -> 3 * factorial(2)
+            -> 2 * factorial(1)
+                 -> 1  (base case)
+            <- 2 * 1 = 2
+       <- 3 * 2 = 6
+  <- 4 * 6 = 24
 ```
 
 ## 핵심 개념
 
 | 용어 | 설명 |
 |------|------|
-| 재귀(recursion) | 함수가 자기 자신을 호출하는 기법입니다 |
-| 기저 조건(base case) | 재귀를 멈추는 조건입니다 |
-| 꼬리 재귀(tail recursion) | 재귀 호출이 함수의 마지막 연산인 형태입니다 |
-| 스택 오버플로우(stack overflow) | 재귀 깊이가 한계를 초과하여 발생하는 오류입니다 |
-| 분할 정복(divide and conquer) | 문제를 작은 하위 문제로 나누어 해결하는 전략입니다 |
+| 재귀(recursion) | 함수가 자기 자신을 다시 호출하는 기법입니다 |
+| base case | 재귀를 멈추는 종료 조건입니다 |
+| 꼬리 재귀(tail recursion) | 함수의 마지막 연산이 재귀 호출인 형태입니다 |
+| 스택 오버플로우(stack overflow) | 재귀 깊이가 한계를 넘어서 발생하는 오류입니다 |
+| 분할 정복(divide and conquer) | 문제를 더 작은 하위 문제로 나누어 푸는 전략입니다 |
 
-## Before / After
-
-반복문을 재귀로 표현합니다.
+## 적용 전후 비교
+반복문의 누적 합도 재귀로 표현할 수 있습니다. 다만 그 표현이 실제로 더 적절한지는 별도의 판단이 필요합니다.
 
 ```python
-# before: 반복문으로 합계 계산
+# 이전: 반복문 기반 합계
 def sum_iterative(numbers: list[int]) -> int:
     total = 0
     for n in numbers:
@@ -74,9 +81,9 @@ print(sum_iterative([1, 2, 3, 4, 5]))  # 15
 ```
 
 ```python
-# after: 재귀로 합계 계산
+# 이후: 재귀 기반 합계
 def sum_recursive(numbers: list[int]) -> int:
-    if not numbers:  # 기저 조건
+    if not numbers:  # base case
         return 0
     return numbers[0] + sum_recursive(numbers[1:])
 
@@ -85,28 +92,27 @@ print(sum_recursive([1, 2, 3, 4, 5]))  # 15
 
 ## 단계별 실습
 
-### Step 1: 기본 재귀 — 팩토리얼
+### 단계 1: 기본 재귀 — 팩토리얼
 
 ```python
 def factorial(n: int) -> int:
     """n! = n * (n-1) * ... * 1"""
-    if n <= 1:  # 기저 조건
+    if n <= 1:  # base case
         return 1
     return n * factorial(n - 1)
-
 
 print(factorial(5))   # 120
 print(factorial(10))  # 3628800
 
-# 호출 과정 시각화
+# call stack 시각화
 def factorial_verbose(n: int, depth: int = 0) -> int:
     indent = "  " * depth
     print(f"{indent}factorial({n})")
     if n <= 1:
-        print(f"{indent}→ 1")
+        print(f"{indent}-> 1")
         return 1
     result = n * factorial_verbose(n - 1, depth + 1)
-    print(f"{indent}→ {result}")
+    print(f"{indent}-> {result}")
     return result
 
 factorial_verbose(4)
@@ -114,87 +120,88 @@ factorial_verbose(4)
 #   factorial(3)
 #     factorial(2)
 #       factorial(1)
-#       → 1
-#     → 2
-#   → 6
-# → 24
+#       -> 1
+#     -> 2
+#   -> 6
+# -> 24
 ```
 
-### Step 2: 피보나치와 메모이제이션
+재귀를 이해하는 가장 좋은 방법은 호출 스택을 눈으로 따라가는 것입니다. base case가 왜 중요한지, 반환값이 어떻게 쌓여 올라오는지가 바로 보입니다.
+
+### 단계 2: 피보나치와 메모이제이션
 
 ```python
 from functools import lru_cache
 
-
-# 순수 재귀: O(2^n) — 매우 느림
+# 단순 재귀: O(2^n) — 매우 느림
 def fib_naive(n: int) -> int:
     if n <= 1:
         return n
     return fib_naive(n - 1) + fib_naive(n - 2)
 
-
-# 메모이제이션: O(n) — 중복 계산 제거
+# memoization: O(n) — 중복 계산 제거
 @lru_cache(maxsize=None)
 def fib_memo(n: int) -> int:
     if n <= 1:
         return n
     return fib_memo(n - 1) + fib_memo(n - 2)
 
+print(fib_naive(10))  # 55 (slow)
+print(fib_memo(100))  # 354224848179261915075 (fast)
 
-print(fib_naive(10))  # 55 (느림)
-print(fib_memo(100))  # 354224848179261915075 (빠름)
-
-# 캐시 정보 확인
+# cache 통계 확인
 print(fib_memo.cache_info())
 # CacheInfo(hits=98, misses=101, maxsize=None, currsize=101)
 ```
 
-### Step 3: 꼬리 재귀와 Python의 한계
+재귀가 느린 것이 아니라, 같은 하위 문제를 중복 계산하는 재귀가 느린 것입니다. 이 차이를 이해하면 메모이제이션이 왜 강력한지 바로 연결됩니다.
+
+### 단계 3: 꼬리 재귀와 Python의 한계
 
 ```python
 import sys
 
-# 일반 재귀 — 스택 프레임 누적
+# 일반 재귀 — stack frame이 누적됨
 def factorial_normal(n: int) -> int:
     if n <= 1:
         return 1
-    return n * factorial_normal(n - 1)  # 곱셈이 대기 중
+    return n * factorial_normal(n - 1)  # multiplication is pending
 
 # 꼬리 재귀 — 결과를 인자로 전달
 def factorial_tail(n: int, acc: int = 1) -> int:
     if n <= 1:
         return acc
-    return factorial_tail(n - 1, n * acc)  # 마지막 연산이 재귀 호출
+    return factorial_tail(n - 1, n * acc)  # last operation is the recursive call
 
-
-# Python은 꼬리 호출 최적화(TCO)를 지원하지 않음
-print(sys.getrecursionlimit())  # 기본 1000
-print(factorial_tail(900))  # 동작하지만...
+# Python은 tail call optimization(TCO)을 지원하지 않음
+print(sys.getrecursionlimit())  # default 1000
+print(factorial_tail(900))  # works but...
 # factorial_tail(1500)  # RecursionError!
 
-# 해결: 반복으로 변환
+# 해결 방법: 반복문으로 변환
 def factorial_iterative(n: int) -> int:
     result = 1
     for i in range(2, n + 1):
         result *= i
     return result
 
-print(factorial_iterative(10000))  # 문제 없음
+print(factorial_iterative(10000))  # no problem
 ```
 
-### Step 4: 트리 순회 — 재귀의 자연스러운 활용
+많은 입문자가 여기서 한 번 헷갈립니다. 꼬리 재귀는 이론적으로 스택을 줄일 수 있는 형태이지만, Python 런타임이 그 최적화를 해 주지 않기 때문에 깊이가 깊어지면 결국 반복이 더 안전합니다.
+
+### 단계 4: 트리 순회와 재귀의 궁합
 
 ```python
 from typing import Any
 
-
-# 중첩 딕셔너리(트리 구조) 탐색
+# 중첩 dict(tree 구조) 순회
 def flatten_dict(
     d: dict,
     parent_key: str = "",
     sep: str = ".",
 ) -> dict[str, Any]:
-    """중첩 딕셔너리를 평탄화합니다."""
+    """Flattens a nested dictionary."""
     items: list[tuple[str, Any]] = []
     for k, v in d.items():
         new_key = f"{parent_key}{sep}{k}" if parent_key else k
@@ -203,7 +210,6 @@ def flatten_dict(
         else:
             items.append((new_key, v))
     return dict(items)
-
 
 config = {
     "database": {
@@ -227,12 +233,14 @@ for k, v in flat.items():
 # debug: True
 ```
 
-### Step 5: 재귀를 반복으로 변환
+중첩 딕셔너리, 트리, AST처럼 구조 자체가 재귀적일 때는 재귀가 문제 도메인을 가장 직접적으로 반영합니다.
+
+### 단계 5: 재귀를 반복으로 바꾸기
 
 ```python
-# 재귀 버전: 디렉터리 내 모든 파일 크기 합계 (시뮬레이션)
+# 재귀 버전: 모의 파일 트리의 전체 크기
 def total_size_recursive(tree: dict) -> int:
-    """중첩 딕셔너리로 표현된 파일 트리의 크기 합계입니다."""
+    """Total size of a file tree represented as nested dicts."""
     total = 0
     for name, value in tree.items():
         if isinstance(value, dict):
@@ -241,8 +249,7 @@ def total_size_recursive(tree: dict) -> int:
             total += value
     return total
 
-
-# 반복 버전: 스택을 명시적으로 관리
+# 반복 버전: 명시적 stack 관리
 def total_size_iterative(tree: dict) -> int:
     total = 0
     stack = [tree]
@@ -254,7 +261,6 @@ def total_size_iterative(tree: dict) -> int:
             else:
                 total += value
     return total
-
 
 file_tree = {
     "src": {
@@ -274,60 +280,146 @@ print(total_size_recursive(file_tree))  # 3300
 print(total_size_iterative(file_tree))  # 3300
 ```
 
+실무에서는 이 전환이 매우 중요합니다. 구조는 재귀적으로 이해하되, 실행은 명시적 스택으로 바꿔 안정성을 확보하는 경우가 많습니다.
+
 ## 이 코드에서 주목할 점
 
-- 모든 재귀에는 반드시 기저 조건이 필요합니다
-- `@lru_cache`는 중복 호출을 제거하여 재귀 성능을 극적으로 개선합니다
-- Python은 꼬리 호출 최적화를 지원하지 않으므로 깊은 재귀는 반복으로 변환합니다
-- 트리 구조 순회는 재귀가 가장 자연스러운 표현입니다
+- 모든 재귀에는 반드시 base case가 있어야 합니다.
+- `@lru_cache`는 중복 호출을 제거해 재귀 성능을 크게 개선합니다.
+- Python은 꼬리 호출 최적화를 지원하지 않으므로 깊은 재귀는 반복으로 바꾸는 편이 안전합니다.
+- 트리 순회는 재귀가 가장 자연스럽게 읽히는 대표 사례입니다.
 
 ## 흔한 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| 기저 조건 누락 | 무한 재귀 → 스택 오버플로우가 발생합니다 | 먼저 기저 조건을 작성합니다 |
-| 깊은 재귀 사용 | Python의 기본 한도는 1000입니다 | 깊이가 깊으면 반복으로 변환합니다 |
-| 메모이제이션 누락 | 지수 시간 복잡도가 됩니다 | `@lru_cache`를 적용합니다 |
-| 매번 리스트 슬라이싱 | O(n) 복사가 매 호출마다 발생합니다 | 인덱스를 인자로 전달합니다 |
-| 꼬리 재귀에 의존 | Python에서는 최적화되지 않습니다 | 반복문을 사용합니다 |
+| base case를 빼먹음 | 무한 재귀로 스택 오버플로우가 납니다 | 종료 조건을 먼저 작성합니다 |
+| 깊은 재귀를 그대로 사용함 | Python 기본 한계를 쉽게 넘깁니다 | 깊이가 크면 반복으로 전환합니다 |
+| 메모이제이션 없이 중복 계산함 | 시간 복잡도가 폭증합니다 | `@lru_cache`를 적용합니다 |
+| 매 호출마다 리스트 슬라이싱을 함 | 호출마다 O(n) 복사가 생깁니다 | 인덱스를 인자로 넘기는 방식을 고려합니다 |
+| 꼬리 재귀면 안전하다고 믿음 | Python은 TCO를 하지 않습니다 | 반복문으로 바꿉니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- JSON 파싱 결과의 중첩 구조를 재귀로 탐색합니다
-- 파일 시스템 트리 순회에 재귀를 사용합니다
-- 분할 정복 알고리즘(퀵소트, 머지소트)에서 활용합니다
-- AST(추상 구문 트리) 처리에 재귀 패턴이 필수적입니다
-- 깊이 제한이 있는 경우 명시적 스택으로 변환합니다
+- 파싱한 JSON의 중첩 구조를 재귀로 순회합니다.
+- 파일 시스템 트리 탐색 로직을 재귀적으로 표현합니다.
+- 퀵정렬, 병합정렬 같은 분할 정복 알고리즘에 적용합니다.
+- AST 처리에서 재귀 패턴을 사용합니다.
+- 깊이가 불확실하면 명시적 스택 기반 반복으로 바꿉니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 현업에서는 이렇게 판단합니다
 
-재귀는 트리, 그래프, 중첩 구조를 다룰 때 가장 자연스러운 도구입니다. 하지만 Python에서는 재귀 깊이 한도(기본 1000)를 항상 인지해야 합니다. 실무에서 깊이가 불확실한 재귀는 반복으로 변환하는 것이 안전합니다.
+재귀는 트리, 그래프, 중첩 구조를 설명하는 가장 자연스러운 도구입니다. 하지만 Python에서는 언제나 재귀 깊이 제한을 먼저 떠올려야 합니다. 깊이가 얕고 구조 표현이 중요한 경우에만 재귀를 그대로 유지하고, 깊이가 크거나 입력이 불확실하면 반복으로 전환하는 편이 안전합니다.
 
-"재귀 vs 반복"은 가독성과 안전성의 트레이드오프입니다. 깊이가 얕고(수십 단계) 구조가 재귀적인 문제는 재귀로, 깊이가 깊거나 불확실한 경우는 반복으로 작성하는 것이 실용적인 판단입니다.
+결국 재귀와 반복의 선택은 우아함과 안정성의 균형입니다. 구조를 드러내는 데 재귀가 압도적으로 좋다면 쓰되, 운영 환경에서 스택 리스크가 생기면 주저 없이 명시적 스택으로 옮기는 것이 실전적인 판단입니다.
 
 ## 체크리스트
 
-- [ ] 재귀 함수의 기저 조건을 올바르게 설정할 수 있다
-- [ ] 재귀 호출의 스택 프레임 축적을 이해하고 있다
+- [ ] 재귀 함수의 올바른 base case를 설정할 수 있다
+- [ ] 재귀 호출에서 스택 프레임이 어떻게 쌓이는지 설명할 수 있다
 - [ ] `@lru_cache`로 재귀 성능을 개선할 수 있다
-- [ ] 재귀를 명시적 스택을 사용한 반복으로 변환할 수 있다
-- [ ] 재귀와 반복의 선택 기준을 설명할 수 있다
+- [ ] 명시적 스택을 사용해 재귀를 반복으로 바꿀 수 있다
+- [ ] 재귀와 반복 중 무엇을 택할지 기준을 설명할 수 있다
 
-## 정리 및 다음 글 안내
+## 연습 문제
 
-재귀는 문제를 자기 자신의 작은 버전으로 분해하는 기법입니다. Python에서는 꼬리 호출 최적화가 없으므로 깊이를 인지하고 필요하면 반복으로 변환해야 합니다. 다음 글에서는 필요할 때만 계산하는 **지연 평가와 제너레이터**를 다룹니다.
+1. 이진 탐색을 재귀 버전과 반복 버전으로 각각 구현해 보세요.
+2. 중첩 리스트 `[1, [2, [3, 4], 5], 6]`를 평탄화하는 재귀 함수를 작성해 보세요.
+3. `@lru_cache` 대신 dict를 직접 사용해 메모이제이션을 구현해 보세요.
+
+## 정리와 다음 글
+
+재귀는 문제를 더 작은 같은 문제로 분해해 푸는 방식입니다. 다만 Python은 꼬리 호출 최적화를 지원하지 않으므로 깊이 제한을 항상 염두에 두어야 합니다. 다음 글에서는 값이 정말 필요해질 때까지 계산을 미루는 **지연 평가와 제너레이터**를 다룹니다.
+
+## 검증 시나리오: 경계 조건을 먼저 잠그기
+
+실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
+
+```python
+from functools import reduce
+
+def pipeline(values: list[int]) -> dict[str, int]:
+    filtered = [v for v in values if v >= 0]
+    squared = [v * v for v in filtered]
+    total = reduce(lambda acc, x: acc + x, squared, 0)
+    return {
+        "count": len(squared),
+        "total": total,
+        "max": max(squared) if squared else 0,
+    }
+
+# 경계 조건 검증
+assert pipeline([]) == {"count": 0, "total": 0, "max": 0}
+assert pipeline([-3, -1]) == {"count": 0, "total": 0, "max": 0}
+assert pipeline([0, 2, 3]) == {"count": 3, "total": 13, "max": 9}
+
+print("Pass")
+```
+
+또한 지연 평가를 사용할 때는 소비 시점을 테스트에 명시해 두는 편이 좋습니다. generator는 한 번 소비하면 비어야 정상이며, 이 성질이 깨지면 중간 단계에서 의도치 않은 materialize가 발생했을 가능성이 큽니다.
+
+```python
+from itertools import islice
+
+def naturals():
+    n = 0
+    while True:
+        yield n
+        n += 1
+
+stream = naturals()
+first_five = list(islice(stream, 5))
+next_three = list(islice(stream, 3))
+
+assert first_five == [0, 1, 2, 3, 4]
+assert next_three == [5, 6, 7]
+print("Pass")
+```
+
+이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
+
+## 리뷰 포인트: 코드 리뷰에서 바로 확인할 항목
+
+함수형 스타일을 적용한 코드 리뷰에서는 다음 네 가지를 빠르게 확인합니다. 첫째, 계산 함수가 외부 상태를 직접 읽거나 쓰지 않는지 확인합니다. 둘째, mutable 인자를 제자리에서 수정하지 않는지 확인합니다. 셋째, 파이프라인 단계의 입력과 출력 타입이 자연스럽게 연결되는지 확인합니다. 넷째, 실패 경로가 값으로 표현되는지 확인합니다.
+
+```python
+def reviewer_checklist() -> list[str]:
+    return [
+        "pure-core",
+        "immutable-update",
+        "typed-boundary",
+        "explicit-failure-path",
+    ]
+
+assert len(reviewer_checklist()) == 4
+print("Pass")
+```
+
+이 항목을 PR 템플릿에 고정해 두면 스타일 논쟁보다 설계 품질을 빠르게 맞출 수 있습니다.
+
+## 처음 질문으로 돌아가기
+
+- **재귀 함수는 어떤 구조를 가져야 안전하게 동작할까요?**
+  - 안전한 재귀는 먼저 멈추는 조건이 분명해야 하고, 그다음 호출마다 더 작은 같은 문제로 내려가야 합니다. `factorial()`의 `if n <= 1`, 빈 리스트에서 끝나는 `sum_recursive()`, 중첩 dict를 한 단계씩 평탄화하는 `flatten_dict()`가 모두 그 구조를 따릅니다.
+- **base case는 왜 항상 먼저 생각해야 할까요?**
+  - base case가 없으면 호출이 끝나지 않아 스택이 계속 쌓이기 때문입니다. 팩토리얼 호출 흐름에서 `factorial(1)`이 반환 경로의 출발점이 되고, 피보나치 예제에서도 `n <= 1`이 있어야 메모이제이션이 의미 있는 값으로 수렴합니다.
+- **Python에서 꼬리 재귀는 왜 이론만큼 실용적이지 않을까요?**
+  - `factorial_tail()`처럼 마지막 연산이 재귀 호출이어도 Python 런타임은 꼬리 호출 최적화를 해 주지 않습니다. 그래서 `sys.getrecursionlimit()`를 넘길 수 있는 입력에서는 `factorial_iterative()`나 `total_size_iterative()`처럼 명시적 스택을 쓰는 반복 버전이 더 안전합니다.
 
 <!-- toc:begin -->
-- [함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)
-- [순수 함수와 부수효과](./02-pure-functions.md)
-- [immutable 데이터](./03-immutable-data.md)
-- [고차 함수](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [클로저와 partial](./06-closure-and-partial.md)
+## 시리즈 목차
+
+- [Functional Programming 101 (1/10): 함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): 순수 함수와 부수효과](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): immutable 데이터](./03-immutable-data.md)
+- [Functional Programming 101 (4/10): 고차 함수](./04-higher-order-functions.md)
+- [Functional Programming 101 (5/10): map, filter, reduce](./05-map-filter-reduce.md)
+- [Functional Programming 101 (6/10): 클로저와 partial](./06-closure-and-partial.md)
 - **재귀와 꼬리 호출 (현재 글)**
-- [지연 평가와 제너레이터](./08-lazy-evaluation.md)
-- [함수 합성과 파이프라인](./09-function-composition.md)
-- [객체지향과 함수형의 균형](./10-oop-and-fp-balance.md)
+- 지연 평가와 제너레이터 (예정)
+- 함수 합성과 파이프라인 (예정)
+- 객체지향과 함수형의 균형 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -336,3 +428,5 @@ print(total_size_iterative(file_tree))  # 3300
 - [Real Python — Recursion in Python](https://realpython.com/python-recursion/)
 - [Python 공식 문서 — functools.lru_cache](https://docs.python.org/3/library/functools.html#functools.lru_cache)
 - [The Little Schemer — Daniel P. Friedman](https://mitpress.mit.edu/9780262560993/the-little-schemer/)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/functional-programming-101/ko)

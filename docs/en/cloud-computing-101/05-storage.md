@@ -1,10 +1,10 @@
 ---
 series: cloud-computing-101
 episode: 5
-title: Storage
-status: content-ready
+title: "Cloud Computing 101 (5/10): Storage"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,33 @@ tags:
   - EBS
   - Architecture
 seo_description: Object, block, file, and archive cloud storage compared by access pattern, durability, and cost — with S3 lifecycle examples in boto3.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Storage
+# Cloud Computing 101 (5/10): Storage
 
-> Cloud Computing 101 series (5/10)
+S3, EBS, EFS, and Glacier exist separately for a reason. They may all hold data, but they are optimized for very different access patterns, durability expectations, and recovery trade-offs.
 
-<!-- a-grade-intro:begin -->
+Block storage is for OS disks and databases. Object storage is for files, backups, and archives. File storage is for NFS-like shared access. Databases are for structured data with queries. Archive is for data you almost never touch. Each has a different cost curve, latency profile, and use case.
 
-**Core question**: Why do S3, EBS, EFS, and Glacier all exist *separately*?
+This is post 5 in the Cloud Computing 101 series.
 
-> *Cloud storage splits into object, block, file, and archive based on access pattern and durability/cost tradeoffs.*
+In this post, we'll compare object, block, file, and archive storage and connect each one to the workload shape it actually fits.
 
-<!-- a-grade-intro:end -->
+> Storage is not just where data sits. It is part of the operating contract for latency, recovery time, cost, and sharing semantics.
 
-## What You Will Learn
+
+![cloud computing 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 5 flow overview*
+> Storage decisions lock in performance characteristics, cost patterns, and operational constraints that are hard to change later.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Storage?
+- Which signal should the example or diagram make visible for Storage?
+- What failure should be prevented first when Storage reaches a real system?
+
+## Questions This Chapter Answers
 
 - The four storage types
 - Durability vs availability
@@ -43,16 +54,6 @@ last_reviewed: '2026-05-04'
 ## Why It Matters
 
 The wrong storage choice is *expensive, slow, and fragile*. The right one quietly works for years.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Block["block (EBS)"] --> VM["vm disk"]
-    Object["object (S3)"] --> Web["web/api"]
-    File["file (EFS)"] --> Share["multi-host share"]
-    Archive["archive (Glacier)"] --> Cold["compliance"]
-```
 
 ## Key Terms
 
@@ -121,6 +122,26 @@ def apply_lifecycle(bucket, policy):
 - Transitions are how you actually save money.
 - EBS is typically attached to a single VM at a time.
 
+## How to Verify This Example
+
+A lifecycle policy only matters when it is truly attached to the bucket and scoped to the intended object prefix. Otherwise the cost optimization story exists in code review but never reaches production data.
+
+```bash
+aws s3api get-bucket-lifecycle-configuration --bucket my-test-bucket-2026
+```
+
+**Expected output:**
+
+- You should see a rule ID such as `to-glacier-after-90d`.
+- The `logs/` prefix and `GLACIER` transition should both be present.
+- That confirmation is what turns lifecycle from documentation into an operating control.
+
+### Where teams usually get stuck
+
+- Bucket policy and lifecycle policy solve different problems: access control versus storage-tier movement.
+- Glacier is cheap because retrieval is slower. Restore time belongs in the design conversation.
+- EFS is a shared file system, not a drop-in replacement for high-IOPS block storage.
+
 ## Five Common Mistakes
 
 1. **Public ACLs that expose buckets.**
@@ -158,17 +179,29 @@ Logs land in S3 and transition to Glacier after 90 days. Database volumes use EB
 
 Once data sits somewhere, you have to *connect* to it. The next post covers Network.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Storage?**
+  - The article treats Storage as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Storage?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Storage reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region and Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region and Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
 - **Storage (current)**
 - Network (upcoming)
 - Identity and Security (upcoming)
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

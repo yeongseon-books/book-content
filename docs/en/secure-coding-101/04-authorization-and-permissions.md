@@ -1,10 +1,10 @@
 ---
 series: secure-coding-101
 episode: 4
-title: Authorization and Permissions
+title: "Secure Coding 101 (4/10): Authorization and Permissions"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,30 @@ tags:
   - LeastPrivilege
   - SecureCoding
 seo_description: RBAC, ABAC, IDOR defenses, least privilege, and a five-step playbook for safe authorization on every request.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Authorization and Permissions
+# Secure Coding 101 (4/10): Authorization and Permissions
 
-> Secure Coding 101 series (4/10)
+Logging in does not answer the question that matters most to a secure application: may this user touch this resource right now? Reading another person's order, editing a document, or downloading an internal report all need a separate decision. Broken access control keeps ranking near the top of real-world incident lists because teams often stop at authentication and never finish the authorization model behind it.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Secure Coding 101 series.
 
-**Core question**: The user is logged in. But *who decides whether they may touch this resource*?
+In this chapter, we will treat authorization as a server-side decision over actor, action, and resource, not as a UI rule or a handful of role names. That framing makes RBAC, ABAC, IDOR defense, list filtering, and default-deny behavior fit together cleanly.
 
-> *Authorization is decided per *action and resource*, not just per *role*. The server decides — every time.*
+> Authorization is not a visibility rule. It is a repeated server-side decision over who wants to do what to which resource.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![secure coding 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Authorization and Permissions?
+- Which signal should the example or diagram make visible for Authorization and Permissions?
+- What failure should be prevented first when Authorization and Permissions reaches a real system?
+
+## Questions This Chapter Answers
 
 - The difference between *RBAC* and *ABAC*
 - What *IDOR* is and how to defend
@@ -45,16 +53,6 @@ last_reviewed: '2026-05-04'
 OWASP Top 10 is often led by *Broken Access Control*. Hiding a button in the UI is *not a defense*. Every decision must happen *on the server*.
 
 > *Authorize at the *resource* level, not just the *route*.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Request["Request"] --> AuthN["AuthN (who)"]
-    AuthN --> Resource["Load resource"]
-    Resource --> AuthZ["AuthZ check"]
-    AuthZ --> Action["Perform action"]
-```
 
 ## Key Terms
 
@@ -158,10 +156,21 @@ Most teams keep a *policy module* (`policies.py`) and the route just calls `auth
 
 Once authorization is *explicit*, incidents stay *short*. Next we make the *resource itself safe* — *safe data storage*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Authorization and Permissions?**
+  - The article treats Authorization and Permissions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Authorization and Permissions?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Authorization and Permissions reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Secure Coding?](./01-what-is-secure-coding.md)
-- [Input Validation](./02-input-validation.md)
-- [Authentication and Session](./03-authentication-and-session.md)
+## In this series
+
+- [Secure Coding 101 (1/10): What Is Secure Coding?](./01-what-is-secure-coding.md)
+- [Secure Coding 101 (2/10): Input Validation](./02-input-validation.md)
+- [Secure Coding 101 (3/10): Authentication and Session](./03-authentication-and-session.md)
 - **Authorization and Permissions (current)**
 - Safe Data Storage (upcoming)
 - Secret and Key Management (upcoming)
@@ -169,6 +178,7 @@ Once authorization is *explicit*, incidents stay *short*. Next we make the *reso
 - XSS and CSRF Defense (upcoming)
 - Managing Dependency Vulnerabilities (upcoming)
 - Safe Logging and Audit (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -177,3 +187,4 @@ Once authorization is *explicit*, incidents stay *short*. Next we make the *reso
 - [OWASP Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)
 - [NIST RBAC](https://csrc.nist.gov/projects/role-based-access-control)
 - [Open Policy Agent](https://www.openpolicyagent.org/)
+- [NIST SP 800-162 — Guide to Attribute Based Access Control](https://csrc.nist.gov/pubs/sp/800/162/upd2/final)

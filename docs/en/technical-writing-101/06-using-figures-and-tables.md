@@ -1,10 +1,10 @@
 ---
 series: technical-writing-101
 episode: 6
-title: Using Figures and Tables
-status: content-ready
+title: "Technical Writing 101 (6/10): Using Figures and Tables"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,42 +16,36 @@ tags:
   - Tables
   - Visual
   - Beginner
-seo_description: A beginner-friendly tour of using diagrams and tables to make a technical post easier to scan and understand.
-last_reviewed: '2026-05-04'
+seo_description: Choose figures and tables by the reader's question, then write captions and alt text that make the visual actionable.
+last_reviewed: '2026-05-15'
 ---
 
-# Using Figures and Tables
+# Technical Writing 101 (6/10): Using Figures and Tables
 
-> Technical Writing 101 series (6/10)
+Not every dense paragraph should become a diagram. Not every list of options deserves a table. The real skill is choosing the visual form that best answers the reader's question. If that choice is wrong, visuals add noise instead of clarity.
 
-<!-- a-grade-intro:begin -->
+Figures are strongest when the reader needs direction, sequence, or system shape. Tables are strongest when the reader needs side-by-side differences, limits, and trade-offs. Once you see that split, visual choices stop feeling decorative and start feeling editorial.
 
-**Core question**: When does a *figure* beat *prose*, and when does a *table* win?
+This is post 6 in the Technical Writing 101 series. It covers when to use figures, when to use tables, and how captions and alt text make them readable.
 
-> *Flow* wants a *figure*; *comparison* wants a *table*.
 
-<!-- a-grade-intro:end -->
+![technical writing 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 6 flow overview*
+> A figure answers one question; a table makes side-by-side comparison possible; captions tie them both to the text.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- *Flowcharts* and *sequence diagrams*
-- *Comparison* and *decision* tables
-- Writing *captions*
-- Writing *alt text*
-- *Resolution* and *accessibility*
+- Flowcharts* and *sequence diagrams?
+- Comparison* and *decision* tables?
+- Writing *captions?
 
 ## Why It Matters
 
 One *figure* often replaces *five* paragraphs.
 
-## Concept at a Glance
+> Mental model: use a figure for flow and a table for side-by-side decisions.
 
-```mermaid
-flowchart LR
-    F[Flow] --> Img[Diagram]
-    C[Comparison] --> Tbl[Table]
-```
-
+Figures work best for flow and relationships; tables work best for trade-offs and decisions. Choosing the right visual form based on the reader's actual question is what separates editorial clarity from decorative noise.
 ## Key Terms
 
 - **flowchart**: A *flow diagram*.
@@ -66,26 +60,29 @@ flowchart LR
 
 **After**: One *flowchart*.
 
+## Choose the visual from the reader's question
+
+| Reader question | Better fit | Why |
+| --- | --- | --- |
+| Where does the request go? | Flowchart | Direction and order matter most. |
+| Which option is cheaper? | Comparison table | Criteria need side-by-side alignment. |
+| Where does the failure happen? | Sequence diagram | Timing and handoff points matter. |
+| What policy should we choose? | Decision table | Trade-offs must stay visible at once. |
+
+Captions should answer the same question. `Architecture diagram` is too broad to help. `Request path from client to API server and database` tells the reader what to extract before they even inspect the figure.
+
 ## Hands-on: A Figure and a Table
 
 ### Step 1 — Flowchart
 
-```mermaid
-flowchart LR
-    Client --> Server
-    Server --> DB
-```
+![request flow from client to server and database](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-02-step-1-flowchart.en.png)
 
+*This flowchart shows the basic path from the client to the server and database.*
 ### Step 2 — Sequence
 
-```mermaid
-sequenceDiagram
-    Client->>Server: GET /user
-    Server->>DB: SELECT
-    DB-->>Server: row
-    Server-->>Client: JSON
-```
+![call order between the client server and database](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-03-step-2-sequence.en.png)
 
+*This sequence diagram shows the call order between the client, server, and database.*
 ### Step 3 — Comparison table
 
 ```markdown
@@ -150,17 +147,29 @@ Specs, architecture docs, and incident retros all combine *figures and tables*.
 
 The next post is *Writing the README*.
 
+## Answering the Opening Questions
+
+- **Flowcharts* and *sequence diagrams?**
+  - The article treats Using Figures and Tables as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Comparison* and *decision* tables?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Writing *captions?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
-- [Title and Structure](./03-title-and-structure.md)
-- [Explaining Concepts](./04-explaining-concepts.md)
-- [Explaining Example Code](./05-explaining-example-code.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): Title and Structure](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): Explaining Concepts](./04-explaining-concepts.md)
+- [Technical Writing 101 (5/10): Explaining Example Code](./05-explaining-example-code.md)
 - **Using Figures and Tables (current)**
 - Writing the README (upcoming)
 - Writing Tutorials (upcoming)
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

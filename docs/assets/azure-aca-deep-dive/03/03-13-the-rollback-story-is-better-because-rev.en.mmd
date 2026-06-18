@@ -1,0 +1,17 @@
+flowchart TD
+  subgraph Rollback["Instant Rollback"]
+    Rev2["Rev 2 (Failing, Weight 100%)"] -. "Update Config" .-> Rev1["Rev 1 (Old, Active=true, Weight 0% -> 100%)"]
+  end
+  Traffic["Traffic shifts instantly via Envoy"] --> Rev1
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

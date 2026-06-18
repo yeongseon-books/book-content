@@ -1,0 +1,11 @@
+flowchart TD
+    C["No Eval"] --> R1["Cannot detect regressions"]
+    C --> R2["Model upgrades feel risky"]
+    C --> R3["No evidence of improvement"]
+
+    R1 --> R1A["Quality drops surface late in production"]
+    R2 --> R2A["Teams avoid experiments and upgrades"]
+    R3 --> R3A["Decisions depend on gut feeling"]
+    R1A --> R4["User trust declines"]
+    R2A --> R4
+    R3A --> R4

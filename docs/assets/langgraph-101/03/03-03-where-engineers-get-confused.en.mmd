@@ -1,0 +1,17 @@
+flowchart TD
+  A["classify_question()<br/>write route into state"] --> B["route_question()<br/>return one route label only"]
+  B --> C["Path map<br/>code / concept / debug / fallback"]
+  C --> D["Work branch<br/>run the chosen node"]
+
+  C --> E["Unknown route?<br/>send to fallback"]
+  D --> F["Loop present?<br/>termination rule + recursion limit"]
+  E --> F
+  F --> G["Safe stop<br/>END or stable next step"]
+
+  style A fill:#e3f2fd,stroke:#1976d2
+  style B fill:#fff3e0,stroke:#f57c00
+  style C fill:#e8f5e9,stroke:#388e3c
+  style D fill:#f3e5f5,stroke:#7b1fa2
+  style E fill:#fff8e1,stroke:#f9a825
+  style F fill:#fce4ec,stroke:#c2185b
+  style G fill:#e0f2f1,stroke:#00796b

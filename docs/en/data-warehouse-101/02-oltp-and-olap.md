@@ -1,10 +1,10 @@
 ---
 series: data-warehouse-101
 episode: 2
-title: OLTP and OLAP
-status: content-ready
+title: "Data Warehouse 101 (2/10): OLTP and OLAP"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,35 @@ tags:
   - Database
   - Analytics
 seo_description: How OLTP and OLAP workloads differ, why row vs column storage matters, and the case for keeping the two systems separate.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# OLTP and OLAP
+# Data Warehouse 101 (2/10): OLTP and OLAP
 
-> Data Warehouse 101 series (2/10)
+From far away, both systems speak SQL. Up close, they solve opposite problems. One is built to confirm a payment in milliseconds. The other is built to scan months of history without dragging production down with it.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Data Warehouse 101 series.
 
-**Core question**: It is the *same SQL* — why do we need *different engines*? Why does *row vs column* storage make such a *big difference*?
+In this post, we compare those workloads directly. The important question is not whether both systems can run queries, but what kind of query pattern each engine is optimized to carry all day.
 
-> *OLTP writes short and often; OLAP reads long and rarely.*
 
-<!-- a-grade-intro:end -->
+![data warehouse 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/02/02-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 2 flow overview*
+> OLTP and OLAP have opposite optimization goals: OLTP for single-row speed, OLAP for bulk-read throughput. A single engine cannot do both well.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying OLTP and OLAP?
+- Which signal should the example or diagram make visible for OLTP and OLAP?
+- What failure should be prevented first when OLTP and OLAP reaches a real system?
+
+## Questions this article answers
+
+- How do OLTP and OLAP differ in the workloads they are built to handle?
+- Where does the gap between row storage and column storage become most visible?
+- Why does one engine become a bad compromise when you ask it to serve both workloads?
+- How should you think about CDC and replication lag in a split architecture?
+- What practical criteria do teams use to decide when to separate OLTP from OLAP?
 
 ## What You Will Learn
 
@@ -46,15 +61,7 @@ OLTP processes *one record right now* fast. OLAP scans *all of history* in one s
 
 > *Pick the right tool. Trying to do both with one makes both unhappy.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    User["User"] --> OLTP["OLTP DB (row store)"]
-    OLTP --> CDC["CDC / ETL"]
-    CDC --> OLAP["OLAP DB (column store)"]
-    Analyst["Analyst"] --> OLAP
-```
+This picture places OLTP and OLAP inside an operating flow. The point is not to memorize the workload difference, but to see how row storage and column storage trade off for different access patterns.
 
 ## Key Terms
 
@@ -152,8 +159,19 @@ Payments live on *Postgres / MySQL*. Revenue reports live on *Snowflake / BigQue
 
 OLTP and OLAP optimize for opposite directions. Next we cover *facts and dimensions*, the core OLAP modeling unit.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying OLTP and OLAP?**
+  - The article treats OLTP and OLAP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for OLTP and OLAP?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when OLTP and OLAP reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
+## In this series
+
+- [Data Warehouse 101 (1/10): What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
 - **OLTP and OLAP (current)**
 - Fact and Dimension (upcoming)
 - Star Schema (upcoming)
@@ -163,6 +181,7 @@ OLTP and OLAP optimize for opposite directions. Next we cover *facts and dimensi
 - Data Mart (upcoming)
 - Performance Optimization (upcoming)
 - Warehouse Design Example (upcoming)
+
 <!-- toc:end -->
 
 ## References

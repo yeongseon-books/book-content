@@ -1,10 +1,10 @@
 ---
 series: technical-writing-101
 episode: 1
-title: What Is Technical Writing
-status: content-ready
+title: "Technical Writing 101 (1/10): What Is Technical Writing"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,43 +16,36 @@ tags:
   - Documentation
   - Communication
   - Beginner
-seo_description: A beginner-friendly tour of what technical writing is and how it differs from everyday prose for software engineers.
-last_reviewed: '2026-05-04'
+seo_description: Define technical writing with a reader-task-output model so engineering prose leads to action instead of vague explanation.
+last_reviewed: '2026-05-15'
 ---
 
-# What Is Technical Writing
+# Technical Writing 101 (1/10): What Is Technical Writing
 
-> Technical Writing 101 series (1/10)
+When beginners hear *technical writing*, they often picture polish first: clean grammar, nice headings, maybe a few screenshots. In real engineering teams, the harder problem is direction. If the writer does not know who the reader is, what action should follow, and what counts as success, even elegant prose turns into a slow document.
 
-<!-- a-grade-intro:begin -->
+Technical writing matters because it keeps working after the meeting ends. A README, runbook, tutorial, or migration note gets read by someone who still has to install, run, compare, debug, or decide something. That operational handoff is what separates it from everyday explanatory prose.
 
-**Core question**: How is *technical writing* different from *everyday writing*?
+This is the first post in the Technical Writing 101 series. It establishes the reader-task-output-boundary frame that the rest of the series builds on.
 
-> The reader must be able to *act* on it.
 
-<!-- a-grade-intro:end -->
+![technical writing 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/01/01-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 1 flow overview*
+> Technical writing succeeds when it changes what readers can do, not just what they know.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- A definition of *technical writing*
-- The difference from *everyday* prose
-- The *three purposes*
-- The reader's *action*
-- The shape of a *series*
+- A definition of *technical writing?
+- The difference from *everyday* prose?
+- The *three purposes?
 
 ## Why It Matters
 
 Writing tends to *outlive* the *code* it describes.
 
-## Concept at a Glance
+> Mental model: the post only works when a reader can turn the explanation into an action.
 
-```mermaid
-flowchart LR
-    R[Reader] --> Q[Question]
-    Q --> A[Answer]
-    A --> X[Action]
-```
-
+Technical writing differs from everyday prose because it must close the loop: reader → task → measurable outcome. That closure is what separates a document that stalls on confusion from one that drives action.
 ## Key Terms
 
 - **technical writing**: Prose that *delivers technical information*.
@@ -67,19 +60,26 @@ flowchart LR
 
 **After**: "A *beginner* can *run Hello World* in *five minutes*."
 
+## One frame that sharpens the whole paragraph
+
+| Element | Weak version | Stronger version |
+| --- | --- | --- |
+| Reader | Developers | A junior backend engineer building a first FastAPI endpoint |
+| Task | Environment setup | Create a virtual environment and install dependencies |
+| Output | Success | `(.venv)` appears and `pip list` shows the package |
+| Boundary | Python basics | Local setup only, not deployment |
+
+This table matters because technical vagueness usually begins in the opening promise. If the reader is broad, the task widens, the output becomes invisible, and the post starts to sound friendly while remaining hard to execute. Filling in these four cells before writing often fixes the paragraph before the prose stage even begins.
+
 ## Hands-on: One Technical Paragraph
 
 ### Step 1 — Pick the audience
 
-```python
-audience = "Python beginners"
-```
+Start by naming the audience plainly: Python beginners.
 
 ### Step 2 — Pick the task
 
-```python
-task = "Create and activate a virtual environment"
-```
+Then narrow the task to one concrete action: create and activate a virtual environment.
 
 ### Step 3 — The commands
 
@@ -90,15 +90,11 @@ source .venv/bin/activate
 
 ### Step 4 — The result
 
-```python
-result = "(.venv) shows up in the prompt"
-```
+State the visible result as part of the prose: the prompt should now show `(.venv)`.
 
 ### Step 5 — The next action
 
-```python
-next_step = "pip install requests"
-```
+End with the next action so the reader knows where to go next: `pip install requests`.
 
 ## What to Notice in This Code
 
@@ -143,7 +139,18 @@ Internal company docs, open source READMEs, and conference talk slides are all *
 
 The next post is *Defining the Reader*.
 
+## Answering the Opening Questions
+
+- **A definition of *technical writing?**
+  - The article treats What Is Technical Writing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The difference from *everyday* prose?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The *three purposes?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Technical Writing (current)**
 - Defining the Reader (upcoming)
 - Title and Structure (upcoming)
@@ -154,6 +161,7 @@ The next post is *Defining the Reader*.
 - Writing Tutorials (upcoming)
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

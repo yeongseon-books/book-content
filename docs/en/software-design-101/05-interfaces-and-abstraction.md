@@ -1,10 +1,10 @@
 ---
 series: software-design-101
 episode: 5
-title: Interfaces and Abstraction
+title: "Software Design 101 (5/10): Interfaces and Abstraction"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,28 @@ tags:
   - LSP
   - Polymorphism
 seo_description: What separates a good interface, how to set the right level of abstraction, polymorphism, and the Liskov Substitution Principle.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Interfaces and Abstraction
+# Software Design 101 (5/10): Interfaces and Abstraction
 
-> Software Design 101 series (5/10)
+Interface design usually breaks long before the implementation does. You can see it the moment the caller needs to know too much about channels, protocols, or internal branching.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Software Design 101 series.
 
-**Core question**: What makes one interface clearly better than another?
+In this post, we treat interfaces as contracts written in the caller's language. The focus is on abstraction level, polymorphism, and the signals that tell you when a contract is leaking implementation detail.
 
-> It speaks the caller's intent and survives even when the implementation changes underneath.
+> A good interface speaks in user intent and stays stable while implementations change underneath.
 
-<!-- a-grade-intro:end -->
+
+![software design 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/05/05-01-concept-at-a-glance.en.png)
+*software design 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Interfaces and Abstraction?
+- Which signal should the example or diagram make visible for Interfaces and Abstraction?
+- What failure should be prevented first when Interfaces and Abstraction reaches a real system?
 
 ## What You Will Learn
 
@@ -46,15 +54,6 @@ last_reviewed: '2026-05-04'
 An interface is a promise. When the promise is small and clear, both sides stay free.
 
 > Write interfaces in the user's language, not the implementer's.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    C["Caller"] --> I["Interface"]
-    I --> A["Impl A"]
-    I --> B["Impl B"]
-```
 
 The caller knows one shape; multiple implementations sit behind it.
 
@@ -149,6 +148,29 @@ class Writer:
 
 Do not force a read-only caller to depend on writes.
 
+## Quick Verification
+
+The fastest way to inspect an interface is to read only the method names and parameters. If the caller's intent is still obvious with the implementation stripped away, the abstraction level is probably right.
+
+```python
+class Notifier:
+    def send(self, user, msg): ...
+```
+
+**Expected output:** the name alone should tell you what the caller wants, and swapping implementations should not force caller rewrites.
+
+Then pick one subtype and verify that it really honors the contract. The moment it starts throwing `NotImplementedError`, the interface itself is suspect.
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| Method names are full of implementation terms | Check whether the interface is speaking in the implementer's language |
+| Parameter lists keep growing | Check whether the interface is carrying too many responsibilities |
+| A subtype escapes through exceptions | Redesign the supertype contract itself |
+
+A strong interface is less about hiding implementation and more about expressing caller intent in a short, stable shape.
+
 ## What to Notice in This Code
 
 - The interface name reads in the caller's vocabulary.
@@ -193,17 +215,29 @@ Payment gateways, repositories, notification channels — all places where a cle
 
 A good interface is a unit of freedom. Next up we look at how interfaces compose into structure — layered architecture.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Interfaces and Abstraction?**
+  - The article treats Interfaces and Abstraction as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Interfaces and Abstraction?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Interfaces and Abstraction reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
-- [Separation of Concerns](./02-separation-of-concerns.md)
-- [Modules and Boundaries](./03-modules-and-boundaries.md)
-- [Dependency Direction](./04-dependency-direction.md)
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): Separation of Concerns](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): Modules and Boundaries](./03-modules-and-boundaries.md)
+- [Software Design 101 (4/10): Dependency Direction](./04-dependency-direction.md)
 - **Interfaces and Abstraction (current)**
 - Layered Architecture (upcoming)
 - Data Flow Design (upcoming)
 - Reducing Change Impact (upcoming)
 - Design Principles (upcoming)
-- Small Design Practice (upcoming)
+- Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -212,3 +246,8 @@ A good interface is a unit of freedom. Next up we look at how interfaces compose
 - [Interface Segregation Principle](https://web.archive.org/web/20150905081110/http://www.objectmentor.com/resources/articles/isp.pdf)
 - [Joshua Bloch — How to Design a Good API](https://www.youtube.com/watch?v=heh4OeB9A-c)
 - [Designing Data-Intensive Applications — Abstractions](https://dataintensive.net/)
+
+### Practical Docs
+
+- [typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
+- [abc — Abstract Base Classes](https://docs.python.org/3/library/abc.html)

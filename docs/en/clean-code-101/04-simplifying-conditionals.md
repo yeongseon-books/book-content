@@ -1,10 +1,10 @@
 ---
 series: clean-code-101
 episode: 4
-title: Simplifying Conditionals
-status: content-ready
+title: "Clean Code 101 (4/10): Simplifying Conditionals"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,44 +18,43 @@ tags:
   - Refactoring
   - Readability
 seo_description: Use guard clauses, early return, polymorphism, and strategy to flatten nested if statements and reduce branching.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Simplifying Conditionals
+# Clean Code 101 (4/10): Simplifying Conditionals
 
-> Clean Code 101 series (4/10)
+Nested conditionals usually reveal a deeper problem than awkward indentation. They show one function is carrying validation, policy, and type dispatch at the same time.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Clean Code 101 series.
 
-**Core question**: Why do nested if statements grow so fast?
+Here we will flatten the easy cases with guard clauses, then move the harder cases into polymorphism, strategy objects, and tables so the main path stays visible.
 
-> Because one function carries more than one responsibility. Splitting responsibilities reduces depth.
 
-<!-- a-grade-intro:end -->
+![clean code 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/04/04-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 4 flow overview*
+> As your tools grow, branch count falls and flow flattens.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Guard clauses and early return
-- Avoiding negative and double-negative conditions
-- Removing if/else chains with polymorphism
-- Separating branches with the Strategy pattern
-- Table-driven branching
+- What boundary should you inspect first when applying Simplifying Conditionals?
+- Which signal should the example or diagram make visible for Simplifying Conditionals?
+- What failure should be prevented first when Simplifying Conditionals reaches a real system?
+
+## Questions this article answers
+
+- When are guard clauses and early returns most effective?
+- Why do negative conditions and double negatives make code harder to read?
+- When should an if/else chain become polymorphism instead?
+- What kinds of branching does the Strategy pattern separate well?
+- How does a table-driven approach simplify policy-heavy branching?
+
+> Conditional depth is cognitive load. Reduce it by one level and readability improves more than most teams expect.
 
 ## Why It Matters
 
 Nested conditionals are the most common source of complexity. Reducing depth by one already doubles readability.
 
 > Depth is cognitive load.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    N["Nested if"] --> G["Guard clause"]
-    G --> P["Polymorphism"]
-    P --> T["Table driven"]
-    T --> R["Flat flow"]
-```
 
 More tools, fewer branches.
 
@@ -172,6 +171,23 @@ def grade(score):
 
 The if/elif chain becomes data.
 
+## How to Verify This in a Real Codebase
+
+```bash
+radon cc app/pricing.py -s
+python -m pytest -q tests/test_pricing.py
+```
+
+**Expected output**
+
+- Complexity should drop while tests keep the branch behavior stable.
+- Table-driven or strategy-based rules must produce the same result set.
+
+## Failure Modes to Watch
+
+- Reordering conditions changes the semantics while flattening.
+- Type checks are only renamed, not actually removed from the design.
+
 ## What to Notice in This Code
 
 - Guard clauses cut indentation.
@@ -216,10 +232,21 @@ Pricing, authorization, and routing — anywhere branches resemble data — are 
 
 Fewer conditions, clearer code. Next we tackle the second great enemy: duplication.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Simplifying Conditionals?**
+  - The article treats Simplifying Conditionals as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Simplifying Conditionals?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Simplifying Conditionals reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
-- [Naming](./02-naming.md)
-- [Small Functions](./03-small-functions.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
+- [Clean Code 101 (2/10): Naming](./02-naming.md)
+- [Clean Code 101 (3/10): Small Functions](./03-small-functions.md)
 - **Simplifying Conditionals (current)**
 - Removing Duplication (upcoming)
 - Error Handling (upcoming)
@@ -227,6 +254,7 @@ Fewer conditions, clearer code. Next we tackle the second great enemy: duplicati
 - Testable Code (upcoming)
 - Refactoring Basics (upcoming)
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,10 +1,10 @@
 ---
 series: pandas-101
 episode: 6
-title: groupby
-status: content-ready
+title: "Pandas 101 (6/10): Groupby and Aggregation"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,31 @@ tags:
   - DataAnalysis
   - Beginner
 seo_description: Understand groupby through split-apply-combine and master agg, transform, and filter — the three faces of Pandas grouping
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# groupby
+# Pandas 101 (6/10): Groupby and Aggregation
 
-> Pandas 101 series (6/10)
+Analysis almost never ends with reading a table. Sooner or later you need sales by city, conversion rate by segment, or monthly KPI summaries. That is why `groupby` is not just another Pandas method. It is one of the main ways raw tables become decisions.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Pandas 101 series.
 
-**Core question**: Is *Pandas groupby* exactly *the same as SQL GROUP BY*?
+In this chapter, we will frame `groupby` as the split-apply-combine workflow. That gives you a clearer mental model for when to reach for `agg`, `transform`, or `filter`.
 
-> *groupby is the *split-apply-combine* pattern. It has three faces: agg, transform, and filter.*
 
-<!-- a-grade-intro:end -->
+![pandas 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/06/06-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 6 flow overview*
+> *Aggregation starts with the split. Group by customer, by date, or by region on the same data — you get completely different answers. Choose your grain first.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *split-apply-combine* model
-- The difference between *agg / transform / filter*
-- *Multi-key grouping*
-- A 5-step groupby hands-on
-- Five common mistakes
+- The *split-apply-combine* model?
+- The difference between *agg / transform / filter?
+- Multi-key grouping?
 
 ## Why It Matters
 
 *Aggregation is the core of analysis*. With *groupby*, *dozens of for-loop lines* collapse into *one*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Data["DataFrame"] --> Split["split by key"]
-    Split --> Apply["apply (agg / transform / filter)"]
-    Apply --> Combine["combine into result"]
-```
 
 ## Key Terms
 
@@ -85,6 +75,16 @@ df = pd.DataFrame({
 ```python
 print(df.groupby("city")["sales"].sum())
 ```
+A simple grouped sum is the first proof that split and combine already work. Before you reach for richer statistics, make sure the grouped totals themselves match your mental math.
+
+**Expected output:**
+
+```text
+city
+Busan    175
+Seoul    220
+Name: sales, dtype: int64
+```
 
 ### Step 3 — agg with multiple stats
 
@@ -101,6 +101,18 @@ print(df.groupby("city").agg(
 ```python
 df["share"] = df["sales"] / df.groupby("city")["sales"].transform("sum")
 print(df)
+```
+
+`transform` matters because it keeps the original row shape intact. That makes it the natural tool for feature engineering like per-group shares, z-scores, and deviations from a group average.
+
+**Expected output:**
+
+```text
+    city month  sales     share
+0  Seoul   Jan    100  0.454545
+1  Seoul   Feb    120  0.545455
+2  Busan   Jan     80  0.457143
+3  Busan   Feb     95  0.542857
 ```
 
 ### Step 5 — filter
@@ -149,21 +161,33 @@ Segment analysis, cohort retention, KPI aggregation — *groupby* powers *busine
 2. Use *transform* to attach the *group mean* back to the original DataFrame.
 3. Use *filter* to keep groups whose *sum exceeds a threshold*.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 groupby is the *engine of analysis*. Next we cover *merge and join*.
 
+## Answering the Opening Questions
+
+- **The *split-apply-combine* model?**
+  - The article treats Groupby and Aggregation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The difference between *agg / transform / filter?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Multi-key grouping?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
-- [Reading CSV and Excel](./03-read-csv-and-excel.md)
-- [Filtering and Selection](./04-filtering-and-selection.md)
-- [Handling Missing Values](./05-missing-values.md)
-- **groupby (current)**
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
+- [Pandas 101 (3/10): Reading CSV and Excel](./03-read-csv-and-excel.md)
+- [Pandas 101 (4/10): Filtering and Selection](./04-filtering-and-selection.md)
+- [Pandas 101 (5/10): Handling Missing Values](./05-missing-values.md)
+- **Groupby and Aggregation (current)**
 - Merge and Join (upcoming)
 - Time Series (upcoming)
-- apply and Vectorization (upcoming)
-- Real-world Data Analysis (upcoming)
+- Apply and Vectorization (upcoming)
+- Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

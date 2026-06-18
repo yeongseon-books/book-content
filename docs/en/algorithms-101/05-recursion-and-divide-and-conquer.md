@@ -1,10 +1,10 @@
 ---
 series: algorithms-101
 episode: 5
-title: Recursion and Divide and Conquer
+title: "Algorithms 101 (5/10): Recursion and Divide and Conquer"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,23 @@ seo_description: The three rules for correct recursion, the call stack, divide-a
 last_reviewed: '2026-05-04'
 ---
 
-# Recursion and Divide and Conquer
-
-> Algorithms 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
+# Algorithms 101 (5/10): Recursion and Divide and Conquer
 
 **Core question**: Why does recursion feel hard, and why are divide-and-conquer algorithms like mergesort fast for the right reason?
 
-> Recursion expresses a problem in terms of smaller versions of itself. Three rules make it work: a base case that is reachable, strict progress toward that base case, and no shared mutable state. Divide and conquer is the most useful pattern built on recursion — divide, conquer, combine. Cost is analysed via recurrences. When the same subproblems repeat, we cache their results, which is exactly the door to dynamic programming.
+Recursion expresses a problem in terms of smaller versions of itself. Three rules make it work: a base case that is reachable, strict progress toward that base case, and no shared mutable state. Divide and conquer is the most useful pattern built on recursion — divide, conquer, combine.
 
-<!-- a-grade-intro:end -->
+This is post 5 in the Algorithms 101 series. Here we cover the call stack, recurrence-based cost analysis, and the mental model behind divide-and-conquer algorithms.
+
+
+![algorithms 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/05/05-01-big-picture.en.png)
+*algorithms 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Recursion and Divide and Conquer?
+- Which signal should the example or diagram make visible for Recursion and Divide and Conquer?
+- What failure should be prevented first when Recursion and Divide and Conquer reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +51,6 @@ last_reviewed: '2026-05-04'
 Without comfortable recursion, trees, graphs, divide and conquer, dynamic programming, and backtracking all feel harder than they are. With it, complex problems decompose naturally into smaller versions of themselves.
 
 > Recursion is the second native language of algorithms.
-
-## Concept at a Glance
 
 > A recursive function has a base case, a progress step, and a self-call. Divide and conquer breaks input into a parts of size n/b and combines results in f(n) work. The cost satisfies T(n) = a · T(n/b) + f(n); the master theorem gives the closed form. Mergesort yields O(n log n); binary search yields O(log n).
 
@@ -244,17 +248,29 @@ Recursion expresses a problem as smaller versions of itself. Divide and conquer 
 
 The next article introduces dynamic programming proper — memoization vs tabulation, the art of state design, and classic problems like 0/1 knapsack and longest common subsequence.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Recursion and Divide and Conquer?**
+  - The article treats Recursion and Divide and Conquer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Recursion and Divide and Conquer?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Recursion and Divide and Conquer reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an Algorithm?](./01-what-is-an-algorithm.md)
-- [Time and Space Complexity](./02-time-and-space-complexity.md)
-- [Search Algorithms](./03-search-algorithms.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
+## In this series
+
+- [Algorithms 101 (1/10): What Is an Algorithm?](./01-what-is-an-algorithm.md)
+- [Algorithms 101 (2/10): Time and Space Complexity](./02-time-and-space-complexity.md)
+- [Algorithms 101 (3/10): Search Algorithms](./03-search-algorithms.md)
+- [Algorithms 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
 - **Recursion and Divide and Conquer (current)**
 - Dynamic Programming (upcoming)
 - Greedy Algorithms (upcoming)
 - Graph Algorithms (upcoming)
 - String Algorithm Basics (upcoming)
 - Algorithm Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

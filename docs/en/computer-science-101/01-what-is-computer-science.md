@@ -1,10 +1,10 @@
 ---
 series: computer-science-101
 episode: 1
-title: What Is Computer Science?
-status: content-ready
+title: "Computer Science 101 (1/10): What Is Computer Science?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,34 @@ tags:
   - Curriculum Overview
   - Learning Roadmap
 seo_description: A map of what computer science actually studies, why abstraction is its central tool, and how the core subjects connect.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is Computer Science?
+# Computer Science 101 (1/10): What Is Computer Science?
 
-> Computer Science 101 series (1/10)
+When people first encounter computer science, it is easy to mistake it for “being good at programming languages.” In practice, the engineers who keep growing are usually the ones who can model computation, reason about abstraction, and explain where a system's limits come from.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Computer Science 101 series.
 
-**Key question**: Is computer science the study of "how to use computers well"?
+In this article, we'll define what computer science actually studies, why abstraction is the field's shared tool, and how the rest of the series connects into one map.
 
-> Computer science studies *computation*, not computers. It asks which problems can be solved by computation, how efficiently they can be solved, and how we can design that process systematically. This article defines the field, lays out its core questions, and draws a map of how the major subjects connect.
 
-<!-- a-grade-intro:end -->
+![Computer Science 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/01/01-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Computer Science??
+- Which signal should the example or diagram make visible for What Is Computer Science??
+- What failure should be prevented first when What Is Computer Science? reaches a real system?
+
+## Questions This Article Answers
+
+- How is computer science different from programming, and what does it actually study?
+- Why does abstraction keep showing up as the field's central tool?
+- How do algorithms, systems, and applications connect as layers?
+- Why can the same problem produce very different solutions when viewed through a CS lens?
+- How should you read this series so that the full picture becomes clearer over time?
 
 ## What You Will Learn
 
@@ -48,27 +62,7 @@ Learning a programming language and learning computer science are not the same. 
 
 This series walks through the major subjects of a CS curriculum, one at a time, to draw the whole picture.
 
-## Concept at a Glance
-
 > Computer science has three pillars: theory, systems, and applications. Every subject is connected through one shared tool — abstraction.
-
-```text
-         Computation theory
-        /                  \
-  Algorithms          Complexity
-       \                /
-       Data structures
-            |
-   ┌────────┼────────┐
- Computer   OS    Networks
- architecture        |
-   └────────┼────────┘
-            |
-       Software
-       engineering
-            |
-     AI / Data science
-```
 
 ## Key Terms
 
@@ -119,7 +113,6 @@ def is_even(n: int) -> bool:
     """Return True if n is even."""
     return n % 2 == 0
 
-
 print(is_even(4))   # True
 print(is_even(7))   # False
 ```
@@ -145,7 +138,6 @@ class Stack:
     def is_empty(self) -> bool:
         return len(self._items) == 0
 
-
 # Users do not need to know there is a list inside
 stack = Stack()
 stack.push(1)
@@ -160,14 +152,12 @@ Abstraction is the field's most important tool. Operating systems abstract hardw
 ```python
 import time
 
-
 def linear_search(items: list[int], target: int) -> int:
     """Sequential search — O(n)."""
     for i, item in enumerate(items):
         if item == target:
             return i
     return -1
-
 
 def binary_search(items: list[int], target: int) -> int:
     """Binary search — O(log n), requires sorted input."""
@@ -182,7 +172,6 @@ def binary_search(items: list[int], target: int) -> int:
             high = mid - 1
     return -1
 
-
 data = list(range(1_000_000))
 
 start = time.time()
@@ -193,6 +182,8 @@ start = time.time()
 binary_search(data, 999_999)
 print(f"Binary search: {time.time() - start:.6f}s")
 ```
+
+**Expected output:** `Linear search` should take much longer than `Binary search`, and the gap grows quickly as the input size increases.
 
 The performance gap between two algorithms that solve the same problem widens dramatically as the input grows.
 
@@ -287,22 +278,34 @@ Computer science is the study of the principles, limits, and applications of com
 
 The next article digs into the most basic CS question — "What is computation?" — and traces the evolution of programming paradigms.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Computer Science??**
+  - The article treats What Is Computer Science? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Computer Science??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Computer Science? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Computer Science? (current)**
-- [Computation and Programs](./02-computation-and-programs.md)
-- [Data Representation](./03-data-representation.md)
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
-- [Computer Architecture](./05-computer-architecture.md)
-- [Operating Systems](./06-operating-systems.md)
-- [Networks](./07-networks.md)
-- [Databases](./08-databases.md)
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Computation and Programs (upcoming)
+- Data Representation (upcoming)
+- Algorithms and Complexity (upcoming)
+- Computer Architecture (upcoming)
+- Operating Systems (upcoming)
+- Networks (upcoming)
+- Databases (upcoming)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
 - [CS50 — Introduction to Computer Science (Harvard)](https://cs50.harvard.edu/)
-- [Wikipedia — Computer Science](https://en.wikipedia.org/wiki/Computer_science)
+- [ACM/IEEE-CS/AAAI — Computing Curricula 2020](https://www.acm.org/binaries/content/assets/education/curricula-recommendations/cc2020.pdf)
 - [Structure and Interpretation of Computer Programs (MIT)](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book.html)
 - [Computer Science Distilled — Wladston Ferreira Filho](https://code.energy/computer-science-distilled/)

@@ -1,10 +1,10 @@
 ---
 series: programming-languages-101
 episode: 2
-title: Syntax and Semantics
-status: content-ready
+title: "Programming Languages 101 (2/10): Syntax and Semantics"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,44 +18,39 @@ tags:
   - Grammar
   - Parsing
 seo_description: Whether characters form a legal program (syntax) and what they mean (semantics) are different questions. This episode separates the two axes.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Syntax and Semantics
+# Programming Languages 101 (2/10): Syntax and Semantics
 
-> Programming Languages 101 series (2/10)
+Sometimes a build passes and the program still behaves strangely. Other times a single missing comma prevents the code from running at all. Both are errors, but they are not the same kind of error.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Programming Languages 101 series.
 
-**Core question**: Why does the build pass yet the program misbehave, and why does a single missing comma break the whole compilation?
+In this post, we will separate the two axes every language stands on: syntax and semantics. Once you can tell “is this legal text?” apart from “what does this legal text mean?”, compile errors, runtime bugs, and later topics like type systems become much easier to reason about.
 
-> Every programming language stands on two axes. **Syntax** answers which arrangements of characters are legal. **Semantics** answers what those legal arrangements actually mean. They get blurred together in everyday talk, but separating them is the moment compile errors and runtime bugs stop looking like the same animal.
 
-<!-- a-grade-intro:end -->
+![programming languages 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/02/02-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 2 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The exact boundary between syntax and semantics
-- The pipeline from tokens to grammar to an AST
-- Why "syntactically valid but meaningfully wrong" code happens
-- The difference between static and dynamic semantics
+- What boundary should you inspect first when applying Syntax and Semantics?
+- Which signal should the example or diagram make visible for Syntax and Semantics?
+- What failure should be prevented first when Syntax and Semantics reaches a real system?
+
+## Questions this article answers
+
+- Where exactly is the boundary between syntax and semantics?
+- How do tokens, grammar, and an AST connect in sequence?
+- Why can code be valid yet still behave differently from what you intended?
+- How do static semantics and dynamic semantics differ?
 
 ## Why It Matters
 
 Reading errors quickly, picking up new language syntax fast, and understanding why the same code behaves differently across languages all require splitting the two axes. The later episodes — type systems, scope, closures — are all examples of "same syntax, different semantics."
 
 > "It builds" only means syntax passed. It does not mean the meaning matches your intent.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    A["Source: total = 3 + 4"] --> B["Lexer (tokens)"]
-    B --> C["Parser (grammar)"]
-    C --> D["AST"]
-    D --> E["Type check / IR"]
-    E --> F["Execute"]
-```
 
 The lexer cuts characters into tokens; the parser checks token order against a grammar and builds a tree (AST). All of that is syntax. After it, interpreting meaning — type checking and evaluation — is semantics.
 
@@ -71,7 +66,7 @@ The lexer cuts characters into tokens; the parser checks token order against a g
 
 **Before — confusing syntax errors with intent errors**
 
-```python
+```text
 # Both are "errors," but they live in different layers.
 print("hello"   # SyntaxError
 divide(10, 0)   # legal syntax, throws ZeroDivisionError at runtime
@@ -126,7 +121,7 @@ This step only cuts text into meaningful chunks. It does not interpret meaning.
 
 In BNF-flavored notation:
 
-```
+```text
 expr    = term  ("+" term  | "-" term)*
 term    = factor ("*" factor | "/" factor)*
 factor  = NUM | "(" expr ")"
@@ -249,8 +244,19 @@ It also helps when reading logs. `Unexpected token` is a syntax-stage message. `
 
 Syntax is the question of legality. Semantics is the question of meaning. Splitting them clarifies what an error really is and tells you where to look first when meeting a new language. Next we examine the biggest tool in static semantics — the type system.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Syntax and Semantics?**
+  - The article treats Syntax and Semantics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Syntax and Semantics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Syntax and Semantics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
 - **Syntax and Semantics (current)**
 - Type Systems (upcoming)
 - Scope and Binding (upcoming)
@@ -260,6 +266,7 @@ Syntax is the question of legality. Semantics is the question of meaning. Splitt
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

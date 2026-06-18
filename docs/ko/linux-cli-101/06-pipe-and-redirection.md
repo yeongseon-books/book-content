@@ -1,13 +1,13 @@
 ---
-title: pipe와 redirection
+title: "Linux CLI 101 (6/10): pipe와 redirection"
 series: linux-cli-101
 episode: 6
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,39 +17,35 @@ tags:
 - stdin
 - stdout
 - CLI
-last_reviewed: '2026-05-04'
-seo_description: pipe는 명령어를 수도관으로 연결하는 것이고, redirection은 물줄기의 방향을 파일로 바꾸는 것입니다.
+last_reviewed: '2026-05-15'
+seo_description: 표준 입출력 개념을 파악하고 파이프와 리다이렉션을 활용해 명령어를 연결하거나 파일로 저장하는 실무 텍스트 처리 기법을 단계별 예제로 실습합니다.
 ---
 
-# pipe와 redirection
+# Linux CLI 101 (6/10): pipe와 redirection
 
-> Linux CLI 101 시리즈 (6/10)
-
----
-
-
-## 이 글에서 다룰 문제
+이 글은 Linux CLI 101 시리즈의 6번째 글입니다.
 
 Linux의 철학은 "한 가지 일을 잘하는 작은 도구를 만들고, 조합하여 큰 일을 한다"입니다. `grep`은 검색만 하고, `sort`는 정렬만 하고, `wc`는 세기만 합니다. 이 도구들을 연결하는 접착제가 pipe와 redirection입니다.
 
-> 웹 서버 로그에서 오늘 가장 많이 접속한 IP 상위 5개를 알고 싶습니다. 에디터에서 수만 줄을 눈으로 세는 것은 불가능합니다.
+![Linux CLI 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/06/06-01-mental-model.ko.png)
+*Linux CLI 101 6장 흐름 개요*
 
-```bash
-cat access.log | grep "2026-05-04" | awk '{print $1}' | sort | uniq -c | sort -rn | head -5
-```
+## 먼저 던지는 질문
 
-이 한 줄이 분석가가 스프레드시트에서 30분 걸릴 작업을 3초에 끝냅니다.
+- 표준 입력, 표준 출력, 표준 오류는 왜 분리되어 있을까요?
+- `|`, `>`, `>>`, `2>`는 각각 어떤 흐름을 만들까요?
+- 중간 파일 없이 명령을 이어 붙이면 무엇이 좋아질까요?
 
-## Mental Model
+## 머릿속에 먼저 그릴 그림
 
 > 명령어는 수도꼭지이고, pipe(`|`)는 수도관입니다. 물(데이터)은 왼쪽에서 오른쪽으로 흐릅니다. redirection(`>`)은 물줄기를 수도관 대신 물통(파일)으로 보내는 것입니다.
 
 ```text
-[명령어A] ──stdout──|──stdin──> [명령어B] ──stdout──> 화면
-                                                      |
-[명령어A] ──stdout──> file.txt    (덮어쓰기)          |
-[명령어A] ──stdout──>> file.txt   (이어쓰기)          |
-[명령어A] <──stdin── file.txt     (파일을 입력으로)
+[Command A] --stdout--|--stdin--> [Command B] --stdout--> screen
+                                                          |
+[Command A] --stdout--> file.txt    (overwrite)           |
+[Command A] --stdout-->> file.txt   (append)              |
+[Command A] <--stdin-- file.txt     (file as input)
 ```
 
 ## 핵심 개념
@@ -63,7 +59,7 @@ cat access.log | grep "2026-05-04" | awk '{print $1}' | sort | uniq -c | sort -r
 | `2>` | stderr redirect | 에러만 파일로 | `cmd 2> error.log` |
 | `2>&1` | stderr to stdout | 에러와 출력 합치기 | `cmd > all.log 2>&1` |
 
-## Before / After
+## 전과 후
 
 **Before (중간 파일을 수동으로 만들 때)**
 
@@ -73,19 +69,19 @@ sort errors.txt > sorted.txt
 uniq -c sorted.txt > counted.txt
 sort -rn counted.txt > result.txt
 cat result.txt
-# 파일 4개 생성, 정리도 필요
+# 4 files created, cleanup needed
 ```
 
 **After (pipe로 한 줄)**
 
 ```bash
 grep "ERROR" app.log | sort | uniq -c | sort -rn
-# 중간 파일 없이 결과 즉시 출력
+# No intermediate files, result printed immediately
 ```
 
 ## 단계별 실습
 
-### Step 1. 실습 데이터 준비
+### 1단계. 실습 데이터 준비
 
 ```bash
 cd ~/practice/linux-cli
@@ -101,52 +97,52 @@ cat > access.log << 'EOF'
 EOF
 ```
 
-### Step 2. pipe로 명령어 연결
+### 2단계. 명령어 연결
 
 ```bash
-cat access.log | grep "200"             # 성공 요청만
+cat access.log | grep "200"             # Only successful requests
 cat access.log | awk '{print $1}' | sort | uniq -c | sort -rn
 # 3 192.168.1.10
 # 3 10.0.0.5
 # 2 172.16.0.1
 ```
 
-### Step 3. redirection으로 파일 저장
+### 3단계. 파일로 저장하기
 
 ```bash
-grep "500" access.log > errors.txt      # 500 에러만 저장
+grep "500" access.log > errors.txt      # Save only 500 errors
 cat errors.txt
 # 192.168.1.10 GET /api/data 500
 
-echo "new error" >> errors.txt          # 이어쓰기
+echo "new error" >> errors.txt          # Append
 cat errors.txt
 # 192.168.1.10 GET /api/data 500
 # new error
 ```
 
-### Step 4. stderr 분리
+### 4단계. 오류 출력 분리
 
 ```bash
-ls /nonexistent 2> error.log            # 에러만 파일로
+ls /nonexistent 2> error.log            # Errors only to file
 cat error.log
 # ls: cannot access '/nonexistent': No such file or directory
 
-ls /tmp /nonexistent > out.txt 2> err.txt  # 출력과 에러 분리
-ls /tmp /nonexistent > all.txt 2>&1        # 둘 다 같은 파일로
+ls /tmp /nonexistent > out.txt 2> err.txt  # Separate output and errors
+ls /tmp /nonexistent > all.txt 2>&1        # Both to same file
 ```
 
-### Step 5. 실전 파이프라인
+### 5단계. 실전 파이프라인
 
 ```bash
-# 접속 로그에서 IP별 요청 수 상위 3개
+# Top 3 IPs by request count
 awk '{print $1}' access.log | sort | uniq -c | sort -rn | head -3
 
-# 500 에러 IP만 추출
+# Extract only 500-error IPs
 grep "500" access.log | awk '{print $1}' | sort -u
 
-# 결과를 파일에 저장하면서 화면에도 출력 (tee)
+# Save to file AND print to screen (tee)
 grep "200" access.log | tee success.log | wc -l
-# 6 (화면 출력) + success.log에도 저장
+# 6 (screen output) + success.log also saved
 ```
 
 ## 이 코드에서 봐야 할 것
@@ -161,8 +157,8 @@ grep "200" access.log | tee success.log | wc -l
 ### 실수 1. `>`와 `>>`를 혼동하여 데이터를 날린다
 
 ```bash
-echo "important" > data.txt    # 기존 내용 삭제하고 덮어쓰기
-echo "important" >> data.txt   # 기존 내용 뒤에 추가
+echo "important" > data.txt    # Overwrites — existing contents deleted
+echo "important" >> data.txt   # Appends — existing contents preserved
 ```
 
 중요한 파일에는 `>>`를 쓰거나 백업 후 `>`를 씁니다.
@@ -170,23 +166,23 @@ echo "important" >> data.txt   # 기존 내용 뒤에 추가
 ### 실수 2. 같은 파일에서 읽고 쓴다
 
 ```bash
-sort file.txt > file.txt    # 파일이 비어버림!
-# Shell이 먼저 > file.txt로 파일을 비운 뒤 sort를 실행하기 때문
-sort file.txt > sorted.txt && mv sorted.txt file.txt  # 안전
+sort file.txt > file.txt    # File becomes empty!
+# Shell empties file.txt with > before sort reads it
+sort file.txt > sorted.txt && mv sorted.txt file.txt  # Safe
 ```
 
-### 실수 3. stderr를 무시한다
+### 실수 3. 오류 출력을 무시한다
 
 스크립트에서 에러를 잡지 않으면 에러 메시지가 화면에 섞여 나옵니다. `2>/dev/null`로 버리거나 `2>error.log`로 따로 저장하세요.
 
-### 실수 4. 불필요한 cat을 쓴다 (UUOC)
+### 실수 4. 불필요한 중간 명령을 둔다
 
 ```bash
 cat file.txt | grep "pattern"    # Useless Use of Cat
-grep "pattern" file.txt          # grep이 직접 파일을 읽음 — 더 효율적
+grep "pattern" file.txt          # grep reads the file directly — more efficient
 ```
 
-### 실수 5. pipe 순서를 잘못 잡는다
+### 실수 5. 명령어 연결 순서를 잘못 잡는다
 
 데이터를 먼저 필터링(grep)하고 나서 정렬(sort)하는 것이 효율적입니다. 정렬 후 필터링하면 불필요한 줄까지 정렬하므로 느립니다.
 
@@ -204,6 +200,13 @@ pipe는 Unix 철학의 핵심입니다. 작은 도구를 조합하면 전용 프
 
 반면 pipe 체인이 5단계 이상 복잡해지면, 유지보수성이 떨어집니다. 이 시점에서는 Python이나 셸 스크립트로 옮기는 것이 맞습니다. pipe는 "일회성 분석"에 최적이고, "반복적으로 실행하는 로직"은 스크립트로 남기는 것이 팀 협업에 유리합니다.
 
+## 문제가 생기면 먼저 이렇게 확인하세요
+
+- 파이프라인 결과가 비어 있으면 왼쪽부터 한 단계씩 떼어 내세요. `grep "ERROR" app.log` → `grep "ERROR" app.log | sort`처럼 확인하면 어느 단계에서 데이터가 사라지는지 바로 보입니다.
+- 원본 파일이 갑자기 비었다면 `sort file.txt > file.txt`처럼 같은 파일을 읽고 쓴 흔적이 있는지 먼저 봐야 합니다. 이런 경우는 중간 파일을 쓰거나 `sponge` 같은 도구가 필요합니다.
+- 에러 메시지가 안 보이거나 로그 파일에 안 남으면 stdout과 stderr를 분리했는지 확인하세요. 빌드 로그처럼 실패 원인을 남겨야 할 때는 `2>&1 | tee build.log`가 기본값에 가깝습니다.
+- `>`를 써서 덮어쓸지 `>>`로 이어쓸지 헷갈리면 먼저 임시 파일에 저장해 비교하세요. 운영 로그나 보고서 파일은 한 번 덮어쓰면 되돌리기 어렵습니다.
+
 ## 체크리스트
 
 - [ ] `|`로 두 명령어의 출력/입력을 연결할 수 있다
@@ -212,7 +215,13 @@ pipe는 Unix 철학의 핵심입니다. 작은 도구를 조합하면 전용 프
 - [ ] `2>&1`로 에러와 출력을 합칠 수 있다
 - [ ] `tee`로 화면 출력과 파일 저장을 동시에 할 수 있다
 
-## 정리 · 다음 글
+## 연습 문제
+
+1. 텍스트 파일 하나를 만든 뒤 `cat`, `grep`, `sort`, `uniq -c`를 파이프로 연결해 빈도표를 만들어 보세요.
+2. `>`, `>>`, `2>`를 각각 한 번씩 써 보고 어떤 파일이 어떻게 달라지는지 직접 확인해 보세요.
+3. `tee`가 화면 출력과 파일 저장을 동시에 처리할 때 왜 유용한지 배포 로그 예시와 함께 설명해 보세요.
+
+## 정리와 다음 글
 
 - pipe(`|`)는 명령어의 stdout을 다음 명령어의 stdin으로 연결합니다.
 - `>`는 덮어쓰기, `>>`는 이어쓰기로 출력을 파일에 저장합니다.
@@ -222,14 +231,227 @@ pipe는 Unix 철학의 핵심입니다. 작은 도구를 조합하면 전용 프
 
 다음 글에서는 **프로세스 확인과 종료** — `ps`, `top`, `kill`, 백그라운드 실행을 다룹니다.
 
+## 자동화 품질을 높이는 셸 체크포인트
+
+### 입력 검증과 종료 코드 계약
+셸 스크립트가 팀 도구가 되려면 실패 방식이 예측 가능해야 합니다. 인자 검증과 종료 코드 계약을 명시하면 CI와 운영 스크립트가 안전하게 연동됩니다.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <log_dir> <keyword>"
+}
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 64
+fi
+
+log_dir="$1"
+keyword="$2"
+
+if [ ! -d "$log_dir" ]; then
+  echo "directory not found: $log_dir"
+  exit 66
+fi
+
+if grep -R --line-number "$keyword" "$log_dir" >/tmp/match.out; then
+  echo "match found"
+  exit 0
+else
+  echo "no match"
+  exit 1
+fi
+```
+
+여기서 `64`, `66` 같은 종료 코드는 호출자에게 실패 원인을 분류해 전달합니다. 사람이 읽는 메시지와 기계가 읽는 코드가 분리되어 있으면 자동화 파이프라인에서 분기 처리하기 쉽습니다.
+
+### 파이프라인 병목 찾기
+복잡한 파이프라인은 체감만으로 병목을 찾기 어렵습니다. 각 단계 앞뒤에 타임스탬프를 찍거나 임시 파일에 분리 저장해 어느 단계가 느린지 확인합니다.
+
+```bash
+time grep -R "ERROR" /var/log/myapp > /tmp/step1.txt
+time cut -d' ' -f1-8 /tmp/step1.txt > /tmp/step2.txt
+time sort /tmp/step2.txt | uniq -c | sort -nr > /tmp/step3.txt
+```
+
+이 방식은 단순하지만 효과가 큽니다. 어떤 단계가 CPU 중심인지 I/O 중심인지 빠르게 감을 잡을 수 있고, 이후 `awk` 대체, 병렬화, 입력 축소 같은 최적화 방향을 정하기 쉬워집니다.
+
+### 재사용 가능한 함수형 스니펫
+긴 스크립트에서도 기능 단위를 함수로 분리하면 테스트와 유지보수가 쉬워집니다.
+
+```bash
+collect_pids() {
+  pgrep -f "$1" || true
+}
+
+kill_gracefully() {
+  local pid="$1"
+  kill -TERM "$pid"
+  sleep 2
+  kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" || true
+}
+```
+
+함수 단위로 쪼개면 시나리오별 검증이 가능해집니다. 예를 들어 종료 신호가 정상 처리되는지, 남은 프로세스가 있는지, 재시작 로직이 중복 실행되는지 등을 독립적으로 점검할 수 있습니다.
+
+## 실무 시나리오: 파이프와 리다이렉션으로 분석 흐름 고정하기
+
+파이프와 리다이렉션은 CLI 자동화의 중심입니다. 핵심은 출력 포맷을 예쁘게 만드는 것이 아니라, **다음 단계가 소비할 수 있는 형태로 변환**하는 것입니다.
+
+### 표준 스트림을 먼저 분리해 이해하기
+
+```bash
+python3 app.py > /tmp/app.out 2> /tmp/app.err
+
+# 예상 결과
+# /tmp/app.out : 정상 출력
+# /tmp/app.err : 오류 출력
+```
+
+문제 분석에서 stdout과 stderr를 분리하면 원인 추적이 빨라집니다.
+
+### tee로 화면 출력과 파일 저장 동시 처리
+
+```bash
+journalctl -u my-api --since '20 min ago'   | grep -E 'ERROR|CRITICAL|timeout'   | tee /tmp/my-api-errors.txt
+```
+
+`tee`는 "지금 보고" + "나중에 재사용"을 동시에 만족합니다.
+
+### 파이프 체인 설계 예시: 접근 로그 요약
+
+```bash
+cat /var/log/nginx/access.log   | awk '{print $1, $7, $9}'   | grep -E ' 5[0-9]{2}$'   | sort   | uniq -c   | sort -nr   | head -n 20
+
+# 예상 출력
+#   87 10.10.1.2 /api/pay 502
+#   41 10.10.1.5 /api/order 504
+```
+
+이 흐름은 "원문 로그"를 "우선 조치 대상 목록"으로 바꾸는 전형적인 패턴입니다.
+
+### 여기문서와 리다이렉션으로 설정 파일 생성
+
+```bash
+cat > /tmp/my-api.env << 'EOF'
+APP_ENV=production
+LOG_LEVEL=INFO
+WORKER_COUNT=4
+EOF
+
+cat /tmp/my-api.env
+```
+
+자동화 스크립트에서 설정 파일을 만들 때 유용하지만, 비밀값은 평문으로 남지 않도록 별도 비밀 관리 체계를 사용해야 합니다.
+
+### stderr 합치기와 분리 전략
+
+```bash
+# stdout + stderr 모두 파일로
+./deploy.sh > /tmp/deploy.log 2>&1
+
+# stderr만 별도 파일
+./deploy.sh 2> /tmp/deploy.err
+```
+
+운영에서는 "실패 로그만 모아 보기"가 중요하므로 stderr 파일 분리가 자주 쓰입니다.
+
+### xargs와 파이프 결합으로 대량 실행
+
+```bash
+printf '%s
+' api worker scheduler   | xargs -n 1 -I {} sh -c 'systemctl status my-{} --no-pager | sed -n "1,5p"'
+```
+
+서비스 다수를 빠르게 점검할 때 효과적입니다.
+
+### systemd 로그와 리다이렉션 결합
+
+```bash
+journalctl -u my-api --since '1 hour ago' --no-pager   > /tmp/my-api-journal.txt
+
+grep -E 'ERROR|CRITICAL|timeout|OOM' /tmp/my-api-journal.txt
+```
+
+실시간 조회만으로 끝내지 않고 파일로 남기면 팀 리뷰와 회고에 재사용할 수 있습니다.
+
+### Bash 파이프라인 스크립트 예시
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+service="my-api"
+out="/tmp/${service}-incident-$(date +%Y%m%d-%H%M%S).log"
+
+journalctl -u "$service" --since '30 min ago' --no-pager   | grep -E 'ERROR|CRITICAL|timeout|OOM'   | tee "$out"
+
+printf '[INFO] saved=%s
+' "$out"
+```
+
+이런 스크립트는 장애 시 "누가 실행해도 같은 결과"를 만들기 때문에 운영 품질을 안정화합니다.
+
+## 실전 점검 로그 예시
+
+아래 예시는 실제 운영에서 자주 보는 "점검 출력 형태"를 축약한 것입니다. 중요한 것은 특정 명령을 그대로 복사하는 것이 아니라, 출력을 근거로 다음 판단을 연결하는 습관입니다.
+
+```bash
+# 서비스 상태 + 최근 오류를 한 번에 수집
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager   | grep -E 'ERROR|CRITICAL|timeout|Failed'   | tail -n 20
+
+# 예상 출력
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# 프로세스/포트/파일 핸들 점검
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# 예상 출력 예시
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+이런 출력들을 시계열로 저장해 두면 재발 시 비교가 쉬워지고, "지금이 평소와 어떻게 다른가"를 빠르게 설명할 수 있습니다. 결국 CLI 실무 역량은 명령 자체보다 **증거 기반 판단 루틴**을 안정적으로 반복하는 능력입니다.
+
+### 운영 메모: 실패 후 복구 순서
+
+실패가 발생했을 때는 "원인 추정 -> 즉시 재시작"보다 "상태 확인 -> 증거 수집 -> 최소 조치" 순서가 안전합니다.
+
+```bash
+systemctl status my-api --no-pager | sed -n '1,12p'
+journalctl -u my-api -n 50 --no-pager | grep -E 'ERROR|CRITICAL|timeout|Failed' || true
+```
+
+상태와 로그를 먼저 남겨 두면, 재시작 후 증거가 사라져도 회고와 재발 방지 작업을 진행할 수 있습니다.
+
+## 처음 질문으로 돌아가기
+
+- **표준 입력, 표준 출력, 표준 오류는 왜 분리되어 있을까요?**
+  - 정상 결과와 오류를 섞지 않아야 다음 명령이 필요한 데이터만 안정적으로 소비할 수 있기 때문입니다. 글의 `python3 app.py > /tmp/app.out 2> /tmp/app.err` 예시처럼 stdout과 stderr를 분리하면 분석과 자동화가 쉬워지고, `2>&1 | tee build.log`로 다시 합칠지 여부도 명시적으로 결정할 수 있습니다.
+- **`|`, `>`, `>>`, `2>`는 각각 어떤 흐름을 만들까요?**
+  - `|`는 왼쪽 stdout을 오른쪽 stdin으로 넘기고, `>`는 파일 덮어쓰기, `>>`는 이어쓰기, `2>`는 stderr만 따로 저장하는 흐름을 만듭니다. `awk '{print $1}' access.log | sort | uniq -c | sort -rn | head -3`와 `ls /tmp /nonexistent > out.txt 2> err.txt`가 각각 파이프와 리다이렉션의 대표적인 사용 예입니다.
+- **중간 파일 없이 명령을 이어 붙이면 무엇이 좋아질까요?**
+  - `grep "ERROR" app.log | sort | uniq -c | sort -rn`처럼 즉시 결과를 만들 수 있어 디스크 낭비와 정리 비용이 줄어듭니다. 또 접근 로그를 5xx 목록으로 압축하는 파이프 체인처럼, 원문 데이터를 다음 단계가 바로 소비할 수 있는 형태로 변환하기 쉬워집니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [CLI와 Shell이란 무엇인가?](./01-what-is-cli-and-shell.md)
-- [파일과 디렉터리 다루기](./02-files-and-directories.md)
-- [권한과 소유자 이해하기](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- [grep, find, xargs](./05-grep-find-xargs.md)
+- [Linux CLI 101 (1/10): CLI와 Shell이란 무엇인가?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): 파일과 디렉터리 다루기](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): 권한과 소유자 이해하기](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — 파일 내용 보기](./04-viewing-files.md)
+- [Linux CLI 101 (5/10): grep, find, xargs — 검색의 삼총사](./05-grep-find-xargs.md)
 - **pipe와 redirection (현재 글)**
 - 프로세스 확인과 종료 (예정)
 - 환경변수와 PATH (예정)
@@ -244,3 +466,5 @@ pipe는 Unix 철학의 핵심입니다. 작은 도구를 조합하면 전용 프
 - [The Missing Semester - Data Wrangling](https://missing.csail.mit.edu/2020/data-wrangling/)
 - [Linux Documentation - I/O Redirection](https://tldp.org/LDP/abs/html/io-redirection.html)
 - [Useless Use of Cat Award](https://porkmail.org/era/unix/award)
+
+- book-examples (linux-cli-101): https://github.com/yeongseon-books/book-examples/tree/main/linux-cli-101/ko

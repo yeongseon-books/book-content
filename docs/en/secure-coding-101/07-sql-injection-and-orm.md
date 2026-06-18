@@ -1,10 +1,10 @@
 ---
 series: secure-coding-101
 episode: 7
-title: SQL Injection and Safe ORM Usage
+title: "Secure Coding 101 (7/10): SQL Injection and Safe ORM Usage"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,30 @@ tags:
   - SecureCoding
   - OWASP
 seo_description: Parameterized queries, safe ORM patterns, raw SQL pitfalls, and a five-step playbook to defeat SQL injection for good.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# SQL Injection and Safe ORM Usage
+# Secure Coding 101 (7/10): SQL Injection and Safe ORM Usage
 
-> Secure Coding 101 series (7/10)
+SQL injection is old, but it remains expensive because one mistake can hand over not just a page or a user account, but the entire database behind the application. A single f-string in the wrong place can become an authentication bypass, a data dump, and a destructive write path at the same time.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Secure Coding 101 series.
 
-**Core question**: Twenty-five years on, why is *SQL injection still the top issue*?
+Here, we will treat SQL injection as a structural error in how code combines syntax and data, not as a problem that disappears automatically once an ORM is in place. That distinction is what helps you reason clearly about raw SQL, dynamic identifiers, ORM escape hatches, and database account permissions.
 
-> *The cause is always the same — *building SQL by string concatenation*. So is the fix — *use parameters*.*
+> SQL injection almost always comes from the same root cause: building SQL by string composition instead of sending data as data.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![secure coding 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/07/07-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying SQL Injection and Safe ORM Usage?
+- Which signal should the example or diagram make visible for SQL Injection and Safe ORM Usage?
+- What failure should be prevented first when SQL Injection and Safe ORM Usage reaches a real system?
+
+## Questions This Chapter Answers
 
 - How *SQL injection* works
 - Why *parameterized queries* matter
@@ -45,16 +53,6 @@ last_reviewed: '2026-05-04'
 A single SQLi exposes the *entire database*. Auth bypass, data exfiltration, and tampering — all at once.
 
 > *If SQL is built from string concatenation, it *will leak* one day.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Input["User input"] -->|concat| Bad["SQL string"]
-    Bad --> Vuln["Vulnerable (SQLi)"]
-    Input -->|parameter| Good["Prepared statement"]
-    Good --> Safe["Safe"]
-```
 
 ## Key Terms
 
@@ -112,6 +110,22 @@ session.execute(text("SELECT * FROM logs WHERE user_id=:uid"), {"uid": uid})
 GRANT SELECT, INSERT, UPDATE ON db.* TO 'app'@'%';
 ```
 
+## How to verify the query path before production
+
+It is worth checking the dangerous cases explicitly instead of assuming the ORM got everything right.
+
+```python
+payload = "' OR 1=1 --"
+
+# Safe path: returns only matching rows for the literal payload value
+cursor.execute("SELECT id FROM users WHERE name=%s", (payload,))
+
+# Unsafe path: payload changes the SQL itself
+sql = f"SELECT id FROM users WHERE name='{payload}'"
+```
+
+**Expected result:** the parameterized version treats the payload as a string value and returns either zero or legitimate matches. The interpolated version changes the query meaning and can return unintended rows. This is the fastest possible demonstration to keep in a team code review.
+
 ## What to Notice in This Code
 
 - *String concatenation* into SQL is a *red flag* every time.
@@ -155,17 +169,29 @@ Most teams default to the ORM and treat *raw SQL* as the exception. Every raw SQ
 
 A safe DB removes the attacker's *biggest prize*. Next we cover the two browser-side attacks — *XSS and CSRF*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying SQL Injection and Safe ORM Usage?**
+  - The article treats SQL Injection and Safe ORM Usage as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for SQL Injection and Safe ORM Usage?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when SQL Injection and Safe ORM Usage reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Secure Coding?](./01-what-is-secure-coding.md)
-- [Input Validation](./02-input-validation.md)
-- [Authentication and Session](./03-authentication-and-session.md)
-- [Authorization and Permissions](./04-authorization-and-permissions.md)
-- [Safe Data Storage](./05-safe-data-storage.md)
-- [Secret and Key Management](./06-secret-and-key-management.md)
+## In this series
+
+- [Secure Coding 101 (1/10): What Is Secure Coding?](./01-what-is-secure-coding.md)
+- [Secure Coding 101 (2/10): Input Validation](./02-input-validation.md)
+- [Secure Coding 101 (3/10): Authentication and Session](./03-authentication-and-session.md)
+- [Secure Coding 101 (4/10): Authorization and Permissions](./04-authorization-and-permissions.md)
+- [Secure Coding 101 (5/10): Safe Data Storage](./05-safe-data-storage.md)
+- [Secure Coding 101 (6/10): Secret and Key Management](./06-secret-and-key-management.md)
 - **SQL Injection and Safe ORM Usage (current)**
 - XSS and CSRF Defense (upcoming)
 - Managing Dependency Vulnerabilities (upcoming)
 - Safe Logging and Audit (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -174,3 +200,4 @@ A safe DB removes the attacker's *biggest prize*. Next we cover the two browser-
 - [PortSwigger — SQL injection](https://portswigger.net/web-security/sql-injection)
 - [SQLAlchemy security](https://docs.sqlalchemy.org/)
 - [psycopg parameter binding](https://www.psycopg.org/psycopg3/docs/basic/params.html)
+- [SQLAlchemy — Selecting with textual SQL](https://docs.sqlalchemy.org/en/20/tutorial/dbapi_transactions.html)

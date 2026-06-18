@@ -1,10 +1,10 @@
 ---
 series: database-systems-101
 episode: 1
-title: What Is a Database System?
+title: "Database Systems 101 (1/10): What Is a Database System?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: Why a DBMS is more than a clever file — what it guarantees ab
 last_reviewed: '2026-05-04'
 ---
 
-# What Is a Database System?
+# Database Systems 101 (1/10): What Is a Database System?
+
+This is the first post in the Database Systems 101 series.
 
 > Database Systems 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: We could just put data in a file. Why do we run a whole separate piece of software called a database?
 
 > A database management system (DBMS) is not just storage. It is software that solves four hard problems together — **concurrent access, crash recovery, consistency, and querying**. A flat file works until two users, a power failure, or a non-trivial question shows up. After that, it does not. This first episode draws that boundary.
 
-<!-- a-grade-intro:end -->
+
+![database systems 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/01/01-01-big-picture.en.png)
+*database systems 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is a Database System??
+- Which signal should the example or diagram make visible for What Is a Database System??
+- What failure should be prevented first when What Is a Database System? reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 If you treat a database as "the place where data goes," you cannot explain why locks happen, why transactions exist, or why your data survives a power loss. Once you understand what a DBMS is for, the rest of this series — SQL, indexes, transactions, isolation — stops looking like trivia and starts looking like inevitable design.
 
 > "We use a database" really means "we don't write concurrency, crash recovery, and consistency by hand."
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -231,7 +237,18 @@ In operations, what matters is not how it runs on a calm Tuesday but **whether y
 
 A DBMS is not a place to put data — it is **software that solves concurrency, durability, consistency, and querying together**. That is what lets your application stay focused on intent. Next we look at the model SQL is built on: the relational model.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is a Database System??**
+  - The article treats What Is a Database System? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is a Database System??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is a Database System? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Database System? (current)**
 - The Relational Model (upcoming)
 - SQL and Query Processing (upcoming)
@@ -242,6 +259,7 @@ A DBMS is not a place to put data — it is **software that solves concurrency, 
 - Query Optimization (upcoming)
 - Replication and Backup (upcoming)
 - OLTP and OLAP (upcoming)
+
 <!-- toc:end -->
 
 ## References

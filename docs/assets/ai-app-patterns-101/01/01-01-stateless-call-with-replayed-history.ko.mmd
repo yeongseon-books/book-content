@@ -1,0 +1,15 @@
+flowchart TD
+  U["사용자 메시지\n새 턴 도착"] --> A["앱 상태\nHumanMessage 추가"]
+  A --> H["전체 이력 재생\nSystem + 이전 턴 + 새 턴"]
+  H --> L["무상태 LLM API 호출\nllm.invoke(history)"]
+  L --> R["어시스턴트 응답\n현재 답변 반환"]
+  R --> S["앱 상태\nAIMessage 추가"]
+  S --> N["다음 턴\n누적 메시지 목록을 다시 전송"]
+
+  style U fill:#e3f2fd,stroke:#1976d2
+  style A fill:#fff3e0,stroke:#f57c00
+  style H fill:#fffde7,stroke:#f9a825
+  style L fill:#f3e5f5,stroke:#7b1fa2
+  style R fill:#e8f5e9,stroke:#388e3c
+  style S fill:#fce4ec,stroke:#c2185b
+  style N fill:#ede7f6,stroke:#5e35b1

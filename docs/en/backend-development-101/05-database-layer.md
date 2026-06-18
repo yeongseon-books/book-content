@@ -1,10 +1,10 @@
 ---
 series: backend-development-101
 episode: 5
-title: The Database Layer
-status: content-ready
+title: "Backend Development 101 (5/10): The Database Layer"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,44 +17,30 @@ tags:
   - SQLAlchemy
   - Python
 seo_description: Use the repository pattern to isolate database access — transactions, migrations, and the N+1 query problem covered in one place.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# The Database Layer
+# Backend Development 101 (5/10): The Database Layer
 
-> Backend Development 101 series (5/10)
+The moment services start writing SQL directly, query duplication and data-access drift begin to spread. It feels convenient at first, but the cost shows up later when you need to tune performance, add caching, or swap test storage.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Backend Development 101 series. Here, we use the repository pattern to separate the database layer and then walk through ORM basics, migrations, transaction boundaries, and the N+1 problem.
 
-**Core question**: Why should services *not* write SQL directly?
 
-> Because the database might change, the same query gets duplicated everywhere, and maintenance turns into hell. The repository sits between them.
+![backend development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 5 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The role of the repository pattern
-- Why we use an ORM and where its *traps* live
-- The flow of transactions, commits, and rollbacks
-- What a migration is and why it matters
-- The N+1 query problem and how to fix it
+- The role of the repository pattern?
+- Why we use an ORM and where its *traps* live?
+- The flow of transactions, commits, and rollbacks?
 
 ## Why It Matters
 
 Databases are *what changes most often* and *what should change least*. Splitting the layer early means swapping a database, adding a cache, or running tests on an in-memory engine all happen in *one file*.
 
 > A repository is the *translator between the database and the service*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Svc["Service"] --> Repo["Repository"]
-    Repo --> ORM["ORM"]
-    ORM --> DB[("Database")]
-    Repo --> Cache[("Cache")]
-```
 
 The service does not know SQL — only the repository does.
 
@@ -166,6 +152,16 @@ orders = session.scalars(stmt).all()
 
 Loading the children in *one shot* eliminates N+1.
 
+## Verification points
+
+**Expected output:** after `Base.metadata.create_all(engine)`, the `users` table should exist, and both `add()` calls inside one transaction block should commit together unless an exception triggers rollback.
+
+### First failure modes to check
+
+- Long-lived sessions often show up later as leaked connections or lock contention.
+- Manual schema edits start environment drift immediately when no migration records the change.
+- If list endpoints suddenly slow down, check for repeated relation fetches before looking anywhere else.
+
 ## What to Notice in This Code
 
 - Sessions stay *short* — one per request is standard.
@@ -210,22 +206,39 @@ Most backends start with *PostgreSQL + ORM + Alembic + Repository*. As traffic g
 
 A repository is a *translator over the database*. Next, we look at *who can see what* — authentication and authorization.
 
+## Answering the Opening Questions
+
+- **The role of the repository pattern?**
+  - The article treats The Database Layer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why we use an ORM and where its *traps* live?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The flow of transactions, commits, and rollbacks?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Backend Development?](./01-what-is-backend-development.md)
-- [Building an HTTP Server](./02-building-an-http-server.md)
-- [Routing and Controllers](./03-routing-and-controllers.md)
-- [The Service Layer](./04-service-layer.md)
+## In this series
+
+- [Backend Development 101 (1/10): What Is Backend Development?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): Building an HTTP Server](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing and Controllers](./03-routing-and-controllers.md)
+- [Backend Development 101 (4/10): The Service Layer](./04-service-layer.md)
 - **The Database Layer (current)**
 - Authentication and Authorization (upcoming)
 - Logging and Error Handling (upcoming)
 - Testing the Backend (upcoming)
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+### Official Docs
+
 - [SQLAlchemy ORM](https://docs.sqlalchemy.org/en/20/orm/)
 - [Alembic Tutorial](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
+- [SQLAlchemy relationship loading techniques](https://docs.sqlalchemy.org/en/20/orm/queryguide/relationships.html)
+
+### Further Reading
+
 - [Repository pattern (Martin Fowler)](https://martinfowler.com/eaaCatalog/repository.html)
-- [N+1 queries explained](https://www.sqlshack.com/n1-query-problem/)

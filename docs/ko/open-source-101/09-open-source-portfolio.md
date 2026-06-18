@@ -1,12 +1,12 @@
 ---
 series: open-source-101
 episode: 9
-title: 오픈소스 포트폴리오
-status: content-ready
+title: "Open Source 101 (9/10): 오픈소스 포트폴리오"
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -16,112 +16,326 @@ tags:
   - Career
   - GitHub
   - Beginner
-seo_description: 채용 담당자가 신뢰하는 오픈소스 포트폴리오 구성 원칙을 정리한 글
-last_reviewed: '2026-05-04'
+seo_description: 깃허브 활동을 근거와 서사가 보이는 오픈소스 포트폴리오로 정리하는 방법을 설명합니다.
+last_reviewed: '2026-05-15'
 ---
 
-# 오픈소스 포트폴리오
+# Open Source 101 (9/10): 오픈소스 포트폴리오
 
-> 오픈소스 101 시리즈 (9/10)
+오픈소스 활동을 조금 시작하고 나면 이런 고민이 생깁니다. 내 깃허브가 그냥 저장소 창고로 보이는지, 아니면 내가 어떤 문제를 어떻게 풀어 왔는지 보여 주는 포트폴리오로 보이는지입니다. 기여 횟수만 많다고 좋은 포트폴리오가 되지는 않습니다. 보는 사람은 숫자보다 맥락과 지속성을 더 봅니다.
 
+여기서는 깃허브 활동을 단순한 이력 나열이 아니라, 문제 선택과 해결 방식과 지속성을 보여 주는 포트폴리오로 정리하는 기준을 봅니다.
 
-## 이 글에서 다룰 문제
+![Open Source 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/09/09-01-the-smallest-portfolio-structure.ko.png)
+*Open Source 101 9장 흐름 개요*
+> 오픈소스 포트폴리오의 강점은 **코드 목록이 아니라 협업 과정이 공개되어 있다**는 점입니다. 채용담당자는 코드와 함께 기여자의 의사소통을 읽을 수 있습니다.
 
-*포트폴리오* 는 *경력* 의 *증거* 입니다.
+## 먼저 던지는 질문
 
-## 전체 흐름
-```mermaid
-flowchart LR
-    P[Profile] --> R[Pinned]
-    R --> C[Contribs]
-    C --> N[Narrative]
-```
+- 오픈소스 기여가 어떻게 포트폴리오가 될 수 있을까요?
+- 프로필 소개 문서와 고정 저장소는 각각 무엇을 보여 줄까요?
+- 수많은 활동 중 어떤 풀 리퀘스트를 대표 사례로 골라야 할까요?
 
-## Before/After
+## 왜 중요한가
 
-**Before**: "*GitHub* 에 *fork* 만 *가득* 하다."
+포트폴리오는 경력의 증거입니다. 특히 경력이 짧거나 특정 분야로 전환하려는 사람에게는, 실제로 공개된 협업 흔적이 말보다 강한 자료가 됩니다. 코드 리뷰를 받았고, 수정했고, 병합되었고, 문서를 남겼다는 기록은 면접에서 설명하기 좋은 구체성을 줍니다.
 
-**After**: "*세 개* 의 *대표 PR* 과 *하나* 의 *자작 프로젝트* 가 *고정* 되어 있다."
+하지만 정리되지 않은 깃허브는 오히려 역효과를 낼 수 있습니다. 포크만 잔뜩 있고, 링크가 깨져 있고, 어떤 프로젝트가 대표 작업인지 알 수 없으면 보는 사람은 맥락을 읽기 어렵습니다. 포트폴리오는 양보다 편집이 중요합니다.
 
-## 포트폴리오 정비
+## 포트폴리오를 구성하는 최소 구조
 
-### 1단계 — Profile README
+이 그림에서 마지막 단계가 중요합니다. 링크만 모아 두면 자료실에 가깝고, 서사만 있으면 자기소개에 그칩니다. 둘이 합쳐져야 포트폴리오가 됩니다.
+
+즉, 좋은 포트폴리오는 "무엇을 했는가"와 "왜 그 일이 의미 있는가"를 같이 보여 줍니다. 보는 사람이 직접 검증할 수 있는 링크와, 그 링크를 어떻게 읽어야 하는지 알려 주는 설명이 함께 있어야 합니다.
+
+## 꼭 알아야 할 다섯 가지 개념
+
+프로필 소개 문서는 깃허브 첫 화면에서 자신을 소개하는 문서입니다. 고정 저장소는 내가 보여 주고 싶은 대표 작업을 전면에 배치하는 기능입니다. 활동 그래프는 활동량을 보여 주지만 맥락까지 설명해 주지는 않습니다. 기여 서사는 기여의 흐름과 성장 방향을 설명하는 이야기입니다. 작업 증거는 풀 리퀘스트 링크, 커밋, 문서, 릴리스처럼 실제로 확인 가능한 흔적입니다.
+
+포트폴리오는 보여 주기 위한 포장보다, 읽는 사람이 쉽게 검증할 수 있는 흔적을 정리하는 작업에 가깝습니다.
+
+## 생각이 어떻게 바뀌어야 할까
+
+처음에는 깃허브에 포크가 많으면 활동적으로 보인다고 생각하기 쉽습니다. 하지만 실제로 강하게 보이는 것은 수보다 선택입니다.
+
+대표 풀 리퀘스트 몇 개, 직접 만든 작은 프로젝트 하나, 그리고 일정 기간 이어진 활동 흐름이 정리돼 있으면 훨씬 신뢰할 수 있는 포트폴리오가 됩니다. 포트폴리오는 화려함보다 읽기 쉬움이 중요합니다.
+
+포트폴리오를 만드는 과정 자체가 학습입니다. 무엇을 보여 줄지 선택하고, 설명을 다듬고, 증거를 정리하며 자신의 성장을 객관화하는 훈련을 하게 됩니다.
+## 오픈소스 펜딩 모델
+
+포트폴리오로서의 오픈소스 활동은 무료 기여만을 의미하지 않습니다. 오픈소스 프로젝트도 지속 가능성을 위해 펜딩을 고민하게 되며, 포트폴리오에 펜딩 경험을 포함하면 비즈니스 감각도 보여 줄 수 있습니다.
+
+| 모델 | 예시 | 규모 | 지속성 | 특징 |
+|---|---|---|---|---|
+| 스폰서 | GitHub Sponsors, Patreon | 소규모 | 불안정 | 개인 기부 의존 |
+| 듀얼 라이선스 | MySQL, Qt | 대규모 | 안정 | OSS + 상업 버전 병행 |
+| SaaS | Sentry, GitLab | 대규모 | 안정 | 호스팅 서비스로 수익 |
+| 기부 | Apache, Linux | 대규모 | 안정 | 재단/기업 후원 |
+| 컨설팅 | Red Hat, Canonical | 대규모 | 안정 | 기술 지원 판매 |
+
+소규모 프로젝트는 GitHub Sponsors나 Ko-fi같은 스폰서부터 시작하는 편이 부담 없습니다. 사용자가 늘어나면 듀얼 라이선스나 SaaS 모델을 고려할 수 있습니다. 중요한 것은 펜딩 모델이 오픈소스 정신과 충돌하지 않도록 투명하게 공개하는 것입니다.
+## 직접 따라해 보기: 포트폴리오 정리 절차
+
+### 1단계 — 프로필 소개 문서 만들기
+
+프로필 첫 화면에서 내가 어떤 분야에 관심이 있고, 어떤 오픈소스 활동을 해 왔는지 짧게 보여 줄 수 있습니다.
 
 ```bash
 gh repo create <username> --public
 echo "# Hi, I am ..." > README.md
 ```
 
-### 2단계 — Pinned 6개 선정
+### 2단계 — 고정 항목 여섯 개 고르기
+
+무조건 많이 보여 주는 것이 목표가 아닙니다. 원본 프로젝트, 대표 풀 리퀘스트, 학습 자료, 꾸준히 기여한 저장소처럼 성격이 다른 증거를 균형 있게 고르는 편이 좋습니다.
 
 ```text
-- 자작 프로젝트 1
-- 의미 있는 PR 3
-- 학습 노트 1
-- 기여한 OSS 1
+- 1 original project
+- 3 meaningful PRs
+- 1 learning notebook
+- 1 OSS you contribute to
 ```
 
-### 3단계 — PR 인덱스
+### 3단계 — 대표 풀 리퀘스트 목록 만들기
 
+링크를 흩어 두지 말고 한곳에 묶어 두면 보는 사람이 훨씬 빠르게 판단할 수 있습니다. 내가 무엇을 고쳤는지 한 줄 요약도 함께 적는 편이 좋습니다.
+
+````markdown
 ```markdown
 ## Notable PRs
 - pandas#123 — Fix x
 - requests#456 — Add y
 ```
+````
 
-### 4단계 — 기여 서사
+### 4단계 — 기여 서사 적기
 
+활동의 순서와 성격을 설명하면 점수판처럼 보이던 기록이 성장 이야기로 바뀝니다. 문서에서 버그로, 버그에서 기능 작업으로 이동한 흐름은 좋은 사례입니다.
+
+````markdown
 ```markdown
 ## Story
 Started with docs, moved to bugs, now feature work.
 ```
+````
 
-### 5단계 — 지속 증거
+### 5단계 — 지속성 증거 만들기
+
+강한 한 번보다 꾸준한 여러 번이 더 설득력 있을 때가 많습니다. 일정 기간 반복된 활동은 협업 습관을 보여 줍니다.
 
 ```text
-주 2 commits 이상, 3개월 연속
+At least 2 commits per week, three months straight
 ```
 
-## 이 코드에서 주목할 점
+## 이 예시에서 먼저 읽어야 할 점
 
-- *서사* 가 *맥락*.
-- *Pinned* 가 *얼굴*.
-- *지속* 이 *신뢰*.
+프로필은 입구입니다. 고정 항목은 첫인상을 좌우합니다. 풀 리퀘스트 링크는 실제 증거입니다. 지속성은 재능보다 신뢰를 보여 줍니다.
 
-## 자주 하는 실수 5가지
+포트폴리오가 강해지는 이유는 숫자가 많아서가 아닙니다. 보는 사람이 "이 사람은 이런 문제를 골라 이런 방식으로 끝까지 밀어 왔구나"를 빠르게 이해할 수 있기 때문입니다.
 
-1. ***fork* 만 *쌓는다*.**
-2. ***README* 가 *비어 있다*.**
-3. ***PR* 링크가 *깨져 있다*.**
-4. ***활동* 이 *간헐적*.**
-5. ***설명* 이 *없다*.**
+## 깃허브 스폰서 설정 예시
 
-## 실무에서는 이렇게 쓰입니다
+포트폴리오에 펜딩 경험을 추가하려면 GitHub Sponsors가 가장 쉽습니다. 포트폴리오 README에 스폰서 배지를 표시하면 비즈니스 감각을 보여 줄 수 있습니다.
 
-기업 *채용* 시에도 *GitHub* 활동을 *기술 인터뷰* *전* *참고* 자료로 *활용* 합니다.
+**1단계: `.github/FUNDING.yml` 파일 생성**
+
+```yaml
+github: [your-username]
+patreon: your-username
+ko_fi: your-username
+custom: ["https://paypal.me/username", "https://buymeacoffee.com/username"]
+```
+
+**2단계: 스폰서 티어 구성**
+
+```markdown
+## Sponsor Tiers
+
+### $5/month - Supporter
+- Name in README
+- Early access to releases
+
+### $25/month - Contributor
+- Priority issue triage
+- Monthly video call
+
+### $100/month - Sponsor
+- Logo on website
+- Dedicated support channel
+```
+
+**3단계: README에 배지 추가**
+
+```markdown
+## Sponsors
+
+Thank you to our sponsors!
+
+[![Sponsor](https://img.shields.io/github/sponsors/username?style=for-the-badge)](https://github.com/sponsors/username)
+```
+
+스폰서를 받는 경험은 포트폴리오에 두 가지를 보여 줍니다. 첨째, 프로젝트가 실제 사용자에게 가치를 주고 있다는 증거. 둘째, 비즈니스 모델을 설계하고 운영하는 능력.
+## 자주 하는 실수 다섯 가지
+
+1. 포크만 쌓아 두고 정작 대표 작업은 보이지 않게 둡니다.
+2. 프로필 소개 문서를 비워 둡니다.
+3. 깨진 풀 리퀘스트 링크나 오래된 설명을 방치합니다.
+4. 활동이 단발성인데도 맥락 설명이 없습니다.
+5. 무엇을 왜 했는지 설명 없이 저장소만 나열합니다.
+
+## 실무에서는 이렇게 생각한다
+
+채용 팀이나 협업 상대는 종종 깃허브를 사전 참고 자료로 봅니다. 이때 중요한 것은 모든 저장소가 아니라, 내가 문제를 선택하고 끝까지 다듬은 흔적이 얼마나 명확한가입니다. 대표 풀 리퀘스트 몇 개와 짧은 설명만 잘 정리되어 있어도 대화의 질이 크게 달라집니다.
+
+시니어 엔지니어는 포트폴리오를 숫자 경쟁으로 보지 않습니다. 잔디밭보다 맥락이 중요하고, 서른 개의 얕은 활동보다 세 개의 분명한 기여가 더 설득력 있습니다. 결국 포트폴리오는 내가 실제로 해 온 일을 읽기 쉽게 정리하는 문서입니다.
 
 ## 체크리스트
 
-- [ ] *Profile README* 작성.
-- [ ] *Pinned 6개* 선정.
-- [ ] *Notable PRs* 인덱스.
-- [ ] *3개월* 활동.
+- [ ] 프로필 소개 문서를 작성했습니다.
+- [ ] 대표로 보여 줄 고정 항목을 골랐습니다.
+- [ ] 대표 풀 리퀘스트 목록을 한곳에 정리했습니다.
+- [ ] 최근 몇 달의 지속적 활동 흐름을 설명할 수 있습니다.
 
-## 정리 및 다음 단계
+## 연습 문제
 
-다음 글은 *내 첫 오픈소스 프로젝트* 입니다.
+1. 고정 항목과 포크의 차이를 한 문장으로 적어 보세요.
+2. 프로필 소개 문서의 목적을 한 문장으로 적어 보세요.
+3. 지속성 있는 활동 증거 예시를 하나 적어 보세요.
 
+## 포트폴리오 업데이트 주기
+
+오픈소스 포트폴리오는 한 번 쓰고 끝나는 문서가 아닙니다. 정기적으로 업데이트해야 최신 활동이 반영됩니다.
+
+| 주기 | 활동 | 목적 |
+|------|------|------|
+| **매달** | GitHub 프로필 README 업데이트 | 최근 3개월 활동 요약 유지 |
+| **분기마다** | 고정 항목 재검토 | 더 나은 프로젝트로 교체 |
+| **지원 전** | 대표 PR 목록 재작성 | 지원 직무에 맞게 강조점 조정 |
+
+포트폴리오는 "내가 무엇을 할 수 있는가"를 보여주는 살아있는 문서입니다. 6개월 전 활동만 있으면 "현재는 활동하지 않는다"는 인상을 줍니다.
+
+## 기술 블로그 연동
+
+오픈소스 프로젝트 경험을 기술 블로그 글로 정리하면 포트폴리오의 깊이가 더해집니다. 코드만으로는 보이지 않는 의사결정 과정과 학습 내용을 설명할 수 있습니다.
+
+```markdown
+## 블로그 글 연동 예시
+
+### 프로젝트
+- [my-cli-tool](https://github.com/username/my-cli-tool) — Python CLI 도구
+
+### 관련 글
+- [첫 오픈소스 프로젝트를 만들며 배운 것](https://blog.example.com/first-oss)
+- [GitHub Actions로 릴리스 자동화하기](https://blog.example.com/gh-actions)
+- [사용자 피드백을 받고 설계를 바꾼 이야기](https://blog.example.com/design-change)
+```
+
+블로그 글은 프로젝트 README의 "Related Posts" 섹션에 링크하거나, GitHub 프로필 README에 최신 글 목록을 자동으로 표시할 수 있습니다.
+
+## 포트폴리오를 신뢰 가능한 증거로 만드는 구성법
+
+좋은 포트폴리오는 "많이 했다"가 아니라 "검증 가능하다"를 보여 줍니다. 그래서 대표 항목마다 같은 템플릿으로 정리하는 편이 좋습니다: 문제, 접근, 결과, 링크.
+
+```markdown
+### PR #142 — 로그인 예외 처리 안정화
+- 문제: Safari 환경에서 간헐적 500
+- 접근: 세션 검증 분기 추가 + 회귀 테스트 작성
+- 결과: 재현 실패율 0%로 감소
+- 링크: PR, 커밋, 릴리스 노트
+```
+
+이 형식이 강한 이유는 리뷰어가 빠르게 실력을 판단할 수 있기 때문입니다. 단순 커밋 수보다 "어떤 문제를 끝까지 해결했는지"가 더 분명하게 보입니다.
+
+프로필 README에는 LICENSE 이해, CONTRIBUTING 문서 작성 경험, PR 리뷰 대응 경험을 한 줄씩 명시하세요. 협업 역량을 보여 주는 지점이기 때문입니다.
+
+또한 CI 배지와 최신 릴리스 배지를 걸어 두면 "지금도 관리 중"이라는 신호를 줄 수 있습니다. 포트폴리오는 과거 기록이지만, 동시에 현재 운영 상태를 보여 주는 문서이기도 합니다.
+
+마지막으로 SemVer를 지키는 개인 프로젝트 하나를 대표로 두면 좋습니다. 버전 정책, 변경 기록, 마이그레이션 안내를 직접 운영해 본 경험은 주니어와 시니어를 가르는 중요한 증거가 됩니다.
+
+## 정리
+
+이번 글에서는 오픈소스 활동을 경력 증거로 정리하는 방법을 살펴봤습니다. 핵심은 많이 했다는 인상을 주는 것이 아니라, 무엇을 어떻게 해 왔는지 근거와 이야기로 함께 보여 주는 것입니다.
+
+다음 글에서는 시리즈의 마지막으로, 작은 도구 하나를 실제 오픈소스 프로젝트로 공개하는 전 과정을 정리해 보겠습니다.
+
+## 처음 질문으로 돌아가기
+
+- **왜 포트폴리오로 개인 프로젝트보다 오픈소스 기여를 보여주는 게 좋을까요?** 오픈소스는 **코드 리뷰, 피드백 수용, 협업**의 실제 과정이 모두 공개되어 있어서, 채용담당자가 기술 실력 외에 협업 능력도 판단할 수 있습니다.
+
+- **첫 오픈소스 기여를 포트폴리오에 넣을 때 어떤 점을 주의해야 할까요?** 작은 기여라도 **질문, 리뷰 피드백, 최종 결과**가 명확하게 기록되어 있으면 충분합니다. 완성도보다 **협업 과정**이 중요합니다.
+
+- **"X개 프로젝트 기여"라고 쓰면 되는 건가요?** 아닙니다. **어떤 문제를 푸는 기여였고, 어떤 리뷰를 받았고, 그 경험에서 뭘 배웠는지**를 구체적으로 적을 때 포트폴리오의 신뢰도가 올라갑니다.
 <!-- toc:begin -->
-- [오픈소스란 무엇인가](./01-what-is-open-source.md)
-- [라이선스 이해하기](./02-understanding-licenses.md)
-- [Issue 읽기](./03-reading-issues.md)
-- [PR 만들기](./04-creating-pull-requests.md)
-- [좋은 README](./05-good-readme.md)
-- [Release 와 Versioning](./06-release-and-versioning.md)
-- [Community 관리](./07-community-management.md)
-- [Maintainer 의 역할](./08-maintainer-role.md)
+
+## 펜딩 없이 지속하는 법
+
+모든 오픈소스 프로젝트가 펜딩을 받을 필요는 없습니다. 펜딩이 없어도 오래 지속하는 프로젝트들이 많습니다. 다음은 펜딩 없이 지속하는 전략입니다.
+
+**1. 범위를 작게 유지**
+
+프로젝트 범위를 작게 유지하면 유지보수 부담이 줄어듭니다. 하나의 문제를 잘 푸는 도구는 모든 문제를 푸려는 플랫폼보다 오래 갑니다.
+
+```markdown
+## Non-goals
+
+- We will NOT add GUI
+- We will NOT support Python 2
+- We will NOT become a framework
+```
+
+**2. 자동화를 최대화**
+
+CI/CD, 테스트, 린트, 문서 배포를 모두 자동화하면 메인테이너의 수동 작업이 줄어듭니다.
+
+```yaml
+# .github/workflows/ci.yml
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - run: pytest
+    - run: ruff check
+```
+
+**3. 기여자를 메인테이너로 승격**
+
+한 명이 모든 것을 책임지려고 하면 금방 지칩니다. 정기적으로 기여하는 사람을 committer나 maintainer로 승격하면 bus factor가 올라갑니다.
+
+```markdown
+## Maintainers
+
+- @alice (founder)
+- @bob (committer since 2024)
+- @carol (docs maintainer)
+```
+
+**4. 휴면기를 인정**
+
+모든 프로젝트가 항상 활발해야 하는 것은 아닙니다. 프로젝트가 안정된 상태라면, README에 "Stable, not abandoned"라고 명시하는 것도 좋습니다.
+
+```markdown
+## Status
+
+This project is stable and maintained.
+We accept bug fixes but do not plan major new features.
+```
+
+펜딩 없이 지속하는 프로젝트는 펜딩을 받는 프로젝트보다 덜 중요하지 않습니다. 오히려 범위를 작게 유지하고 자동화를 잘 구축한 프로젝트가 더 오래 갑니다.
+## 시리즈 목차
+
+- [Open Source 101 (1/10): 오픈소스란 무엇인가](./01-what-is-open-source.md)
+- [Open Source 101 (2/10): 라이선스 이해하기](./02-understanding-licenses.md)
+- [Open Source 101 (3/10): 이슈 읽기](./03-reading-issues.md)
+- [Open Source 101 (4/10): 풀 리퀘스트 만들기](./04-creating-pull-requests.md)
+- [Open Source 101 (5/10): 좋은 리드미 문서](./05-good-readme.md)
+- [Open Source 101 (6/10): 릴리스와 버전 관리](./06-release-and-versioning.md)
+- [Open Source 101 (7/10): 커뮤니티 운영](./07-community-management.md)
+- [Open Source 101 (8/10): 메인테이너의 역할](./08-maintainer-role.md)
 - **오픈소스 포트폴리오 (현재 글)**
 - 내 첫 오픈소스 프로젝트 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -130,3 +344,6 @@ Started with docs, moved to bugs, now feature work.
 - [Pinning items](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/pinning-items-to-your-profile)
 - [Open Source Guides — Finding Users](https://opensource.guide/finding-users/)
 - [Hiring with GitHub](https://github.com/readme)
+- [github/readme](https://github.com/readme)
+
+- [이 시리즈 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/open-source-101/ko)

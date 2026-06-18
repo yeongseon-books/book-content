@@ -1,5 +1,5 @@
 ---
-title: Model Evaluation
+title: "LLM Fine-tuning 101 (5/6): Model Evaluation"
 series: llm-finetuning-101
 episode: 5
 language: en
@@ -21,22 +21,20 @@ seo_description: Evaluation works best when you separate "internal model signals
   from "user-facing quality."
 ---
 
-# Model Evaluation
+# LLM Fine-tuning 101 (5/6): Model Evaluation
 
-## Questions this post answers
+Evaluation is where many fine-tuning demos become misleading. This article separates internal model signals from user-facing quality so you can measure improvement and catch regressions with a repeatable loop.
 
-![Questions this post answers](../../assets/llm-finetuning-101/05/05-01-questions-this-post-answers.en.png)
+This is the fifth post in the LLM Fine-tuning 101 series.
 
-*Questions this post answers*
+![LLM Fine-tuning 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-02-the-right-way-to-read-perplexity.en.png)
+*LLM Fine-tuning 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
 
 - How do you compute perplexity, the first quantitative signal to look at right after fine-tuning?
 - Why is comparing perplexity before and after training not a complete quality evaluation?
 - Why keep a separate evaluation loop even in a tiny model demo?
-- How should you combine perplexity with golden-set evaluation?
-
-> Perplexity measures how unsurprised the model is by the next token. It does not directly guarantee that humans will find the output good.
-
-Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/05-evaluation)
 
 ## Why this matters
 
@@ -48,7 +46,7 @@ The real goal of episode 5 is to make evaluation an **automatable pipeline**. Ey
 
 Evaluation works best when you separate "internal model signals" from "user-facing quality."
 
-```
+```text
 [Internal signals]              [User-facing quality]
 - perplexity                    - answer match rate
 - token-level accuracy          - format compliance
@@ -85,7 +83,7 @@ Two more facts to memorize:
 
 **After** — Adopting the evaluation loop in episode 5 condenses the result into one line:
 
-```
+```text
 {'before_ppl': 27431.84, 'after_ppl': 26890.17, 'delta_pct': -1.97}
 ```
 
@@ -93,13 +91,9 @@ The absolute value does not matter. What matters is (1) evaluation is separated 
 
 ## How to read perplexity correctly
 
-![Relationship between perplexity and quality metrics](../../assets/llm-finetuning-101/05/05-02-the-right-way-to-read-perplexity.en.png)
-
-*Relationship between perplexity and quality metrics*
-
 Perplexity is "lower is better," but you cannot judge quality from the absolute value alone. Tiny demo models, small datasets, and short context lengths cause large swings. So in practice, perplexity is best used as a **regression baseline** — strong at detecting whether things got worse, or whether a setting change improved the trend.
 
-![How to read perplexity correctly](../../assets/llm-finetuning-101/05/05-01-the-right-way-to-read-perplexity.en.png)
+![How to read perplexity correctly](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-01-the-right-way-to-read-perplexity.en.png)
 
 *How to read perplexity correctly*
 
@@ -171,7 +165,7 @@ The moment these two lines print together, you see the regression baseline and u
 
 ## What to notice in this code
 
-![Calculation flow from average loss to perplexity](../../assets/llm-finetuning-101/05/05-03-what-to-notice-in-this-code.en.png)
+![Calculation flow from average loss to perplexity](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-03-what-to-notice-in-this-code.en.png)
 
 *Calculation flow from average loss to perplexity*
 
@@ -182,7 +176,7 @@ The moment these two lines print together, you see the regression baseline and u
 
 ## Common mistakes
 
-![Decision flow for overfit signals and comparison baselines](../../assets/llm-finetuning-101/05/05-04-where-engineers-get-confused.en.png)
+![Decision flow for overfit signals and comparison baselines](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-04-where-engineers-get-confused.en.png)
 
 *Decision flow for overfit signals and comparison baselines*
 
@@ -222,15 +216,24 @@ Evaluation is unglamorous, but it is the step that earns trust in a fine-tuning 
 
 The next article (episode 6) covers serving. We will deploy the LoRA adapter separated from the base model and reduce inference memory and latency in code.
 
+## Answering the Opening Questions
+
+- **How do you compute perplexity, the first quantitative signal to look at right after fine-tuning?**
+  - The article treats Model Evaluation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is comparing perplexity before and after training not a complete quality evaluation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why keep a separate evaluation loop even in a tiny model demo?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LLM Fine-tuning Primer](./01-intro.md)
-- [Dataset Preparation and Preprocessing](./02-dataset.md)
-- [Configuring LoRA Adapters](./03-lora.md)
-- [Training Loop and Hyperparameters](./04-training.md)
-- **Model Evaluation (current)**
-- Model Serving (upcoming)
+- [LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer](./01-intro.md)
+- [LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing](./02-dataset.md)
+- [LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters](./03-lora.md)
+- [LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters](./04-training.md)
+- **LLM Fine-tuning 101 (5/6): Model Evaluation (current)**
+- LLM Fine-tuning 101 (6/6): Model Serving (upcoming)
 
 <!-- toc:end -->
 

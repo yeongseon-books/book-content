@@ -1,11 +1,11 @@
 ---
-title: Shell Script Basics
+title: "Linux CLI 101 (9/10): Shell Script Basics"
 series: linux-cli-101
 episode: 9
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,36 +17,26 @@ tags:
 - Automation
 - Scripting
 - CLI
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: A shell script is a recipe file of CLI commands. Write it once, and
   it runs repetitive tasks automatically every time.
 ---
 
-# Shell Script Basics
+# Linux CLI 101 (9/10): Shell Script Basics
 
-> Linux CLI 101 series (9/10)
+Repeated command sequences are where the CLI starts to pay back the learning cost. The moment you run the same deploy, backup, or setup steps twice, you are already paying interest on work that should become a script.
 
----
+This is post 9 in the Linux CLI 101 series.
 
-<!-- a-grade-intro:begin -->
 
-## Key Questions
+![Linux CLI 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/09/09-01-big-picture.en.png)
+*Linux CLI 101 chapter 9 flow overview*
 
-- What is a shell script and why use it instead of Python?
-- Why is the shebang (`#!/bin/bash`) required?
-- What is the basic syntax for variables, conditionals, and loops?
-- How do you pass arguments and check exit codes?
+## Questions to Keep in Mind
 
-> A shell script is a recipe file of CLI commands. Write it once, and it runs repetitive tasks automatically every time.
-
-<!-- a-grade-intro:end -->
-
-## What you will learn
-
-- The basic flow of writing and running a shell script
-- Bash syntax for variables, `if/else`, and `for` loops
-- Script arguments (`$1`, `$2`, `$#`) and exit codes (`$?`)
-- Common script patterns used in real-world workflows
+- The basic flow of writing and running a shell script?
+- Bash syntax for variables, `if/else`, and `for` loops?
+- Script arguments (`$1`, `$2`, `$#`) and exit codes (`$?`)?
 
 ## Why it matters
 
@@ -284,6 +274,13 @@ The strength of shell scripts is that you can use CLI commands directly. For glu
 
 On the other hand, complex logic — JSON parsing, API calls, error handling — is far better in Python. The rule of thumb is: "Will this script exceed 50 lines?" If so, write it in Python. Shell scripts shine as "sub-50-line command compositions".
 
+## When it breaks, check these first
+
+- If the script does not start and shows `Permission denied`, verify both `chmod u+x script.sh` and the presence of a shebang. Correct logic does not matter if the file is not executable.
+- If Bash syntax mysteriously fails, check how the script was launched. `sh script.sh` can break Bash-only features, so reproduce with `./script.sh` or `bash script.sh` first.
+- If files are "missing", check the working directory before changing the code. `pwd`, `dirname "$0"`, and `set -x` usually reveal relative-path mistakes much faster than manual guesswork.
+- If a deploy script keeps going after a failure, confirm that `set -e` and explicit exit handling exist. Silent mid-script failure is one of the most expensive automation mistakes.
+
 ## Checklist
 
 - [ ] You understand the purpose of a shebang (`#!/bin/bash`) and always include it
@@ -308,17 +305,26 @@ On the other hand, complex logic — JSON parsing, API calls, error handling —
 
 The next post covers **SSH and remote access** — key-based authentication, scp, and ssh config.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
-- [Permissions and Ownership](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- [grep, find, xargs](./05-grep-find-xargs.md)
-- [Pipes and Redirection](./06-pipe-and-redirection.md)
-- [Process Management](./07-process-management.md)
-- [Environment Variables and PATH](./08-environment-variables.md)
+- **The basic flow of writing and running a shell script?**
+  - The article treats Shell Script Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Bash syntax for variables, `if/else`, and `for` loops?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Script arguments (`$1`, `$2`, `$#`) and exit codes (`$?`)?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): Permissions and Ownership](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents](./04-viewing-files.md)
+- [Linux CLI 101 (5/10): grep, find, xargs — The Search Trio](./05-grep-find-xargs.md)
+- [Linux CLI 101 (6/10): Pipes and Redirection](./06-pipe-and-redirection.md)
+- [Linux CLI 101 (7/10): Process Management](./07-process-management.md)
+- [Linux CLI 101 (8/10): Environment Variables and PATH](./08-environment-variables.md)
 - **Shell Script Basics (current)**
 - SSH and Remote Access (upcoming)
 

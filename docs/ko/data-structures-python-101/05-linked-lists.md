@@ -1,12 +1,12 @@
 ---
 series: data-structures-python-101
 episode: 5
-title: 연결 리스트
-status: content-ready
+title: "Data Structures with Python 101 (5/10): 연결 리스트"
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -16,64 +16,76 @@ tags:
   - Linked List
   - 연결 리스트
   - 노드
-seo_description: Python으로 단일·이중 연결 리스트를 구현하고 배열과 비교합니다.
-last_reviewed: '2026-05-04'
+seo_description: 연결 리스트의 구조와 배열 대비 장단점을 Python 코드로 설명합니다.
+last_reviewed: '2026-05-15'
 ---
 
-# 연결 리스트
+# Data Structures with Python 101 (5/10): 연결 리스트
 
-> Data Structures with Python 101 시리즈 (5/10)
+이 글은 Data Structures with Python 101 시리즈의 다섯 번째 글입니다.
 
 
-## 이 글에서 다룰 문제
+![Data Structures with Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.ko.png)
+*Data Structures with Python 101 5장 흐름 개요*
 
-연결 리스트는 자료구조의 기본 중 기본입니다. 트리, 그래프, 해시 테이블의 체이닝 등 고급 자료구조의 빌딩 블록이 됩니다. 연결 리스트를 직접 구현하면 포인터(참조) 개념을 확실히 익힐 수 있습니다.
+## 먼저 던지는 질문
 
-> 연결 리스트는 각 노드가 데이터와 다음 노드에 대한 참조를 가지는 자료구조입니다.
+- Python에 이미 list가 있는데 왜 연결 리스트를 따로 배워야 할까요?
+- 단일 연결 리스트와 이중 연결 리스트는 어떻게 다를까요?
+- 연결 리스트는 왜 삽입·삭제에는 강하고, 인덱스 접근에는 약할까요?
 
-코딩 면접에서 연결 리스트 문제는 가장 자주 출제되는 유형 중 하나입니다. 뒤집기, 순환 감지, 병합 등 다양한 변형 문제가 있습니다.
+## 왜 이 글이 중요한가
 
-## 핵심 개념 잡기
+연결 리스트는 자료구조에서 가장 기본적인 빌딩 블록 중 하나입니다. 트리, 그래프, 해시 테이블의 체이닝, LRU 캐시 같은 구조를 제대로 이해하려면 결국 노드와 참조를 다루는 감각이 필요합니다. 연결 리스트는 그 감각을 가장 직접적으로 훈련시키는 구조입니다.
 
-> 연결 리스트 = 노드들이 포인터로 연결된 선형 자료구조
+> 연결 리스트는 각 노드가 데이터와 다음 노드에 대한 참조를 저장하는 선형 자료구조입니다.
 
+코딩 면접에서 연결 리스트 문제가 자주 나오는 이유도 같습니다. 뒤집기, 순환 감지, 병합, 중간 노드 찾기처럼 포인터 조작과 경계 조건 처리를 한꺼번에 볼 수 있기 때문입니다. 즉, 연결 리스트를 잘 다루는 사람은 단순 문법보다 데이터 흐름을 더 잘 이해하는 경우가 많습니다.
+
+## 핵심 개념 한눈에 보기
+
+> 연결 리스트 = 노드들이 참조로 연결된 선형 구조
+
+```text
+[Singly Linked List]
+  head -> [A|->] -> [B|->] -> [C|->] -> None
+
+[Doubly Linked List]
+  None <- [<-|A|->] <-> [<-|B|->] <-> [<-|C|->] -> None
 ```
-[단일 연결 리스트]
-  head → [A|→] → [B|→] → [C|→] → None
 
-[이중 연결 리스트]
-  None ← [←|A|→] ⇄ [←|B|→] ⇄ [←|C|→] → None
-```
+## 연결 구조를 그림으로 보면
 
 ## 핵심 개념
 
 | 용어 | 설명 |
 |------|------|
-| 노드(Node) | 데이터와 다음 노드에 대한 참조를 가지는 단위입니다 |
-| head | 연결 리스트의 첫 번째 노드를 가리킵니다 |
-| tail | 연결 리스트의 마지막 노드를 가리킵니다 |
-| 단일 연결 리스트 | 각 노드가 다음 노드만 참조하는 구조입니다 |
-| 이중 연결 리스트 | 각 노드가 이전과 다음 노드를 모두 참조하는 구조입니다 |
+| 노드(Node) | 데이터와 다음 노드 참조를 담는 기본 단위입니다 |
+| head | 연결 리스트의 첫 번째 노드를 가리키는 참조입니다 |
+| tail | 마지막 노드를 가리키는 참조입니다 |
+| 단일 연결 리스트 | 각 노드가 다음 노드만 가리키는 구조입니다 |
+| 이중 연결 리스트 | 각 노드가 이전 노드와 다음 노드를 모두 가리키는 구조입니다 |
 
-## Before / After
-
-배열에서 중간 삭제와 연결 리스트에서 중간 삭제를 비교합니다.
+## 적용 전후 비교
+배열 기반 구조와 연결 리스트 기반 구조가 중간 삭제를 어떻게 다르게 처리하는지 보겠습니다.
 
 ```python
-# before: list 중간 삭제 — O(n), 뒤의 원소를 모두 이동
+# before: list 중간 삭제 — O(n), 뒤 원소를 모두 당겨야 함
 data = [10, 20, 30, 40, 50]
-data.pop(2)  # 30 삭제 — 40, 50이 한 칸씩 앞으로 이동
+data.pop(2)  # removes 30 — 40 and 50 shift left
 ```
 
 ```python
-# after: 연결 리스트 중간 삭제 — O(1), 포인터만 변경
+# after: linked list 중간 삭제 — O(1), 포인터만 변경
 # node_b.next = node_b.next.next
-# 30 노드를 건너뛰고 20 → 40 연결
+# 30 노드를 건너뛰고 20 -> 40으로 연결
 ```
+
+여기서 연결 리스트의 장단점이 동시에 드러납니다. 삭제 자체는 포인터 변경만으로 끝나지만, 삭제할 노드를 찾기까지는 보통 순차 탐색이 필요합니다. 그래서 “무엇을 빨리 하려는 구조인가”를 분리해서 봐야 합니다.
 
 ## 단계별 실습
 
-### Step 1: Node 클래스 정의
+### 단계 1: Node 클래스 정의하기
 
 ```python
 class Node:
@@ -85,7 +97,7 @@ class Node:
         return f"Node({self.data})"
 ```
 
-### Step 2: 단일 연결 리스트 구현
+### 단계 2: 단일 연결 리스트 구현하기
 
 ```python
 class SinglyLinkedList:
@@ -134,21 +146,21 @@ class SinglyLinkedList:
         while current:
             parts.append(str(current.data))
             current = current.next
-        return " → ".join(parts)
+        return " -> ".join(parts)
 
 sll = SinglyLinkedList()
 sll.append("A")
 sll.append("B")
 sll.append("C")
-print(sll)          # A → B → C
+print(sll)          # A -> B -> C
 sll.prepend("Z")
-print(sll)          # Z → A → B → C
+print(sll)          # Z -> A -> B -> C
 sll.delete("B")
-print(sll)          # Z → A → C
+print(sll)          # Z -> A -> C
 print(len(sll))     # 3
 ```
 
-### Step 3: 연결 리스트 뒤집기
+### 단계 3: 연결 리스트 뒤집기
 
 ```python
 def reverse_linked_list(head: Node) -> Node:
@@ -164,12 +176,12 @@ def reverse_linked_list(head: Node) -> Node:
 sll = SinglyLinkedList()
 for item in ["A", "B", "C", "D"]:
     sll.append(item)
-print(f"원본: {sll}")  # A → B → C → D
+print(f"original: {sll}")  # A -> B -> C -> D
 sll.head = reverse_linked_list(sll.head)
-print(f"뒤집기: {sll}")  # D → C → B → A
+print(f"reversed: {sll}")  # D -> C -> B -> A
 ```
 
-### Step 4: 이중 연결 리스트 구현
+### 단계 4: 이중 연결 리스트 구현하기
 
 ```python
 class DNode:
@@ -210,18 +222,17 @@ class DoublyLinkedList:
         while current:
             parts.append(str(current.data))
             current = current.next
-        return " ⇄ ".join(parts)
+        return " <-> ".join(parts)
 
 dll = DoublyLinkedList()
 dll.append("A")
 dll.append("B")
 dll.append("C")
 dll.prepend("Z")
-print(dll)  # Z ⇄ A ⇄ B ⇄ C
+print(dll)  # Z <-> A <-> B <-> C
 ```
 
-### Step 5: 순환 감지 (Floyd's algorithm)
-
+### 단계 5: 순환 감지 (Floyd 알고리즘)
 ```python
 def has_cycle(head: Node) -> bool:
     slow = fast = head
@@ -232,46 +243,52 @@ def has_cycle(head: Node) -> bool:
             return True
     return False
 
-# 순환 없는 리스트
+# no cycle
 a, b, c = Node("A"), Node("B"), Node("C")
 a.next, b.next = b, c
 print(has_cycle(a))  # False
 
-# 순환 있는 리스트
-c.next = a  # C → A 순환
+# cycle present
+c.next = a  # C -> A creates a cycle
 print(has_cycle(a))  # True
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- 연결 리스트의 prepend는 O(1)이지만 list의 insert(0, x)는 O(n)입니다
-- 연결 리스트는 인덱스 접근이 O(n)이라 랜덤 접근에는 부적합합니다
-- 뒤집기, 순환 감지 등은 코딩 면접 단골 문제입니다
-- Python의 collections.deque는 내부적으로 이중 연결 리스트입니다
+- 연결 리스트의 `prepend`는 O(1)이지만 `list.insert(0, x)`는 O(n)입니다.
+- 인덱스 접근은 O(n)이므로 랜덤 접근이 많으면 연결 리스트는 불리합니다.
+- 뒤집기와 순환 감지는 연결 리스트 사고방식을 가장 잘 드러내는 대표 문제입니다.
+- Python의 `collections.deque`를 이해할 때도 이중 연결 구조에 대한 감각이 도움이 됩니다.
+
+연결 리스트는 “무조건 빠른 구조”가 아닙니다. 배열보다 느린 점도 많습니다. 대신 참조를 바꿔 구조를 재배열하는 문제에서는 매우 강력합니다. 결국 핵심은 메모리 배치가 아니라 연결 관계를 조작하는 능력입니다.
+
+실무 관점에서는 이론 복잡도만 보면 오해하기 쉽습니다. Python `list`는 연속 메모리 덕분에 CPU 캐시 친화적이라 순차 순회와 인덱스 접근에서 매우 강합니다. 반면 연결 리스트는 노드 객체가 흩어져 있어 포인터를 따라가야 하므로, 삽입 자체가 O(1)이어도 전체 처리량은 기대보다 낮을 수 있습니다.
+
+또한 `append`조차 tail 참조가 없으면 O(n)으로 늘어납니다. 즉, 연결 리스트를 도입할 때는 “중간 삽입이 많다”만 볼 것이 아니라, 탐색 비용·메모리 오버헤드·구현 복잡도까지 함께 계산해야 합니다. 그래서 Python 실무에서는 직접 구현한 연결 리스트보다 `deque`, `OrderedDict`, 라이브러리 내부 구현을 더 자주 만납니다.
 
 ## 흔한 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| next 포인터 업데이트 순서 오류 | 노드가 유실되어 리스트가 끊깁니다 | 다음 노드를 임시 변수에 저장한 뒤 포인터를 수정합니다 |
-| head가 None인 경우 미처리 | NoneType 에러가 발생합니다 | head가 None인 경우를 먼저 처리합니다 |
-| 삭제 후 size 미갱신 | len()이 잘못된 값을 반환합니다 | 삭제 성공 시 _size -= 1을 빠뜨리지 않습니다 |
-| 이중 연결 리스트에서 prev 미설정 | 역방향 순회가 불가능합니다 | 삽입·삭제 시 prev와 next를 모두 업데이트합니다 |
-| 순환 참조로 무한 루프 발생 | while current가 끝나지 않습니다 | Floyd 알고리즘으로 순환을 감지합니다 |
+| `next` 업데이트 순서 실수 | 노드가 유실되어 리스트가 끊어질 수 있습니다 | 포인터를 바꾸기 전 다음 노드를 임시 변수에 저장합니다 |
+| `head is None` 케이스 누락 | `NoneType` 관련 오류가 발생합니다 | 빈 리스트 조건을 항상 먼저 처리합니다 |
+| 삭제 후 `_size` 미갱신 | `len()` 결과가 실제와 달라집니다 | 성공적으로 삭제했을 때 반드시 감소시킵니다 |
+| 이중 연결 리스트에서 `prev` 누락 | 역방향 순회와 삭제가 꼬입니다 | 삽입·삭제 때 `prev`와 `next`를 모두 맞춥니다 |
+| 순환 리스트를 일반 순회로 처리 | 무한 루프에 빠집니다 | Floyd 알고리즘 같은 감지 로직을 사용합니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- LRU 캐시를 이중 연결 리스트 + dict로 구현합니다
-- 텍스트 에디터의 실행 취소를 연결 리스트로 관리합니다
-- 메모리 할당자가 빈 블록을 연결 리스트로 관리합니다
-- 해시 테이블의 체이닝 방식이 연결 리스트를 사용합니다
-- 브라우저 히스토리를 이중 연결 리스트로 구현합니다
+- LRU 캐시는 이중 연결 리스트와 dict를 조합해 구현합니다.
+- 텍스트 에디터의 undo 이력은 연결 구조로 관리하기 좋습니다.
+- 메모리 할당자는 빈 블록 목록을 연결 리스트로 관리하기도 합니다.
+- 해시 테이블 체이닝은 충돌 버킷을 연결 리스트로 연결할 수 있습니다.
+- 브라우저 히스토리는 이전/다음 이동 때문에 이중 연결 구조와 잘 맞습니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 실무에서는 이렇게 생각합니다
 
-Python에서는 연결 리스트를 직접 구현할 일이 거의 없습니다. list와 deque가 대부분의 상황을 커버하기 때문입니다. 하지만 연결 리스트의 개념을 이해하면 deque, LRU 캐시, 그래프 등의 동작 원리를 파악할 수 있습니다.
+Python에서는 연결 리스트를 직접 구현할 일이 많지 않습니다. list와 deque가 대부분의 요구를 해결하기 때문입니다. 그래도 연결 리스트를 이해하는 이유는 구현 자체보다, 참조 기반 구조가 어떻게 움직이는지 감각을 익히기 위해서입니다.
 
-면접 준비에서 연결 리스트는 필수입니다. 포인터 조작, 경계 조건 처리, 재귀적 사고를 연습하기에 최적의 자료구조입니다.
+면접 관점에서도 연결 리스트는 필수입니다. 포인터 조작, 경계 조건 처리, 재귀와 반복 전환 능력을 모두 보여 줄 수 있기 때문입니다. 즉, 연결 리스트 문제를 잘 푼다는 것은 다른 자료구조 문제에도 강하다는 신호가 됩니다.
 
 ## 체크리스트
 
@@ -281,26 +298,352 @@ Python에서는 연결 리스트를 직접 구현할 일이 거의 없습니다.
 - [ ] Floyd의 순환 감지 알고리즘을 설명할 수 있다
 - [ ] 배열과 연결 리스트의 성능 차이를 비교할 수 있다
 
+## 연습 문제
+
+1. 단일 연결 리스트에서 한 번의 순회로 가운데 노드를 찾는 함수를 작성해 보세요. 힌트: slow/fast 포인터를 사용합니다.
+2. 정렬된 연결 리스트 두 개를 받아 하나의 정렬된 연결 리스트로 합치는 함수를 작성해 보세요.
+3. 연결 리스트의 뒤에서 N번째 노드를 삭제하는 함수를 작성해 보세요.
+
 ## 정리 및 다음 글 안내
 
-연결 리스트는 노드를 포인터로 연결하여 삽입·삭제에 O(1)을 달성합니다. 배열과 달리 연속된 메모리가 필요 없지만, 인덱스 접근이 O(n)입니다. 다음 글에서는 계층 구조를 표현하는 트리와 이진 트리를 다룹니다.
+연결 리스트는 노드를 참조로 연결해 삽입과 삭제를 유연하게 처리하는 구조입니다. 배열처럼 연속 메모리를 요구하지 않지만, 인덱스 기반 임의 접근은 느립니다. 즉, 연결 리스트는 “위치로 찾는 구조”보다 “연결을 바꾸는 구조”에 가깝습니다. 다음 글에서는 계층 구조를 표현하는 트리와 이진 트리를 봅니다.
+
+
+## 타입 힌트 기반 이중 연결 리스트 구현
+
+단일 연결 리스트는 앞서 Step에서 다뤘으므로, 여기서는 실무에서 더 유용한 이중 연결 리스트(Doubly Linked List)를 타입 힌트와 함께 구현합니다.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Generic, Iterator, Optional, TypeVar
+
+T = TypeVar("T")
+
+
+@dataclass
+class DNode(Generic[T]):
+    """이중 연결 리스트의 노드입니다."""
+    value: T
+    prev: Optional[DNode[T]] = None
+    next: Optional[DNode[T]] = None
+
+
+class DoublyLinkedList(Generic[T]):
+    """sentinel 노드 기반 이중 연결 리스트입니다."""
+
+    def __init__(self) -> None:
+        # sentinel head/tail로 경계 조건을 단순화합니다
+        self._head: DNode[T] = DNode(value=None)  # type: ignore[arg-type]
+        self._tail: DNode[T] = DNode(value=None)  # type: ignore[arg-type]
+        self._head.next = self._tail
+        self._tail.prev = self._head
+        self._size: int = 0
+
+    def __len__(self) -> int:
+        return self._size
+
+    def __bool__(self) -> bool:
+        return self._size > 0
+
+    def _insert_between(self, value: T, predecessor: DNode[T], successor: DNode[T]) -> DNode[T]:
+        """predecessor와 successor 사이에 새 노드를 삽입합니다."""
+        new_node = DNode(value=value, prev=predecessor, next=successor)
+        predecessor.next = new_node
+        successor.prev = new_node
+        self._size += 1
+        return new_node
+
+    def _remove_node(self, node: DNode[T]) -> T:
+        """노드를 리스트에서 제거하고 값을 반환합니다."""
+        predecessor = node.prev
+        successor = node.next
+        assert predecessor is not None and successor is not None
+        predecessor.next = successor
+        successor.prev = predecessor
+        self._size -= 1
+        return node.value
+
+    def append(self, value: T) -> None:
+        """끝에 추가합니다. O(1)"""
+        self._insert_between(value, self._tail.prev, self._tail)  # type: ignore[arg-type]
+
+    def prepend(self, value: T) -> None:
+        """앞에 추가합니다. O(1)"""
+        self._insert_between(value, self._head, self._head.next)  # type: ignore[arg-type]
+
+    def pop_front(self) -> T:
+        """앞 원소를 제거하고 반환합니다. O(1)"""
+        if self._size == 0:
+            raise IndexError("pop from empty list")
+        return self._remove_node(self._head.next)  # type: ignore[arg-type]
+
+    def pop_back(self) -> T:
+        """끝 원소를 제거하고 반환합니다. O(1)"""
+        if self._size == 0:
+            raise IndexError("pop from empty list")
+        return self._remove_node(self._tail.prev)  # type: ignore[arg-type]
+
+    def __iter__(self) -> Iterator[T]:
+        current = self._head.next
+        while current is not self._tail:
+            assert current is not None
+            yield current.value
+            current = current.next
+
+    def __reversed__(self) -> Iterator[T]:
+        current = self._tail.prev
+        while current is not self._head:
+            assert current is not None
+            yield current.value
+            current = current.prev
+
+    def __repr__(self) -> str:
+        items = " <-> ".join(repr(v) for v in self)
+        return f"DoublyLinkedList([{items}])"
+```
+
+### 설계 결정 세 가지
+
+1. **sentinel 노드**: head와 tail에 더미 노드를 두면, 삽입/삭제 시 "리스트가 비어있는가?"를 별도로 확인할 필요가 없습니다. 모든 실제 노드는 항상 predecessor와 successor를 갖습니다.
+2. **`_insert_between`과 `_remove_node`**: 모든 삽입/삭제를 이 두 메서드로 위임하면, 포인터 조작 로직이 한 곳에 집중됩니다. append, prepend, pop_front, pop_back은 모두 이 메서드의 얇은 wrapper입니다.
+3. **`__reversed__` 구현**: 이중 연결 리스트의 장점은 역방향 순회가 O(n)에 가능하다는 사실입니다. `reversed()` 내장 함수와 자연스럽게 연동됩니다.
+
+## 메모리 프로파일링: list vs 연결 리스트
+
+연결 리스트는 삽입/삭제가 빠르지만, 메모리 측면에서는 비쌉니다. 각 노드가 별도 객체이고, prev/next 포인터 오버헤드가 있기 때문입니다.
+
+```python
+import sys
+from typing import Any
+
+
+def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
+    if seen is None:
+        seen = set()
+    obj_id = id(obj)
+    if obj_id in seen:
+        return 0
+    seen.add(obj_id)
+    size = sys.getsizeof(obj)
+    if hasattr(obj, "__dict__"):
+        size += deep_getsizeof(obj.__dict__, seen)
+        for v in obj.__dict__.values():
+            size += deep_getsizeof(v, seen)
+    if isinstance(obj, (list, tuple, set, frozenset)):
+        size += sum(deep_getsizeof(item, seen) for item in obj)
+    elif isinstance(obj, dict):
+        size += sum(deep_getsizeof(k, seen) + deep_getsizeof(v, seen) for k, v in obj.items())
+    return size
+
+
+n = 1_000
+
+# Python list
+py_list = list(range(n))
+list_size = deep_getsizeof(py_list)
+
+# DoublyLinkedList
+dll = DoublyLinkedList[int]()
+for i in range(n):
+    dll.append(i)
+dll_size = deep_getsizeof(dll)
+
+print(f"list ({n} ints):               {list_size:>10} bytes")
+print(f"DoublyLinkedList ({n} ints):   {dll_size:>10} bytes")
+print(f"linked list overhead: {dll_size / list_size:.1f}x")
+```
+
+연결 리스트는 보통 list보다 3-5배 더 많은 메모리를 사용합니다. 노드 객체 헤더(16바이트), `__dict__`(또는 `__slots__` 미사용 시), prev/next 포인터(각 8바이트)가 누적되기 때문입니다. 이것이 "대부분의 경우 list가 더 나은 기본값"인 이유의 하나입니다.
+
+### `__slots__`로 메모리 절약하기
+
+```python
+from __future__ import annotations
+from typing import Generic, Optional, TypeVar
+
+T = TypeVar("T")
+
+
+class SlotNode(Generic[T]):
+    __slots__ = ("value", "prev", "next")
+
+    def __init__(self, value: T, prev: Optional[SlotNode[T]] = None, next: Optional[SlotNode[T]] = None) -> None:
+        self.value = value
+        self.prev = prev
+        self.next = next
+```
+
+`__slots__`를 쓰면 노드당 `__dict__`가 생성되지 않아 약 40-60% 메모리를 절약할 수 있습니다. 노드가 수만 개 이상일 때 체감됩니다.
+
+## 성능 벤치마크: 중간 삽입 list vs 연결 리스트
+
+연결 리스트의 이론적 장점은 "노드 참조만 있으면 O(1) 삽입/삭제"입니다. 하지만 Python에서 이 장점이 실제로 발현되는지 측정해 봅니다.
+
+```python
+import timeit
+from collections import deque
+
+
+def bench_list_middle_insert(n: int = 10_000) -> None:
+    data = list(range(n))
+    mid = n // 2
+    for i in range(1_000):
+        data.insert(mid, i)
+
+
+def bench_deque_rotate_insert(n: int = 10_000) -> None:
+    """deque는 중간 삽입을 직접 지원하지 않으므로 rotate로 흉내냅니다."""
+    data = deque(range(n))
+    mid = n // 2
+    for i in range(1_000):
+        data.rotate(-mid)
+        data.appendleft(i)
+        data.rotate(mid)
+
+
+trials = 5
+t_list = timeit.timeit(bench_list_middle_insert, number=trials)
+t_deque = timeit.timeit(bench_deque_rotate_insert, number=trials)
+
+print(f"list middle insert (1k ops, n=10k): {t_list:.4f}s")
+print(f"deque rotate insert (1k ops, n=10k): {t_deque:.4f}s")
+```
+
+Python에서는 list의 중간 삽입이 deque rotate보다 빠른 경우가 많습니다. C 레벨의 `memmove`가 매우 최적화되어 있기 때문입니다. 연결 리스트가 진정으로 유리한 상황은 "노드 참조를 이미 갖고 있어서 탐색 없이 바로 삽입/삭제할 수 있는" 경우입니다. LRU 캐시가 대표적인 예입니다.
+
+## unittest로 DoublyLinkedList 검증
+
+```python
+import unittest
+
+
+class TestDoublyLinkedList(unittest.TestCase):
+    def setUp(self) -> None:
+        self.dll: DoublyLinkedList[int] = DoublyLinkedList()
+
+    def test_append_and_iter(self) -> None:
+        for i in range(5):
+            self.dll.append(i)
+        self.assertEqual(list(self.dll), [0, 1, 2, 3, 4])
+
+    def test_prepend(self) -> None:
+        for i in range(3):
+            self.dll.prepend(i)
+        self.assertEqual(list(self.dll), [2, 1, 0])
+
+    def test_pop_front(self) -> None:
+        self.dll.append(10)
+        self.dll.append(20)
+        self.assertEqual(self.dll.pop_front(), 10)
+        self.assertEqual(len(self.dll), 1)
+
+    def test_pop_back(self) -> None:
+        self.dll.append(10)
+        self.dll.append(20)
+        self.assertEqual(self.dll.pop_back(), 20)
+        self.assertEqual(len(self.dll), 1)
+
+    def test_reversed(self) -> None:
+        for i in range(5):
+            self.dll.append(i)
+        self.assertEqual(list(reversed(self.dll)), [4, 3, 2, 1, 0])
+
+    def test_empty_pop_raises(self) -> None:
+        with self.assertRaises(IndexError):
+            self.dll.pop_front()
+        with self.assertRaises(IndexError):
+            self.dll.pop_back()
+
+    def test_mixed_operations(self) -> None:
+        self.dll.append(1)
+        self.dll.prepend(0)
+        self.dll.append(2)
+        self.dll.pop_front()
+        self.assertEqual(list(self.dll), [1, 2])
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+## 실무 패턴: LRU 캐시와 연결 리스트
+
+연결 리스트가 실무에서 빛나는 대표적 사례는 LRU(Least Recently Used) 캐시입니다. 접근된 항목을 O(1)에 리스트 끝으로 이동시키고, 가장 오래된 항목을 O(1)에 제거할 수 있기 때문입니다.
+
+```python
+from collections import OrderedDict
+from typing import Generic, TypeVar
+
+K = TypeVar("K")
+V = TypeVar("V")
+
+
+class LRUCache(Generic[K, V]):
+    """OrderedDict 기반 LRU 캐시입니다."""
+
+    def __init__(self, capacity: int) -> None:
+        self._capacity = capacity
+        self._cache: OrderedDict[K, V] = OrderedDict()
+
+    def get(self, key: K) -> V | None:
+        if key not in self._cache:
+            return None
+        self._cache.move_to_end(key)
+        return self._cache[key]
+
+    def put(self, key: K, value: V) -> None:
+        if key in self._cache:
+            self._cache.move_to_end(key)
+        self._cache[key] = value
+        if len(self._cache) > self._capacity:
+            self._cache.popitem(last=False)
+
+    def __len__(self) -> int:
+        return len(self._cache)
+
+
+cache: LRUCache[str, int] = LRUCache(capacity=3)
+cache.put("a", 1)
+cache.put("b", 2)
+cache.put("c", 3)
+cache.get("a")      # "a"를 최근 사용으로 이동
+cache.put("d", 4)   # capacity 초과 → "b" 제거 (가장 오래 미사용)
+print(cache.get("b"))  # None — 이미 제거됨
+```
+
+`OrderedDict`는 내부적으로 이중 연결 리스트를 사용해 삽입 순서를 유지합니다. `move_to_end()`가 O(1)인 이유가 바로 연결 리스트의 포인터 재배치 때문입니다. Python 3.7+의 일반 dict도 삽입 순서를 유지하지만, `move_to_end()`를 지원하지 않으므로 LRU에는 OrderedDict가 필요합니다.
+
+## 처음 질문으로 돌아가기
+
+- **Python에 이미 list가 있는데 왜 연결 리스트를 따로 배워야 할까요?**
+  - list(동적 배열)는 인덱스 접근에 강하고 메모리 효율이 좋지만, 중간 삽입/삭제는 원소 이동이 필요합니다. 연결 리스트는 노드 참조만 있으면 O(1)에 삽입/삭제가 가능합니다. LRU 캐시, undo 기록, 에디터 버퍼처럼 "특정 위치의 빈번한 삽입/삭제"가 핵심인 문제에서 연결 리스트의 구조적 장점이 발현됩니다.
+- **단일 연결 리스트와 이중 연결 리스트는 어떻게 다를까요?**
+  - 단일은 next 포인터만 있어 앞→뒤 순회만 가능하고, 삭제 시 이전 노드를 별도로 추적해야 합니다. 이중은 prev/next 모두 있어 양방향 순회와 O(1) 삭제가 가능합니다. 메모리는 포인터 하나만큼 더 쓰지만, 구현 단순성과 연산 효율 면에서 이중이 실무에서 더 자주 쓰입니다.
+- **연결 리스트는 왜 삽입·삭제에는 강하고, 인덱스 접근에는 약할까요?**
+  - 삽입/삭제는 포인터 2-4개만 바꾸면 되므로 O(1)입니다. 하지만 n번째 원소에 접근하려면 head부터 n번 따라가야 하므로 O(n)입니다. 연속 메모리가 아니라 노드가 힙 곳곳에 흩어져 있어 주소 계산으로 바로 접근할 수 없기 때문입니다.
 
 <!-- toc:begin -->
-- [자료구조란 무엇인가?](./01-what-are-data-structures.md)
-- [배열과 리스트](./02-arrays-and-lists.md)
-- [스택과 큐](./03-stacks-and-queues.md)
-- [해시 테이블과 dict](./04-hash-tables-and-dict.md)
+## 시리즈 목차
+
+- [Data Structures with Python 101 (1/10): 자료구조란 무엇인가?](./01-what-are-data-structures.md)
+- [Data Structures with Python 101 (2/10): 배열과 리스트](./02-arrays-and-lists.md)
+- [Data Structures with Python 101 (3/10): 스택과 큐](./03-stacks-and-queues.md)
+- [Data Structures with Python 101 (4/10): 해시 테이블과 dict](./04-hash-tables-and-dict.md)
 - **연결 리스트 (현재 글)**
 - 트리와 이진 트리 (예정)
 - 힙과 우선순위 큐 (예정)
 - 그래프 표현 (예정)
 - set과 집합 연산 (예정)
 - 자료구조 선택 기준 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
+- [Python 공식 문서 — collections.deque](https://docs.python.org/3/library/collections.html#collections.deque)
+- [CPython 소스 — collections 모듈 구현](https://github.com/python/cpython/blob/main/Modules/_collectionsmodule.c)
 - [Real Python — Linked Lists in Python](https://realpython.com/linked-lists-python/)
-- [GeeksforGeeks — Linked List Data Structure](https://www.geeksforgeeks.org/data-structures/linked-list/)
-- [Visualgo — Linked List Visualization](https://visualgo.net/en/list)
-- [LeetCode — Linked List Problems](https://leetcode.com/tag/linked-list/)
+- [book-examples 저장소 — data-structures-python-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/data-structures-python-101/ko)
+- [Runestone Academy — Linked Lists](https://runestone.academy/ns/books/published/pythonds3/BasicDS/ImplementinganUnorderedListLinkedLists.html)

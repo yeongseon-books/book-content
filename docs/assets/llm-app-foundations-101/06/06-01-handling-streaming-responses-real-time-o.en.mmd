@@ -1,0 +1,30 @@
+flowchart TB
+    Prompt["User submits prompt"] --> Server["Application server"]
+    Server --> Model["LLM call"]
+
+    Model --> Blocking["Non-streaming\nwait for full answer"]
+    Blocking --> FinalPayload["One final payload"]
+    FinalPayload --> BlankUX["User sees blank wait\nuntil completion"]
+
+    Model --> Stream["Streaming\nfirst chunk as soon as ready"]
+    Stream --> Chunk1["chunk 1"]
+    Chunk1 --> Chunk2["chunk 2"]
+    Chunk2 --> ChunkN["final chunk\nclose + metadata"]
+    Chunk1 --> LiveUI["UI starts rendering early"]
+    Chunk2 --> LiveUI
+    ChunkN --> LiveUI
+    BlankUX --> Compare["Same total work\ndifferent perceived latency"]
+    LiveUI --> Compare
+
+    style Prompt fill:#e3f2fd,stroke:#1976d2
+    style Server fill:#f3e5f5,stroke:#7b1fa2
+    style Model fill:#fff3e0,stroke:#f57c00
+    style Blocking fill:#ffebee,stroke:#c62828
+    style FinalPayload fill:#ffebee,stroke:#c62828
+    style BlankUX fill:#ffebee,stroke:#c62828
+    style Stream fill:#e8f5e9,stroke:#388e3c
+    style Chunk1 fill:#ede7f6,stroke:#5e35b1
+    style Chunk2 fill:#ede7f6,stroke:#5e35b1
+    style ChunkN fill:#ede7f6,stroke:#5e35b1
+    style LiveUI fill:#fff8e1,stroke:#f9a825
+    style Compare fill:#e0f7fa,stroke:#00838f
