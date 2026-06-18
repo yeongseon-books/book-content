@@ -21,6 +21,8 @@ seo_description: "바이브코딩 시대, AI가 리스트를 줬는데 딕셔너
 
 # 바이브코딩을 위한 Python 기초 (4/10): list, tuple, set, dict
 
+이 글은 바이브코딩을 위한 Python 기초 시리즈의 4번째 글입니다.
+
 AI에게 "사용자 ID 목록에서 중복 제거하고 특정 ID가 있는지 검사해줘"라고 했더니 이런 코드가 나왔습니다.
 
 ```python
@@ -267,3 +269,32 @@ Python의 변수는 값을 담는 상자가 아니라 객체에 붙는 이름표
 ## 정리
 
 바이브코딩에서 AI는 보통 리스트를 기본값으로 선택합니다. 그러나 "멤버십 검사가 반복된다 → set", "키-값 매핑이 필요하다 → dict", "변경이 없는 묶음이다 → tuple" 이 세 판단을 할 수 있으면 AI 코드를 훨씬 빠르게 개선할 수 있습니다. 자료구조 선택이 맞으면 코드 길이와 버그 수가 동시에 줄어듭니다.
+
+## 참고 자료
+
+### 공식 문서
+- [Python 공식 문서 (python.org)](https://docs.python.org/3/)
+- [Python Tutorial (python.org)](https://docs.python.org/3/tutorial/)
+
+### 관련 시리즈
+- [Python DB-API 101](../../python-dbapi-101/ko/)
+- [Pytest 101](../../pytest-101/ko/)
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [바이브코딩을 위한 Python 기초 (1/10): 왜 Python이고, 어떻게 설치할까?](./01-why-python-and-install.md)
+- [바이브코딩을 위한 Python 기초 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- [바이브코딩을 위한 Python 기초 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- **바이브코딩을 위한 Python 기초 (4/10): list, tuple, set, dict (현재 글)**
+- [바이브코딩을 위한 Python 기초 (5/10): 제어 흐름](./05-control-flow.md)
+- [바이브코딩을 위한 Python 기초 (6/10): 함수와 인자](./06-functions-and-arguments.md)
+- [바이브코딩을 위한 Python 기초 (7/10): 모듈과 패키지](./07-modules-and-packages.md)
+- [바이브코딩을 위한 Python 기초 (8/10): 파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
+- [바이브코딩을 위한 Python 기초 (9/10): 클래스와 객체](./09-classes-and-objects.md)
+- [바이브코딩을 위한 Python 기초 (10/10): 표준 라이브러리 투어](./10-standard-library-tour.md)
+
+<!-- toc:end -->
+Tags: 바이브코딩, Python, AI코딩, 리스트, 딕셔너리, 자료구조선택, comprehension

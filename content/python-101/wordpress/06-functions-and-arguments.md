@@ -20,6 +20,8 @@ seo_description: "바이브코딩 시대, AI가 만든 함수 시그니처를 �
 
 # 바이브코딩을 위한 Python 기초 (6/10): AI가 만든 함수 시그니처 읽고 수정하기
 
+이 글은 바이브코딩을 위한 Python 기초 시리즈의 6번째 글입니다.
+
 AI에게 "CSV 파일 읽어서 통계 내는 함수 만들어줘"라고 했더니 이런 코드가 돌아왔습니다.
 
 ```python
@@ -265,3 +267,32 @@ AI가 만들어주는 함수 시그니처는 다양한 패턴을 담고 있습�
 특히 실수하기 쉬운 mutable 기본값 문제와 `return` 누락은 AI도 자주 만들어내는 버그입니다. 이걸 잡아내는 것도 바이브코더의 실력입니다.
 
 다음 편에서는 AI가 import한 모듈이 뭔지, 내 프로젝트에 어떻게 넣는지를 다룹니다.
+
+## 참고 자료
+
+### 공식 문서
+- [Python 공식 문서 (python.org)](https://docs.python.org/3/)
+- [Python Tutorial (python.org)](https://docs.python.org/3/tutorial/)
+
+### 관련 시리즈
+- [Python DB-API 101](../../python-dbapi-101/ko/)
+- [Pytest 101](../../pytest-101/ko/)
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [바이브코딩을 위한 Python 기초 (1/10): 왜 Python이고, 어떻게 설치할까?](./01-why-python-and-install.md)
+- [바이브코딩을 위한 Python 기초 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- [바이브코딩을 위한 Python 기초 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- [바이브코딩을 위한 Python 기초 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [바이브코딩을 위한 Python 기초 (5/10): 제어 흐름](./05-control-flow.md)
+- **바이브코딩을 위한 Python 기초 (6/10): 함수와 인자 (현재 글)**
+- [바이브코딩을 위한 Python 기초 (7/10): 모듈과 패키지](./07-modules-and-packages.md)
+- [바이브코딩을 위한 Python 기초 (8/10): 파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
+- [바이브코딩을 위한 Python 기초 (9/10): 클래스와 객체](./09-classes-and-objects.md)
+- [바이브코딩을 위한 Python 기초 (10/10): 표준 라이브러리 투어](./10-standard-library-tour.md)
+
+<!-- toc:end -->
+Tags: 바이브코딩, Python, AI코딩, 함수시그니처, args-kwargs, 타입힌트

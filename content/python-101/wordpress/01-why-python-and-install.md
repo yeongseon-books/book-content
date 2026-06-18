@@ -19,6 +19,8 @@ seo_description: "바이브코딩 시대, AI에게 코드를 시키기 전에 Py
 
 # 바이브코딩을 위한 Python 기초 (1/10): 왜 Python이고, 어떻게 설치할까?
 
+이 글은 바이브코딩을 위한 Python 기초 시리즈의 첫 번째 글입니다.
+
 ChatGPT에게 "파이썬으로 웹 크롤러 만들어줘"라고 했더니 코드가 나왔습니다. 복사해서 터미널에 붙여넣었더니 `ModuleNotFoundError: No module named 'requests'`가 뜹니다. `pip install requests`를 했더니 이번엔 `Permission denied`. 결국 `sudo pip install`을 했더니 돌아가긴 하는데, 다음날 다른 프로젝트를 열었더니 패키지 버전이 꼬여서 둘 다 안 됩니다.
 
 바이브코딩의 핵심은 AI가 코드를 생성하고 사람이 실행하는 것입니다. 그런데 **실행 환경이 망가져 있으면 AI가 아무리 좋은 코드를 줘도 돌아가지 않습니다.** 환경 설정은 AI가 대신 해줄 수 없는 영역이고, 한 번 잘 잡아두면 이후 모든 바이브코딩이 매끄러워집니다.
@@ -209,3 +211,32 @@ python main.py
 바이브코딩의 첫 단계는 AI에게 프롬프트를 잘 쓰는 것이 아니라, AI가 준 코드가 돌아갈 환경을 만드는 것입니다. `python3 -m venv .venv` → `source .venv/bin/activate` → `pip install` — 이 세 줄이 모든 바이브코딩 프로젝트의 시작점입니다. 한 번 습관이 되면 AI가 어떤 코드를 줘도 안전하게 실행할 수 있습니다.
 
 다음 글에서는 변수, 타입, 연산자를 다룹니다. AI가 생성한 코드를 읽으려면 이 기초 문법을 알아야 합니다.
+
+## 참고 자료
+
+### 공식 문서
+- [Python 공식 문서 (python.org)](https://docs.python.org/3/)
+- [Python Tutorial (python.org)](https://docs.python.org/3/tutorial/)
+
+### 관련 시리즈
+- [Python DB-API 101](../../python-dbapi-101/ko/)
+- [Pytest 101](../../pytest-101/ko/)
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- **바이브코딩을 위한 Python 기초 (1/10): 왜 Python이고, 어떻게 설치할까? (현재 글)**
+- [바이브코딩을 위한 Python 기초 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- [바이브코딩을 위한 Python 기초 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- [바이브코딩을 위한 Python 기초 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [바이브코딩을 위한 Python 기초 (5/10): 제어 흐름](./05-control-flow.md)
+- [바이브코딩을 위한 Python 기초 (6/10): 함수와 인자](./06-functions-and-arguments.md)
+- [바이브코딩을 위한 Python 기초 (7/10): 모듈과 패키지](./07-modules-and-packages.md)
+- [바이브코딩을 위한 Python 기초 (8/10): 파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
+- [바이브코딩을 위한 Python 기초 (9/10): 클래스와 객체](./09-classes-and-objects.md)
+- [바이브코딩을 위한 Python 기초 (10/10): 표준 라이브러리 투어](./10-standard-library-tour.md)
+
+<!-- toc:end -->
+Tags: 바이브코딩, Python, venv, AI코딩, 개발환경

@@ -21,6 +21,8 @@ seo_description: "바이브코딩 시대, AI가 만든 코드에서 TypeError가
 
 # 바이브코딩을 위한 Python 기초 (2/10): 변수, 타입, 연산자
 
+이 글은 바이브코딩을 위한 Python 기초 시리즈의 2번째 글입니다.
+
 Claude에게 "쇼핑몰 장바구니 총액 계산 함수 짜줘"라고 했더니 깔끔한 코드가 뚝딱 나왔습니다. 신나서 실행했는데 첫 줄부터 에러가 터집니다.
 
 ```
@@ -192,3 +194,32 @@ IEEE 754 부동소수점 표현의 한계입니다. 금액처럼 정확성이 �
 ## 정리
 
 바이브코딩에서 변수와 타입을 아는 것은 Python을 완전히 배우기 위해서가 아닙니다. AI가 생성한 코드에서 TypeError 메시지를 읽고, 어느 변수가 어떤 타입이어야 하는지 AI에게 정확히 지시하기 위해서입니다. "이름표 모델"과 다섯 가지 기본 타입을 머릿속에 두면, AI와의 대화에서 에러의 원인을 짚어내는 속도가 눈에 띄게 달라집니다.
+
+## 참고 자료
+
+### 공식 문서
+- [Python 공식 문서 (python.org)](https://docs.python.org/3/)
+- [Python Tutorial (python.org)](https://docs.python.org/3/tutorial/)
+
+### 관련 시리즈
+- [Python DB-API 101](../../python-dbapi-101/ko/)
+- [Pytest 101](../../pytest-101/ko/)
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [바이브코딩을 위한 Python 기초 (1/10): 왜 Python이고, 어떻게 설치할까?](./01-why-python-and-install.md)
+- **바이브코딩을 위한 Python 기초 (2/10): 변수, 타입, 연산자 (현재 글)**
+- [바이브코딩을 위한 Python 기초 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- [바이브코딩을 위한 Python 기초 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [바이브코딩을 위한 Python 기초 (5/10): 제어 흐름](./05-control-flow.md)
+- [바이브코딩을 위한 Python 기초 (6/10): 함수와 인자](./06-functions-and-arguments.md)
+- [바이브코딩을 위한 Python 기초 (7/10): 모듈과 패키지](./07-modules-and-packages.md)
+- [바이브코딩을 위한 Python 기초 (8/10): 파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
+- [바이브코딩을 위한 Python 기초 (9/10): 클래스와 객체](./09-classes-and-objects.md)
+- [바이브코딩을 위한 Python 기초 (10/10): 표준 라이브러리 투어](./10-standard-library-tour.md)
+
+<!-- toc:end -->
+Tags: 바이브코딩, Python, AI코딩, 변수, 타입, TypeError, 부동소수점

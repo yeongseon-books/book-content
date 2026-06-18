@@ -21,11 +21,15 @@ seo_description: "바이브코딩 시대, 외부 패키지 없이 표준 라이�
 
 # 바이브코딩을 위한 Python 기초 (10/10): AI에게 시키기 전에 표준 라이브러리로 이미 되는지 먼저 확인
 
+이 글은 바이브코딩을 위한 Python 기초 시리즈의 마지막 글입니다.
+
 AI에게 "날짜 계산하는 코드 만들어줘"라고 하면 가끔 이런 코드가 돌아옵니다.
 
-```python
+```bash
 pip install arrow
+```
 
+```python
 import arrow
 
 now = arrow.now()
@@ -166,6 +170,9 @@ with open("data.json", encoding="utf-8") as f:
 **AI 코드에서 자주 보는 패턴:**
 
 ```python
+import json
+from pathlib import Path
+
 # 한 줄로 설정 파일 읽기
 config = json.loads(Path("config.json").read_text(encoding="utf-8"))
 ```
@@ -250,10 +257,12 @@ for key, group in groupby(data, key=lambda x: x[0]):
 
 ### AI가 외부 패키지로 짠 코드
 
-```python
-# AI 초안 — 외부 패키지 3개 사용
+```bash
+# AI 초안 — 외부 패키지 3개 필요
 pip install pandas numpy tabulate
+```
 
+```python
 import pandas as pd
 import numpy as np
 from tabulate import tabulate
@@ -345,3 +354,32 @@ AI에게 요청: "이 코드를 pandas 없이 표준 라이브러리만 써서 �
 `datetime`으로 날짜 계산, `pathlib`로 경로 처리, `json`으로 직렬화, `Counter`로 빈도 세기, `defaultdict`로 그룹핑. 이 다섯 가지 패턴을 손에 익혀두면 일상적인 바이브코딩 작업의 절반은 AI 없이도 금방 짤 수 있습니다.
 
 Python 기초 시리즈를 마칩니다. 함수, 모듈, 파일 처리, 클래스, 표준 라이브러리. 이 다섯 편에서 다룬 내용이 앞으로 AI와 함께 Python으로 무언가를 만들 때의 기반이 됩니다.
+
+## 참고 자료
+
+### 공식 문서
+- [Python 공식 문서 (python.org)](https://docs.python.org/3/)
+- [Python Tutorial (python.org)](https://docs.python.org/3/tutorial/)
+
+### 관련 시리즈
+- [Python DB-API 101](../../python-dbapi-101/ko/)
+- [Pytest 101](../../pytest-101/ko/)
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [바이브코딩을 위한 Python 기초 (1/10): 왜 Python이고, 어떻게 설치할까?](./01-why-python-and-install.md)
+- [바이브코딩을 위한 Python 기초 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- [바이브코딩을 위한 Python 기초 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- [바이브코딩을 위한 Python 기초 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [바이브코딩을 위한 Python 기초 (5/10): 제어 흐름](./05-control-flow.md)
+- [바이브코딩을 위한 Python 기초 (6/10): 함수와 인자](./06-functions-and-arguments.md)
+- [바이브코딩을 위한 Python 기초 (7/10): 모듈과 패키지](./07-modules-and-packages.md)
+- [바이브코딩을 위한 Python 기초 (8/10): 파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
+- [바이브코딩을 위한 Python 기초 (9/10): 클래스와 객체](./09-classes-and-objects.md)
+- **바이브코딩을 위한 Python 기초 (10/10): 표준 라이브러리 투어 (현재 글)**
+
+<!-- toc:end -->
+Tags: 바이브코딩, Python, AI코딩, 표준라이브러리, datetime, pathlib, collections

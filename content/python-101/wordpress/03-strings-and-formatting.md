@@ -21,6 +21,8 @@ seo_description: "바이브코딩 시대, AI가 생성한 출력 포맷을 수�
 
 # 바이브코딩을 위한 Python 기초 (3/10): 문자열과 포매팅
 
+이 글은 바이브코딩을 위한 Python 기초 시리즈의 3번째 글입니다.
+
 AI에게 "CSV 파일 읽어서 사용자별 매출 리포트 출력해줘"라고 했습니다. 코드를 실행했더니 이런 에러가 납니다.
 
 ```
@@ -244,3 +246,32 @@ f-string은 그 자리에서 즉시 렌더링, `str.format()`은 나중에 채�
 ## 정리
 
 바이브코딩에서 문자열을 다룰 때 두 가지만 기억하면 됩니다. 첫째, 파일과 네트워크 경계에서만 bytes/str 변환이 일어나고, 그 경계에서 인코딩을 명시해야 합니다. 둘째, f-string format spec으로 출력 형식을 정확히 지정할 수 있고, 이 용어를 알면 AI에게 "이름은 왼쪽 정렬 10자, 금액은 천 단위 콤마"처럼 구체적으로 요청할 수 있습니다. 이 두 가지가 AI 출력 코드를 수정하는 속도를 크게 높입니다.
+
+## 참고 자료
+
+### 공식 문서
+- [Python 공식 문서 (python.org)](https://docs.python.org/3/)
+- [Python Tutorial (python.org)](https://docs.python.org/3/tutorial/)
+
+### 관련 시리즈
+- [Python DB-API 101](../../python-dbapi-101/ko/)
+- [Pytest 101](../../pytest-101/ko/)
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [바이브코딩을 위한 Python 기초 (1/10): 왜 Python이고, 어떻게 설치할까?](./01-why-python-and-install.md)
+- [바이브코딩을 위한 Python 기초 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- **바이브코딩을 위한 Python 기초 (3/10): 문자열과 포매팅 (현재 글)**
+- [바이브코딩을 위한 Python 기초 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [바이브코딩을 위한 Python 기초 (5/10): 제어 흐름](./05-control-flow.md)
+- [바이브코딩을 위한 Python 기초 (6/10): 함수와 인자](./06-functions-and-arguments.md)
+- [바이브코딩을 위한 Python 기초 (7/10): 모듈과 패키지](./07-modules-and-packages.md)
+- [바이브코딩을 위한 Python 기초 (8/10): 파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
+- [바이브코딩을 위한 Python 기초 (9/10): 클래스와 객체](./09-classes-and-objects.md)
+- [바이브코딩을 위한 Python 기초 (10/10): 표준 라이브러리 투어](./10-standard-library-tour.md)
+
+<!-- toc:end -->
+Tags: 바이브코딩, Python, AI코딩, f-string, 인코딩, UnicodeDecodeError, 문자열포매팅
