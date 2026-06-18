@@ -1,0 +1,32 @@
+id: ai-image-gen-101
+articles:
+- idx: 1
+  slug: 01-first-image-generation
+  status: draft
+- idx: 2
+  slug: 02-prompt-structure
+  status: draft
+- idx: 3
+  slug: 03-mastering-styles
+  status: draft
+- idx: 4
+  slug: 04-composition-and-perspective
+  status: draft
+- idx: 5
+  slug: 05-color-and-lighting
+  status: draft
+- idx: 6
+  slug: 06-complex-scene-design
+  status: draft
+- idx: 7
+  slug: 07-consistency-across-images
+  status: draft
+- idx: 8
+  slug: 08-text-and-typography
+  status: draft
+- idx: 9
+  slug: 09-reference-image-editing
+  status: draft
+- idx: 10
+  slug: 10-production-workflow
+  status: draft

@@ -1215,6 +1215,30 @@ series:
   track: traffic
   stage: korean
   tier: core
+- id: ai-image-gen-101
+  status: draft
+  category: ai
+  title:
+    ko: AI 이미지 생성 101
+    en: AI Image Generation 101
+  description:
+    ko: ChatGPT 이미지 생성 프롬프트 엔지니어링 기초부터 심화까지 — 스타일, 구도, 색감, 장면 설계, 실전 워크플로우 10부작.
+    en: ChatGPT image generation prompt engineering from basics to advanced — style, composition, color, scene design, and production workflows in 10 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: false
+  level: 101
+  lifecycle: active
+  path: content/ai-image-gen-101
+  track: traffic
+  stage: applied
+  tier: supported
 - id: ai-web-dev-101
   status: needs-update
   category: ai
