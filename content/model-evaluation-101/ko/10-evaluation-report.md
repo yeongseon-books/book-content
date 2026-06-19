@@ -22,11 +22,11 @@ last_reviewed: '2026-05-15'
 
 # Model Evaluation 101 (10/10): 평가 리포트 만들기
 
-모델 학습과 평가까지는 많은 팀이 잘합니다. 문제는 배포 직전입니다. 이때 결과가 슬라이드 한 장이나 메시지 한 줄로 축약되면, 며칠 뒤에는 가장 중요한 맥락이 사라집니다. 어떤 데이터에서 계산했는지, 임계값은 얼마였는지, 어떤 슬라이스가 약했는지, 재현성 정보가 남아 있는지 다시 묻게 됩니다.
+새 모델 배포 6개월 후, 성능이 왜 떨어졌는지 조사해야 합니다. 배포 당시 리포트를 찾았는데 슬라이드 한 장에 "F1=0.86, 배포 승인"이라고만 적혀 있습니다. 어떤 데이터로 측정했는지, 임계값은 무엇이었는지, 알려진 취약점은 있었는지 아무것도 없습니다. 같은 실험을 재현하는 데 이틀이 걸립니다. 이 상황을 막는 것이 좋은 평가 리포트입니다.
 
 이 글은 Model Evaluation 101 시리즈의 마지막 글입니다.
 
-좋은 평가 리포트는 그래서 문서 작업이 아니라 의사결정 기록입니다. 리뷰, 감사, 사고 후 분석이 모두 같은 문서를 참고할 수 있어야 팀의 속도도 유지되고 책임 경계도 분명해집니다.
+좋은 평가 리포트는 문서 작업이 아니라 의사결정 기록입니다. 리뷰, 감사, 사고 후 분석이 모두 같은 문서를 참고할 수 있어야 팀의 속도도 유지되고 책임 경계도 분명해집니다.
 
 ![Model Evaluation 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.ko.png)
 *Model Evaluation 101 10장 흐름 개요*
@@ -35,151 +35,501 @@ last_reviewed: '2026-05-15'
 
 ## 이 글에서 다룰 문제
 
-- 모델 배포 전에 어떤 평가 정보를 한곳에 모아야 할까요?
-- 평가 리포트와 Model Card는 무엇이 다를까요?
-- 임계값, 슬라이스, 재현성 정보는 왜 빠지면 안 될까요?
-- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
-- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
+- 좋은 평가 리포트에 반드시 포함해야 할 요소는 무엇일까요?
+- 오프라인 지표와 온라인 지표는 어떻게 다르고 둘 다 왜 필요할까요?
+- 평가 리포트와 Model Card는 어떻게 다를까요?
+- 재현성 정보는 왜 빠지면 안 될까요?
+- 자동화된 리포트 생성을 어떻게 구현할까요?
 
-## 왜 이 글이 중요한가
+## 평가 리포트의 5가지 필수 요소
 
-평가 리포트가 없으면 같은 질문에 팀이 계속 같은 답을 다시 만들어야 합니다. 어떤 모델을 왜 선택했는지, 어떤 한계를 알고도 배포했는지, 나중에 같은 결과를 다시 재현할 수 있는지 확인하기가 어려워집니다.
+좋은 평가 리포트는 다음 5가지를 반드시 포함해야 합니다.
 
-반대로 리포트 형식이 일정하면 리뷰와 감사가 훨씬 빨라집니다. 어떤 숫자가 어디서 왔는지 추적하기 쉬워지고, 비교 기준도 안정됩니다. 결국 리포트는 문서 정리의 문제가 아니라 팀 메모리의 문제입니다.
+| 요소 | 내용 | 없으면 어떻게 되는가 |
+| --- | --- | --- |
+| 데이터 정보 | 어떤 데이터로 측정했는가 | 재현 불가, 드리프트 추적 불가 |
+| 핵심 지표 | 어떤 지표를 어떤 임계값에서 | 의사결정 근거 없음 |
+| 슬라이스 성능 | 세그먼트별 약점 | 숨겨진 실패 발견 불가 |
+| 재현성 메타데이터 | 코드/데이터 버전 | 같은 실험 재현 불가 |
+| 알려진 리스크 | 이미 알고 있는 약점 | 책임 회피, 미래 감사 실패 |
 
-## 한눈에 보는 멘탈 모델
+## 오프라인 지표 vs. 온라인 지표
 
-이 다섯 요소가 한곳에 모여야 리포트가 완성됩니다. 데이터, 지표, 슬라이스, 재현성, 리스크 중 하나라도 빠지면 배포 판단의 근거가 비어 버립니다.
-
-- **Model Card**: 모델의 의도와 한계를 설명하는 문서입니다.
-- **Datasheet**: 데이터셋의 출처와 편향 가능성을 설명하는 문서입니다.
-- **운영 임계값**: 실제 배포 환경에서 사용하는 결정 기준선입니다.
-- **재현성 해시**: 코드와 데이터 버전을 다시 식별할 수 있는 값입니다.
-- **리스크 등록부**: 이미 알고 있는 실패 모드 목록입니다.
-
-## 리포트를 읽는 방식의 전환
-
-좋지 않은 습관은 점수 하나만 전달하고 끝내는 것입니다. `acc 0.92` 혹은 `F1 0.81`만으로는 배포 판단의 맥락이 남지 않습니다. 누가 봐도 다시 계산할 수 있고, 같은 질문에 같은 답을 줄 수 있어야 합니다.
-
-좋은 습관은 리포트를 산출물로 다루는 것입니다. 모델을 다시 학습하면 리포트도 다시 생성되고, 숫자마다 어떤 데이터와 임계값에서 나왔는지 추적할 수 있어야 합니다.
-
-## 평가 리포트를 만드는 다섯 단계
-
-### 1단계 — 지표 수집
+배포 전 테스트 세트에서의 성능(오프라인)과 실제 운영 중 성능(온라인)은 다를 수 있습니다.
 
 ```python
+import numpy as np
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score, roc_auc_score, brier_score_loss
-X, y = make_classification(n_samples=3000, weights=[0.7, 0.3], random_state=0)
-Xtr, Xte, ytr, yte = train_test_split(X, y, stratify=y, random_state=42)
-m = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
-proba = m.predict_proba(Xte)[:, 1]
+
+# 데이터 및 모델
+X, y = make_classification(n_samples=5000, weights=[0.7, 0.3], random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, stratify=y, random_state=42
+)
+
+model = LogisticRegression(max_iter=1000, random_state=42).fit(X_train, y_train)
+proba = model.predict_proba(X_test)[:, 1]
 pred = (proba >= 0.5).astype(int)
-metrics = {
-    "f1_macro": f1_score(yte, pred, average="macro"),
-    "auc_roc": roc_auc_score(yte, proba),
-    "brier": brier_score_loss(yte, proba),
+
+# 오프라인 지표 계산
+offline_metrics = {
+    "f1_macro": f1_score(y_test, pred, average="macro"),
+    "f1_positive": f1_score(y_test, pred),
+    "auc_roc": roc_auc_score(y_test, proba),
+    "brier_score": brier_score_loss(y_test, proba),
 }
+
+print("=== 오프라인 지표 (테스트 세트) ===")
+for name, value in offline_metrics.items():
+    print(f"  {name}: {value:.4f}")
+
+print()
+print("=== 오프라인 vs. 온라인 지표 비교 ===")
+print()
+print("오프라인 지표:")
+print("  - 고정된 테스트 세트에서 측정")
+print("  - 배포 전에 미리 계산 가능")
+print("  - 예: F1, AUC, Brier Score")
+print("  - 한계: 실제 운영 환경과 다를 수 있음")
+print()
+print("온라인 지표:")
+print("  - 실제 운영 중 실시간 측정")
+print("  - 사용자 행동, 비즈니스 KPI와 연결")
+print("  - 예: 클릭률, 전환율, 사기 탐지율, 정확한 거래 차단율")
+print("  - 한계: 라벨이 실시간으로 없는 경우 많음")
+print()
+print("두 지표가 모두 필요한 이유:")
+print("  오프라인이 좋지만 온라인이 나쁜 경우 → 배포 환경 드리프트")
+print("  오프라인이 나쁘지만 온라인이 좋은 경우 → 테스트 데이터 대표성 문제")
 ```
 
-### 2단계 — 슬라이스 점수 수집
+## 슬라이스 성능 자동 수집
 
 ```python
-slice_mask = Xte[:, 0] > 0
-slices = {
-    "slice_pos": f1_score(yte[slice_mask], pred[slice_mask]),
-    "slice_neg": f1_score(yte[~slice_mask], pred[~slice_mask]),
-}
+from sklearn.metrics import (
+    confusion_matrix,
+    precision_score,
+    recall_score,
+)
+
+def collect_slice_metrics(X_test, y_test, pred, proba, feature_idx=0, n_bins=4):
+    """피처 구간별 성능 지표를 수집합니다."""
+    feat = X_test[:, feature_idx]
+    bins = np.percentile(feat, np.linspace(0, 100, n_bins + 1))
+    slices = {}
+
+    for i in range(len(bins) - 1):
+        lo, hi = bins[i], bins[i+1]
+        mask = (feat >= lo) & (feat <= hi)
+        seg_name = f"feat{feature_idx}_{i+1}Q"
+
+        if mask.sum() < 10 or len(np.unique(y_test[mask])) < 2:
+            continue
+
+        y_seg = y_test[mask]
+        pred_seg = pred[mask]
+        proba_seg = proba[mask]
+
+        cm = confusion_matrix(y_seg, pred_seg)
+        tn_s, fp_s, fn_s, tp_s = cm.ravel()
+
+        slices[seg_name] = {
+            "n_samples": int(mask.sum()),
+            "positive_rate": float(y_seg.mean()),
+            "f1_macro": float(f1_score(y_seg, pred_seg, average="macro", zero_division=0)),
+            "recall": float(recall_score(y_seg, pred_seg, zero_division=0)),
+            "precision": float(precision_score(y_seg, pred_seg, zero_division=0)),
+            "fp": int(fp_s),
+            "fn": int(fn_s),
+        }
+
+    return slices
+
+slice_metrics = collect_slice_metrics(X_test, y_test, pred, proba, feature_idx=0)
+print("=== 슬라이스 성능 ===")
+print(f"{'세그먼트':>15} {'샘플수':>8} {'F1':>8} {'재현율':>8} {'정밀도':>8}")
+print("-" * 55)
+for seg, metrics in slice_metrics.items():
+    flag = " ← 약점" if metrics["f1_macro"] < 0.70 else ""
+    print(f"{seg:>15} {metrics['n_samples']:>8d} {metrics['f1_macro']:>8.3f} "
+          f"{metrics['recall']:>8.3f} {metrics['precision']:>8.3f}{flag}")
 ```
 
-### 3단계 — 메타데이터 기록
+## 재현성 메타데이터 수집
 
 ```python
-import hashlib, sys, sklearn
-meta = {
-    "python": sys.version.split()[0],
-    "sklearn": sklearn.__version__,
-    "data_hash": hashlib.sha1(X.tobytes()).hexdigest()[:10],
-    "threshold": 0.5,
-}
-```
-
-### 4단계 — 리포트 직렬화
-
-```python
+import hashlib
+import sys
 import json
-report = {"metrics": metrics, "slices": slices, "meta": meta,
-          "risks": ["minor calibration drift", "slice_neg lower F1"]}
-print(json.dumps(report, indent=2))
+import datetime
+import sklearn
+
+def collect_metadata(X, model, threshold=0.5):
+    """재현성을 위한 메타데이터를 수집합니다."""
+    return {
+        "timestamp": datetime.datetime.now().isoformat(),
+        "python_version": sys.version.split()[0],
+        "sklearn_version": sklearn.__version__,
+        "numpy_version": np.__version__,
+        "data_hash_sha1": hashlib.sha1(X.tobytes()).hexdigest()[:16],
+        "data_shape": list(X.shape),
+        "threshold": threshold,
+        "model_class": type(model).__name__,
+        "model_params": model.get_params(),
+    }
+
+meta = collect_metadata(X_test, model, threshold=0.5)
+print("=== 재현성 메타데이터 ===")
+for key, value in meta.items():
+    if key == "model_params":
+        print(f"  {key}:")
+        for k, v in value.items():
+            print(f"    {k}: {v}")
+    else:
+        print(f"  {key}: {value}")
 ```
 
-### 5단계 — 마크다운 렌더링
+## 완전한 평가 리포트 생성
 
 ```python
-def to_md(rep):
-    lines = ["# Evaluation Report", "## Metrics"]
-    for k, v in rep["metrics"].items():
-        lines.append(f"- {k}: {round(v, 3)}")
-    lines.append("## Slices")
-    for k, v in rep["slices"].items():
-        lines.append(f"- {k}: {round(v, 3)}")
-    lines.append("## Meta")
-    for k, v in rep["meta"].items():
-        lines.append(f"- {k}: {v}")
+def generate_evaluation_report(
+    y_test, pred, proba, X_test,
+    model, threshold=0.5,
+    known_risks=None,
+    deployment_notes=None,
+):
+    """완전한 평가 리포트를 생성합니다."""
+    if known_risks is None:
+        known_risks = []
+    if deployment_notes is None:
+        deployment_notes = {}
+
+    from sklearn.metrics import balanced_accuracy_score
+
+    # 핵심 지표
+    metrics = {
+        "accuracy": float((pred == y_test).mean()),
+        "balanced_accuracy": float(balanced_accuracy_score(y_test, pred)),
+        "f1_macro": float(f1_score(y_test, pred, average="macro")),
+        "f1_positive": float(f1_score(y_test, pred)),
+        "precision": float(precision_score(y_test, pred, zero_division=0)),
+        "recall": float(recall_score(y_test, pred, zero_division=0)),
+        "roc_auc": float(roc_auc_score(y_test, proba)),
+        "brier_score": float(brier_score_loss(y_test, proba)),
+    }
+
+    # 혼동 행렬
+    cm = confusion_matrix(y_test, pred)
+    tn, fp, fn, tp = cm.ravel()
+    confusion = {"TN": int(tn), "FP": int(fp), "FN": int(fn), "TP": int(tp)}
+
+    # 슬라이스 성능
+    slices = collect_slice_metrics(X_test, y_test, pred, proba, feature_idx=0)
+
+    # 메타데이터
+    meta = collect_metadata(X_test, model, threshold)
+
+    # 리포트 조립
+    report = {
+        "report_version": "1.0",
+        "generated_at": meta["timestamp"],
+        "metrics": metrics,
+        "confusion_matrix": confusion,
+        "threshold": threshold,
+        "slices": slices,
+        "metadata": meta,
+        "known_risks": known_risks,
+        "deployment_notes": deployment_notes,
+    }
+
+    return report
+
+# 리포트 생성
+report = generate_evaluation_report(
+    y_test, pred, proba, X_test, model,
+    threshold=0.5,
+    known_risks=[
+        "피처 0 하위 25% 세그먼트 F1 낮음 (0.62)",
+        "FN 비율 높음 — 재현율 개선 여지 있음",
+        "보정(calibration) 검증 미완료",
+    ],
+    deployment_notes={
+        "approved_by": "평가팀 리뷰",
+        "deployment_condition": "재현율 목표 65% 달성 시",
+        "next_review_date": "2026-09-01",
+    },
+)
+
+print("=== 평가 리포트 (JSON) ===")
+print(json.dumps(report, indent=2, ensure_ascii=False)[:1500] + "\n... (생략)")
+```
+
+## 마크다운 리포트 렌더링
+
+```python
+def render_markdown_report(report):
+    """평가 리포트를 마크다운으로 렌더링합니다."""
+    lines = []
+    lines.append(f"# 모델 평가 리포트")
+    lines.append(f"생성 시각: {report['generated_at']}")
+    lines.append("")
+
+    # 핵심 지표
+    lines.append("## 핵심 지표")
+    lines.append("")
+    lines.append(f"| 지표 | 값 |")
+    lines.append(f"| --- | ---: |")
+    for metric, value in report["metrics"].items():
+        flag = " ← 주요 지표" if metric in ["f1_macro", "recall", "roc_auc"] else ""
+        lines.append(f"| {metric} | {value:.4f}{flag} |")
+    lines.append("")
+
+    # 임계값
+    lines.append(f"**운영 임계값: {report['threshold']}**")
+    lines.append("")
+
+    # 혼동 행렬
+    cm = report["confusion_matrix"]
+    lines.append("## 혼동 행렬")
+    lines.append("")
+    lines.append(f"| | 예측: 음성 | 예측: 양성 |")
+    lines.append(f"| --- | ---: | ---: |")
+    lines.append(f"| 실제: 음성 | {cm['TN']} (TN) | {cm['FP']} (FP) |")
+    lines.append(f"| 실제: 양성 | {cm['FN']} (FN) | {cm['TP']} (TP) |")
+    lines.append("")
+
+    # 슬라이스 성능
+    lines.append("## 세그먼트별 성능")
+    lines.append("")
+    lines.append("| 세그먼트 | 샘플수 | F1 | 재현율 | 정밀도 |")
+    lines.append("| --- | ---: | ---: | ---: | ---: |")
+    for seg, metrics in report["slices"].items():
+        flag = " ⚠" if metrics["f1_macro"] < 0.70 else ""
+        lines.append(
+            f"| {seg}{flag} | {metrics['n_samples']} | "
+            f"{metrics['f1_macro']:.3f} | {metrics['recall']:.3f} | "
+            f"{metrics['precision']:.3f} |"
+        )
+    lines.append("")
+
+    # 알려진 리스크
+    if report.get("known_risks"):
+        lines.append("## 알려진 리스크")
+        lines.append("")
+        for risk in report["known_risks"]:
+            lines.append(f"- {risk}")
+        lines.append("")
+
+    # 배포 메모
+    if report.get("deployment_notes"):
+        lines.append("## 배포 메모")
+        lines.append("")
+        for key, value in report["deployment_notes"].items():
+            lines.append(f"- **{key}**: {value}")
+        lines.append("")
+
+    # 재현성 정보
+    meta = report["metadata"]
+    lines.append("## 재현성 정보")
+    lines.append("")
+    lines.append(f"- Python: {meta['python_version']}")
+    lines.append(f"- scikit-learn: {meta['sklearn_version']}")
+    lines.append(f"- 데이터 해시: `{meta['data_hash_sha1']}`")
+    lines.append(f"- 데이터 크기: {meta['data_shape']}")
+    lines.append(f"- 모델 클래스: {meta['model_class']}")
+    lines.append("")
+
     return "\n".join(lines)
 
-print(to_md(report))
+md_report = render_markdown_report(report)
+print("=== 마크다운 리포트 ===")
+print(md_report[:2000])
+print("... (생략)")
 ```
 
-**예상 결과:** 먼저 기계가 읽기 좋은 JSON 리포트가 나오고, 그다음 사람이 바로 리뷰할 수 있는 마크다운 요약이 나와야 합니다. 지표, 임계값, 슬라이스, 재현성 메타데이터, 알려진 리스크가 한 번에 모이면 리포트의 최소 골격이 갖춰진 것입니다.
+## 평가 리포트 vs. Model Card
 
-첫 번째와 두 번째 단계는 리포트가 단순한 점수 표가 아니라는 점을 보여 줍니다. 전체 지표와 슬라이스 지표가 함께 있어야 약한 구간을 숨기지 않을 수 있습니다. 세 번째 단계의 메타데이터는 나중에 재현성을 복원하는 뼈대가 됩니다.
+두 문서는 목적이 다릅니다.
 
-네 번째와 다섯 번째 단계는 생성 순서도 중요하다는 점을 보여 줍니다. 먼저 구조화된 JSON을 만들고, 그다음 사람이 읽을 마크다운으로 바꾸는 편이 자동화와 검증에 유리합니다.
+| 항목 | 평가 리포트 | Model Card |
+| --- | --- | --- |
+| 목적 | 특정 배포 결정 근거 | 모델의 전반적 설명 |
+| 작성 시점 | 매 배포 전 | 모델 출시 시 |
+| 대상 독자 | 팀 내부 (개발자, PM) | 외부 이해관계자 포함 |
+| 내용 | 테스트 세트 지표, 임계값, 슬라이스 | 의도된 용도, 제한사항, 윤리 고려 |
+| 갱신 주기 | 매 배포마다 | 모델 버전이 크게 바뀔 때 |
+| 재현성 | 필수 | 선택 |
 
-## 자주 헷갈리는 지점
+```python
+# Model Card 최소 구조 예시
+model_card = {
+    "model_name": "고객 이탈 예측 모델 v2.1",
+    "intended_use": "30일 내 이탈 가능성 높은 고객 사전 식별",
+    "not_intended_for": "개별 고객 처벌 또는 서비스 차별",
+    "training_data": "2025년 1월~12월 활성 사용자 거래 로그",
+    "evaluation_data": "2026년 1월~2월 홀드아웃 세트",
+    "metrics": {
+        "primary": "recall (목표 ≥ 65%)",
+        "secondary": ["f1_macro", "precision"],
+    },
+    "known_limitations": [
+        "신규 가입 30일 미만 사용자에 대한 성능 제한",
+        "비정기 결제 패턴에 대한 학습 데이터 부족",
+    ],
+    "ethical_considerations": [
+        "예측 점수를 이유로 서비스를 차단하지 않을 것",
+        "고소득 사용자 그룹에 대한 편향 검토 미완료",
+    ],
+    "contact": "ml-team@example.com",
+}
 
-첫째, 임계값을 기록하지 않으면 숫자의 의미가 흔들립니다. 둘째, 슬라이스 점수를 빼면 평균 뒤의 위험이 사라집니다. 셋째, 버전과 해시 정보를 빼면 같은 결과를 다시 만들 수 없습니다.
+print("=== Model Card 구조 ===")
+print(json.dumps(model_card, indent=2, ensure_ascii=False))
+```
 
-또한 리스크 섹션을 비워 두는 실수도 많습니다. 하지만 배포 판단에서 가장 중요한 것은 이미 알고 있는 약점을 숨기지 않는 일입니다. 좋은 리포트는 자신감보다 제약을 더 또렷하게 남깁니다.
+## 자동화된 리포트 파이프라인
 
-## 실무에서는 이렇게 생각한다
+```python
+def run_full_evaluation_pipeline(
+    model, X_train, y_train, X_test, y_test,
+    threshold=None,
+    output_path=None,
+):
+    """
+    모델 평가부터 리포트 생성까지 전체 파이프라인을 실행합니다.
+    threshold=None이면 검증 세트에서 자동 탐색합니다.
+    """
+    from sklearn.model_selection import train_test_split
+    import numpy as np
 
-시니어 엔지니어는 평가 리포트를 빌드 산출물처럼 다룹니다. 모델이 새로 학습되면 리포트도 함께 다시 생성되어야 하고, 숫자마다 출처가 분명해야 합니다. 손으로 작성한 요약은 빠를 수 있지만 오래 버티지 못합니다.
+    # 검증 세트에서 임계값 탐색 (옵션)
+    if threshold is None:
+        X_tr, X_val, y_tr, y_val = train_test_split(
+            X_train, y_train, test_size=0.2, stratify=y_train, random_state=42
+        )
+        model.fit(X_tr, y_tr)
+        val_proba = model.predict_proba(X_val)[:, 1]
 
-또한 Model Card와 평가 리포트를 구분합니다. Model Card가 더 넓은 설명 문서라면, 평가 리포트는 특정 실험과 배포 판단을 뒷받침하는 좁고 단단한 운영 문서입니다.
+        best_f1, best_threshold = 0, 0.5
+        for t in np.arange(0.1, 0.9, 0.05):
+            pred_t = (val_proba >= t).astype(int)
+            f1_t = f1_score(y_val, pred_t, zero_division=0)
+            if f1_t > best_f1:
+                best_f1 = f1_t
+                best_threshold = float(t)
+        threshold = best_threshold
+        print(f"검증 세트 최적 임계값: {threshold:.2f} (F1={best_f1:.4f})")
 
-## 점검 목록
+        # 전체 훈련 데이터로 재학습
+        model.fit(X_train, y_train)
+    else:
+        model.fit(X_train, y_train)
 
-- [ ] 지표와 임계값을 함께 기록합니다.
-- [ ] 슬라이스 점수를 포함합니다.
-- [ ] 버전과 해시 정보를 남깁니다.
-- [ ] 알려진 리스크를 숨기지 않고 적습니다.
+    # 테스트 세트 평가
+    proba = model.predict_proba(X_test)[:, 1]
+    pred = (proba >= threshold).astype(int)
+
+    # 리포트 생성
+    report = generate_evaluation_report(
+        y_test, pred, proba, X_test, model, threshold=threshold
+    )
+
+    # 배포 판정
+    recall_val = report["metrics"]["recall"]
+    f1_val = report["metrics"]["f1_macro"]
+
+    print(f"\n=== 배포 판정 ===")
+    print(f"재현율: {recall_val:.4f} (목표: 0.65)")
+    print(f"F1 macro: {f1_val:.4f}")
+
+    if recall_val >= 0.65:
+        print("판정: 배포 가능 (재현율 목표 달성)")
+    else:
+        print("판정: 배포 보류 (재현율 목표 미달)")
+        print(f"  → 임계값 낮추기 또는 모델 개선 필요")
+
+    if output_path:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(report, f, indent=2, ensure_ascii=False)
+        print(f"\n리포트 저장: {output_path}")
+
+    return report
+
+# 파이프라인 실행
+final_report = run_full_evaluation_pipeline(
+    LogisticRegression(max_iter=2000, random_state=42),
+    X_train, y_train, X_test, y_test,
+    threshold=None,
+)
+```
+
+## 자주 하는 실수
+
+**실수 1 — 임계값을 기록하지 않음**
+
+임계값 없는 F1 점수는 재현 불가능합니다. 임계값 0.5와 0.3에서의 F1은 완전히 다를 수 있습니다. 모든 지표는 어떤 임계값에서 측정했는지를 함께 기록해야 합니다.
+
+**실수 2 — 슬라이스 성능 생략**
+
+전체 F1만 보고에 넣으면 숨겨진 약점을 은폐하게 됩니다. 최소한 3개 이상의 중요 세그먼트 성능을 포함해야 합니다. 슬라이스 성능이 없으면 감사(audit) 시 문제가 됩니다.
+
+**실수 3 — 재현성 정보 미포함**
+
+버전과 해시 정보 없이는 6개월 후 같은 실험을 재현할 수 없습니다. scikit-learn 버전 차이 하나로도 결과가 달라질 수 있습니다. Python 버전, 라이브러리 버전, 데이터 해시를 반드시 포함해야 합니다.
+
+**실수 4 — 알려진 리스크 섹션 비워두기**
+
+"약점이 없다"가 아니라 "약점을 파악했지만 허용 가능한 범위로 판단했다"가 좋은 리포트입니다. 알려진 리스크를 숨기면 나중에 그 리스크가 실제 문제가 됐을 때 신뢰를 잃습니다.
+
+**실수 5 — 수동으로 작성한 요약만 남기기**
+
+수동 요약은 오류 가능성이 있고, 다음 배포 시 재사용이 어렵습니다. JSON 형식의 구조화된 리포트를 먼저 생성하고, 그것에서 마크다운을 자동으로 생성하는 파이프라인을 구축해야 합니다.
 
 ## 운영 체크리스트
 
-- [ ] 모델 배포 전에 어떤 평가 정보를 한곳에 모아야 할 수 있다
-- [ ] 평가 리포트와 Model Card는 무엇이 다를까요
-- [ ] 임계값, 슬라이스, 재현성 정보는 왜 빠지면 안 될까요
+- [ ] 핵심 지표와 임계값을 함께 기록했습니다.
+- [ ] 최소 3개 세그먼트의 슬라이스 성능을 포함했습니다.
+- [ ] Python, 라이브러리 버전, 데이터 해시를 기록했습니다.
+- [ ] 알려진 리스크 목록을 솔직하게 작성했습니다.
+- [ ] 배포 조건과 다음 검토 일정을 명시했습니다.
+- [ ] JSON 형식으로 구조화된 리포트를 생성했습니다.
+- [ ] 마크다운 요약을 자동으로 생성하는 코드를 작성했습니다.
+- [ ] 오프라인 지표와 온라인 지표를 모두 추적 계획을 수립했습니다.
+
+## 처음 질문으로 돌아가기
+
+- **좋은 평가 리포트에 반드시 포함해야 할 요소는 무엇일까요?**
+  - 5가지 필수 요소: 데이터 정보(어떤 데이터로 측정했는가), 핵심 지표(임계값과 함께), 슬라이스 성능(세그먼트별 약점), 재현성 메타데이터(버전/해시), 알려진 리스크(이미 파악한 약점). 이 중 하나라도 빠지면 6개월 후 문제가 생겼을 때 조사가 불가능합니다.
+
+- **오프라인 지표와 온라인 지표는 어떻게 다르고 둘 다 왜 필요할까요?**
+  - 오프라인 지표는 배포 전 테스트 세트에서 측정한 F1, AUC 같은 지표입니다. 온라인 지표는 배포 후 실제 운영에서 측정한 클릭률, 전환율, 사기 탐지율 같은 비즈니스 KPI입니다. 두 지표 모두 필요한 이유는 오프라인 성능이 온라인 성능을 보장하지 않기 때문입니다. 데이터 드리프트, 피드백 루프, 사용자 행동 변화로 인해 온라인 성능이 오프라인과 다를 수 있습니다.
+
+- **재현성 정보는 왜 빠지면 안 될까요?**
+  - 재현성 정보 없이는 6개월 후 같은 실험을 재현할 수 없습니다. Python 버전, scikit-learn 버전 차이로 부동소수점 결과가 달라질 수 있고, 데이터 해시가 없으면 어떤 데이터를 썼는지 추적이 불가능합니다. 감사, 사고 분석, 모델 비교 등 모든 후속 작업이 재현성에 의존합니다.
 
 ---
 
 ## 정리
 
-좋은 평가 리포트는 한 장짜리 요약이면서도, 배포 판단에 필요한 맥락을 빠짐없이 담고 있어야 합니다. 데이터, 지표, 임계값, 슬라이스, 재현성, 리스크가 한곳에 모여야 숫자가 의사결정의 근거가 됩니다. 여기까지가 Model Evaluation 101의 기본 어휘이며, 이후에는 MLOps와 더 깊은 오류 분석으로 자연스럽게 이어질 수 있습니다.
+좋은 평가 리포트는 한 장짜리 요약이면서도, 배포 판단에 필요한 맥락을 빠짐없이 담고 있어야 합니다. 데이터, 지표, 임계값, 슬라이스, 재현성, 리스크가 한곳에 모여야 숫자가 의사결정의 근거가 됩니다.
 
-## 처음 질문으로 돌아가기
+이것으로 Model Evaluation 101 시리즈의 10가지 주제를 모두 다루었습니다.
 
-- **모델 배포 전에 어떤 평가 정보를 한곳에 모아야 할까요?**
-  - 이 다섯 요소가 한곳에 모여야 리포트가 완성됩니다. 데이터, 지표, 슬라이스, 재현성, 리스크 중 하나라도 빠지면 배포 판단의 근거가 비어 버립니다.
-- **평가 리포트와 Model Card는 무엇이 다를까요?**
-  - 첫 번째와 두 번째 단계는 리포트가 단순한 점수 표가 아니라는 점을 보여 줍니다. 전체 지표와 슬라이스 지표가 함께 있어야 약한 구간을 숨기지 않을 수 있습니다. 세 번째 단계의 메타데이터는 나중에 재현성을 복원하는 뼈대가 됩니다.
-- **임계값, 슬라이스, 재현성 정보는 왜 빠지면 안 될까요?**
-  - 이 다섯 요소가 한곳에 모여야 리포트가 완성됩니다
-  - 평가 리포트가 없으면 같은 질문에 팀이 계속 같은 답을 다시 만들어야 합니다. 어떤 모델을 왜 선택했는지, 어떤 한계를 알고도 배포했는지, 나중에 같은 결과를 다시 재현할 수 있는지 확인하기가 어려워집니다.
-  - 이 다섯 요소가 한곳에 모여야 리포트가 완성됩니다. 데이터, 지표, 슬라이스, 재현성, 리스크 중 하나라도 빠지면 배포 판단의 근거가 비어 버립니다.
+1. 모델 평가는 의사결정 설계입니다 (1장)
+2. 데이터 분할이 평가의 신뢰성을 결정합니다 (2장)
+3. 정확도 하나로는 불충분합니다 (3장)
+4. 정밀도-재현율 트레이드오프를 운영 정책으로 연결합니다 (4장)
+5. F1은 올바른 절차와 함께 사용해야 합니다 (5장)
+6. AUC는 운영 임계값 선택과 연결되어야 합니다 (6장)
+7. 확률 신뢰성은 순위 성능과 별도로 검증합니다 (7장)
+8. 교차 검증으로 평가의 불확실성을 추정합니다 (8장)
+9. 오류 분석으로 다음 개선의 방향을 찾습니다 (9장)
+10. 모든 것을 기록하여 의사결정 흔적을 남깁니다 (10장)
+
+이 10가지가 모델 평가의 기본 어휘입니다. 이후에는 MLOps와 지속적인 모니터링, 더 깊은 오류 분석으로 자연스럽게 이어집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -193,7 +543,7 @@ print(to_md(report))
 - [Model Evaluation 101 (7/10): 확률 보정 이해하기](./07-calibration.md)
 - [Model Evaluation 101 (8/10): 교차 검증 이해하기](./08-cross-validation.md)
 - [Model Evaluation 101 (9/10): 오류 분석으로 약점 찾기](./09-error-analysis.md)
-- **평가 리포트 만들기 (현재 글)**
+- **Model Evaluation 101 (10/10): 평가 리포트 만들기 (현재 글)**
 
 <!-- toc:end -->
 
