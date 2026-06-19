@@ -54,6 +54,26 @@ path: /var/log/app.log
  data blocks → [page cache] → fsync → [disk]
 ```
 
+### inode가 담고 있는 정보
+
+```text
+inode {
+    type:        regular file / directory / symlink / ...
+    permissions: rwxr-xr--
+    uid/gid:     owner info
+    size:        1234 bytes
+    atime:       last access time
+    mtime:       last modification time
+    ctime:       last metadata change time
+    block[0..12]: direct data block pointers
+    block[13]:    single indirect pointer
+    block[14]:    double indirect pointer
+    block[15]:    triple indirect pointer
+}
+```
+
+파일 이름은 inode에 없습니다. 이름은 디렉터리 엔트리에 있고, 엔트리가 inode 번호를 가리킵니다.
+
 ## 같은 코드를 다르게 읽는 법
 
 **이전 관점 — "쓰기 호출을 했으니 안전하다":**
@@ -128,6 +148,31 @@ fsync는 매번 디스크 회전을 기다리므로 수십~수백 배 느릴 수
 
 위 "After" 코드를 그대로 실행해 보고, 중간에 일부러 예외를 던져도 원본 파일이 손상되지 않는지 확인합니다.
 
+```python
+import os, tempfile, json
+
+def save_atomic(path, data):
+    d = os.path.dirname(path) or '.'
+    fd, tmp = tempfile.mkstemp(dir=d)
+    try:
+        with os.fdopen(fd, 'w') as f:
+            json.dump(data, f)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except Exception:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+        raise
+
+# 테스트: 중간에 예외가 나도 원본이 안전한지 확인
+try:
+    save_atomic('/tmp/test.json', {'key': 'value'})
+    print('saved ok')
+except Exception as e:
+    print('failed, original safe:', e)
+```
+
 ### 5단계: 동시에 같은 파일에 쓰기
 
 ```python
@@ -173,7 +218,7 @@ POSIX는 작은 append에 한해 원자성을 약속하지만, 레코드 분리�
 - [ ] 페이지 캐시 효과가 시간에 미치는 영향을 안다
 - [ ] 동시 쓰기에서 어떤 원자성이 보장되는지 안다
 
-## 시스템 관찰: 파일 시스템 내구성 체크리스트
+## 시스템 관찰: 파일 시스템 내구성과 I/O 패턴 분석
 
 파일 저장 코드의 안전성은 "정상 종료"가 아니라 "비정상 종료"에서 평가해야 합니다.
 
@@ -184,6 +229,7 @@ POSIX는 작은 append에 한해 원자성을 약속하지만, 레코드 분리�
 iostat -xz 1
 # await: 평균 I/O 대기 시간 (ms)
 # w_await: 쓰기 대기 시간
+# %util: 디스크 포화도
 ```
 
 `await`가 높으면 fsync가 너무 자주 호출되거나 디스크가 느린 것입니다. 그룹 커밋은 여러 fsync 요청을 묶어 한 번의 I/O로 처리해 throughput을 높입니다.
@@ -194,18 +240,18 @@ iostat -xz 1
 import os, tempfile
 
 def atomic_write(path, data: bytes):
+    """크래시 안전한 파일 쓰기: tmp → fsync → rename → dir fsync"""
     d = os.path.dirname(path) or '.'
     fd, tmp = tempfile.mkstemp(dir=d)
     try:
         with os.fdopen(fd, 'wb') as f:
             f.write(data)
             f.flush()
-            os.fsync(f.fileno())
-        os.replace(tmp, path)
-        # 디렉터리 메타데이터도 내구성 보장
+            os.fsync(f.fileno())          # 데이터 내구성 보장
+        os.replace(tmp, path)             # 원자적 rename
         dirfd = os.open(d, os.O_DIRECTORY)
         try:
-            os.fsync(dirfd)
+            os.fsync(dirfd)               # 디렉터리 메타데이터 내구성 보장
         finally:
             os.close(dirfd)
     except Exception:
@@ -218,22 +264,57 @@ def atomic_write(path, data: bytes):
 
 ### 저널링 복구 관점
 
-저널링 파일시스템(ext4, xfs)은 메타데이터 일관성을 복구해 주지만, 애플리케이션 레코드 원자성까지 자동 보장하지는 않습니다. 따라서 애플리케이션 계층에서 append 단위, checksum, commit marker를 함께 설계해야 합니다.
+저널링 파일시스템(ext4, xfs)은 메타데이터 일관성을 복구해 주지만, 애플리케이션 레코드 원자성까지 자동 보장하지는 않습니다.
 
 | 파일시스템 이벤트 | 저널링이 보장 | 저널링이 보장하지 않음 |
 | --- | --- | --- |
 | 메타데이터(크기, 시간) | 일관성 복구 | |
-| 데이터 내용 | data=journal 모드에서만 | 기본 모드에서는 미보장 |
+| 데이터 내용 | data=journal 모드에서만 | 기본 ordered 모드에서는 미보장 |
 | 애플리케이션 레코드 경계 | | 애플리케이션이 직접 관리 |
+
+따라서 애플리케이션 계층에서 append 단위, checksum, commit marker를 함께 설계해야 합니다.
+
+### 파일 시스템 I/O 트러블슈팅 루틴
+
+```bash
+# 1. 디스크 I/O 포화도 확인
+iostat -xz 1 | grep -E "Device|sda|nvme"
+
+# 2. 어느 프로세스가 I/O를 많이 쓰는지
+iotop -b -n 5 | head -20
+
+# 3. 특정 프로세스의 파일 I/O syscall 패턴
+strace -f -e trace=read,write,fsync,fdatasync -c -p <PID>
+```
+
+`fsync` 비율이 높고 `w_await`도 높으면, 그룹 커밋 또는 배치 쓰기로 개선할 여지가 있습니다.
+
+### 페이지 캐시 히트율 측정
+
+```python
+import os, time
+
+def measure_read(path, drop_cache=False):
+    if drop_cache:
+        os.system("sync; echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null 2>&1")
+    t = time.perf_counter()
+    with open(path, 'rb') as f:
+        data = f.read()
+    elapsed = time.perf_counter() - t
+    print(f"{'cold' if drop_cache else 'warm'}: {len(data)/1e6:.1f}MB in {elapsed*1000:.1f}ms "
+          f"({len(data)/elapsed/1e6:.0f} MB/s)")
+```
+
+같은 파일을 두 번 읽으면 두 번째는 수십 배 빠릅니다. 이것이 페이지 캐시의 효과입니다.
 
 ## 처음 질문으로 돌아가기
 
 - **inode와 디렉터리 엔트리는 파일을 어떻게 표현할까요?**
-  - inode는 파일의 메타데이터(크기, 권한, 수정 시각, 데이터 블록 포인터)를 저장하는 구조체입니다. 디렉터리 엔트리는 "파일명 → inode 번호"의 매핑입니다. 파일 이름 자체는 inode에 없고 디렉터리에 있기 때문에, 하드 링크는 같은 inode를 가리키는 여러 이름입니다.
+  - inode는 파일의 메타데이터(크기, 권한, 수정 시각, 데이터 블록 포인터)를 저장하는 구조체입니다. 디렉터리 엔트리는 "파일명 → inode 번호"의 매핑입니다. 파일 이름 자체는 inode에 없고 디렉터리에 있기 때문에, 하드 링크는 같은 inode를 가리키는 여러 이름이고, 파일 이름을 바꿔도 inode 번호는 같습니다.
 - **페이지 캐시와 `fsync`는 각각 어디까지를 보장할까요?**
-  - `write` 시스템 콜은 커널의 페이지 캐시까지만 씁니다. 커널이 캐시를 비울 때 비로소 디스크에 내려갑니다. `fsync`는 "지금 당장 디스크까지 내려가라"를 요청해, 호출이 반환된 시점에는 디스크에 안전하게 기록된 것을 보장합니다.
+  - `write` 시스템 콜은 커널의 페이지 캐시까지만 씁니다. 커널이 캐시를 비울 때 비로소 디스크에 내려갑니다. `fsync`는 "지금 당장 디스크까지 내려가라"를 요청해, 호출이 반환된 시점에는 디스크에 안전하게 기록된 것을 보장합니다. 전원 장애 후에도 데이터가 남아야 한다면 fsync가 필수입니다.
 - **저널링은 충돌 이후 어떤 복구를 가능하게 할까요?**
-  - 저널링 파일시스템은 실제 변경 전에 저널에 "무엇을 할 것인지" 기록합니다. 크래시 후 재부팅 시 저널을 확인해 완료된 트랜잭션만 반영하고 불완전한 것은 롤백합니다. 이로써 fsck 없이도 파일시스템 메타데이터 일관성을 빠르게 복원합니다.
+  - 저널링 파일시스템은 실제 변경 전에 저널에 "무엇을 할 것인지" 기록합니다. 크래시 후 재부팅 시 저널을 확인해 완료된 트랜잭션만 반영하고 불완전한 것은 롤백합니다. 이로써 fsck 없이도 파일시스템 메타데이터 일관성을 빠르게 복원합니다. 단, 저널링은 파일시스템 메타데이터 수준의 보장이고, 애플리케이션 데이터의 원자성은 별도로 관리해야 합니다.
 
 ## 연습 문제
 

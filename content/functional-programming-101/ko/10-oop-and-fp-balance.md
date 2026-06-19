@@ -54,9 +54,11 @@ State + behavior together     Stateless data transformation
 Managing multiple instances   Pipeline data processing
 Framework integration         Concurrency / parallelism
 Complex domain models         Mathematical / declarative logic
-```
 
-## OOP와 FP의 경계를 나누는 기준
+OOP와 FP 경계 기준:
+  "이 코드에 상태가 필요한가?" -> OOP
+  "이 코드는 값을 변환하기만 하는가?" -> FP
+```
 
 ## 핵심 개념
 
@@ -69,6 +71,7 @@ Complex domain models         Mathematical / declarative logic
 | 서비스 함수(service function) | 상태 없이 비즈니스 로직을 수행하는 함수입니다 |
 
 ## 적용 전후 비교
+
 모든 것을 클래스 안에 넣는 설계는 익숙하지만, 계산 로직까지 상태 객체에 묶어 버릴 수 있습니다. 값 객체와 순수 함수를 분리하면 테스트성과 재사용성이 좋아집니다.
 
 ```python
@@ -84,14 +87,12 @@ class OrderProcessor:
     def format_receipt(self, items: list[dict]) -> str:
         total = self.calculate_total(items)
         return f"Total: ${total:,.2f}"
-
-processor = OrderProcessor(0.1)
-print(processor.format_receipt([{"price": 25.00, "qty": 2}]))
 ```
 
 ```python
 # 이후: value object(OOP) + 순수 함수(FP)
 from dataclasses import dataclass
+from functools import reduce
 
 @dataclass(frozen=True)
 class OrderItem:
@@ -99,8 +100,10 @@ class OrderItem:
     price: float
     qty: int
 
+# 순수 함수: map과 reduce로 계산
 def calculate_total(items: list[OrderItem], tax_rate: float) -> float:
-    subtotal = sum(i.price * i.qty for i in items)
+    subtotals = list(map(lambda i: i.price * i.qty, items))
+    subtotal = reduce(lambda acc, x: acc + x, subtotals, 0.0)
     return subtotal * (1 + tax_rate)
 
 def format_receipt(items: list[OrderItem], tax_rate: float) -> str:
@@ -108,7 +111,7 @@ def format_receipt(items: list[OrderItem], tax_rate: float) -> str:
     return f"Total: ${total:,.2f}"
 
 items = [OrderItem("Coffee", 25.00, 2)]
-print(format_receipt(items, 0.1))
+print(format_receipt(items, 0.1))  # Total: $55.00
 ```
 
 ## 단계별 실습
@@ -118,6 +121,7 @@ print(format_receipt(items, 0.1))
 ```python
 from dataclasses import dataclass, replace
 from typing import NamedTuple
+from functools import reduce
 
 # value object: 불변, 동등성 기반
 @dataclass(frozen=True)
@@ -144,9 +148,14 @@ price = Money(50000)
 discounted = apply_discount(price, Percentage(0.1))
 final = add_tax(discounted, Percentage(0.1))
 
-print(f"Original: {format_money(price)}")       # Original: 50,000 USD
-print(f"After discount: {format_money(discounted)}")  # After discount: 45,000 USD
-print(f"After tax: {format_money(final)}")       # After tax: 49,500 USD
+print(f"Original: {format_money(price)}")              # Original: 50,000 USD
+print(f"After discount: {format_money(discounted)}")   # After discount: 45,000 USD
+print(f"After tax: {format_money(final)}")             # After tax: 49,500 USD
+
+# map으로 여러 가격에 동시 적용
+prices = [Money(10000), Money(25000), Money(50000)]
+discounted_all = list(map(lambda p: apply_discount(p, Percentage(0.2)), prices))
+print([format_money(p) for p in discounted_all])  # ['8,000 USD', '20,000 USD', '40,000 USD']
 ```
 
 값 객체는 OOP의 명시적인 데이터 모델링 장점을 가져오고, 순수 함수는 FP의 예측 가능성을 제공합니다. 둘을 함께 쓰면 서로의 약점을 상당 부분 보완할 수 있습니다.
@@ -193,11 +202,11 @@ def handle_registration(name: str, email: str) -> None:
         # 운영 환경: DB 저장, 이메일 발송 등
 
 handle_registration("Alice", "alice@example.com")
-# 등록됨: User(name='Alice', email='alice@example.com', active=True)
+# Registered: User(name='Alice', email='alice@example.com', active=True)
 
 handle_registration("", "invalid-email")
-# 오류: @ 기호가 필요합니다
-# 오류: 이름이 비어 있습니다
+# Error: @ symbol is required
+# Error: Name is empty
 ```
 
 이 패턴은 Python에서 함수형 사고를 가장 실용적으로 도입하는 방법입니다. 핵심 규칙은 순수 함수로 두고, 실제 부수효과는 가장 바깥쪽 핸들러에서만 수행합니다.
@@ -207,7 +216,7 @@ handle_registration("", "invalid-email")
 ```python
 from dataclasses import dataclass
 from collections.abc import Callable
-from typing import Iterator
+from functools import reduce
 
 @dataclass
 class DataPipeline:
@@ -229,15 +238,15 @@ class DataPipeline:
             result = step(result)
         return result
 
-# 순수 함수 단계
+# 순수 함수 단계 — map과 filter 활용
 def normalize(records: list[dict]) -> list[dict]:
-    return [{**r, "name": r["name"].strip().title()} for r in records]
+    return list(map(lambda r: {**r, "name": r["name"].strip().title()}, records))
 
 def enrich(records: list[dict]) -> list[dict]:
-    return [{**r, "name_len": len(r["name"])} for r in records]
+    return list(map(lambda r: {**r, "name_len": len(r["name"])}, records))
 
 def filter_valid(records: list[dict]) -> list[dict]:
-    return [r for r in records if r.get("score", 0) > 0]
+    return list(filter(lambda r: r.get("score", 0) > 0, records))
 
 # pipeline 조립(OOP 인터페이스 + FP 실행)
 pipeline = (
@@ -265,6 +274,8 @@ for r in result:
 ### 단계 4: 패러다임 선택 기준 세우기
 
 ```python
+from functools import reduce
+
 # 상황 1: 상태 관리 -> OOP
 class ShoppingCart:
     def __init__(self) -> None:
@@ -277,19 +288,17 @@ class ShoppingCart:
     def total(self) -> int:
         return sum(i["price"] for i in self._items)
 
-# 상황 2: 데이터 변환 -> FP
-def transform_prices(
-    items: list[dict],
-    rate: float,
-) -> list[dict]:
-    return [{**i, "price": int(i["price"] * rate)} for i in items]
+# 상황 2: 데이터 변환 -> FP (map/filter/reduce)
+def transform_prices(items: list[dict], rate: float) -> list[dict]:
+    return list(map(lambda i: {**i, "price": int(i["price"] * rate)}, items))
 
-# 상황 3: framework 통합 -> OOP(framework 요구)
-class UserSerializer:
-    def to_dict(self, user) -> dict:
-        return {"name": user.name, "email": user.email}
+def filter_affordable(items: list[dict], max_price: int) -> list[dict]:
+    return list(filter(lambda i: i["price"] <= max_price, items))
 
-# 상황 4: 유틸리티 -> FP
+def total_cost(items: list[dict]) -> int:
+    return reduce(lambda acc, i: acc + i["price"], items, 0)
+
+# 상황 3: 유틸리티 -> FP
 def slugify(text: str) -> str:
     return text.lower().strip().replace(" ", "-")
 
@@ -297,13 +306,15 @@ def slugify(text: str) -> str:
 cart = ShoppingCart()
 cart.add("Coffee", 450)
 cart.add("Cake", 600)
+cart.add("Juice", 300)
 
 # FP로 OOP 객체 데이터를 변환
 discounted = transform_prices(cart._items, 0.9)
-print(f"Before discount: {cart.total:,}")
-print(f"After discount: {sum(i['price'] for i in discounted):,}")
-# Before discount: 1,050
-# After discount: 945
+affordable = filter_affordable(discounted, 500)
+print(f"Original total: {cart.total:,}")
+print(f"After discount & filter: {total_cost(affordable):,}")
+# Original total: 1,350
+# After discount & filter: 405
 ```
 
 이 예제는 패러다임 선택이 정체성이 아니라 상황 판단임을 잘 보여 줍니다. 상태를 오래 들고 있어야 하면 OOP, 데이터만 바꾸면 되면 FP가 더 자연스럽습니다.
@@ -312,6 +323,7 @@ print(f"After discount: {sum(i['price'] for i in discounted):,}")
 
 ```python
 from dataclasses import dataclass
+from functools import reduce
 
 @dataclass(frozen=True)
 class RawConfig:
@@ -325,6 +337,7 @@ class AppConfig:
     port: int
     debug: bool
 
+# 순수 함수 코어
 def normalize_config(raw: RawConfig) -> AppConfig:
     return AppConfig(
         host=raw.host.strip(),
@@ -340,6 +353,7 @@ def validate_config(config: AppConfig) -> list[str]:
         errors.append("port must be 1-65535")
     return errors
 
+# OOP 셸
 class AppServer:
     def __init__(self, config: AppConfig) -> None:
         self.config = config
@@ -369,87 +383,15 @@ print("Normalized config:", normalize_config(good))
 print("Success run:", boot(good))
 print("Missing host:", boot(bad_host))
 print("Bad port:", boot(bad_port))
-# 정규화된 config: AppConfig(host='localhost', port=8080, debug=True)
-# 실행 성공: localhost:8080에서 서버 시작(debug)
-# host 누락: 검증 실패 ['host is required']
-# 잘못된 port: 검증 실패 ['port must be 1-65535']
 ```
 
 팀 차원의 기준을 만들 때도 결국 이런 질문이 필요합니다. 상태가 핵심인가, 변환이 핵심인가, 테스트 우선순위는 무엇인가. 이 기준이 없으면 패러다임 논쟁은 금방 취향 싸움이 됩니다.
 
-#### 예상 출력
-
-```text
-Normalized config: AppConfig(host='localhost', port=8080, debug=True)
-Success run: starting server on localhost:8080 (debug)
-Missing host: validation failed: ['host is required']
-Bad port: validation failed: ['port must be 1-65535']
-```
-
-#### 결과가 다르면 먼저 확인할 점
-
-- `normalize_config()`가 `host.strip()`을 호출하는지 확인합니다. 공백만 있는 호스트는 정규화 뒤 빈 문자열이어야 합니다.
-- `port`를 `int`로 바꾼 뒤 범위를 검사하는지 확인합니다. 문자열 상태로 비교하면 잘못된 포트가 통과할 수 있습니다.
-- 검증 실패 시 `AppServer`를 만들지 않는지 확인합니다. 이 경계가 무너지면 shell이 core의 오류를 무시하게 됩니다.
-- 성공 경로는 클래스 셸이 맡고, 정규화와 검증은 순수 함수가 맡는지 확인합니다. 이 역할 분리가 하이브리드 설계의 핵심입니다.
-
-## 이 코드에서 주목할 점
-
-- 값 객체(`frozen dataclass`)는 OOP의 구조화와 FP의 불변성을 함께 제공합니다.
-- Functional Core, Imperative Shell은 테스트 가능한 코어를 만드는 실용 패턴입니다.
-- 공개 인터페이스는 OOP, 내부 계산은 FP로 두는 혼합 설계가 매우 효과적입니다.
-- 선택 기준은 결국 "상태 관리가 필요한가"입니다.
-
-## 흔한 실수 5가지
-
-| 실수 | 왜 문제인가 | 해결 방법 |
-|------|------------|----------|
-| 패러다임 순수주의 | 불필요한 복잡성을 만듭니다 | 문제에 맞는 도구를 고릅니다 |
-| 모든 것을 클래스에 넣음 | 함수로 충분한 로직까지 무거워집니다 | 먼저 상태가 필요한지 묻습니다 |
-| 상태를 무조건 피하려 함 | 상태 관리가 필요한 곳에서 오히려 비효율적입니다 | 필요한 곳에서는 클래스를 사용합니다 |
-| 팀 안에서 스타일이 뒤섞임 | 리뷰와 협업 비용이 커집니다 | 팀 기준을 명확히 합의합니다 |
-| 과도한 추상화 | 단순한 코드가 더 읽기 좋을 수 있습니다 | YAGNI를 적용합니다 |
-
-## 실무에서 이렇게 쓰입니다
-
-- Django/FastAPI에서 클래스 기반 인터페이스와 순수 함수 비즈니스 로직을 함께 사용합니다.
-- 데이터 파이프라인에서는 OOP 커넥터와 FP 변환 단계를 결합합니다.
-- 테스트는 순수 함수에 단위 테스트, 클래스에는 통합 테스트를 집중합니다.
-- 설정은 frozen dataclass, 검증은 순수 함수로 분리합니다.
-- 이벤트 객체는 OOP로, 핸들러 로직은 FP로 구성합니다.
-
-## 현업에서는 이렇게 판단합니다
-
-"OOP vs FP"는 Python에서는 대체로 잘못된 질문입니다. 더 좋은 질문은 "이 코드는 테스트하기 쉬운가", "변경하기 쉬운가", "읽기 쉬운가"입니다. 값 객체는 dataclass로, 비즈니스 로직은 순수 함수로, 프레임워크 경계는 클래스나 핸들러로 두는 방식이 실무적으로 가장 자주 성공합니다.
-
-이 시리즈에서 다룬 순수 함수, 불변 데이터, 고차 함수, 클로저, 제너레이터, 함수 합성은 서로 따로 떨어진 기술이 아닙니다. 모두 더 작고 예측 가능한 계산 단위를 만들기 위한 도구입니다. 객체지향과 함수형의 균형을 잡는 일은 그 도구들을 상황에 맞게 조합하는 판단에서 시작합니다.
-
-## 운영 체크리스트
-
-- [ ] 객체지향과 함수형의 장단점을 비교할 수 있다
-- [ ] Functional Core, Imperative Shell 패턴을 설명할 수 있다
-- [ ] 값 객체와 순수 함수를 함께 사용하는 설계를 할 수 있다
-- [ ] 상황별 패러다임 선택 기준을 적용할 수 있다
-- [ ] 하이브리드 설계 패턴을 실제 코드에 적용할 수 있다
-
-## 연습 문제
-
-1. 장바구니를 OOP(`Cart` 클래스) + FP(할인, 세금 계산 함수) 혼합 구조로 설계해 보세요.
-2. 파일 기반 설정 로더를 Functional Core, Imperative Shell 패턴으로 구현해 보세요.
-3. 기존 OOP 코드에서 순수 함수로 뽑아낼 수 있는 부분을 찾아 리팩터링해 보세요.
-
-## 정리와 다음 글
-
-객체지향과 함수형은 경쟁 관계가 아니라 상호 보완 관계입니다. Python에서는 불변 값 객체(OOP) + 순수 함수(FP) + 얇은 클래스 셸이라는 조합이 가장 실용적인 경우가 많습니다. 이 시리즈에서 다룬 함수형 도구들을 적절히 섞어 쓰면 더 읽기 쉽고 테스트하기 쉬운 코드를 만들 수 있습니다.
-
-## 심화 앵커: 하이브리드 설계를 검증 가능한 형태로 고정하기
-
-여기서는 시리즈 전체에서 다룬 패턴을 하나의 실행 흐름으로 묶습니다. 핵심은 클래스 경계와 함수 경계를 분리하는 것입니다. 상태를 가진 객체는 조립과 라이프사이클을 담당하고, 계산은 순수 함수 파이프라인으로 고정합니다.
+### 단계 6: 시리즈 전체 패턴 통합 예시
 
 ```python
 from dataclasses import dataclass, replace
 from functools import reduce
-from itertools import islice
 
 @dataclass(frozen=True)
 class Event:
@@ -464,16 +406,20 @@ class LedgerRow:
     fee: int
     net: int
 
+# map으로 정규화
 def normalize(event: Event) -> Event:
     return replace(event, kind=event.kind.strip().lower())
 
+# filter로 선택
 def paid_only(event: Event) -> bool:
     return event.kind == "paid"
 
+# map으로 변환
 def to_ledger(event: Event) -> LedgerRow:
     fee = int(event.amount * 0.02)
     return LedgerRow(event_id=event.event_id, gross=event.amount, fee=fee, net=event.amount - fee)
 
+# reduce로 집계
 def summarize(rows: list[LedgerRow]) -> dict[str, int]:
     return reduce(
         lambda acc, row: {
@@ -498,79 +444,72 @@ sample = [
     Event("E-3", 12000, "paid"),
 ]
 
-print(settle(sample))
+result = settle(sample)
+print(result)
 # {'count': 2, 'gross': 22000, 'fee': 440, 'net': 21560}
 ```
 
-이 구조는 monad-like `Result` 패턴, 재귀적 변환, 지연 파이프라인으로 확장하기 쉽습니다. 특히 검증 단계에서 속성 기반 테스트를 추가하면 변경이 잦은 정산 규칙도 안정적으로 운영할 수 있습니다.
+이 예시는 시리즈 전체에서 다룬 패턴을 하나로 통합합니다. 불변 값 객체, 순수 함수, `map`/`filter`/`reduce` 파이프라인, 그리고 OOP 셸 분리가 자연스럽게 어우러집니다.
 
-```python
-from hypothesis import given, strategies as st
+## 이 코드에서 주목할 점
 
-@given(st.integers(min_value=0, max_value=10_000))
-def test_fee_never_negative(amount: int) -> None:
-    row = to_ledger(Event("X", amount, "paid"))
-    assert row.fee >= 0
-    assert row.net <= row.gross
-```
+- 값 객체(`frozen dataclass`)는 OOP의 구조화와 FP의 불변성을 함께 제공합니다.
+- Functional Core, Imperative Shell은 테스트 가능한 코어를 만드는 실용 패턴입니다.
+- `map`/`filter`/`reduce`를 OOP 데이터에 적용해도 자연스럽게 동작합니다.
+- 선택 기준은 결국 "상태 관리가 필요한가"입니다.
 
-테스트에서 중요한 것은 "예제가 맞다"가 아니라 "성질이 유지된다"입니다. 이 관점을 유지하면 OOP와 FP를 섞어도 설계 품질이 흔들리지 않습니다.
+## 자주 하는 실수
 
-## 검증 시나리오: 경계 조건을 먼저 잠그기
+| 실수 | 왜 문제인가 | 해결 방법 |
+|------|------------|----------|
+| 패러다임 순수주의 | 불필요한 복잡성을 만듭니다 | 문제에 맞는 도구를 고릅니다 |
+| 모든 것을 클래스에 넣음 | 함수로 충분한 로직까지 무거워집니다 | 먼저 상태가 필요한지 묻습니다 |
+| 상태를 무조건 피하려 함 | 상태 관리가 필요한 곳에서 오히려 비효율적입니다 | 필요한 곳에서는 클래스를 사용합니다 |
+| 팀 안에서 스타일이 뒤섞임 | 리뷰와 협업 비용이 커집니다 | 팀 기준을 명확히 합의합니다 |
+| 과도한 추상화 | 단순한 코드가 더 읽기 좋을 수 있습니다 | YAGNI를 적용합니다 |
 
-실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
+## 실무에서 이렇게 쓰입니다
 
-```python
-from functools import reduce
+- Django/FastAPI에서 클래스 기반 인터페이스와 순수 함수 비즈니스 로직을 함께 사용합니다.
+- 데이터 파이프라인에서 OOP 커넥터와 `map`/`filter`/`reduce` 변환 단계를 결합합니다.
+- 테스트는 순수 함수에 단위 테스트, 클래스에는 통합 테스트를 집중합니다.
+- 설정은 frozen dataclass, 검증은 순수 함수로 분리합니다.
+- 이벤트 객체는 OOP로, 핸들러 로직은 FP로 구성합니다.
 
-def pipeline(values: list[int]) -> dict[str, int]:
-    filtered = [v for v in values if v >= 0]
-    squared = [v * v for v in filtered]
-    total = reduce(lambda acc, x: acc + x, squared, 0)
-    return {
-        "count": len(squared),
-        "total": total,
-        "max": max(squared) if squared else 0,
-    }
+## 현업에서는 이렇게 판단합니다
 
-# 경계 조건 검증
-assert pipeline([]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([-3, -1]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([0, 2, 3]) == {"count": 3, "total": 13, "max": 9}
+"OOP vs FP"는 Python에서는 대체로 잘못된 질문입니다. 더 좋은 질문은 "이 코드는 테스트하기 쉬운가", "변경하기 쉬운가", "읽기 쉬운가"입니다. 값 객체는 dataclass로, 비즈니스 로직은 순수 함수로, 프레임워크 경계는 클래스나 핸들러로 두는 방식이 실무적으로 가장 자주 성공합니다.
 
-print("Pass")
-```
-
-또한 지연 평가를 사용할 때는 소비 시점을 테스트에 명시해 두는 편이 좋습니다. generator는 한 번 소비하면 비어야 정상이며, 이 성질이 깨지면 중간 단계에서 의도치 않은 materialize가 발생했을 가능성이 큽니다.
-
-```python
-from itertools import islice
-
-def naturals():
-    n = 0
-    while True:
-        yield n
-        n += 1
-
-stream = naturals()
-first_five = list(islice(stream, 5))
-next_three = list(islice(stream, 3))
-
-assert first_five == [0, 1, 2, 3, 4]
-assert next_three == [5, 6, 7]
-print("Pass")
-```
-
-이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
+이 시리즈에서 다룬 순수 함수, 불변 데이터, 고차 함수, 클로저, 제너레이터, `map`/`filter`/`reduce`, 함수 합성은 서로 따로 떨어진 기술이 아닙니다. 모두 더 작고 예측 가능한 계산 단위를 만들기 위한 도구입니다. 객체지향과 함수형의 균형을 잡는 일은 그 도구들을 상황에 맞게 조합하는 판단에서 시작합니다.
 
 ## 처음 질문으로 돌아가기
 
 - **객체지향과 함수형은 각각 어떤 문제에 더 잘 맞을까요?**
-  - 객체지향과 함수형은 경쟁 관계가 아니라 상호 보완 관계입니다
+  OOP는 라이프사이클이 있고 상태를 오래 유지해야 하는 것, 예컨대 HTTP 서버, DB 연결 풀, 사용자 세션, 프레임워크 컴포넌트에 잘 맞습니다. FP는 입력을 받아 출력을 만드는 순수 변환, 예컨대 할인 계산, 데이터 정규화, 검증 규칙, ETL 단계에 잘 맞습니다. 핵심 질문은 "상태가 필요한가"입니다.
+
 - **두 패러다임을 섞을 때 가장 실용적인 기본 패턴은 무엇일까요?**
-  - 값 객체는 OOP의 명시적인 데이터 모델링 장점을 가져오고, 순수 함수는 FP의 예측 가능성을 제공합니다
+  불변 값 객체(`frozen dataclass`, `NamedTuple`) + 순수 함수 코어 + 얇은 OOP 셸 조합이 가장 자주 성공합니다. 값 객체는 구조를, 순수 함수는 변환을, OOP 셸은 프레임워크 연결과 부수효과를 담당합니다. `map`/`filter`/`reduce`는 이 셋을 연결하는 접착제 역할을 합니다.
+
 - **Functional Core, Imperative Shell은 Python에서 어떻게 적용할 수 있을까요?**
-  - - Django/FastAPI에서 클래스 기반 인터페이스와 순수 함수 비즈니스 로직을 함께 사용합니다
+  비즈니스 로직(검증, 계산, 변환)을 순수 함수로 작성하고, DB 저장, API 호출, 로그 출력, 이메일 발송 같은 부수효과는 가장 바깥쪽 핸들러나 서비스 레이어에서만 수행합니다. Django/FastAPI에서는 view나 endpoint 함수가 셸 역할을 하고, 내부 계산은 순수 함수 모듈로 분리합니다.
+
+## 운영 체크리스트
+
+- [ ] 객체지향과 함수형의 장단점을 비교할 수 있다
+- [ ] Functional Core, Imperative Shell 패턴을 설명할 수 있다
+- [ ] 값 객체와 순수 함수를 함께 사용하는 설계를 할 수 있다
+- [ ] 상황별 패러다임 선택 기준을 적용할 수 있다
+- [ ] `map`/`filter`/`reduce`를 OOP 데이터와 조합해 사용할 수 있다
+
+## 연습 문제
+
+1. 장바구니를 OOP(`Cart` 클래스) + FP(할인, 세금 `map`/`reduce` 함수) 혼합 구조로 설계해 보세요.
+2. 파일 기반 설정 로더를 Functional Core, Imperative Shell 패턴으로 구현해 보세요.
+3. 기존 OOP 코드에서 순수 함수로 뽑아낼 수 있는 부분을 찾아 리팩터링해 보세요.
+
+## 정리와 다음 글
+
+객체지향과 함수형은 경쟁 관계가 아니라 상호 보완 관계입니다. Python에서는 불변 값 객체(OOP) + 순수 함수(FP) + 얇은 클래스 셸이라는 조합이 가장 실용적인 경우가 많습니다. 이 시리즈에서 다룬 `map`, `filter`, `reduce`, 클로저, 제너레이터, 함수 합성 같은 도구들을 적절히 섞어 쓰면 더 읽기 쉽고 테스트하기 쉬운 코드를 만들 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -46,16 +46,21 @@ last_reviewed: '2026-05-12'
 
 ```text
 Graph representations
-    Adjacency list   memory O(V+E), good for sparse graphs
+    Adjacency list   memory O(V+E), good for sparse graphs (E << V^2)
     Adjacency matrix memory O(V^2),  O(1) edge lookup, good for dense graphs
 
 Core traversals
-    BFS  queue   unweighted shortest paths, layered exploration
-    DFS  stack   connectivity, cycles, topological sort
+    BFS  queue   O(V+E)  unweighted shortest paths, layered exploration
+    DFS  stack   O(V+E)  connectivity, cycles, topological sort
 
-Weighted graphs
-    Dijkstra   non-negative shortest paths   O((V+E) log V)
-    MST        cheapest tree connecting all  Kruskal/Prim
+Weighted shortest paths
+    Dijkstra      non-negative weights  O((V+E) log V)
+    Bellman-Ford  negative weights      O(VE)
+    Floyd-Warshall all-pairs             O(V^3)
+
+Minimum Spanning Tree
+    Kruskal   sort edges + Union-Find   O(E log E)
+    Prim      priority queue            O((V+E) log V)
 ```
 
 | 용어 | 설명 |
@@ -71,8 +76,8 @@ Weighted graphs
 **Before — 희소 그래프를 인접 행렬로 표현:**
 
 ```python
-# V=10000, E=30000 행렬로서의 희소 그래프
-adj = [[0] * 10000 for _ in range(10000)]   # 100 million cells, mostly zero
+# V=10000, E=30000인 희소 그래프
+adj = [[0] * 10000 for _ in range(10000)]   # 1억 셀, 대부분 0
 ```
 
 **After — 인접 리스트 사용:**
@@ -93,6 +98,10 @@ adj[1].append(2)
 from collections import deque, defaultdict
 
 def bfs(adj, start):
+    """
+    너비 우선 탐색: 가중치 없는 최단 거리 반환.
+    큐에서 꺼낸 노드의 거리 = 최단 거리 (BFS 불변식)
+    """
     visited = {start: 0}
     q = deque([start])
     while q:
@@ -108,21 +117,26 @@ edges = [(0, 1), (0, 2), (1, 3), (2, 3), (3, 4)]
 for a, b in edges:
     adj[a].append(b); adj[b].append(a)
 
-print(bfs(adj, 0))   # {0: 0, 1: 1, 2: 1, 3: 2, 4: 3}
+dist = bfs(adj, 0)
+print(dist)   # {0: 0, 1: 1, 2: 1, 3: 2, 4: 3}
 ```
 
 BFS는 가중치가 없는 그래프의 최단 거리를 자연스럽게 반환합니다. 큐는 양끝 O(1)을 보장하는 `deque`를 쓰는 것이 기본입니다.
 
-### 2단계: DFS와 위상 정렬
+### 2단계: DFS와 위상 정렬 (Kahn's algorithm)
 
 ```python
 def topological_sort(n, edges):
+    """
+    Kahn's algorithm: BFS 기반 위상 정렬.
+    사이클 존재 시 None 반환.
+    """
     adj = defaultdict(list)
     indeg = [0] * n
     for u, v in edges:
         adj[u].append(v)
         indeg[v] += 1
-    q = deque([i for i in range(n) if indeg[i] == 0])
+    q = deque(i for i in range(n) if indeg[i] == 0)
     order = []
     while q:
         u = q.popleft()
@@ -131,10 +145,11 @@ def topological_sort(n, edges):
             indeg[v] -= 1
             if indeg[v] == 0:
                 q.append(v)
-    return order if len(order) == n else None   # None means a cycle exists
+    return order if len(order) == n else None   # None → 사이클 존재
 
-# A -> B, A -> C, B -> D, C -> D
-print(topological_sort(4, [(0, 1), (0, 2), (1, 3), (2, 3)]))   # [0, 1, 2, 3]
+# A(0) → B(1), A(0) → C(2), B(1) → D(3), C(2) → D(3)
+order = topological_sort(4, [(0, 1), (0, 2), (1, 3), (2, 3)])
+print(order)   # [0, 1, 2, 3] 또는 [0, 2, 1, 3]
 ```
 
 빌드 시스템 실행 순서와 선수 과목 배치는 전형적인 위상 정렬 문제입니다.
@@ -145,16 +160,21 @@ print(topological_sort(4, [(0, 1), (0, 2), (1, 3), (2, 3)]))   # [0, 1, 2, 3]
 import heapq
 
 def dijkstra(n, edges, start):
+    """
+    음이 아닌 가중치 그래프의 최단 경로.
+    핵심: 우선순위 큐에서 꺼낼 때 이미 처리된 노드는 스킵.
+    """
     adj = defaultdict(list)
     for u, v, w in edges:
-        adj[u].append((v, w)); adj[v].append((u, w))
+        adj[u].append((v, w))
+        adj[v].append((u, w))
     dist = [float('inf')] * n
     dist[start] = 0
     pq = [(0, start)]
     while pq:
         d, u = heapq.heappop(pq)
         if d > dist[u]:
-            continue
+            continue   # 오래된 거리 — 스킵
         for v, w in adj[u]:
             nd = d + w
             if nd < dist[v]:
@@ -172,50 +192,100 @@ print(dijkstra(4, edges, 0))   # [0, 3, 1, 4]
 
 ```python
 class DSU:
+    """Disjoint Set Union (경로 압축 + union by rank)."""
     def __init__(self, n):
         self.p = list(range(n))
-        self.r = [0] * n
+        self.rank = [0] * n
+
     def find(self, x):
         while self.p[x] != x:
-            self.p[x] = self.p[self.p[x]]
+            self.p[x] = self.p[self.p[x]]   # 경로 압축
             x = self.p[x]
         return x
+
     def union(self, a, b):
         ra, rb = self.find(a), self.find(b)
         if ra == rb:
             return False
-        if self.r[ra] < self.r[rb]:
+        if self.rank[ra] < self.rank[rb]:
             ra, rb = rb, ra
         self.p[rb] = ra
-        if self.r[ra] == self.r[rb]:
-            self.r[ra] += 1
+        if self.rank[ra] == self.rank[rb]:
+            self.rank[ra] += 1
         return True
 
 def kruskal(n, edges):
+    """가중치 오름차순으로 정렬 후, 사이클 없는 간선만 선택."""
     edges = sorted(edges, key=lambda e: e[2])
     dsu = DSU(n)
-    total = 0
+    total, selected = 0, []
     for u, v, w in edges:
         if dsu.union(u, v):
             total += w
-    return total
+            selected.append((u, v, w))
+    return total, selected
 
-print(kruskal(4, [(0, 1, 1), (1, 2, 2), (0, 2, 4), (2, 3, 3)]))   # 6
+total, mst = kruskal(4, [(0, 1, 1), (1, 2, 2), (0, 2, 4), (2, 3, 3)])
+print(f"MST 비용: {total}, 간선: {mst}")   # 6
 ```
 
 가장 가벼운 간선부터 보되, 사이클을 만들지 않을 때만 채택합니다. 그리디와 Union-Find의 가장 고전적인 결합입니다.
 
-### 5단계: 실전 예시 — 도시 연결 최소 비용
+### 5단계: DFS로 사이클 탐지
 
 ```python
-roads = [
-    (0, 1, 10), (0, 2, 6), (0, 3, 5),
-    (1, 3, 15), (2, 3, 4),
-]
-print("MST cost:", kruskal(4, roads))   # 19 (e.g. 5 + 6 + 4 + ... )
+def has_cycle_undirected(adj, n):
+    """무방향 그래프에서 DFS로 사이클 탐지."""
+    visited = set()
+
+    def dfs(node, parent):
+        visited.add(node)
+        for neighbor in adj[node]:
+            if neighbor not in visited:
+                if dfs(neighbor, node):
+                    return True
+            elif neighbor != parent:   # 부모가 아닌 방문 노드 = 사이클
+                return True
+        return False
+
+    for i in range(n):
+        if i not in visited:
+            if dfs(i, -1):
+                return True
+    return False
+
+# 사이클 있음: 0-1-2-0
+adj_cycle = defaultdict(list)
+for u, v in [(0, 1), (1, 2), (2, 0)]:
+    adj_cycle[u].append(v); adj_cycle[v].append(u)
+print(has_cycle_undirected(adj_cycle, 3))   # True
 ```
 
-MST는 네트워크 설계, 클러스터 거리 분석, 회로 배선처럼 "모두 연결하되 가장 싸게"라는 문제에 그대로 대응합니다.
+### 6단계: 연결 컴포넌트 수 세기
+
+```python
+def count_components(n, edges):
+    """Union-Find로 연결 컴포넌트 수 세기."""
+    dsu = DSU(n)
+    for u, v in edges:
+        dsu.union(u, v)
+    return len({dsu.find(i) for i in range(n)})
+
+print(count_components(5, [(0, 1), (1, 2), (3, 4)]))   # 2
+```
+
+## 그래프 알고리즘 Big-O 비교
+
+| 알고리즘 | 시간 복잡도 | 공간 복잡도 | 전제 조건 | 사용 사례 |
+| --- | --- | --- | --- | --- |
+| BFS | O(V+E) | O(V) | 없음 | 최단 거리(무가중치), 레벨 탐색 |
+| DFS | O(V+E) | O(V) | 없음 | 연결성, 사이클, 위상 정렬 |
+| 다익스트라 | O((V+E) log V) | O(V) | 음이 아닌 가중치 | 단일 출발점 최단 경로 |
+| Bellman-Ford | O(VE) | O(V) | 음수 가중치 가능 | 음수 가중치, 음수 사이클 탐지 |
+| Floyd-Warshall | O(V³) | O(V²) | 없음 | 모든 쌍 최단 경로 |
+| Kruskal MST | O(E log E) | O(V) | 없음 | MST, 최소 신장 트리 |
+| Prim MST | O((V+E) log V) | O(V) | 없음 | MST, 밀집 그래프 |
+| Kahn's 위상 정렬 | O(V+E) | O(V) | DAG | 의존성 순서, 빌드 시스템 |
 
 ## 이 글에서 먼저 가져갈 점
 
@@ -223,16 +293,18 @@ MST는 네트워크 설계, 클러스터 거리 분석, 회로 배선처럼 "모
 - BFS는 큐, DFS는 스택이라는 도구 차이가 결과 차이로 이어집니다.
 - 다익스트라의 핵심은 우선순위 큐와 오래된 거리 무시 검사입니다.
 - Union-Find는 연결성 문제의 보편 도구입니다.
+- 음수 가중치가 있으면 다익스트라를 쓰면 안 됩니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수
 
 | 실수 | 문제 | 해결 |
 | --- | --- | --- |
 | 희소 그래프에 인접 행렬 사용 | OOM | 인접 리스트로 바꿉니다 |
 | 음수 가중치에 다익스트라 적용 | 오답 | Bellman-Ford 등으로 전환합니다 |
 | 가중치가 있는데 BFS 거리 사용 | 오답 | 가중치가 있으면 다익스트라를 씁니다 |
-| Union-Find에 경로 압축 누락 | `find`가 느려짐 | path compression + union-by-rank를 넣습니다 |
-| 사이클 그래프에 위상 정렬 적용 후 예외 처리 누락 | 잘못된 가정 | 결과 길이로 사이클을 확인합니다 |
+| Union-Find에 경로 압축 누락 | find가 느려짐 | path compression + union-by-rank를 넣습니다 |
+| 위상 정렬 결과 길이로 사이클 확인 안 함 | 사이클 무시 | len(order) != n이면 None 반환합니다 |
+| BFS에 list 대신 deque 미사용 | O(n) 팝 비용 | `from collections import deque`를 씁니다 |
 
 ## 실무에서는 이렇게 쓰입니다
 
@@ -246,7 +318,7 @@ MST는 네트워크 설계, 클러스터 거리 분석, 회로 배선처럼 "모
 
 시니어 엔지니어는 먼저 "이 문제를 그래프로 볼 수 있는가"를 묻습니다. 무엇이 노드이고 무엇이 간선인지 정의하는 순간 풀이의 90%가 끝나는 경우가 많습니다. 프레이밍이 맞으면 표준 알고리즘을 바로 적용할 수 있습니다.
 
-또한 처음부터 V와 E의 크기, 희소성, 가중치 분포를 추정합니다. 같은 문제라도 V=10^3과 V=10^7은 완전히 다른 표현과 도구를 요구하기 때문입니다.
+또한 처음부터 V와 E의 크기, 희소성, 가중치 분포를 추정합니다. 같은 문제라도 V=10^3과 V=10^7은 완전히 다른 표현과 도구를 요구하기 때문입니다. E >> V이면 밀집 그래프 알고리즘을, E ≈ V이면 희소 그래프 알고리즘을 선택합니다.
 
 ## 운영 체크리스트
 
@@ -255,6 +327,7 @@ MST는 네트워크 설계, 클러스터 거리 분석, 회로 배선처럼 "모
 - [ ] 다익스트라를 한 문장으로 설명할 수 있는가
 - [ ] 최소 신장 트리 알고리즘을 하나 이상 구현할 수 있는가
 - [ ] 새로운 문제를 그래프로 환원하는 감각이 있는가
+- [ ] 음수 가중치와 음수 사이클을 다루는 방법을 아는가
 
 ## 연습 문제
 
@@ -264,93 +337,22 @@ MST는 네트워크 설계, 클러스터 거리 분석, 회로 배선처럼 "모
 
 3. 음이 아닌 가중치 그래프에서 다익스트라를 실행한 뒤, 시작점 기준 최단 경로 트리를 부모 포인터 형태로 출력해 보세요.
 
+4. Union-Find를 이용해 n개의 도시와 m개의 도로가 주어질 때, 모든 도시를 연결하기 위해 새로 건설해야 하는 최소 도로 수를 구해 보세요.
+
 ## 정리 및 다음 단계
 
 그래프 알고리즘은 다양한 시스템 문제를 노드와 간선이라는 단순한 언어로 표현하게 해 줍니다. 표현, 순회, 최단 경로, MST만 익혀도 실무의 많은 문제를 다룰 수 있습니다. 그다음에는 flow, SCC, matching 같은 고급 주제로 자연스럽게 확장됩니다.
 
 다음 글에서는 문자열 알고리즘 기초를 다룹니다. 단순 매칭의 비용, KMP의 실패 함수, 트라이, 그리고 정규식 비용 감각까지 연결해 보겠습니다.
 
-## 실전 확장 워크북
-
-이 절은 그래프 탐색/최단경로를 실제 문제 풀이와 운영 감각으로 연결하기 위한 보강 파트입니다. 개념을 암기하는 대신, 입력 크기·자료 구조·검증 순서를 함께 다루어 같은 유형의 문제를 반복적으로 안정적으로 풀 수 있게 만드는 데 목적이 있습니다. 핵심은 "정답 코드 한 번"이 아니라 "다음 문제에서도 재사용 가능한 판단 프레임"을 확보하는 것입니다.
-
-### 1) 시간 복잡도와 입력 제약을 먼저 맞추기
-
-| 입력 조건 | 우선 배제할 접근 | 현실적인 후보 | 확인 포인트 |
-| --- | --- | --- | --- |
-| n <= 10^3 | 없음(학습 목적 실험 가능) | 브루트포스, 정렬, 해시 | 구현 명확성 |
-| n <= 10^5 | O(n^2) 대부분 배제 | O(n log n), O(n), BFS/DFS | 경계값 테스트 |
-| n <= 10^6 이상 | O(n log n)도 부담 가능 | 단일 패스, 압축, 스트리밍 | 메모리 상한 |
-
-복잡도 판단은 코드 스타일 논쟁보다 우선합니다. 같은 팀에서 코드 품질 기준이 달라도, 입력 제약과 차수를 맞추는 원칙은 공통으로 적용됩니다. 이 단계를 건너뛰면 구현이 아무리 깔끔해도 제출 실패나 운영 지연으로 이어집니다.
-
-### 2) 단계별 추적 표로 경계 버그를 조기에 찾기
-
-| 단계 | 관찰 값 | 기대 신호 | 실패 신호 |
-| --- | --- | --- | --- |
-| 초기화 | 포인터/상태/큐/테이블 | 문제 정의와 일치 | 초기값 누락 |
-| 1회 반복 | 상태 전이 | 단조 증가 또는 감소 | 제자리 반복 |
-| 종료 직전 | 반환 후보 | 문제 요구와 직접 연결 | 보조값 반환 |
-
-경계 버그는 대부분 "한 줄"에서 발생하지만, 원인은 상태 전이 설계에 있습니다. 그래서 디버깅할 때는 출력값 하나만 보지 말고, 전이 로그를 함께 봐야 합니다. 특히 인덱스 기반 문제는 `lo, mid, hi`, DP 문제는 `state, transition`, 그래프 문제는 `queue size, visited count`를 같이 기록하면 원인 분리가 훨씬 빨라집니다.
-
-### 3) Python 구현 앵커
-
-```python
-from collections import deque
-
-def bfs_levels(graph, start):
-    q = deque([start])
-    dist = {start: 0}
-    while q:
-        u = q.popleft()
-        for v in graph[u]:
-            if v not in dist:
-                dist[v] = dist[u] + 1
-                q.append(v)
-    return dist
-```
-
-코드는 짧아도 충분합니다. 중요한 점은 구현 전에 불변식(invariant)을 문장으로 먼저 고정하는 것입니다. 예를 들어 "현재 단계가 끝나면 최소 비용이 보장된다" 같은 문장이 없으면, 코드가 돌아가도 왜 맞는지 설명할 수 없고, 변형 문제에서 무너지기 쉽습니다.
-
-### 4) LeetCode 스타일 매핑
-
-| 문제 | 핵심 패턴 | 첫 시도에서 자주 틀리는 지점 |
-| --- | --- | --- |
-| 200 Number of Islands | 제약을 통한 후보 축소 | 입력 조건을 늦게 반영 |
-| 994 Rotting Oranges | 상태/포인터 유지 | 경계 인덱스 처리 |
-| 743 Network Delay Time | 자료구조 선택 | 복잡도 목표 미달 |
-
-문제 매핑의 목적은 정답 암기가 아닙니다. 같은 구조를 빠르게 인식하고, "왜 이 패턴을 쓰는가"를 재현하는 데 있습니다. 시리즈 전체를 관통하는 실력 차이는 여기서 발생합니다.
-
-### 5) 비교 벤치마크를 읽는 기준
-
-| 비교 항목 | A 접근 | B 접근 | 의사결정 기준 |
-| --- | --- | --- | --- |
-| 시간 | 평균적으로 빠름 | 최악 케이스 안정적 | 입력 분포가 고정인지 |
-| 메모리 | 추가 배열 필요 | 제자리 처리 가능 | 메모리 제한 강도 |
-| 구현 난이도 | 짧음 | 디버깅 난이도 높음 | 팀 유지보수 역량 |
-
-벤치마크 숫자는 환경에 따라 달라집니다. 하지만 차수와 메모리 계층에서 발생하는 방향성은 반복됩니다. 그래서 한 번 측정한 결과를 절대값으로 외우기보다, 어떤 조건에서 우위가 바뀌는지(입력 크기, 정렬 여부, 중복 비율)를 함께 기록해야 다음 의사결정에 도움이 됩니다.
-
-### 6) 제출/배포 전 점검 루틴
-
-1. 문제 제약을 한 줄로 요약하고 불가능한 차수를 먼저 제거합니다.
-2. 핵심 자료구조 선택 이유를 "삽입/조회/삭제 비용" 기준으로 적습니다.
-3. 경계 입력 3종(빈값, 최소값, 중복/극단값) 테스트를 고정합니다.
-4. 시간·공간 복잡도를 코드 옆에 기록하고, 실제 측정값을 짧게 남깁니다.
-5. 같은 패턴의 변형 문제를 1개 더 풀어 일반화 여부를 확인합니다.
-
-이 루틴을 꾸준히 적용하면 "이번 문제를 맞춤"에서 끝나지 않고 "같은 유형을 안정적으로 재현"하는 상태로 넘어갈 수 있습니다. 알고리즘 학습은 지식 축적이 아니라 판단 체계 구축이라는 점을 계속 기억하는 것이 중요합니다.
-
 ## 처음 질문으로 돌아가기
 
 - **인접 리스트와 인접 행렬은 어떤 트레이드오프를 가질까요?**
-  - BFS는 가중치가 없는 그래프의 최단 거리를 자연스럽게 반환합니다
+  - 인접 리스트는 O(V+E) 메모리를 써서 희소 그래프(E << V²)에 적합합니다. 이웃 노드 열거는 O(degree)입니다. 인접 행렬은 O(V²) 메모리를 쓰지만 특정 간선 존재 여부를 O(1)에 확인할 수 있어 밀집 그래프나 간선 조회가 빈번한 경우에 적합합니다.
 - **BFS와 DFS는 각각 언제 써야 할까요?**
-  - BFS는 가중치가 없는 그래프의 최단 거리를 자연스럽게 반환합니다
+  - BFS는 가중치 없는 최단 거리, 레벨별 탐색, 이분 그래프 판별에 씁니다. 큐를 사용하므로 목표까지 최단 경로가 필요하면 BFS가 맞습니다. DFS는 연결 컴포넌트, 사이클 탐지, 위상 정렬, 백트래킹에 씁니다. 스택(재귀)을 사용하므로 경로 전체를 탐색하거나 조합 탐색에 맞습니다.
 - **다익스트라는 어떻게 동작하고 어떻게 구현할까요?**
-  - BFS는 가중치가 없는 그래프의 최단 거리를 자연스럽게 반환합니다
+  - 시작 노드부터 가장 짧은 거리가 확정된 노드를 순서대로 처리합니다. 우선순위 큐에서 최소 거리 노드를 꺼내고, 이웃의 거리를 갱신합니다. Python 구현의 핵심은 `if d > dist[u]: continue` 검사입니다. 오래된 거리로 삽입된 항목은 꺼낼 때 스킵해야 정확성이 보장됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
