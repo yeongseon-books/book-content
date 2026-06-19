@@ -497,10 +497,10 @@ def summarize_token_lengths(tokenized):
 
 - [LLM Fine-tuning 101 (1/6): LLM 파인튜닝 입문](./01-intro.md)
 - **LLM Fine-tuning 101 (2/6): 데이터셋 준비와 전처리 (현재 글)**
-- [LLM Fine-tuning 101 (3/6): LoRA 어댑터 구성](./03-lora.md)
-- [LLM Fine-tuning 101 (4/6): 학습 루프와 하이퍼파라미터](./04-training.md)
-- [LLM Fine-tuning 101 (5/6): 모델 평가](./05-evaluation.md)
-- [LLM Fine-tuning 101 (6/6): 모델 서빙](./06-serving.md)
+- LLM Fine-tuning 101 (3/6): LoRA 어댑터 구성 (예정)
+- LLM Fine-tuning 101 (4/6): 학습 루프와 하이퍼파라미터 (예정)
+- LLM Fine-tuning 101 (5/6): 모델 평가 (예정)
+- LLM Fine-tuning 101 (6/6): 모델 서빙 (예정)
 
 <!-- toc:end -->
 

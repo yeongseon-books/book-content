@@ -738,14 +738,14 @@ repos:
 
 - [Python Package 101 (1/10): Python Package란 무엇인가?](./01-what-is-a-python-package.md)
 - **Python Package 101 (2/10): 프로젝트 구조 잡기 — src layout과 pyproject.toml (현재 글)**
-- [Python Package 101 (3/10): 의존성 관리 — venv, pip, uv, requirements](./03-dependency-management.md)
-- [Python Package 101 (4/10): 패키지 빌드하기 — wheel과 sdist](./04-building-packages.md)
-- [Python Package 101 (5/10): PyPI에 배포하기 — TestPyPI부터 실제 배포까지](./05-publishing-to-pypi.md)
-- [Python Package 101 (6/10): 버전 관리와 릴리스](./06-versioning-and-releases.md)
-- [Python Package 101 (7/10): CLI 패키지 만들기](./07-cli-packages.md)
-- [Python Package 101 (8/10): 타입 힌트와 정적 검사](./08-type-hints-and-static-analysis.md)
-- [Python Package 101 (9/10): 문서화 — README, MkDocs, API Reference](./09-documentation.md)
-- [Python Package 101 (10/10): 실전 패키지 템플릿 만들기](./10-package-template.md)
+- Python Package 101 (3/10): 의존성 관리 — venv, pip, uv, requirements (예정)
+- Python Package 101 (4/10): 패키지 빌드하기 — wheel과 sdist (예정)
+- Python Package 101 (5/10): PyPI에 배포하기 — TestPyPI부터 실제 배포까지 (예정)
+- Python Package 101 (6/10): 버전 관리와 릴리스 (예정)
+- Python Package 101 (7/10): CLI 패키지 만들기 (예정)
+- Python Package 101 (8/10): 타입 힌트와 정적 검사 (예정)
+- Python Package 101 (9/10): 문서화 — README, MkDocs, API Reference (예정)
+- Python Package 101 (10/10): 실전 패키지 템플릿 만들기 (예정)
 
 <!-- toc:end -->
 

@@ -813,7 +813,7 @@ MkDocs Material에서 admonition(경고/정보 박스)을 활용하면 문서의
 - [Python Package 101 (7/10): CLI 패키지 만들기](./07-cli-packages.md)
 - [Python Package 101 (8/10): 타입 힌트와 정적 검사](./08-type-hints-and-static-analysis.md)
 - **Python Package 101 (9/10): 문서화 — README, MkDocs, API Reference (현재 글)**
-- [Python Package 101 (10/10): 실전 패키지 템플릿 만들기](./10-package-template.md)
+- Python Package 101 (10/10): 실전 패키지 템플릿 만들기 (예정)
 
 <!-- toc:end -->
 

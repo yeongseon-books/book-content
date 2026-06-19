@@ -368,7 +368,7 @@ ACA의 Dapr는 API 문법이 아니라 런타임 구조의 변화입니다. 앱�
 - [Azure Container Apps Deep Dive (3/6): Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가](./03-revision-and-traffic-split.md)
 - [Azure Container Apps Deep Dive (4/6): ACA 안의 KEDA — Scale Rule이 만드는 것](./04-keda-in-aca.md)
 - **Azure Container Apps Deep Dive (5/6): Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스 (현재 글)**
-- [Azure Container Apps Deep Dive (6/6): Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지](./06-envoy-ingress-path.md)
+- Azure Container Apps Deep Dive (6/6): Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지 (예정)
 
 <!-- toc:end -->
 
