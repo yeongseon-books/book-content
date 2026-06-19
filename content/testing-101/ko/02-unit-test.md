@@ -26,7 +26,7 @@ last_reviewed: '2026-05-12'
 
 그래서 단위 테스트는 크기를 줄이는 연습이기도 합니다. 외부 의존을 걷어 내고, 작은 동작 하나를 빠르게 확인하는 방식으로 신뢰를 쌓습니다.
 
-이 글은 Testing 101 시리즈의 두 번째 글입니다. 여기서는 단위 테스트의 범위, AAA 패턴, `pytest`의 기본 작성법, 그리고 좋은 단위 테스트가 갖춰야 할 조건을 정리하겠습니다.
+이 글은 Testing 101 시리즈의 두 번째 글입니다. 여기서는 단위 테스트의 범위, AAA 패턴, `pytest`의 기본 작성법, fixture와 parametrize 활용, 그리고 좋은 단위 테스트가 갖춰야 할 조건을 정리하겠습니다.
 
 ![Testing 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/02/02-01-diagram.ko.png)
 *Testing 101 2장 흐름 개요*
@@ -37,61 +37,60 @@ last_reviewed: '2026-05-12'
 - 단위 테스트는 정확히 어디까지를 검증할까요?
 - AAA 패턴은 왜 많이 쓰일까요?
 - `pytest`의 fixture와 parametrize는 언제 도움이 될까요?
-- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
-- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
+- 경계값 테스트는 왜 중요할까요?
+- 단위 테스트를 도메인 설계 도구로 어떻게 활용할까요?
 
 단위 테스트는 테스트 피라미드의 바닥을 이룹니다. 실행이 빠르기 때문에 수천 개가 있어도 몇 초 안에 돌릴 수 있고, 변경 직후에 가장 먼저 피드백을 줍니다. 그래서 상위 단계의 통합 테스트와 E2E 테스트를 무한히 늘리지 않고도 핵심 로직을 두껍게 보호할 수 있습니다.
 
-가격 계산, 권한 판정, 상태 전이처럼 사고가 나기 쉬운 도메인 로직은 단위 테스트의 투자 대비 효과가 특히 큽니다. 화면이나 데이터베이스까지 다 붙이지 않아도, 위험한 계산과 분기 자체를 촘촘하게 검증할 수 있기 때문입니다.
-
-## 한눈에 보는 구조
-
-단위 테스트는 가장 많고 가장 빨라야 합니다. 통합 테스트는 그보다 적고, E2E 테스트는 더 적어야 합니다. 이 분포가 중요한 이유는 속도 때문입니다. 빠른 테스트가 많아야 개발자가 자주 돌릴 수 있고, 자주 돌려야 테스트가 실제 습관이 됩니다.
-
-- **단위(unit)**: 함수, 메서드, 클래스 같은 작은 동작 단위입니다.
-- **AAA 패턴**: Arrange, Act, Assert 순서로 테스트를 읽기 쉽게 나누는 방식입니다.
-- **픽스처(fixture)**: 여러 테스트가 함께 쓰는 준비 데이터나 객체입니다.
-- **파라미터화(parametrize)**: 입력만 달라지는 비슷한 테스트를 하나로 묶는 기법입니다.
-- **경계값(edge case)**: 0, 빈 문자열, 음수, `None`처럼 분기와 오류를 자주 드러내는 입력입니다.
+가격 계산, 권한 판정, 상태 전이처럼 사고가 나기 쉬운 도메인 로직은 단위 테스트의 투자 대비 효과가 특히 큽니다.
 
 ## 단위 테스트와 통합 테스트 비교
-
-단위 테스트를 처음 배울 때 가장 헷갈리는 지점은 통합 테스트와의 경계입니다. 다음 표는 두 테스트 계층의 차이를 보여 줍니다.
 
 | 항목 | 단위 테스트 | 통합 테스트 |
 |---|---|---|
 | 검증 범위 | 함수나 메서드 하나 | 여러 컴포넌트가 연결된 흐름 |
 | 외부 의존 | 없음 (또는 mock/stub 사용) | 실제 DB, HTTP 등 포함 |
 | 실행 속도 | 밀리초 단위 | 수백 밀리초 ~ 초 단위 |
-| 실패 시 원인 파악 | 즉시 가능 (범위가 좁음) | 조금 더 넓음 (여러 계층 포함) |
+| 실패 시 원인 파악 | 즉시 가능 (범위가 좁음) | 여러 계층 포함으로 범위가 넓음 |
 | 테스트 수 | 수백~수천 개 | 수십~수백 개 |
 | CI 실행 빈도 | 모든 PR, 모든 커밋 | 선택적 또는 병합 전 |
 
 이 구분이 중요한 이유는 테스트 전략 때문입니다. 단위 테스트는 많고 빠르고 좁아야 하고, 통합 테스트는 적고 느리지만 경계를 확인해야 합니다. 두 계층의 성질을 섞으면 빠르지도 않고 범위도 애매한 테스트가 됩니다.
 
-## 바꾸기 전과 후
+## 하나에 여러 동작을 몰아넣은 테스트 vs 작은 동작으로 분리
 
-**바꾸기 전 — 하나에 여러 동작을 몰아넣은 테스트**
+**나쁜 예 — 하나에 여러 동작을 몰아넣은 테스트**
 
 ```python
 def test_user_flow():
-    u = create_user("a")
+    u = create_user("a@b.com")
     u.activate()
     u.upgrade()
     assert u.plan == "pro"
 ```
 
-**바꾼 뒤 — 작은 동작으로 분리한 테스트**
+**좋은 예 — 작은 동작으로 분리한 테스트**
 
 ```python
-def test_create_user_starts_inactive(): ...
-def test_activate_sets_active(): ...
-def test_upgrade_sets_pro(): ...
+def test_create_user_starts_inactive():
+    user = create_user("a@b.com")
+    assert user.active is False
+
+def test_activate_sets_active_flag():
+    user = create_user("a@b.com")
+    user.activate()
+    assert user.active is True
+
+def test_upgrade_sets_plan_to_pro():
+    user = create_user("a@b.com")
+    user.activate()
+    user.upgrade()
+    assert user.plan == "pro"
 ```
 
-작게 나누면 실패 원인을 즉시 알 수 있습니다. 반대로 한 테스트에 여러 단계를 몰아넣으면 어디가 깨졌는지 추적하는 시간이 길어집니다. 단위 테스트의 장점은 작은 크기에서 나옵니다.
+작게 나누면 실패 원인을 즉시 알 수 있습니다. 반대로 한 테스트에 여러 단계를 몰아넣으면 어디가 깨졌는지 추적하는 시간이 길어집니다.
 
-## 다섯 단계로 파이테스트 시작하기
+## 다섯 단계로 pytest 시작하기
 
 ### 1단계 — 검증할 함수 준비
 
@@ -103,11 +102,12 @@ def apply_discount(price: int, percent: int) -> int:
     return price - price * percent // 100
 ```
 
-### 2단계 — 기본 테스트 작성
+### 2단계 — AAA 패턴으로 기본 테스트 작성
 
 ```python
-# tests/test_discount.py
+# tests/unit/test_discount.py
 from src.discount import apply_discount
+import pytest
 
 def test_apply_10_percent_discount():
     # Arrange
@@ -115,18 +115,17 @@ def test_apply_10_percent_discount():
     # Act
     result = apply_discount(price, percent)
     # Assert
-    assert result == 900
+    assert result == 900, f"Expected 900, got {result}"
 ```
 
-### 3단계 — 비슷한 케이스를 묶기
+### 3단계 — 비슷한 케이스를 파라미터화로 묶기
 
 ```python
-import pytest
-
 @pytest.mark.parametrize("price,percent,expected", [
-    (1000, 0, 1000),
-    (1000, 50, 500),
-    (1000, 100, 0),
+    (1000, 0, 1000),    # 할인 없음
+    (1000, 50, 500),    # 반값 할인
+    (1000, 100, 0),     # 전액 할인
+    (500, 20, 400),     # 일반 케이스
 ])
 def test_apply_discount_table(price, percent, expected):
     assert apply_discount(price, percent) == expected
@@ -135,9 +134,14 @@ def test_apply_discount_table(price, percent, expected):
 ### 4단계 — 예외 케이스 분리
 
 ```python
-def test_apply_discount_invalid_percent_raises():
-    with pytest.raises(ValueError):
-        apply_discount(1000, 150)
+@pytest.mark.parametrize("price,percent", [
+    (1000, -1),    # 음수 퍼센트
+    (1000, 101),   # 범위 초과
+    (1000, 200),   # 크게 초과
+])
+def test_apply_discount_invalid_percent_raises(price, percent):
+    with pytest.raises(ValueError, match="percent must be 0..100"):
+        apply_discount(price, percent)
 ```
 
 ### 5단계 — 픽스처로 준비 코드 줄이기
@@ -147,56 +151,20 @@ def test_apply_discount_invalid_percent_raises():
 def base_price() -> int:
     return 10_000
 
-def test_with_fixture(base_price: int):
+@pytest.fixture
+def premium_price() -> int:
+    return 50_000
+
+def test_discount_on_base_price(base_price: int):
     assert apply_discount(base_price, 10) == 9_000
+
+def test_full_discount_on_premium(premium_price: int):
+    assert apply_discount(premium_price, 100) == 0
 ```
 
-## 이 코드에서 먼저 볼 점
-
-- 테스트 하나가 한 가지 사실만 검증합니다.
-- 같은 모양의 테스트는 `parametrize`로 묶어 중복을 줄입니다.
-- 예외 상황은 별도 테스트로 분리해 의도를 분명하게 남깁니다.
-
-AAA 패턴이 좋은 이유도 여기에 있습니다. 준비, 실행, 검증이 눈에 보이면 테스트를 읽는 사람도 흐름을 빠르게 따라갈 수 있습니다. 단위 테스트는 작성자만 보는 코드가 아니라, 나중에 다른 사람이 설계를 이해할 때 읽는 코드이기도 합니다.
-
-실무 프로젝트에서는 단위 테스트가 수백 개를 넘기는 일이 흔합니다. 이때 각 테스트가 독립적이고 빠르게 실행되어야 CI 파이프라인에서 피드백 시간을 짧게 유지할 수 있습니다. 느린 테스트 하나가 전체 스위트를 지연시키면, 팀원들이 테스트를 건너뛰는 습관으로 이어질 수 있습니다.
-
-## 어디서 자주 헷갈릴까요?
-
-가장 흔한 실수는 실제 데이터베이스나 네트워크를 붙인 채 단위 테스트라고 부르는 경우입니다. 외부 의존이 붙으면 그 시점부터는 단위 테스트보다 통합 테스트에 가까워집니다.
-
-또 하나는 테스트끼리 상태를 공유하는 경우입니다. 이전 테스트가 남긴 값을 다음 테스트가 기대하면 실행 순서가 바뀌는 순간 깨집니다. 단위 테스트는 어떤 순서로 돌려도 같은 결과가 나와야 합니다.
-
-이름을 대충 붙이는 문제도 자주 보입니다. `test_1`, `test_2` 같은 이름은 실패했을 때 아무 설명을 주지 못합니다. 테스트 이름은 동작 설명서라고 생각하는 편이 좋습니다.
-
-## 좋은 단위 테스트의 조건
-
-좋은 단위 테스트는 다음 다섯 가지 성질을 만족합니다.
-
-### 1. 빠르다 (Fast)
-
-수백 개가 있어도 몇 초 안에 끝나야 합니다. 외부 네트워크나 디스크 IO가 들어가면 빠르지 않습니다.
-
-### 2. 독립적이다 (Independent)
-
-테스트 순서를 바꿔도, 병렬로 돌려도 결과가 같아야 합니다. 이전 테스트의 상태에 의존하면 안 됩니다.
-
-### 3. 반복 가능하다 (Repeatable)
-
-같은 코드를 백 번 실행해도 같은 결과가 나와야 합니다. 시간, 랜덤, 네트워크에 의존하면 반복성이 무너집니다.
-
-### 4. 스스로 검증한다 (Self-validating)
-
-테스트 결과를 사람이 판단하지 않습니다. 통과와 실패가 자동으로 판정되어야 합니다.
-
-### 5. 적시에 작성한다 (Timely)
-
-코드를 작성한 직후, 또는 코드 작성 전에 테스트를 씁니다. 배포 전날 급하게 쓰는 테스트는 형식적입니다.
-
-이 다섯 가지는 Robert C. Martin의 FIRST 원칙으로도 알려져 있습니다. 이 원칙을 어기는 테스트는 느리고, 불안정하고, 신뢰받지 못합니다.
 ## 테스트 함수 이름 짓기
 
-테스트 이름은 실패했을 때 읽는 첫 번째 설명서입니다. 다음은 좋은 테스트 이름과 나쁜 테스트 이름의 비교입니다.
+테스트 이름은 실패했을 때 읽는 첫 번째 설명서입니다. CI 로그에서 어떤 시나리오가 깨졌는지 바로 알 수 있어야 합니다.
 
 **나쁜 예:**
 
@@ -210,72 +178,64 @@ def test_user(): ...
 
 ```python
 def test_apply_discount_with_zero_percent_returns_original_price(): ...
+def test_apply_discount_with_100_percent_returns_zero(): ...
+def test_apply_discount_with_negative_percent_raises_value_error(): ...
 def test_create_user_with_duplicate_email_raises_value_error(): ...
-def test_calculate_total_with_empty_cart_returns_zero(): ...
 ```
 
-좋은 테스트 이름은 다음 세 가지 정보를 담습니다.
+좋은 테스트 이름은 세 가지 정보를 담습니다.
 
-1. **무엇을 하는가** (동작, 함수명)
-2. **어떤 조건에서** (입력, 상태)
-3. **무엇을 기대하는가** (결과, 예외)
+1. **무엇을 하는가** — 동작, 함수명
+2. **어떤 조건에서** — 입력, 상태
+3. **무엇을 기대하는가** — 결과, 예외
 
-이름이 길어지는 것은 문제가 아닙니다. 실패 로그에서 어떤 시나리오가 깨졌는지 바로 알 수 있다면 길이는 부차적입니다. 테스트 이름을 줄이려다 의미를 잃는 것이 더 큰 손해입니다.
+실무에서는 `test_<action>_<condition>_<result>` 형식을 자주 씁니다. 이름이 길어지는 것은 문제가 아닙니다. 실패 로그에서 어떤 시나리오가 깨졌는지 바로 알 수 있다면 길이는 부차적입니다.
 
-실무에서는 `test_<action>_<condition>_<result>` 형식을 자주 씁니다. 예를 들어 `test_login_with_invalid_password_returns_401`처럼 쓰면 테스트 목록만 봐도 검증 범위가 드러납니다.
 ## 경계값 테스트 — 버그가 숨는 곳
 
 경계값은 정상 케이스보다 버그를 더 잘 드러냅니다. `0`, `None`, 빈 문자열, 음수, 최대값 같은 입력은 조건문과 반복문의 경계에서 예상 밖의 동작을 일으킵니다.
 
-다음은 경계값 테스트를 추가한 예시입니다.
-
 ```python
-import pytest
-
 @pytest.mark.parametrize("price,percent,expected", [
-    (1000, 0, 1000),       # 경계: 할인 없음
-    (1000, 100, 0),        # 경계: 전액 할인
-    (0, 50, 0),            # 경계: 가격 0
-    (1, 1, 0),             # 경계: 최소 단위
+    (1000, 0, 1000),    # 경계: 할인 없음
+    (1000, 100, 0),     # 경계: 전액 할인
+    (0, 50, 0),         # 경계: 가격 0
+    (1, 1, 0),          # 경계: 최소 단위 (정수 나누기)
+    (9999, 99, 9900),   # 경계: 큰 숫자
 ])
 def test_apply_discount_edge_cases(price, percent, expected):
     assert apply_discount(price, percent) == expected
-
-@pytest.mark.parametrize("price,percent", [
-    (1000, -1),            # 경계: 음수 퍼센트
-    (1000, 101),           # 경계: 범위 초과
-])
-def test_apply_discount_rejects_invalid_percent(price, percent):
-    with pytest.raises(ValueError):
-        apply_discount(price, percent)
 ```
 
-경계값 테스트는 코드 리뷰에서 자주 등장하는 질문입니다. `0`일 때는? `None`일 때는? 빈 배열일 때는? 이 질문에 코드로 답하는 것이 경계값 테스트의 역할입니다.
-## 단위 테스트를 도메인 규칙에 맞추는 확장 패턴
+경계값 테스트는 코드 리뷰에서 자주 등장하는 질문에 코드로 답하는 것입니다. `0`일 때는? `None`일 때는? 빈 배열일 때는?
 
-단위 테스트를 충분히 작성했는데도 운영 버그가 계속 나오는 팀은 대체로 같은 문제를 겪습니다. 함수 단위 분기는 많이 테스트했지만, 비즈니스 규칙의 조합을 충분히 다루지 못한 경우입니다. 예를 들어 할인 정책은 "회원 등급"과 "쿠폰"과 "최대 할인 상한"이 함께 작동합니다. 이때 조합 테스트를 설계하지 않으면 단일 케이스가 모두 통과해도 실제 시나리오에서 실패할 수 있습니다.
+## 도메인 규칙 조합 테스트
+
+단위 테스트를 충분히 작성했는데도 운영 버그가 계속 나오는 팀은 대체로 같은 문제를 겪습니다. 함수 단위 분기는 많이 테스트했지만, 비즈니스 규칙의 조합을 충분히 다루지 못한 경우입니다.
+
+예를 들어 할인 정책은 "회원 등급"과 "쿠폰"과 "최대 할인 상한"이 함께 작동합니다. 이때 조합 테스트를 설계하지 않으면 단일 케이스가 모두 통과해도 실제 시나리오에서 실패할 수 있습니다.
 
 ```python
-import pytest
-
 @pytest.mark.parametrize(
     'tier,coupon,amount,expected',
     [
-        ('bronze', None, 10000, 10000),
-        ('silver', None, 10000, 9500),
-        ('gold', 'WELCOME10', 10000, 8500),
-        ('gold', 'VIP30', 10000, 7000),   # 상한 적용
+        ('bronze', None, 10000, 10000),         # 할인 없음
+        ('silver', None, 10000, 9500),          # 5% 할인
+        ('gold', None, 10000, 9000),            # 10% 할인
+        ('gold', 'WELCOME10', 10000, 8500),     # 10% + 쿠폰 5%
+        ('gold', 'VIP30', 10000, 7000),         # 상한 30% 적용
     ],
 )
 def test_calculate_price_by_tier_and_coupon(tier, coupon, amount, expected):
-    assert calculate_final_price(tier=tier, coupon=coupon, amount=amount) == expected
+    result = calculate_final_price(tier=tier, coupon=coupon, amount=amount)
+    assert result == expected, f"tier={tier}, coupon={coupon}, amount={amount}: expected {expected}, got {result}"
 ```
 
 이 방식은 단순히 케이스 수를 늘리는 것이 아니라, 규칙 표를 테스트로 고정한다는 의미가 있습니다. 정책 문서가 바뀌면 표를 먼저 업데이트하고 테스트를 실패시켜 수정 범위를 드러내는 흐름이 효과적입니다.
 
 ## 픽스처 계층화로 준비 비용 줄이기
 
-단위 테스트가 늘어날수록 fixture를 한 단계로만 운영하면 재사용성과 가독성이 동시에 떨어집니다. 실무에서는 "기본 객체"와 "상태 변형"을 분리해 계층화하면 유지보수가 쉬워집니다.
+단위 테스트가 늘어날수록 fixture를 한 단계로만 운영하면 재사용성과 가독성이 동시에 떨어집니다. "기본 객체"와 "상태 변형"을 분리해 계층화하면 유지보수가 쉬워집니다.
 
 ```python
 import pytest
@@ -290,21 +250,29 @@ def paid_order(base_order):
     base_order.status = 'paid'
     return base_order
 
+@pytest.fixture
+def cancelled_order(base_order):
+    base_order.status = 'cancelled'
+    return base_order
+
 def test_refund_only_for_paid_order(paid_order):
     assert can_refund(paid_order) is True
 
 def test_refund_rejected_for_pending_order(base_order):
     assert can_refund(base_order) is False
+
+def test_refund_rejected_for_cancelled_order(cancelled_order):
+    assert can_refund(cancelled_order) is False
 ```
 
 fixture를 이렇게 쪼개면 테스트 본문은 의도만 남고, 준비 로직은 한곳에서 관리됩니다. 특히 도메인 객체 필드가 바뀔 때 수정 지점이 명확해집니다.
 
-## 유닛테스트 목 객체로 단위 경계 고정하기
+## Mock으로 외부 의존 격리하기
 
 단위 테스트에서 외부 의존을 제거할 때 `unittest.mock`은 매우 실용적입니다. 핵심은 "외부 호출 결과를 흉내" 내는 것보다 "호출 계약이 지켜졌는지"를 확인하는 데 있습니다.
 
 ```python
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 def test_send_invoice_calls_mailer_with_expected_payload():
     mailer = Mock()
@@ -315,13 +283,22 @@ def test_send_invoice_calls_mailer_with_expected_payload():
     mailer.send.assert_called_once_with(
         to='u-1',
         subject='청구서가 발행되었습니다',
-        body='결제 금액: 39000원',
+        body='결제 금액: 39,000원',
     )
+
+def test_payment_retries_once_on_timeout():
+    with patch('src.payment.client.charge') as charge:
+        charge.side_effect = [TimeoutError(), {'status': 'ok'}]
+        service = PaymentService()
+        result = service.pay(user_id='u-1', amount=10000)
+
+    assert result['status'] == 'ok'
+    assert charge.call_count == 2
 ```
 
 이 테스트는 네트워크 없이도 서비스 계층의 행위를 검증합니다. 다만 호출 인자 검증이 구현 세부사항에 과하게 묶이지 않도록, 비즈니스적으로 의미 있는 필드만 확인하는 균형이 필요합니다.
 
-## 커버리지 리포트로 단위 테스트 공백 찾기
+## 커버리지로 단위 테스트 공백 찾기
 
 `pytest-cov`를 단위 테스트 루프에 연결하면 누락 분기를 빠르게 발견할 수 있습니다.
 
@@ -334,15 +311,16 @@ Name                     Stmts   Miss  Cover   Missing
 -------------------------------------------------------
 src/domain/coupon.py        48      7    85%   33-36, 58-60
 src/domain/tax.py           29      0   100%
+src/domain/discount.py      35      3    91%   44-46
 -------------------------------------------------------
-TOTAL                       77      7    90%
+TOTAL                      112     10    91%
 ```
 
 `coupon.py`의 누락 라인이 "만료 쿠폰" 처리라면, 곧바로 회귀 버그로 이어질 가능성이 큽니다. 이런 경우에는 커버리지 임계값을 높이는 것보다, 누락된 규칙 케이스를 먼저 추가하는 편이 맞습니다.
 
-## 단위 테스트를 지속적 통합 기본 계약으로 두기
+## 단위 테스트를 CI 기본 계약으로 두기
 
-단위 테스트는 가장 빠르기 때문에 CI에서 반드시 실행해야 합니다. 다음 구성은 최소 기준으로 충분합니다.
+단위 테스트는 가장 빠르기 때문에 CI에서 반드시 실행해야 합니다.
 
 ```yaml
 name: unit-test
@@ -358,10 +336,43 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements-dev.txt
-      - run: pytest tests/unit -q --maxfail=1
+      - run: pytest tests/unit -q --maxfail=1 --cov=src/domain --cov-report=term-missing
 ```
 
 테스트 전략에서 가장 먼저 자동화해야 할 계층이 단위 테스트인 이유가 여기에 있습니다. 빠르고 싸고, 실패 원인이 선명하기 때문입니다.
+
+## FIRST 원칙
+
+좋은 단위 테스트는 다음 다섯 가지 성질을 만족합니다. Robert C. Martin의 FIRST 원칙으로도 알려져 있습니다.
+
+| 원칙 | 의미 | 위반 신호 |
+|------|------|-----------|
+| Fast | 수백 개가 몇 초 안에 끝나야 합니다 | DB 연결, 파일 I/O, HTTP 호출 포함 |
+| Independent | 테스트 순서를 바꿔도 결과가 같아야 합니다 | 전역 상태, 파일 공유, 테스트 간 의존 |
+| Repeatable | 같은 코드를 몇 번 돌려도 같은 결과가 나와야 합니다 | 시간, 랜덤, 네트워크에 의존 |
+| Self-validating | 통과/실패가 자동으로 판정되어야 합니다 | 사람이 로그를 직접 확인해야 하는 구조 |
+| Timely | 코드 작성 직후 또는 직전에 씁니다 | 배포 전날 급조된 형식적 테스트 |
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 올바른 접근 |
+|------|------|------------|
+| DB나 네트워크를 붙이고 단위 테스트라 부름 | 느리고 환경에 따라 결과가 달라짐 | 외부 의존을 mock/stub으로 교체하거나 통합 테스트로 분류 |
+| 테스트끼리 상태 공유 | 순서를 바꾸면 실패하는 불안정한 테스트 | 각 테스트에서 독립적으로 상태를 초기화 |
+| 이름을 `test_1`, `test_case` 처럼 모호하게 지음 | 실패 메시지에서 원인을 바로 읽기 어려움 | `test_<행동>_<조건>_<기대결과>` 형식 사용 |
+| 단언문 없이 실행만 확인 | 커버리지는 높지만 버그를 잡지 못함 | 의미 있는 `assert`로 결과를 명시적 검증 |
+| 하나의 테스트에 여러 동작을 몰아넣음 | 실패 시 어느 단계가 문제인지 불분명 | 동작 하나당 테스트 하나 원칙 |
+| 경계값을 빠뜨림 | 0, None, 음수, 최대값에서 런타임 오류 | 경계값을 파라미터화 테스트로 체계적으로 커버 |
+
+## 단위 테스트를 설계 도구로 쓰기
+
+시니어 엔지니어는 보통 단위 테스트를 도메인 설계 점검 도구로도 씁니다. 테스트를 쓰기 지나치게 어렵다면 함수 책임이 너무 많거나 의존이 과하게 얽혀 있을 가능성이 큽니다.
+
+- Mock 설정이 테스트보다 길어진다면 의존이 과하게 퍼져 있는 신호입니다.
+- 픽스처 없이 테스트 준비 코드가 50줄을 넘는다면 객체 생성이 복잡하다는 뜻입니다.
+- 같은 모듈에서 테스트가 계속 깨진다면 설계 단순화가 필요할 수 있습니다.
+
+테스트의 불편함이 설계의 불편함을 드러내는 경우가 많습니다. 테스트를 억지로 통과시키기 전에 코드 구조를 먼저 살펴보는 편이 낫습니다.
 
 ## 직접 검증해 볼 것
 
@@ -371,88 +382,25 @@ jobs:
 
 **예상 결과:** 정상 입력은 즉시 초록색으로 끝나고, 잘못된 퍼센트 입력은 `ValueError`를 분명하게 보여 줘야 합니다.
 
-## 심화 실습: 운영 관점 테스트 점검
-
-실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
-
-또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
-
-fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
-
-회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
-
-커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
-
-CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
-
-실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
-
-또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
-
-fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
-
-회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
-
-커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
-
-CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
-
-```python
-from unittest.mock import patch
-
-def test_payment_service_retries_once_on_timeout():
-    service = PaymentService()
-    with patch('src.payment.client.charge') as charge:
-        charge.side_effect = [TimeoutError(), {'status': 'ok'}]
-        result = service.pay(user_id='u-1', amount=10000)
-
-    assert result['status'] == 'ok'
-    assert charge.call_count == 2
-```
-
-```bash
-pytest -q --maxfail=1 --disable-warnings
-pytest --cov=src --cov-report=term-missing
-```
-
-## 실패 신호와 첫 점검
-
-- 예외 테스트가 `with pytest.raises(...)` 없이 작성되어 있으면 실패 원인이 흐려집니다.
-- 픽스처가 전역 상태를 공유하면 순서를 바꿨을 때만 깨지는 테스트가 생깁니다.
-- 단위 테스트 하나가 너무 많은 단계를 담고 있다면 함수 책임이 과한지부터 의심하는 편이 낫습니다.
-
-## 실무에서는 이렇게 생각합니다
-
-실무에서 단위 테스트는 양보다 성질이 더 중요합니다. 빠르게 돌고, 외부 환경에 흔들리지 않고, 실패했을 때 어느 동작이 깨졌는지 바로 말해 주어야 합니다.
-
-시니어 엔지니어는 보통 단위 테스트를 도메인 설계 점검 도구로도 씁니다. 테스트를 쓰기 지나치게 어렵다면 함수 책임이 너무 많거나 의존이 과하게 얽혀 있을 가능성이 큽니다. 테스트의 불편함이 설계의 불편함을 드러내는 경우가 많습니다.
-
 ## 운영 체크리스트
 
 - [ ] 함수 하나에 대해 테스트 세 개 이상을 작성했습니다.
 - [ ] 경계값과 예외 케이스를 함께 다뤘습니다.
 - [ ] AAA 구조로 읽히게 작성했습니다.
 - [ ] `parametrize`를 한 번 이상 사용했습니다.
+- [ ] 테스트 이름에 행동, 조건, 기대 결과가 담겨 있습니다.
+- [ ] 외부 의존 없이 밀리초 단위로 실행됩니다.
 
 ## 연습 문제
 
 1. `is_palindrome(s)` 함수를 만들고 다섯 입력으로 파라미터화 테스트를 작성해 보세요.
 2. 빈 문자열, 한 글자, 공백 문자열 같은 경계값을 추가해 보세요.
 3. 일부러 버그를 넣고 어떤 테스트가 잡는지 기록해 보세요.
+4. fixture를 사용해 기본 사용자 객체를 만들고 role별 권한 테스트를 작성해 보세요.
 
 ## 정리
 
 단위 테스트는 작고, 빠르고, 외부 의존이 없어야 합니다. 이 성질이 지켜질 때 테스트 피라미드의 바닥이 단단해집니다. 다음 글에서는 여러 부품을 실제로 연결했을 때 무엇이 깨지는지 확인하는 통합 테스트를 보겠습니다.
-
-## 처음 질문으로 돌아가기
-
-- **단위 테스트는 정확히 어디까지를 검증할까요?**
-  - 단위 테스트를 처음 배울 때 가장 헷갈리는 지점은 통합 테스트와의 경계입니다. 다음 표는 두 테스트 계층의 차이를 보여 줍니다.
-- **AAA 패턴은 왜 많이 쓰일까요?**
-  - 단위 테스트는 가장 많고 가장 빨라야 합니다
-- **`pytest`의 fixture와 parametrize는 언제 도움이 될까요?**
-  - 단위 테스트는 가장 많고 가장 빨라야 합니다
-  - 단위 테스트는 가장 많고 가장 빨라야 합니다. 통합 테스트는 그보다 적고, E2E 테스트는 더 적어야 합니다. 이 분포가 중요한 이유는 속도 때문입니다. 빠른 테스트가 많아야 개발자가 자주 돌릴 수 있고, 자주 돌려야 테스트가 실제 습관이 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -46,12 +46,12 @@ last_reviewed: '2026-05-12'
 
 ```text
 DP applicability signals
-    1) The same subproblem appears many times (overlapping subproblems)
-    2) Optimal subproblem solutions compose into optimal whole (optimal substructure)
+    1) Overlapping subproblems: same subproblem computed many times
+    2) Optimal substructure: optimal solution = optimal sub-solutions combined
 
 Two implementations
-    Top-down  (memoization) : recursion + cache, computes only needed states
-    Bottom-up (tabulation)  : iteration,         fills every state in order
+    Top-down  (memoization) : recursion + cache, only needed states computed
+    Bottom-up (tabulation)  : iteration, every state filled in topological order
 ```
 
 | 용어 | 설명 |
@@ -84,6 +84,8 @@ def fib(n):
     if n <= 1:
         return n
     return fib(n - 1) + fib(n - 2)
+
+print(fib(100))   # 354224848179261915075
 ```
 
 ## 단계별로 따라가기
@@ -91,16 +93,20 @@ def fib(n):
 ### 1단계: 중복 부분 문제를 눈으로 보기
 
 ```python
-calls = 0
-def fib_naive(n):
-    global calls
-    calls += 1
+call_count = {}
+
+def fib_trace(n):
+    call_count[n] = call_count.get(n, 0) + 1
     if n <= 1:
         return n
-    return fib_naive(n - 1) + fib_naive(n - 2)
+    return fib_trace(n - 1) + fib_trace(n - 2)
 
-fib_naive(20)
-print(calls)   # 13529 — explosive in n
+fib_trace(20)
+# 가장 많이 호출된 상위 5개
+top5 = sorted(call_count.items(), key=lambda x: -x[1])[:5]
+print("(n, 호출 횟수):", top5)
+# 총 호출 횟수 — 지수적
+print(f"총 호출: {sum(call_count.values())}")
 ```
 
 같은 `fib(k)`가 여러 번 다시 계산되는 것을 직접 볼 수 있습니다. 이 반복이 바로 DP의 출발 신호입니다.
@@ -111,12 +117,16 @@ print(calls)   # 13529 — explosive in n
 from functools import lru_cache
 
 @lru_cache(maxsize=None)
-def fib(n):
+def fib_memo(n):
     if n <= 1:
         return n
-    return fib(n - 1) + fib(n - 2)
+    return fib_memo(n - 1) + fib_memo(n - 2)
 
-print(fib(100))   # 354224848179261915075
+# 각 상태가 정확히 한 번씩만 계산됨
+import time
+t0 = time.perf_counter()
+print(fib_memo(1000))
+print(f"time: {(time.perf_counter() - t0)*1000:.2f}ms")
 ```
 
 재귀 구조는 그대로 유지되고, 캐시가 중복 계산만 없애 줍니다. 이해하기 쉽고 문제를 확장할 때도 편합니다.
@@ -125,6 +135,7 @@ print(fib(100))   # 354224848179261915075
 
 ```python
 def fib_tab(n):
+    """Bottom-up: 작은 상태부터 순서대로 채움."""
     if n <= 1:
         return n
     dp = [0] * (n + 1)
@@ -133,15 +144,30 @@ def fib_tab(n):
         dp[i] = dp[i - 1] + dp[i - 2]
     return dp[n]
 
-print(fib_tab(100))
+# Rolling array로 O(1) 공간으로 줄이기
+def fib_opt(n):
+    if n <= 1:
+        return n
+    a, b = 0, 1
+    for _ in range(n - 1):
+        a, b = b, a + b
+    return b
+
+assert fib_tab(100) == fib_opt(100)
 ```
 
-작은 상태부터 순서대로 채우므로 재귀 깊이 문제를 피할 수 있습니다. 필요하면 배열을 두 개의 rolling 변수로 줄일 수도 있습니다.
+작은 상태부터 순서대로 채우므로 재귀 깊이 문제를 피할 수 있습니다.
 
 ### 4단계: 0/1 knapsack으로 상태 정의 연습
 
 ```python
 def knapsack(weights, values, W):
+    """
+    상태: dp[i][cap] = 앞의 i개 물건만 사용하고 용량 cap일 때 최대 가치
+    점화식:
+        dp[i][cap] = dp[i-1][cap]                          (i번째 안 넣음)
+                   = max(dp[i-1][cap], dp[i-1][cap-w]+v)   (i번째 넣음, w <= cap)
+    """
     n = len(weights)
     dp = [[0] * (W + 1) for _ in range(n + 1)]
     for i in range(1, n + 1):
@@ -152,15 +178,23 @@ def knapsack(weights, values, W):
                 dp[i][cap] = max(dp[i][cap], dp[i - 1][cap - w] + v)
     return dp[n][W]
 
-print(knapsack([2, 3, 4, 5], [3, 4, 5, 6], 5))   # 7
+weights = [2, 3, 4, 5]
+values  = [3, 4, 5, 6]
+print(knapsack(weights, values, 5))   # 7 (weight 2+3, value 3+4)
 ```
 
-상태 `dp[i][cap]`는 "앞의 i개 물건만 사용하고 용량 cap일 때 얻을 수 있는 최대 가치"입니다. 상태의 뜻이 분명해지는 순간 점화식은 거의 자동으로 나옵니다.
+상태 `dp[i][cap]`의 의미가 분명해지는 순간 점화식은 거의 자동으로 나옵니다.
 
 ### 5단계: LCS로 두 시퀀스 위의 DP 보기
 
 ```python
 def lcs(a, b):
+    """
+    상태: dp[i][j] = a[:i]와 b[:j]의 최장 공통 부분 수열 길이
+    점화식:
+        a[i-1] == b[j-1] → dp[i][j] = dp[i-1][j-1] + 1
+        a[i-1] != b[j-1] → dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+    """
     n, m = len(a), len(b)
     dp = [[0] * (m + 1) for _ in range(n + 1)]
     for i in range(1, n + 1):
@@ -171,10 +205,53 @@ def lcs(a, b):
                 dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
     return dp[n][m]
 
-print(lcs("ABCBDAB", "BDCABC"))   # 4
+print(lcs("ABCBDAB", "BDCABC"))   # 4  (e.g. "BCAB")
 ```
 
-두 문자열의 모든 접두사 쌍을 상태로 잡아 표를 채웁니다. diff 도구, DNA 정렬, 문서 비교 같은 실제 문제의 핵심 패턴이 여기서 나옵니다.
+diff 도구, DNA 정렬, 문서 비교 같은 실제 문제의 핵심 패턴이 여기서 나옵니다.
+
+### 6단계: 편집 거리(Levenshtein distance)
+
+```python
+def edit_distance(s, t):
+    """
+    삽입, 삭제, 치환 비용 각 1일 때 s를 t로 바꾸는 최소 연산 수.
+    상태: dp[i][j] = s[:i]를 t[:j]로 바꾸는 최소 비용
+    """
+    n, m = len(s), len(t)
+    dp = [[0] * (m + 1) for _ in range(n + 1)]
+    # 베이스 케이스
+    for i in range(n + 1):
+        dp[i][0] = i
+    for j in range(m + 1):
+        dp[0][j] = j
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            if s[i - 1] == t[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1]
+            else:
+                dp[i][j] = 1 + min(
+                    dp[i - 1][j],      # 삭제
+                    dp[i][j - 1],      # 삽입
+                    dp[i - 1][j - 1]   # 치환
+                )
+    return dp[n][m]
+
+print(edit_distance("kitten", "sitting"))   # 3
+print(edit_distance("saturday", "sunday"))  # 3
+```
+
+## 동적 계획법 Big-O 비교
+
+| 문제 | 상태 수 | 점화식 비용 | 총 시간 복잡도 | 공간 복잡도 |
+| --- | --- | --- | --- | --- |
+| 피보나치 | O(n) | O(1) | O(n) | O(n) / O(1) rolling |
+| 동전 교환 | O(amount) | O(k) 동전 수 | O(n·k) | O(amount) |
+| 0/1 Knapsack | O(n·W) | O(1) | O(n·W) | O(n·W) / O(W) rolling |
+| LCS | O(n·m) | O(1) | O(n·m) | O(n·m) / O(m) rolling |
+| 편집 거리 | O(n·m) | O(1) | O(n·m) | O(n·m) / O(m) rolling |
+| 행렬 체인 곱 | O(n²) | O(n) | O(n³) | O(n²) |
+| TSP (bitmask DP) | O(2^n·n) | O(n) | O(2^n·n²) | O(2^n·n) |
 
 ## 이 글에서 먼저 가져갈 점
 
@@ -182,8 +259,9 @@ print(lcs("ABCBDAB", "BDCABC"))   # 4
 - top-down은 자연스럽고, bottom-up은 대체로 더 빠르고 메모리 효율적입니다.
 - 2차원 DP는 종종 한 행만 남기는 rolling array로 줄일 수 있습니다.
 - 같은 문제도 상태를 어떻게 잡느냐에 따라 비용이 크게 달라집니다.
+- `dp[i][j]`의 의미를 한 문장으로 적는 것이 설계의 출발점입니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수
 
 | 실수 | 문제 | 해결 |
 | --- | --- | --- |
@@ -192,6 +270,7 @@ print(lcs("ABCBDAB", "BDCABC"))   # 4
 | 가변 객체를 캐시 키로 사용 | 캐시 미스 | tuple 등 불변형으로 바꿉니다 |
 | 중복 부분 문제가 없는데 DP 적용 | 과한 풀이 | 부분 문제가 정말 반복되는지 먼저 확인합니다 |
 | 메모리 폭발 | OOM | rolling array로 차원을 줄입니다 |
+| 점화식 방향을 잘못 설정 | 참조 전 미계산 상태 접근 | 계산 순서와 의존 관계를 그림으로 그립니다 |
 
 ## 실무에서는 이렇게 쓰입니다
 
@@ -207,6 +286,8 @@ print(lcs("ABCBDAB", "BDCABC"))   # 4
 
 또한 DP를 "기억하는 분할 정복"으로 봅니다. 재귀에 캐시를 붙인 것이 자연스럽게 느껴진다면, 이미 DP의 핵심을 잡은 것입니다. 표를 억지로 그리며 시작하기보다 재귀 → 메모이제이션 → 타뷸레이션 순서로 배우는 편이 훨씬 부드럽습니다.
 
+상태 차원을 줄이는 rolling array 최적화는 마지막에 합니다. 먼저 2차원 테이블로 정확한 답을 확보하고, 그다음 메모리 최적화를 합니다. 처음부터 최적화를 시도하면 디버깅이 어려워집니다.
+
 ## 운영 체크리스트
 
 - [ ] DP의 두 조건을 확인할 수 있는가
@@ -214,14 +295,17 @@ print(lcs("ABCBDAB", "BDCABC"))   # 4
 - [ ] top-down과 bottom-up 둘 다 작성할 수 있는가
 - [ ] rolling array로 메모리를 줄여 본 적이 있는가
 - [ ] 적용 가능 신호를 알아볼 수 있는가
+- [ ] LCS와 편집 거리를 막힘 없이 구현할 수 있는가
 
 ## 연습 문제
 
 1. 동전 종류와 목표 금액이 주어졌을 때 최소 동전 개수를 반환하는 함수를 작성해 보세요. 먼저 상태와 점화식을 말로 정의한 뒤 코드로 옮겨 보세요.
 
-2. 두 문자열의 편집 거리(Levenshtein distance)를 구해 보세요. 삽입, 삭제, 치환의 비용은 모두 1로 둡니다.
+2. 두 문자열의 편집 거리(Levenshtein distance)를 구해 보세요. 삽입, 삭제, 치환의 비용은 모두 1로 둡니다. rolling array를 써서 O(m) 공간으로 줄여 보세요.
 
 3. 양의 가중치를 가진 그래프에서 두 노드 사이의 총 길이가 5 이하인 경로 수를 세는 DP를 설계해 보세요. 상태는 현재 노드와 남은 길이를 가집니다.
+
+4. Knapsack에서 선택된 물건 목록을 dp 테이블을 역추적해 출력해 보세요. 최댓값뿐만 아니라 경로도 복원하는 backtracking 기법을 익히세요.
 
 ## 정리 및 다음 단계
 
@@ -229,117 +313,14 @@ DP는 "같은 부분 문제를 두 번 풀지 않는다"에서 출발합니다. 
 
 다음 글에서는 그리디 알고리즘을 다룹니다. 그리디가 정말 통하는 조건, 교환 논증, 그리고 겉보기에는 그리디 같지만 실제로는 DP가 필요한 문제를 봅니다.
 
-## 추가 보강: 검증 가능한 예제 세트
-
-### 입력 크기 대비 알고리즘/학습 선택 표
-
-| 상황 | 빠른 선택 | 검증 기준 |
-| --- | --- | --- |
-| 작은 입력, 빠른 프로토타입 | 단순 구현 우선 | 정답 검증 테스트 3종 |
-| 큰 입력, 지연시간 민감 | 차수 낮은 알고리즘 또는 안정적 optimizer | 시간/메모리 동시 측정 |
-| 운영 장애 재현 필요 | 로그/추적 필드 강화 | 동일 입력 재실행 가능성 |
-
-### 짧은 비교 코드
-
-```python
-import time
-
-def measure(fn, *args, repeat=3):
-    best = float('inf')
-    for _ in range(repeat):
-        t0 = time.perf_counter()
-        fn(*args)
-        best = min(best, time.perf_counter() - t0)
-    return best
-```
-
-측정 코드는 화려할 필요가 없습니다. 같은 입력, 같은 환경, 같은 반복 기준을 유지하는 것이 더 중요합니다. 이 습관이 있어야 최적화 전후의 차이를 신뢰할 수 있습니다.
-
-### 실전 점검 질문
-
-1. 지금 선택한 방법의 시간/공간 비용을 한 문장으로 설명할 수 있는가
-2. 경계 입력에서 동작이 바뀌는 지점을 테스트로 고정했는가
-3. 운영 로그만으로 실패 원인을 분리할 수 있는가
-
-이 질문에 즉답할 수 있으면 구현이 아니라 설계 수준에서 품질을 확보한 상태에 가깝습니다.
-
-## 실전 확장 워크북
-
-이 절은 동적 계획법 상태 설계를 실제 문제 풀이와 운영 감각으로 연결하기 위한 보강 파트입니다. 개념을 암기하는 대신, 입력 크기·자료 구조·검증 순서를 함께 다루어 같은 유형의 문제를 반복적으로 안정적으로 풀 수 있게 만드는 데 목적이 있습니다. 핵심은 "정답 코드 한 번"이 아니라 "다음 문제에서도 재사용 가능한 판단 프레임"을 확보하는 것입니다.
-
-### 1) 시간 복잡도와 입력 제약을 먼저 맞추기
-
-| 입력 조건 | 우선 배제할 접근 | 현실적인 후보 | 확인 포인트 |
-| --- | --- | --- | --- |
-| n <= 10^3 | 없음(학습 목적 실험 가능) | 브루트포스, 정렬, 해시 | 구현 명확성 |
-| n <= 10^5 | O(n^2) 대부분 배제 | O(n log n), O(n), BFS/DFS | 경계값 테스트 |
-| n <= 10^6 이상 | O(n log n)도 부담 가능 | 단일 패스, 압축, 스트리밍 | 메모리 상한 |
-
-복잡도 판단은 코드 스타일 논쟁보다 우선합니다. 같은 팀에서 코드 품질 기준이 달라도, 입력 제약과 차수를 맞추는 원칙은 공통으로 적용됩니다. 이 단계를 건너뛰면 구현이 아무리 깔끔해도 제출 실패나 운영 지연으로 이어집니다.
-
-### 2) 단계별 추적 표로 경계 버그를 조기에 찾기
-
-| 단계 | 관찰 값 | 기대 신호 | 실패 신호 |
-| --- | --- | --- | --- |
-| 초기화 | 포인터/상태/큐/테이블 | 문제 정의와 일치 | 초기값 누락 |
-| 1회 반복 | 상태 전이 | 단조 증가 또는 감소 | 제자리 반복 |
-| 종료 직전 | 반환 후보 | 문제 요구와 직접 연결 | 보조값 반환 |
-
-경계 버그는 대부분 "한 줄"에서 발생하지만, 원인은 상태 전이 설계에 있습니다. 그래서 디버깅할 때는 출력값 하나만 보지 말고, 전이 로그를 함께 봐야 합니다. 특히 인덱스 기반 문제는 `lo, mid, hi`, DP 문제는 `state, transition`, 그래프 문제는 `queue size, visited count`를 같이 기록하면 원인 분리가 훨씬 빨라집니다.
-
-### 3) Python 구현 앵커
-
-```python
-def coin_change(coins, amount):
-    INF = amount + 1
-    dp = [0] + [INF] * amount
-    for a in range(1, amount + 1):
-        for c in coins:
-            if a - c >= 0:
-                dp[a] = min(dp[a], dp[a - c] + 1)
-    return -1 if dp[amount] == INF else dp[amount]
-```
-
-코드는 짧아도 충분합니다. 중요한 점은 구현 전에 불변식(invariant)을 문장으로 먼저 고정하는 것입니다. 예를 들어 "현재 단계가 끝나면 최소 비용이 보장된다" 같은 문장이 없으면, 코드가 돌아가도 왜 맞는지 설명할 수 없고, 변형 문제에서 무너지기 쉽습니다.
-
-### 4) LeetCode 스타일 매핑
-
-| 문제 | 핵심 패턴 | 첫 시도에서 자주 틀리는 지점 |
-| --- | --- | --- |
-| 70 Climbing Stairs | 제약을 통한 후보 축소 | 입력 조건을 늦게 반영 |
-| 198 House Robber | 상태/포인터 유지 | 경계 인덱스 처리 |
-| 322 Coin Change | 자료구조 선택 | 복잡도 목표 미달 |
-
-문제 매핑의 목적은 정답 암기가 아닙니다. 같은 구조를 빠르게 인식하고, "왜 이 패턴을 쓰는가"를 재현하는 데 있습니다. 시리즈 전체를 관통하는 실력 차이는 여기서 발생합니다.
-
-### 5) 비교 벤치마크를 읽는 기준
-
-| 비교 항목 | A 접근 | B 접근 | 의사결정 기준 |
-| --- | --- | --- | --- |
-| 시간 | 평균적으로 빠름 | 최악 케이스 안정적 | 입력 분포가 고정인지 |
-| 메모리 | 추가 배열 필요 | 제자리 처리 가능 | 메모리 제한 강도 |
-| 구현 난이도 | 짧음 | 디버깅 난이도 높음 | 팀 유지보수 역량 |
-
-벤치마크 숫자는 환경에 따라 달라집니다. 하지만 차수와 메모리 계층에서 발생하는 방향성은 반복됩니다. 그래서 한 번 측정한 결과를 절대값으로 외우기보다, 어떤 조건에서 우위가 바뀌는지(입력 크기, 정렬 여부, 중복 비율)를 함께 기록해야 다음 의사결정에 도움이 됩니다.
-
-### 6) 제출/배포 전 점검 루틴
-
-1. 문제 제약을 한 줄로 요약하고 불가능한 차수를 먼저 제거합니다.
-2. 핵심 자료구조 선택 이유를 "삽입/조회/삭제 비용" 기준으로 적습니다.
-3. 경계 입력 3종(빈값, 최소값, 중복/극단값) 테스트를 고정합니다.
-4. 시간·공간 복잡도를 코드 옆에 기록하고, 실제 측정값을 짧게 남깁니다.
-5. 같은 패턴의 변형 문제를 1개 더 풀어 일반화 여부를 확인합니다.
-
-이 루틴을 꾸준히 적용하면 "이번 문제를 맞춤"에서 끝나지 않고 "같은 유형을 안정적으로 재현"하는 상태로 넘어갈 수 있습니다. 알고리즘 학습은 지식 축적이 아니라 판단 체계 구축이라는 점을 계속 기억하는 것이 중요합니다.
-
 ## 처음 질문으로 돌아가기
 
 - **동적 계획법이 성립하려면 어떤 두 조건이 필요할까요?**
-  - 같은 `fib(k)`가 여러 번 다시 계산되는 것을 직접 볼 수 있습니다
+  - 첫째, 중복 부분 문제(overlapping subproblems): 같은 부분 문제가 반복해서 등장해야 합니다. 피보나치처럼 fib(k)가 여러 경로에서 반복 계산됩니다. 둘째, 최적 부분 구조(optimal substructure): 전체 최적해가 부분 최적해로 구성됩니다. 두 조건 모두 없으면 DP를 적용해도 이득이 없거나 오답이 나옵니다.
 - **메모이제이션과 타뷸레이션은 어떻게 다를까요?**
-  - 같은 `fib(k)`가 여러 번 다시 계산되는 것을 직접 볼 수 있습니다
+  - 메모이제이션(top-down)은 재귀에 캐시를 붙여 필요한 상태만 계산합니다. 직관적이고 구현이 쉽지만 재귀 오버헤드와 스택 깊이 제한이 있습니다. 타뷸레이션(bottom-up)은 작은 상태부터 순서대로 표를 채웁니다. 재귀 없이 반복으로 구현되어 더 빠르고 메모리도 rolling array로 줄일 수 있습니다.
 - **상태는 어떻게 정의하고 점화식은 어떻게 세워야 할까요?**
-  - 같은 `fib(k)`가 여러 번 다시 계산되는 것을 직접 볼 수 있습니다
+  - 상태는 "dp[...] = ..." 형식으로 한 문장으로 정의합니다. 예: "dp[i][cap] = 앞의 i개 물건을 사용하고 용량 cap일 때 얻을 수 있는 최대 가치". 상태 의미가 명확해지면 점화식은 "이 상태를 만들 수 있는 직전 상태들의 관계"로 자연스럽게 나옵니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

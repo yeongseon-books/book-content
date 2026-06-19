@@ -23,11 +23,9 @@ last_reviewed: '2026-05-12'
 
 # Algorithms 101 (4/10): 정렬 알고리즘
 
-전형적인 분할 정복 정렬입니다. 안정적이고 O(n log n)을 보장하지만 O(n) 추가 메모리를 지불합니다.
+Python의 `sorted`는 왜 그렇게 안정적으로 빠를까요? 그리고 교과서의 quicksort가 놓치는 것은 무엇일까요? 여기서는 대표 정렬 알고리즘의 트레이드오프와 Timsort가 실무에서 자주 이기는 이유를 다룹니다.
 
 이 글은 Algorithms 101 시리즈의 4번째 글입니다.
-
-Python의 `sorted`는 왜 그렇게 안정적으로 빠를까요? 그리고 교과서의 quicksort가 놓치는 것은 무엇일까요? 여기서는 대표 정렬 알고리즘의 트레이드오프와 Timsort가 실무에서 자주 이기는 이유를 다룹니다.
 
 ![Algorithms 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/04/04-01-big-picture.ko.png)
 *Algorithms 101 4장 흐름 개요*
@@ -71,11 +69,10 @@ Timsort     stable,   adaptive,           best O(n) / worst O(n log n)
 def quicksort(arr):
     if len(arr) <= 1:
         return arr
-    pivot = arr[0]
+    pivot = arr[0]    # 이미 정렬된 입력에서 O(n^2)
     left = [x for x in arr[1:] if x < pivot]
     right = [x for x in arr[1:] if x >= pivot]
     return quicksort(left) + [pivot] + quicksort(right)
-# 이미 정렬된 입력에 대해 O(n^2)
 ```
 
 **After — 표준 라이브러리 사용:**
@@ -83,6 +80,8 @@ def quicksort(arr):
 ```python
 sorted_arr = sorted(arr)        # Timsort, stable, adaptive
 arr.sort()                      # in-place variant
+# key 함수와 reverse 옵션 활용
+sorted_people = sorted(people, key=lambda p: (p.age, p.name))
 ```
 
 ## 단계별로 따라가기
@@ -91,6 +90,7 @@ arr.sort()                      # in-place variant
 
 ```python
 def mergesort(arr):
+    """안정 정렬, O(n log n) 보장, O(n) 추가 공간."""
     if len(arr) <= 1:
         return arr
     mid = len(arr) // 2
@@ -101,14 +101,15 @@ def mergesort(arr):
 def merge(a, b):
     out, i, j = [], 0, 0
     while i < len(a) and j < len(b):
-        if a[i] <= b[j]:
+        if a[i] <= b[j]:       # <= 로 안정성 보장
             out.append(a[i]); i += 1
         else:
             out.append(b[j]); j += 1
     out.extend(a[i:]); out.extend(b[j:])
     return out
 
-print(mergesort([3, 1, 4, 1, 5, 9, 2, 6]))
+result = mergesort([3, 1, 4, 1, 5, 9, 2, 6])
+print(result)   # [1, 1, 2, 3, 4, 5, 6, 9]
 ```
 
 전형적인 분할 정복 정렬입니다. 안정적이고 O(n log n)을 보장하지만 O(n) 추가 메모리를 지불합니다.
@@ -119,16 +120,18 @@ print(mergesort([3, 1, 4, 1, 5, 9, 2, 6]))
 import random
 
 def quicksort_inplace(arr, lo=0, hi=None):
+    """평균 O(n log n), 랜덤 pivot으로 최악 케이스를 희귀하게 만듦."""
     if hi is None:
         hi = len(arr) - 1
     if lo >= hi:
         return
+    # 랜덤 pivot 선택
     pivot_idx = random.randint(lo, hi)
     arr[pivot_idx], arr[hi] = arr[hi], arr[pivot_idx]
     pivot = arr[hi]
     i = lo
     for j in range(lo, hi):
-        if arr[j] < pivot:
+        if arr[j] <= pivot:
             arr[i], arr[j] = arr[j], arr[i]
             i += 1
     arr[i], arr[hi] = arr[hi], arr[i]
@@ -137,10 +140,10 @@ def quicksort_inplace(arr, lo=0, hi=None):
 
 a = [3, 1, 4, 1, 5, 9, 2, 6]
 quicksort_inplace(a)
-print(a)
+print(a)   # [1, 1, 2, 3, 4, 5, 6, 9]
 ```
 
-첫 원소를 pivot으로 고정하면 이미 정렬된 입력에서 O(n²)까지 무너질 수 있습니다. 그래서 랜덤 pivot이나 median-of-three 같은 방어가 사실상 표준입니다.
+첫 원소를 pivot으로 고정하면 이미 정렬된 입력에서 O(n²)까지 무너질 수 있습니다. 랜덤 pivot이나 median-of-three가 사실상 표준입니다.
 
 ### 3단계: Heapsort
 
@@ -148,39 +151,45 @@ print(a)
 import heapq
 
 def heapsort(arr):
+    """O(n log n) 보장, O(1) 추가 공간, 비안정 정렬."""
     h = list(arr)
-    heapq.heapify(h)
-    return [heapq.heappop(h) for _ in range(len(h))]
+    heapq.heapify(h)                          # O(n)
+    return [heapq.heappop(h) for _ in range(len(h))]   # O(n log n)
 
-print(heapsort([3, 1, 4, 1, 5, 9, 2, 6]))
+result = heapsort([3, 1, 4, 1, 5, 9, 2, 6])
+print(result)   # [1, 1, 2, 3, 4, 5, 6, 9]
 ```
 
-안정 정렬은 아니지만 O(n log n)을 보장하고 추가 메모리도 mergesort보다 적습니다. 최악 시간 보장이 필요할 때 의미가 큽니다.
+안정 정렬은 아니지만 O(n log n)을 보장하고 추가 메모리도 mergesort보다 적습니다. 최악 시간 보장이 필요하면서 메모리가 제한된 환경에 적합합니다.
 
 ### 4단계: Timsort의 적응성 관찰
 
 ```python
 import random, time
 
-def measure(arr):
-    t = time.perf_counter()
-    sorted(arr)
-    return time.perf_counter() - t
+def measure(arr, repeat=3):
+    best = float('inf')
+    for _ in range(repeat):
+        a = arr[:]
+        t0 = time.perf_counter()
+        sorted(a)
+        best = min(best, time.perf_counter() - t0)
+    return best
 
 n = 1_000_000
 random_arr = [random.random() for _ in range(n)]
 sorted_arr = sorted(random_arr)
 nearly_sorted = sorted_arr[:]
 for _ in range(100):
-    i = random.randrange(n); j = random.randrange(n)
+    i, j = random.randrange(n), random.randrange(n)
     nearly_sorted[i], nearly_sorted[j] = nearly_sorted[j], nearly_sorted[i]
 
-print(f"random        : {measure(random_arr):.3f}s")
-print(f"already sorted: {measure(sorted_arr):.3f}s")
-print(f"nearly sorted : {measure(nearly_sorted):.3f}s")
+print(f"random        : {measure(random_arr)*1000:.1f}ms")
+print(f"already sorted: {measure(sorted_arr)*1000:.1f}ms")
+print(f"nearly sorted : {measure(nearly_sorted)*1000:.1f}ms")
 ```
 
-Timsort는 이미 존재하는 run을 감지해 싸게 병합합니다. 실전 데이터는 완전 난수보다 부분 정렬된 경우가 많기 때문에, 바로 여기서 성능 이득이 납니다.
+Timsort는 이미 존재하는 run(정렬된 구간)을 감지해 싸게 병합합니다. 실전 데이터는 완전 난수보다 부분 정렬된 경우가 많기 때문에, 바로 여기서 성능 이득이 납니다.
 
 ### 5단계: 안정성을 이용한 다중 키 정렬
 
@@ -188,12 +197,46 @@ Timsort는 이미 존재하는 run을 감지해 싸게 병합합니다. 실전 �
 people = [
     ("Alice", 30), ("Bob", 25), ("Carol", 30), ("Dan", 25),
 ]
-people.sort(key=lambda p: p[0])     # secondary
-people.sort(key=lambda p: p[1])     # primary
-print(people)
+# 안정 정렬: 보조 키부터 정렬, 그다음 주 키 정렬
+people.sort(key=lambda p: p[0])     # 이름 오름차순 (보조)
+people.sort(key=lambda p: p[1])     # 나이 오름차순 (주)
+print(people)   # [('Bob', 25), ('Dan', 25), ('Alice', 30), ('Carol', 30)]
+
+# 더 간결하게: 튜플 키 사용
+people2 = [("Alice", 30), ("Bob", 25), ("Carol", 30), ("Dan", 25)]
+people2.sort(key=lambda p: (p[1], p[0]))
+print(people2)   # 동일한 결과
 ```
 
-안정 정렬이면 보조 키부터 먼저 정렬한 뒤 주 키를 정렬해 다중 키 정렬을 간결하게 표현할 수 있습니다. Python의 Timsort가 안정 정렬이기 때문에 가능한 패턴입니다.
+안정 정렬이면 보조 키부터 먼저 정렬한 뒤 주 키를 정렬해 다중 키 정렬을 간결하게 표현할 수 있습니다.
+
+### 6단계: 비교 기반 정렬의 하한 이해
+
+```text
+n개 원소의 모든 순열 수: n!
+비교 1번으로 구분할 수 있는 경우: 2가지
+k번 비교로 구분할 수 있는 경우: 2^k가지
+
+2^k >= n!  →  k >= log₂(n!) ≈ n log₂ n
+
+따라서 비교 기반 정렬의 최선 비용 = Ω(n log n)
+```
+
+이 하한은 어떤 비교 기반 정렬도 피할 수 없습니다. 더 빠른 정렬이 존재한다면 비교 이외의 정보(예: 원소가 정수, 범위가 제한됨)를 활용해야 합니다.
+
+## 정렬 알고리즘 Big-O 비교
+
+| 알고리즘 | 최선 | 평균 | 최악 | 공간 | 안정 | 특징 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Insertion sort | O(n) | O(n²) | O(n²) | O(1) | 안정 | 소규모, 거의 정렬됨 |
+| Selection sort | O(n²) | O(n²) | O(n²) | O(1) | 비안정 | 교환 횟수 최소 |
+| Bubble sort | O(n) | O(n²) | O(n²) | O(1) | 안정 | 교육 목적 |
+| Mergesort | O(n log n) | O(n log n) | O(n log n) | O(n) | 안정 | 안정 보장 |
+| Quicksort | O(n log n) | O(n log n) | O(n²) | O(log n) | 비안정 | 평균 빠름 |
+| Heapsort | O(n log n) | O(n log n) | O(n log n) | O(1) | 비안정 | 최악 보장+제자리 |
+| Timsort | O(n) | O(n log n) | O(n log n) | O(n) | 안정 | 실전 최강, Python 표준 |
+| Counting sort | O(n+k) | O(n+k) | O(n+k) | O(k) | 안정 | 정수, 범위 제한 |
+| Radix sort | O(nk) | O(nk) | O(nk) | O(n+k) | 안정 | 고정 길이 키 |
 
 ## 이 글에서 먼저 가져갈 점
 
@@ -201,14 +244,16 @@ print(people)
 - quicksort는 평균적으로 빠르지만 pivot 방어가 없으면 위험합니다.
 - heapsort는 메모리를 아끼며 최악 시간 보장을 제공합니다.
 - Timsort는 안정성과 현실 데이터 적응성을 함께 가져갑니다.
+- 실무에서는 항상 `sorted`와 `sort()`를 먼저 씁니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수
 
 | 실수 | 문제 | 해결 |
 | --- | --- | --- |
 | 별도 인덱스를 손으로 맞추며 정렬 | 동기화 버그 | `sorted(..., key=..., reverse=...)`를 활용합니다 |
 | 첫 원소 pivot quicksort 고집 | 정렬 입력에서 O(n²) | 랜덤 또는 median-of-three를 씁니다 |
 | 안정성 가정 없이 다중 키 정렬 | 결과 비결정성 | 안정 정렬인지 먼저 확인합니다 |
+| 전체 정렬이 필요한지 확인하지 않음 | 불필요한 비용 | 상위 k개만 필요하면 heapq.nlargest를 씁니다 |
 | 아주 큰 데이터를 메모리에서 통째로 정렬 | OOM | 외부 병합 정렬이나 청크 처리를 검토합니다 |
 | 부작용이 있는 comparator 사용 | 비교 결과 불일치 | key 함수로 값만 뽑아 비교합니다 |
 
@@ -233,6 +278,7 @@ print(people)
 - [ ] 안정 정렬의 의미와 효용을 이해하는가
 - [ ] Timsort가 실전 데이터에서 빠른 이유를 설명할 수 있는가
 - [ ] 전체 정렬이 정말 필요한지 먼저 묻는가
+- [ ] 외부 병합 정렬이 언제 필요한지 아는가
 
 ## 연습 문제
 
@@ -242,91 +288,22 @@ print(people)
 
 3. 메모리에 다 들어가지 않는 10^8개의 정수에 대해 external mergesort를 스케치해 보세요. 디스크 I/O 패스가 몇 번 필요한지도 추정해 보세요.
 
+4. Insertion sort가 Timsort보다 성능이 좋을 수 있는 상황을 코드로 시연해 보세요. 어떤 입력 크기와 데이터 분포에서 이런 역전이 일어나는지 설명하세요.
+
 ## 정리 및 다음 단계
 
 같은 O(n log n) 울타리 안에서도 정렬 알고리즘은 안정성, 메모리, 적응성에서 큰 차이를 보입니다. 기본 선택은 `sorted`와 `sort()`이고, 트레이드오프가 분명할 때만 다른 정렬을 검토하면 됩니다.
 
 다음 글에서는 재귀와 분할 정복을 다룹니다. 호출 스택, 점화식, 그리고 분할 정복에서 동적 계획법으로 이어지는 사고 흐름을 봅니다.
 
-## 실전 확장 워크북
-
-이 절은 정렬 알고리즘 비교를 실제 문제 풀이와 운영 감각으로 연결하기 위한 보강 파트입니다. 개념을 암기하는 대신, 입력 크기·자료 구조·검증 순서를 함께 다루어 같은 유형의 문제를 반복적으로 안정적으로 풀 수 있게 만드는 데 목적이 있습니다. 핵심은 "정답 코드 한 번"이 아니라 "다음 문제에서도 재사용 가능한 판단 프레임"을 확보하는 것입니다.
-
-### 1) 시간 복잡도와 입력 제약을 먼저 맞추기
-
-| 입력 조건 | 우선 배제할 접근 | 현실적인 후보 | 확인 포인트 |
-| --- | --- | --- | --- |
-| n <= 10^3 | 없음(학습 목적 실험 가능) | 브루트포스, 정렬, 해시 | 구현 명확성 |
-| n <= 10^5 | O(n^2) 대부분 배제 | O(n log n), O(n), BFS/DFS | 경계값 테스트 |
-| n <= 10^6 이상 | O(n log n)도 부담 가능 | 단일 패스, 압축, 스트리밍 | 메모리 상한 |
-
-복잡도 판단은 코드 스타일 논쟁보다 우선합니다. 같은 팀에서 코드 품질 기준이 달라도, 입력 제약과 차수를 맞추는 원칙은 공통으로 적용됩니다. 이 단계를 건너뛰면 구현이 아무리 깔끔해도 제출 실패나 운영 지연으로 이어집니다.
-
-### 2) 단계별 추적 표로 경계 버그를 조기에 찾기
-
-| 단계 | 관찰 값 | 기대 신호 | 실패 신호 |
-| --- | --- | --- | --- |
-| 초기화 | 포인터/상태/큐/테이블 | 문제 정의와 일치 | 초기값 누락 |
-| 1회 반복 | 상태 전이 | 단조 증가 또는 감소 | 제자리 반복 |
-| 종료 직전 | 반환 후보 | 문제 요구와 직접 연결 | 보조값 반환 |
-
-경계 버그는 대부분 "한 줄"에서 발생하지만, 원인은 상태 전이 설계에 있습니다. 그래서 디버깅할 때는 출력값 하나만 보지 말고, 전이 로그를 함께 봐야 합니다. 특히 인덱스 기반 문제는 `lo, mid, hi`, DP 문제는 `state, transition`, 그래프 문제는 `queue size, visited count`를 같이 기록하면 원인 분리가 훨씬 빨라집니다.
-
-### 3) Python 구현 앵커
-
-```python
-import heapq
-
-def top_k(nums, k):
-    heap = []
-    for x in nums:
-        if len(heap) < k:
-            heapq.heappush(heap, x)
-        elif x > heap[0]:
-            heapq.heapreplace(heap, x)
-    return sorted(heap, reverse=True)
-```
-
-코드는 짧아도 충분합니다. 중요한 점은 구현 전에 불변식(invariant)을 문장으로 먼저 고정하는 것입니다. 예를 들어 "현재 단계가 끝나면 최소 비용이 보장된다" 같은 문장이 없으면, 코드가 돌아가도 왜 맞는지 설명할 수 없고, 변형 문제에서 무너지기 쉽습니다.
-
-### 4) LeetCode 스타일 매핑
-
-| 문제 | 핵심 패턴 | 첫 시도에서 자주 틀리는 지점 |
-| --- | --- | --- |
-| 912 Sort an Array | 제약을 통한 후보 축소 | 입력 조건을 늦게 반영 |
-| 56 Merge Intervals | 상태/포인터 유지 | 경계 인덱스 처리 |
-| 215 Kth Largest Element | 자료구조 선택 | 복잡도 목표 미달 |
-
-문제 매핑의 목적은 정답 암기가 아닙니다. 같은 구조를 빠르게 인식하고, "왜 이 패턴을 쓰는가"를 재현하는 데 있습니다. 시리즈 전체를 관통하는 실력 차이는 여기서 발생합니다.
-
-### 5) 비교 벤치마크를 읽는 기준
-
-| 비교 항목 | A 접근 | B 접근 | 의사결정 기준 |
-| --- | --- | --- | --- |
-| 시간 | 평균적으로 빠름 | 최악 케이스 안정적 | 입력 분포가 고정인지 |
-| 메모리 | 추가 배열 필요 | 제자리 처리 가능 | 메모리 제한 강도 |
-| 구현 난이도 | 짧음 | 디버깅 난이도 높음 | 팀 유지보수 역량 |
-
-벤치마크 숫자는 환경에 따라 달라집니다. 하지만 차수와 메모리 계층에서 발생하는 방향성은 반복됩니다. 그래서 한 번 측정한 결과를 절대값으로 외우기보다, 어떤 조건에서 우위가 바뀌는지(입력 크기, 정렬 여부, 중복 비율)를 함께 기록해야 다음 의사결정에 도움이 됩니다.
-
-### 6) 제출/배포 전 점검 루틴
-
-1. 문제 제약을 한 줄로 요약하고 불가능한 차수를 먼저 제거합니다.
-2. 핵심 자료구조 선택 이유를 "삽입/조회/삭제 비용" 기준으로 적습니다.
-3. 경계 입력 3종(빈값, 최소값, 중복/극단값) 테스트를 고정합니다.
-4. 시간·공간 복잡도를 코드 옆에 기록하고, 실제 측정값을 짧게 남깁니다.
-5. 같은 패턴의 변형 문제를 1개 더 풀어 일반화 여부를 확인합니다.
-
-이 루틴을 꾸준히 적용하면 "이번 문제를 맞춤"에서 끝나지 않고 "같은 유형을 안정적으로 재현"하는 상태로 넘어갈 수 있습니다. 알고리즘 학습은 지식 축적이 아니라 판단 체계 구축이라는 점을 계속 기억하는 것이 중요합니다.
-
 ## 처음 질문으로 돌아가기
 
 - **비교 기반 정렬은 왜 O(n log n)보다 더 좋아질 수 없을까요?**
-  - 비교 기반 정렬은 왜 O(n log n)보다 더 좋아질 수 없을까요에 대해 본문에서 실무 예시와 함께 답합니다.
+  - n개의 원소를 정렬하려면 n!가지 순열 중 하나를 선택해야 합니다. 비교 1번이 두 가지 경우를 구분하므로, k번의 비교로 2^k가지 경우를 구분할 수 있습니다. `2^k >= n!`을 풀면 `k >= log(n!) ≈ n log n`이 됩니다. 이 하한은 어떤 비교 기반 알고리즘도 피할 수 없습니다.
 - **mergesort, quicksort, heapsort는 각각 무엇을 주고 무엇을 얻을까요?**
-  - mergesort, quicksort, heapsort는 각각 무엇을 주고 무엇을 얻을까요에 대해 본문에서 실무 예시와 함께 답합니다.
+  - mergesort는 안정성과 O(n log n) 보장을 주지만 O(n) 추가 메모리를 소비합니다. quicksort는 추가 메모리 없이 평균 빠르지만 최악 O(n²) 위험이 있습니다. heapsort는 제자리에서 O(n log n)을 보장하지만 안정적이지 않고 캐시 효율이 낮습니다.
 - **안정 정렬과 비안정 정렬의 차이는 왜 중요할까요?**
-  - 안정 정렬과 비안정 정렬의 차이는 중요할까요 — 이 글에서 근거와 함께 설명합니다.
+  - 안정 정렬은 같은 키를 가진 원소들의 원래 순서를 보존합니다. 이는 다중 키 정렬에서 결정적으로 중요합니다. "나이로 정렬 후 이름으로 정렬"할 때 나이가 같은 그룹 내의 이름 순서가 보장되어야 합니다. 비안정 정렬을 쓰면 이 보장이 사라집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

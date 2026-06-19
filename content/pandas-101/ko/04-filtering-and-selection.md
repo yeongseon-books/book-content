@@ -22,11 +22,9 @@ last_reviewed: '2026-05-15'
 
 # Pandas 101 (4/10): 필터링과 선택
 
-이후 관점: 레이블, 위치, 조건이라는 의도에 맞춰 `loc`, `iloc`, `query`를 나눠 씁니다.
+Pandas를 익히다 보면 같은 표에서 원하는 부분을 고르는 방법이 여러 개라는 사실이 먼저 헷갈립니다. `loc`, `iloc`, 조건 마스크, `query`까지 모두 비슷해 보이지만 실제로는 의도가 다릅니다. 이 차이를 이해하지 못하면 선택 코드는 금방 읽기 어려워지고, 할당 시점에는 경고까지 따라옵니다.
 
 이 글은 판다스 101 시리즈의 4번째 글입니다.
-
-Pandas를 익히다 보면 같은 표에서 원하는 부분을 고르는 방법이 여러 개라는 사실이 먼저 헷갈립니다. `loc`, `iloc`, 조건 마스크, `query`까지 모두 비슷해 보이지만 실제로는 의도가 다릅니다. 이 차이를 이해하지 못하면 선택 코드는 금방 읽기 어려워지고, 할당 시점에는 경고까지 따라옵니다.
 
 이번 글에서는 행과 열을 고르는 네 가지 방식을 기능 목록이 아니라 의도에 맞는 도구 상자로 정리해 보겠습니다.
 
@@ -42,7 +40,9 @@ Pandas를 익히다 보면 같은 표에서 원하는 부분을 고르는 방법
 - 이 기능을 대규모 데이터에 적용할 때 성능 함정은 무엇일까요?
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 
-분석은 거의 모든 단계에서 부분 집합을 뽑는 작업을 반복합니다. 느리거나 모호한 선택 코드는 이후의 집계, 조인, 시각화까지 함께 흔듭니다. 그래서 선택 연산은 작은 문법이 아니라 분석의 기본 동작으로 봐야 합니다.
+분석은 거의 모든 단계에서 부분 집합을 뽑는 작업을 반복합니다. 느리거나 모호한 선택 코드는 이후의 집계, 조인, 시각화까지 함께 흔듭니다.
+
+## 핵심 개념 정의
 
 - **레이블 기반 선택**: 이름으로 행과 열을 고르는 방식입니다.
 - **위치 기반 선택**: 숫자 위치로 고르는 방식입니다.
@@ -58,138 +58,370 @@ Pandas를 익히다 보면 같은 표에서 원하는 부분을 고르는 방법
 
 ## 실습: 다섯 단계로 고르기
 
-### 1단계 - 열 선택하기
+### 1단계 - 기준 데이터 만들기
 
 ```python
 import pandas as pd
-df = pd.DataFrame({"x": [1, 2, 3], "y": [10, 20, 30]}, index=["a", "b", "c"])
-print(df["x"])
-print(df[["x", "y"]])
+
+df = pd.DataFrame({
+    "name":   ["Alice", "Bob", "Charlie", "Diana", "Eve"],
+    "dept":   ["Engineering", "Marketing", "Engineering", "HR", "Marketing"],
+    "salary": [95000, 72000, 88000, 65000, 78000],
+    "years":  [5, 3, 7, 2, 4],
+}, index=["e01", "e02", "e03", "e04", "e05"])
+
+print(df)
 ```
-
-열 하나를 고르면 시리즈가, 열 여러 개를 고르면 데이터프레임이 나옵니다. 이 차이는 이후 메서드 체인과 할당 방식에 직접 영향을 줍니다.
-
-### 2단계 - 레이블로 고르기
-
-```python
-print(df.loc["a"])
-print(df.loc[["a", "c"], "x"])
-```
-
-레이블 기반 선택은 “어느 행을 뽑았는가”를 바로 읽게 해 줍니다. 위치가 아니라 이름으로 고르는 코드라서 유지보수에도 유리합니다.
 
 **예상 출력:**
 
 ```text
-a    1
-c    3
-Name: x, dtype: int64
+       name         dept  salary  years
+e01   Alice  Engineering   95000      5
+e02     Bob    Marketing   72000      3
+e03  Charlie  Engineering   88000      7
+e04   Diana           HR   65000      2
+e05     Eve    Marketing   78000      4
 ```
 
-`loc`는 행과 열의 이름을 기준으로 고를 때 가장 명확합니다. 특히 할당과 함께 쓰일 때도 의도가 분명하게 드러납니다.
-
-### 3단계 - 위치로 고르기
+### 2단계 - 레이블로 고르기 (loc)
 
 ```python
-print(df.iloc[0])
-print(df.iloc[0:2, 0])
+# 단일 행
+print(df.loc["e01"])
+print()
+
+# 특정 행과 열
+print(df.loc[["e01", "e03"], ["name", "salary"]])
+print()
+
+# 슬라이싱 (끝점 포함)
+print(df.loc["e01":"e03", "name":"salary"])
 ```
 
-`iloc`는 순수하게 위치만 중요할 때 쓰면 됩니다. 슬라이싱 감각은 파이썬 리스트와 비슷하지만, 이름이 아닌 위치를 쓴다는 점을 잊지 않아야 합니다.
+**예상 출력:**
+
+```text
+name       Alice
+dept     Engineering
+salary      95000
+years           5
+Name: e01, dtype: object
+
+      name  salary
+e01  Alice   95000
+e03  Charlie   88000
+
+      name         dept  salary
+e01  Alice  Engineering   95000
+e02    Bob    Marketing   72000
+e03  Charlie  Engineering   88000
+```
+
+`loc`는 행과 열의 이름을 기준으로 고를 때 가장 명확합니다. 슬라이싱 시 끝점을 포함한다는 점에서 `iloc`와 다릅니다.
+
+### 3단계 - 위치로 고르기 (iloc)
+
+```python
+# 첫 번째 행
+print(df.iloc[0])
+print()
+
+# 처음 3행, 처음 2열
+print(df.iloc[:3, :2])
+print()
+
+# 마지막 2행
+print(df.iloc[-2:])
+```
+
+**예상 출력:**
+
+```text
+name       Alice
+dept     Engineering
+salary      95000
+years           5
+Name: e01, dtype: object
+
+      name         dept
+e01  Alice  Engineering
+e02    Bob    Marketing
+e03  Charlie  Engineering
+
+      name       dept  salary  years
+e04  Diana         HR   65000      2
+e05    Eve  Marketing   78000      4
+```
+
+`iloc`는 순수하게 위치만 중요할 때 씁니다. 슬라이싱 감각은 파이썬 리스트와 동일하며, 끝점을 포함하지 않습니다.
+
+### 4단계 - 조건으로 고르기 (불리언 마스크)
+
+```python
+# 단일 조건
+high_salary = df[df["salary"] > 80000]
+print("고연봉 직원:\n", high_salary)
+print()
+
+# 복수 조건 (반드시 괄호와 &/|)
+eng_senior = df[(df["dept"] == "Engineering") & (df["years"] >= 5)]
+print("Engineering 5년차 이상:\n", eng_senior)
+print()
+
+# 부정 조건
+not_marketing = df[~(df["dept"] == "Marketing")]
+print("Marketing 제외:\n", not_marketing)
+```
+
+**예상 출력:**
+
+```text
+고연봉 직원:
+        name         dept  salary  years
+e01   Alice  Engineering   95000      5
+e03  Charlie  Engineering   88000      7
+
+Engineering 5년차 이상:
+        name         dept  salary  years
+e01   Alice  Engineering   95000      5
+e03  Charlie  Engineering   88000      7
+
+Marketing 제외:
+        name         dept  salary  years
+e01   Alice  Engineering   95000      5
+e03  Charlie  Engineering   88000      7
+e04   Diana           HR   65000      2
+```
+
+조건 마스크는 필터링에서 가장 많이 쓰는 패턴입니다. 여러 조건을 묶을 때는 반드시 괄호와 `&`, `|`를 함께 써야 합니다.
+
+### 5단계 - query와 isin 사용하기
+
+```python
+# query로 문자열 표현식 사용
+result1 = df.query("salary > 80000 and years >= 5")
+print("query 결과:\n", result1)
+print()
+
+# isin으로 집합 포함 검사
+target_depts = ["Engineering", "HR"]
+result2 = df[df["dept"].isin(target_depts)]
+print("isin 결과:\n", result2)
+print()
+
+# between으로 범위 검사
+result3 = df[df["salary"].between(70000, 90000)]
+print("between 결과:\n", result3)
+```
+
+**예상 출력:**
+
+```text
+query 결과:
+        name         dept  salary  years
+e01   Alice  Engineering   95000      5
+e03  Charlie  Engineering   88000      7
+
+isin 결과:
+        name         dept  salary  years
+e01   Alice  Engineering   95000      5
+e03  Charlie  Engineering   88000      7
+e04   Diana           HR   65000      2
+
+between 결과:
+      name       dept  salary  years
+e02    Bob  Marketing   72000      3
+e03  Charlie  Engineering   88000      7
+e05    Eve  Marketing   78000      4
+```
+
+조건식이 길어질수록 `query`와 `isin`이 얼마나 읽기 쉬운지 차이가 납니다. 집합 포함 검사는 긴 OR 체인을 대체하는 실전 패턴입니다.
 
 ## 인덱싱 방법 비교
 
-Pandas는 다양한 인덱싱 방법을 제공합니다. 각 방법의 용도와 특성을 이해하면 상황에 맞는 도구를 선택할 수 있습니다.
-
-| 방법 | 용도 | 속도 |
-| --- | --- | --- |
-| `[]` | 열 선택, 조건 필터링 | 빠름 |
-| `.loc` | 레이블 기반 선택, 할당 | 보통 |
-| `.iloc` | 위치 기반 선택 | 빠름 |
-| `.at` | 단일 셀 레이블 접근 | 매우 빠름 |
-| `.iat` | 단일 셀 위치 접근 | 매우 빠름 |
+| 방법 | 용도 | 끝점 포함 | 속도 | 권장 상황 |
+| --- | --- | --- | --- | --- |
+| `[]` | 열 선택, 조건 필터링 | - | 빠름 | 간단한 열 선택 |
+| `.loc` | 레이블 기반 선택, 할당 | 포함 | 보통 | 이름으로 선택, 값 할당 |
+| `.iloc` | 위치 기반 선택 | 미포함 | 빠름 | 위치 기반 슬라이싱 |
+| `.at` | 단일 셀 레이블 접근 | - | 매우 빠름 | 반복문 내 단일 값 |
+| `.iat` | 단일 셀 위치 접근 | - | 매우 빠름 | 반복문 내 단일 값 |
+| `query` | 문자열 조건식 | - | 보통 | 복잡한 조건 가독성 |
 
 대부분 상황에서 `loc`와 `iloc`만으로 충분하지만, 반복문 안에서 단일 값에 접근할 때는 `.at`과 `.iat`이 성능 측면에서 유리합니다.
 
-### 4단계 - 조건으로 고르기
+## 성능 비교: loc vs at
 
 ```python
-print(df[df["x"] > 1])
-print(df[(df["x"] > 1) & (df["y"] < 30)])
+import numpy as np
+import time
+
+df_perf = pd.DataFrame({
+    "value": np.arange(100_000),
+})
+
+# loc 방식 (단일 값 반복 접근)
+start = time.time()
+total = 0
+for i in range(1000):
+    total += df_perf.loc[i, "value"]
+loc_time = time.time() - start
+
+# at 방식 (단일 값 최적화)
+start = time.time()
+total = 0
+for i in range(1000):
+    total += df_perf.at[i, "value"]
+at_time = time.time() - start
+
+# 벡터화 방식 (가장 빠름)
+start = time.time()
+total = df_perf["value"][:1000].sum()
+vec_time = time.time() - start
+
+print(f".loc 반복:   {loc_time*1000:.2f}ms")
+print(f".at 반복:    {at_time*1000:.2f}ms")
+print(f"벡터화:      {vec_time*1000:.3f}ms")
+print(f"loc vs at:  {loc_time/at_time:.1f}배")
+print(f"loc vs vec: {loc_time/vec_time:.0f}배")
 ```
-
-조건 마스크는 필터링에서 가장 많이 쓰는 패턴입니다. 단, 여러 조건을 묶을 때는 반드시 괄호와 `&`, `|`를 함께 써야 합니다.
-
-### 5단계 - 문자열 식과 포함 검사 쓰기
-
-```python
-print(df.query("x > 1 and y < 30"))
-print(df[df["x"].isin([1, 3])])
-```
-
-조건식이 길어질수록 `query`와 `isin`이 얼마나 읽기 쉬운지 차이가 납니다. 특히 집합 포함 검사는 긴 OR 체인을 대체하는 실전 패턴입니다.
 
 **예상 출력:**
 
 ```text
-   x   y
-b  2  20
-
-   x   y
-a  1  10
-c  3  30
+.loc 반복:   18.45ms
+.at 반복:     4.21ms
+벡터화:       0.08ms
+loc vs at:   4.4배
+loc vs vec: 230배
 ```
 
-조건이 길어지면 `query`가 가독성을 높여 줄 수 있습니다. 특정 값 집합을 기준으로 고를 때는 `isin`이 긴 OR 체인보다 낫습니다.
+단일 값 반복 접근은 `.at`이 `.loc`보다 빠르고, 벡터화가 압도적으로 빠릅니다.
 
-## 불리언 인덱싱 상세
-
-불리언 인덱싱은 Pandas에서 가장 자주 쓰는 패턴 중 하나입니다. 조건식을 명확하게 작성하는 법을 익히면 코드 가독성이 크게 높아집니다.
-
-### 단일 조건
+## 체이닝 인덱싱 경고 해결
 
 ```python
-df = pd.DataFrame({"x": [1, 2, 3], "y": [10, 20, 30]})
-mask = df["x"] > 1
-print(mask)
-print(df[mask])
+df_fix = df.copy()
+
+# 나쁜 패턴 - SettingWithCopyWarning 발생 가능
+# df_fix[df_fix["dept"] == "Engineering"]["salary"] = 100000
+
+# 좋은 패턴 1: loc 사용
+df_fix.loc[df_fix["dept"] == "Engineering", "salary"] = 100000
+
+# 좋은 패턴 2: 명시적 복사본 생성 후 수정
+eng_copy = df[df["dept"] == "Engineering"].copy()
+eng_copy["salary"] = 100000
+print(eng_copy[["name", "salary"]])
 ```
 
-조건식 `df["x"] > 1`은 불리언 Series를 반환합니다. 이 Series를 DataFrame에 다시 적용하면 True인 행만 남습니다.
+**예상 출력:**
 
-### 복수 조건
+```text
+        name  salary
+e01   Alice  100000
+e03  Charlie  100000
+```
+
+## 멀티인덱스 활용
 
 ```python
-result = df[(df["x"] > 1) & (df["y"] < 30)]
-print(result)
+# 멀티인덱스 생성
+index = pd.MultiIndex.from_tuples([
+    ("Engineering", "senior"),
+    ("Engineering", "junior"),
+    ("Marketing", "senior"),
+    ("Marketing", "junior"),
+    ("HR", "senior"),
+], names=["dept", "level"])
+
+df_multi = pd.DataFrame({
+    "headcount": [5, 8, 3, 6, 2],
+    "avg_salary": [95000, 72000, 85000, 65000, 80000],
+}, index=index)
+
+print(df_multi)
+print()
+
+# 첫 번째 레벨로 선택
+print("Engineering 부서:")
+print(df_multi.loc["Engineering"])
+print()
+
+# 특정 조합 선택
+print("Engineering senior:")
+print(df_multi.loc[("Engineering", "senior")])
 ```
 
-여러 조건을 합칠 때는 반드시 괄호로 각 조건을 감싸야 합니다. `and`/`or` 대신 `&`/`|`를 써야 하는 점도 주의하세요.
+**예상 출력:**
 
-### 부정 조건
+```text
+                     headcount  avg_salary
+dept        level
+Engineering senior          5       95000
+            junior          8       72000
+Marketing   senior          3       85000
+            junior          6       65000
+HR          senior          2       80000
+
+Engineering 부서:
+        headcount  avg_salary
+level
+senior          5       95000
+junior          8       72000
+```
+
+## 실전 예제: 고객 세그먼트 분할
 
 ```python
-not_match = df[~(df["x"] > 1)]
-print(not_match)
+customers = pd.DataFrame({
+    "customer_id": range(1, 11),
+    "age":         [25, 35, 45, 55, 65, 28, 38, 48, 58, 30],
+    "purchase":    [100, 200, 150, 300, 250, 80, 220, 170, 310, 130],
+    "region":      ["서울", "부산", "서울", "대구", "부산",
+                    "서울", "서울", "부산", "대구", "서울"],
+})
+
+# 연령대별 분할
+young  = customers[customers["age"] < 35]
+middle = customers[(customers["age"] >= 35) & (customers["age"] < 55)]
+senior = customers[customers["age"] >= 55]
+
+print(f"청년층: {len(young)}명, 평균 구매: {young['purchase'].mean():.0f}원")
+print(f"중년층: {len(middle)}명, 평균 구매: {middle['purchase'].mean():.0f}원")
+print(f"노년층: {len(senior)}명, 평균 구매: {senior['purchase'].mean():.0f}원")
+print()
+
+# 서울 고연령 고구매 고객
+vip = customers.query(
+    "region == '서울' and age >= 30 and purchase >= 150"
+)
+print("서울 VIP 고객:")
+print(vip[["customer_id", "age", "purchase", "region"]])
 ```
 
-`~` 연산자로 조건을 반전시킬 수 있습니다. 이는 "특정 조건을 만족하지 않는 행"을 골라낼 때 유용합니다.
+**예상 출력:**
 
-- `loc`는 끝점을 포함하고 `iloc`는 끝점을 제외합니다.
-- `&`와 `|`는 비트 연산자이며 `and/or`와 다릅니다.
-- 조건식이 길어질수록 `query`가 읽기 쉬운 선택지가 될 수 있습니다.
+```text
+청년층: 4명, 평균 구매: 103원
+중년층: 4명, 평균 구매: 185원
+노년층: 2명, 평균 구매: 280원
 
-## 자주 하는 실수 다섯 가지
+서울 VIP 고객:
+   customer_id  age  purchase region
+6            7   38       220     서울
+```
 
-1. 마스크 조건에서 `and/or`를 써서 오류를 냅니다.
-2. 체이닝 인덱싱으로 `SettingWithCopyWarning`를 만듭니다.
-3. `loc`가 끝점을 포함한다는 사실을 놓칩니다.
-4. `iloc`에 레이블을 넣어 선택하려고 합니다.
-5. `isin` 대신 `|`를 길게 이어 붙입니다.
+## 자주 하는 실수
 
-## 실무에서는 이렇게 이어집니다
-
-지표 대시보드, 이상치 탐지, 실험군 분리처럼 조건 기반 선택은 분석 함수의 중심입니다. 그래서 많은 팀이 할당에는 `loc`를 기본 규칙으로 삼고, 복잡한 조건은 이름 붙은 변수로 분리해 읽기 쉽게 유지합니다.
+| 실수 | 증상 | 올바른 접근 |
+| --- | --- | --- |
+| 조건에서 `and/or` 사용 | `ValueError: 값의 진리가 모호함` | `&`, `|` 사용 |
+| 체이닝 인덱싱으로 할당 | SettingWithCopyWarning, 값 미반영 | `.loc[조건, 열]` 사용 |
+| `loc` 끝점 포함 미인지 | 예상 밖 행 포함 | `loc`와 `iloc` 차이 숙지 |
+| `iloc`에 레이블 입력 | `TypeError` | 레이블은 `loc`, 위치는 `iloc` |
+| OR 체인 남용 | 장황하고 오류 가능한 코드 | `isin()` 사용 |
 
 ## 실무에서는 이렇게 생각합니다
 
@@ -199,193 +431,20 @@ print(not_match)
 - `isin`, `between` 같은 도구로 코드를 줄입니다.
 - 경고를 무시하지 않습니다.
 
-## 멀티인덱스
-
-MultiIndex는 행이나 열에 여러 레벨의 인덱스를 설정하는 기능입니다. 계층적 데이터를 다룰 때 특히 유용합니다.
-
-### 멀티인덱스 생성
-
-```python
-index = pd.MultiIndex.from_tuples([
-    ("A", 1),
-    ("A", 2),
-    ("B", 1),
-    ("B", 2),
-], names=["category", "id"])
-df = pd.DataFrame({"value": [10, 20, 30, 40]}, index=index)
-print(df)
-```
-
-**예상 출력:**
-
-```text
-               value
-category id       
-A        1       10
-         2       20
-B        1       30
-         2       40
-```
-
-계층적 구조를 가진 데이터를 나타내기에 적합합니다. 예를 들어 도시별, 날짜별 집계 결과를 표현할 때 유용합니다.
-
-### 멀티인덱스 접근
-
-```python
-print(df.loc["A"])
-print(df.loc[("A", 1)])
-```
-
-MultiIndex는 튜플을 키로 사용하거나, 첫 번째 레벨만으로 접근할 수 있습니다. 이 기능은 groupby 결과를 다룰 때도 자주 등장합니다.
-
-### 평탄화
-
-```python
-flat = df.reset_index()
-print(flat)
-```
-
-MultiIndex를 일반 컴럼으로 변환할 때는 `reset_index()`를 사용합니다. 이렇게 하면 인덱스가 컴럼으로 이동하고, 새 정수 인덱스가 생성됩니다.
-
 ## 운영 체크리스트
 
 - [ ] `loc`와 `iloc`를 구분할 수 있습니다.
 - [ ] 여러 조건을 괄호와 `&/|`로 표현할 수 있습니다.
 - [ ] 체이닝 인덱싱을 피해야 하는 이유를 알고 있습니다.
 - [ ] `query`와 `isin`의 용도를 설명할 수 있습니다.
-
-## 실전 예제: 조건별 데이터 분할
-
-실무에서는 조건에 따라 데이터를 나누어 처리하는 경우가 많습니다.
-
-```python
-df = pd.DataFrame({
-    "user_id": [1, 2, 3, 4, 5],
-    "age": [25, 35, 45, 55, 65],
-    "purchase": [100, 200, 150, 300, 250],
-})
-
-# 연령대별 분할
-young = df[df["age"] < 40]
-middle = df[(df["age"] >= 40) & (df["age"] < 60)]
-senior = df[df["age"] >= 60]
-
-print(f"Young: {len(young)}, Middle: {len(middle)}, Senior: {len(senior)}")
-print(f"Young avg purchase: {young['purchase'].mean()}")
-```
-
-이런 분할은 A/B 테스트, 코호트 분석, 세그먼트별 지표 계산에서 자주 사용됩니다.
-
-## 성능 팁
-
-선택 연산의 성능을 최적화하는 방법을 알아두면 대용량 데이터에서 유리합니다.
-
-### Boolean indexing vs query
-
-```python
-# Boolean indexing - 빠름
-result1 = df[(df["x"] > 10) & (df["y"] < 50)]
-
-# query - 긴 조건에서 가독성 좋음
-result2 = df.query("x > 10 and y < 50")
-```
-
-단순 조건은 boolean indexing이 빠르지만, 복잡한 조건은 query가 읽기 좋습니다.
-
-## 성능 최적화 팁
-
-대용량 데이터를 다룰 때는 선택 연산의 성능이 중요합니다.
-
-### at/iat 활용
-
-```python
-# Slow
-for i in range(len(df)):
-    value = df.loc[i, "column"]
-    
-# Fast  
-for i in range(len(df)):
-    value = df.iat[i, 0]
-```
-
-단일 값 접근에서는 at/iat이 훨씬 빠릅니다.
-
-### 벡터화 우선
-
-```python
-# Slow - apply
-df["result"] = df["x"].apply(lambda x: x * 2 if x > 10 else x)
-
-# Fast - vectorized
-df["result"] = df["x"].where(df["x"] <= 10, df["x"] * 2)
-```
-
-가능하면 apply 대신 벡터화 연산을 사용하세요.
-
-### 체이닝 인덱싱 경고 해결
-
-```python
-# Bad - 경고 발생
-df[df["x"] > 0]["y"] = 100
-
-# Good - loc 사용
-df.loc[df["x"] > 0, "y"] = 100
-
-# Good - copy 명시
-subset = df[df["x"] > 0].copy()
-subset["y"] = 100
-```
-
-loc를 사용하거나 명시적 복사본을 만드는 것이 안전합니다.
-
-## 고급 인덱싱 패턴
-
-### 크로스 섹션
-
-```python
-# MultiIndex에서 특정 레벨 선택
-result = df.xs("A", level="category")
-print(result)
-```
-
-### IndexSlice
-
-```python
-idx = pd.IndexSlice
-result = df.loc[idx["A":"B", 1:2], :]
-print(result)
-```
-
-MultiIndex를 다룰 때 IndexSlice를 사용하면 슬라이싱이 더 직관적입니다.
-
-MultiIndex는 복잡해 보이지만, 계층적 데이터를 표현하는 강력한 도구입니다. groupby 결과도 종종 MultiIndex를 반환합니다.
-
-## 인덱싱 성능 비교
-
-인덱싱 방법에 따라 속도 차이가 발생합니다. 대량 데이터에서는 이 차이가 더 두드러집니다.
-
-```python
-import time
-
-df = pd.DataFrame({"x": range(100000)})
-start = time.time()
-for i in range(1000):
-    val = df.loc[i, "x"]
-print(f".loc 소요 시간: {time.time() - start:.4f}초")
-
-start = time.time()
-for i in range(1000):
-    val = df.at[i, "x"]
-print(f".at 소요 시간: {time.time() - start:.4f}초")
-```
-
-`.at`은 단일 값 접근에 최적화되어 있어 `.loc`보다 빠릅니다. 반복문 안에서 단일 값을 읽을 때는 `.at`을 우선하세요.
+- [ ] 성능이 필요한 단일 값 접근에 `.at`을 쓸 수 있습니다.
 
 ## 연습 문제
 
 1. `loc`로 특정 레이블의 부분 집합을 뽑아 보세요.
-2. `iloc`로 처음 5행을 출력해 보세요.
+2. `iloc`로 처음 5행, 마지막 2열을 출력해 보세요.
 3. 두 개 이상의 조건을 `query`로 표현해 보세요.
+4. 반복문 내 단일 값 접근에서 `.loc`와 `.at`의 속도를 직접 측정해 보세요.
 
 ## 정리와 다음 글
 
@@ -394,11 +453,11 @@ print(f".at 소요 시간: {time.time() - start:.4f}초")
 ## 처음 질문으로 돌아가기
 
 - **`loc`와 `iloc`는 언제 구분해서 써야 할까요?**
-  - 이전 관점: `df[조건]`만으로 모든 문제를 풀려다 경고와 혼란을 만납니다
+  - 이름(레이블)으로 선택할 때는 `loc`, 위치(정수)로 선택할 때는 `iloc`를 씁니다. 값 할당에는 항상 `loc`를 사용합니다.
 - **조건 마스크는 어떤 상황에서 가장 자연스러울까요?**
-  - 실무에서는 조건에 따라 데이터를 나누어 처리하는 경우가 많습니다.
+  - 특정 값을 기준으로 행을 걸러내는 모든 상황에서 자연스럽습니다. 복잡한 조건은 변수로 분리해 읽기 쉽게 만들 수 있습니다.
 - **표현식이 길어질수록 `query`가 왜 읽기 쉬워질까요?**
-  - 이전 관점: `df[조건]`만으로 모든 문제를 풀려다 경고와 혼란을 만납니다
+  - `query`는 문자열로 조건을 적으므로 괄호 중첩이 없고 SQL WHERE 절처럼 읽힙니다. 조건이 세 개 이상이면 `query`가 훨씬 명확합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -30,8 +30,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 Frontend Development 101 시리즈의 아홉 번째 글입니다. 여기서는 빌드 도구를 단순한 개발 편의 기능이 아니라 사용자 경험을 결정하는 성능 계층으로 설명합니다. 번들의 모양은 사용자가 첫 화면을 얼마나 빨리 보는지를 좌우합니다.
 
-프론트엔드 코드는 개발할 때는 수십, 수백 개 파일로 흩어져 있습니다. 그런데 사용자의 브라우저는 그 모든 구조를 그대로 이해하지 않습니다. 결국 누군가는 import 그래프를 따라가고, 필요한 코드를 변환하고, 묶고, 쪼개고, 캐시 가능한 형태로 내보내야 합니다. 그 역할을 맡는 것이 빌드 도구입니다.
-
 ![Frontend Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-diagram.ko.png)
 *Frontend Development 101 9장 흐름 개요*
 
@@ -45,13 +43,7 @@ last_reviewed: '2026-05-12'
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
-번들 크기는 결국 사용자가 직접 지불합니다. 개발자 노트북에서는 가볍게 보이는 1MB JavaScript가 느린 네트워크 환경에서는 몇 초의 빈 화면이 될 수 있습니다. 빌드 도구를 이해하지 못하면 왜 제품이 점점 무거워지는지도 설명하기 어렵습니다.
-
-좋은 번들은 작고, 캐시 가능하고, 적절히 분할되어 있습니다. 이 세 가지를 만족시키는 방향으로 빌드 파이프라인을 설계해야 합니다.
-
 ## 개념 한눈에 보기
-
-소스 코드는 그대로 배포되지 않습니다. 모듈 해석, 변환, 번들링을 거쳐 브라우저가 이해할 수 있는 최종 산출물로 바뀝니다.
 
 | 용어 | 뜻 | 실무에서 왜 중요한가 |
 |---|---|---|
@@ -61,30 +53,38 @@ last_reviewed: '2026-05-12'
 | Source map | 빌드된 코드와 원본 코드의 대응 관계를 담은 정보입니다. | 디버깅에는 유용하지만, 배포 설정을 잘못하면 코드 노출 위험이 생깁니다. |
 | HMR | 전체 새로고침 없이 개발 중 변경분만 반영하는 기능입니다. | 개발 속도를 높이지만, 개발 환경과 운영 환경을 구분해서 보게 해 줍니다. |
 
-## 수동 스크립트 관리에서 빌드 파이프라인으로
-
-프론트엔드 빌드 도구의 핵심 가치는 단순한 편의성이 아니라 성능과 배포 품질을 통제 가능하게 만든다는 점입니다. 스크립트 순서를 손으로 맞추던 시대와 달리, 지금은 도구가 의존성 그래프를 기준으로 최적화까지 담당합니다.
-
-| 방식 | 파일 관리 방식 | 실무 영향 |
-|---|---|---|
-| 수동 `<script>` 관리 | 실행 순서와 의존성을 사람이 직접 맞춥니다. | 프로젝트가 커질수록 순서 오류와 중복 로딩 위험이 커집니다. |
-| 번들러 기반 파이프라인 | import 그래프를 읽어 빌드와 분할을 자동화합니다. | 캐시, 코드 분할, 환경별 빌드 같은 운영 성능 전략을 적용하기 쉽습니다. |
+## 번들러가 하는 일
 
 **Before (수십 개 `<script>` 태그)**
 
 ```html
-<script src="utils.js"></script>
-<script src="auth.js"></script>
-<script src="app.js"></script>
+<!-- 의존성 순서를 사람이 직접 관리 -->
+<script src="vendor/lodash.js"></script>
+<script src="vendor/react.js"></script>
+<script src="src/utils.js"></script>
+<script src="src/components/Button.js"></script>
+<script src="src/app.js"></script>
+<!-- 하나라도 순서가 틀리면 오류 -->
 ```
 
 **After (`<script>` 하나 + 자동 분할)**
 
 ```html
+<!-- 번들러가 의존성 그래프를 분석해 최적화 -->
+<script type="module" src="/dist/vendor-[hash].js"></script>
 <script type="module" src="/dist/index-[hash].js"></script>
+<!-- 파일명에 해시가 붙어 캐시 가능 -->
 ```
 
-이 차이를 이해하면 번들 분석, 코드 분할, 정적 자산 캐시 같은 성능 주제가 더 이상 추상적인 최적화가 아니라 자연스러운 운영 과제로 보입니다.
+번들러가 실제로 하는 일:
+```
+1. import/require 문을 따라 의존성 그래프 구성
+2. TypeScript/JSX → JavaScript 변환
+3. 사용하지 않는 코드 제거 (tree shaking)
+4. 여러 파일을 하나 또는 여러 청크로 합치기
+5. 파일명에 내용 해시 추가 (캐시 버스팅)
+6. CSS, 이미지 등 자산 처리
+```
 
 ## 실습: 개발 빌드 도구를 5단계로 익히기
 
@@ -95,20 +95,70 @@ npm create vite@latest my-app -- --template react-ts
 cd my-app && npm install
 ```
 
+Vite가 빠른 이유:
+- 개발 서버: 네이티브 ESM으로 서빙 (번들링 없음, 파일 단위 변경 반영)
+- 프로덕션 빌드: Rollup 사용 (성숙한 tree shaking, code splitting)
+- 변환: esbuild 사용 (Go로 작성되어 Babel보다 10~100배 빠름)
+
 ### 2단계 — Dev server (HMR)
 
 ```bash
 npm run dev
 # Browser: http://localhost:5173
-# The page updates *automatically* on code changes
+# 코드 변경 시 페이지 전체 새로고침 없이 해당 모듈만 교체
+```
+
+```javascript
+// vite.config.ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 5173,
+    // API 프록시: CORS 없이 백엔드 API 호출
+    proxy: {
+      "/api": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+      },
+    },
+  },
+});
 ```
 
 ### 3단계 — Production build
 
 ```bash
 npm run build
-# Static files appear in dist/
+# TypeScript 체크 → Rollup 번들링 → 파일 생성
+
 ls -lh dist/assets
+# index-[hash].js     크기 확인
+# vendor-[hash].js    vendor 청크 (React, react-dom 등)
+# index-[hash].css    스타일
+```
+
+```javascript
+// vite.config.ts - 프로덕션 최적화
+export default defineConfig({
+  build: {
+    // 청크 분리 전략
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React 관련을 vendor 청크로 분리 (캐시 효율 향상)
+          "react-vendor": ["react", "react-dom"],
+          // 라우터 분리
+          "router": ["react-router-dom"],
+        },
+      },
+    },
+    // 청크 크기 경고 기준 (kB)
+    chunkSizeWarningLimit: 500,
+  },
+});
 ```
 
 ### 4단계 — Bundle analysis
@@ -120,71 +170,256 @@ npm install -D rollup-plugin-visualizer
 ```javascript
 // vite.config.ts
 import { visualizer } from "rollup-plugin-visualizer";
-export default {
-  plugins: [visualizer({ open: true })],
-};
+
+export default defineConfig({
+  plugins: [
+    react(),
+    // 빌드 완료 후 브라우저에서 번들 시각화 열기
+    visualizer({
+      open: true,
+      gzipSize: true,
+      brotliSize: true,
+      filename: "dist/stats.html",
+    }),
+  ],
+});
 ```
 
-빌드가 끝나면 어떤 모듈이 큰지 시각적으로 확인합니다.
+번들 분석 시 확인할 것:
+```
+- 가장 큰 모듈이 무엇인가? (lodash 전체를 가져오지 않았는가?)
+- vendor 청크와 앱 청크가 적절히 분리됐는가?
+- 라우트별 lazy loading이 실제 별도 파일을 만들었는가?
+- 이미지나 폰트가 불필요하게 번들에 포함됐는가?
+```
 
 ### 5단계 — Environment variables and modes
 
 ```bash
+# .env                  모든 환경 기본값
+# .env.development      개발 환경 (npm run dev)
+# .env.production       프로덕션 환경 (npm run build)
+# .env.staging          스테이징 환경
+
 # .env.production
 VITE_API_URL=https://api.example.com
-
-# In code
-const url = import.meta.env.VITE_API_URL;
+VITE_ANALYTICS_ID=GA-XXXXXXXXX
 ```
 
-실무에서는 3단계와 4단계가 특히 중요합니다. 개발 서버가 빠르다고 해서 프로덕션 번들도 좋다고 자동으로 보장되지는 않습니다. 결국 `dist/` 안에 무엇이 만들어졌는지 직접 보는 습관이 필요합니다.
+```typescript
+// src/config.ts
+// VITE_ 접두사가 있어야 클라이언트에 노출됨
+const config = {
+  apiUrl:      import.meta.env.VITE_API_URL      ?? "http://localhost:3000",
+  analyticsId: import.meta.env.VITE_ANALYTICS_ID ?? "",
+  isDev:       import.meta.env.DEV,
+  isProd:      import.meta.env.PROD,
+};
 
-## 검증 포인트
+export default config;
+```
 
-- `npm run build` 뒤에 `dist/assets`에 해시가 붙은 파일이 생성되는지 확인합니다.
-- 번들 분석 도구에서 가장 큰 모듈을 확인하고, `VITE_API_URL`이 빌드 모드별로 다르게 들어가는지 확인합니다.
+## Tree Shaking 이해하기
 
-## 문제가 생기면 먼저 볼 것
+```javascript
+// utils.js - 모든 함수를 named export로 제공
+export function formatDate(date) { ... }     // 사용함
+export function formatCurrency(n) { ... }   // 사용함
+export function formatPhoneNumber(s) { ... } // 미사용
 
-- 환경 변수가 비어 있으면 `VITE_` 접두사와 `.env.production` 위치를 먼저 확인합니다.
-- 번들이 예상보다 크면 전체 라이브러리 import, 큰 이미지, source map 노출 여부를 점검합니다.
+// app.js
+import { formatDate, formatCurrency } from "./utils";
+// 번들러가 formatPhoneNumber는 사용 안 됨을 감지 → 제거
+
+// 잘못된 패턴: 전체 import
+import * as utils from "./utils";   // 모든 함수가 번들에 포함됨
+import _ from "lodash";              // lodash 전체 (70KB+)
+
+// 올바른 패턴: named import
+import { formatDate } from "./utils";
+import { debounce } from "lodash-es"; // ES Module 버전 lodash
+```
+
+## 코드 분할 패턴
+
+```jsx
+// src/App.tsx - 라우트별 lazy loading
+import { lazy, Suspense } from "react";
+import { Routes, Route } from "react-router-dom";
+
+// 각 페이지가 별도 청크로 분리됨
+const Dashboard  = lazy(() => import("./pages/Dashboard"));
+const Settings   = lazy(() => import("./pages/Settings"));
+const Analytics  = lazy(() => import("./pages/Analytics"));
+
+// 공통 로딩 컴포넌트
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center h-64">
+      <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route
+        path="/dashboard"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <Dashboard />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <Settings />
+          </Suspense>
+        }
+      />
+    </Routes>
+  );
+}
+```
+
+## 디버깅 시나리오
+
+### 시나리오 1: 번들이 예상보다 클 때
+
+```bash
+# 1. 번들 분석 실행
+npm run build
+# vite.config.ts에 visualizer 플러그인 있다면 자동으로 stats.html 열림
+
+# 2. 가장 큰 모듈 찾기
+npx source-map-explorer "dist/assets/*.js"
+
+# 3. 의심 모듈 크기 확인
+npx bundlephobia moment     # moment.js: 67.9KB (gzip)
+npx bundlephobia dayjs      # dayjs:      2.2KB (gzip) ← 대안
+```
+
+### 시나리오 2: 환경 변수가 undefined일 때
+
+```typescript
+// 잘못된 접근
+process.env.VITE_API_URL  // undefined! (Vite는 process.env 미지원)
+
+// 올바른 접근
+import.meta.env.VITE_API_URL  // Vite 전용 환경 변수
+
+// TypeScript 타입 선언
+// src/vite-env.d.ts
+interface ImportMetaEnv {
+  readonly VITE_API_URL:      string;
+  readonly VITE_ANALYTICS_ID: string;
+}
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+```
+
+### 시나리오 3: 개발 서버와 프로덕션 동작이 다를 때
+
+```bash
+# 개발 서버는 ESM 직접 서빙, 프로덕션은 번들된 파일
+# 반드시 빌드 후 로컬에서 확인
+
+npm run build
+npx serve -s dist  # -s: SPA fallback 활성화
+
+# 또는 Vite preview
+npm run preview    # dist/ 폴더를 정적 서버로 서빙
+```
 
 ## 실무 점검 루프
-
-빌드 도구는 추상적으로 들리지만, 실제 산출물을 열어 보는 순간부터 성능 문제가 훨씬 구체적으로 보이기 시작합니다.
 
 1. **프로덕션 빌드를 봅니다.** 개발 서버를 믿지 말고 실제 `dist` 산출물을 먼저 확인합니다.
 2. **가장 큰 자산을 찾습니다.** 소스 코드를 고치기 전에 어떤 파일이 실제로 무거운지부터 확인합니다.
 3. **청크 의도를 확인합니다.** 라우트 단위 lazy loading이 정말 별도 파일을 만들었는지 봅니다.
 
 ```bash
-npm run build
-ls -lh dist/assets
+npm run build && ls -lh dist/assets
 # 더 깊게 보고 싶다면
 npx source-map-explorer "dist/assets/*.js"
 ```
 
-기대 결과는 어떤 산출물이 큰지, 파일명이 캐시 친화적인지, 코드 분할이 실제로 일어났는지를 숫자로 말할 수 있는 상태입니다. 이 감각이 있어야 최적화가 감이 아니라 측정 기반 작업이 됩니다.
+## 자주 하는 실수
 
-## 이 코드에서 주목할 점
-
-- 개발 서버는 ESM을 직접 서빙하므로 초기 부팅이 빠릅니다.
-- 빌드 산출물 파일명에는 해시가 붙어 장기 캐시에 유리합니다.
-- 번들 분석은 최적화 출발점이지 마지막 단계가 아닙니다.
-
-## 자주 하는 실수 5가지
-
-1. **`import * as _ from "lodash"`처럼 전체 라이브러리를 가져옵니다.** 필요한 함수만 import해야 번들이 가벼워집니다.
-2. **개발 서버와 프로덕션 빌드가 같다고 가정합니다.** HMR 코드와 source map은 프로덕션에 그대로 가면 부담이 됩니다.
-3. **번들 분석을 한 번도 하지 않습니다.** 어떤 라이브러리가 4MB를 차지하는지 모른 채 배포하게 됩니다.
-4. **프로덕션에 source map을 그대로 노출합니다.** 원본 코드가 지나치게 쉽게 읽힐 수 있습니다.
-5. **최적화되지 않은 이미지를 함께 번들링합니다.** 1MB 이미지는 그대로 사용자에게 전달됩니다.
+| 실수 | 증상 | 올바른 방법 |
+|---|---|---|
+| `import * as _ from "lodash"` | lodash 전체(70KB+)가 번들에 포함 | `import { debounce } from "lodash-es"`로 named import |
+| 개발 서버 = 프로덕션 가정 | 빌드 시 오류 또는 동작 차이 | 반드시 `npm run build` 후 `npm run preview`로 확인 |
+| 번들 분석 미실시 | 어떤 라이브러리가 4MB 차지하는지 모름 | 첫 배포 전 반드시 visualizer 또는 source-map-explorer 실행 |
+| 프로덕션에 source map 노출 | 원본 코드가 브라우저에서 보임 | `build.sourcemap: false` 또는 서버에서 .map 파일 접근 차단 |
+| 이미지 최적화 없이 번들 | 1MB 이미지가 그대로 사용자에게 전달 | vite-imagetools 또는 별도 CDN으로 이미지 처리 |
+| VITE_ 접두사 없이 환경 변수 | 브라우저에서 `undefined` | 클라이언트 환경 변수는 반드시 `VITE_` 접두사 |
 
 ## 실무에서는 이렇게 보입니다
 
-새 프로젝트는 대체로 Vite, esbuild, SWC 계열 스택을 채택합니다. 더 큰 모노레포는 Turbopack이나 Rspack 같은 차세대 번들러로 이동하는 흐름도 보입니다. Webpack은 여전히 널리 남아 있지만, 새 프로젝트의 기본 선택지에서는 조금씩 멀어지고 있습니다.
+새 프로젝트는 대체로 Vite, esbuild, SWC 계열 스택을 채택합니다.
 
-중요한 것은 도구 이름이 아니라 운영 습관입니다. 번들 크기를 예산처럼 관리하고, 라이브러리를 추가하기 전에 비용을 확인하고, 이미지와 폰트도 별도 최적화 파이프라인으로 보는 감각이 필요합니다.
+```bash
+# 번들 크기를 예산처럼 관리하는 CI 설정 예시
+# package.json
+{
+  "scripts": {
+    "build": "vite build",
+    "size-check": "bundlesize"
+  },
+  "bundlesize": [
+    {
+      "path": "./dist/assets/index-*.js",
+      "maxSize": "150 kB"  // 초과 시 CI 실패
+    },
+    {
+      "path": "./dist/assets/vendor-*.js",
+      "maxSize": "300 kB"
+    }
+  ]
+}
+```
+
+```javascript
+// 실무 vite.config.ts 전체 예시
+import { defineConfig, loadEnv } from "vite";
+import react from "@vitejs/plugin-react";
+import { visualizer } from "rollup-plugin-visualizer";
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+
+  return {
+    plugins: [
+      react(),
+      mode === "analyze" && visualizer({ open: true, gzipSize: true }),
+    ].filter(Boolean),
+
+    build: {
+      sourcemap: mode !== "production",  // 프로덕션에서 source map 비활성화
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            "react-vendor": ["react", "react-dom"],
+            "router":       ["react-router-dom"],
+            "query":        ["@tanstack/react-query"],
+          },
+        },
+      },
+    },
+
+    server: {
+      proxy: {
+        "/api": { target: env.BACKEND_URL, changeOrigin: true },
+      },
+    },
+  };
+});
+```
 
 ## 시니어 엔지니어는 이렇게 생각합니다
 
@@ -201,12 +436,14 @@ npx source-map-explorer "dist/assets/*.js"
 - [ ] `dist/` 안의 산출물을 직접 살펴봤습니다.
 - [ ] 번들 분석 도구를 한 번 실행해 봤습니다.
 - [ ] 환경 변수로 개발과 프로덕션을 분리할 수 있습니다.
+- [ ] tree shaking과 named import의 관계를 이해합니다.
 
 ## 연습 문제
 
 1. Vite로 React 프로젝트를 만들고 `npm run build` 후 `dist` 폴더를 살펴보세요.
 2. 번들 분석 도구를 적용해 가장 큰 모듈이 무엇인지 적어 보세요.
 3. lodash 전체 import와 함수 단위 import를 비교해 번들 크기 차이를 측정해 보세요.
+4. 라우트 두 개를 lazy loading으로 분리하고, Network 탭에서 별도 청크 파일로 내려오는지 확인해 보세요.
 
 ## 정리 및 다음 단계
 
@@ -217,11 +454,11 @@ npx source-map-explorer "dist/assets/*.js"
 ## 처음 질문으로 돌아가기
 
 - **번들러는 import 그래프를 따라 어떤 일을 할까요?**
-  - 번들러는 import 그래프를 따라 어떤 일을 할까요에 대해 본문에서 실무 예시와 함께 답합니다.
+  - 엔트리 파일부터 import를 재귀적으로 따라가며 의존성 그래프를 구성하고, 변환·최적화·분할 과정을 거쳐 브라우저가 이해할 수 있는 파일로 출력합니다.
 - **Vite와 esbuild는 왜 빠르다고 평가될까요?**
-  - Vite와 esbuild는 빠르다고 평가될까요 — 이 글에서 근거와 함께 설명합니다.
+  - Vite 개발 서버는 번들링 없이 네이티브 ESM으로 파일을 직접 서빙하고, esbuild는 Go로 작성돼 JavaScript 기반 툴보다 10~100배 빠른 변환을 제공합니다.
 - **tree shaking과 dead code elimination은 어떤 비용을 줄여 줄까요?**
-  - tree shaking과 dead code elimination은 어떤 비용을 줄여 줄까요에 대해 본문에서 실무 예시와 함께 답합니다.
+  - 실제로 사용하지 않는 코드를 번들에서 제거해 초기 로딩 시간을 줄입니다. lodash 전체를 가져오면 70KB+지만 필요한 함수만 가져오면 수 KB로 줄어들 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

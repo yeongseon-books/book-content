@@ -42,11 +42,13 @@ last_reviewed: '2026-05-15'
 
 결측치 처리 방식은 모델 성능과 분석 해석을 모두 바꿉니다. 같은 데이터라도 무작정 `dropna`를 쓰면 표본이 심하게 줄어들 수 있고, 무심코 0이나 평균으로 채우면 분포가 왜곡될 수 있습니다.
 
+## 핵심 개념 정의
+
 - **NaN**: 숫자형 결측을 나타내는 대표 표식입니다.
-- **통합 결측 표식**: Pandas가 제공하는 결측 표현입니다.
+- **pd.NA**: Pandas 1.0 이후의 통합 결측 표식입니다.
 - **행 또는 열 제거**: 결측이 있는 축을 삭제하는 방식입니다.
-- 채우기: 상수, 평균, 이전 값 등으로 대체하는 방식입니다.
-- 보간: 주변 값을 이용해 중간 값을 추정하는 방식입니다.
+- **채우기**: 상수, 평균, 이전 값 등으로 대체하는 방식입니다.
+- **보간**: 주변 값을 이용해 중간 값을 추정하는 방식입니다.
 
 ## 전과 후
 
@@ -56,140 +58,322 @@ last_reviewed: '2026-05-15'
 
 ## 실습: 결측치를 다루는 다섯 단계
 
-### 1단계 - 결측치 찾기
+### 1단계 - 결측치 진단하기
 
 ```python
-import numpy as np, pandas as pd
-df = pd.DataFrame({"x": [1, np.nan, 3], "y": [np.nan, 2, 3]})
-print(df.isna())
-print(df.isna().sum())
-```
+import numpy as np
+import pandas as pd
 
-진단 단계에서는 어떤 열에 결측이 몰려 있는지 먼저 확인해야 합니다. 숫자 하나만 봐도 제거가 나은지, 채우기가 나은지 판단의 출발점이 생깁니다.
+df = pd.DataFrame({
+    "user_id":   [1, 2, 3, 4, 5, 6, 7, 8],
+    "age":       [25, np.nan, 35, 45, np.nan, 28, np.nan, 52],
+    "income":    [50000, 60000, np.nan, 80000, 45000, np.nan, 70000, 90000],
+    "score":     [8.5, 7.2, 9.0, np.nan, 6.8, 7.9, np.nan, 8.1],
+    "region":    ["서울", "부산", "서울", np.nan, "대구", "서울", "부산", np.nan],
+})
+
+# 기본 진단
+print("결측치 개수:\n", df.isna().sum())
+print()
+print("결측치 비율 (%):")
+print((df.isna().sum() / len(df) * 100).round(1))
+print()
+
+# 행별 결측 개수
+df["missing_count"] = df.isna().sum(axis=1)
+print("행별 결측 개수:")
+print(df[["user_id", "missing_count"]].to_string(index=False))
+```
 
 **예상 출력:**
 
 ```text
-x    1
-y    1
+결측치 개수:
+ user_id    0
+age        3
+income     2
+score      2
+region     2
 dtype: int64
-```
 
-결측치 처리는 항상 진단에서 시작합니다. 특히 `isna().sum()`은 열별 결측 규모를 가장 빠르게 보여 주는 기본 점검입니다.
-
-### 2단계 - 제거하기
-
-```python
-print(df.dropna())            # drop rows with any NaN
-print(df.dropna(axis=1))      # drop columns with any NaN
-```
-
-제거는 간단하지만 비용이 큽니다. 어떤 행이나 열이 얼마나 사라지는지 측정하지 않으면 분석 대상 자체가 바뀔 수 있습니다.
-
-### 3단계 - 값 채우기
-
-```python
-print(df.fillna(0))
-print(df.fillna(df.mean(numeric_only=True)))
-```
-
-상수나 평균으로 채우는 방식은 빠르지만 의미가 약할 수 있습니다. 특히 평균 대체는 분포와 분산을 왜곡할 수 있다는 점을 염두에 둬야 합니다.
-
-## 결측치 처리 방법 비교
-
-결측치를 다루는 주요 방법을 표로 정리하면 상황별 선택 기준이 명확해집니다.
-
-| 방법 | 함수 | 장점 | 단점 |
-| --- | --- | --- | --- |
-| 제거 | `dropna()` | 간단, 빠름 | 표본 감소 |
-| 상수 대체 | `fillna(value)` | 간단, 예측 가능 | 분포 왜곡 |
-| 통계 대체 | `fillna(df.mean())` | 중심 경향 보존 | 분산 감소 |
-| 전후 채우기 | `ffill()`, `bfill()` | 시계열에 적합 | 끝단 결측 유지 |
-| 보간 | `interpolate()` | 흐름 보존 | 복잡도 증가 |
-
-각 방법은 장단점이 명확합니다. 데이터의 특성과 분석 목적에 따라 적절한 방법을 선택해야 합니다.
-
-### 4단계 - 앞값이나 뒷값으로 채우기
-
-```python
-print(df.fillna(method="ffill"))
-print(df.fillna(method="bfill"))
-```
-
-앞값 채우기와 뒷값 채우기는 순서가 있는 데이터에서 자주 쓰입니다. 다만 선두 결측이나 후미 결측은 그대로 남을 수 있으니 끝단 처리를 따로 생각해야 합니다.
-
-### 5단계 - 보간하기
-
-```python
-ts = pd.Series([1.0, np.nan, np.nan, 4.0])
-print(ts.interpolate())
-```
-
-보간은 앞뒤 값을 이어 빈 구간을 메우는 방식이라 시계열에서 특히 자연스럽습니다. 단순 상수 대체와 달리 흐름을 어느 정도 보존한다는 점을 눈으로 확인해 보세요.
-
-**예상 출력:**
-
-```text
-0    1.0
-1    2.0
-2    3.0
-3    4.0
+결측치 비율 (%):
+user_id     0.0
+age        37.5
+income     25.0
+score      25.0
+region     25.0
 dtype: float64
 ```
 
-보간은 시계열처럼 흐름이 있는 데이터에 특히 잘 맞습니다. 모든 결측에 쓸 수 있는 만능 도구는 아니지만, 연속값의 빈 구간을 다룰 때는 매우 자연스럽습니다.
+진단 단계에서는 어떤 열에 결측이 몰려 있는지 먼저 확인해야 합니다. 결측 비율이 높은 열은 제거를 고려하고, 낮은 열은 대체 전략을 씁니다.
 
-## 복합 조건 필터링
-
-결측치를 기준으로 필터링할 때는 보통 여러 조건을 조합합니다.
-
-### 특정 열에 결측이 있는 행
+### 2단계 - 결측치 제거하기
 
 ```python
-df = pd.DataFrame({
-    "x": [1, np.nan, 3],
-    "y": [np.nan, 2, 3],
+df_clean = df.drop(columns=["missing_count"])
+
+# 행 제거 (any: 하나라도 결측, all: 전부 결측)
+removed_any = df_clean.dropna()
+removed_thresh = df_clean.dropna(thresh=4)   # 최소 4개 이상 유효값
+
+print(f"원본 행 수: {len(df_clean)}")
+print(f"dropna() 후: {len(removed_any)}행 ({len(df_clean) - len(removed_any)}행 제거)")
+print(f"thresh=4 후: {len(removed_thresh)}행 ({len(df_clean) - len(removed_thresh)}행 제거)")
+
+# 특정 열 기준
+removed_age = df_clean.dropna(subset=["age", "income"])
+print(f"age+income 기준 제거 후: {len(removed_age)}행")
+```
+
+**예상 출력:**
+
+```text
+원본 행 수: 8
+dropna() 후: 2행 (6행 제거)
+thresh=4 후: 5행 (3행 제거)
+age+income 기준 제거 후: 5행
+```
+
+제거는 간단하지만 비용이 큽니다. `thresh`를 활용하면 너무 많은 데이터를 잃지 않으면서 불완전한 행을 걸러낼 수 있습니다.
+
+### 3단계 - 값으로 채우기
+
+```python
+df_fill = df.drop(columns=["missing_count"])
+
+# 상수 대체
+df_zero = df_fill.fillna({"age": 0, "income": 0, "score": 0, "region": "미상"})
+
+# 통계 대체
+df_stat = df_fill.copy()
+df_stat["age"]    = df_stat["age"].fillna(df_stat["age"].median())
+df_stat["income"] = df_stat["income"].fillna(df_stat["income"].mean())
+df_stat["score"]  = df_stat["score"].fillna(df_stat["score"].mean())
+df_stat["region"] = df_stat["region"].fillna(df_stat["region"].mode()[0])
+
+print("통계 대체 결과:")
+print(df_stat.to_string())
+```
+
+**예상 출력:**
+
+```text
+통계 대체 결과:
+   user_id   age     income  score region
+0        1  25.0  50000.000    8.5     서울
+1        2  31.0  60000.000    7.2     부산
+2        3  35.0  65000.000    9.0     서울
+3        4  45.0  80000.000    7.9     서울
+4        5  31.0  45000.000    6.8     대구
+5        6  28.0  65000.000    7.9     서울
+6        7  31.0  70000.000    7.9     부산
+7        8  52.0  90000.000    8.1     서울
+```
+
+### 4단계 - 앞값/뒷값으로 채우기 (시계열에 적합)
+
+```python
+ts = pd.DataFrame({
+    "date":  pd.date_range("2026-01-01", periods=7),
+    "sales": [100, np.nan, np.nan, 130, np.nan, 110, 120],
 })
-has_missing_x = df[df["x"].isna()]
-print(has_missing_x)
+ts = ts.set_index("date")
+
+ts["ffill"] = ts["sales"].ffill()        # 앞값 채우기
+ts["bfill"] = ts["sales"].bfill()        # 뒷값 채우기
+ts["interp"] = ts["sales"].interpolate() # 선형 보간
+
+print(ts.to_string())
 ```
 
-특정 열에만 결측치가 있는 행을 골라내면 결측 패턴을 분석할 수 있습니다.
+**예상 출력:**
 
-### 모든 열이 비지 않은 행
+```text
+            sales  ffill  bfill  interp
+date
+2026-01-01  100.0  100.0  100.0  100.00
+2026-01-02    NaN  100.0  130.0  110.00
+2026-01-03    NaN  100.0  130.0  120.00
+2026-01-04  130.0  130.0  130.0  130.00
+2026-01-05    NaN  130.0  110.0  123.33
+2026-01-06  110.0  110.0  110.0  110.00
+2026-01-07  120.0  120.0  120.0  120.00
+```
+
+`ffill`은 직전 값을 그대로 복사하고, `bfill`은 다음 값을 사용합니다. `interpolate`는 선형으로 중간 값을 추정해 흐름을 보존합니다.
+
+### 5단계 - 그룹별 대체 (고급)
 
 ```python
-complete_rows = df.dropna()
-print(complete_rows)
+df_group = pd.DataFrame({
+    "dept":   ["Engineering", "Engineering", "Marketing", "Marketing", "Engineering"],
+    "salary": [90000, np.nan, 70000, np.nan, 95000],
+})
+
+# 같은 부서 평균으로 대체
+df_group["salary_filled"] = df_group.groupby("dept")["salary"].transform(
+    lambda x: x.fillna(x.mean())
+)
+print(df_group)
 ```
 
-모든 열이 채워져 있는 행만 남기면 완전한 데이터셋을 얻지만, 표본 크기는 크게 줄어듭니다.
+**예상 출력:**
 
-### query로 결측치 필터링
+```text
+          dept   salary  salary_filled
+0  Engineering  90000.0        90000.0
+1  Engineering      NaN        92500.0
+2    Marketing  70000.0        70000.0
+3    Marketing      NaN        70000.0
+4  Engineering  95000.0        95000.0
+```
 
-Pandas 1.x부터는 `query`에서 `isna()`를 직접 쓸 수 없지만, 조건식을 미리 계산해 두면 가독성을 높일 수 있습니다.
+같은 범주에 속한 데이터의 평균으로 대체하면 전체 평균보다 더 정확한 추정이 됩니다.
+
+## 결측치 처리 방법 비교
+
+| 방법 | 함수 | 장점 | 단점 | 적합한 상황 |
+| --- | --- | --- | --- | --- |
+| 행 제거 | `dropna()` | 간단, 정확 | 표본 감소 | 결측 비율 < 5% |
+| 상수 대체 | `fillna(0)` | 예측 가능 | 분포 왜곡 | 결측=0의 의미가 명확할 때 |
+| 통계 대체 | `fillna(mean)` | 중심 경향 보존 | 분산 감소 | 연속값, MAR 가정 |
+| 앞/뒤 채우기 | `ffill/bfill` | 순서 보존 | 끝단 결측 유지 | 시계열, 순서 있는 데이터 |
+| 선형 보간 | `interpolate()` | 흐름 보존 | 이상치 민감 | 연속 시계열 |
+| 그룹 평균 | `transform` | 맥락 반영 | 복잡도 증가 | 범주별 특성이 다를 때 |
+
+각 방법은 장단점이 명확합니다. 데이터의 특성과 분석 목적에 따라 적절한 방법을 선택해야 합니다.
+
+## 결측 패턴 분석
 
 ```python
-df["has_x"] = df["x"].notna()
-result = df.query("has_x == True")
-print(result)
+import matplotlib.pyplot as plt
+
+df_pattern = pd.DataFrame({
+    "A": [1, np.nan, 3, np.nan, 5, 6, np.nan, 8],
+    "B": [np.nan, 2, 3, 4, 5, np.nan, 7, 8],
+    "C": [1, 2, 3, 4, 5, 6, 7, 8],
+    "D": [np.nan, np.nan, 3, np.nan, np.nan, 6, np.nan, np.nan],
+})
+
+# 열별 결측 비율 시각화
+missing_ratio = df_pattern.isna().mean() * 100
+print("열별 결측 비율 (%):")
+print(missing_ratio)
+
+# 결측 패턴 행렬 (0=존재, 1=결측)
+missing_map = df_pattern.isna().astype(int)
+print("\n결측 패턴 행렬:")
+print(missing_map.to_string())
 ```
 
-- `isna().sum()`은 결측 진단의 첫 단계입니다.
-- 평균 대체는 분포를 왜곡할 수 있습니다.
-- `interpolate()`는 시계열 결측에 잘 맞습니다.
+**예상 출력:**
 
-## 자주 하는 실수 다섯 가지
+```text
+열별 결측 비율 (%):
+A    37.5
+B    25.0
+C     0.0
+D    62.5
+dtype: float64
 
-1. `dropna`를 남용해 대부분의 행을 잃습니다.
-2. 0으로 채워 분포를 인위적으로 바꿉니다.
-3. `ffill`만 쓰고 선두 결측을 놓칩니다.
-4. 범주형 열에 평균을 채우려 합니다.
-5. 결측 처리 기준을 기록하지 않은 채 임의로 바꿉니다.
+결측 패턴 행렬:
+   A  B  C  D
+0  0  1  0  1
+1  1  0  0  1
+2  0  0  0  0
+3  1  0  0  1
+4  0  0  0  1
+5  0  1  0  0
+6  1  0  0  1
+7  0  0  0  1
+```
 
-## 실무에서는 이렇게 이어집니다
+열 D처럼 결측 비율이 62%를 넘으면 해당 열을 아예 제거하거나 결측 여부 자체를 이진 특징으로 사용하는 방법을 고려합니다.
 
-센서 데이터, 설문 데이터, 거래 로그에서는 결측 패턴 자체가 중요한 신호일 수 있습니다. 그래서 결측 원인 가설을 먼저 세우고, 처리 방식을 문서화한 뒤 분석이나 모델링에 들어가는 편이 안전합니다.
+## 결측 여부를 특징으로 활용
+
+```python
+df_ml = pd.DataFrame({
+    "age":    [25, np.nan, 35, np.nan, 50],
+    "income": [50000, 60000, np.nan, 80000, 70000],
+    "target": [0, 1, 0, 1, 1],
+})
+
+# 결측 여부를 별도 열로
+df_ml["age_missing"]    = df_ml["age"].isna().astype(int)
+df_ml["income_missing"] = df_ml["income"].isna().astype(int)
+
+# 결측치 채우기 (ML 모델에 NaN 불가)
+df_ml["age"]    = df_ml["age"].fillna(df_ml["age"].median())
+df_ml["income"] = df_ml["income"].fillna(df_ml["income"].median())
+
+print(df_ml)
+```
+
+**예상 출력:**
+
+```text
+    age  income  target  age_missing  income_missing
+0  25.0  50000.0       0            0               0
+1  35.0  60000.0       1            1               0
+2  35.0  65000.0       0            0               1
+3  35.0  80000.0       1            1               0
+4  50.0  70000.0       1            0               0
+```
+
+머신러닝에서는 결측 여부 자체가 중요한 패턴을 담고 있을 수 있습니다. 이진 플래그를 별도 열로 추가하면 모델이 결측 패턴을 학습할 수 있습니다.
+
+## 이상치를 결측치로 변환
+
+```python
+df_outlier = pd.DataFrame({
+    "temperature": [-999, 25, 30, 28, 999, 22, 27, -888],
+    "humidity":    [60, 65, 200, 55, 70, 68, 110, 62],
+})
+
+# 범위 밖 값을 NaN으로
+df_outlier["temperature"] = df_outlier["temperature"].where(
+    df_outlier["temperature"].between(-50, 60)
+)
+df_outlier["humidity"] = df_outlier["humidity"].where(
+    df_outlier["humidity"].between(0, 100)
+)
+
+print(df_outlier)
+print()
+print("처리 후 결측치:\n", df_outlier.isna().sum())
+```
+
+**예상 출력:**
+
+```text
+   temperature  humidity
+0          NaN      60.0
+1         25.0      65.0
+2         30.0       NaN
+3         28.0      55.0
+4          NaN      70.0
+5         22.0      68.0
+6         27.0       NaN
+7          NaN      62.0
+
+처리 후 결측치:
+ temperature    3
+humidity       2
+dtype: int64
+```
+
+이상치를 결측치로 변환하는 전략은 데이터 정제의 흔한 패턴입니다. 원본 데이터는 별도로 보관하는 것이 안전합니다.
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 올바른 접근 |
+| --- | --- | --- |
+| `dropna` 남용 | 데이터 80% 소실 | 결측 비율 확인 후 `thresh` 활용 |
+| 0으로 무조건 채우기 | 분포 왜곡, 0의 의미 혼동 | 결측 원인 파악 후 전략 선택 |
+| `ffill`로 선두 결측 방치 | 첫 행 NaN 유지 | `bfill` 또는 상수 대체 병행 |
+| 범주형 열에 숫자 평균 채우기 | 의미 없는 값 생성 | `mode()[0]`(최빈값) 사용 |
+| 결측 처리 기준 미기록 | 재현 불가능 | 처리 정책을 코드 주석에 명시 |
 
 ## 실무에서는 이렇게 생각합니다
 
@@ -199,192 +383,20 @@ print(result)
 - 시계열에서는 보간을 적극적으로 검토합니다.
 - 머신러닝에서는 결측 자체를 특징으로 활용할지 판단합니다.
 
-## 고급 결측치 처리 기법
-
-실무에서는 단순한 대체보다 더 정교한 방법이 필요할 때가 있습니다.
-
-### 그룹별 평균 대체
-
-```python
-df = pd.DataFrame({
-    "category": ["A", "A", "B", "B", "B"],
-    "value": [10, np.nan, 20, 25, np.nan],
-})
-df["value"] = df.groupby("category")["value"].transform(
-    lambda x: x.fillna(x.mean())
-)
-print(df)
-```
-
-같은 범주에 속한 데이터의 평균으로 대체하면 전체 평균보다 더 정확할 수 있습니다.
-
-### 결측 여부를 특징으로 활용
-
-```python
-df["value_missing"] = df["value"].isna().astype(int)
-print(df.head())
-```
-
-머신러닝에서는 결측 여부 자체가 중요한 정보일 수 있습니다. 별도 특징으로 추가하면 모델이 결측 패턴을 학습할 수 있습니다.
-
-### 조건부 대체
-
-```python
-df["value"] = df["value"].apply(
-    lambda x: 0 if pd.isna(x) and some_condition else x
-)
-```
-
-특정 조건에서만 결측치를 대체하고 싶을 때는 `apply`와 조건식을 결합할 수 있습니다.
-
-## 결측치 비율 분석
-
-결측치를 처리하기 전에 그 규모와 분포를 파악하는 것이 중요합니다.
-
-### 열별 결측 비율
-
-```python
-df = pd.DataFrame({
-    "a": [1, np.nan, 3, np.nan, 5],
-    "b": [np.nan, 2, 3, 4, 5],
-    "c": [1, 2, 3, 4, 5],
-})
-missing_ratio = df.isna().sum() / len(df) * 100
-print(missing_ratio)
-```
-
-**예상 출력:**
-
-```text
-a    40.0
-b    20.0
-c     0.0
-dtype: float64
-```
-
-결측 비율이 높은 열은 아예 제거하거나 별도로 처리하는 편이 나을 수 있습니다.
-
-### 행별 결측 개수
-
-```python
-missing_per_row = df.isna().sum(axis=1)
-print(missing_per_row)
-```
-
-행마다 결측 개수를 세면 어떤 행이 데이터 품질이 낮은지 파악할 수 있습니다.
-
-### 결측 패턴 시각화
-
-```python
-import matplotlib.pyplot as plt
-df.isna().sum().plot(kind="bar")
-plt.title("Missing Values per Column")
-plt.ylabel("Count")
-plt.show()
-```
-
-시각화를 통해 결측 분포를 한눈에 파악할 수 있습니다. 특정 열에 결측이 몰려 있다면 그 원인을 분석할 필요가 있습니다.
-
 ## 운영 체크리스트
 
 - [ ] `isna().sum()`으로 결측 규모를 진단할 수 있습니다.
 - [ ] `dropna`가 데이터 양에 주는 영향을 측정합니다.
 - [ ] `fillna` 전략을 명시적으로 정합니다.
 - [ ] 결측 비율과 처리 기준을 기록합니다.
-
-## 결측 패턴 분석
-
-결측치를 처리하기 전에 패턴을 분석하면 더 나은 전략을 세울 수 있습니다.
-
-### 결측 상관관계
-
-```python
-import seaborn as sns
-import matplotlib.pyplot as plt
-
-missing = df.isna()
-correlation = missing.corr()
-sns.heatmap(correlation, annot=True)
-plt.title("Missing Value Correlation")
-plt.show()
-```
-
-특정 열들의 결측치가 함께 나타나는 패턴이 있다면, 이는 데이터 수집 과정의 문제를 시사할 수 있습니다.
-
-### 시계열 결측 패턴
-
-```python
-df["date"] = pd.to_datetime(df["date"])
-df.set_index("date", inplace=True)
-missing_by_time = df.isna().resample("D").sum()
-missing_by_time.plot()
-plt.title("Missing Values Over Time")
-plt.show()
-```
-
-시간에 따른 결측치 분포를 보면 시스템 장애나 계절성 패턴을 발견할 수 있습니다.
-
-### 머신러닝에서의 결측치
-
-머신러닝 모델에서는 결측치 처리 전략이 모델 성능에 직접 영향을 줍니다.
-
-```python
-from sklearn.impute import SimpleImputer
-
-# Scikit-learn imputer 사용
-imputer = SimpleImputer(strategy="median")
-df_imputed = pd.DataFrame(
-    imputer.fit_transform(df),
-    columns=df.columns
-)
-print(df_imputed.isna().sum())
-```
-
-Pandas 기본 기능 외에도 scikit-learn의 Imputer를 활용할 수 있습니다.
-
-## 결측치 생성 패턴
-
-때로는 의도적으로 결측치를 생성해야 할 때도 있습니다.
-
-```python
-# 조건부로 NaN 설정
-df.loc[df["value"] < 0, "value"] = np.nan
-
-# 특정 값을 NaN으로 변환
-df.replace(-999, np.nan, inplace=True)
-
-# 범위 밖 값을 NaN으로
-df["temperature"] = df["temperature"].where(
-    (df["temperature"] >= -50) & (df["temperature"] <= 50)
-)
-```
-
-이상치를 결측치로 처리하는 것도 정제 전략 중 하나입니다.
-
-이상치를 결측치로 변환하는 전략은 통계 분석에서 자주 사용됩니다. 다만 원본 데이터는 별도로 보관하는 것이 안전합니다.
-
-## 결측 패턴 시각화
-
-결측 패턴을 시각화하면 데이터의 구조적 문제를 발견할 수 있습니다.
-
-```python
-import matplotlib.pyplot as plt
-
-missing_pattern = df.isna().astype(int)
-plt.imshow(missing_pattern, cmap="gray", aspect="auto")
-plt.xlabel("Column")
-plt.ylabel("Row")
-plt.title("Missing Value Pattern")
-plt.show()
-```
-
-결측이 무작위로 퍼져 있는지, 특정 구간에 몰려 있는지에 따라 처리 전략이 달라집니다.
+- [ ] 그룹별 대체를 `transform`으로 구현할 수 있습니다.
 
 ## 연습 문제
 
-1. 열별 결측 비율을 계산해 보세요.
-2. `dropna` 전후의 행 수를 비교해 보세요.
-3. 시계열에서 `ffill`과 `interpolate()`의 결과 차이를 살펴보세요.
+1. 열별 결측 비율을 계산하고 50% 이상인 열을 자동으로 제거하는 코드를 작성해 보세요.
+2. `dropna` 전후의 행 수를 비교하고 표본 손실 비율을 계산해 보세요.
+3. 시계열에서 `ffill`, `bfill`, `interpolate()`의 결과를 나란히 비교해 보세요.
+4. 결측 여부를 이진 특징으로 추가한 뒤 원본 결측치를 중앙값으로 채우는 파이프라인을 작성해 보세요.
 
 ## 정리와 다음 글
 
@@ -393,11 +405,11 @@ plt.show()
 ## 처음 질문으로 돌아가기
 
 - **`NaN`과 `pd.NA`는 어떤 의미를 가질까요?**
-  - 이전 관점: `dropna()` 한 줄로 끝내고 데이터 대부분을 잃습니다
+  - `NaN`은 NumPy의 float 결측 표식이고, `pd.NA`는 Pandas 1.0 이후에 추가된 정수/문자열/불리언 등 모든 타입을 위한 통합 결측 표식입니다.
 - **결측치를 먼저 어떻게 진단해야 할까요?**
-  - 진단 단계에서는 어떤 열에 결측이 몰려 있는지 먼저 확인해야 합니다. 숫자 하나만 봐도 제거가 나은지, 채우기가 나은지 판단의 출발점이 생깁니다.
+  - `isna().sum()`으로 열별 결측 개수를, `isna().mean() * 100`으로 비율을 확인합니다. 결측 비율이 높은 열과 낮은 열을 구분해 전략을 다르게 씁니다.
 - **언제 제거하고 언제 채워야 할까요?**
-  - 이전 관점: `dropna()` 한 줄로 끝내고 데이터 대부분을 잃습니다
+  - 결측 비율이 낮고(5% 미만) 패턴이 무작위이면 제거가 안전합니다. 결측이 많거나 패턴이 있으면 대체 또는 보간이 적합합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

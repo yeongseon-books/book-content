@@ -47,6 +47,20 @@ last_reviewed: '2026-05-12'
 
 > eager는 값을 즉시 만들고, lazy는 필요해질 때까지 미룹니다.
 
+```text
+Eager (즉시 평가):
+  list comprehension → 전체 리스트를 메모리에 생성
+  [x**2 for x in range(1_000_000)]  # 8MB+
+
+Lazy (지연 평가):
+  generator expression → 값이 요청될 때만 계산
+  (x**2 for x in range(1_000_000))  # ~200 bytes
+
+Pull model: consumer가 필요할 때 값을 당겨옴
+  for item in generator:  ← 한 번에 하나씩
+      process(item)
+```
+
 ## 핵심 개념
 
 | 용어 | 설명 |
@@ -58,6 +72,7 @@ last_reviewed: '2026-05-12'
 | itertools | 효율적인 iterator 조합 도구를 제공하는 표준 라이브러리입니다 |
 
 ## 적용 전후 비교
+
 리스트 전체를 만드는 코드와 값을 하나씩 내보내는 코드는 겉보기엔 비슷하지만, 메모리 사용량은 완전히 다릅니다.
 
 ```python
@@ -70,11 +85,12 @@ squares = get_squares(1_000_000)  # millions of items stored at once
 
 ```python
 # 이후: 한 번에 하나의 값만 yield
-def get_squares(n: int):
+def get_squares_lazy(n: int):
     for i in range(n):
         yield i ** 2
 
-squares = get_squares(1_000_000)  # almost no memory used
+squares = get_squares_lazy(1_000_000)  # almost no memory used
+first_ten = list(map(next, [squares] * 10))  # 첫 10개만 소비
 ```
 
 ## 단계별 실습
@@ -102,14 +118,19 @@ for n in gen:
 # 3 2 1
 
 # generator가 이제 소진됨
-# next(gen)  # StopIteration
+try:
+    next(gen)
+except StopIteration:
+    print("Generator exhausted")
 ```
 
 제너레이터는 함수처럼 보이지만, 실제로는 "다음 값을 요청받을 때마다 이어서 실행되는 상태 기계"에 가깝습니다. 이 관점을 잡으면 동작이 훨씬 명확해집니다.
 
-### 단계 2: 제너레이터 표현식
+### 단계 2: 제너레이터 표현식과 메모리 비교
 
 ```python
+import sys
+
 # list comprehension — 즉시 평가
 squares_list = [x ** 2 for x in range(10)]
 print(type(squares_list))  # <class 'list'>
@@ -119,17 +140,19 @@ squares_gen = (x ** 2 for x in range(10))
 print(type(squares_gen))  # <class 'generator'>
 
 # memory comparison
-import sys
-
 big_list = [x ** 2 for x in range(1_000_000)]
 big_gen = (x ** 2 for x in range(1_000_000))
 
-print(f"List: {sys.getsizeof(big_list):,} bytes")       # ~8,000,000 bytes
-print(f"Generator: {sys.getsizeof(big_gen):,} bytes")    # ~200 bytes
+print(f"List: {sys.getsizeof(big_list):,} bytes")     # ~8,000,000 bytes
+print(f"Generator: {sys.getsizeof(big_gen):,} bytes") # ~200 bytes
 
-# generator expression을 sum()에 직접 전달
+# generator expression을 sum()에 직접 전달 — 중간 리스트 불필요
 total = sum(x ** 2 for x in range(1_000_000))
 print(f"Total: {total:,}")
+
+# map도 지연 평가 — generator와 동일
+mapped = map(lambda x: x ** 2, range(1_000_000))
+print(type(mapped))  # <class 'map'>
 ```
 
 제너레이터 표현식은 문법 비용이 거의 없으면서 지연 평가의 장점을 바로 가져옵니다. 집계 함수에 직접 넘길 수 있다는 점도 실용적입니다.
@@ -150,19 +173,19 @@ def fibonacci():
 fib_10 = list(islice(fibonacci(), 10))
 print(fib_10)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 
-# infinite counter
+# map과 filter를 지연 파이프라인으로 조합
 def natural_numbers():
     n = 1
     while True:
         yield n
         n += 1
 
-# 처음 5개의 완전제곱수
-squares = list(islice(
-    (n ** 2 for n in natural_numbers()),
+# 짝수 피보나치 수 앞 5개 — 모두 지연 평가
+even_fibs = islice(
+    filter(lambda x: x % 2 == 0, fibonacci()),
     5,
-))
-print(squares)  # [1, 4, 9, 16, 25]
+)
+print(list(even_fibs))  # [0, 2, 8, 34, 144]
 ```
 
 지연 평가의 진짜 힘은 여기서 드러납니다. 끝이 없는 데이터도 "필요한 만큼만" 가져오면 안전하게 다룰 수 있습니다.
@@ -220,84 +243,84 @@ def parse_csv(lines: Iterator[str]) -> Iterator[dict]:
 
 def filter_by_score(records: Iterator[dict], min_score: int) -> Iterator[dict]:
     """Yields only records above the minimum score."""
-    for record in records:
-        if int(record["score"]) >= min_score:
-            yield record
+    return filter(lambda r: int(r["score"]) >= min_score, records)
 
 def format_output(records: Iterator[dict]) -> Iterator[str]:
     """Formats records for display."""
-    for r in records:
-        yield f"{r['name']}: {r['score']} points"
+    return map(lambda r: f"{r['name']}: {r['score']} points", records)
 
 # pipeline이 실제 stream처럼 동작하도록 작은 샘플 파일 생성
 sample_path = Path("scores.csv")
 sample_path.write_text(
-    "\n".join(
-        [
-            "name,score",
-            "Alice,85",
-            "Bob,92",
-            "Charlie,78",
-            "Diana,95",
-            "Eve,60",
-        ]
-    ),
+    "\n".join(["name,score", "Alice,85", "Bob,92", "Charlie,78", "Diana,95", "Eve,60"]),
     encoding="utf-8",
 )
 
 try:
-    # 각 stage handle을 분리해 개별적으로 확인 가능하게 유지
     lines_stage = read_lines(sample_path)
-    header = next(lines_stage)
-    print(f"Header preview: {header}")
-
     pipeline = format_output(
         filter_by_score(
-            parse_csv(chain([header], lines_stage)),
+            parse_csv(lines_stage),
             min_score=80,
         )
     )
 
-    # 결과를 한 번에 하나씩 소비
     for line in pipeline:
         print(line)
     # Alice: 85 points
     # Bob: 92 points
     # Diana: 95 points
 
-    print(list(pipeline))
-    # []
+    # generator는 한 번 소비하면 비어 있어야 정상
+    print(list(pipeline))  # []
 finally:
     sample_path.unlink(missing_ok=True)
 ```
 
 좋은 지연 파이프라인은 각 단계가 입력 iterator를 받아 출력 iterator를 돌려주는 형태를 유지합니다. 그 덕분에 단계별 테스트와 재조합이 쉬워집니다.
 
-#### 예상 출력
+### 단계 6: 제너레이터로 페이지네이션 처리하기
 
-```text
-Header preview: name,score
-Alice: 85 points
-Bob: 92 points
-Diana: 95 points
-[]
+```python
+from typing import Iterator
+
+def paginate(items: list, page_size: int) -> Iterator[list]:
+    """Yields chunks of page_size items."""
+    for i in range(0, len(items), page_size):
+        yield items[i:i + page_size]
+
+# API 페이지네이션 시뮬레이션
+all_records = list(range(1, 101))  # 100개 레코드
+
+# 한 번에 10개씩 처리
+page_count = 0
+total_processed = 0
+
+for page in paginate(all_records, page_size=10):
+    page_count += 1
+    # map으로 페이지 안 각 레코드 처리
+    processed = list(map(lambda x: x * 2, page))
+    total_processed += len(processed)
+
+print(f"Pages: {page_count}")            # Pages: 10
+print(f"Records: {total_processed}")    # Records: 100
+
+# filter로 특정 조건 페이지만 처리
+large_pages = list(filter(
+    lambda page: sum(page) > 500,
+    paginate(all_records, page_size=10),
+))
+print(f"Large pages: {len(large_pages)}")  # Large pages: 6
 ```
-
-#### 결과가 다르면 먼저 확인할 점
-
-- 헤더가 `name,score`로 읽혔는지 확인합니다. 첫 줄을 잘못 건너뛰면 `score` 컬럼을 찾을 수 없습니다.
-- `min_score=80` 비교가 `>=`인지 확인합니다. `>`로 바뀌면 `Alice`가 빠집니다.
-- `rstrip("\n")`이나 `strip()`이 빠지면 이름 끝 개행 때문에 출력이 어긋날 수 있습니다.
-- 마지막 `print(list(pipeline))`가 `[]`인지 확인합니다. generator는 한 번 소비하면 다시 비어 있어야 정상입니다.
 
 ## 이 코드에서 주목할 점
 
 - 제너레이터는 값을 한 번에 하나씩 만들어 메모리를 절약합니다.
 - 제너레이터 표현식은 `sum()`, `max()`, `min()`에 직접 전달할 수 있습니다.
+- `map`과 `filter`도 지연 평가를 사용하므로 제너레이터와 자연스럽게 조합됩니다.
 - 무한 시퀀스는 `islice()`나 `takewhile()`로 안전하게 유한화해야 합니다.
-- 지연 파이프라인에서는 각 단계가 generator이므로 데이터가 레코드 단위로 흐릅니다.
 
-## 흔한 실수 5가지
+## 자주 하는 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
@@ -321,6 +344,17 @@ Python의 제너레이터는 함수형 프로그래밍의 지연 평가를 아�
 
 운영 코드에서는 각 파이프라인 단계를 generator로 만들고, 마지막 소비자만 실제 계산을 밀어붙이게 하는 패턴이 가장 강합니다. `for` 루프, `sum()`, 파일 쓰기 같은 최종 소비자가 파이프 전체를 구동하는 구조는 UNIX 파이프와도 같은 철학을 가집니다.
 
+## 처음 질문으로 돌아가기
+
+- **eager evaluation과 lazy evaluation은 무엇이 다를까요?**
+  eager는 표현식을 만나는 즉시 모든 값을 계산해 메모리에 올립니다. `[x**2 for x in range(1_000_000)]`은 즉시 백만 개 숫자를 만듭니다. lazy는 값이 실제로 필요해질 때(요청받을 때)만 계산합니다. `(x**2 for x in range(1_000_000))`은 `.next()`가 호출될 때 하나씩 만듭니다. 결과는 같지만 메모리 사용량이 완전히 다릅니다.
+
+- **제너레이터 함수와 제너레이터 표현식은 어떤 상황에서 유용할까요?**
+  메모리에 한 번에 올리기 어려운 대용량 데이터, 무한 시퀀스, 파이프라인 각 단계를 독립적으로 테스트하고 싶을 때 유용합니다. 제너레이터 함수는 복잡한 상태 관리나 try/finally가 필요할 때, 제너레이터 표현식은 간단한 변환·필터링에 적합합니다.
+
+- **무한 시퀀스와 큰 데이터를 Python에서는 어떻게 안전하게 다룰 수 있을까요?**
+  무한 시퀀스는 `islice(gen, n)` 또는 `takewhile(predicate, gen)`으로 필요한 만큼만 소비합니다. 큰 파일은 줄 단위로 yield하는 제너레이터로 감싸고, 각 처리 단계도 제너레이터로 구성해 "pull model" 파이프라인을 만듭니다. 최종 소비 단계(for 루프, sum 등)에서만 실제 계산이 일어납니다.
+
 ## 운영 체크리스트
 
 - [ ] 일반 함수와 제너레이터 함수의 차이를 설명할 수 있다
@@ -338,62 +372,6 @@ Python의 제너레이터는 함수형 프로그래밍의 지연 평가를 아�
 ## 정리와 다음 글
 
 지연 평가는 값이 정말 필요해지는 순간까지 계산을 미뤄 메모리 사용량을 안정적으로 유지하는 전략입니다. Python에서는 제너레이터와 `itertools`가 그 중심 도구입니다. 다음 글에서는 작은 함수를 큰 변환으로 연결하는 **함수 합성과 파이프라인**을 다룹니다.
-
-## 검증 시나리오: 경계 조건을 먼저 잠그기
-
-실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
-
-```python
-from functools import reduce
-
-def pipeline(values: list[int]) -> dict[str, int]:
-    filtered = [v for v in values if v >= 0]
-    squared = [v * v for v in filtered]
-    total = reduce(lambda acc, x: acc + x, squared, 0)
-    return {
-        "count": len(squared),
-        "total": total,
-        "max": max(squared) if squared else 0,
-    }
-
-# 경계 조건 검증
-assert pipeline([]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([-3, -1]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([0, 2, 3]) == {"count": 3, "total": 13, "max": 9}
-
-print("Pass")
-```
-
-또한 지연 평가를 사용할 때는 소비 시점을 테스트에 명시해 두는 편이 좋습니다. generator는 한 번 소비하면 비어야 정상이며, 이 성질이 깨지면 중간 단계에서 의도치 않은 materialize가 발생했을 가능성이 큽니다.
-
-```python
-from itertools import islice
-
-def naturals():
-    n = 0
-    while True:
-        yield n
-        n += 1
-
-stream = naturals()
-first_five = list(islice(stream, 5))
-next_three = list(islice(stream, 3))
-
-assert first_five == [0, 1, 2, 3, 4]
-assert next_three == [5, 6, 7]
-print("Pass")
-```
-
-이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
-## 처음 질문으로 돌아가기
-
-- **eager evaluation과 lazy evaluation은 무엇이 다를까요?**
-  - > eager는 값을 즉시 만들고, lazy는 필요해질 때까지 미룹니다.
-- **제너레이터 함수와 제너레이터 표현식은 어떤 상황에서 유용할까요?**
-  - 제너레이터는 함수처럼 보이지만, 실제로는 "다음 값을 요청받을 때마다 이어서 실행되는 상태 기계"에 가깝습니다
-- **무한 시퀀스와 큰 데이터를 Python에서는 어떻게 안전하게 다룰 수 있을까요?**
-  - Python의 제너레이터는 함수형 프로그래밍의 지연 평가를 아주 실용적으로 구현한 도구입니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

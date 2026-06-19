@@ -56,9 +56,11 @@ outer_func(x)
        |
        +-- x + y  <- remembers outer x
             (closure)
-```
 
-## 클로저와 `partial` 선택 흐름
+클로저 vs partial 선택 기준:
+  상태를 점진적으로 변경해야 한다 -> 클로저 (nonlocal)
+  인자만 고정하면 충분하다        -> partial
+```
 
 ## 핵심 개념
 
@@ -71,6 +73,7 @@ outer_func(x)
 | 커링(currying) | 여러 인자를 받는 함수를 단일 인자 함수들의 연쇄로 바꾸는 개념입니다 |
 
 ## 적용 전후 비교
+
 같은 접두어를 계속 넘겨야 하는 코드는 의도보다 반복이 먼저 보입니다. 클로저로 그 반복을 흡수할 수 있습니다.
 
 ```python
@@ -145,8 +148,8 @@ bye = make_greeter("Goodbye")
 print(hello("Alice"))  # Hello, Alice!
 print(bye("Bob"))      # Goodbye, Bob!
 
-# free variable 확인
-print(hello.__code__.co_freevars)      # ('greeting',)
+# free variable 확인 — 디버깅 시 유용
+print(hello.__code__.co_freevars)          # ('greeting',)
 print(hello.__closure__[0].cell_contents)  # Hello
 print(bye.__closure__[0].cell_contents)    # Goodbye
 ```
@@ -168,6 +171,13 @@ cube = partial(power, exponent=3)
 print(square(5))  # 25
 print(cube(5))    # 125
 
+# map에 partial 적용
+numbers = [1, 2, 3, 4, 5]
+squares = list(map(square, numbers))
+cubes = list(map(cube, numbers))
+print(squares)  # [1, 4, 9, 16, 25]
+print(cubes)    # [1, 8, 27, 64, 125]
+
 # 실전 예시: API client 설정
 def send_request(method: str, url: str, headers: dict) -> str:
     return f"{method} {url} (headers={headers})"
@@ -175,10 +185,8 @@ def send_request(method: str, url: str, headers: dict) -> str:
 api_get = partial(send_request, "GET", headers={"Authorization": "Bearer token"})
 api_post = partial(send_request, "POST", headers={"Authorization": "Bearer token"})
 
-print(api_get("/users"))
-# 사용자 조회 GET /users (headers={'Authorization': 'Bearer token'})
-print(api_post("/orders"))
-# 주문 생성 POST /orders (headers={'Authorization': 'Bearer token'})
+print(api_get("/users"))   # GET /users (headers={'Authorization': 'Bearer token'})
+print(api_post("/orders")) # POST /orders (headers={'Authorization': 'Bearer token'})
 ```
 
 기존 함수 시그니처를 유지하면서 일부 인자만 고정하고 싶다면 `partial`이 훨씬 직관적입니다. 클로저를 새로 작성할 필요도 없습니다.
@@ -188,33 +196,63 @@ print(api_post("/orders"))
 ```python
 from functools import partial
 
-# approach 1: closure
+# 방법 1: closure
 def make_tax_calculator_closure(rate: float):
     def calculate(amount: float) -> float:
         return round(amount * rate, 2)
     return calculate
 
-# approach 2: partial
+# 방법 2: partial
 def calculate_tax(amount: float, rate: float) -> float:
     return round(amount * rate, 2)
 
-make_tax_calculator_partial = lambda rate: partial(calculate_tax, rate=rate)
+tax_10_closure = make_tax_calculator_closure(0.1)
+tax_10_partial = partial(calculate_tax, rate=0.1)
 
-# 사용 방법은 동일
-tax_10 = make_tax_calculator_closure(0.1)
-tax_10_p = make_tax_calculator_partial(0.1)
+print(tax_10_closure(50000))  # 5000.0
+print(tax_10_partial(50000))  # 5000.0
 
-print(tax_10(50000))    # 5000.0
-print(tax_10_p(50000))  # 5000.0
-
-# selection criteria
+# 선택 기준
+# - partial: 인자만 고정하면 될 때 (더 간결)
 # - closure: 상태 변경(nonlocal)이 필요할 때
-# - partial: 인자만 고정하면 될 때
+
+# partial은 repr에 고정 인자가 드러남
+print(tax_10_partial)
+# functools.partial(<function calculate_tax at 0x...>, rate=0.1)
 ```
 
 둘 다 가능할 때는 대개 `partial`이 더 읽기 쉽습니다. 반대로 내부 상태를 점진적으로 바꾸거나 `nonlocal`이 필요하면 클로저가 더 자연스럽습니다.
 
-### 단계 5: 실무 예시 — 이벤트 핸들러
+### 단계 5: 루프 변수 공유 문제와 해결
+
+```python
+# 문제: 루프 안에서 클로저를 만들 때 변수 공유
+funcs_wrong = []
+for i in range(3):
+    funcs_wrong.append(lambda: i)  # 모두 같은 i를 참조
+
+print([f() for f in funcs_wrong])  # [2, 2, 2] — 의도와 다름!
+
+# 해결 1: 기본 인자로 값 복사
+funcs_correct = []
+for i in range(3):
+    funcs_correct.append(lambda x=i: x)  # 현재 i 값을 복사
+
+print([f() for f in funcs_correct])  # [0, 1, 2] — 올바름
+
+# 해결 2: partial 사용
+from functools import partial
+
+def identity(x: int) -> int:
+    return x
+
+funcs_partial = [partial(identity, i) for i in range(3)]
+print([f() for f in funcs_partial])  # [0, 1, 2] — 올바름
+```
+
+루프 변수 공유는 클로저를 처음 쓸 때 가장 많이 빠지는 함정입니다. `partial`로 우회하거나 기본 인자로 값을 복사하는 것이 가장 명확한 해결책입니다.
+
+### 단계 6: 실무 예시 — 이벤트 핸들러
 
 ```python
 from functools import partial
@@ -253,61 +291,18 @@ bus.emit("user.created", name="Alice", email="alice@example.com")
 
 이벤트 시스템, 웹훅, UI 콜백 같은 구조에서 클로저와 `partial`은 아주 자주 만납니다. 문법 장난이 아니라 실전 연결 도구라는 점이 중요합니다.
 
-### 단계 6: 실무 예시 — 테넌트별 웹훅 처리기 조립하기
-
-```python
-from dataclasses import dataclass
-from functools import partial
-
-@dataclass(frozen=True)
-class TenantPolicy:
-    tenant: str
-    retry_limit: int
-    audit_channel: str
-
-def make_retry_decider(policy: TenantPolicy):
-    attempts = 0
-
-    def should_retry(status: str) -> bool:
-        nonlocal attempts
-        attempts += 1
-        return status == "temporary-failure" and attempts < policy.retry_limit
-
-    return should_retry
-
-def publish_audit(channel: str, event_name: str, payload: dict) -> None:
-    print(f"[{channel}] {event_name}: {payload}")
-
-policy = TenantPolicy(
-    tenant="store-kr",
-    retry_limit=3,
-    audit_channel="orders.webhook",
-)
-
-should_retry = make_retry_decider(policy)
-record_audit = partial(publish_audit, policy.audit_channel)
-
-event = {"order_id": "A-1024", "status": "temporary-failure"}
-record_audit("webhook.received", {"tenant": policy.tenant, **event})
-
-if should_retry(event["status"]):
-    record_audit("webhook.retry_scheduled", {"order_id": event["order_id"], "attempt": 1})
-```
-
-이 패턴은 운영 코드에서 특히 유용합니다. 클로저는 테넌트별 재시도 상태를 기억하고, `partial`은 공통 감사 채널을 고정합니다. 덕분에 각 웹훅 핸들러는 설정 객체를 계속 다시 넘기지 않아도 되고, 어떤 값이 컨텍스트인지도 코드에 바로 드러납니다.
-
 ## 이 코드에서 주목할 점
 
 - 클로저는 바깥 변수를 `__closure__` 안에 보존해 바깥 함수가 끝난 뒤에도 살려 둡니다.
 - 바깥 변수를 수정할 때만 `nonlocal`이 필요하고, 읽기만 할 때는 필요하지 않습니다.
 - `partial`은 인자 고정이 목적일 때 가장 간단한 선택입니다.
-- 상태 변경이 필요하면 클로저, 인자 고정만 필요하면 `partial`이 더 적합합니다.
+- `map`과 `partial`을 조합하면 특화된 변환 함수를 간결하게 만들 수 있습니다.
 
-## 흔한 실수 5가지
+## 자주 하는 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| 루프 안에서 클로저를 만들며 변수를 공유함 | 모든 클로저가 같은 마지막 값을 참조합니다 | 기본 인자로 값을 복사합니다 |
+| 루프 안에서 클로저를 만들며 변수를 공유함 | 모든 클로저가 같은 마지막 값을 참조합니다 | 기본 인자로 값을 복사하거나 `partial`을 씁니다 |
 | `nonlocal` 없이 바깥 변수를 수정함 | `UnboundLocalError`가 발생합니다 | `nonlocal` 선언을 추가합니다 |
 | 클로저에 너무 많은 상태를 넣음 | 클래스가 더 적합한 상황이 됩니다 | 상태가 복잡하면 클래스로 전환합니다 |
 | `partial` 대신 불필요한 `lambda`를 씀 | 의도가 덜 분명합니다 | 인자 고정 목적이면 `partial`을 사용합니다 |
@@ -316,7 +311,7 @@ if should_retry(event["status"]):
 ## 실무에서 이렇게 쓰입니다
 
 - 데코레이터는 설정 값을 기억하기 위해 클로저를 사용합니다.
-- 콜백에 추가 인자를 붙일 때 `partial`을 사용합니다.
+- `map`의 콜백에 추가 인자를 붙일 때 `partial`을 사용합니다.
 - 테스트에서 공통 파라미터를 고정한 함수를 만들어 재사용합니다.
 - 로깅 유틸리티에서 접두어를 고정하는 데 클로저를 씁니다.
 - 이벤트 핸들러에 컨텍스트를 바인딩할 때 클로저를 활용합니다.
@@ -326,6 +321,17 @@ if should_retry(event["status"]):
 클로저는 "가벼운 객체"라고 생각하면 이해가 쉽습니다. 상태가 단순하고 메서드도 하나면, 클래스를 만드는 것보다 클로저가 훨씬 경제적입니다. 반대로 상태가 복잡하고 여러 행동이 필요해지면, 그때는 객체지향 모델이 더 낫습니다.
 
 `functools.partial`은 과소평가된 도구입니다. `lambda x: f(x, fixed_arg)`보다 의도가 더 명확하고 `repr()`에도 고정 인자가 드러나서 디버깅에도 유리합니다. 좋은 팀은 클로저와 `partial`을 감으로 고르지 않고, 상태 기억이 필요한지 인자만 고정하면 되는지로 구분합니다.
+
+## 처음 질문으로 돌아가기
+
+- **클로저는 바깥 스코프의 변수를 어떻게 기억할까요?**
+  Python은 내부 함수가 바깥 변수를 참조할 때 그 변수를 "자유 변수"로 만들고 `cell object`에 보관합니다. 바깥 함수가 종료되어도 이 cell은 살아남아 내부 함수의 `__closure__` 속성에서 접근할 수 있습니다. `hello.__closure__[0].cell_contents`로 실제 값을 확인할 수 있습니다.
+
+- **자유 변수와 cell object는 디버깅에서 왜 중요한 단서일까요?**
+  클로저가 예상과 다른 값을 내놓을 때, `func.__closure__[0].cell_contents`를 확인하면 실제로 기억하고 있는 값을 즉시 알 수 있습니다. 루프 변수 공유 문제처럼 "왜 모두 같은 결과가 나오지?"라는 버그를 추적할 때 가장 빠른 단서입니다.
+
+- **`functools.partial`은 어떤 상황에서 클로저보다 더 적합할까요?**
+  상태 변경 없이 기존 함수의 일부 인자만 고정하면 될 때 `partial`이 더 적합합니다. `make_validator(0, 100)`처럼 클로저를 새로 작성하는 대신 `partial(validate, min_val=0, max_val=100)`으로 표현할 수 있습니다. `repr()`에 고정 인자가 드러나서 디버깅도 더 쉽습니다.
 
 ## 운영 체크리스트
 
@@ -338,68 +344,12 @@ if should_retry(event["status"]):
 ## 연습 문제
 
 1. 감싼 함수의 호출 횟수를 세는 `make_call_counter(func)` 클로저를 작성해 보세요.
-2. 유틸리티 함수 안에서 `sorted`의 `key` 인자를 `partial`로 특화해 보세요.
-3. 루프 변수 공유 문제를 의도적으로 재현한 뒤 올바르게 수정해 보세요.
+2. `map`에서 쓸 특화된 변환 함수를 `partial`로 만들어 적용해 보세요.
+3. 루프 변수 공유 문제를 의도적으로 재현한 뒤 두 가지 방법으로 올바르게 수정해 보세요.
 
 ## 정리와 다음 글
 
 클로저는 함수가 자신이 정의된 환경을 기억하게 만들고, `partial`은 기존 함수의 일부 인자를 고정해 새 함수를 만듭니다. 상태를 기억해야 하면 클로저가, 인자만 고정하면 되면 `partial`이 더 적합합니다. 다음 글에서는 반복을 자기 호출로 표현하는 **재귀와 꼬리 호출**을 다룹니다.
-
-## 검증 시나리오: 경계 조건을 먼저 잠그기
-
-실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
-
-```python
-from functools import reduce
-
-def pipeline(values: list[int]) -> dict[str, int]:
-    filtered = [v for v in values if v >= 0]
-    squared = [v * v for v in filtered]
-    total = reduce(lambda acc, x: acc + x, squared, 0)
-    return {
-        "count": len(squared),
-        "total": total,
-        "max": max(squared) if squared else 0,
-    }
-
-# 경계 조건 검증
-assert pipeline([]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([-3, -1]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([0, 2, 3]) == {"count": 3, "total": 13, "max": 9}
-
-print("Pass")
-```
-
-또한 지연 평가를 사용할 때는 소비 시점을 테스트에 명시해 두는 편이 좋습니다. generator는 한 번 소비하면 비어야 정상이며, 이 성질이 깨지면 중간 단계에서 의도치 않은 materialize가 발생했을 가능성이 큽니다.
-
-```python
-from itertools import islice
-
-def naturals():
-    n = 0
-    while True:
-        yield n
-        n += 1
-
-stream = naturals()
-first_five = list(islice(stream, 5))
-next_three = list(islice(stream, 3))
-
-assert first_five == [0, 1, 2, 3, 4]
-assert next_three == [5, 6, 7]
-print("Pass")
-```
-
-이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
-## 처음 질문으로 돌아가기
-
-- **클로저는 바깥 스코프의 변수를 어떻게 기억할까요?**
-  - - 클로저는 바깥 변수를 `__closure__` 안에 보존해 바깥 함수가 끝난 뒤에도 살려 둡니다
-- **자유 변수와 cell object는 디버깅에서 왜 중요한 단서일까요?**
-  - > 클로저의 핵심은 안쪽 함수가 바깥 변수에 대한 참조를 들고 있다는 사실입니다.
-- **`functools.partial`은 어떤 상황에서 클로저보다 더 적합할까요?**
-  - > 클로저의 핵심은 안쪽 함수가 바깥 변수에 대한 참조를 들고 있다는 사실입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

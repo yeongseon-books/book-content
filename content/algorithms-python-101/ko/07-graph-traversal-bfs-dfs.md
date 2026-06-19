@@ -39,19 +39,15 @@ BFS와 DFS는 그래프 탐색의 두 기초 전략입니다. 둘의 차이를 �
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
-소셜 네트워크, 지도, 웹 링크, 의존성 그래프는 모두 그래프로 모델링됩니다. BFS와 DFS는 이런 구조를 탐색하는 가장 기본적인 알고리즘입니다.
-
 > BFS는 가까운 이웃을 층별로 탐색하고, DFS는 한 경로를 가능한 깊게 내려간 뒤 되돌아옵니다.
-
-가중치가 없는 그래프의 최단 경로에는 BFS가 적합하고, 경로 존재 여부 확인, 사이클 탐지, 위상 정렬 같은 문제에는 DFS가 자주 사용됩니다.
 
 ## 개념 한눈에 보기
 
 > 그래프는 노드(vertex)와 간선(edge)의 집합입니다
 
 ```text
-Example graph:     BFS order:           DFS order:
-  A—B               A (layer 0)         A → B → D → E → C → F
+Example graph:     BFS order:               DFS order:
+  A—B               A (layer 0)             A → B → D → C → E → F
   |\ \              B, C (layer 1)
   | C  D            D, E, F (layer 2)
   |/ \
@@ -68,14 +64,31 @@ Example graph:     BFS order:           DFS order:
 | BFS (Breadth-First Search) | 큐를 사용해 가까운 노드부터 방문합니다 |
 | DFS (Depth-First Search) | 스택 또는 재귀를 사용해 가능한 깊게 방문합니다 |
 
+## BFS vs DFS 선택 기준
+
+| 질문 | BFS | DFS |
+|------|-----|-----|
+| 최단 거리(홉 수)가 필요한가? | 적합 | 부적합 |
+| 경로 존재 여부만 확인하나? | 가능 | 적합 |
+| 사이클 탐지가 필요한가? | 가능 | 적합 |
+| 위상 정렬이 필요한가? | 불가 | 적합 |
+| 그래프가 매우 깊은가? | 안전 | 스택 주의 |
+
 ## 적용 전후 비교
+
 두 노드가 연결되어 있는지 확인하는 두 가지 접근입니다.
 
 ```python
-# before: ad-hoc 순회 — 무한 루프 위험
-def is_connected(graph, start, end):
-    # 체계적이지 않아 무한 루프에 빠질 수 있음
-    pass
+# before: ad-hoc 순회 — visited 없이 무한 루프 위험
+def is_connected_wrong(graph, start, end):
+    # visited 집합 없이 구현하면 사이클에서 무한 루프
+    queue = [start]
+    while queue:
+        node = queue.pop(0)
+        if node == end:
+            return True
+        queue.extend(graph[node])  # 무한 루프!
+    return False
 ```
 
 ```python
@@ -99,6 +112,7 @@ def is_connected(graph, start, end):
 ## 단계별 실습
 
 ### 단계 1: 그래프 표현
+
 ```python
 # dictionary를 사용하는 Adjacency list
 graph: dict[str, list[str]] = {
@@ -110,7 +124,7 @@ graph: dict[str, list[str]] = {
     "F": ["C"],
 }
 
-# Directed graph
+# 방향 그래프
 directed_graph: dict[str, list[str]] = {
     "A": ["B", "C"],
     "B": ["D"],
@@ -119,7 +133,7 @@ directed_graph: dict[str, list[str]] = {
     "E": [],
 }
 
-# Weighted graph
+# 가중 그래프
 weighted_graph: dict[str, list[tuple[str, int]]] = {
     "A": [("B", 4), ("C", 2)],
     "B": [("A", 4), ("D", 3)],
@@ -129,9 +143,8 @@ weighted_graph: dict[str, list[tuple[str, int]]] = {
 }
 ```
 
-그래프는 보통 인접 리스트로 표현합니다. 노드 수가 많고 연결이 희소한 경우에 특히 효율적이며, BFS와 DFS 구현도 자연스럽습니다.
-
 ### 단계 2: BFS 구현
+
 ```python
 from collections import deque
 
@@ -146,7 +159,7 @@ def bfs(graph: dict[str, list[str]], start: str) -> list[str]:
         order.append(node)
         for neighbor in graph[node]:
             if neighbor not in visited:
-                visited.add(neighbor)
+                visited.add(neighbor)  # 큐에 넣을 때 방문 처리!
                 queue.append(neighbor)
 
     return order
@@ -154,7 +167,7 @@ def bfs(graph: dict[str, list[str]], start: str) -> list[str]:
 print(bfs(graph, "A"))  # ['A', 'B', 'C', 'D', 'E', 'F']
 ```
 
-BFS는 시작점에서 가까운 노드부터 한 층씩 넓혀 갑니다. 그래서 가중치가 없는 그래프의 최단 경로 문제에 특히 적합합니다.
+방문 처리를 `popleft()` 시점이 아닌 `append()` 시점에 해야 중복 방문을 막을 수 있습니다.
 
 ### 단계 3: DFS 구현 (재귀와 반복)
 
@@ -197,9 +210,8 @@ def dfs_iterative(graph: dict[str, list[str]], start: str) -> list[str]:
 print(dfs_iterative(graph, "A"))  # ['A', 'B', 'D', 'C', 'E', 'F']
 ```
 
-DFS는 한 경로를 끝까지 따라가는 방식이라, 구조를 깊게 파고드는 문제에 잘 맞습니다. 재귀와 반복 모두 구현 가능하다는 점도 중요합니다.
-
 ### 단계 4: BFS 최단 경로
+
 ```python
 from collections import deque
 
@@ -229,8 +241,6 @@ print(bfs_shortest_path(graph, "A", "F"))  # ['A', 'C', 'F']
 print(bfs_shortest_path(graph, "D", "E"))  # ['D', 'B', 'A', 'C', 'E']
 ```
 
-가중치가 없는 그래프에서는 BFS가 먼저 도착한 경로가 곧 최단 경로입니다. 이 성질이 BFS를 아주 실용적으로 만듭니다.
-
 ### 단계 5: 연결 요소와 사이클 탐지
 
 ```python
@@ -257,7 +267,7 @@ print(find_connected_components(split_graph))
 # [['A', 'B'], ['C', 'D']]
 
 def has_cycle(graph: dict[str, list[str]], start: str) -> bool:
-    """Cycle detection in an undirected graph using DFS."""
+    """무방향 그래프 사이클 탐지 — DFS + 부모 추적."""
     visited: set[str] = set()
 
     def _dfs(node: str, parent: str | None) -> bool:
@@ -266,7 +276,7 @@ def has_cycle(graph: dict[str, list[str]], start: str) -> bool:
             if neighbor not in visited:
                 if _dfs(neighbor, node):
                     return True
-            elif neighbor != parent:
+            elif neighbor != parent:  # 부모 제외하고 방문된 노드 = 사이클
                 return True
         return False
 
@@ -275,22 +285,154 @@ def has_cycle(graph: dict[str, list[str]], start: str) -> bool:
 print(has_cycle(graph, "A"))  # True
 ```
 
-그래프 문제는 단순 방문을 넘어서 연결 요소 분리, 사이클 검출 같은 응용으로 이어집니다. BFS와 DFS를 익히면 이 확장이 자연스럽게 보이기 시작합니다.
+## 단계별 실행 추적 — BFS
 
-- BFS는 큐(`deque`)를 쓰고, DFS는 스택 또는 재귀를 씁니다.
-- BFS는 가중치 없는 그래프에서 최단 경로를 보장하지만, DFS는 그렇지 않습니다.
-- `visited` 집합은 이미 방문한 노드를 기록해 무한 루프를 막습니다.
-- 무방향 그래프의 사이클 검출에서는 부모 노드를 함께 추적해야 오탐을 막을 수 있습니다.
+`bfs(graph, "A")` 실행 추적:
 
-## 자주 하는 실수 5가지
+```text
+그래프: A-[B,C], B-[A,D], C-[A,E,F], D-[B], E-[C], F-[C]
+
+초기: visited={'A'}, queue=deque(['A']), order=[]
+
+Step 1: pop 'A'
+  order=['A']
+  이웃 B: not in visited → visited.add('B'), queue=['B']
+  이웃 C: not in visited → visited.add('C'), queue=['B','C']
+
+Step 2: pop 'B'
+  order=['A','B']
+  이웃 A: in visited → skip
+  이웃 D: not in visited → visited.add('D'), queue=['C','D']
+
+Step 3: pop 'C'
+  order=['A','B','C']
+  이웃 A: in visited → skip
+  이웃 E: not in visited → queue=['D','E']
+  이웃 F: not in visited → queue=['D','E','F']
+
+Step 4: pop 'D' → order=['A','B','C','D']
+Step 5: pop 'E' → order=['A','B','C','D','E']
+Step 6: pop 'F' → order=['A','B','C','D','E','F']
+
+결과: ['A', 'B', 'C', 'D', 'E', 'F'] (층별 탐색)
+```
+
+## 코딩 테스트 풀이 예시
+
+**문제**: 2차원 격자에서 '1'로 이루어진 섬의 개수를 찾아라.
+
+```python
+from collections import deque
+
+def num_islands(grid: list[list[str]]) -> int:
+    """
+    BFS로 섬의 개수를 셉니다.
+    '1'=땅, '0'=물
+    시간 복잡도: O(rows * cols)
+    """
+    if not grid:
+        return 0
+
+    rows, cols = len(grid), len(grid[0])
+    visited = set()
+    count = 0
+
+    def bfs_island(r: int, c: int) -> None:
+        queue = deque([(r, c)])
+        visited.add((r, c))
+        while queue:
+            row, col = queue.popleft()
+            for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                nr, nc = row + dr, col + dc
+                if (0 <= nr < rows and 0 <= nc < cols
+                        and grid[nr][nc] == "1"
+                        and (nr, nc) not in visited):
+                    visited.add((nr, nc))
+                    queue.append((nr, nc))
+
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == "1" and (r, c) not in visited:
+                bfs_island(r, c)
+                count += 1
+
+    return count
+
+
+grid1 = [
+    ["1", "1", "0", "0", "0"],
+    ["1", "1", "0", "0", "0"],
+    ["0", "0", "1", "0", "0"],
+    ["0", "0", "0", "1", "1"],
+]
+print(num_islands(grid1))  # 3
+```
+
+**단계별 추적** (grid1에서 첫 번째 섬):
+
+```text
+(0,0)='1' → BFS 시작
+  큐: [(0,0)]
+  pop (0,0): 이웃 (0,1)='1', (1,0)='1' → 큐에 추가
+  pop (0,1): 이웃 (0,2)='0' skip, (1,1)='1' → 큐에 추가
+  pop (1,0): 이웃 (1,1) 이미 방문
+  pop (1,1): 이웃 모두 방문 또는 물
+  → 섬 1 완성, count=1
+```
+
+**문제**: 방향 그래프에서 위상 정렬을 구하라 (DFS 기반).
+
+```python
+def topological_sort(graph: dict[str, list[str]]) -> list[str]:
+    """
+    DFS 기반 위상 정렬.
+    모든 노드에서 DFS 후 완료 시각 역순 = 위상 정렬 순서
+    """
+    visited: set[str] = set()
+    result: list[str] = []
+
+    def dfs(node: str) -> None:
+        visited.add(node)
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                dfs(neighbor)
+        result.append(node)  # 완료 후 추가
+
+    for node in graph:
+        if node not in visited:
+            dfs(node)
+
+    return list(reversed(result))
+
+
+dag = {
+    "A": ["C"],
+    "B": ["C", "D"],
+    "C": ["E"],
+    "D": ["F"],
+    "E": [],
+    "F": [],
+}
+print(topological_sort(dag))  # ['B', 'A', 'D', 'C', 'F', 'E'] (순서 중 하나)
+```
+
+## 자주 하는 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|-------------|-----------|
-| 방문 체크를 빼먹음 | 무한 루프에 빠집니다 | 노드를 처리하기 전에 `visited`를 확인합니다 |
+| 방문 체크를 빼먹음 | 무한 루프에 빠집니다 | 노드를 큐/스택에 넣을 때 visited에 추가합니다 |
 | BFS 큐로 리스트 사용 | `pop(0)`이 `O(n)`입니다 | `collections.deque`를 사용합니다 |
 | DFS를 재귀로만 구현 | 큰 그래프에서 `RecursionError`가 날 수 있습니다 | 반복형 DFS도 익혀 둡니다 |
 | 방향 그래프와 무방향 그래프를 혼동 | 탐색 결과와 해석이 달라집니다 | 그래프 종류를 먼저 명시합니다 |
 | 끊어진 그래프를 하나의 시작점만 탐색 | 일부 노드를 놓칩니다 | 모든 미방문 노드에서 시작합니다 |
+
+## 복잡도 비교표
+
+| 알고리즘 | 자료구조 | 시간 복잡도 | 주 용도 |
+|----------|----------|-------------|---------|
+| BFS | 큐 | `O(V+E)` | 무가중치 최단 경로, 층별 탐색 |
+| DFS 재귀 | 호출 스택 | `O(V+E)` | 사이클, 연결성, 위상 정렬 |
+| DFS 반복 | 명시적 스택 | `O(V+E)` | 깊은 그래프에서 안전 |
 
 ## 실무에서는 이렇게 연결됩니다
 
@@ -305,13 +447,6 @@ print(has_cycle(graph, "A"))  # True
 BFS와 DFS는 그래프 알고리즘의 벽돌입니다. 이 둘을 이해하면 다익스트라, 위상 정렬, 최소 신장 트리 같은 다음 단계 주제가 훨씬 자연스럽게 이어집니다.
 
 실무에서는 NetworkX 같은 라이브러리를 쓸 수 있지만, 내부 동작을 이해해야 어떤 문제에 어떤 탐색이 맞는지 스스로 판단할 수 있습니다.
-
-## BFS와 DFS를 고를 때 먼저 확인할 것
-
-- 최단 단계 수가 필요하면 BFS부터 의심하는 편이 안전합니다. 무가중치 그래프에서는 도착 순서 자체가 답이 되기 때문입니다.
-- 경로 존재 여부, 사이클, 위상 정렬처럼 구조를 깊게 파고들어야 하면 DFS가 더 자연스럽습니다.
-- 입력 그래프가 매우 깊으면 재귀 DFS보다 반복형 DFS를 먼저 검토해야 합니다. 운영 코드에서는 재귀 깊이 제한이 장애 원인이 되기 쉽습니다.
-- 탐색이 느리거나 메모리를 많이 쓰면, 자료구조 문제가 아닌 visited 처리 누락과 중복 방문부터 먼저 의심하는 편이 좋습니다.
 
 ## 운영 체크리스트
 
@@ -330,143 +465,6 @@ BFS와 DFS는 그래프 알고리즘의 벽돌입니다. 이 둘을 이해하면
 ## 정리와 다음 글
 
 BFS는 노드를 층별로 탐색하고, 가중치 없는 그래프의 최단 경로를 보장합니다. DFS는 깊게 먼저 들어가므로 사이클 검출과 위상 정렬에 잘 맞습니다. 다음 글에서는 가중치가 있는 그래프의 최단 경로를 다익스트라 알고리즘으로 다룹니다.
-
-## 심화 실전 노트: 그래프 탐색을 문제 유형으로 분해하기
-
-### 구현 앵커: BFS 거리 배열과 DFS 진입/이탈 시간
-
-```python
-from collections import deque
-
-def bfs_distance(graph: dict[int, list[int]], start: int) -> dict[int, int]:
-    dist = {start: 0}
-    q = deque([start])
-    while q:
-        node = q.popleft()
-        for nxt in graph[node]:
-            if nxt not in dist:
-                dist[nxt] = dist[node] + 1
-                q.append(nxt)
-    return dist
-
-def dfs_time(graph: dict[int, list[int]], start: int):
-    visited = set()
-    tin, tout = {}, {}
-    clock = 0
-
-    def go(node: int):
-        nonlocal clock
-        visited.add(node)
-        clock += 1
-        tin[node] = clock
-        for nxt in graph[node]:
-            if nxt not in visited:
-                go(nxt)
-        clock += 1
-        tout[node] = clock
-
-    go(start)
-    return tin, tout
-```
-
-### 실행 추적: BFS 레이어
-
-```text
-start=1
-layer0: [1]
-layer1: [2,3]
-layer2: [4,5,6]
-```
-
-레이어 정보가 필요한 문제(최단 단계 수, 감염 전파 일수)는 BFS가 기본 선택입니다.
-
-### 복잡도 비교표
-
-| 알고리즘 | 자료구조 | 시간 복잡도 | 주 용도 |
-|----------|----------|-------------|---------|
-| BFS | 큐 | `O(V+E)` | 무가중치 최단 경로 |
-| DFS 재귀 | 호출 스택 | `O(V+E)` | 사이클, 연결성, 위상 정렬 기반 |
-| DFS 반복 | 명시적 스택 | `O(V+E)` | 깊은 그래프에서 안전 |
-
-### 인터뷰형 분해 질문
-
-- 그래프가 방향/무방향 중 무엇인가
-- 끊어진 그래프 가능성이 있는가
-- 최단 "거리"가 필요한가, 단순 도달성만 필요한가
-- 재귀 깊이가 입력에서 안전한가
-
-### 증명 스케치: BFS 최단거리 보장
-
-BFS는 큐를 통해 거리 `d` 노드를 모두 처리한 뒤 거리 `d+1` 노드로 이동합니다. 따라서 어떤 노드를 처음 방문하는 순간의 거리는 시작점에서 갈 수 있는 최소 간선 수와 일치합니다.
-
-### 실수-수정 페어
-
-| 실수 | 증상 | 수정 |
-|------|------|------|
-| 방문 처리를 pop 시점에만 수행 | 중복 enqueue 폭증 | enqueue 시점 방문 처리 |
-| 무방향 그래프 사이클 탐지에서 부모 추적 누락 | 오탐 | `(node,parent)`로 DFS |
-| 분리 그래프에서 단일 시작점만 탐색 | 일부 노드 미방문 | 전체 노드 루프 + 미방문 시작 |
-
-## 실전 검증 부록: 성능 측정과 반례 설계
-
-알고리즘 학습에서 구현 자체보다 오래 남는 자산은 검증 습관입니다. 아래 체크는 주제와 무관하게 거의 모든 문제에서 공통으로 적용됩니다.
-
-### 1) 마이크로 벤치마크 규칙
-
-```python
-import time
-
-def benchmark(func, *args, repeat: int = 5) -> float:
-    best = float("inf")
-    for _ in range(repeat):
-        start = time.perf_counter()
-        func(*args)
-        best = min(best, time.perf_counter() - start)
-    return best
-```
-
-- 단일 실행 시간은 노이즈가 큽니다.
-- 최소/중앙값 기준으로 비교하는 편이 안정적입니다.
-- 입력 크기를 여러 단계로 늘려 증가 추세를 기록해야 합니다.
-
-### 2) 반례 세트 템플릿
-
-```text
-A. 최소 입력: 빈 배열, 원소 1개
-B. 중복 입력: 같은 값 다수
-C. 정렬/역정렬 입력: 경계 인덱스 오류 탐지
-D. 음수/0 포함 입력: 비교식 방향 오류 탐지
-E. 해답 없음 케이스: 종료 조건 검증
-```
-
-테스트를 통과했는지보다, 어떤 종류의 실패를 막았는지 기록하는 편이 품질에 더 직접적입니다.
-
-### 3) 복잡도-메모리 트레이드오프 표
-
-| 개선 전략 | 시간 영향 | 공간 영향 | 적용 판단 |
-|-----------|-----------|-----------|-----------|
-| 캐시/메모이제이션 | 감소 | 증가 | 중복 계산이 명확할 때 |
-| 정렬 후 탐색 | 대체로 감소 | 동일/약간 증가 | 질의가 여러 번일 때 |
-| 해시 사용 | 평균 감소 | 증가 | 순서보다 조회가 중요할 때 |
-| 힙 사용 | 상위/최소 유지에 유리 | 증가 | 우선순위 선택이 핵심일 때 |
-
-### 4) 인터뷰 답변 스크립트
-
-- "먼저 입력 제약을 보고 가능한 복잡도 상한을 정하겠습니다."
-- "현재 접근의 시간/공간 복잡도를 계산해 보겠습니다."
-- "경계 입력 다섯 가지로 검증 계획을 먼저 제시하겠습니다."
-- "필요하면 정답 유지 조건을 짧게 증명하겠습니다."
-
-이 스크립트를 반복하면 설명의 밀도가 올라가고, 구현 중 길을 잃는 빈도가 줄어듭니다.
-
-## 처음 질문으로 돌아가기
-
-- **그래프의 기본 개념과 Python에서의 표현 방식은 무엇일까요?**
-  - 그래프는 보통 인접 리스트로 표현합니다
-- **BFS는 어떤 원리로 동작하고 언제 써야 할까요?**
-  - > 그래프는 노드(vertex)와 간선(edge)의 집합입니다
-- **DFS는 어떤 원리로 동작하고 언제 써야 할까요?**
-  - > 그래프는 노드(vertex)와 간선(edge)의 집합입니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

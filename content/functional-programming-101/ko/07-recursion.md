@@ -69,6 +69,7 @@ factorial(4)
 | 분할 정복(divide and conquer) | 문제를 더 작은 하위 문제로 나누어 푸는 전략입니다 |
 
 ## 적용 전후 비교
+
 반복문의 누적 합도 재귀로 표현할 수 있습니다. 다만 그 표현이 실제로 더 적절한지는 별도의 판단이 필요합니다.
 
 ```python
@@ -90,6 +91,7 @@ def sum_recursive(numbers: list[int]) -> int:
     return numbers[0] + sum_recursive(numbers[1:])
 
 print(sum_recursive([1, 2, 3, 4, 5]))  # 15
+# 주의: 큰 리스트에는 적합하지 않음 — 반복 버전이 더 안전
 ```
 
 ## 단계별 실습
@@ -154,6 +156,10 @@ print(fib_memo(100))  # 354224848179261915075 (fast)
 # cache 통계 확인
 print(fib_memo.cache_info())
 # CacheInfo(hits=98, misses=101, maxsize=None, currsize=101)
+
+# map으로 피보나치 수열 생성
+fib_sequence = list(map(fib_memo, range(10)))
+print(fib_sequence)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 ```
 
 재귀가 느린 것이 아니라, 같은 하위 문제를 중복 계산하는 재귀가 느린 것입니다. 이 차이를 이해하면 메모이제이션이 왜 강력한지 바로 연결됩니다.
@@ -177,7 +183,7 @@ def factorial_tail(n: int, acc: int = 1) -> int:
 
 # Python은 tail call optimization(TCO)을 지원하지 않음
 print(sys.getrecursionlimit())  # default 1000
-print(factorial_tail(900))  # works but...
+print(factorial_tail(900))      # works
 # factorial_tail(1500)  # RecursionError!
 
 # 해결 방법: 반복문으로 변환
@@ -284,14 +290,41 @@ print(total_size_iterative(file_tree))  # 3300
 
 실무에서는 이 전환이 매우 중요합니다. 구조는 재귀적으로 이해하되, 실행은 명시적 스택으로 바꿔 안정성을 확보하는 경우가 많습니다.
 
+### 단계 6: 재귀와 map/filter 조합
+
+```python
+from functools import lru_cache
+
+# 재귀로 모든 중첩 리스트를 평탄화
+def flatten(lst: list) -> list:
+    """Recursively flattens a nested list."""
+    result = []
+    for item in lst:
+        if isinstance(item, list):
+            result.extend(flatten(item))
+        else:
+            result.append(item)
+    return result
+
+nested = [1, [2, [3, 4], 5], [6, 7], 8]
+flat = flatten(nested)
+print(flat)  # [1, 2, 3, 4, 5, 6, 7, 8]
+
+# 평탄화 후 filter와 map 적용
+evens = list(filter(lambda x: x % 2 == 0, flat))
+doubled = list(map(lambda x: x * 2, evens))
+print(evens)    # [2, 4, 6, 8]
+print(doubled)  # [4, 8, 12, 16]
+```
+
 ## 이 코드에서 주목할 점
 
 - 모든 재귀에는 반드시 base case가 있어야 합니다.
 - `@lru_cache`는 중복 호출을 제거해 재귀 성능을 크게 개선합니다.
 - Python은 꼬리 호출 최적화를 지원하지 않으므로 깊은 재귀는 반복으로 바꾸는 편이 안전합니다.
-- 트리 순회는 재귀가 가장 자연스럽게 읽히는 대표 사례입니다.
+- 재귀로 평탄화한 결과에 `map`/`filter`를 조합하면 강력한 파이프라인이 됩니다.
 
-## 흔한 실수 5가지
+## 자주 하는 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
@@ -315,6 +348,17 @@ print(total_size_iterative(file_tree))  # 3300
 
 결국 재귀와 반복의 선택은 우아함과 안정성의 균형입니다. 구조를 드러내는 데 재귀가 압도적으로 좋다면 쓰되, 운영 환경에서 스택 리스크가 생기면 주저 없이 명시적 스택으로 옮기는 것이 실전적인 판단입니다.
 
+## 처음 질문으로 돌아가기
+
+- **재귀 함수는 어떤 구조를 가져야 안전하게 동작할까요?**
+  두 가지가 반드시 있어야 합니다. 첫째, 재귀를 멈추는 base case입니다. base case가 없으면 무한 재귀로 `RecursionError`가 납니다. 둘째, 재귀 호출마다 입력이 base case에 가까워지는 방향성입니다. `factorial(n)`이 `factorial(n-1)`을 부르는 것처럼, 문제 크기가 단조롭게 줄어야 합니다.
+
+- **base case는 왜 항상 먼저 생각해야 할까요?**
+  재귀 함수를 설계할 때 "가장 작은 입력에서 답은 무엇인가"를 먼저 잡으면 전체 구조가 저절로 따라옵니다. `factorial(0) = 1`, `sum([]) = 0`처럼 base case를 먼저 결정하면 재귀 케이스에서 "이 base case로 수렴하는가"만 확인하면 됩니다. 반대로 재귀 케이스부터 쓰면 종료 조건을 나중에 끼워 맞추게 됩니다.
+
+- **Python에서 꼬리 재귀는 왜 이론만큼 실용적이지 않을까요?**
+  꼬리 재귀 최적화(TCO)는 컴파일러나 런타임이 마지막 재귀 호출을 반복문으로 변환해 스택 프레임을 재사용하는 최적화입니다. Python 인터프리터는 이 최적화를 의도적으로 지원하지 않습니다(Guido van Rossum의 결정). 그래서 꼬리 재귀 형태로 작성해도 스택은 똑같이 쌓입니다. 깊이 제한에 걸릴 것 같으면 반복문으로 직접 변환하는 것이 유일한 안전한 방법입니다.
+
 ## 운영 체크리스트
 
 - [ ] 재귀 함수의 올바른 base case를 설정할 수 있다
@@ -326,87 +370,12 @@ print(total_size_iterative(file_tree))  # 3300
 ## 연습 문제
 
 1. 이진 탐색을 재귀 버전과 반복 버전으로 각각 구현해 보세요.
-2. 중첩 리스트 `[1, [2, [3, 4], 5], 6]`를 평탄화하는 재귀 함수를 작성해 보세요.
+2. 중첩 리스트 `[1, [2, [3, 4], 5], 6]`를 평탄화하는 재귀 함수를 작성하고 결과에 `map`으로 제곱을 적용해 보세요.
 3. `@lru_cache` 대신 dict를 직접 사용해 메모이제이션을 구현해 보세요.
 
 ## 정리와 다음 글
 
 재귀는 문제를 더 작은 같은 문제로 분해해 푸는 방식입니다. 다만 Python은 꼬리 호출 최적화를 지원하지 않으므로 깊이 제한을 항상 염두에 두어야 합니다. 다음 글에서는 값이 정말 필요해질 때까지 계산을 미루는 **지연 평가와 제너레이터**를 다룹니다.
-
-## 검증 시나리오: 경계 조건을 먼저 잠그기
-
-실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
-
-```python
-from functools import reduce
-
-def pipeline(values: list[int]) -> dict[str, int]:
-    filtered = [v for v in values if v >= 0]
-    squared = [v * v for v in filtered]
-    total = reduce(lambda acc, x: acc + x, squared, 0)
-    return {
-        "count": len(squared),
-        "total": total,
-        "max": max(squared) if squared else 0,
-    }
-
-# 경계 조건 검증
-assert pipeline([]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([-3, -1]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([0, 2, 3]) == {"count": 3, "total": 13, "max": 9}
-
-print("Pass")
-```
-
-또한 지연 평가를 사용할 때는 소비 시점을 테스트에 명시해 두는 편이 좋습니다. generator는 한 번 소비하면 비어야 정상이며, 이 성질이 깨지면 중간 단계에서 의도치 않은 materialize가 발생했을 가능성이 큽니다.
-
-```python
-from itertools import islice
-
-def naturals():
-    n = 0
-    while True:
-        yield n
-        n += 1
-
-stream = naturals()
-first_five = list(islice(stream, 5))
-next_three = list(islice(stream, 3))
-
-assert first_five == [0, 1, 2, 3, 4]
-assert next_three == [5, 6, 7]
-print("Pass")
-```
-
-이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
-## 리뷰 포인트: 코드 리뷰에서 바로 확인할 항목
-
-함수형 스타일을 적용한 코드 리뷰에서는 다음 네 가지를 빠르게 확인합니다. 첫째, 계산 함수가 외부 상태를 직접 읽거나 쓰지 않는지 확인합니다. 둘째, mutable 인자를 제자리에서 수정하지 않는지 확인합니다. 셋째, 파이프라인 단계의 입력과 출력 타입이 자연스럽게 연결되는지 확인합니다. 넷째, 실패 경로가 값으로 표현되는지 확인합니다.
-
-```python
-def reviewer_checklist() -> list[str]:
-    return [
-        "pure-core",
-        "immutable-update",
-        "typed-boundary",
-        "explicit-failure-path",
-    ]
-
-assert len(reviewer_checklist()) == 4
-print("Pass")
-```
-
-이 항목을 PR 템플릿에 고정해 두면 스타일 논쟁보다 설계 품질을 빠르게 맞출 수 있습니다.
-
-## 처음 질문으로 돌아가기
-
-- **재귀 함수는 어떤 구조를 가져야 안전하게 동작할까요?**
-  - - 파싱한 JSON의 중첩 구조를 재귀로 순회합니다
-- **base case는 왜 항상 먼저 생각해야 할까요?**
-  - 실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
-- **Python에서 꼬리 재귀는 왜 이론만큼 실용적이지 않을까요?**
-  - - 모든 재귀에는 반드시 base case가 있어야 합니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

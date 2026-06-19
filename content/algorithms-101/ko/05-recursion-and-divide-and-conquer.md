@@ -46,14 +46,15 @@ last_reviewed: '2026-05-12'
 
 ```text
 Recursive shape
-    if base case: return
-    self-call(smaller input)
+    if base case: return fixed value
+    self-call(strictly smaller input)
     combine results
 
 Divide-and-conquer recurrence
     T(n) = a · T(n/b) + f(n)
-    e.g. mergesort     T(n) = 2T(n/2) + O(n) = O(n log n)
-         binary search T(n) = T(n/2)   + O(1) = O(log n)
+    mergesort     T(n) = 2T(n/2) + O(n) = O(n log n)
+    binary search T(n) = T(n/2)   + O(1) = O(log n)
+    fast power    T(n) = T(n/2)   + O(1) = O(log n)
 ```
 
 | 용어 | 설명 |
@@ -70,16 +71,20 @@ Divide-and-conquer recurrence
 
 ```python
 def factorial(n):
-    return n * factorial(n - 1)        # no termination → RecursionError
+    return n * factorial(n - 1)   # 종료 조건 없음 → RecursionError
 ```
 
 **After — 명시적 베이스 케이스:**
 
 ```python
 def factorial(n):
-    if n <= 1:
+    if n <= 1:         # 베이스 케이스: 도달 가능하고 자명한 값
         return 1
-    return n * factorial(n - 1)
+    return n * factorial(n - 1)   # 입력이 엄격하게 줄어듦
+
+assert factorial(0) == 1
+assert factorial(1) == 1
+assert factorial(5) == 120
 ```
 
 ## 단계별로 따라가기
@@ -88,11 +93,17 @@ def factorial(n):
 
 ```python
 def power(base, exp):
-    if exp == 0:                           # (1) base case
+    # 규칙 1: 베이스 케이스 — 가장 단순한 경우
+    if exp == 0:
         return 1
-    return base * power(base, exp - 1)     # (2) smaller input (3) self-call
+    # 규칙 2: 입력이 엄격하게 줄어들어야 함 (exp - 1 < exp)
+    # 규칙 3: 자기 호출로 더 작은 문제를 해결
+    return base * power(base, exp - 1)
 
 print(power(2, 10))   # 1024
+
+# 베이스 케이스 도달 가능성 확인
+# exp=10 → exp=9 → ... → exp=0 (베이스 케이스)
 ```
 
 베이스 케이스는 실제로 도달 가능해야 하고, 모든 호출은 그쪽으로 엄격하게 가까워져야 합니다.
@@ -101,20 +112,24 @@ print(power(2, 10))   # 1024
 
 ```python
 import sys
-print(sys.getrecursionlimit())     # 1000 by default
+print(sys.getrecursionlimit())   # 기본 1000
 
-def deep(n):
+def trace_depth(n, depth=0):
     if n == 0:
-        return 0
-    return 1 + deep(n - 1)
+        print(f"최대 깊이: {depth}")
+        return
+    trace_depth(n - 1, depth + 1)
+
+trace_depth(10)   # 최대 깊이: 10
 
 try:
-    deep(2000)
+    trace_depth(2000)
 except RecursionError as e:
-    print("RecursionError:", e)
+    print(f"RecursionError: {e}")
 
+# 한도 조정 (필요할 때만)
 sys.setrecursionlimit(10_000)
-print(deep(2000))
+trace_depth(2000)   # 최대 깊이: 2000
 ```
 
 CPython에는 tail-call optimisation이 없습니다. 깊은 재귀는 한도를 높이거나 반복문으로 바꿔야 합니다.
@@ -122,29 +137,45 @@ CPython에는 tail-call optimisation이 없습니다. 깊은 재귀는 한도를
 ### 3단계: 분할 정복 거듭제곱, O(n) → O(log n)
 
 ```python
+def slow_power(base, exp):
+    """O(exp) = O(n) 시간."""
+    if exp == 0:
+        return 1
+    return base * slow_power(base, exp - 1)
+
 def fast_power(base, exp):
+    """분할 정복으로 O(log exp) = O(log n) 시간."""
     if exp == 0:
         return 1
     half = fast_power(base, exp // 2)
     if exp % 2 == 0:
-        return half * half
-    return half * half * base
+        return half * half            # exp = 2k: base^(2k) = (base^k)^2
+    return half * half * base         # exp = 2k+1: base^(2k+1) = (base^k)^2 * base
 
-print(fast_power(2, 30))   # 1073741824
+import time
+
+base, exp = 2, 100_000
+t0 = time.perf_counter()
+slow_power(base, exp)
+t1 = time.perf_counter()
+fast_power(base, exp)
+t2 = time.perf_counter()
+print(f"slow: {(t1-t0)*1000:.1f}ms, fast: {(t2-t1)*1000:.1f}ms")
 ```
 
-지수를 절반으로 줄이면 호출 수가 O(log n)이 됩니다. 암호학의 modular exponentiation에서도 같은 아이디어를 씁니다.
+지수를 절반으로 줄이면 호출 수가 O(log n)이 됩니다. 점화식은 `T(n) = T(n/2) + O(1)` → O(log n).
 
 ### 4단계: Mergesort로 점화식 체감하기
 
 ```python
 def mergesort(arr):
+    """T(n) = 2T(n/2) + O(n) → O(n log n)."""
     if len(arr) <= 1:
         return arr
     mid = len(arr) // 2
-    left = mergesort(arr[:mid])
-    right = mergesort(arr[mid:])
-    return merge(left, right)
+    left = mergesort(arr[:mid])    # T(n/2)
+    right = mergesort(arr[mid:])   # T(n/2)
+    return merge(left, right)      # O(n) — 결합 비용
 
 def merge(a, b):
     out, i, j = [], 0, 0
@@ -156,19 +187,31 @@ def merge(a, b):
     out.extend(a[i:]); out.extend(b[j:])
     return out
 
-print(mergesort([3, 1, 4, 1, 5, 9, 2, 6]))
+result = mergesort([3, 1, 4, 1, 5, 9, 2, 6])
+print(result)   # [1, 1, 2, 3, 4, 5, 6, 9]
 ```
 
-`T(n) = 2T(n/2) + O(n)`이 O(n log n)이 되는 가장 친숙한 예입니다.
+`T(n) = 2T(n/2) + O(n)`이 O(n log n)이 되는 가장 친숙한 예입니다. log n 층이 있고 각 층의 총 작업량이 O(n)이므로 전체가 O(n log n)입니다.
 
 ### 5단계: 반복 부분 문제에서 메모이제이션으로
 
 ```python
-def fib_naive(n):
+def fib_naive(n, calls=[0]):
+    calls[0] += 1
     if n <= 1:
         return n
     return fib_naive(n - 1) + fib_naive(n - 2)
-# 동일한 하위 문제가 기하급수적으로 반복되고 매우 느림
+
+calls = [0]
+def fib_count(n, c):
+    c[0] += 1
+    if n <= 1:
+        return n
+    return fib_count(n - 1, c) + fib_count(n - 2, c)
+
+c = [0]
+fib_count(30, c)
+print(f"fib(30) without cache: {c[0]} calls")   # 2,692,537 calls
 
 from functools import lru_cache
 
@@ -178,10 +221,53 @@ def fib_memo(n):
         return n
     return fib_memo(n - 1) + fib_memo(n - 2)
 
-print(fib_memo(100))
+print(fib_memo(100))   # 354224848179261915075 — 순식간에
 ```
 
 캐싱을 추가하면 O(2^n)이 O(n)으로 무너집니다. 바로 다음 글인 동적 계획법으로 이어지는 핵심 전환점입니다.
+
+### 6단계: 재귀를 반복문으로 변환
+
+```python
+# 재귀 피보나치 → 반복 피보나치
+def fib_iterative(n):
+    """O(n) 시간, O(1) 공간 — 깊은 재귀 없음."""
+    if n <= 1:
+        return n
+    a, b = 0, 1
+    for _ in range(n - 1):
+        a, b = b, a + b
+    return b
+
+# 재귀 트리 순회 → 명시적 스택 반복 순회
+def dfs_iterative(adj, start):
+    """DFS를 명시적 스택으로 구현."""
+    visited = set()
+    stack = [start]
+    order = []
+    while stack:
+        node = stack.pop()
+        if node in visited:
+            continue
+        visited.add(node)
+        order.append(node)
+        for neighbor in adj.get(node, []):
+            if neighbor not in visited:
+                stack.append(neighbor)
+    return order
+```
+
+## 분할 정복 알고리즘 Big-O 비교
+
+| 알고리즘 | 점화식 | 시간 복잡도 | 공간 복잡도 | 특징 |
+| --- | --- | --- | --- | --- |
+| Binary search | T(n) = T(n/2) + O(1) | O(log n) | O(log n) 재귀 또는 O(1) 반복 | 정렬 전제 |
+| Fast power | T(n) = T(n/2) + O(1) | O(log n) | O(log n) | 암호학 기초 |
+| Mergesort | T(n) = 2T(n/2) + O(n) | O(n log n) | O(n) | 안정 정렬 |
+| Quicksort (평균) | T(n) = 2T(n/2) + O(n) | O(n log n) | O(log n) | 제자리 |
+| Strassen 행렬 곱 | T(n) = 7T(n/2) + O(n²) | O(n^2.807) | O(n²) | 나이브보다 빠름 |
+| 카라츠바 곱셈 | T(n) = 3T(n/2) + O(n) | O(n^1.585) | O(n log n) | 큰 수 곱셈 |
+| 최근접 점 쌍 | T(n) = 2T(n/2) + O(n log n) | O(n log n) | O(n) | 기하 알고리즘 |
 
 ## 이 글에서 먼저 가져갈 점
 
@@ -189,16 +275,18 @@ print(fib_memo(100))
 - 결합 비용 `f(n)`이 전체 복잡도를 지배할 수 있습니다.
 - 반복 부분 문제를 발견하면 큰 폭의 최적화 기회가 생깁니다.
 - Python의 깊은 재귀는 종종 반복문으로 바꿔야 합니다.
+- 점화식을 쓰면 복잡도를 기계적으로 읽을 수 있습니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수
 
 | 실수 | 문제 | 해결 |
 | --- | --- | --- |
 | 베이스 케이스가 없거나 도달 불가 | 무한 재귀 | 입력이 단조롭게 줄어드는지 확인합니다 |
 | 가변 객체를 호출 간 공유 | 의도치 않은 누적 | 복사하거나 인덱스를 전달합니다 |
-| Python에서 깊은 재귀를 그대로 사용 | `RecursionError` | 반복문으로 바꾸거나 한도를 조정합니다 |
-| 분할 비율 `b`를 무시 | 복잡도 오판 | 점화식으로 적고 읽습니다 |
+| Python에서 깊은 재귀를 그대로 사용 | RecursionError | 반복문으로 바꾸거나 한도를 조정합니다 |
+| 점화식 없이 복잡도를 직관으로 추정 | 오판 | 점화식으로 적고 Master theorem을 적용합니다 |
 | 반복 부분 문제를 놓침 | 지수 시간 | `lru_cache` 같은 메모이제이션을 추가합니다 |
+| 재귀 함수에 가변 기본 인자 사용 | 상태 누적 버그 | 기본 인자에 가변 객체를 쓰지 않습니다 |
 
 ## 실무에서는 이렇게 쓰입니다
 
@@ -207,6 +295,7 @@ print(fib_memo(100))
 - 분산 reduce 단계의 k-way 병합
 - 그래픽스의 quadtree, octree
 - 결정 트리 학습의 재귀적 분할
+- 병렬 알고리즘의 divide-and-conquer 단계
 
 ## 시니어 엔지니어는 이렇게 생각합니다
 
@@ -214,13 +303,16 @@ print(fib_memo(100))
 
 또한 분할 정복을 보면 머릿속에서 바로 점화식을 그립니다. `T(n)=2T(n/2)+O(n)`은 O(n log n), `T(n)=T(n/2)+O(1)`은 O(log n)이라는 감각만 있어도 실전 분석의 상당수를 커버할 수 있습니다.
 
+재귀 함수를 작성할 때는 항상 세 가지를 먼저 적습니다: 베이스 케이스의 조건, 입력이 줄어드는 이유, 결합 단계가 하는 일. 이 세 줄이 명확하면 구현은 거의 자동으로 따라옵니다.
+
 ## 운영 체크리스트
 
 - [ ] 재귀의 세 가지 규칙을 점검할 수 있는가
-- [ ] `RecursionError`가 무엇을 의미하는지 아는가
+- [ ] RecursionError가 무엇을 의미하는지 아는가
 - [ ] 분할 정복 루틴의 점화식을 쓸 수 있는가
 - [ ] 반복 부분 문제를 알아볼 수 있는가
 - [ ] 깊은 재귀를 반복문으로 바꿀 수 있는가
+- [ ] Master theorem의 세 가지 케이스를 구분할 수 있는가
 
 ## 연습 문제
 
@@ -230,130 +322,22 @@ print(fib_memo(100))
 
 3. 하노이 탑을 재귀로 풀고, 호출 횟수가 `2^n - 1`이 되는 이유를 점화식으로 증명해 보세요.
 
+4. `fast_power(base, exp, mod)`를 구현해 모듈러 거듭제곱을 O(log exp)에 계산해 보세요. 왜 암호학에서 이 함수가 필수적인지 설명하세요.
+
 ## 정리 및 다음 단계
 
 재귀는 문제를 더 작은 자기 자신으로 표현하는 방식입니다. 분할 정복은 그중 가장 유용한 패턴이며, 비용은 점화식으로 분석합니다. 부분 문제가 반복되면 메모이제이션이 필요해지고, 바로 그 지점에서 동적 계획법으로 자연스럽게 이어집니다.
 
 다음 글에서는 동적 계획법을 본격적으로 다룹니다. 메모이제이션과 타뷸레이션, 상태 설계, 그리고 0/1 knapsack과 LCS 같은 대표 문제를 봅니다.
 
-## 추가 보강: 검증 가능한 예제 세트
-
-### 입력 크기 대비 알고리즘/학습 선택 표
-
-| 상황 | 빠른 선택 | 검증 기준 |
-| --- | --- | --- |
-| 작은 입력, 빠른 프로토타입 | 단순 구현 우선 | 정답 검증 테스트 3종 |
-| 큰 입력, 지연시간 민감 | 차수 낮은 알고리즘 또는 안정적 optimizer | 시간/메모리 동시 측정 |
-| 운영 장애 재현 필요 | 로그/추적 필드 강화 | 동일 입력 재실행 가능성 |
-
-### 짧은 비교 코드
-
-```python
-import time
-
-def measure(fn, *args, repeat=3):
-    best = float('inf')
-    for _ in range(repeat):
-        t0 = time.perf_counter()
-        fn(*args)
-        best = min(best, time.perf_counter() - t0)
-    return best
-```
-
-측정 코드는 화려할 필요가 없습니다. 같은 입력, 같은 환경, 같은 반복 기준을 유지하는 것이 더 중요합니다. 이 습관이 있어야 최적화 전후의 차이를 신뢰할 수 있습니다.
-
-### 실전 점검 질문
-
-1. 지금 선택한 방법의 시간/공간 비용을 한 문장으로 설명할 수 있는가
-2. 경계 입력에서 동작이 바뀌는 지점을 테스트로 고정했는가
-3. 운영 로그만으로 실패 원인을 분리할 수 있는가
-
-이 질문에 즉답할 수 있으면 구현이 아니라 설계 수준에서 품질을 확보한 상태에 가깝습니다.
-
-## 실전 확장 워크북
-
-이 절은 재귀/분할 정복 설계를 실제 문제 풀이와 운영 감각으로 연결하기 위한 보강 파트입니다. 개념을 암기하는 대신, 입력 크기·자료 구조·검증 순서를 함께 다루어 같은 유형의 문제를 반복적으로 안정적으로 풀 수 있게 만드는 데 목적이 있습니다. 핵심은 "정답 코드 한 번"이 아니라 "다음 문제에서도 재사용 가능한 판단 프레임"을 확보하는 것입니다.
-
-### 1) 시간 복잡도와 입력 제약을 먼저 맞추기
-
-| 입력 조건 | 우선 배제할 접근 | 현실적인 후보 | 확인 포인트 |
-| --- | --- | --- | --- |
-| n <= 10^3 | 없음(학습 목적 실험 가능) | 브루트포스, 정렬, 해시 | 구현 명확성 |
-| n <= 10^5 | O(n^2) 대부분 배제 | O(n log n), O(n), BFS/DFS | 경계값 테스트 |
-| n <= 10^6 이상 | O(n log n)도 부담 가능 | 단일 패스, 압축, 스트리밍 | 메모리 상한 |
-
-복잡도 판단은 코드 스타일 논쟁보다 우선합니다. 같은 팀에서 코드 품질 기준이 달라도, 입력 제약과 차수를 맞추는 원칙은 공통으로 적용됩니다. 이 단계를 건너뛰면 구현이 아무리 깔끔해도 제출 실패나 운영 지연으로 이어집니다.
-
-### 2) 단계별 추적 표로 경계 버그를 조기에 찾기
-
-| 단계 | 관찰 값 | 기대 신호 | 실패 신호 |
-| --- | --- | --- | --- |
-| 초기화 | 포인터/상태/큐/테이블 | 문제 정의와 일치 | 초기값 누락 |
-| 1회 반복 | 상태 전이 | 단조 증가 또는 감소 | 제자리 반복 |
-| 종료 직전 | 반환 후보 | 문제 요구와 직접 연결 | 보조값 반환 |
-
-경계 버그는 대부분 "한 줄"에서 발생하지만, 원인은 상태 전이 설계에 있습니다. 그래서 디버깅할 때는 출력값 하나만 보지 말고, 전이 로그를 함께 봐야 합니다. 특히 인덱스 기반 문제는 `lo, mid, hi`, DP 문제는 `state, transition`, 그래프 문제는 `queue size, visited count`를 같이 기록하면 원인 분리가 훨씬 빨라집니다.
-
-### 3) Python 구현 앵커
-
-```python
-def merge_sort(arr):
-    if len(arr) <= 1:
-        return arr
-    mid = len(arr) // 2
-    left = merge_sort(arr[:mid])
-    right = merge_sort(arr[mid:])
-    out = []
-    i = j = 0
-    while i < len(left) and j < len(right):
-        if left[i] <= right[j]:
-            out.append(left[i]); i += 1
-        else:
-            out.append(right[j]); j += 1
-    out.extend(left[i:]); out.extend(right[j:])
-    return out
-```
-
-코드는 짧아도 충분합니다. 중요한 점은 구현 전에 불변식(invariant)을 문장으로 먼저 고정하는 것입니다. 예를 들어 "현재 단계가 끝나면 최소 비용이 보장된다" 같은 문장이 없으면, 코드가 돌아가도 왜 맞는지 설명할 수 없고, 변형 문제에서 무너지기 쉽습니다.
-
-### 4) LeetCode 스타일 매핑
-
-| 문제 | 핵심 패턴 | 첫 시도에서 자주 틀리는 지점 |
-| --- | --- | --- |
-| 50 Pow(x, n) | 제약을 통한 후보 축소 | 입력 조건을 늦게 반영 |
-| 169 Majority Element | 상태/포인터 유지 | 경계 인덱스 처리 |
-| 148 Sort List | 자료구조 선택 | 복잡도 목표 미달 |
-
-문제 매핑의 목적은 정답 암기가 아닙니다. 같은 구조를 빠르게 인식하고, "왜 이 패턴을 쓰는가"를 재현하는 데 있습니다. 시리즈 전체를 관통하는 실력 차이는 여기서 발생합니다.
-
-### 5) 비교 벤치마크를 읽는 기준
-
-| 비교 항목 | A 접근 | B 접근 | 의사결정 기준 |
-| --- | --- | --- | --- |
-| 시간 | 평균적으로 빠름 | 최악 케이스 안정적 | 입력 분포가 고정인지 |
-| 메모리 | 추가 배열 필요 | 제자리 처리 가능 | 메모리 제한 강도 |
-| 구현 난이도 | 짧음 | 디버깅 난이도 높음 | 팀 유지보수 역량 |
-
-벤치마크 숫자는 환경에 따라 달라집니다. 하지만 차수와 메모리 계층에서 발생하는 방향성은 반복됩니다. 그래서 한 번 측정한 결과를 절대값으로 외우기보다, 어떤 조건에서 우위가 바뀌는지(입력 크기, 정렬 여부, 중복 비율)를 함께 기록해야 다음 의사결정에 도움이 됩니다.
-
-### 6) 제출/배포 전 점검 루틴
-
-1. 문제 제약을 한 줄로 요약하고 불가능한 차수를 먼저 제거합니다.
-2. 핵심 자료구조 선택 이유를 "삽입/조회/삭제 비용" 기준으로 적습니다.
-3. 경계 입력 3종(빈값, 최소값, 중복/극단값) 테스트를 고정합니다.
-4. 시간·공간 복잡도를 코드 옆에 기록하고, 실제 측정값을 짧게 남깁니다.
-5. 같은 패턴의 변형 문제를 1개 더 풀어 일반화 여부를 확인합니다.
-
-이 루틴을 꾸준히 적용하면 "이번 문제를 맞춤"에서 끝나지 않고 "같은 유형을 안정적으로 재현"하는 상태로 넘어갈 수 있습니다. 알고리즘 학습은 지식 축적이 아니라 판단 체계 구축이라는 점을 계속 기억하는 것이 중요합니다.
-
 ## 처음 질문으로 돌아가기
 
 - **올바른 재귀가 되기 위한 세 가지 규칙은 무엇일까요?**
-  - 베이스 케이스는 실제로 도달 가능해야 하고, 모든 호출은 그쪽으로 엄격하게 가까워져야 합니다
+  - 첫째, 베이스 케이스가 존재하고 실제로 도달 가능해야 합니다. 둘째, 재귀 호출의 입력이 베이스 케이스 방향으로 엄격하게 줄어들어야 합니다. 셋째, 더 작은 문제의 해답을 결합해 원래 문제의 해답을 만들어야 합니다.
 - **호출 스택은 어떻게 동작하며, `RecursionError`는 왜 생길까요?**
-  - 베이스 케이스는 실제로 도달 가능해야 하고, 모든 호출은 그쪽으로 엄격하게 가까워져야 합니다
+  - 함수가 호출될 때마다 매개변수, 지역 변수, 반환 주소가 스택에 쌓입니다. CPython은 기본 1000 깊이 제한을 두고 있으며, 이를 초과하면 RecursionError를 발생시킵니다. 꼬리 재귀 최적화가 없기 때문에 깊은 선형 재귀는 반복문으로 바꿔야 합니다.
 - **분할 정복 점화식은 어떻게 읽어야 할까요?**
-  - 시니어 엔지니어는 문제가 자연스럽게 트리 구조를 가지면 재귀를 택하고, 깊은 선형 체인이라면 반복을 더 선호합니다
+  - `T(n) = a·T(n/b) + f(n)`에서 a는 부분 문제 수, b는 분할 비율, f(n)은 분할/결합 비용입니다. Master theorem으로 세 케이스를 구분합니다. mergesort의 `T(n) = 2T(n/2) + O(n)`에서 a=2, b=2, f(n)=O(n)이고 n^log_b(a) = n^1 = n이므로 Case 2: O(n log n)입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

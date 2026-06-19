@@ -50,131 +50,256 @@ HTTP는 상태를 기억하지 않는 프로토콜입니다. 요청 하나가 �
 
 ## 왜 이 주제가 중요한가
 
-거의 모든 앱에는 로그인 기능이 들어갑니다. 여기가 약하면 계정 탈취, 세션 하이재킹, 권한 우회가 한 번에 이어집니다. 인증은 부가 기능이 아니라 서비스 전체를 떠받치는 기반입니다.
-
 이 도구들의 이름과 역할을 분명히 알아 두면 많은 실수를 초기에 막을 수 있습니다. 비밀번호는 어디에 저장하면 안 되는지, JWT에 무엇을 넣으면 안 되는지, 쿠키 옵션을 왜 꼼꼼히 봐야 하는지 같은 판단이 전부 이 기반 위에서 나옵니다.
 
-## 한눈에 보는 개념 지도
+## 인증 vs 인가
 
-이 그림의 핵심은 서버가 비밀번호를 매번 다시 받지 않아도 된다는 사실입니다. 로그인 한 번으로 세션 식별자를 만들고, 브라우저는 이후 요청마다 그 식별자를 쿠키로 자동 전송합니다.
+```
+인증 (Authentication): 당신이 누구인지 확인
+  예) 아이디/비밀번호로 로그인 → "당신은 alice입니다"
 
-### 직접 검증해 볼 포인트
-
-- 로그인 요청 뒤 DevTools Application 탭에서 세션 쿠키가 실제로 저장되는지 확인합니다.
-- `curl -c`와 `curl -b`로 쿠키 저장과 재사용이 분리되는지 검증합니다.
-- 로그아웃 요청 뒤 같은 쿠키로 `/me`를 호출했을 때 401이 나는지 확인합니다.
-
-**기대 결과:** 로그인 직후에는 세션 쿠키가 생기고, 로그아웃 뒤에는 같은 쿠키를 보내도 보호된 엔드포인트가 더는 사용자를 인정하지 않습니다.
-
-**실패 모드:** 쿠키에 `HttpOnly`, `Secure`, `SameSite`를 두지 않으면 탈취와 재사용 위험이 커집니다. JWT에 민감 정보를 넣으면 서명만으로는 내용을 숨길 수 없습니다.
-
-## 먼저 알아둘 용어
-
-- **Authentication**: 내가 누구인지 확인하는 과정입니다.
-- **Authorization**: 내가 무엇을 할 수 있는지 결정하는 과정입니다.
-- **Session**: 서버가 보관하는 사용자 상태입니다.
-- **Cookie**: 브라우저가 도메인 단위로 저장하는 key/value 데이터입니다.
-- **JWT**: 서버가 서명한 self-describing token입니다.
-
-## 전후 비교로 보는 인증 흐름
-
-**Before (매 요청마다 비밀번호)**
-
-```python
-requests.get("/api/me", auth=("alice", "secret"))  # 비밀번호가 반복해서 흐릅니다
+인가 (Authorization): 당신이 무엇을 할 수 있는지 결정
+  예) alice는 admin 역할 → "/admin 페이지 접근 허용"
+       bob은 user 역할  → "/admin 페이지 접근 거부 (403)"
 ```
 
-**After (세션 쿠키)**
-
 ```python
-s = requests.Session()
-s.post("/login", json={"id": "alice", "pw": "secret"})
-s.get("/api/me")  # 쿠키가 자동으로 함께 전송됩니다
+# 401 Unauthorized: 로그인이 필요한 상태
+# 403 Forbidden: 로그인은 됐지만 권한이 없는 상태
+
+@app.get("/admin")
+def admin_page():
+    user = get_current_user()
+    if not user:
+        return jsonify(error={"code": "UNAUTHORIZED"}), 401   # 로그인 안 됨
+    if user["role"] != "admin":
+        return jsonify(error={"code": "FORBIDDEN"}), 403      # 권한 없음
+    return jsonify(data="관리자 전용 데이터")
 ```
 
-비밀번호는 로그인 시점에만 확인하고, 이후에는 세션 식별자로 사용자를 이어 가는 편이 안전합니다.
+## 쿠키와 세션의 동작 방식
 
-## 로그인 흐름을 다섯 단계로 만들어 보기
+```
+로그인 흐름:
+  1. POST /login  (id, password 전송)
+  2. 서버: 비밀번호 검증 → 세션 생성 → 세션 ID를 쿠키로 전송
+     Set-Cookie: session_id=abc123; HttpOnly; Secure; SameSite=Lax
+  3. 브라우저: 쿠키 저장
 
-### 1단계 — Flask 세션 로그인 만들기
+이후 요청마다:
+  4. GET /me  (자동으로 쿠키 포함)
+     Cookie: session_id=abc123
+  5. 서버: 세션 ID로 사용자 조회 → 인증 성공
+
+로그아웃:
+  6. POST /logout
+  7. 서버: 세션 삭제
+  8. 이후 같은 세션 ID를 보내도 → 401 Unauthorized
+```
+
+## Flask 세션 구현
 
 ```python
-# app.py
 from flask import Flask, session, request, jsonify
-app = Flask(__name__)
-app.secret_key = "dev-only-change-me"
+import hashlib, os
 
-USERS = {"alice": "secret"}
+app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "dev-only-change-in-production")
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,    # JavaScript에서 접근 불가 (XSS 방어)
+    SESSION_COOKIE_SECURE=True,      # HTTPS에서만 전송
+    SESSION_COOKIE_SAMESITE="Lax",  # CSRF 부분 방어
+    PERMANENT_SESSION_LIFETIME=3600, # 1시간 후 만료
+)
+
+# 실제 서비스에서는 bcrypt/argon2 같은 단방향 해시 사용
+def hash_password(pw: str) -> str:
+    return hashlib.sha256(pw.encode()).hexdigest()
+
+USERS = {
+    "alice": hash_password("secret123")
+}
 
 @app.post("/login")
 def login():
     data = request.get_json()
-    if USERS.get(data["id"]) == data["pw"]:
-        session["user"] = data["id"]
-        return jsonify(ok=True)
-    return jsonify(ok=False), 401
+    user_id = data.get("id")
+    password = data.get("pw")
+
+    stored_hash = USERS.get(user_id)
+    if not stored_hash or stored_hash != hash_password(password):
+        return jsonify(error={"code": "INVALID_CREDENTIALS"}), 401
+
+    session["user_id"] = user_id
+    session.permanent = True
+    return jsonify(ok=True, user_id=user_id)
 
 @app.get("/me")
 def me():
-    user = session.get("user")
-    if not user: return jsonify(error="unauth"), 401
-    return jsonify(user=user)
-```
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify(error={"code": "UNAUTHORIZED"}), 401
+    return jsonify(user_id=user_id)
 
-이 예제에서 서버는 로그인 성공 시 `session["user"]`에 사용자 ID를 저장합니다. 이후 `/me` 요청은 세션에 값이 있는지 보고 로그인 여부를 판단합니다.
-
-### 2단계 — 쿠키가 실제로 생기는지 확인하기
-
-```bash
-curl -c c.txt -X POST -H "Content-Type: application/json" -d '{"id":"alice","pw":"secret"}' http://localhost:5000/login
-curl -b c.txt http://localhost:5000/me  # → {"user":"alice"}
-```
-
-첫 번째 명령은 서버가 내려준 쿠키를 파일에 저장하고, 두 번째 명령은 그 쿠키를 다시 보내서 로그인 상태를 재사용합니다.
-
-### 3단계 — 로그아웃 추가하기
-
-```python
 @app.post("/logout")
 def logout():
     session.clear()
     return jsonify(ok=True)
 ```
 
-로그아웃은 세션 정보를 지우는 작업입니다. 서버 기준 기억을 지우면 브라우저가 같은 세션 ID를 보내도 더는 유효하지 않습니다.
+## curl로 쿠키 흐름 확인
 
-### 4단계 — JWT 발급하기
+```bash
+# 1. 로그인 (쿠키를 파일에 저장)
+curl -c cookies.txt -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"id":"alice","pw":"secret123"}' \
+  http://localhost:5000/login
 
-```python
-# jwt_demo.py
-import jwt, time
-SECRET = "dev"
-token = jwt.encode({"sub": "alice", "exp": time.time() + 3600}, SECRET, algorithm="HS256")
-print(jwt.decode(token, SECRET, algorithms=["HS256"]))
+# 2. 쿠키 파일 내용 확인
+cat cookies.txt
+
+# 3. 인증된 요청 (저장된 쿠키 사용)
+curl -b cookies.txt http://localhost:5000/me
+# → {"user_id": "alice"}
+
+# 4. 로그아웃
+curl -b cookies.txt -c cookies.txt -X POST http://localhost:5000/logout
+
+# 5. 로그아웃 후 같은 쿠키로 요청
+curl -b cookies.txt http://localhost:5000/me
+# → 401 Unauthorized
 ```
 
-JWT는 서버가 상태를 직접 저장하지 않고도 사용자를 식별하게 도와줍니다. 대신 서명 검증과 만료 시간 관리가 중요합니다.
+## JWT (JSON Web Token)
 
-### 5단계 — Authorization 헤더로 호출하기
+세션은 서버가 상태를 저장합니다. JWT는 서버 저장 없이 토큰 자체에 정보를 담고 서명으로 위조를 방지합니다.
 
-```python
-import requests
-requests.get("/api/me", headers={"Authorization": f"Bearer {token}"})
+```
+JWT 구조:
+  eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsImV4cCI6MTczMjI4ODAwMH0.abc123
+  │                    │                                              │
+  Header (알고리즘)     Payload (사용자 정보, 만료시간)               Signature
+
+Header: {"alg": "HS256", "typ": "JWT"}
+Payload: {"sub": "alice", "role": "user", "exp": 1732288000}
+Signature: HMAC-SHA256(header + "." + payload, secret_key)
 ```
 
-세션 쿠키 대신 `Authorization` 헤더에 토큰을 넣어 요청하는 방식입니다. 모바일 앱과 분산 시스템에서 자주 보게 됩니다.
+```python
+import jwt
+import time
+import os
 
-- 세션은 서버 메모리나 데이터베이스 같은 저장소를 필요로 합니다.
-- JWT는 서버가 매 요청마다 서명만 검증해도 되므로 분산 환경에 잘 맞습니다.
-- 쿠키에는 `HttpOnly`, `Secure`, `SameSite` 같은 보안 옵션이 꼭 필요합니다.
+SECRET = os.environ.get("JWT_SECRET", "dev-only")
 
-## 여기서 자주 헷갈립니다
+def create_token(user_id: str, role: str = "user") -> str:
+    payload = {
+        "sub": user_id,
+        "role": role,
+        "iat": int(time.time()),          # 발급 시각
+        "exp": int(time.time()) + 3600,   # 만료: 1시간 후
+    }
+    return jwt.encode(payload, SECRET, algorithm="HS256")
 
-1. **비밀번호를 평문으로 저장하는 경우**: 반드시 hash 함수로 저장해야 합니다.
-2. **JWT 안에 민감한 비밀을 넣는 경우**: JWT는 서명되었을 뿐 암호화된 것이 아닙니다.
-3. **쿠키 보안 옵션을 비워 두는 경우**: XSS와 CSRF 위험이 커집니다.
-4. **만료 시간이 없는 토큰을 쓰는 경우**: 한 번 유출되면 오래 남습니다.
-5. **권한 검사를 로그인 한 번으로 끝내는 경우**: 보호된 모든 엔드포인트에서 다시 확인해야 합니다.
+def verify_token(token: str) -> dict:
+    try:
+        return jwt.decode(token, SECRET, algorithms=["HS256"])
+    except jwt.ExpiredSignatureError:
+        raise ValueError("토큰 만료")
+    except jwt.InvalidTokenError:
+        raise ValueError("유효하지 않은 토큰")
+
+# 발급
+token = create_token("alice", role="admin")
+print(token)
+
+# 검증
+payload = verify_token(token)
+print(payload["sub"])   # "alice"
+print(payload["role"])  # "admin"
+```
+
+```python
+# JWT를 Authorization 헤더로 전송하는 API
+@app.get("/api/profile")
+def profile():
+    auth = request.headers.get("Authorization", "")
+    if not auth.startswith("Bearer "):
+        return jsonify(error={"code": "UNAUTHORIZED"}), 401
+    try:
+        payload = verify_token(auth[7:])
+    except ValueError as e:
+        return jsonify(error={"code": "INVALID_TOKEN", "message": str(e)}), 401
+    return jsonify(user_id=payload["sub"], role=payload["role"])
+```
+
+```bash
+# JWT로 API 호출
+TOKEN=$(curl -s -X POST -H "Content-Type: application/json" \
+  -d '{"id":"alice","pw":"secret"}' http://localhost:5000/login | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
+
+curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/profile
+```
+
+## 세션 vs JWT 선택 기준
+
+```
+세션 (서버 저장)             JWT (Stateless)
+───────────────────────────────────────────────────
+서버가 세션 저장소 관리     서버에 상태 저장 불필요
+즉각 폐기 가능              만료 전까지 폐기 어려움
+단일 서버에 적합            분산 환경, 마이크로서비스에 적합
+CSRF 방어 필요              Authorization 헤더 사용 시 CSRF 없음
+쿠키로 자동 전송            클라이언트가 직접 헤더에 추가
+```
+
+## 비밀번호 안전 저장
+
+```python
+# 절대 안 되는 것
+import hashlib
+password_stored = hashlib.md5(password.encode()).hexdigest()  # MD5: 무지개 테이블 공격 취약
+password_stored = password  # 평문 저장
+
+# 올바른 방법: bcrypt
+import bcrypt
+
+# 저장 시
+hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt(rounds=12))
+
+# 검증 시
+bcrypt.checkpw(password.encode(), hashed)  # True/False
+```
+
+bcrypt의 `rounds` 파라미터가 높을수록 해시 계산이 느려져 brute force 공격에 강해집니다. 하드웨어 성능에 맞춰 로그인 응답이 약 100-300ms 걸리도록 조정하는 것이 일반적입니다.
+
+## 쿠키 보안 옵션
+
+```http
+Set-Cookie: session_id=abc123; HttpOnly; Secure; SameSite=Lax; Max-Age=3600; Path=/
+```
+
+```
+옵션         의미                              없으면?
+─────────────────────────────────────────────────────────
+HttpOnly    JavaScript에서 쿠키 접근 불가    XSS로 쿠키 탈취 가능
+Secure      HTTPS에서만 쿠키 전송            HTTP로 쿠키가 평문 전송됨
+SameSite    다른 사이트에서 쿠키 전송 제한   CSRF 공격 취약
+Max-Age     만료 시간                         세션 쿠키 (브라우저 종료 시 삭제)
+Path        쿠키가 전송될 경로               /: 모든 경로, /api: API만
+```
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 올바른 방법 |
+|------|------|-------------|
+| 비밀번호를 평문 또는 MD5로 저장 | DB 유출 시 즉시 노출 | bcrypt, argon2id 사용 |
+| JWT에 비밀번호나 민감 정보 저장 | Base64 디코딩으로 내용 노출 | JWT는 서명만, 암호화 아님 |
+| 쿠키에 HttpOnly 없음 | XSS로 세션 쿠키 탈취 | 항상 HttpOnly 설정 |
+| 만료 시간 없는 JWT | 유출 시 영구 사용 가능 | access token 15분, refresh 1주 |
+| 권한 검사를 로그인 한 번으로 끝내기 | 모든 API에서 권한 재확인 | 미들웨어로 매 요청 검증 |
+| secret_key를 코드에 하드코딩 | 저장소 노출 시 모든 토큰 위조 가능 | 환경 변수로 관리 |
 
 ## 운영에서는 이렇게 보입니다
 
@@ -192,9 +317,9 @@ requests.get("/api/me", headers={"Authorization": f"Bearer {token}"})
 
 - [ ] 인증과 인가의 차이를 설명할 수 있습니다.
 - [ ] 세션과 JWT의 장단점을 알고 있습니다.
-- [ ] 비밀번호를 저장할 때 hash 함수를 써야 함을 알고 있습니다.
+- [ ] 비밀번호를 저장할 때 bcrypt를 써야 함을 알고 있습니다.
 - [ ] 쿠키 보안 플래그 세 가지를 말할 수 있습니다.
-- [ ] OAuth 흐름을 한 줄로 설명할 수 있습니다.
+- [ ] 401과 403의 차이를 설명할 수 있습니다.
 
 ## 연습 문제
 
@@ -205,169 +330,6 @@ requests.get("/api/me", headers={"Authorization": f"Bearer {token}"})
 ## 정리와 다음 글
 
 HTTP는 상태를 기억하지 않지만, 웹앱은 쿠키, 세션, 토큰, OAuth를 이용해 사용자 맥락을 이어 갑니다. 인증 구조를 제대로 잡아야 나머지 기능도 안전하게 쌓을 수 있습니다. 다음 글에서는 이렇게 확인한 사용자 데이터를 영속적으로 저장하는 데이터베이스 연결을 보겠습니다.
-
-## HTTP-인증-배포를 함께 검증하는 점검 루틴
-
-웹 서비스는 단일 기능이 아니라 경로 전체의 안정성으로 평가됩니다. 따라서 API 스펙, 인증 예외, 배포 헬스체크를 같은 릴리스 체크리스트로 묶는 편이 안전합니다.
-
-```text
-배포 전 점검
-1) 핵심 API 3개에 대해 상태 코드/응답 스키마 계약 테스트 실행
-2) access 만료, refresh 만료, revoke 토큰 시나리오 재현
-3) /health, /ready 엔드포인트를 배포 환경에서 실제 호출
-4) CDN/브라우저 캐시 무효화 정책 확인
-```
-
-### 장애 예방을 위한 최소 헤더 정책
-
-```http
-Cache-Control: no-store
-X-Content-Type-Options: nosniff
-X-Frame-Options: DENY
-Referrer-Policy: strict-origin-when-cross-origin
-```
-
-헤더 정책은 프론트엔드 코드 변경 없이도 보안/캐시 동작을 크게 바꿉니다. 기능 개발과 별개로 표준 헤더를 고정해 두면 릴리스 변동성이 줄어듭니다.
-
-### 배포 후 15분 관찰 항목
-
-- 5xx 비율과 p95 지연 시간의 급격한 상승 여부
-- 로그인 성공률, 토큰 재발급 성공률
-- 정적 자산 404 발생률
-
-이 루틴을 반복하면 "배포는 되었지만 정상 운영은 아닌" 상태를 초기에 감지할 수 있습니다.
-
-## 실전 앵커 모음: 인증 경계을 운영 문서로 바꾸기
-
-작은 기능이라도 운영 단계까지 생각하면 문서화 기준이 달라집니다. 아래 예시는 팀이 기능 구현과 동시에 남겨 두면 바로 도움이 되는 최소 산출물입니다. 특히 요청/응답 계약, 세션/쿠키 정책, SQL 기준 쿼리, 배포 설정, 캐시 규칙을 함께 기록하면 변경 시점의 실패 반경을 크게 줄일 수 있습니다.
-
-### HTTP 요청/응답 계약 예시
-
-```http
-GET /api/v1/todos?limit=20&cursor=todo_120 HTTP/1.1
-Host: api.example.com
-Accept: application/json
-Authorization: Bearer <access_token>
-X-Request-Id: req-2026-05-21-0001
-```
-
-```http
-HTTP/1.1 200 OK
-Content-Type: application/json
-Cache-Control: private, max-age=30
-ETag: "todo-list-v42"
-
-{
-  "items": [
-    {"id": "todo_121", "text": "문서 작성", "done": false},
-    {"id": "todo_122", "text": "테스트 실행", "done": true}
-  ],
-  "next_cursor": "todo_122"
-}
-```
-
-응답 예시는 상태 코드만 맞추는 수준에서 끝내지 말고, 캐시 정책과 추적 ID를 함께 포함하는 편이 좋습니다. 특히 `X-Request-Id`를 표준화하면 장애 시점에 브라우저 로그와 서버 로그를 빠르게 결합할 수 있습니다.
-
-### REST API 설계 스케치
-
-```text
-GET    /api/v1/todos            목록 조회
-POST   /api/v1/todos            항목 생성
-PATCH  /api/v1/todos/{id}       항목 일부 수정(done 토글 등)
-DELETE /api/v1/todos/{id}       항목 삭제
-```
-
-리소스 이름은 복수형으로 고정하고, 동작은 method로 분리하는 편이 유지보수에 유리합니다. 예를 들어 `/toggleTodo`처럼 동사형 엔드포인트를 늘리기 시작하면 권한 정책과 감사 로그 규칙이 빠르게 파편화됩니다.
-
-### 세션/쿠키 정책 코드 예시
-
-```python
-from flask import Flask, session, jsonify
-
-app = Flask(__name__)
-app.secret_key = "change-me"
-app.config.update(
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SECURE=True,
-    SESSION_COOKIE_SAMESITE="Lax",
-)
-
-@app.get("/api/v1/me")
-def me():
-    user_id = session.get("user_id")
-    if not user_id:
-        return jsonify(error={"code": "UNAUTHORIZED"}), 401
-    return jsonify(user_id=user_id)
-```
-
-인증은 로그인 성공 시점보다 실패 시점 설계가 더 중요합니다. 어떤 경우에 401을 돌리고, 어떤 경우에 403을 돌릴지 미리 고정해 두어야 프론트엔드 재시도 정책과 알림 문구가 안정됩니다.
-
-### SQL 기준 쿼리와 인덱스 예시
-
-```sql
-CREATE TABLE IF NOT EXISTS todo_items (
-  id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  text TEXT NOT NULL,
-  done INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL
-);
-
-CREATE INDEX IF NOT EXISTS idx_todo_user_created
-ON todo_items(user_id, created_at DESC);
-
-SELECT id, text, done, created_at
-FROM todo_items
-WHERE user_id = ?
-ORDER BY created_at DESC
-LIMIT 20;
-```
-
-조회 패턴을 먼저 적고 그다음 인덱스를 정의하면 불필요한 인덱스 폭증을 피할 수 있습니다. 특히 쓰기 비중이 높은 서비스에서는 인덱스를 한 개 추가할 때마다 INSERT 비용이 늘어난다는 점을 함께 기록해야 합니다.
-
-### 배포 설정과 헬스 체크 예시
-
-```yaml
-services:
-  api:
-    image: ghcr.io/example/todo-api:1.0.0
-    environment:
-      - APP_ENV=production
-      - DATABASE_URL=postgresql://app:***@db:5432/todo
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-```
-
-배포 문서에는 반드시 "성공 기준"을 남겨야 합니다. 예를 들어 `/health`가 200을 반환하고, 배포 후 15분 동안 5xx 비율이 1% 미만이며, 로그인 성공률이 평시 대비 하락하지 않는지를 체크리스트로 고정하면 릴리스 판단이 사람마다 달라지지 않습니다.
-
-### 캐시 전략 표준 예시
-
-```http
-Cache-Control: public, max-age=31536000, immutable
-```
-
-정적 자산은 파일명에 해시를 넣고 장기 캐시를 적용하는 편이 안전합니다. 반대로 사용자별 데이터는 `private` 또는 `no-store` 정책을 명시해 캐시 오염을 방지해야 합니다. 이 구분을 코드 리뷰 항목으로 올려 두면 보안 이슈와 성능 이슈를 동시에 예방할 수 있습니다.
-
-### 운영 체크리스트
-
-- 요청/응답 샘플에 상태 코드, 헤더, 오류 본문 형식을 모두 기록합니다.
-- 인증 실패(401), 권한 실패(403), 입력 오류(400) 경계를 API 문서에 고정합니다.
-- 핵심 SQL 쿼리 3개를 선정해 `EXPLAIN` 결과를 릴리스마다 비교합니다.
-- 배포 후 15분 관측 지표(5xx, p95, 로그인 성공률)를 팀 표준으로 유지합니다.
-- 캐시 정책 변경 시 무효화 전략과 롤백 절차를 같은 PR에 포함합니다.
-
-## 처음 질문으로 돌아가기
-
-- **인증과 인가는 무엇이 다를까요?**
-  - 거의 모든 앱에는 로그인 기능이 들어갑니다
-- **상태가 없는 HTTP 위에서 서버는 사용자를 어떻게 기억할까요?**
-  - 웹 서비스는 단일 기능이 아니라 경로 전체의 안정성으로 평가됩니다. 따라서 API 스펙, 인증 예외, 배포 헬스체크를 같은 릴리스 체크리스트로 묶는 편이 안전합니다.
-- **쿠키와 세션은 어떤 식으로 맞물릴까요?**
-  - 거의 모든 앱에는 로그인 기능이 들어갑니다
-  - 이 그림의 핵심은 서버가 비밀번호를 매번 다시 받지 않아도 된다는 사실입니다. 로그인 한 번으로 세션 식별자를 만들고, 브라우저는 이후 요청마다 그 식별자를 쿠키로 자동 전송합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

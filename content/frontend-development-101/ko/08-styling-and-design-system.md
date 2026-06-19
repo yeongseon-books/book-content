@@ -30,8 +30,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 Frontend Development 101 시리즈의 여덟 번째 글입니다. 여기서는 스타일링을 단순한 CSS 작성이 아니라 일관성을 운영하는 체계로 설명합니다. 색, 간격, 타이포그래피 같은 시각 규칙은 개별 컴포넌트 안에 흩어져 있으면 안 되고 토큰과 공용 컴포넌트 계층으로 모여 있어야 합니다.
 
-초기 프로젝트에서는 버튼 하나쯤 직접 색을 주고 간격을 맞춰도 큰 문제가 없어 보입니다. 하지만 화면이 늘어나고 팀원이 늘어나면 작은 차이가 금방 누적됩니다. 페이지마다 파란색이 조금씩 다르고, 간격 기준이 섞이고, 다크 모드는 나중에 붙이려다 전체를 다시 만지게 됩니다.
-
 ![Frontend Development 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-diagram.ko.png)
 *Frontend Development 101 8장 흐름 개요*
 
@@ -45,13 +43,7 @@ last_reviewed: '2026-05-12'
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
-코드가 일관되어도 디자인이 일관되지 않으면 사용자는 제품을 미완성으로 느낍니다. 페이지마다 버튼 느낌이 다르면 기술적 품질과 별개로 신뢰가 떨어집니다. 디자인 시스템은 팀 규모에서의 일관성이라고 볼 수 있습니다.
-
-좋은 디자인 시스템은 디자이너와 엔지니어가 같은 언어를 쓰게 만듭니다. “이 버튼은 primary인가 secondary인가”, “spacing token은 어느 단계인가” 같은 대화가 가능해지면 변경도 훨씬 빨라집니다.
-
 ## 개념 한눈에 보기
-
-디자인 토큰이 가장 아래의 공통 규칙이고, 컴포넌트는 그 규칙을 구현하며, 페이지는 그 컴포넌트를 조합합니다. 다크 모드도 대개 구조 자체를 바꾸는 것이 아니라 토큰 값을 바꾸는 문제로 다뤄야 합니다.
 
 | 용어 | 뜻 | 실무에서 왜 중요한가 |
 |---|---|---|
@@ -61,30 +53,88 @@ last_reviewed: '2026-05-12'
 | Utility-first CSS | 작은 클래스를 조합해 스타일을 만드는 방식입니다. | 화면을 빠르게 만들 수 있지만, 토큰 규칙이 없으면 난잡해지기 쉽습니다. |
 | 컴포넌트 라이브러리 | 디자인 시스템을 구현한 재사용 가능한 컴포넌트 모음입니다. | 팀이 같은 버튼, 입력창, 카드 규칙을 공유하게 만드는 운영 기반입니다. |
 
-## 페이지별 임의 스타일에서 토큰 기반 시스템으로
+## 스타일링 방식 비교
 
-스타일링이 어려워지는 시점은 버튼 하나를 예쁘게 만드는 순간이 아니라, 여러 화면과 여러 개발자가 동시에 스타일을 바꾸기 시작하는 순간입니다. 그때부터는 값 하나를 이름으로 다루는 시스템이 필요합니다.
+```css
+/* 1. 전역 CSS */
+/* button.css */
+.btn-primary {
+  background: #1d72ff;  /* 값이 흩어짐 → 변경 시 전체 검색 필요 */
+  color: white;
+  padding: 8px 16px;
+}
+```
 
-| 방식 | 스타일 관리 방식 | 실무 영향 |
-|---|---|---|
-| 페이지별 임의 값 사용 | 색상과 간격이 파일마다 흩어집니다. | 사소한 디자인 변경도 전역 수작업이 되고, 다크 모드는 특히 비싸집니다. |
-| 토큰 + 컴포넌트 중심 | 값은 토큰으로, 사용법은 컴포넌트로 모읍니다. | 브랜드 변경, 코드 리뷰, 테마 확장이 훨씬 예측 가능해집니다. |
+```css
+/* 2. CSS Modules */
+/* Button.module.css */
+.button {
+  background: var(--color-primary);  /* 토큰 참조 */
+  color: white;
+  padding: var(--spacing-2) var(--spacing-4);
+}
+
+/* 빌드 후 클래스명이 자동으로 고유해짐: .Button_button__3xNvj */
+```
+
+```jsx
+/* 3. CSS-in-JS (예: vanilla-extract, Emotion) */
+const buttonStyle = css({
+  background: vars.color.primary,
+  color: "white",
+  padding: `${vars.spacing[2]} ${vars.spacing[4]}`,
+  ":hover": { opacity: 0.9 },
+});
+```
+
+```jsx
+/* 4. Tailwind CSS */
+<button className="bg-primary text-white px-4 py-2 rounded hover:opacity-90">
+  클릭
+</button>
+```
 
 **Before (페이지마다 다른 색상)**
 
 ```css
 .btn-a { background: #1d72ff; }   /* page A */
-.btn-b { background: #1d70ff; }   /* page B (typo) */
+.btn-b { background: #1d70ff; }   /* page B (오타) */
+.btn-c { background: #1D72FF; }   /* page C (대소문자) */
 ```
 
 **After (디자인 토큰)**
 
 ```css
-:root { --color-primary: #1d72ff; }
-.btn  { background: var(--color-primary); }
-```
+:root {
+  /* 기본 토큰 */
+  --color-primary-500: #1d72ff;
+  --color-primary-600: #1b65e6;
 
-디자인 시스템의 핵심은 규칙을 문서로만 두지 않고 코드 구조 안에 녹여 두는 것입니다. 그래야 일관성이 리뷰와 배포 과정에서도 유지됩니다.
+  /* 시맨틱 토큰 */
+  --color-action-default:  var(--color-primary-500);
+  --color-action-hover:    var(--color-primary-600);
+
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-4: 1rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+}
+
+.btn {
+  background: var(--color-action-default);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-md);
+}
+.btn:hover {
+  background: var(--color-action-hover);
+}
+```
 
 ## 실습: 유틸리티 스타일 기반 컴포넌트를 5단계로 만들기
 
@@ -99,11 +149,37 @@ npx tailwindcss init -p
 
 ```javascript
 // tailwind.config.js
+/** @type {import('tailwindcss').Config} */
 module.exports = {
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  darkMode: "class",
   theme: {
     extend: {
-      colors: { primary: "#1d72ff", surface: "#f8fafc" },
-      spacing: { gutter: "1rem" },
+      colors: {
+        primary: {
+          DEFAULT: "#1d72ff",
+          hover:   "#1b65e6",
+          light:   "#e8f0fe",
+        },
+        surface: {
+          DEFAULT: "#ffffff",
+          muted:   "#f8fafc",
+        },
+        text: {
+          primary:   "#1e293b",
+          secondary: "#64748b",
+          disabled:  "#94a3b8",
+        },
+      },
+      spacing: {
+        "gutter-sm": "1rem",
+        "gutter-md": "1.5rem",
+        "gutter-lg": "2rem",
+      },
+      borderRadius: {
+        DEFAULT: "8px",
+        lg: "12px",
+      },
     },
   },
 };
@@ -112,77 +188,250 @@ module.exports = {
 ### 3단계 — Button component
 
 ```jsx
-function Button({ children, variant = "primary" }) {
-  const base = "px-4 py-2 rounded font-medium transition";
-  const variants = {
-    primary:   "bg-primary text-white hover:opacity-90",
-    secondary: "bg-surface text-gray-900 border border-gray-200",
-  };
-  return <button className={`${base} ${variants[variant]}`}>{children}</button>;
+// src/components/ui/Button.jsx
+const buttonVariants = {
+  primary:   "bg-primary text-white hover:bg-primary-hover focus-visible:ring-primary",
+  secondary: "bg-surface text-text-primary border border-slate-200 hover:bg-surface-muted",
+  danger:    "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500",
+  ghost:     "text-text-primary hover:bg-surface-muted",
+};
+
+const buttonSizes = {
+  sm: "px-3 py-1.5 text-sm rounded",
+  md: "px-4 py-2   text-base rounded",
+  lg: "px-6 py-3   text-lg rounded-lg",
+};
+
+export function Button({
+  children,
+  variant = "primary",
+  size = "md",
+  disabled = false,
+  loading = false,
+  onClick,
+  type = "button",
+  className = "",
+}) {
+  const base = [
+    "inline-flex items-center justify-center gap-2",
+    "font-medium transition-all duration-150",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+    "disabled:opacity-50 disabled:cursor-not-allowed",
+    buttonVariants[variant],
+    buttonSizes[size],
+    className,
+  ].join(" ");
+
+  return (
+    <button
+      type={type}
+      className={base}
+      disabled={disabled || loading}
+      onClick={onClick}
+      aria-busy={loading}
+    >
+      {loading && (
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+      )}
+      {children}
+    </button>
+  );
 }
+
+// 사용 예시
+<Button variant="primary" size="lg">저장하기</Button>
+<Button variant="secondary">취소</Button>
+<Button variant="danger" loading={isDeleting}>삭제</Button>
 ```
 
 ### 4단계 — Dark mode
 
 ```jsx
-// tailwind.config.js: { darkMode: "class" }
-<button className="bg-primary dark:bg-primary/80 text-white">
-  Click
-</button>
+// src/components/ThemeToggle.jsx
+import { useState, useEffect } from "react";
+
+export function ThemeToggle() {
+  const [isDark, setIsDark] = useState(
+    () => window.matchMedia("(prefers-color-scheme: dark)").matches
+  );
+
+  useEffect(() => {
+    // class 기반 다크 모드: html 태그에 'dark' 클래스 토글
+    document.documentElement.classList.toggle("dark", isDark);
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  }, [isDark]);
+
+  return (
+    <button
+      onClick={() => setIsDark(d => !d)}
+      aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
+      className="p-2 rounded-md text-text-secondary hover:bg-surface-muted"
+    >
+      {isDark ? "☀️" : "🌙"}
+    </button>
+  );
+}
+
+// Tailwind 다크 모드 클래스 사용
+// tailwind.config.js: darkMode: "class"
+<div className="bg-white dark:bg-slate-900 text-text-primary dark:text-slate-100">
+  <Button className="bg-primary dark:bg-primary/80">
+    다크 모드 버튼
+  </Button>
+</div>
 ```
 
 ### 5단계 — Enforce consistency
 
 ```bash
-# eslint-plugin-tailwindcss
-# Catches arbitrary class names and bad token usage at lint time.
+# eslint-plugin-tailwindcss 설치
+npm install -D eslint-plugin-tailwindcss
+
+# .eslintrc.js
+{
+  "plugins": ["tailwindcss"],
+  "rules": {
+    "tailwindcss/classnames-order": "warn",      // 클래스 정렬
+    "tailwindcss/no-custom-classname": "error",  // 임의 클래스 금지
+  }
+}
+
+# 하드코딩된 값 검색
+grep -rn "color\s*:\s*#\|background\s*:\s*#" src/ --include="*.css"
 ```
 
-이 예제의 핵심은 스타일이 컴포넌트 내부에 흩어져 있지 않다는 사실입니다. 이름 있는 토큰을 기준으로 버튼 변형을 정의하고, 다크 모드도 새 코드를 많이 추가하는 대신 토큰 조합으로 해결합니다.
+## Card 컴포넌트 패턴
 
-## 검증 포인트
+```jsx
+// src/components/ui/Card.jsx
+// 합성 패턴으로 유연한 카드 컴포넌트
 
-- 토큰 값 하나를 바꿨을 때 버튼과 표면색이 한 번에 바뀌는지 확인합니다.
-- 다크 모드 클래스를 켰을 때 대비와 상태 스타일이 모두 같이 바뀌는지 확인합니다.
+export function Card({ children, className = "" }) {
+  return (
+    <article
+      className={`bg-surface rounded-lg border border-slate-200 overflow-hidden shadow-sm dark:bg-slate-800 dark:border-slate-700 ${className}`}
+    >
+      {children}
+    </article>
+  );
+}
 
-## 문제가 생기면 먼저 볼 것
+export function CardHeader({ children }) {
+  return (
+    <div className="px-gutter-md py-4 border-b border-slate-200 dark:border-slate-700">
+      {children}
+    </div>
+  );
+}
 
-- 색이 일부만 바뀌면 하드코딩 색상이 남아 있는지 확인합니다.
-- 다크 모드가 안 먹으면 `darkMode` 설정과 실제 클래스 부착 위치를 먼저 봅니다.
+export function CardBody({ children }) {
+  return <div className="px-gutter-md py-gutter-sm">{children}</div>;
+}
+
+export function CardFooter({ children }) {
+  return (
+    <div className="px-gutter-md py-4 bg-surface-muted dark:bg-slate-900 flex justify-end gap-2">
+      {children}
+    </div>
+  );
+}
+
+// 사용: 조각을 원하는 대로 조합
+function ProductCard({ product }) {
+  return (
+    <Card>
+      <CardHeader>
+        <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
+      </CardHeader>
+      <CardBody>
+        <h2 className="text-lg font-semibold text-text-primary">{product.name}</h2>
+        <p className="text-text-secondary">{product.price.toLocaleString()}원</p>
+      </CardBody>
+      <CardFooter>
+        <Button variant="secondary">담기</Button>
+        <Button>구매하기</Button>
+      </CardFooter>
+    </Card>
+  );
+}
+```
+
+## 디버깅 시나리오
+
+### 시나리오 1: 색이 일부만 바뀔 때
+
+```bash
+# 하드코딩된 색상 찾기
+grep -rn "#1d72ff\|bg-blue-600\|color: blue" src/
+
+# 발견된 파일에서 토큰으로 교체
+# background: #1d72ff; → background: var(--color-action-default);
+# bg-blue-600 → bg-primary (Tailwind 토큰)
+```
+
+### 시나리오 2: 다크 모드가 일부 컴포넌트에서 안 될 때
+
+```jsx
+// 문제: 하드코딩된 색상은 다크 모드 토글에 반응 안 함
+<div style={{ background: "#ffffff" }}>  // 안 바뀜
+
+// 해결: 토큰 또는 Tailwind 다크 클래스 사용
+<div className="bg-white dark:bg-slate-900">  // 바뀜
+```
+
+### 시나리오 3: 간격이 일관되지 않을 때
+
+```css
+/* 문제: 임의의 px 값 혼용 */
+.card { padding: 13px; }
+.modal { padding: 15px; }
+
+/* 해결: spacing 토큰만 사용 */
+.card  { padding: var(--spacing-4); }   /* 1rem = 16px */
+.modal { padding: var(--spacing-4); }   /* 동일 */
+```
 
 ## 실무 점검 루프
-
-디자인 시스템 문제는 대형 버그가 되기 전에 이름 없는 값의 드리프트로 먼저 드러나는 경우가 많습니다.
 
 1. **토큰 사용 여부를 봅니다.** 컴포넌트를 고치기 전에 하드코딩된 색상과 간격 값이 숨어 있지 않은지 찾습니다.
 2. **컴포넌트 경계를 봅니다.** 시각 변경이 공유 컴포넌트에 속하는지, 특정 페이지 레이아웃에만 속하는지 구분합니다.
 3. **테마 검증을 봅니다.** 기본 화면만 보지 말고 dark mode에서 hover, focus, disabled 상태까지 같이 비교합니다.
 
 ```bash
-grep -R "#1d72ff\|margin: 13px\|padding: 7px" src || true
+grep -R "#[0-9a-fA-F]\{3,6\}\|margin:\s*[0-9]px\|padding:\s*[0-9]px" src/ || true
 ```
 
-기대 결과는 공유 시각 규칙이 모두 토큰 이름으로 설명되거나, 예외라면 왜 예외인지 문서화할 수 있는 상태입니다. 그렇게 설명할 수 없다면 디자인 시스템은 이미 조금씩 흔들리고 있는 것입니다.
+## 자주 하는 실수
 
-## 이 코드에서 주목할 점
-
-- 모든 색이 `primary` 같은 이름으로 표현되어 변경 지점이 한곳으로 모입니다.
-- `Button` 컴포넌트가 스타일의 진실의 출처 역할을 합니다.
-- 다크 모드는 별도 기능이 아니라 토큰 체계를 확장하는 문제로 다루는 편이 좋습니다.
-
-## 자주 하는 실수 5가지
-
-1. **컴포넌트마다 색을 직접 하드코딩합니다.** 디자이너가 색을 바꾸면 고통이 시작됩니다.
-2. **문서 없이 variant를 계속 늘립니다.** 합의된 디자인과 실제 코드가 금방 어긋납니다.
-3. **다크 모드를 나중 일로 미룹니다.** 색이 흩어져 있을수록 전체 컴포넌트를 다시 만져야 합니다.
-4. **간격을 모두 `px`로 박아 둡니다.** 반응형과 접근성 대응이 어려워집니다.
-5. **컴포넌트 라이브러리에 비즈니스 로직을 넣습니다.** 재사용성이 빠르게 무너집니다.
+| 실수 | 증상 | 올바른 방법 |
+|---|---|---|
+| 컴포넌트마다 색을 직접 하드코딩 | 브랜드 색 변경 시 전체 검색·수정 필요 | 모든 색을 토큰으로 참조 |
+| 문서 없이 variant를 계속 추가 | 합의된 디자인과 코드가 어긋남 | 새 variant마다 디자인 팀과 합의 후 추가 |
+| 다크 모드를 나중 일로 미룸 | 색이 흩어져 있을수록 전체를 다시 수정해야 함 | 처음부터 `dark:` 클래스 함께 작성 |
+| 간격을 `px`로 직접 지정 | 반응형·접근성 대응이 어려워짐 | `rem` 기반 spacing 토큰 사용 |
+| 컴포넌트 라이브러리에 비즈니스 로직 포함 | 재사용성 저하, 라이브러리 교체 어려움 | UI 컴포넌트는 순수하게, 로직은 훅으로 분리 |
+| Storybook 없이 컴포넌트 개발 | 다양한 상태(hover, disabled, dark) 검증 어려움 | Storybook으로 모든 variant 문서화 |
 
 ## 실무에서는 이렇게 보입니다
 
-대부분의 팀은 Storybook으로 컴포넌트를 카탈로그화하고, Tailwind나 CSS Modules와 디자인 토큰을 조합해 일관성을 유지합니다. 큰 조직은 디자인 시스템 자체를 npm 패키지로 배포해 여러 제품이 같은 컴포넌트를 공유하기도 합니다.
+대부분의 팀은 Storybook으로 컴포넌트를 카탈로그화하고, Tailwind나 CSS Modules와 디자인 토큰을 조합해 일관성을 유지합니다.
 
-이때 중요한 기준은 새 컴포넌트를 만들기 전에 기존 컴포넌트가 왜 충분하지 않은지 설명할 수 있는가입니다. 디자인 시스템은 무한히 늘리는 저장소가 아니라 선택과 제약의 체계여야 합니다.
+```jsx
+// src/components/ui/Button.stories.jsx
+export default {
+  title: "UI/Button",
+  component: Button,
+  argTypes: {
+    variant: { control: "select", options: ["primary", "secondary", "danger", "ghost"] },
+    size:    { control: "select", options: ["sm", "md", "lg"] },
+  },
+};
+
+export const Primary   = { args: { children: "기본 버튼", variant: "primary" } };
+export const Secondary = { args: { children: "보조 버튼", variant: "secondary" } };
+export const Loading   = { args: { children: "저장 중...", loading: true } };
+export const Disabled  = { args: { children: "비활성", disabled: true } };
+```
 
 ## 시니어 엔지니어는 이렇게 생각합니다
 
@@ -199,12 +448,14 @@ grep -R "#1d72ff\|margin: 13px\|padding: 7px" src || true
 - [ ] Storybook을 한 번 사용해 봤습니다.
 - [ ] 다크 모드를 한 번 적용해 봤습니다.
 - [ ] 임의의 색상과 간격을 잡아내는 lint 규칙의 필요성을 이해합니다.
+- [ ] Button 컴포넌트의 모든 variant를 한 곳에서 관리할 수 있습니다.
 
 ## 연습 문제
 
 1. Tailwind 토큰에 `primary` 색을 정의하고 Button에 적용해 보세요.
 2. Storybook을 설치하고 Button 변형 두 가지를 문서화해 보세요.
 3. `prefers-color-scheme` 또는 class 기반 스위치로 다크 모드를 적용해 보세요.
+4. `eslint-plugin-tailwindcss`로 하드코딩된 클래스를 자동 감지하는 환경을 만들어 보세요.
 
 ## 정리 및 다음 단계
 
@@ -215,11 +466,11 @@ grep -R "#1d72ff\|margin: 13px\|padding: 7px" src || true
 ## 처음 질문으로 돌아가기
 
 - **글로벌 CSS, CSS Modules, CSS-in-JS, Tailwind는 어떤 차이를 가질까요?**
-  - 디자인 토큰이 가장 아래의 공통 규칙이고, 컴포넌트는 그 규칙을 구현하며, 페이지는 그 컴포넌트를 조합합니다
+  - 모두 전역 cascading 문제를 다르게 풉니다. 글로벌 CSS는 전역 그대로, CSS Modules는 파일 범위로 격리, CSS-in-JS는 컴포넌트 범위로 격리, Tailwind는 클래스 단위 유틸리티로 cascading 자체를 최소화합니다.
 - **디자인 토큰은 왜 프로젝트가 커질수록 더 중요해질까요?**
-  - 디자인 토큰이 가장 아래의 공통 규칙이고, 컴포넌트는 그 규칙을 구현하며, 페이지는 그 컴포넌트를 조합합니다
+  - 파일이 많아질수록 색상이나 간격 값이 흩어지고, 한 번 변경 시 전체를 검색해야 합니다. 토큰이 있으면 한 곳만 바꿔도 전체가 반영됩니다.
 - **컴포넌트 라이브러리는 어떤 구조로 운영되는 편이 좋을까요?**
-  - 이 예제의 핵심은 스타일이 컴포넌트 내부에 흩어져 있지 않다는 사실입니다. 이름 있는 토큰을 기준으로 버튼 변형을 정의하고, 다크 모드도 새 코드를 많이 추가하는 대신 토큰 조합으로 해결합니다.
+  - 원자(색, 타이포그래피) → 컴포넌트(Button, Input) → 패턴(Form, Card) 순서로 계층을 두고, 각 컴포넌트는 비즈니스 로직 없이 순수하게 유지합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

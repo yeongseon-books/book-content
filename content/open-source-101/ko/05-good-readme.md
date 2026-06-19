@@ -40,254 +40,370 @@ last_reviewed: '2026-05-15'
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
-리드미 문서는 프로젝트의 얼굴이라는 말이 흔하지만, 실제로는 그보다 더 실무적입니다. 리드미 문서가 나쁘면 사용자는 설치 전 단계에서 이탈하고, 기여자는 규칙을 찾지 못해 헤매며, 메인테이너는 같은 질문에 반복 답변하게 됩니다.
+## 왜 이 글이 중요한가
+
+리드미 문서가 나쁘면 사용자는 설치 전 단계에서 이탈하고, 기여자는 규칙을 찾지 못해 헤매며, 메인테이너는 같은 질문에 반복 답변하게 됩니다.
 
 좋은 리드미 문서는 지원 비용을 줄이고 신뢰를 높입니다. 특히 작은 프로젝트일수록 문서 품질이 프로젝트 성숙도를 대신 보여 주는 경우가 많습니다. 코드가 아무리 좋아도 시작 경로가 보이지 않으면 사용자는 떠납니다.
 
-## 사용자의 읽기 순서를 따라가기
+## 핵심 관점
 
-이 흐름이 중요한 이유는 읽는 사람의 관심사가 이 순서로 움직이기 때문입니다. 먼저 이 프로젝트가 무엇인지 알고 싶고, 다음에는 설치 가능한지 보고, 그다음 실제로 어떻게 쓰는지 확인합니다. 라이선스와 기여 안내는 그 다음입니다.
+사용자의 읽기 순서를 따라가는 것이 좋은 README의 핵심입니다.
 
-리드미 문서가 길어도 괜찮습니다. 다만 첫 5분 안에 필요한 정보가 위로 올라와 있어야 합니다. 처음부터 아키텍처 전체와 세부 설계까지 밀어 넣으면 입구 문서가 아니라 장벽이 됩니다.
+```text
+이 프로젝트가 뭔가? (한 줄 설명)
+  → 내가 쓸 수 있나? (설치 방법)
+  → 어떻게 쓰는 거야? (사용 예시)
+  → 계속 써도 되나? (라이선스, CI 상태)
+  → 기여할 수 있나? (CONTRIBUTING 링크)
+```
 
-## 꼭 알아야 할 다섯 가지 개념
+> 좋은 README는 화려한 수사보다 **빠른 성공 경험**을 제공합니다. 사용자가 5분 안에 설치하고 한 번 실행해 볼 수 있다면, 이미 절반은 성공한 문서입니다.
 
-리드미 문서는 진입 문서입니다. 저장소의 전체 설계를 다 담는 곳이 아닙니다. badge는 상태를 빠르게 보여 주는 장치이며, 의미 없는 배지 남발은 오히려 시선을 분산시킵니다. TOC는 문서가 길어질 때 이동 비용을 줄여 줍니다. quickstart는 가장 짧은 성공 경로입니다. `CONTRIBUTING`은 기여 규칙을 분리하는 문서입니다.
+## 핵심 개념
 
-리드미 문서는 시작을 책임지고, 더 깊은 내용은 별도 문서와 링크로 넘겨 주는 편이 좋습니다.
+### README 필수 섹션과 역할
 
-## 이슈 라벨 체계
+| 섹션 | 역할 | 없을 때 결과 |
+|---|---|---|
+| 프로젝트명 + 한 줄 설명 | 무엇인지 즉시 이해 | 이탈률 증가 |
+| 배지 (CI, 버전) | 유지보수 상태 신호 | 신뢰도 하락 |
+| 설치 방법 | 진입 장벽 제거 | 포기 또는 질문 폭주 |
+| 사용 예시 (Quickstart) | 첫 성공 경험 제공 | 이해 없이 사용 |
+| 기여 안내 링크 | 기여자 유입 경로 | 메인테이너에게 직접 질문 |
+| 라이선스 | 법적 명확성 | 도입 불가 판단 |
 
-이슈 라벨은 단순한 태그가 아니라 프로젝트의 분류 체계입니다. 좋은 라벨 시스템은 기여자가 적합한 이슈를 빠르게 찾게 해 줍니다.
+### 배지 사용 기준
 
-| 라벨 | 용도 | 대상 | 예시 상황 |
-|---|---|---|---|
-| `bug` | 버그 보고 | 모든 기여자 | 로그인 실패, 예외 발생 |
-| `feature` | 새 기능 제안 | 사용자, 경험 있는 기여자 | API 엔드포인트 추가 요청 |
-| `good-first-issue` | 초보자 진입용 | 처음 기여하는 사람 | 문서 오타, 간단한 검증 추가 |
-| `help-wanted` | 도움 필요 | 누구나 | 메인테이너가 시간 부족한 작업 |
-| `documentation` | 문서 개선 | 글쓰기 좋아하는 기여자 | README 갱신, docstring 추가 |
-| `wontfix` | 수정하지 않음 | 사용자 | 설계 의도와 맞지 않는 요청 |
+배지는 상태를 빠르게 보여 주는 장치이지만, 의미 없는 배지 남발은 오히려 시선을 분산시킵니다.
 
-라벨은 검색 필터이기도 하지만, 프로젝트의 **대화 문화**를 드러냅니다. `good-first-issue` 라벨이 많으면 신규 기여자를 환영하는 프로젝트로 보이고, `wontfix`가 많으면 보수적인 프로젝트로 보입니다.
+**권장 배지**:
+```markdown
+![CI](https://github.com/owner/repo/actions/workflows/ci.yml/badge.svg)
+![PyPI version](https://badge.fury.io/py/my-package.svg)
+![License](https://img.shields.io/github/license/owner/repo)
+![Python versions](https://img.shields.io/pypi/pyversions/my-package)
+```
 
-가장 흔한 실수는 라벨을 너무 많이 만드는 것입니다. 20개 넘는 라벨은 오히려 혼란을 키웁니다. 5-10개 정도가 가장 유지보수하기 좋습니다.
+**피해야 할 배지**:
+```markdown
+# 의미 없거나 항상 초록인 배지는 신뢰를 낮춤
+![Made with love](https://img.shields.io/badge/made%20with-love-red)
+![Stars](https://img.shields.io/github/stars/owner/repo)  # 초기 프로젝트엔 역효과
+```
 
-## 좋은 이슈 작성 템플릿
+## 좋은 README vs 나쁜 README 비교
 
-명확한 이슈는 빠른 대응을 이끌어 냅니다. 다음은 실제로 사용할 수 있는 버그 리포트 템플릿입니다.
+### 한 줄 설명
 
 ```markdown
-## 버그 설명
+# 나쁜 예시
+# MyTool
+A utility tool for developers.
 
-무엇을 하려고 했을 때 문제가 발생했는지 간단히 설명해 주세요.
+# 좋은 예시
+# MyTool
+Convert Markdown files to PDF in one command — no LaTeX required.
+```
 
-## 재현 방법
+차이: 좋은 설명은 **누가**, **무엇을**, **어떤 상황에서** 쓰는지 즉시 알 수 있습니다.
+
+### 설치 방법
+
+```markdown
+# 나쁜 예시
+## Installation
+Install the package using your preferred package manager.
+
+# 좋은 예시
+## Installation
+
+Python 3.9+ required.
 
 ```bash
-# 1. 다음 명령어를 실행합니다
-my-cli command --flag
-
-# 2. 다음과 같은 오류가 발생합니다
-Error: unexpected token
+pip install mytool
 ```
 
-## 기대한 동작
+For development:
 
-정상적으로 동작하면 어떤 결과가 나와야 하는지 설명해 주세요.
-
-## 실제 동작
-
-현재 나타나는 오류 메시지나 비정상 동작을 설명해 주세요.
-
-## 환경
-
-- OS: macOS 13.1
-- Python: 3.11.2
-- Package version: 1.2.3
-
-## 추가 정보
-
-스크린샷, 로그 파일, 스택 트레이스 등을 첨부하면 디버깅에 도움이 됩니다.
+```bash
+git clone https://github.com/owner/mytool
+cd mytool
+pip install -e ".[dev]"
+pre-commit install
+```
 ```
 
-이 템플릿의 핵심은 **재현 방법**입니다. 메인테이너가 같은 문제를 로컬에서 재현할 수 있으면 디버깅 속도가 10배 빨라집니다.
-
-기능 요청 템플릿은 조금 다릅니다:
+### 사용 예시
 
 ```markdown
-## 기능 설명
+# 나쁜 예시
+## Usage
+Use the tool to convert files.
 
-어떤 기능을 요청하는지 간단히 설명해 주세요.
+# 좋은 예시
+## Usage
 
-## 사용 예시
+### Convert a single file
+
+```bash
+mytool convert README.md --output README.pdf
+```
+
+### Convert a directory
+
+```bash
+mytool convert docs/ --output build/pdf/ --recursive
+```
+
+### Python API
 
 ```python
-# 이렇게 사용할 수 있으면 좋겠습니다
-result = my_function(input, option='new-feature')
+from mytool import Converter
+
+converter = Converter(theme="minimal")
+converter.convert("README.md", "README.pdf")
+```
 ```
 
-## 현재 회피 방법
+## 실전 README 구조 예시
 
-지금은 어떻게 해결하고 있는지 설명해 주세요. (없으면 생략)
-
-## 기대 효과
-
-이 기능이 추가되면 어떤 문제가 해결되는지 설명해 주세요.
-```
-
-기능 요청에서 가장 중요한 부분은 **사용 예시**입니다. 메인테이너는 추상적 설명보다 구체적 코드 예시를 선호합니다.
-
-## 풀 리퀘스트 설명 작성법
-
-PR 설명은 코드보다 먼저 읽힙니다. 메인테이너는 PR 타이틀과 본문을 보고 리뷰 우선순위를 결정합니다. 다음은 좋은 PR 설명 템플릿입니다.
+실제 프로젝트에서 쓸 수 있는 완성된 구조입니다.
 
 ```markdown
-## Summary
+# mytool
 
-이 PR이 무엇을 하는지 한 문장으로 요약합니다.
+> Convert Markdown files to PDF in one command — no LaTeX required.
 
-## Changes
+[![CI](https://github.com/owner/mytool/actions/workflows/ci.yml/badge.svg)](https://github.com/owner/mytool/actions)
+[![PyPI](https://badge.fury.io/py/mytool.svg)](https://pypi.org/project/mytool/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-- 변경 사항 1: 무엇을 왜 바꾸었는지
-- 변경 사항 2: 무엇을 왜 바꾸었는지
+## Features
 
-## Testing
+- Single command conversion
+- Custom CSS themes
+- Batch processing
+- Python 3.9+ support
 
-어떻게 테스트했는지 구체적으로 설명합니다.
+## Installation
 
 ```bash
-pytest tests/test_new_feature.py
-# All pass
+pip install mytool
 ```
 
-## Related Issues
+## Quickstart
 
-Closes #42
-Relates to #38
+```bash
+# Convert a single file
+mytool convert README.md
 
-## Screenshots (if applicable)
-
-(필요하면 스크린샷 첨부)
-
-## Checklist
-
-- [x] 테스트 추가 또는 기존 테스트 통과
-- [x] 문서 갱신 (필요 시)
-- [x] 커밋 메시지가 규칙을 따름
-- [x] CI 통과
+# Convert with custom theme
+mytool convert README.md --theme minimal --output output.pdf
 ```
 
-**좋은 PR 설명의 패턴**
+## Documentation
 
-1. **Summary**는 한 문장으로 압축합니다
-2. **Changes**는 무엇보다 **왜**을 설명합니다
-3. **Testing**은 리뷰어가 재현할 수 있게 구체적으로 적습니다
-4. **Related Issues**는 `Closes #N` 형식으로 자동 연결합니다
-5. **Checklist**는 리뷰 전에 자기 점검을 돕습니다
+Full documentation: [https://mytool.readthedocs.io](https://mytool.readthedocs.io)
 
-**나쁨 PR 설명의 패턴**
+## Contributing
 
-- Fail "코드 수정했습니다" (무엇을 왜 바꾸었는지 불명확)
-- Fail 테스트 방법 빠짐 (리뷰어가 검증하기 어려움)
-- Fail 관련 이슈 누락 (맥락을 찾기 위해 이슈 탭을 뒤져야 함)
-- Fail 체크리스트 비우기 (준비 여부를 판단하기 어려움)
-- Fail 한 줄 요약조차 없음 (리뷰어가 코드를 열기 전에 우선순위를 판단할 수 없음)
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 
-차이는 명확합니다. 좋은 PR 설명은 **리뷰어가 10초 안에 맥락을 파악하게** 해 줍니다. 나쁨 PR 설명은 리뷰어가 코드를 읽으며 직접 추론하게 만듭니다.
+```bash
+# Development setup
+pip install -e ".[dev]"
+pre-commit install
+pytest
+```
 
-**README 작성 순서** — README를 처음 쓸 때는 다음 순서로 작성하면 녹지 않습니다: (1) 한 줄 설명 (가치 명확화) (2) 설치 명령 (진입 장벽 낙하) (3) Quickstart (성공 경험 제공) (4) 더 자세한 문서 링크 (5) 라이선스 (법적 명확성). 이 순서는 독자가 프로젝트를 이해하는 순서와 일치합니다. 아키텍처 설명을 맨 위에 넣는 실수를 하지 마세요.
+## License
 
-**README 갱신 습관** — README는 한 번 쓰고 끝나는 문서가 아닙니다. 다음 시점에 반드시 갱신해야 합니다: (1) 주요 기능 추가 시 (2) 설치 방법 변경 시 (3) 라이선스 변경 시 (4) 기여 가이드 추가 시 (5) 브레이킹 체인지 발생 시. CI에 README 링크 검증을 추가하면 깨진 링크를 조기에 발견할 수 있습니다.
-## 생각이 어떻게 바뀌어야 할까
+MIT © 2026 Your Name
+```
 
-처음에는 리드미 문서를 나중에 쓰는 장식 같은 문서로 생각하기 쉽습니다. 하지만 실제로는 사용자가 프로젝트와 처음 만나는 인터페이스입니다.
+## 섹션별 작성 가이드
 
-좋은 리드미 문서는 프로젝트를 돋보이게 꾸미는 문서가 아닙니다. 사용자가 실제로 설치하고 실행하게 만드는 문서입니다. 이 차이를 이해하면 문서 우선순위가 달라집니다.
+### 한 줄 설명 공식
+
+```text
+[동사] + [무엇을] + [어디서/어떻게] + [차별점]
+
+좋은 예시:
+"Convert Markdown to PDF in one command — no LaTeX required."
+"Detect memory leaks in Python applications with one import."
+"Send Slack notifications from GitHub Actions without configuration."
+```
+
+### Quickstart 5분 원칙
+
+첫 성공 경험까지 5분이 넘으면 이탈률이 급격히 높아집니다.
+
+```markdown
+## Quickstart
+
+Install (30초):
+```bash
+pip install mytool
+```
+
+Run your first conversion (30초):
+```bash
+mytool convert README.md
+# Output: README.pdf ✓
+```
+
+See result: Open README.pdf in your PDF viewer.
+
+→ 전체 시간: 약 2분
+```
+
+### CONTRIBUTING 링크 패턴
+
+```markdown
+## Contributing
+
+We welcome contributions! To get started:
+
+1. Read [CONTRIBUTING.md](CONTRIBUTING.md)
+2. Find an issue labeled [`good first issue`](https://github.com/owner/repo/issues?q=is%3Aopen+label%3A%22good+first+issue%22)
+3. Fork the repo and create a branch
+4. Make your changes and run tests
+5. Submit a pull request
+
+Questions? Open a [Discussion](https://github.com/owner/repo/discussions).
+```
+
+## README 분리 기준
+
+README가 너무 길어지면 다른 파일로 분리합니다.
+
+```text
+README.md          ← 첫 5분 온보딩 (설치, 사용 예시, 링크)
+CONTRIBUTING.md    ← 기여 규칙 (환경 설정, 브랜치, 커밋)
+ARCHITECTURE.md    ← 설계 문서 (경험 있는 기여자용)
+CHANGELOG.md       ← 버전별 변경 이력
+docs/              ← 상세 API 문서, 튜토리얼
+```
+
+분리 기준: README가 1000줄을 넘거나, 스크롤 없이 설치 방법을 볼 수 없으면 분리를 고려합니다.
+
+## 자동화로 README 최신 상태 유지
+
+```yaml
+# .github/workflows/readme-check.yml
+name: README Link Check
+
+on:
+  push:
+    paths: ['README.md']
+  schedule:
+    - cron: '0 0 * * 1'  # 매주 월요일
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Check links
+      uses: lycheeverse/lychee-action@v1
+      with:
+        args: README.md
+        fail: true
+```
+
+```yaml
+# .github/workflows/readme-contributors.yml
+# 기여자 목록 자동 업데이트
+name: Update Contributors
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  contributors:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: minicli/action-contributors@v3
+      with:
+        repo: '${{ github.repository }}'
+        output: 'CONTRIBUTORS.md'
+```
+
+## 다국어 README 전략
+
+글로벌 프로젝트라면 영어와 함께 주요 언어 README를 제공합니다.
+
+```markdown
+# 영어 README.md 상단에 언어 링크 추가
+Available in: [한국어](README.ko.md) | [中文](README.zh.md) | [日本語](README.ja.md)
+```
+
+```text
+파일 구조:
+README.md      ← 영어 (기본)
+README.ko.md   ← 한국어
+README.zh.md   ← 중국어
+```
+
+번역은 커뮤니티 기여로 받되, 핵심 섹션(설치, 사용 예시, 라이선스)은 메인테이너가 직접 관리합니다.
 
 ## 직접 따라해 보기: 리드미 문서 기본 뼈대 만들기
 
 ### 1단계 — 제목과 한 줄 설명 쓰기
 
-제목은 프로젝트 정체성을, 한 줄 설명은 사용 가치를 압축합니다. 애매한 문구보다 누가 무엇을 왜 쓰는지 보이게 적는 편이 좋습니다.
-
-````markdown
 ```markdown
 # my-project
 
 > A tiny tool that does X in one command.
 ```
-````
 
 ### 2단계 — 꼭 필요한 배지만 넣기
 
-배지는 한눈에 상태를 보여 주는 장점이 있지만, 의미 없는 장식으로 늘리기 쉽습니다. 유지되는 지표만 두는 편이 낫습니다.
-
-````markdown
 ```markdown
-![CI](https://github.com/user/repo/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/user/repo/actions/workflows/ci.yml/badge.svg)](https://github.com/user/repo/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ```
-````
 
 ### 3단계 — 설치 명령 적기
 
-설치 명령이 빠진 문서는 사용자를 추측에 맡기는 문서입니다. 가장 짧은 설치 경로를 명시해야 합니다.
-
-````markdown
 ```markdown
-## Install
+## Installation
 
 ```bash
 pip install my-project
 ```
 ```
-````
 
 ### 4단계 — 바로 실행 가능한 사용 예시 넣기
 
-예시는 설명보다 강합니다. 사용자가 복사해 실행했을 때 바로 동작하는 코드 한 개가 긴 문단보다 낫습니다.
-
-**README 길이와 분할 기준** — README가 1000줄을 넘어가면 분할을 고려해야 합니다. 다음 기준으로 분리합니다: (1) `CONTRIBUTING.md` — 기여 규칙 (2) `ARCHITECTURE.md` — 설계 문서 (3) `DEPLOYMENT.md` — 배포 가이드 (4) `TROUBLESHOOTING.md` — 문제 해결 (5) `docs/` — 상세 API 문서. README는 여전히 첫 진입 문서 역할만 하고, 나머지는 링크로 연결합니다.
-
-**README 자동화 팁** — README를 수동으로 유지하면 쉽게 낡습니다. 다음 방법으로 자동화를 고려하세요: (1) 예제 코드를 별도 파일로 분리하고 README에서 include (2) 테스트에서 README 코드 블록 실행 검증 (3) CI에서 배지 상태 자동 갱신 (4) 기여자 목록 자동 생성 (5) 다국어 README 동기화 스크립트. 이렇게 하면 README가 항상 최신 상태로 유지됩니다.
-
-**다국어 README 전략** — 글로벌 프로젝트라면 영어와 함께 주요 언어 README를 제공하는 것이 좋습니다. 일반적으로 `README.md` (영어 기본), `README.ko.md` (한국어), `README.zh.md` (중국어) 형식을 사용합니다. 영어 README 상단에 다른 언어 링크를 넣어 두면 접근성이 높아집니다. 번역은 커뮤니티 기여로 받되, 핵심 섹션(설치, 사용 예시, 라이선스)은 메인테이너가 직접 관리하는 것이 좋습니다.
-
-````markdown
 ```markdown
 ## Usage
 
 ```bash
-my-project --help
+my-project --input data.csv --output result.pdf
 ```
 ```
-````
 
 ### 5단계 — 라이선스 명시하기
 
-사용 예시가 좋아도 라이선스가 비어 있으면 배포와 재사용 판단이 멈춥니다. 짧더라도 명확하게 적는 편이 좋습니다.
-
-````markdown
 ```markdown
 ## License
 
 MIT © 2026 Author Name
 ```
-````
 
-## 이 예시에서 먼저 읽어야 할 점
+## 자주 하는 실수
 
-제목은 프로젝트가 무엇인지 단번에 보여 줘야 합니다. 예시는 실제로 실행 가능해야 합니다. 설치 항목과 사용 예시를 따로 두면 독자가 훨씬 빨리 읽습니다. 라이선스 표기는 문서 맨 아래에 놓아도 절대 빠지면 안 됩니다.
-
-좋은 리드미 문서는 화려한 수사보다 빠른 성공 경험을 제공합니다. 사용자가 5분 안에 설치하고 한 번 실행해 볼 수 있다면, 이미 절반은 성공한 문서입니다.
-
-## 자주 하는 실수 다섯 가지
-
-1. 설치 명령을 적지 않습니다.
-2. 오래되어 실행되지 않는 예시를 남겨 둡니다.
-3. 스크린샷만 넣고 설명은 비워 둡니다.
-4. 라이선스 섹션을 생략합니다.
-5. 리드미 문서 하나에 모든 설계를 몰아넣습니다.
+| 실수 | 구체적 상황 | 올바른 접근 |
+|---|---|---|
+| 설치 명령 없음 | "소스에서 빌드하세요" 한 줄만 있음 | `pip install`, `npm install` 등 복사 가능한 명령어 제공 |
+| 오래된 예시 | 실행하면 오류나는 코드 블록 방치 | CI에서 README 코드 블록 테스트 자동화 |
+| 스크린샷만 있음 | 스크린샷만 있고 텍스트 설명 없음 | 스크린샷 + 접근성 고려한 alt text + 텍스트 설명 병행 |
+| 라이선스 섹션 생략 | README에 라이선스 언급 없음 | LICENSE 파일 + README 하단 라이선스 섹션 필수 |
+| 모든 설계를 README에 | 아키텍처 다이어그램부터 API 문서까지 | README는 진입 문서, 나머지는 별도 파일로 분리 |
 
 ## 실무에서는 이렇게 생각한다
 
@@ -295,46 +411,27 @@ MIT © 2026 Author Name
 
 시니어 엔지니어는 리드미 문서를 광고처럼 쓰되 과장하지 않습니다. 짧은 문장, 바로 실행되는 예시, 관련 문서 링크, 기여 문서 분리 같은 기본이 오히려 더 큰 신뢰를 만듭니다.
 
+**README 갱신 습관** — README는 한 번 쓰고 끝나는 문서가 아닙니다. 다음 시점에 반드시 갱신합니다:
+- 주요 기능 추가 시
+- 설치 방법 변경 시 (Python 버전 요구사항 변경 포함)
+- 라이선스 변경 시
+- Breaking change 발생 시
+- 기여 가이드 추가·수정 시
+
 ## 운영 체크리스트
 
 - [ ] 제목과 한 줄 설명이 있습니다.
 - [ ] 설치 명령이 바로 보입니다.
 - [ ] 실행 가능한 사용 예시가 있습니다.
 - [ ] 라이선스 섹션이 있습니다.
+- [ ] CI 배지가 있습니다.
+- [ ] CONTRIBUTING.md 링크가 있습니다.
 
 ## 연습 문제
 
 1. quickstart의 목표 시간을 한 문장으로 적어 보세요.
 2. badge의 목적을 한 문장으로 적어 보세요.
 3. `CONTRIBUTING.md`를 리드미 문서와 분리하는 이유를 한 문장으로 적어 보세요.
-
-## README에 반드시 넣어야 할 운영 신호
-
-좋은 README는 설치 명령만 보여 주지 않습니다. 프로젝트가 실제로 유지되고 있는지 판단할 수 있는 운영 신호를 함께 제공합니다.
-
-첫째, LICENSE 링크를 본문에서 노출합니다. 하단 라이선스 문구 한 줄로 끝내지 말고, 어떤 정책을 의도하는지 짧게 설명하면 사용자가 빠르게 도입 판단을 할 수 있습니다.
-
-둘째, `CONTRIBUTING.md`와 PR 체크리스트를 README에서 바로 연결합니다. 신규 기여자는 README만 보고도 어디서 시작해야 하는지 알아야 합니다.
-
-```markdown
-## 기여하기
-기여 절차는 `CONTRIBUTING.md`를 참고해 주세요.
-PR 전 체크리스트:
-- 테스트 통과
-- 변경 이유 설명
-- 관련 이슈 연결
-```
-
-셋째, Git 워크플로를 한 단락으로 명시합니다. 예를 들어 "기능 브랜치에서 작업 후 Squash Merge"처럼 저장소 규칙을 한 문장으로 적어 두면 협업 마찰이 줄어듭니다.
-
-넷째, CI 배지와 릴리스 배지를 함께 둡니다. 테스트 상태와 최신 릴리스를 동시에 보여 주면 사용자 신뢰가 올라갑니다.
-
-```markdown
-![CI](https://github.com/<owner>/<repo>/actions/workflows/ci.yml/badge.svg)
-![Release](https://img.shields.io/github/v/release/<owner>/<repo>)
-```
-
-마지막으로 버전 정책(SemVer)도 README에 짧게 명시하세요. "PATCH는 버그 수정, MINOR는 기능 추가, MAJOR는 호환성 변경" 문장 하나만 있어도 업데이트 판단 비용이 크게 줄어듭니다.
 
 ## 정리
 
@@ -345,11 +442,11 @@ PR 전 체크리스트:
 ## 처음 질문으로 돌아가기
 
 - **처음 방문한 사용자가 리드미 문서에서 가장 먼저 찾는 정보는 무엇일까요?**
-  - 스크린샷, 로그 파일, 스택 트레이스 등을 첨부하면 디버깅에 도움이 됩니다.
+  - 가장 먼저 찾는 것은 "이 프로젝트가 내 문제를 해결해 주는가"입니다. 한 줄 설명과 사용 예시가 여기에 답합니다. 그 다음이 설치 방법입니다. 이 세 가지가 5분 안에 보이지 않으면 사용자는 이탈합니다.
 - **제목, 한 줄 설명, 설치, 사용 예시, 라이선스는 왜 핵심 섹션일까요?**
-  - 이 흐름이 중요한 이유는 읽는 사람의 관심사가 이 순서로 움직이기 때문입니다. 먼저 이 프로젝트가 무엇인지 알고 싶고, 다음에는 설치 가능한지 보고, 그다음 실제로 어떻게 쓰는지 확인합니다. 라이선스와 기여 안내는 그 다음입니다.
+  - 이 다섯 섹션은 사용자가 프로젝트를 평가하는 순서와 일치합니다. 무엇인지 → 쓸 수 있는지 → 어떻게 쓰는지 → 계속 써도 되는지. 이 흐름이 끊기면 사용자는 다음 단계로 넘어가지 못합니다.
 - **배지와 스크린샷은 언제 도움이 되고 언제 방해가 될까요?**
-  - 이 흐름이 중요한 이유는 읽는 사람의 관심사가 이 순서로 움직이기 때문입니다
+  - CI 통과, 최신 버전, 라이선스 배지는 신뢰 신호로 도움이 됩니다. 스크린샷은 GUI 도구나 시각적 결과물을 보여줄 때 유용합니다. 하지만 의미 없는 장식 배지가 5개 이상이거나 스크린샷이 오래되어 실제와 다르면 오히려 신뢰를 낮춥니다.
 
 <!-- toc:end -->
 
