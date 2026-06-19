@@ -193,6 +193,75 @@ print(f"speedup: {t_linear / t_binary:.1f}x")
 | 브루트포스 | O(n^2) 이상 | O(1)~O(n) | 없음 | n ≤ 1000인 프로토타입 |
 | 분할 정복 | O(n log n) | O(log n) | 분해 가능 | 정렬, 거듭제곱, 대부분의 최적화 |
 
+## 심화: 알고리즘 정확성 형식적으로 생각하기
+
+알고리즘의 정확성을 주장하는 방법은 여러 가지입니다. 가장 실용적인 세 가지는 루프 불변식, 귀납적 증명, 반례 탐색입니다.
+
+**루프 불변식 예시:**
+
+```python
+def insertion_sort(arr):
+    """
+    루프 불변식: 반복 i 직전에 arr[0..i-1]은 정렬되어 있다.
+    초기화: i=1일 때 arr[0..0]은 길이 1이므로 자명하게 정렬됨.
+    유지: 각 반복에서 arr[i]를 올바른 위치에 삽입해 arr[0..i]를 정렬 상태로 유지.
+    종료: i=len(arr)에서 arr[0..n-1] 전체가 정렬됨.
+    """
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
+    return arr
+
+result = insertion_sort([5, 2, 4, 6, 1, 3])
+assert result == [1, 2, 3, 4, 5, 6]
+```
+
+불변식을 적으면 버그 위치를 코드 전체가 아닌 불변식이 깨지는 구간으로 좁힐 수 있습니다.
+
+**반례 탐색 패턴:**
+
+```python
+def brute_force_check(algorithm, oracle, inputs):
+    """
+    작은 입력에 대해 알고리즘 결과와 정답(oracle)을 비교해 반례를 탐색합니다.
+    """
+    for inp in inputs:
+        got = algorithm(inp)
+        expected = oracle(inp)
+        if got != expected:
+            print(f"반례: input={inp}, algorithm={got}, oracle={expected}")
+            return inp
+    print("테스트 범위에서 반례 없음")
+    return None
+
+# 예시: find_minimum 검증
+import random
+random.seed(42)
+test_inputs = [[random.randint(-100, 100) for _ in range(random.randint(1, 20))]
+               for _ in range(1000)]
+brute_force_check(find_minimum, min, test_inputs)
+```
+
+1000개의 무작위 입력에 대해 정답(`min`)과 비교하는 방식은 알고리즘 초안을 빠르게 검증하는 실용적인 방법입니다.
+
+## 알고리즘 설계 흐름 요약
+
+```text
+1. 문제 정의       : 입력 / 출력 / 제약 조건 명시
+2. 효율성 추정     : 입력 크기 → 허용 복잡도 결정
+3. 의사코드        : 언어 독립적 절차 기술 + 불변식 명시
+4. 정확성 논증     : 루프 불변식 또는 귀납법
+5. 구현            : 의사코드 → Python
+6. 검증            : 경계 입력 + 무작위 테스트
+7. 측정            : 예측한 복잡도와 실측 데이터 비교
+```
+
+이 흐름을 머릿속에 갖고 있으면, 막막한 문제도 단계별로 쪼개서 접근할 수 있습니다.
+
 ## 이 글에서 먼저 가져갈 점
 
 - 같은 문제에도 비용이 전혀 다른 여러 알고리즘이 존재합니다.

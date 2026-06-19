@@ -26,7 +26,7 @@ last_reviewed: '2026-05-12'
 
 소프트웨어는 스스로 기억하지 않습니다. 그래서 버그 수정을 코드로 얼려 두는 장치가 필요합니다. 그 역할을 하는 것이 회귀 테스트입니다.
 
-이 글은 Testing 101 시리즈의 여덟 번째 글입니다. 여기서는 회귀 테스트의 의미, 버그를 테스트로 재현하고 수정으로 연결하는 흐름, 그리고 회귀 테스트를 어디 계층에 두는 편이 좋은지 정리하겠습니다.
+이 글은 Testing 101 시리즈의 여덟 번째 글입니다. 여기서는 회귀 테스트의 의미, 버그를 테스트로 재현하고 수정으로 연결하는 흐름, git bisect로 원인 커밋을 좁히는 방법, 그리고 회귀 테스트를 어느 계층에 두는 편이 좋은지 정리하겠습니다.
 
 ![Testing 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/08/08-01-diagram.ko.png)
 *Testing 101 8장 흐름 개요*
@@ -37,8 +37,8 @@ last_reviewed: '2026-05-12'
 - 회귀 테스트는 무엇을 막는 테스트일까요?
 - 버그를 재현하고 테스트로 남기는 순서는 어떻게 될까요?
 - 최소 재현 케이스는 왜 중요할까요?
-- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
-- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
+- git bisect로 어떻게 원인 커밋을 추적할까요?
+- 회귀 테스트가 쌓일 때 속도를 어떻게 유지할까요?
 
 버그를 말로만 기억하면 사람과 함께 사라집니다. 이슈 트래커에 기록이 남아 있어도, 코드가 그 맥락을 스스로 막아 주지는 못합니다. 회귀 테스트는 팀의 기억을 실행 가능한 형태로 남깁니다.
 
@@ -53,6 +53,7 @@ last_reviewed: '2026-05-12'
 - **버그 ID**: 이슈 트래커에서 쓰는 고유 식별자입니다.
 - **골든 파일**: 기대 결과를 파일 형태로 고정해 비교하는 방식입니다.
 - **스냅샷 테스트**: 전체 출력 결과를 한 번에 비교하는 테스트입니다.
+- **git bisect**: 이진 탐색으로 회귀가 처음 발생한 커밋을 찾는 Git 명령입니다.
 
 ## 회귀 테스트 트리거 시점
 
@@ -74,55 +75,81 @@ last_reviewed: '2026-05-12'
 ```text
 - "이 버그 고쳤습니다"라고 말하고 머지한다
 - 몇 달 뒤 같은 버그가 다시 발견된다
+- 팀은 이미 본 문제를 처음부터 다시 조사한다
 ```
 
 **바꾼 뒤 — 회귀 테스트를 추가한 상태**
 
 ```python
+# pytest.mark.regression 마커로 분류
+@pytest.mark.regression
 def test_regression_PROJ_1234_negative_total():
-    cart = Cart(); cart.add(Item(price=-1))
-    with pytest.raises(ValueError):
-        cart.total()
+    cart = Cart()
+    with pytest.raises(ValueError, match="price must be >= 0"):
+        cart.add(Item(price=-1))
 ```
 
-차이는 기억 방식입니다. 사람의 설명 대신 테스트가 버그의 경계를 코드 안에 남깁니다.
+차이는 기억 방식입니다. 사람의 설명 대신 테스트가 버그의 경계를 코드 안에 남깁니다. 다음 번에 같은 경로가 깨지면 CI가 먼저 알려줍니다.
 
 ## 다섯 단계로 회귀 테스트 만들기
 
-### 1단계 — 버그를 재현하기
+### 1단계 — 버그를 재현하는 실패 테스트 작성하기
+
+버그를 수정하기 전에 먼저 실패하는 테스트를 작성합니다. 이것이 회귀 테스트의 핵심입니다.
 
 ```python
 # tests/test_regression.py
-def test_repro_negative_price_breaks_total():
-    cart = Cart(); cart.add(Item(price=-1))
-    assert cart.total() >= 0   # 현재는 실패함
+import pytest
+from src.cart import Cart, Item
+
+@pytest.mark.regression
+def test_regression_PROJ_1234_negative_price_rejected():
+    """Adding item with negative price should raise ValueError. (PROJ-1234)"""
+    cart = Cart()
+    # 버그 수정 전에는 이 테스트가 반드시 실패해야 합니다.
+    with pytest.raises(ValueError, match="price must be >= 0"):
+        cart.add(Item(price=-100))
 ```
 
 ### 2단계 — 실패를 먼저 확인하기
 
 ```bash
-pytest tests/test_regression.py -v
-# FAILED ... assert -1 >= 0
+pytest tests/test_regression.py::test_regression_PROJ_1234_negative_price_rejected -v
+# FAILED ... ValueError not raised
 ```
+
+이 단계를 건너뛰면 테스트가 실제로 버그를 잡는지 알 수 없습니다. 처음부터 초록색인 테스트는 재현력이 없는 장식일 수 있습니다.
 
 ### 3단계 — 코드 수정하기
 
 ```python
+# src/cart.py
+from dataclasses import dataclass, field
+from typing import List
+
+@dataclass
+class Item:
+    name: str = ""
+    price: float = 0.0
+
 class Cart:
-    def add(self, item):
+    def __init__(self):
+        self._items: List[Item] = []
+
+    def add(self, item: Item) -> None:
         if item.price < 0:
             raise ValueError("price must be >= 0")
         self._items.append(item)
+
+    def total(self) -> float:
+        return sum(item.price for item in self._items)
 ```
 
-### 4단계 — 의도를 담아 테스트 다듬기
+### 4단계 — 테스트가 통과하는지 확인하기
 
-```python
-def test_regression_PROJ_1234_negative_price_rejected():
-    """Adding an item with a negative price raises ValueError. (PROJ-1234)"""
-    cart = Cart()
-    with pytest.raises(ValueError):
-        cart.add(Item(price=-1))
+```bash
+pytest tests/test_regression.py::test_regression_PROJ_1234_negative_price_rejected -v
+# PASSED
 ```
 
 ### 5단계 — CI에 넣어 다시 돌아오지 못하게 하기
@@ -132,234 +159,274 @@ git add tests/test_regression.py src/cart.py
 git commit -m "fix(cart): reject negative price (PROJ-1234)"
 ```
 
-## 이 코드에서 먼저 볼 점
+이 전체 흐름은 버그를 고치기 전에 반드시 재현 테스트가 먼저 실패하는 것을 확인하는 습관을 보여줍니다.
 
-- 테스트 이름에 버그 ID를 넣어 추적 가능성을 남겼습니다.
-- 재현 케이스는 작고 분명합니다. 한 가지 버그만 겨냥합니다.
-- 회귀 테스트는 모든 버그에 기계적으로 추가하는 것이 아니라, 재발 위험이 큰 문제에 우선 적용합니다.
+## 마커로 회귀 테스트 분류하기
 
-실패를 먼저 확인하는 과정도 중요합니다. 테스트가 실제로 버그를 잡는지 보지 않고 바로 초록색 테스트만 남기면, 그 테스트는 재현력이 없는 장식일 수 있습니다.
+회귀 테스트가 쌓일수록 분류가 중요합니다. pytest 마커를 사용하면 회귀 테스트만 선택적으로 실행할 수 있습니다.
 
-## 어디서 자주 헷갈릴까요?
+**pytest.ini 설정**
 
-가장 흔한 실수는 버그를 고치고 테스트를 쓰지 않는 일입니다. 그 순간부터 같은 회귀가 다시 시작될 가능성이 생깁니다.
-
-또 다른 실수는 재현 테스트를 지나치게 크게 만드는 일입니다. 화면 전체를 띄우거나 거대한 시나리오를 태우지 않아도 되는 문제라면, 가장 낮은 계층으로 내려 작은 케이스로 고정하는 편이 유지비가 훨씬 낮습니다.
-
-## 버그 리포트를 회귀 테스트로 바꾸는 전체 예시
-
-실제 버그 수정 시나리오를 pytest 전체 코드로 보겠습니다. 이 예시는 버그 발견부터 테스트 추가, 수정, 검증까지 전체 흐름을 보여줍니다.
-
-**버그 리포트 — PROJ-1234**
-
-```text
-제목: 장바구니에 음수 가격 상품 추가 시 total이 음수가 됨
-재현 단계:
-1. Item(price=-100) 생성
-2. cart.add(item)
-3. cart.total() 호출
-예상: 예외 발생 또는 거부
-실제: -100 반환
+```ini
+[pytest]
+markers =
+    regression: marks tests as regression tests (deselect with '-m "not regression"')
+    critical: marks tests covering critical user paths
 ```
 
-**1단계 — 실패하는 재현 테스트 작성**
+**conftest.py — 버그 ID 메타데이터 추가**
 
 ```python
-# tests/test_regression.py
+# tests/conftest.py
+import pytest
+
+def pytest_collection_modifyitems(items):
+    for item in items:
+        if "regression" in item.keywords:
+            # 버그 ID를 이름에서 파싱해 출력에 포함
+            if "PROJ_" in item.name:
+                bug_id = next(
+                    (part for part in item.name.split("_") if part.startswith("PROJ")),
+                    None
+                )
+                if bug_id:
+                    item.add_marker(pytest.mark.usefixtures())
+```
+
+**선택적 실행**
+
+```bash
+# 회귀 테스트만 실행
+pytest -m regression -v
+
+# 특정 버그 ID로 필터링
+pytest tests/test_regression.py -k "PROJ_1234"
+
+# 회귀 테스트 제외
+pytest -m "not regression"
+```
+
+## 여러 경계 조건을 parametrize로 고정하기
+
+한 버그가 여러 입력에서 발생했다면 parametrize로 모두 고정합니다.
+
+```python
 import pytest
 from src.cart import Cart, Item
 
-def test_regression_PROJ_1234_negative_price_rejected():
-    """Adding item with negative price should raise ValueError. (PROJ-1234)"""
+@pytest.mark.regression
+@pytest.mark.parametrize("price,expected_error", [
+    (-1, "price must be >= 0"),
+    (-100, "price must be >= 0"),
+    (-0.01, "price must be >= 0"),
+])
+def test_regression_PROJ_1234_various_negative_prices(price, expected_error):
+    """PROJ-1234: Any negative price must be rejected."""
     cart = Cart()
-    # 버그 수정 전에는 이 테스트가 통과하지 않아야 합니다.
-    with pytest.raises(ValueError, match="price must be >= 0"):
-        cart.add(Item(price=-100))
+    with pytest.raises(ValueError, match=expected_error):
+        cart.add(Item(price=price))
+
+@pytest.mark.regression
+@pytest.mark.parametrize("price", [0, 0.01, 1, 9999.99])
+def test_regression_PROJ_1234_valid_prices_accepted(price):
+    """PROJ-1234: Non-negative prices must be accepted."""
+    cart = Cart()
+    cart.add(Item(price=price))
+    assert cart.total() == price
 ```
 
-**2단계 — 실패 확인**
+이 방식은 버그 수정 범위를 명확히 하고, 경계 조건이 모두 테스트됨을 보장합니다.
+
+## 재현 케이스를 가능한 한 낮은 계층에 두기
+
+버그를 최소 계층에서 재현하면 유지비가 낮습니다.
+
+| 상황 | 권장 계층 | 이유 |
+|---|---|---|
+| 순수 도메인 로직 버그 | 단위 테스트 | 빠르고 결정적, 의존 없음 |
+| DB 저장 오류 | 통합 테스트 | 실제 DB 경계에서 발생 |
+| 화면 흐름 오류 | E2E | 브라우저 상호작용 필요 |
+| API 응답 형식 오류 | 통합 테스트 | HTTP 경계에서 검증 |
+
+E2E 계층에서만 재현되는 버그도 가능한 한 아래 계층으로 내려 검증합니다. E2E 회귀 테스트는 속도가 느리고 유지비가 높습니다.
+
+## git bisect로 원인 커밋 추적하기
+
+회귀가 발견되었는데 어느 커밋에서 문제가 시작되었는지 모를 때 `git bisect`를 사용합니다. 이진 탐색으로 원인 커밋을 빠르게 찾습니다.
+
+**수동 bisect**
 
 ```bash
-pytest tests/test_regression.py::test_regression_PROJ_1234_negative_price_rejected -v
-# FAILED ... ValueError not raised
+git bisect start
+git bisect bad HEAD              # 현재 커밋은 실패
+git bisect good v1.2.0           # v1.2.0에서는 통과했음
+
+# Git이 중간 커밋으로 자동 체크아웃
+pytest tests/test_regression.py
+# 통과하면:
+git bisect good
+# 실패하면:
+git bisect bad
+# 반복하면 문제 커밋을 찾아냄
+
+git bisect reset                 # 원래 HEAD로 복귀
 ```
 
-**3단계 — 코드 수정**
-
-```python
-# src/cart.py
-class Cart:
-    def __init__(self):
-        self._items = []
-
-    def add(self, item):
-        if item.price < 0:
-            raise ValueError("price must be >= 0")
-        self._items.append(item)
-
-    def total(self):
-        return sum(item.price for item in self._items)
-```
-
-**4단계 — 테스트 재실행**
+**자동 bisect — 테스트 스크립트 연결**
 
 ```bash
-pytest tests/test_regression.py::test_regression_PROJ_1234_negative_price_rejected -v
-# PASSED
+# 재현 테스트가 명확하면 완전 자동화가 가능합니다
+git bisect start HEAD v1.2.0
+git bisect run pytest tests/test_regression.py::test_regression_PROJ_1234_negative_price_rejected -x
 ```
 
-**5단계 — 커밋**
+bisect는 회귀 테스트가 명확히 실패할 때 가장 유용합니다. 플래키 테스트는 bisect 결과를 신뢰하기 어렵게 만듭니다. 재현 테스트가 결정적이어야 하는 또 다른 이유입니다.
 
-```bash
-git add tests/test_regression.py src/cart.py
-git commit -m "fix(cart): reject negative price (PROJ-1234)"
+**bisect 결과 예시**
+
+```text
+Bisecting: 3 revisions left to test after this (roughly 2 steps)
+[a3f8b2c] refactor(cart): simplify item validation
+
+...
+
+a3f8b2c is the first bad commit
+Author: Developer <dev@example.com>
+Date:   Mon Jun 2 14:23:11 2026
+
+    refactor(cart): simplify item validation
 ```
 
-이 전체 흐름은 버그를 고치기 전에 반드시 재현 테스트가 먼저 실패하는 것을 확인하는 습관을 보여줍니다.
-스냅샷을 아무 생각 없이 갱신하는 문제도 자주 보입니다. 변경 이유를 이해하지 못한 채 갱신하면 테스트는 문서 작업만 남고 신뢰는 사라집니다.
+## 회귀 테스트가 느려지면? 병렬화와 선택적 실행
 
-## 직접 검증해 볼 것
+회귀 테스트가 계속 쌓이면 실행 시간이 문제가 됩니다. 다음은 속도를 관리하는 전략입니다.
 
-1. 수정 전 코드에서 재현 테스트를 먼저 실행해 진짜로 빨간색이 되는지 확인합니다. 이 단계가 없으면 회귀 테스트가 장식으로 끝날 수 있습니다.
-2. 버그 ID를 테스트 이름과 주석 중 한 곳에는 남겨 두어, 나중에 왜 이 테스트가 존재하는지 바로 추적할 수 있게 합니다.
-3. 같은 버그를 E2E와 단위 테스트 중 어디에 두는 편이 더 싼지 비교합니다. 가능한 한 낮은 계층으로 내리는 편이 유지비가 낮습니다.
-
-**예상 결과:** 수정 전에는 재현 테스트가 실패하고, 수정 후에는 같은 테스트가 안정적으로 통과해야 합니다.
-
-## 심화 실습: 운영 관점 테스트 점검
-
-실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
-
-또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
-
-fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
-
-회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
-
-커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
-
-CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
-
-실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
-
-또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
-
-fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
-
-회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
-
-커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
-
-CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
-
-실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
-
-또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
-
-fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
-
-회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
-
-커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
-
-```python
-from unittest.mock import patch
-
-def test_payment_service_retries_once_on_timeout():
-    service = PaymentService()
-    with patch('src.payment.client.charge') as charge:
-        charge.side_effect = [TimeoutError(), {'status': 'ok'}]
-        result = service.pay(user_id='u-1', amount=10000)
-
-    assert result['status'] == 'ok'
-    assert charge.call_count == 2
-```
-
-```bash
-pytest -q --maxfail=1 --disable-warnings
-pytest --cov=src --cov-report=term-missing
-```
-
-## 실패 신호와 첫 점검
-
-- 버그를 고친 뒤 초록색 테스트만 추가하면 실제 회귀 방지력이 없습니다.
-- 재현 테스트가 너무 크면 다른 원인까지 섞여 실패 이유가 흐려집니다.
-- 스냅샷을 무심코 갱신하는 습관이 생기면 회귀 테스트가 기억 장치가 아니라 승인 절차로 변합니다.
-
-## 회귀 테스트가 느려지면?
-
-회귀 테스트가 계속 쌓이면 결국 실행 시간이 문제가 됩니다. 다음은 속도를 관리하는 세 가지 전략입니다.
-
-### 병렬 실행
+**pytest-xdist로 병렬 실행**
 
 ```bash
 pip install pytest-xdist
 pytest tests/test_regression.py -n auto  # CPU 코어 수만큼 병렬 실행
+pytest tests/test_regression.py -n 4    # 워커 4개 고정
 ```
 
 병렬 실행은 테스트 간 의존이 없을 때 가장 효과적입니다. 공유 상태나 파일 의존이 있으면 간헐적 실패를 일으킬 수 있습니다.
 
-### 선택적 실행
+**마커로 선택적 실행**
 
 ```bash
-pytest -m regression  # 회귀 테스트만 실행
-pytest tests/test_regression.py -k "PROJ_123"  # 특정 버그만
-```
-
-마커를 활용하면 전체 테스트 스위트 중 회귀 테스트만 분리해서 돌릴 수 있습니다.
-
-### 핵심 경로 우선 실행
-
-```bash
-# PR에서는 핵심 경로만
-pytest tests/test_regression.py -m critical
+# PR에서는 critical 마커만
+pytest -m "regression and critical" -n auto
 
 # 야간 빌드에서는 전체
-pytest tests/
+pytest tests/ -n auto
 ```
 
-팀이 회귀 테스트를 계층화하면 빠른 피드백과 전체 검증을 동시에 운영할 수 있습니다.
+**비용이 높은 회귀 테스트 분리**
+
+```python
+@pytest.mark.regression
+@pytest.mark.slow          # 3초 이상 걸리는 테스트
+def test_regression_PROJ_5678_large_cart_performance():
+    """PROJ-5678: Cart with 10,000 items must total in under 1 second."""
+    import time
+    cart = Cart()
+    for i in range(10_000):
+        cart.add(Item(price=1.0))
+    start = time.perf_counter()
+    total = cart.total()
+    elapsed = time.perf_counter() - start
+    assert elapsed < 1.0
+    assert total == 10_000.0
+```
+
+```bash
+# 빠른 회귀 테스트만 PR에서 실행
+pytest -m "regression and not slow"
+
+# 느린 테스트는 야간 또는 머지 후
+pytest -m "regression and slow"
+```
+
+## CI 연동
+
+```yaml
+# .github/workflows/regression.yml
+name: Regression Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-xdist
+
+      - name: Run regression tests (PR fast path)
+        run: |
+          pytest -m "regression and not slow" -n auto -v \
+            --tb=short \
+            --junitxml=reports/regression-fast.xml
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-report
+          path: reports/
+
+  regression-full:
+    runs-on: ubuntu-latest
+    # 야간 빌드에서만 전체 회귀 테스트 실행
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest pytest-xdist
+
+      - name: Run full regression suite
+        run: pytest -m regression -n auto -v --tb=long
+```
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 올바른 접근 |
+|---|---|---|
+| 버그 수정 후 테스트 없이 머지 | 같은 버그가 몇 달 뒤 재발 | 버그 수정 PR에 회귀 테스트를 필수로 포함 |
+| 테스트를 먼저 통과시키고 실패 확인 생략 | 테스트가 실제로 버그를 잡지 못함 | 수정 전에 반드시 실패를 먼저 확인 |
+| 재현 케이스를 E2E에만 작성 | 회귀 테스트가 느리고 유지비 높음 | 가능한 한 낮은 계층(단위/통합)으로 내림 |
+| 버그 ID를 테스트 이름에 남기지 않음 | 왜 이 테스트가 존재하는지 추적 불가 | `test_regression_PROJ_1234_` 형식 유지 |
+| 스냅샷을 이유 없이 갱신 | 테스트가 장식이 됨 | 변경 이유를 이해한 뒤 갱신, 리뷰어 확인 |
+| 같은 영역에 회귀 테스트만 계속 추가 | 테스트 수는 늘지만 버그가 반복됨 | 반복 회귀는 설계 문제 신호, 리팩터링 고려 |
+
 ## 실무에서는 이렇게 생각합니다
 
 강한 팀은 버그 수정 PR에 회귀 테스트를 거의 기본으로 요구합니다. 특히 재발 가능성이 높은 문제, 고객 영향이 큰 문제, 경계 조건과 예외 처리 문제는 더 그렇습니다.
 
 경험 많은 엔지니어는 회귀 테스트가 반복해서 쌓이는 모듈을 보면 구조를 의심합니다. 같은 영역에서 같은 류의 버그가 계속 나온다면 테스트를 더 붙이는 것만으로는 부족하고, 설계 단순화나 리팩터링이 필요할 수 있습니다.
 
-## 깃 바이섹트 활용
-
-회귀가 발견되었는데 어느 커밋에서 문제가 시작되었는지 모를 때 `git bisect`를 사용할 수 있습니다.
-
-```bash
-git bisect start
-git bisect bad HEAD              # 현재 커밋은 실패
-git bisect good v1.2.0           # v1.2.0에서는 통과했음
-# Git이 중간 커밋으로 체크아웃
-pytest tests/test_regression.py
-git bisect good  # 또는 git bisect bad
-# 반복하면 문제 커밋을 찾아냄
-git bisect reset
-```
-
-이 과정은 자동화할 수도 있습니다.
-
-```bash
-git bisect start HEAD v1.2.0
-git bisect run pytest tests/test_regression.py
-```
-
-bisect는 회귀 테스트가 명확히 실패할 때 가장 유용합니다. 플래키 테스트는 bisect 결과를 신뢰하기 어렵게 만듭니다.
-## 운영 체크리스트
-
-- [ ] 최근 버그 수정에 회귀 테스트를 함께 추가했습니다.
-- [ ] 테스트 이름에 이슈 ID나 이유를 남겼습니다.
-- [ ] 재현 테스트를 작고 결정적으로 유지했습니다.
-- [ ] 가능한 한 낮은 테스트 계층에 회귀 테스트를 두었습니다.
-
-## 연습 문제
-
-1. 최근에 고친 버그 하나를 골라 회귀 테스트를 추가해 보세요.
-2. 수정 전 코드에서 그 테스트가 실제로 실패하는지 확인해 보세요.
-3. 같은 모듈에서 회귀가 세 번 이상 있었다면 어떤 리팩터링이 필요한지 적어 보세요.
+회귀 테스트가 쌓이는 속도도 하나의 신호입니다. 어떤 모듈에 회귀 테스트가 집중되는지 분기마다 확인하면 리팩터링 우선순위를 결정하는 데 도움이 됩니다.
 
 ## 회귀 테스트 유지 보수
 
@@ -368,30 +435,38 @@ bisect는 회귀 테스트가 명확히 실패할 때 가장 유용합니다. �
 **삭제 기준**
 
 - 테스트가 참조하는 기능이 완전히 삭제된 경우: 테스트도 함께 삭제합니다.
-- 분기 전체에서 한 번도 실패하지 않은 경우: 가치를 재평가합니다.
+- 분기 전체에서 한 번도 의미 있게 실패하지 않은 경우: 가치를 재평가합니다.
 - 코드보다 테스트 수정 비용이 큰 경우: 테스트를 더 낮은 계층으로 내립니다.
 
 **재작성 기준**
 
-- 테스트 의도가 불분명하거나 이름에서 버그 ID를 찾을 수 없는 경우: 더메이트를 보강합니다.
+- 테스트 의도가 불분명하거나 이름에서 버그 ID를 찾을 수 없는 경우: 명확성을 보강합니다.
 - 같은 회귀를 여러 계층에서 중복 확인하는 경우: 가장 빠른 계층 하나만 남깁니다.
 - 긴 실행 시간으로 인해 CI가 느려지는 경우: 부분 테스트로 쪼개거나 병렬화합니다.
 
 회귀 테스트는 한 번 추가하면 끝이 아니라 지속적으로 가치를 재평가하는 대상입니다.
+
+## 운영 체크리스트
+
+- [ ] 최근 버그 수정에 회귀 테스트를 함께 추가했습니다.
+- [ ] 테스트 이름에 이슈 ID를 남겼습니다(`test_regression_PROJ_XXXX_`).
+- [ ] 수정 전에 재현 테스트가 실패하는 것을 확인했습니다.
+- [ ] 재현 테스트를 작고 결정적으로 유지했습니다.
+- [ ] 가능한 한 낮은 테스트 계층에 회귀 테스트를 두었습니다.
+- [ ] CI 파이프라인에서 회귀 테스트가 자동으로 실행됩니다.
+
+## 연습 문제
+
+1. 최근에 고친 버그 하나를 골라 회귀 테스트를 추가해 보세요. 수정 전 코드에서 그 테스트가 실제로 실패하는지 확인해 보세요.
+2. `pytest -m regression`으로 회귀 테스트만 모아 실행하는 환경을 만들어 보세요.
+3. 같은 모듈에서 회귀가 세 번 이상 있었다면 어떤 리팩터링이 필요한지 적어 보세요.
+4. `git bisect run`으로 회귀 원인 커밋을 자동으로 찾는 스크립트를 작성해 보세요.
+
 ## 정리
 
-회귀 테스트는 팀의 기억을 코드로 남기는 방법입니다. 버그를 고치는 일로 끝내지 않고, 다시 오지 못하게 막는 일까지 해야 수정이 완성됩니다. 다음 글에서는 이런 테스트들을 모든 커밋마다 자동으로 실행하는 CI 흐름을 보겠습니다.
+회귀 테스트는 팀의 기억을 코드로 남기는 방법입니다. 버그를 고치는 일로 끝내지 않고, 다시 오지 못하게 막는 일까지 해야 수정이 완성됩니다. 재현 테스트를 먼저 실패하게 만들고, 코드를 고쳐 통과시키고, CI에 넣는 흐름을 습관으로 만들면 팀의 버그 재발률이 눈에 띄게 줄어듭니다.
 
-## 처음 질문으로 돌아가기
-
-- **회귀 테스트는 무엇을 막는 테스트일까요?**
-  - 회귀 테스트를 작성할 타이밍은 단순히 버그 수정 후만이 아닙니다. 다음 표는 팀이 회귀 테스트를 고려해야 하는 주요 시점을 정리한 것입니다.
-- **버그를 재현하고 테스트로 남기는 순서는 어떻게 될까요?**
-  - 실제 버그 수정 시나리오를 pytest 전체 코드로 보겠습니다. 이 예시는 버그 발견부터 테스트 추가, 수정, 검증까지 전체 흐름을 보여줍니다.
-- **최소 재현 케이스는 왜 중요할까요?**
-  - 좋은 회귀 테스트 흐름은 버그 보고에서 끝나지 않습니다
-  - 좋은 회귀 테스트 흐름은 버그 보고에서 끝나지 않습니다. 먼저 실패하는 재현 테스트를 만들고, 그 테스트를 통과하도록 코드를 고친 뒤, CI에 넣어 다시는 조용히 돌아오지 못하게 만듭니다.
-  - 차이는 기억 방식입니다. 사람의 설명 대신 테스트가 버그의 경계를 코드 안에 남깁니다.
+다음 글에서는 이런 테스트들을 모든 커밋마다 자동으로 실행하는 CI 흐름을 보겠습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -412,11 +487,15 @@ bisect는 회귀 테스트가 명확히 실패할 때 가장 유용합니다. �
 ## 참고 자료
 
 - 실습 예제 저장소(book-examples): https://github.com/yeongseon-books/book-examples/tree/main/testing-101/ko
+
 ### 공식 문서
+
 - [pytest documentation](https://docs.pytest.org/)
-- [GitHub Issues documentation](https://docs.github.com/en/issues)
+- [pytest markers](https://docs.pytest.org/en/stable/how-to/mark.html)
+- [git bisect documentation](https://git-scm.com/docs/git-bisect)
 
 ### 실무 참고
+
 - [Martin Fowler — The Practical Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
 - [The Pragmatic Programmer — Bug fixing chapter](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/)
 
