@@ -24,13 +24,9 @@ seo_description: 호출별 토큰과 비용을 먼저 기록해야 캐시, 프�
 
 # LLM Apps Ops 101 (2/6): LLM 비용 추적과 최적화
 
-월말 청구서는 "이번 달 총 $1,200"이라고 말해 줍니다. 하지만 이 숫자에는 수천 개의 호출이 뭉쳐 있어서, 어떤 요청이 얼마를 만들었는지 분해할 수 없습니다. 호출 단위 기록이 있으면 전혀 다른 질문이 가능해집니다.
-
 이 글은 LLM Apps Ops 101 시리즈의 두 번째 글입니다.
 
 "이번 달 OpenAI 청구서가 왜 3배죠?" 슬랙에 이 메시지가 올라왔을 때, 가장 어려운 부분은 금액 자체가 아닙니다. 어려운 부분은 그 다음 질문입니다. "어떤 엔드포인트에서 많이 썼지?", "언제부터 늘었지?", "누가 긴 프롬프트를 배포했지?" 호출 단위 비용 기록이 없으면, 이 질문들에 답할 방법이 없습니다. 팀은 비용 폭발을 겪은 게 아니라 비용 폭발을 목격만 한 겁니다.
-
-저는 팀들이 데모 단계에서 "LLM 비용은 미미합니다"라고 보고하면서, 정작 반복 호출과 배치 작업이 붙는 순간 청구서가 10배 뛰는 걸 첫 달에야 발견하는 경우를 여러 번 봤습니다. 문제는 비용이 비싼 게 아니라, 비용이 어디서 만들어지는지 모른 채 한 달을 보냈다는 겁니다. 한 달치 최적화 기회가 사라진 셈입니다.
 
 비용 추적의 출발점은 회계가 아닙니다. 운영 의사결정을 수치로 내릴 수 있는 계측 장치, 이것이 출발점입니다.
 
@@ -43,7 +39,7 @@ seo_description: 호출별 토큰과 비용을 먼저 기록해야 캐시, 프�
 - LLM 비용은 왜 월말 청구서가 아니라 호출 단위에서 추적해야 할까요?
 - 단가표를 코드에서 분리하면 어떤 운영 실험이 쉬워질까요?
 - 캐시, 모델 교체, 프롬프트 압축 중 무엇부터 줄일지 어떻게 판단할까요?
-- 최소 실행 예제 — 호출 한 건의 비용을 기록할 때 실무에 적용할 때 주의할 점은 무엇일까요?
+- 비용 경고를 감정이 아니라 조건문으로 다루려면 어떻게 해야 할까요?
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 
 ## 왜 호출 단위 추적이 월말 청구서를 이기는가
@@ -61,10 +57,9 @@ seo_description: 호출별 토큰과 비용을 먼저 기록해야 캐시, 프�
 | 전월 대비 증감 | 비용 급증 시작 시점 (시간 단위) |
 | — | 캐시 후보 자동 식별 |
 | — | 프롬프트 버전별 비용 비교 |
+| — | user_tier별 비용 분포 |
 
-저는 한 팀이 월말 청구서만 보고 "모델을 더 싼 걸로 바꾸자"고 결정했다가, 정작 비용의 60%가 반복 호출에서 나오고 있던 걸 나중에 발견한 경우를 알고 있습니다. 캐시 하나 붙였으면 모델 교체 없이 비용을 절반으로 줄일 수 있었습니다. 호출 단위 데이터 없이 내린 최적화 결정은 높은 확률로 방향이 틀립니다.
-
-이 글의 나머지는 이 호출 단위 추적을 어떻게 코드로 만들고, 그 데이터에서 어떤 최적화 판단을 내릴 수 있는지 단계별로 보여드리겠습니다.
+한 팀이 월말 청구서만 보고 "모델을 더 싼 걸로 바꾸자"고 결정했다가, 정작 비용의 60%가 반복 호출에서 나오고 있던 걸 나중에 발견한 경우를 알고 있습니다. 캐시 하나 붙였으면 모델 교체 없이 비용을 절반으로 줄일 수 있었습니다. 호출 단위 데이터 없이 내린 최적화 결정은 높은 확률로 방향이 틀립니다.
 
 ## 최소 실행 예제 — 호출 한 건의 비용을 기록하기
 
@@ -81,18 +76,29 @@ OUTPUT_PRICE_PER_MILLION_TOKENS = 0.08
 
 @dataclass
 class CostRecord:
+    route: str
+    prompt_version: str
+    model: str
     prompt: str
     prompt_tokens: int
     completion_tokens: int
     total_tokens: int
+    input_cost_usd: float
+    output_cost_usd: float
     cost_usd: float
 
-def estimate_cost(prompt_tokens: int, completion_tokens: int) -> float:
-    prompt_cost = (prompt_tokens / 1_000_000) * INPUT_PRICE_PER_MILLION_TOKENS
-    completion_cost = (completion_tokens / 1_000_000) * OUTPUT_PRICE_PER_MILLION_TOKENS
-    return round(prompt_cost + completion_cost, 8)
+def estimate_cost(prompt_tokens: int, completion_tokens: int) -> tuple[float, float, float]:
+    """입력/출력 비용을 분리 계산. 총합만 쓰면 나중에 원인 분리가 안 됩니다."""
+    input_cost = round((prompt_tokens / 1_000_000) * INPUT_PRICE_PER_MILLION_TOKENS, 8)
+    output_cost = round((completion_tokens / 1_000_000) * OUTPUT_PRICE_PER_MILLION_TOKENS, 8)
+    return input_cost, output_cost, round(input_cost + output_cost, 8)
 
-def run_prompt(client: Groq, prompt: str) -> CostRecord:
+def run_prompt(
+    client: Groq,
+    prompt: str,
+    route: str = "/api/chat",
+    prompt_version: str = "v1.0",
+) -> CostRecord:
     response = client.chat.completions.create(
         model=MODEL,
         temperature=0,
@@ -104,29 +110,40 @@ def run_prompt(client: Groq, prompt: str) -> CostRecord:
     usage = response.usage
     if usage is None:
         raise RuntimeError("usage metadata missing from Groq response")
+    input_cost, output_cost, total_cost = estimate_cost(
+        usage.prompt_tokens, usage.completion_tokens
+    )
     return CostRecord(
+        route=route,
+        prompt_version=prompt_version,
+        model=MODEL,
         prompt=prompt,
         prompt_tokens=usage.prompt_tokens,
         completion_tokens=usage.completion_tokens,
         total_tokens=usage.total_tokens,
-        cost_usd=estimate_cost(usage.prompt_tokens, usage.completion_tokens),
+        input_cost_usd=input_cost,
+        output_cost_usd=output_cost,
+        cost_usd=total_cost,
     )
 
 def main() -> None:
     client = Groq(api_key=os.environ["GROQ_API_KEY"])
     prompts = [
         "Summarize Python decorators in one sentence.",
-        "Summarize Python decorators in one sentence.",
+        "Summarize Python decorators in one sentence.",  # 반복 호출 — 캐시 후보
         "Summarize asyncio.gather in one sentence.",
     ]
-    records = [run_prompt(client, prompt) for prompt in prompts]
+    records = [run_prompt(client, p) for p in prompts]
     report = {
-        "input_price_per_million_tokens": INPUT_PRICE_PER_MILLION_TOKENS,
-        "output_price_per_million_tokens": OUTPUT_PRICE_PER_MILLION_TOKENS,
+        "model": MODEL,
+        "input_price_per_million": INPUT_PRICE_PER_MILLION_TOKENS,
+        "output_price_per_million": OUTPUT_PRICE_PER_MILLION_TOKENS,
         "total_calls": len(records),
-        "total_tokens": sum(record.total_tokens for record in records),
-        "total_cost_usd": round(sum(record.cost_usd for record in records), 8),
-        "records": [asdict(record) for record in records],
+        "total_tokens": sum(r.total_tokens for r in records),
+        "total_input_cost_usd": round(sum(r.input_cost_usd for r in records), 8),
+        "total_output_cost_usd": round(sum(r.output_cost_usd for r in records), 8),
+        "total_cost_usd": round(sum(r.cost_usd for r in records), 8),
+        "records": [asdict(r) for r in records],
     }
     print(json.dumps(report, indent=2, ensure_ascii=False))
 
@@ -148,32 +165,72 @@ if __name__ == "__main__":
 
 ## 단가표를 코드 구조로 분리하는 이유
 
-운영에서는 금방 두 가지 요구가 생깁니다. 모델마다 단가가 다르고, 모델을 교체하는 실험을 자주 해야 한다는 겁니다. 단가 상수가 비용 계산 함수 안에 하드코딩되어 있으면, 모델 비교 실험을 할 때마다 코드를 수정해야 합니다. 분리해 두면 설정만 바꿔서 실험을 돌릴 수 있습니다.
+운영에서는 금방 두 가지 요구가 생깁니다. 모델마다 단가가 다르고, 모델을 교체하는 실험을 자주 해야 한다는 겁니다. 단가 상수가 비용 계산 함수 안에 하드코딩되어 있으면, 모델 비교 실험을 할 때마다 코드를 수정해야 합니다.
 
 ```python
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class PriceCard:
-    input_per_million: float
-    output_per_million: float
+    """모델별 과금 정보. frozen=True로 실수 변경을 방지합니다."""
+    input_per_million: float   # USD per 1M input tokens
+    output_per_million: float  # USD per 1M output tokens
+    provider: str
+    notes: str = ""
 
-PRICE_CARDS = {
-    "llama-3.1-8b-instant": PriceCard(input_per_million=0.05, output_per_million=0.08),
-    "llama-3.1-70b-versatile": PriceCard(input_per_million=0.59, output_per_million=0.79),
-    "gpt-4o-mini": PriceCard(input_per_million=0.15, output_per_million=0.60),
+PRICE_CARDS: dict[str, PriceCard] = {
+    "llama-3.1-8b-instant": PriceCard(
+        input_per_million=0.05, output_per_million=0.08, provider="groq"
+    ),
+    "llama-3.1-70b-versatile": PriceCard(
+        input_per_million=0.59, output_per_million=0.79, provider="groq"
+    ),
+    "gpt-4o-mini": PriceCard(
+        input_per_million=0.15, output_per_million=0.60, provider="openai"
+    ),
+    "gpt-4o": PriceCard(
+        input_per_million=2.50, output_per_million=10.00, provider="openai",
+        notes="캐시 히트 시 입력 단가 50% 할인"
+    ),
+    "claude-3-5-haiku-20241022": PriceCard(
+        input_per_million=0.80, output_per_million=4.00, provider="anthropic"
+    ),
 }
 
-def estimate_split_cost(model: str, prompt_tokens: int, completion_tokens: int) -> float:
+def estimate_split_cost(
+    model: str, prompt_tokens: int, completion_tokens: int
+) -> dict[str, float]:
+    """모델별 단가를 적용해 입출력 비용을 분리 반환합니다."""
+    if model not in PRICE_CARDS:
+        raise ValueError(f"Unknown model: {model}. Add to PRICE_CARDS first.")
     price = PRICE_CARDS[model]
-    input_cost = (prompt_tokens / 1_000_000) * price.input_per_million
-    output_cost = (completion_tokens / 1_000_000) * price.output_per_million
-    return round(input_cost + output_cost, 8)
+    input_cost = round((prompt_tokens / 1_000_000) * price.input_per_million, 8)
+    output_cost = round((completion_tokens / 1_000_000) * price.output_per_million, 8)
+    return {
+        "model": model,
+        "provider": price.provider,
+        "input_cost_usd": input_cost,
+        "output_cost_usd": output_cost,
+        "total_cost_usd": round(input_cost + output_cost, 8),
+    }
+
+def compare_model_costs(
+    prompt_tokens: int,
+    completion_tokens: int,
+    models: list[str] | None = None,
+) -> list[dict]:
+    """동일 토큰 사용량 기준으로 모델별 비용을 비교합니다."""
+    targets = models or list(PRICE_CARDS.keys())
+    results = []
+    for m in targets:
+        cost = estimate_split_cost(m, prompt_tokens, completion_tokens)
+        cost["prompt_tokens"] = prompt_tokens
+        cost["completion_tokens"] = completion_tokens
+        results.append(cost)
+    return sorted(results, key=lambda x: x["total_cost_usd"])
 ```
 
 이 분리가 만드는 실제 차이를 예로 들겠습니다. "입력은 2,000토큰인데 출력은 50토큰인 요약 작업"과 "입력은 100토큰인데 출력은 1,500토큰인 생성 작업"은 총 토큰 수가 비슷해도 과금 패턴이 완전히 다릅니다. 요약 작업은 입력 단가가 싼 모델로 보내는 게 유리하고, 생성 작업은 출력 단가가 싼 모델로 보내는 게 유리합니다. 단가표가 분리되어 있어야 이 비교가 가능합니다.
-
-저는 한 팀이 PriceCard 분리 없이 6개월을 운영하다가, 모델을 교체할 때 비용 비교를 하려고 과거 데이터를 뒤졌는데 입력/출력 분리가 안 되어 있어서 결국 2주간 A/B 테스트를 다시 돌려야 했던 경우를 봤습니다. 처음부터 분리해 뒀으면 기존 데이터만으로 시뮬레이션할 수 있었습니다.
 
 ## 캐시 후보와 최적화 우선순위를 데이터로 정하기
 
@@ -185,30 +242,51 @@ from dataclasses import asdict, dataclass
 
 @dataclass
 class OptimizationReport:
+    """최적화 레버 우선순위를 결정하기 위한 분석 결과."""
     total_calls: int
     repeated_prompt_count: int
-    cache_candidate_ratio: float
+    cache_candidate_ratio: float     # 0.3 이상이면 캐시부터
     total_prompt_tokens: int
     total_completion_tokens: int
     total_cost_usd: float
-    input_cost_ratio: float  # input cost / total cost
+    input_cost_ratio: float          # 0.7 이상이면 입력 압축, 0.3 이하면 출력 제한
+    avg_cost_per_call_usd: float
+    top_expensive_routes: list[dict]
 
 def build_optimization_report(records: list[CostRecord]) -> OptimizationReport:
-    prompt_counter = Counter(record.prompt for record in records)
+    """호출 레코드를 분석해 최적화 우선순위를 반환합니다."""
+    if not records:
+        raise ValueError("No records to analyze")
+
+    prompt_counter = Counter(r.prompt for r in records)
     repeated = sum(count for count in prompt_counter.values() if count > 1)
-    total_input = sum(record.prompt_tokens for record in records)
-    total_output = sum(record.completion_tokens for record in records)
-    input_cost = (total_input / 1_000_000) * INPUT_PRICE_PER_MILLION_TOKENS
-    output_cost = (total_output / 1_000_000) * OUTPUT_PRICE_PER_MILLION_TOKENS
+    total_input = sum(r.prompt_tokens for r in records)
+    total_output = sum(r.completion_tokens for r in records)
+
+    input_cost = sum(r.input_cost_usd for r in records)
+    output_cost = sum(r.output_cost_usd for r in records)
     total_cost = input_cost + output_cost
+
+    # route별 비용 집계
+    route_costs: dict[str, float] = {}
+    for r in records:
+        route_costs[r.route] = route_costs.get(r.route, 0.0) + r.cost_usd
+    top_routes = sorted(
+        [{"route": k, "cost_usd": round(v, 6)} for k, v in route_costs.items()],
+        key=lambda x: x["cost_usd"],
+        reverse=True,
+    )[:5]
+
     return OptimizationReport(
         total_calls=len(records),
         repeated_prompt_count=repeated,
         cache_candidate_ratio=round(repeated / len(records), 3),
         total_prompt_tokens=total_input,
         total_completion_tokens=total_output,
-        total_cost_usd=round(total_cost, 8),
+        total_cost_usd=round(total_cost, 6),
         input_cost_ratio=round(input_cost / total_cost, 3) if total_cost > 0 else 0.0,
+        avg_cost_per_call_usd=round(total_cost / len(records), 8),
+        top_expensive_routes=top_routes,
     )
 ```
 
@@ -220,28 +298,29 @@ def build_optimization_report(records: list[CostRecord]) -> OptimizationReport:
 | `input_cost_ratio > 0.7` | 비용 대부분이 입력에서 발생 | 시스템 프롬프트 압축, context 축소 |
 | `input_cost_ratio < 0.3` | 비용 대부분이 출력에서 발생 | max_tokens 제한, 출력 포맷 간소화 |
 
-이 표가 중요한 이유는, 최적화 우선순위를 사람의 직관이 아니라 데이터에서 결정하기 때문입니다. 실제로 많은 팀이 "프롬프트가 길어서 비쌀 것이다"라고 가정하고 프롬프트 압축부터 시작하지만, 데이터를 보면 반복 호출이 비용의 주범인 경우가 훨씬 많습니다.
+이 표가 중요한 이유는, 최적화 우선순위를 사람의 직관이 아니라 데이터에서 결정하기 때문입니다.
 
 ## 비용 경고를 감정이 아니라 조건문으로 다루기
 
-비용 추적은 숫자를 쌓는 데서 끝나면 효과가 약합니다. 비용이 오르는 조건을 자동으로 탐지하고, 어떤 행동을 취해야 하는지 바로 이어져야 합니다. 그래서 비용 코드는 `수집 → 분석 → 조치` 세 단계로 나눠야 합니다.
+비용 추적은 숫자를 쌓는 데서 끝나면 효과가 약합니다. 비용이 오르는 조건을 자동으로 탐지하고, 어떤 행동을 취해야 하는지 바로 이어져야 합니다.
 
 ```python
 from dataclasses import dataclass
 
 @dataclass
 class CostAlert:
-    key: str
+    key: str                   # "route|model|prompt_version"
     current_usd: float
     baseline_usd: float
     increase_ratio: float
+    recommended_action: str
 
 def aggregate_daily_cost(rows: list[dict]) -> dict[str, float]:
-    """route|model|prompt_version 단위로 일간 비용 집계."""
+    """route|model|prompt_version 단위로 일간 비용을 집계합니다."""
     totals: dict[str, float] = {}
     for row in rows:
         key = f"{row['route']}|{row['model']}|{row['prompt_version']}"
-        totals[key] = totals.get(key, 0.0) + row["estimated_cost_usd"]
+        totals[key] = totals.get(key, 0.0) + row["cost_usd"]
     return totals
 
 def detect_cost_alerts(
@@ -250,25 +329,41 @@ def detect_cost_alerts(
     ratio_threshold: float = 1.5,
     min_delta_usd: float = 5.0,
 ) -> list[CostAlert]:
-    """baseline 대비 ratio_threshold 이상 증가하고, 절대 증가분이 min_delta_usd 이상이면 경고."""
+    """baseline 대비 ratio_threshold 이상 증가하고 절대 증가분이 min_delta_usd 이상이면 경고."""
     alerts: list[CostAlert] = []
     for key, curr in current.items():
         base = baseline.get(key, 0.0)
         if base <= 0:
             continue
         ratio = curr / base
-        if ratio >= ratio_threshold and curr - base >= min_delta_usd:
-            alerts.append(CostAlert(key, round(curr, 2), round(base, 2), round(ratio, 2)))
-    return alerts
+        delta = curr - base
+        if ratio >= ratio_threshold and delta >= min_delta_usd:
+            # 어떤 차원이 증가했는지 키에서 파악
+            parts = key.split("|")
+            action = (
+                "프롬프트 버전 확인 — 최근 변경 여부 점검"
+                if len(parts) == 3 and parts[2] != baseline.get(key, key)
+                else "상위 요청 샘플 10건 확인"
+            )
+            alerts.append(
+                CostAlert(
+                    key=key,
+                    current_usd=round(curr, 2),
+                    baseline_usd=round(base, 2),
+                    increase_ratio=round(ratio, 2),
+                    recommended_action=action,
+                )
+            )
+    return sorted(alerts, key=lambda a: a.increase_ratio, reverse=True)
 ```
 
-이 코드에서 `prompt_version`을 집계 키에 포함하는 이유가 있습니다. 같은 route라도 프롬프트 변경 이후 비용이 늘었는지 즉시 확인할 수 있어야 하기 때문입니다. 저는 한 팀이 시스템 프롬프트에 few-shot 예시 3개를 추가한 뒤 입력 토큰이 40% 증가했는데, route 단위로만 집계하고 있어서 원인을 찾는 데 3일이 걸린 경우를 봤습니다. `prompt_version`이 키에 있었으면 당일 경고가 떴을 겁니다.
+이 코드에서 `prompt_version`을 집계 키에 포함하는 이유가 있습니다. 같은 route라도 프롬프트 변경 이후 비용이 늘었는지 즉시 확인할 수 있어야 하기 때문입니다. 한 팀이 시스템 프롬프트에 few-shot 예시 3개를 추가한 뒤 입력 토큰이 40% 증가했는데, route 단위로만 집계하고 있어서 원인을 찾는 데 3일이 걸린 경우를 봤습니다. `prompt_version`이 키에 있었으면 당일 경고가 떴을 겁니다.
 
 baseline은 7일 이동 평균으로 두는 편이 안전합니다. 요일별 트래픽 패턴이 있는 서비스에서 단일 전일 대비로 비교하면 월요일마다 거짓 경고가 울립니다.
 
 ## 모델 라우팅과 캐시를 비용/품질 함께 평가하기
 
-비용 최적화에서 가장 자주 실패하는 패턴은 비용만 보고 결정을 내리는 겁니다. 저가 모델로 전환해 비용은 줄였지만 재시도율이 늘어 총 비용이 다시 올라가는 경우, 캐시 적중률이 높아 보이지만 캐시 무효화 기준이 느슨해서 오래된 답변을 더 싸게 뿌리는 경우. 두 시나리오 모두 비용만 보면 성공으로 보이지만 제품은 나빠지고 있습니다.
+비용 최적화에서 가장 자주 실패하는 패턴은 비용만 보고 결정을 내리는 겁니다. 저가 모델로 전환해 비용은 줄였지만 재시도율이 늘어 총 비용이 다시 올라가는 경우, 캐시 적중률이 높아 보이지만 캐시 무효화 기준이 느슨해서 오래된 답변을 더 싸게 뿌리는 경우.
 
 ![최적화 레버에 품질 검증이 함께 필요한 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-03-where-engineers-get-confused.ko.png)
 
@@ -302,14 +397,50 @@ baseline은 7일 이동 평균으로 두는 편이 안전합니다. 요일별 �
 | 상위 10개 고비용 route | 비용 집중 지점 변화 확인 | 새로운 route가 상위에 진입 |
 | 캐시 미스 비중 | 캐시 효과 퇴화 탐지 | 미스율 60% 이상으로 증가 |
 | 출력 토큰 편차 | 응답 장황화, 프롬프트 드리프트 탐지 | 표준편차가 평균의 2배 초과 |
+| 입력 비용 비율 | 입력/출력 비용 균형 변화 | 0.7 초과 또는 0.3 미만 |
 
 특히 출력 토큰 편차가 커지는 날은 주의가 필요합니다. 모델이 갑자기 장문 응답을 생성하기 시작했거나, 프롬프트 변경으로 출력 포맷이 불안정해진 신호일 수 있습니다.
 
-이 지표를 팀 대시보드에 고정해 두면, 엔지니어링과 제품 팀이 같은 숫자를 보고 우선순위를 합의할 수 있습니다. 비용 논의가 감정적 논쟁에서 데이터 기반 실험으로 바뀌는 지점이 바로 여기입니다.
+```python
+from statistics import mean, stdev
+
+def daily_cost_summary(records: list[CostRecord]) -> dict:
+    """일간 비용 요약. 매일 아침 슬랙에 자동 발송하면 됩니다."""
+    if not records:
+        return {"status": "no-traffic"}
+
+    costs = [r.cost_usd for r in records]
+    output_tokens = [r.completion_tokens for r in records]
+    input_costs = [r.input_cost_usd for r in records]
+    total_cost = sum(costs)
+
+    avg_output = mean(output_tokens)
+    sd_output = stdev(output_tokens) if len(output_tokens) > 1 else 0.0
+    output_volatile = sd_output > avg_output * 2  # 편차가 평균의 2배 초과
+
+    route_costs: dict[str, float] = {}
+    for r in records:
+        route_costs[r.route] = route_costs.get(r.route, 0.0) + r.cost_usd
+
+    return {
+        "total_calls": len(records),
+        "total_cost_usd": round(total_cost, 4),
+        "avg_cost_per_call_usd": round(total_cost / len(records), 8),
+        "input_cost_ratio": round(sum(input_costs) / total_cost, 3) if total_cost else 0.0,
+        "output_token_avg": round(avg_output, 1),
+        "output_token_stdev": round(sd_output, 1),
+        "output_volatile_alert": output_volatile,
+        "top_routes": sorted(
+            [{"route": k, "cost_usd": round(v, 4)} for k, v in route_costs.items()],
+            key=lambda x: x["cost_usd"],
+            reverse=True,
+        )[:5],
+    }
+```
 
 ## 비용 급증 시 1시간 안에 원인 좁히기
 
-비용 그래프가 갑자기 튀었을 때 "왜 올랐지?"를 1시간 안에 답하지 못하면, 다음 날까지 같은 비율로 비용이 빠져나갑니다. 압박 상황에서 즉석으로 분석 질문을 만들면 빠뜨리는 항목이 생깁니다. 그래서 절차를 미리 고정해 둬야 합니다.
+비용 그래프가 갑자기 튀었을 때 "왜 올랐지?"를 1시간 안에 답하지 못하면, 다음 날까지 같은 비율로 비용이 빠져나갑니다.
 
 **0-15분: 트래픽량 확인.** 요청 수가 그대로인데 비용만 늘었다면 단가, 토큰 수, 재시도 중 하나입니다. 트래픽이 함께 늘었다면 자연 증가인지 이상 유입인지 분리합니다.
 
@@ -328,6 +459,9 @@ python3 -m scripts.cost_report --top-prompts 20
 
 # 3) 모델별 비용 분포 확인
 python3 -m scripts.cost_report --group-by model
+
+# 4) 프롬프트 버전별 평균 비용 비교
+python3 -m scripts.cost_report --group-by prompt_version --metric avg_cost
 ```
 
 이 절차를 런북에 두고 당번 엔지니어가 그대로 실행하면, 비용 이슈도 장애처럼 재현 가능한 대응 체계로 전환됩니다.
@@ -336,7 +470,7 @@ python3 -m scripts.cost_report --group-by model
 
 비용 최적화는 기능 실험과 달리 실패 비용이 바로 청구서에 반영됩니다. 프롬프트를 잘못 줄이면 재시도가 늘어 오히려 비용이 증가할 수 있습니다. 그래서 실험 절차를 먼저 고정해야 합니다.
 
-가설은 반드시 측정 가능한 문장이어야 합니다. "프롬프트 앞부분 요약을 제거하면 요청당 입력 토큰이 15% 감소한다"처럼 쓰면 성공/실패를 수치로 판정할 수 있습니다. "비용을 줄이자"는 가설이 아니라 구호입니다.
+가설은 반드시 측정 가능한 문장이어야 합니다. "프롬프트 앞부분 요약을 제거하면 요청당 입력 토큰이 15% 감소한다"처럼 쓰면 성공/실패를 수치로 판정할 수 있습니다.
 
 실험 절차는 다섯 단계입니다.
 
@@ -346,18 +480,18 @@ python3 -m scripts.cost_report --group-by model
 4. **롤백 기준 확인** — 품질 실패율 1.5배 이상 증가 시 중단, 재시도율 20% 이상 증가 시 중단.
 5. **전면 적용** — 4번 기준을 통과한 경우에만 확대합니다.
 
-롤백 기준이 미리 정해져 있어야 합니다. 이 기준이 없으면 최적화가 성공인지 실패인지 매번 논쟁으로 끝납니다. 저는 롤백 기준 없이 "일단 적용하고 보자"로 시작한 팀이 품질 저하를 2주 뒤에야 발견하고, 그 사이 사용자 이탈이 늘어난 경우를 본 적 있습니다.
-
-운영 조직이 커질수록 "누가 어떤 실험을 언제 켰는지"도 중요해집니다. 실험 ID를 비용 로그에 남기면, 월말에 "이 증가분은 실험 EXP-042 때문"이라고 바로 설명할 수 있습니다.
+롤백 기준이 미리 정해져 있어야 합니다. 이 기준이 없으면 최적화가 성공인지 실패인지 매번 논쟁으로 끝납니다. 운영 조직이 커질수록 "누가 어떤 실험을 언제 켰는지"도 중요해집니다. 실험 ID를 비용 로그에 남기면, 월말에 "이 증가분은 실험 EXP-042 때문"이라고 바로 설명할 수 있습니다.
 
 ## 운영 체크리스트
 
-- [ ] 호출별 `prompt_tokens`, `completion_tokens`, `total_tokens`를 저장하고 있다
-- [ ] 단가 상수는 한 곳에 모으고 모델별로 분리되어 있다
+- [ ] 호출별 `prompt_tokens`, `completion_tokens`, `input_cost_usd`, `output_cost_usd`를 분리 저장하고 있다
+- [ ] 단가 상수는 `PRICE_CARDS` 같은 단일 위치에 모델별로 분리 관리한다
 - [ ] 누적 비용과 호출별 비용을 함께 리포트하고 있다
 - [ ] 반복 프롬프트를 캐시 후보로 자동 표시하고 있다
 - [ ] 비용 절감 실험에는 항상 품질 검증 결과를 같이 붙이고 있다
-- [ ] 비용 경고 임계치와 롤백 기준이 문서화되어 있다
+- [ ] 비용 경고 임계치(비율 + 절대값)와 롤백 기준이 문서화되어 있다
+- [ ] 일간 비용 요약 리포트를 자동화해 팀에 공유하고 있다
+- [ ] baseline을 7일 이동 평균으로 관리하고 있다
 
 ## 정리
 
@@ -368,13 +502,13 @@ python3 -m scripts.cost_report --group-by model
 ## 처음 질문으로 돌아가기
 
 - **LLM 비용은 왜 월말 청구서가 아니라 호출 단위에서 추적해야 할까요?**
-  - 월말 청구서는 "이번 달 총 $1,200"이라고 말해 줍니다. 하지만 이 숫자에는 수천 개의 호출이 뭉쳐 있어서, 어떤 요청이 얼마를 만들었는지 분해할 수 없습니다. 호출 단위 기록이 있으면 전혀 다른 질문이 가능해집니다.
+  - 월말 청구서는 수천 개의 호출이 뭉쳐 있어 어떤 요청이 얼마를 만들었는지 분해할 수 없습니다. 호출 단위 기록이 있으면 route별 비용, 반복 패턴, 급증 시점을 시간 단위로 추적할 수 있습니다.
+
 - **단가표를 코드에서 분리하면 어떤 운영 실험이 쉬워질까요?**
-  - 운영에서는 금방 두 가지 요구가 생깁니다. 모델마다 단가가 다르고, 모델을 교체하는 실험을 자주 해야 한다는 겁니다.
+  - `PRICE_CARDS` 분리 후에는 모델 비교 실험을 코드 수정 없이 할 수 있습니다. 더 중요하게는, 기존 로그 데이터에 새 단가를 사후 적용해 "이 기간에 모델 X를 썼다면 얼마였을까"를 시뮬레이션할 수 있습니다.
+
 - **캐시, 모델 교체, 프롬프트 압축 중 무엇부터 줄일지 어떻게 판단할까요?**
-  - 비용 최적화에서 가장 자주 실패하는 패턴은 비용만 보고 결정을 내리는 겁니다. 저가 모델로 전환해 비용은 줄였지만 재시도율이 늘어 총 비용이 다시 올라가는 경우, 캐시 적중률이 높아 보이지만 캐시 무효화 기준이 느슨해서 오래된 답변을 더 싸게 뿌리는 경우. 두 시나리오 모두 비용만 보면 성공으로 보이지만 제품은 나빠지고 있습니다.
-- **최소 실행 예제 — 호출 한 건의 비용을 기록할 때 실무에 적용할 때 주의할 점은 무엇일까요?**
-  - 이 코드에서 중요한 점은 계산 로직이 아닙니다. 중요한 점은 설계 결정 세 가지입니다.
+  - `cache_candidate_ratio`가 0.3 이상이면 캐시, `input_cost_ratio`가 0.7 이상이면 프롬프트 압축, 품질 여유가 있는 작업이 식별되면 저가 모델 라우팅 순서로 접근합니다. 감이 아니라 OptimizationReport의 숫자가 우선순위를 정합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -393,6 +527,7 @@ python3 -m scripts.cost_report --group-by model
 ## 참고 자료
 
 - [LLM Apps Ops 101 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/llm-apps-ops-101/ko)
+
 ### 공식 문서
 
 - [OpenAI API Pricing](https://openai.com/api/pricing/)
