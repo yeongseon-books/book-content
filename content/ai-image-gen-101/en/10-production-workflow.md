@@ -3,6 +3,7 @@ title: "AI Image Generation 101 (10/10): Production Workflows"
 series: ai-image-gen-101
 episode: 10
 language: en
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: false
@@ -14,7 +15,7 @@ tags:
 - ChatGPT
 - Image Generation
 - Prompt Engineering
-seo_description: "Combine every technique from the series into production-ready templates for thumbnails, social posts, presentations, and batch generation with open-source tools."
+seo_description: "Combine every technique into production-ready templates for thumbnails, social posts, presentations, and batch generation."
 ---
 
 # AI Image Generation 101 (10/10): Production Workflows
@@ -167,7 +168,7 @@ The series' core lesson, distilled into one comparison.
 
 ### Good Prompt
 
-> A professional food photographer setup: a golden-brown sourdough loaf on a rustic wooden cutting board, scattered flour, a linen napkin, and a vintage bread knife, overhead bird eye view composition, photorealistic style, soft natural window light from the left, warm earthy color palette, shallow depth of field
+> A professional food photographer setup: a golden-brown sourdough loaf on a rustic wooden cutting board, scattered flour, a linen napkin, and a vintage bread knife, overhead bird's eye view composition, photorealistic style, soft natural window light from the left, warm earthy color palette, shallow depth of field
 
 ![Good prompt](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/10/08-good-prompt-result.png)
 
@@ -179,7 +180,7 @@ The series' core lesson, distilled into one comparison.
 |---------|-----------|-------------|
 | Subject | "something cool" | "sourdough loaf on cutting board" |
 | Style | (none) | "photorealistic" |
-| Composition | (none) | "overhead bird eye view" |
+| Composition | (none) | "overhead bird's eye view" |
 | Lighting | (none) | "soft natural window light from left" |
 | Color | (none) | "warm earthy color palette" |
 | Detail | (none) | "scattered flour, linen napkin, bread knife" |

@@ -3,10 +3,11 @@ title: "AI 이미지 생성 101 (10/10): 실전 워크플로우"
 series: ai-image-gen-101
 episode: 10
 language: ko
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: false
 tags:
@@ -167,7 +168,7 @@ warm [조명] lighting + soft bokeh background
 
 ### 좋은 프롬프트
 
-> A professional food photographer setup: a golden-brown sourdough loaf on a rustic wooden cutting board, scattered flour, a linen napkin, and a vintage bread knife, overhead bird eye view composition, photorealistic style, soft natural window light from the left, warm earthy color palette, shallow depth of field
+> A professional food photographer setup: a golden-brown sourdough loaf on a rustic wooden cutting board, scattered flour, a linen napkin, and a vintage bread knife, overhead bird's eye view composition, photorealistic style, soft natural window light from the left, warm earthy color palette, shallow depth of field
 
 ![좋은 프롬프트](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/10/08-good-prompt-result.png)
 
@@ -179,7 +180,7 @@ warm [조명] lighting + soft bokeh background
 |------|-------------|-------------|
 | 주제 | "something cool" | "sourdough loaf on cutting board" |
 | 스타일 | (없음) | "photorealistic" |
-| 구도 | (없음) | "overhead bird eye view" |
+| 구도 | (없음) | "overhead bird's eye view" |
 | 조명 | (없음) | "soft natural window light from left" |
 | 색감 | (없음) | "warm earthy color palette" |
 | 디테일 | (없음) | "scattered flour, linen napkin, bread knife" |

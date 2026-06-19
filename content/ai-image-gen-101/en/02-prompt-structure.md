@@ -3,6 +3,7 @@ title: "AI Image Generation 101 (2/10): The Structure of a Good Prompt"
 series: ai-image-gen-101
 episode: 2
 language: en
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: false

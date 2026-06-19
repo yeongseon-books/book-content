@@ -3,6 +3,7 @@ title: "AI Image Generation 101 (4/10): Composition and Perspective"
 series: ai-image-gen-101
 episode: 4
 language: en
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: false
@@ -14,7 +15,7 @@ tags:
 - ChatGPT
 - Image Generation
 - Prompt Engineering
-seo_description: "Control camera distance and angle in AI image generation with specific keywords that transform the same scene into 8 completely different compositions."
+seo_description: "Control camera distance and angle in AI image generation with keywords that transform the same scene into 8 different compositions."
 ---
 
 # AI Image Generation 101 (4/10): Composition and Perspective

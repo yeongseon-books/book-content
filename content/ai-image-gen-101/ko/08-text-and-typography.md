@@ -3,10 +3,11 @@ title: "AI 이미지 생성 101 (8/10): 텍스트와 타이포그래피"
 series: ai-image-gen-101
 episode: 8
 language: ko
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: false
 tags:

@@ -3,6 +3,7 @@ title: "AI Image Generation 101 (3/10): Mastering Styles"
 series: ai-image-gen-101
 episode: 3
 language: en
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: false

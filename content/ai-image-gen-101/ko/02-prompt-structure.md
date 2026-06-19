@@ -1,174 +1,175 @@
 ---
-title: "AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (2/10): \uc88b\uc740 \ud504\ub86c\ud504\ud2b8\uc758 \uad6c\uc870"
+title: "AI 이미지 생성 101 (2/10): 좋은 프롬프트의 구조"
 series: ai-image-gen-101
 episode: 2
 language: ko
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: false
 tags:
 - AI
 - ChatGPT
-- "\uc774\ubbf8\uc9c0 \uc0dd\uc131"
-- "\ud504\ub86c\ud504\ud2b8 \uc5d4\uc9c0\ub2c8\uc5b4\ub9c1"
-seo_description: "\uc774\ubbf8\uc9c0 \uc0dd\uc131 \ud504\ub86c\ud504\ud2b8\uc758 5\uac00\uc9c0 \uad6c\uc131 \uc694\uc18c\uc640 \uc870\ud569 \uacf5\uc2dd\uc744 \uc2e4\uc81c \uc608\uc81c\ub85c \uc54c\uc544\ubd05\ub2c8\ub2e4."
+- "이미지 생성"
+- "프롬프트 엔지니어링"
+seo_description: "이미지 생성 프롬프트의 5가지 구성 요소와 조합 공식을 실제 예제로 알아봅니다."
 ---
 
-# AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (2/10): \uc88b\uc740 \ud504\ub86c\ud504\ud2b8\uc758 \uad6c\uc870
+# AI 이미지 생성 101 (2/10): 좋은 프롬프트의 구조
 
-"\uc774\uc05c \ub85c\ubd07 \uc88c \uadf8\ub824\uc918." \uacb0\uacfc\ub294 \ub098\uc624\ub294\ub370 \ub0b4\uac00 \uc0c1\uc0c1\ud55c \uac83\uacfc\ub294 \ub2e4\ub985\ub2c8\ub2e4. "\uc608\uc05c \ud48d\uacbd \uadf8\ub824\uc918." \ud48d\uacbd\uc740 \ub098\uc624\ub294\ub370 \uc5b4\ub518\uac00 \uc774\uc0c1\ud569\ub2c8\ub2e4. "\uba4b\uc788\ub294 \uc774\ubbf8\uc9c0 \ub9cc\ub4e4\uc5b4\uc918." \uba4b\uc788\uae34 \ud55c\ub370 \uc6d0\ud55c \uac8c \uc774\uac8c \uc544\ub2d9\ub2c8\ub2e4.
+"이쁜 로봇 좌 그려줘." 결과는 나오는데 내가 상상한 것과는 다릅니다. "예쁜 풍경 그려줘." 풍경은 나오는데 어딘가 이상합니다. "멋있는 이미지 만들어줘." 멋있긴 한데 원한 게 이게 아닙니다.
 
-\uc774\ub7f0 \uacbd\ud5d8, \uc775\uc219\ud558\uc2dc\uc8e0? \ubb38\uc81c\ub294 \ud504\ub86c\ud504\ud2b8\uc5d0 \"\ubb34\uc5c7\uc744\" \ub123\uc5c8\ub290\ub0d0\uac00 \uc544\ub2c8\ub77c \"\uc5b4\ub5bb\uac8c\" \ub123\uc5c8\ub290\ub0d0\uc5d0 \uc788\uc2b5\ub2c8\ub2e4. \"\uc608\uc058\ub2e4\", \"\uba4b\uc788\ub2e4\", \"\ub180\ub77c\uc6b4\" \uac19\uc740 \ud615\uc6a9\uc0ac\ub294 AI\uc5d0\uac8c \uac70\uc758 \uc815\ubcf4\ub97c \uc8fc\uc9c0 \ubabb\ud569\ub2c8\ub2e4. AI\ub294 \uad6c\uccb4\uc801\uc778 \uc9c0\uc2dc\uac00 \ud544\uc694\ud569\ub2c8\ub2e4.
+이런 경험, 익숙하시죠? 문제는 프롬프트에 \"무엇을\" 넣었느냐가 아니라 \"어떻게\" 넣었느냐에 있습니다. \"예쁘다\", \"멋있다\", \"놀라운\" 같은 형용사는 AI에게 거의 정보를 주지 못합니다. AI는 구체적인 지시가 필요합니다.
 
-\uc774 \uae00\uc740 AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 \uc2dc\ub9ac\uc988\uc758 2\ubc88\uc9f8 \uae00\uc785\ub2c8\ub2e4. \uc5ec\uae30\uc11c\ub294 \uc88b\uc740 \ud504\ub86c\ud504\ud2b8\uc758 \uad6c\uccb4\uc801\uc778 \uad6c\uc870\ub97c \ubc30\uc6b0\uace0, \uc694\uc18c\ub97c \ud558\ub098\uc529 \ucd94\uac00\ud558\uba74\uc11c \uacb0\uacfc\uac00 \uc5b4\ub5bb\uac8c \ub2ec\ub77c\uc9c0\ub294\uc9c0 \uc2e4\ud5d8\ud574 \ubcf4\uaca0\uc2b5\ub2c8\ub2e4.
+이 글은 AI 이미지 생성 101 시리즈의 2번째 글입니다. 여기서는 좋은 프롬프트의 구체적인 구조를 배우고, 요소를 하나씩 추가하면서 결과가 어떻게 달라지는지 실험해 보겠습니다.
 
 ---
 
 ```mermaid
 flowchart LR
-    A["\uc8fc\uc81c"] --> B["\uc2a4\ud0c0\uc77c"]
-    B --> C["\ubc30\uacbd"]
-    C --> D["\uc870\uba85"]
-    D --> E["\uad6c\ub3c4"]
-    E --> F["\uc644\uc131\ub41c \ud504\ub86c\ud504\ud2b8"]
+    A["주제"] --> B["스타일"]
+    B --> C["배경"]
+    C --> D["조명"]
+    D --> E["구도"]
+    E --> F["완성된 프롬프트"]
 ```
 
-*\ud504\ub86c\ud504\ud2b8 \uad6c\uc131 \uc694\uc18c\uc758 \ub808\uc774\uc5b4\ub9c1 \uad6c\uc870*
+*프롬프트 구성 요소의 레이어링 구조*
 
-## \uba3c\uc800 \ub358\uc9c0\ub294 \uc9c8\ubb38
+## 먼저 던지는 질문
 
-- \ud504\ub86c\ud504\ud2b8\uc5d0 \uc694\uc18c\ub97c \ud558\ub098\uc529 \ub354\ud560 \ub54c\ub9c8\ub2e4 \uc774\ubbf8\uc9c0\uac00 \uc5b4\ub5bb\uac8c \ub2ec\ub77c\uc9c8\uae4c\uc694?
-- "\uc608\uc05c", "\uba4b\uc788\ub294" \uac19\uc740 \ud615\uc6a9\uc0ac\ub97c \ub9ce\uc774 \ub123\uc73c\uba74 \ub354 \uc88b\uc740 \uc774\ubbf8\uc9c0\uac00 \ub098\uc62c\uae4c\uc694?
-- \ud504\ub86c\ud504\ud2b8\uc5d0\uc11c \uc694\uc18c\uc758 \uc21c\uc11c\uac00 \uacb0\uacfc\uc5d0 \uc601\ud5a5\uc744 \uc904\uae4c\uc694?
+- 프롬프트에 요소를 하나씩 더할 때마다 이미지가 어떻게 달라질까요?
+- "예쁜", "멋있는" 같은 형용사를 많이 넣으면 더 좋은 이미지가 나올까요?
+- 프롬프트에서 요소의 순서가 결과에 영향을 줄까요?
 
 ---
 
-## \ud504\ub86c\ud504\ud2b8 \uacf5\uc2dd: \ub808\uc774\uc5b4\ub9c1 \ubc29\uc2dd
+## 프롬프트 공식: 레이어링 방식
 
-\uc88b\uc740 \ud504\ub86c\ud504\ud2b8\ub294 \"\ub9ce\uc774 \uc4f0\ub294 \uac83\"\uc774 \uc544\ub2c8\ub77c \"\uc815\ud655\ud558\uac8c \uc4f0\ub294 \uac83\"\uc785\ub2c8\ub2e4. \ud575\uc2ec\uc740 \ub808\uc774\uc5b4\ub9c1\u2014\uc694\uc18c\ub97c \ud558\ub098\uc529 \ucde8\ud558\ub294 \uac83\uc785\ub2c8\ub2e4.
+좋은 프롬프트는 \"많이 쓰는 것\"이 아니라 \"정확하게 쓰는 것\"입니다. 핵심은 레이어링—요소를 하나씩 취하는 것입니다.
 
 ```
-[\uc8fc\uc81c] + [\uc2a4\ud0c0\uc77c] + [\ubc30\uacbd/\uc7a5\uc18c] + [\uc870\uba85] + [\uad6c\ub3c4/\uc559\uae00]
+[주제] + [스타일] + [배경/장소] + [조명] + [구도/앙글]
 ```
 
-\uc774 \uacf5\uc2dd\uc744 \ub85c\ubd07\uc744 \uc8fc\uc81c\ub85c \uc2e4\ud5d8\ud574 \ubcf4\uaca0\uc2b5\ub2c8\ub2e4. \uc694\uc18c\ub97c \ud558\ub098\uc529 \ucd94\uac00\ud558\uba74\uc11c \uc774\ubbf8\uc9c0\uac00 \uc5b4\ub5bb\uac8c \ubcc0\ud558\ub294\uc9c0 \ub208\uc73c\ub85c \ud655\uc778\ud569\ub2c8\ub2e4.
+이 공식을 로봇을 주제로 실험해 보겠습니다. 요소를 하나씩 추가하면서 이미지가 어떻게 변하는지 눈으로 확인합니다.
 
 ---
 
-## \uc2e4\ud5d8: \uc694\uc18c\ub97c \ud558\ub098\uc529 \uc313\uc544\ubcf4\uae30
+## 실험: 요소를 하나씩 쌓아보기
 
-### \ub2e8\uacc4 1: \uc8fc\uc81c\ub9cc
+### 단계 1: 주제만
 
 > a robot
 
-![\uc8fc\uc81c\ub9cc \uc785\ub825\ud55c \uacb0\uacfc](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/01-subject-only.png)
+![주제만 입력한 결과](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/01-subject-only.png)
 
-*\uc8fc\uc81c\ub9cc \uc37c\uc744 \ub54c: AI\uac00 \ub85c\ubd07\uc758 \ud615\ud0dc, \uc0c9\uc0c1, \ubc30\uacbd, \ubd84\uc704\uae30\ub97c \ubaa8\ub450 \uc784\uc758\ub85c \uacb0\uc815\ud55c\ub2e4.*
+*주제만 썼을 때: AI가 로봇의 형태, 색상, 배경, 분위기를 모두 임의로 결정한다.*
 
-\ub85c\ubd07\uc740 \ub098\uc654\uc9c0\ub9cc, \uc5b4\ub5a4 \uc2a4\ud0c0\uc77c\uc778\uc9c0, \uc5b4\ub514\uc5d0 \uc788\ub294\uc9c0, \ubd84\uc704\uae30\uac00 \uc5b4\ub5a4\uc9c0 \ubaa8\ub450 AI \uc7ac\ub7c9\uc785\ub2c8\ub2e4.
+로봇은 나왔지만, 어떤 스타일인지, 어디에 있는지, 분위기가 어떤지 모두 AI 재량입니다.
 
-### \ub2e8\uacc4 2: \uc8fc\uc81c + \uc2a4\ud0c0\uc77c
+### 단계 2: 주제 + 스타일
 
 > a robot, watercolor painting style
 
-![\uc8fc\uc81c + \uc2a4\ud0c0\uc77c](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/02-subject-style.png)
+![주제 + 스타일](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/02-subject-style.png)
 
-*\uc2a4\ud0c0\uc77c\uc744 \ucd94\uac00\ud558\uc790 \uc804\uccb4 \ubd84\uc704\uae30\uac00 \ubc14\ub00c\uc5c8\ub2e4. \uc218\ucc44\ud654 \ud2b9\uc720\uc758 \ubd80\ub4dc\ub7ec\uc6c0\uacfc \ubc88\uc9d0 \ud6a8\uacfc\uac00 \ub098\ud0c0\ub09c\ub2e4.*
+*스타일을 추가하자 전체 분위기가 바뀌었다. 수채화 특유의 부드러움과 번짐 효과가 나타난다.*
 
-\uc2a4\ud0c0\uc77c \ud558\ub098\ub9cc \ucd94\uac00\ud588\uc744 \ubfd0\uc778\ub370, \uac19\uc740 \ub85c\ubd07\uc774\ub77c\ub3c4 \uc644\uc804\ud788 \ub2e4\ub978 \ub290\ub08c\uc758 \uc774\ubbf8\uc9c0\uac00 \ub429\ub2c8\ub2e4.
+스타일 하나만 추가했을 뿐인데, 같은 로봇이라도 완전히 다른 느낌의 이미지가 됩니다.
 
-### \ub2e8\uacc4 3: \uc8fc\uc81c + \uc2a4\ud0c0\uc77c + \ubc30\uacbd
+### 단계 3: 주제 + 스타일 + 배경
 
 > a robot, watercolor painting style, standing in a flower garden
 
-![\uc8fc\uc81c + \uc2a4\ud0c0\uc77c + \ubc30\uacbd](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/03-subject-style-setting.png)
+![주제 + 스타일 + 배경](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/03-subject-style-setting.png)
 
-*\ubc30\uacbd\uc744 \uc9c0\uc815\ud558\uc790 \ub85c\ubd07\uc774 \ud654\uc6d0\uc5d0 \ub193\uc600\ub2e4. \uc774\uc57c\uae30\uac00 \uc0dd\uae34\ub2e4.*
+*배경을 지정하자 로봇이 화원에 놓였다. 이야기가 생긴다.*
 
-\uc8fc\uc81c\uc5d0 \uc7a5\uc18c\ub97c \uc8fc\uba74 \uc774\ubbf8\uc9c0\uc5d0 \uc774\uc57c\uae30\uac00 \uc0dd\uae41\ub2c8\ub2e4. "\ub85c\ubd07\uc774 \uc788\ub2e4"\uc5d0\uc11c "\ub85c\ubd07\uc774 \ud654\uc6d0\uc5d0 \uc788\ub2e4"\ub85c \ubc14\ub00c\uba74\uc11c \ubcf4\ub294 \uc0ac\ub78c\uc774 \uad81\uae08\ud574\ud558\ub294 \uc7a5\uba74\uc774 \ub429\ub2c8\ub2e4.
+주제에 장소를 주면 이미지에 이야기가 생깁니다. "로봇이 있다"에서 "로봇이 화원에 있다"로 바뀌면서 보는 사람이 궁금해하는 장면이 됩니다.
 
-### \ub2e8\uacc4 4: \uc8fc\uc81c + \uc2a4\ud0c0\uc77c + \ubc30\uacbd + \uc870\uba85
+### 단계 4: 주제 + 스타일 + 배경 + 조명
 
 > a robot, watercolor painting style, standing in a flower garden, golden hour sunlight casting long shadows
 
-![\uc8fc\uc81c + \uc2a4\ud0c0\uc77c + \ubc30\uacbd + \uc870\uba85](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/04-subject-style-setting-light.png)
+![주제 + 스타일 + 배경 + 조명](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/04-subject-style-setting-light.png)
 
-*\uc870\uba85\uc744 \ucd94\uac00\ud558\uc790 \ud654\uba74 \uc804\uccb4\uc758 \uc628\ub3c4\uac10\uc774 \ub2ec\ub77c\uc84c\ub2e4. \uae34 \uadf8\ub9bc\uc790\uac00 \uae4a\uc774\uac10\uc744 \ub354\ud55c\ub2e4.*
+*조명을 추가하자 화면 전체의 온도감이 달라졌다. 긴 그림자가 깊이감을 더한다.*
 
-\uc870\uba85\uc740 \uc774\ubbf8\uc9c0\uc758 \ubd84\uc704\uae30\ub97c \uc644\uc804\ud788 \ubc14\uafc0 \uc218 \uc788\ub294 \uc694\uc18c\uc785\ub2c8\ub2e4. \uac19\uc740 \uc7a5\uba74\uc774\ub77c\ub3c4 "\ub0ae", "\ubc24", "\ub124\uc628 \uc870\uba85"\uc5d0 \ub530\ub77c \uc644\uc804\ud788 \ub2e4\ub978 \uc774\ubbf8\uc9c0\uac00 \ub429\ub2c8\ub2e4.
+조명은 이미지의 분위기를 완전히 바꿀 수 있는 요소입니다. 같은 장면이라도 "낮", "밤", "네온 조명"에 따라 완전히 다른 이미지가 됩니다.
 
-### \ub2e8\uacc4 5: \uc644\uc131\ub41c \ud504\ub86c\ud504\ud2b8 (5\uac00\uc9c0 \uc694\uc18c \uc804\uccb4)
+### 단계 5: 완성된 프롬프트 (5가지 요소 전체)
 
 > a friendly robot with round eyes and a small antenna, watercolor painting style, standing in a flower garden surrounded by sunflowers and daisies, golden hour sunlight casting long soft shadows, gentle warm atmosphere, wide shot showing the full scene
 
-![\uc644\uc131\ub41c \ud504\ub86c\ud504\ud2b8](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/05-full-formula.png)
+![완성된 프롬프트](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/05-full-formula.png)
 
-*5\uac00\uc9c0 \uc694\uc18c\ub97c \ubaa8\ub450 \ub123\uc740 \uacb0\uacfc. \uc8fc\uc81c\uc758 \uc131\uaca9(\uce5c\uadfc\ud55c), \ubc30\uacbd\uc758 \ub514\ud14c\uc77c(\ud574\ubc14\ub77c\uae30, \ub370\uc774\uc9c0), \uad6c\ub3c4(\uc640\uc774\ub4dc\uc0f7)\uae4c\uc9c0 \uc9c0\uc815.*
+*5가지 요소를 모두 넣은 결과. 주제의 성격(친근한), 배경의 디테일(해바라기, 데이지), 구도(와이드샷)까지 지정.*
 
-5\uac00\uc9c0 \uc694\uc18c\ub97c \ubaa8\ub450 \ub123\uc73c\ub2c8 AI\uac00 \uc81c \ub9c8\uc74c\ub300\ub85c \uacb0\uc815\ud560 \uc5ec\uc9c0\uac00 \uac70\uc758 \uc5c6\uc5b4\uc84c\uc2b5\ub2c8\ub2e4. \ub0b4\uac00 \uc6d0\ud558\ub294 \uc7a5\uba74\uc5d0 \ud6e8\uc52c \uac00\uae5d\uc2b5\ub2c8\ub2e4.
+5가지 요소를 모두 넣으니 AI가 제 마음대로 결정할 여지가 거의 없어졌습니다. 내가 원하는 장면에 훨씬 가깝습니다.
 
 ---
 
-## \ud754\ud55c \uc2e4\uc218: \ube08 \ud615\uc6a9\uc0ac \ub098\uc5f4
+## 흔한 실수: 븈 형용사 나열
 
-\ub9ce\uc740 \uc0ac\ub78c\uc774 "\ub354 \uc88b\uc740 \uacb0\uacfc\ub97c \uc5bb\uc73c\ub824\uba74 \uce6d\ucc2c\uc744 \ub9ce\uc774 \ub123\uc73c\uba74 \ub418\uc9c0 \uc54a\uc744\uae4c?" \uc0dd\uac01\ud569\ub2c8\ub2e4. \uc2e4\ud5d8\ud574 \ubcf4\uaca0\uc2b5\ub2c8\ub2e4.
+많은 사람이 "더 좋은 결과를 얻으려면 칭찬을 많이 넣으면 되지 않을까?" 생각합니다. 실험해 보겠습니다.
 
 > a beautiful amazing stunning incredible gorgeous wonderful fantastic robot in a nice pretty lovely amazing place with great lighting and awesome colors
 
-![\ud615\uc6a9\uc0ac \ub098\uc5f4 \ud504\ub86c\ud504\ud2b8 \uacb0\uacfc](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/06-bad-adjectives.png)
+![형용사 나열 프롬프트 결과](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/06-bad-adjectives.png)
 
-*\ud615\uc6a9\uc0ac\ub97c \uc5ec\ub7ec \uac1c \ub098\uc5f4\ud55c \uacb0\uacfc. \ud654\ub824\ud558\uc9c0\ub9cc \uad6c\uccb4\uc131\uc774 \uc5c6\ub2e4.*
+*형용사를 여러 개 나열한 결과. 화려하지만 구체성이 없다.*
 
-\uc704\uc758 \ub2e8\uacc4 5 \uacb0\uacfc\uc640 \ube44\uad50\ud574 \ubcf4\uc138\uc694. \ud615\uc6a9\uc0ac\ub97c \uc544\ubb34\ub9ac \ub9ce\uc774 \ub123\uc5b4\ub3c4 AI\ub294 \uad6c\uccb4\uc801\uc778 \uc9c0\uce68\uc73c\ub85c \ud574\uc11d\ud558\uc9c0 \ubabb\ud569\ub2c8\ub2e4. "\ub180\ub77c\uc6b4"\ubcf4\ub2e4\ub294 "\ub465\uae00\uace0 \ud070 \ub208\uc744 \uac00\uc9c4", "\uc608\uc05c \uacf3"\ubcf4\ub2e4\ub294 "\ud574\ubc14\ub77c\uae30\uc640 \ub370\uc774\uc9c0\uac00 \uc788\ub294 \ud654\uc6d0"\uc774 \ud6e8\uc52c \ud6a8\uacfc\uc801\uc785\ub2c8\ub2e4.
+위의 단계 5 결과와 비교해 보세요. 형용사를 아무리 많이 넣어도 AI는 구체적인 지침으로 해석하지 못합니다. "놀라운"보다는 "둥글고 큰 눈을 가진", "예쁜 곳"보다는 "해바라기와 데이지가 있는 화원"이 훨씬 효과적입니다.
 
-| \ube44\ud6a8\uacfc\uc801 | \ud6a8\uacfc\uc801 |
+| 비효과적 | 효과적 |
 |----------|---------|
-| beautiful, amazing, stunning | \ub465\uae00\uace0 \ud070 \ub208\uc744 \uac00\uc9c4 |
-| nice pretty lovely place | \ud574\ubc14\ub77c\uae30\uc640 \ub370\uc774\uc9c0\uac00 \uc788\ub294 \ud654\uc6d0 |
-| great lighting | \uace8\ub4e0\uc544\uc6cc \ud587\uc0b4\uc774 \uae34 \uadf8\ub9bc\uc790\ub97c \ub9cc\ub4dc\ub294 |
-| awesome colors | \ub530\ub73b\ud55c \uc8fc\ud669\uc0c9 \ud1a4 |
+| beautiful, amazing, stunning | 둥글고 큰 눈을 가진 |
+| nice pretty lovely place | 해바라기와 데이지가 있는 화원 |
+| great lighting | 골든아워 햇살이 긴 그림자를 만드는 |
+| awesome colors | 따뜻한 주황색 톤 |
 
-\uaddc\uce59\uc740 \uac04\ub2e8\ud569\ub2c8\ub2e4: **\ud615\uc6a9\uc0ac\ubcf4\ub2e4 \uba85\uc0ac\uc640 \ub3d9\uc0ac\ub85c \uc4f0\uc138\uc694.** "\uc608\uc05c \uace0\uc591\uc774"\ubcf4\ub2e4 "\ud138\uc774 \ub36e\uc778 \uc624\ub80c\uc9c0\uc0c9 \ud398\ub974\uc2dc\uc548"\uc774 AI\uc5d0\uac8c \ud6e8\uc52c \uba85\ud655\ud55c \uc9c0\uc2dc\uc785\ub2c8\ub2e4.
+규칙은 간단합니다: **형용사보다 명사와 동사로 쓰세요.** "예쁜 고양이"보다 "털이 덮인 오렌지색 페르시안"이 AI에게 훨씬 명확한 지시입니다.
 
 ---
 
-## \uc21c\uc11c\uac00 \uc911\uc694\ud560\uae4c?
+## 순서가 중요할까?
 
-\ud504\ub86c\ud504\ud2b8\uc5d0\uc11c \uc694\uc18c\ub97c \uc4f0\ub294 \uc21c\uc11c\uac00 \uacb0\uacfc\uc5d0 \uc601\ud5a5\uc744 \uc904\uae4c\uc694? \uac19\uc740 \ub0b4\uc6a9\uc744 \ub2e4\ub978 \uc21c\uc11c\ub85c \uc8fc\uc5b4 \ubcf4\uaca0\uc2b5\ub2c8\ub2e4.
+프롬프트에서 요소를 쓰는 순서가 결과에 영향을 줄까요? 같은 내용을 다른 순서로 주어 보겠습니다.
 
-**\ubc30\uacbd \uba3c\uc800**:
+**배경 먼저**:
 
 > In a dimly lit cyberpunk alley at night, a small delivery robot with glowing blue eyes navigates through puddles reflecting neon signs, cinematic photography style
 
-**\uc8fc\uc81c \uba3c\uc800**:
+**주제 먼저**:
 
 > A small delivery robot with glowing blue eyes, cinematic photography style, navigating through puddles in a dimly lit cyberpunk alley at night, neon signs reflecting in the water
 
-| \ubc30\uacbd \uba3c\uc800 | \uc8fc\uc81c \uba3c\uc800 |
+| 배경 먼저 | 주제 먼저 |
 |:---:|:---:|
-| ![\ubc30\uacbd \uba3c\uc800 \uc21c\uc11c](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/07-order-setting-first.png) | ![\uc8fc\uc81c \uba3c\uc800 \uc21c\uc11c](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/08-order-subject-first.png) |
+| ![배경 먼저 순서](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/07-order-setting-first.png) | ![주제 먼저 순서](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/08-order-subject-first.png) |
 
-*\uac19\uc740 \uc694\uc18c\ub97c \ub2e4\ub978 \uc21c\uc11c\ub85c \uc37c\uc744 \ub54c\uc758 \ube44\uad50*
+*같은 요소를 다른 순서로 썼을 때의 비교*
 
-\ub458 \ub2e4 \ube44\uc2b7\ud55c \ub290\ub08c\uc774\uc9c0\ub9cc \ubbf8\ubb18\ud55c \ucc28\uc774\uac00 \uc788\uc2b5\ub2c8\ub2e4. \uc77c\ubc18\uc801\uc73c\ub85c \ub450 \uac00\uc9c0 \ud328\ud134\uc774 \uc788\uc2b5\ub2c8\ub2e4.
+둘 다 비슷한 느낌이지만 미묘한 차이가 있습니다. 일반적으로 두 가지 패턴이 있습니다.
 
-| \uc21c\uc11c | \ud2b9\uc9d5 | \uc801\ud569\ud55c \uc0c1\ud669 |
+| 순서 | 특징 | 적합한 상황 |
 |------|------|----------|
-| \uc8fc\uc81c \uba3c\uc800 | \uc8fc\uc81c\uac00 \ud654\uba74 \uc911\uc2ec\uc5d0 \ud06c\uac8c | \uc81c\ud488 \uc0ac\uc9c4, \uce90\ub9ad\ud130 \uc911\uc2ec |
-| \ubc30\uacbd \uba3c\uc800 | \ubc30\uacbd\uc774 \ub354 \uac15\uc870\ub428 | \ud48d\uacbd, \ubd84\uc704\uae30 \uc911\uc2ec |
+| 주제 먼저 | 주제가 화면 중심에 크게 | 제품 사진, 캐릭터 중심 |
+| 배경 먼저 | 배경이 더 강조됨 | 풍경, 분위기 중심 |
 
-\uc2e4\uc6a9\uc801 \ud301: **\uac00\uc7a5 \uc911\uc694\ud55c \uc694\uc18c\ub97c \ub9e8 \uc55e\uc5d0 \uc4f0\uc138\uc694.** AI\ub294 \uc55e\ucabd\uc5d0 \ub098\uc628 \ub0b4\uc6a9\uc744 \uc57d\uac04 \ub354 \uac15\uc870\ud558\ub294 \uacbd\ud5a5\uc774 \uc788\uc2b5\ub2c8\ub2e4.
+실용적 팁: **가장 중요한 요소를 맨 앞에 쓰세요.** AI는 앞쪽에 나온 내용을 약간 더 강조하는 경향이 있습니다.
 
 ---
 
-## \uc2e4\uc804 \ud15c\ud50c\ub9bf 3\uac00\uc9c0
+## 실전 템플릿 3가지
 
-\uc774\uc81c \uacf5\uc2dd\uc744 \uc54c\uc558\uc73c\ub2c8, \uc2e4\uc804\uc5d0\uc11c \ubc14\ub85c \uc4f8 \uc218 \uc788\ub294 \ud15c\ud50c\ub9bf\uc744 \ub4dc\ub9bd\ub2c8\ub2e4.
+이제 공식을 알았으니, 실전에서 바로 쓸 수 있는 템플릿을 드립니다.
 
-### \ube14\ub85c\uadf8 \uc378\ub124\uc77c\uc6a9
+### 블로그 썸네일용
 
 ```
 [Blog topic icon or metaphor], flat illustration style, 
@@ -176,9 +177,9 @@ clean white background, vibrant [brand color] accents,
 centered composition, soft even lighting
 ```
 
-\uc608: "A magnifying glass examining lines of code, flat illustration style, clean white background, vibrant blue and purple accents, centered composition, soft even lighting"
+예: "A magnifying glass examining lines of code, flat illustration style, clean white background, vibrant blue and purple accents, centered composition, soft even lighting"
 
-### SNS \ud3ec\uc2a4\ud2b8\uc6a9
+### SNS 포스트용
 
 ```
 [Main subject doing action], [photography style], 
@@ -186,9 +187,9 @@ centered composition, soft even lighting
 [angle] shot, [mood] atmosphere
 ```
 
-\uc608: "A person reading a book in a cozy window seat, lifestyle photography style, modern minimalist apartment, afternoon golden light, medium shot, peaceful calm atmosphere"
+예: "A person reading a book in a cozy window seat, lifestyle photography style, modern minimalist apartment, afternoon golden light, medium shot, peaceful calm atmosphere"
 
-### \ud504\ub808\uc824\ud14c\uc774\uc158 \uc77c\ub7ec\uc2a4\ud2b8\uc6a9
+### 프레젤테이션 일러스트용
 
 ```
 [Concept or process as visual metaphor], 
@@ -197,56 +198,56 @@ clean minimal background, soft shadows,
 slightly above eye-level perspective
 ```
 
-\uc608: "A conveyor belt transforming raw materials into finished products as visual metaphor for data pipeline, isometric illustration style, pastel blue and mint color palette, clean minimal background, soft shadows"
+예: "A conveyor belt transforming raw materials into finished products as visual metaphor for data pipeline, isometric illustration style, pastel blue and mint color palette, clean minimal background, soft shadows"
 
 ---
 
-## \uc815\ub9ac: \ud504\ub86c\ud504\ud2b8 \uad6c\uc870\uc758 \ud575\uc2ec
+## 정리: 프롬프트 구조의 핵심
 
-\uc624\ub298 \ubc30\uc6b4 \uac83\uc744 \uc815\ub9ac\ud558\uba74:
+오늘 배운 것을 정리하면:
 
-1. **\ub808\uc774\uc5b4\ub9c1**: \uc8fc\uc81c \u2192 \uc2a4\ud0c0\uc77c \u2192 \ubc30\uacbd \u2192 \uc870\uba85 \u2192 \uad6c\ub3c4 \uc21c\uc11c\ub85c \uc313\ub294\ub2e4
-2. **\uad6c\uccb4\uc131**: \ud615\uc6a9\uc0ac \ub300\uc2e0 \uba85\uc0ac\uc640 \ub3d9\uc0ac\ub85c \uc4f4\ub2e4
-3. **\uc21c\uc11c**: \uac00\uc7a5 \uc911\uc694\ud55c \uc694\uc18c\ub97c \uc55e\uc5d0 \ub454\ub2e4
+1. **레이어링**: 주제 → 스타일 → 배경 → 조명 → 구도 순서로 쌓는다
+2. **구체성**: 형용사 대신 명사와 동사로 쓴다
+3. **순서**: 가장 중요한 요소를 앞에 둔다
 
-\ub2e4\uc74c \uae00\uc5d0\uc11c\ub294 5\uac00\uc9c0 \uc694\uc18c \uc911 \uc774\ubbf8\uc9c0\uc758 \uc804\uccb4 \ubd84\uc704\uae30\ub97c \uac00\uc7a5 \ud06c\uac8c \ubc14\uafb8\ub294 "\uc2a4\ud0c0\uc77c"\uc744 \uae4a\uc774 \ud30c\uace0\ub4e4\uaca0\uc2b5\ub2c8\ub2e4.
+다음 글에서는 5가지 요소 중 이미지의 전체 분위기를 가장 크게 바꾸는 "스타일"을 깊이 파고들겠습니다.
 
 ---
 
-## \ucc98\uc74c \uc9c8\ubb38\uc73c\ub85c \ub3cc\uc544\uac00\uae30
+## 처음 질문으로 돌아가기
 
-**\ud504\ub86c\ud504\ud2b8\uc5d0 \uc694\uc18c\ub97c \ud558\ub098\uc529 \ub354\ud560 \ub54c\ub9c8\ub2e4 \uc774\ubbf8\uc9c0\uac00 \uc5b4\ub5bb\uac8c \ub2ec\ub77c\uc9c0\ub098\uc694?**
+**프롬프트에 요소를 하나씩 더할 때마다 이미지가 어떻게 달라지나요?**
 
-\uc8fc\uc81c\ub9cc \uc788\uc744 \ub54c\ub294 AI\uac00 \ub098\uba38\uc9c0\ub97c \uc804\ubd80 \uacb0\uc815\ud569\ub2c8\ub2e4. \uc2a4\ud0c0\uc77c\uc744 \uc8fc\uba74 \ubd84\uc704\uae30\uac00, \ubc30\uacbd\uc744 \uc8fc\uba74 \uc774\uc57c\uae30\uac00, \uc870\uba85\uc744 \uc8fc\uba74 \uc628\ub3c4\uac10\uc774, \uad6c\ub3c4\ub97c \uc8fc\uba74 \uc2dc\uc120\uc774 \ub2ec\ub77c\uc9d1\ub2c8\ub2e4.
+주제만 있을 때는 AI가 나머지를 전부 결정합니다. 스타일을 주면 분위기가, 배경을 주면 이야기가, 조명을 주면 온도감이, 구도를 주면 시선이 달라집니다.
 
-**\ud615\uc6a9\uc0ac\ub97c \ub9ce\uc774 \ub123\uc73c\uba74 \ub354 \uc88b\uc740 \uc774\ubbf8\uc9c0\uac00 \ub098\uc62c\uae4c\uc694?**
+**형용사를 많이 넣으면 더 좋은 이미지가 나올까요?**
 
-\uc544\ub2d9\ub2c8\ub2e4. "beautiful amazing stunning"\uc740 AI\uc5d0\uac8c \uad6c\uccb4\uc801 \uc815\ubcf4\ub97c \uc8fc\uc9c0 \ubabb\ud569\ub2c8\ub2e4. "\ub465\uae00\uace0 \ud070 \ub208\uc744 \uac00\uc9c4" \uac19\uc740 \uad6c\uccb4\uc801 \uc124\uba85\uc774 \ud6e8\uc52c \ud6a8\uacfc\uc801\uc785\ub2c8\ub2e4.
+아닙니다. "beautiful amazing stunning"은 AI에게 구체적 정보를 주지 못합니다. "둥글고 큰 눈을 가진" 같은 구체적 설명이 훨씬 효과적입니다.
 
-**\ud504\ub86c\ud504\ud2b8\uc5d0\uc11c \uc694\uc18c\uc758 \uc21c\uc11c\uac00 \uacb0\uacfc\uc5d0 \uc601\ud5a5\uc744 \uc904\uae4c\uc694?**
+**프롬프트에서 요소의 순서가 결과에 영향을 줄까요?**
 
-\uc57d\uac04\uc758 \uc601\ud5a5\uc740 \uc788\uc2b5\ub2c8\ub2e4. AI\ub294 \uc55e\ucabd \ub0b4\uc6a9\uc744 \uc870\uae08 \ub354 \uac15\uc870\ud558\ub294 \uacbd\ud5a5\uc774 \uc788\uc5b4\uc11c, \uac00\uc7a5 \uc911\uc694\ud55c \uc694\uc18c\ub97c \uc55e\uc5d0 \ub193\ub294 \uac83\uc774 \uc88b\uc2b5\ub2c8\ub2e4.
+약간의 영향은 있습니다. AI는 앞쪽 내용을 조금 더 강조하는 경향이 있어서, 가장 중요한 요소를 앞에 놓는 것이 좋습니다.
 
 ---
 
 <!-- toc:begin -->
-## \uc774 \uc2dc\ub9ac\uc988\uc5d0\uc11c \ub2e4\ub8e8\ub294 \uae00
+## 이 시리즈에서 다루는 글
 
-- [AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (1/10): \uccab \uc774\ubbf8\uc9c0 \uc0dd\uc131\ud558\uae30](./01-first-image-generation.md)
-- **AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (2/10): \uc88b\uc740 \ud504\ub86c\ud504\ud2b8\uc758 \uad6c\uc870 (\ud604\uc7ac \uae00)**
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (3/10): \uc2a4\ud0c0\uc77c \ub9c8\uc2a4\ud130\ud558\uae30 (\uc608\uc815)
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (4/10): \uad6c\ub3c4\uc640 \uc2dc\uc810 (\uc608\uc815)
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (5/10): \uc0c9\uac10\uacfc \uc870\uba85 (\uc608\uc815)
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (6/10): \ubcf5\uc7a1\ud55c \uc7a5\uba74 \uc124\uacc4\ud558\uae30 (\uc608\uc815)
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (7/10): \uc77c\uad00\uc131 \uc720\uc9c0\ud558\uae30 (\uc608\uc815)
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (8/10): \ud14d\uc2a4\ud2b8\uc640 \ud0c0\uc774\ud3ec\uadf8\ub798\ud53c (\uc608\uc815)
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (9/10): \ub808\ud37c\ub7f0\uc2a4 \uc774\ubbf8\uc9c0 \ud65c\uc6a9 (\uc608\uc815)
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (10/10): \uc2e4\uc804 \uc6cc\ud06c\ud50c\ub85c\uc6b0 (\uc608\uc815)
+- [AI 이미지 생성 101 (1/10): 첫 이미지 생성하기](./01-first-image-generation.md)
+- **AI 이미지 생성 101 (2/10): 좋은 프롬프트의 구조 (현재 글)**
+- AI 이미지 생성 101 (3/10): 스타일 마스터하기 (예정)
+- AI 이미지 생성 101 (4/10): 구도와 시점 (예정)
+- AI 이미지 생성 101 (5/10): 색감과 조명 (예정)
+- AI 이미지 생성 101 (6/10): 복잡한 장면 설계하기 (예정)
+- AI 이미지 생성 101 (7/10): 일관성 유지하기 (예정)
+- AI 이미지 생성 101 (8/10): 텍스트와 타이포그래피 (예정)
+- AI 이미지 생성 101 (9/10): 레퍼런스 이미지 활용 (예정)
+- AI 이미지 생성 101 (10/10): 실전 워크플로우 (예정)
 <!-- toc:end -->
 
-## \ucc38\uace0 \uc790\ub8cc
+## 참고 자료
 
-- [OpenAI DALL-E \ud504\ub86c\ud504\ud2b8 \uac00\uc774\ub4dc](https://platform.openai.com/docs/guides/images)
-- [god-tibo-imagen GitHub \uc800\uc7a5\uc18c](https://github.com/NomaDamas/god-tibo-imagen)
+- [OpenAI DALL-E 프롬프트 가이드](https://platform.openai.com/docs/guides/images)
+- [god-tibo-imagen GitHub 저장소](https://github.com/NomaDamas/god-tibo-imagen)
 
-Tags: AI, ChatGPT, \uc774\ubbf8\uc9c0 \uc0dd\uc131, \ud504\ub86c\ud504\ud2b8 \uc5d4\uc9c0\ub2c8\uc5b4\ub9c1
+Tags: AI, ChatGPT, 이미지 생성, 프롬프트 엔지니어링

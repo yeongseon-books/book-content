@@ -3,6 +3,7 @@ title: "AI Image Generation 101 (6/10): Designing Complex Scenes"
 series: ai-image-gen-101
 episode: 6
 language: en
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: false

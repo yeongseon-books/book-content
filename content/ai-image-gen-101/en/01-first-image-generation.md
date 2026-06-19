@@ -3,6 +3,7 @@ title: "AI Image Generation 101 (1/10): Creating Your First Image"
 series: ai-image-gen-101
 episode: 1
 language: en
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: false

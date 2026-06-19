@@ -3,6 +3,7 @@ title: "AI Image Generation 101 (8/10): Text and Typography"
 series: ai-image-gen-101
 episode: 8
 language: en
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: false
@@ -14,7 +15,7 @@ tags:
 - ChatGPT
 - Image Generation
 - Prompt Engineering
-seo_description: "Put readable text inside AI-generated images — from neon signs to movie posters — and learn where text generation works, fails, and how to work around limitations."
+seo_description: "Put readable text in AI images — neon signs to movie posters — and learn where text generation works, fails, and workarounds."
 ---
 
 # AI Image Generation 101 (8/10): Text and Typography

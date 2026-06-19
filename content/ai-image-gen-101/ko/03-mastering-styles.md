@@ -1,276 +1,277 @@
 ---
-title: "AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (3/10): \uc2a4\ud0c0\uc77c \ub9c8\uc2a4\ud130\ud558\uae30"
+title: "AI 이미지 생성 101 (3/10): 스타일 마스터하기"
 series: ai-image-gen-101
 episode: 3
 language: ko
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: false
 tags:
 - AI
 - ChatGPT
-- "\uc774\ubbf8\uc9c0 \uc0dd\uc131"
-- "\ud504\ub86c\ud504\ud2b8 \uc5d4\uc9c0\ub2c8\uc5b4\ub9c1"
-seo_description: "\uac19\uc740 \uc7a5\uba74\uc744 8\uac00\uc9c0 \uc2a4\ud0c0\uc77c\ub85c \uc0dd\uc131\ud558\uba70 \uac01 \uc2a4\ud0c0\uc77c\uc758 \ud2b9\uc9d5\uacfc \uc0ac\uc6a9\ubc95\uc744 \ube44\uad50\ud569\ub2c8\ub2e4."
+- "이미지 생성"
+- "프롬프트 엔지니어링"
+seo_description: "같은 장면을 8가지 스타일로 생성하며 각 스타일의 특징과 사용법을 비교합니다."
 ---
 
-# AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (3/10): \uc2a4\ud0c0\uc77c \ub9c8\uc2a4\ud130\ud558\uae30
+# AI 이미지 생성 101 (3/10): 스타일 마스터하기
 
-\ube14\ub85c\uadf8\uc6a9 \uc774\ubbf8\uc9c0\ub97c \ub9cc\ub4e4\ub824\ub294\ub370 "\uc0ac\uc9c4 \uac19\uc740 \ub290\ub08c"\uc774 \ud544\uc694\ud560 \ub54c\uac00 \uc788\uace0, "\uc77c\ub7ec\uc2a4\ud2b8 \ub290\ub08c"\uc774 \ud544\uc694\ud560 \ub54c\uac00 \uc788\uc2b5\ub2c8\ub2e4. \uac19\uc740 \uc8fc\uc81c\ub77c\ub3c4 \uc2a4\ud0c0\uc77c\uc5d0 \ub530\ub77c \uc644\uc804\ud788 \ub2e4\ub978 \uc778\uc0c1\uc744 \uc8fc\ub294\ub370, \ubb38\uc81c\ub294 "\uc5b4\ub5a4 \uc2a4\ud0c0\uc77c\uc774 \uc788\ub294\uc9c0" \ubaa8\ub974\ub2c8\uae4c \ud56d\uc0c1 \ube44\uc2b7\ud55c \uacb0\uacfc\ub9cc \ub098\uc628\ub2e4\ub294 \uac83\uc785\ub2c8\ub2e4.
+블로그용 이미지를 만들려는데 "사진 같은 느낌"이 필요할 때가 있고, "일러스트 느낌"이 필요할 때가 있습니다. 같은 주제라도 스타일에 따라 완전히 다른 인상을 주는데, 문제는 "어떤 스타일이 있는지" 모르니까 항상 비슷한 결과만 나온다는 것입니다.
 
-\uc624\ub298\uc740 \uac19\uc740 \uc7a5\uba74\uc744 8\uac00\uc9c0 \uc2a4\ud0c0\uc77c\ub85c \uc0dd\uc131\ud574\uc11c \uac01\uac01\uc758 \ucc28\uc774\ub97c \ub208\uc73c\ub85c \ud655\uc778\ud574 \ubcf4\uaca0\uc2b5\ub2c8\ub2e4. \uc774 \ud55c \uae00\ub9cc \uc77d\uc5b4\ub3c4 \uc55e\uc73c\ub85c \uc5b4\ub5a4 \uc2a4\ud0c0\uc77c\uc744 \uc370\uc57c \ud560\uc9c0 \ubc14\ub85c \ud310\ub2e8\ud560 \uc218 \uc788\uac8c \ub429\ub2c8\ub2e4.
+오늘은 같은 장면을 8가지 스타일로 생성해서 각각의 차이를 눈으로 확인해 보겠습니다. 이 한 글만 읽어도 앞으로 어떤 스타일을 썰야 할지 바로 판단할 수 있게 됩니다.
 
-\uc774 \uae00\uc740 AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 \uc2dc\ub9ac\uc988\uc758 3\ubc88\uc9f8 \uae00\uc785\ub2c8\ub2e4.
+이 글은 AI 이미지 생성 101 시리즈의 3번째 글입니다.
 
 ---
 
 ```mermaid
 flowchart LR
-    A["\uac19\uc740 \uc7a5\uba74"] --> B["\uc0ac\uc9c4"]
-    A --> C["\uc218\ucc44\ud654"]
-    A --> D["\uc720\ud654"]
-    A --> E["\ud53d\uc140\uc544\ud2b8"]
-    A --> F["\uc560\ub2c8\uba54\uc774\uc158"]
-    A --> G["3D \ub80c\ub354"]
-    A --> H["\ud50c\ub7ab \ubca1\ud130"]
-    A --> I["\uc5f0\ud544 \uc2a4\ucf00\uce58"]
+    A["같은 장면"] --> B["사진"]
+    A --> C["수채화"]
+    A --> D["유화"]
+    A --> E["픽셀아트"]
+    A --> F["애니메이션"]
+    A --> G["3D 렌더"]
+    A --> H["플랫 벡터"]
+    A --> I["연필 스케치"]
 ```
 
-*\uac19\uc740 \uc7a5\uba74\uc744 8\uac00\uc9c0 \uc2a4\ud0c0\uc77c\ub85c \ubcc0\ud658\ud558\ub294 \uac83\uc774 \uc624\ub298\uc758 \uc2e4\ud5d8*
+*같은 장면을 8가지 스타일로 변환하는 것이 오늘의 실험*
 
-## \uba3c\uc800 \ub358\uc9c0\ub294 \uc9c8\ubb38
+## 먼저 던지는 질문
 
-- \uc0ac\uc9c4 \uc2a4\ud0c0\uc77c\uacfc \uc77c\ub7ec\uc2a4\ud2b8 \uc2a4\ud0c0\uc77c\uc740 \uc5b4\ub5a4 \uc7a5\uba74\uc5d0\uc11c \uac01\uac01 \ub354 \uc801\ud569\ud560\uae4c\uc694?
-- "\uc218\ucc44\ud654"\uc640 "\uc720\ud654"\ub294 \uac19\uc740 \uadf8\ub9bc \uc2a4\ud0c0\uc77c \uc544\ub2cc\uac00\uc694? \uc2e4\uc81c\ub85c \uc5b4\ub5bb\uac8c \ub2e4\ub97c\uae4c\uc694?
-- \ube14\ub85c\uadf8, SNS, \ud504\ub808\uc824\ud14c\uc774\uc158 \uac01\uac01\uc5d0 \uac00\uc7a5 \uc798 \ub9de\ub294 \uc2a4\ud0c0\uc77c\uc740 \ubb34\uc5c7\uc77c\uae4c\uc694?
-
----
-
-## \uc2e4\ud5d8 \uc124\uacc4: \ud558\ub098\uc758 \uc7a5\uba74, 8\uac00\uc9c0 \uc2a4\ud0c0\uc77c
-
-\ub3d9\uc77c\ud55c \uc7a5\uba74\uc744 8\uac00\uc9c0 \uc2a4\ud0c0\uc77c\ub85c \uc0dd\uc131\ud569\ub2c8\ub2e4. \uacf5\ud1b5 \uc7a5\uba74:
-
-> \ube44 \uc624\ub294 \uc800\ub141, \ub530\ub73b\ud55c \uc870\uba85\uc774 \ucf1c\uc9c4 \uc544\ub2b4\ud55c \ub3c5\ub9bd \uc11c\uc810. \uc816\uc740 \uc790\uac08\uae38\uc5d0 \ubd88\ube5b\uc774 \ubc18\uc0ac\ub428.
-
-\uc2a4\ud0c0\uc77c\ub9cc \ubc14\uafb8\uace0 \ub098\uba38\uc9c0\ub294 \uac19\uac8c \uc720\uc9c0\ud569\ub2c8\ub2e4.
+- 사진 스타일과 일러스트 스타일은 어떤 장면에서 각각 더 적합할까요?
+- "수채화"와 "유화"는 같은 그림 스타일 아닌가요? 실제로 어떻게 다를까요?
+- 블로그, SNS, 프레젤테이션 각각에 가장 잘 맞는 스타일은 무엇일까요?
 
 ---
 
-## 1. \uc0ac\uc9c4 (Photorealistic)
+## 실험 설계: 하나의 장면, 8가지 스타일
+
+동일한 장면을 8가지 스타일로 생성합니다. 공통 장면:
+
+> 비 오는 저녁, 따뜻한 조명이 켜진 아늴한 독립 서점. 젖은 자갈길에 불빛이 반사됨.
+
+스타일만 바꾸고 나머지는 같게 유지합니다.
+
+---
+
+## 1. 사진 (Photorealistic)
 
 > ...photorealistic photography style, 35mm film grain
 
-![\uc0ac\uc9c4 \uc2a4\ud0c0\uc77c](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/01-photorealistic.png)
+![사진 스타일](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/01-photorealistic.png)
 
-*\uc0ac\uc9c4 \uc2a4\ud0c0\uc77c: \uc2e4\uc81c \uce74\uba54\ub77c\ub85c \ucc0d\uc740 \ub4ef\ud55c \uc9c8\uac10. \uc870\uba85\uc758 \uc790\uc5f0\uc2a4\ub7ec\uc6c0, \ubb3c\uc758 \ubc18\uc0ac, \uc7ac\uc9c8 \ud45c\ud604\uc774 \uc0ac\uc2e4\uc801\uc774\ub2e4.*
+*사진 스타일: 실제 카메라로 찍은 듯한 질감. 조명의 자연스러움, 물의 반사, 재질 표현이 사실적이다.*
 
-**\ud2b9\uc9d5**: \uc2e4\uc81c \uc0ac\uc9c4\ucc98\ub7fc \ubcf4\uc785\ub2c8\ub2e4. \uc7ac\uc9c8\uac10, \ubc18\uc0ac, \ube5b\uc758 \ubc88\uc9d0\uc774 \uc790\uc5f0\uc2a4\ub7fd\uc2b5\ub2c8\ub2e4.
+**특징**: 실제 사진처럼 보입니다. 재질감, 반사, 빛의 번짐이 자연스럽습니다.
 
-**\uc0ac\uc6a9\ucc98**: \uc81c\ud488 \uc0ac\uc9c4, \uc5ec\ud589 \ube14\ub85c\uadf8, \uc74c\uc2dd \uc0ac\uc9c4, SNS \ud3ec\uc2a4\ud2b8
+**사용처**: 제품 사진, 여행 블로그, 음식 사진, SNS 포스트
 
-**\ud0a4\uc6cc\ub4dc**: `photorealistic`, `photography`, `35mm film`, `DSLR`, `Canon EOS`, `shallow depth of field`
+**키워드**: `photorealistic`, `photography`, `35mm film`, `DSLR`, `Canon EOS`, `shallow depth of field`
 
 ---
 
-## 2. \uc218\ucc44\ud654 (Watercolor)
+## 2. 수채화 (Watercolor)
 
 > ...watercolor painting style, soft edges and color bleeding
 
-![\uc218\ucc44\ud654 \uc2a4\ud0c0\uc77c](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/02-watercolor.png)
+![수채화 스타일](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/02-watercolor.png)
 
-*\uc218\ucc44\ud654 \uc2a4\ud0c0\uc77c: \uacbd\uacc4\uac00 \ubd80\ub4dc\ub7fd\uace0 \uc0c9\uc774 \ubc88\uc9c0\ub294 \ud2b9\uc720\uc758 \uc9c8\uac10. \ub530\ub73b\ud558\uace0 \ubab0\uc785\uc801\uc774\ub2e4.*
+*수채화 스타일: 경계가 부드럽고 색이 번지는 특유의 질감. 따뜻하고 몰입적이다.*
 
-**\ud2b9\uc9d5**: \uacbd\uacc4\uac00 \ubd80\ub4dc\ub7fd\uace0 \uc0c9\uc774 \ubc88\uc9d1\ub2c8\ub2e4. \ub530\ub73b\ud558\uace0 \ubab0\uc785\uc801\uc778 \ub290\ub08c\uc744 \uc90d\ub2c8\ub2e4.
+**특징**: 경계가 부드럽고 색이 번집니다. 따뜻하고 몰입적인 느낌을 줍니다.
 
-**\uc0ac\uc6a9\ucc98**: \ucd08\ub300\uc7a5, \uc5fd\uc11c, \uc774\ub728 \uac80\uc0c9 \uc378\ub124\uc77c, \uac10\uc131\uc801\uc778 SNS
+**사용처**: 초대장, 엽서, 이뜨 검색 썸네일, 감성적인 SNS
 
-**\ud0a4\uc6cc\ub4dc**: `watercolor`, `watercolour painting`, `soft washes`, `color bleeding`, `wet-on-wet`
+**키워드**: `watercolor`, `watercolour painting`, `soft washes`, `color bleeding`, `wet-on-wet`
 
 ---
 
-## 3. \uc720\ud654 (Oil Painting)
+## 3. 유화 (Oil Painting)
 
 > ...oil painting style, thick impasto brushstrokes, rich saturated colors
 
-![\uc720\ud654 \uc2a4\ud0c0\uc77c](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/03-oil-painting.png)
+![유화 스타일](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/03-oil-painting.png)
 
-*\uc720\ud654 \uc2a4\ud0c0\uc77c: \ub450\uaebc\uc6b4 \ubd93\ud130\uce58\uc640 \uc9c4\ud55c \uc0c9\uac10. \uc218\ucc44\ud654\uc640 \ub2ec\ub9ac \ubb34\uac8c\uac10\uacfc \uc9c8\uac10\uc774 \ub290\uaef4\uc9c4\ub2e4.*
+*유화 스타일: 두꺼운 붓터치와 진한 색감. 수채화와 달리 무게감과 질감이 느껴진다.*
 
-**\ud2b9\uc9d5**: \ub450\uaebc\uc6b4 \ubd93\ud130\uce58\uac00 \ubcf4\uc774\uace0 \uc0c9\uc774 \uc9c4\ud569\ub2c8\ub2e4. \uc218\ucc44\ud654\uc640 \ube44\uad50\ud558\uba74 \ud6e8\uc52c \ubb34\uac9d\uace0 \uc9c8\uac10\uc774 \ub290\uaef4\uc9d1\ub2c8\ub2e4.
+**특징**: 두꺼운 붓터치가 보이고 색이 진합니다. 수채화와 비교하면 훨씬 무겝고 질감이 느껴집니다.
 
-**\uc218\ucc44\ud654 vs \uc720\ud654 \ube44\uad50**:
+**수채화 vs 유화 비교**:
 
-| \ud2b9\uc131 | \uc218\ucc44\ud654 | \uc720\ud654 |
+| 특성 | 수채화 | 유화 |
 |------|--------|------|
-| \uacbd\uacc4 | \ubd80\ub4dc\ub7fd\uace0 \ubc88\uc9d0 | \ub6da\ub837\ud558\uc9c0\ub9cc \uc9c8\uac10\uc774 \uc788\uc74c |
-| \uc0c9\uac10 | \ud22c\uba85\ud558\uace0 \ubc1d\uc74c | \uc9c4\ud558\uace0 \ubc00\ub3c4 \uc788\uc74c |
-| \ubd84\uc704\uae30 | \uac00\ubccd\uace0 \ubab4\uc5d0\uc801 | \ubb34\uac81\uace0 \uc785\uccb4\uc801 |
-| \uc801\ud569\ud55c \uc7a5\uba74 | \uaf43, \ud48d\uacbd, \uacbd\ucf8c\ud55c \uc7a5\uba74 | \uc778\ubb3c, \ub3c4\uc2dc, \ub4dc\ub77c\ub9c8\ud2f1\ud55c \uc7a5\uba74 |
+| 경계 | 부드럽고 번짐 | 뛚렷하지만 질감이 있음 |
+| 색감 | 투명하고 밝음 | 진하고 밀도 있음 |
+| 분위기 | 가볍고 몴에적 | 무겁고 입체적 |
+| 적합한 장면 | 꽃, 풍경, 경쾌한 장면 | 인물, 도시, 드라마틱한 장면 |
 
-**\ud0a4\uc6cc\ub4dc**: `oil painting`, `impasto`, `thick brushstrokes`, `rich colors`, `gallery painting`
+**키워드**: `oil painting`, `impasto`, `thick brushstrokes`, `rich colors`, `gallery painting`
 
 ---
 
-## 4. \ud53d\uc140\uc544\ud2b8 (Pixel Art)
+## 4. 픽셀아트 (Pixel Art)
 
 > ...pixel art style, 16-bit retro game aesthetic, limited color palette
 
-![\ud53d\uc140\uc544\ud2b8 \uc2a4\ud0c0\uc77c](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/04-pixel-art.png)
+![픽셀아트 스타일](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/04-pixel-art.png)
 
-*\ud53d\uc140\uc544\ud2b8 \uc2a4\ud0c0\uc77c: \ubcf5\uace0 \uac8c\uc784 \ub290\ub08c\uc758 \ub3c4\ud2b8 \uadf8\ub798\ud53d. \ub2e8\uc21c\ud558\uc9c0\ub9cc \ub3c5\ud2b9\ud55c \ub9e4\ub825\uc774 \uc788\ub2e4.*
+*픽셀아트 스타일: 복고 게임 느낌의 도트 그래픽. 단순하지만 독특한 매력이 있다.*
 
-**\ud2b9\uc9d5**: \ub808\ud2b8\ub85c \uac8c\uc784 \ub290\ub08c. \uc81c\ud55c\ub41c \uc0c9\uc0c1 \ud314\ub808\ud2b8\ub85c \ub2e8\uc21c\ud558\uc9c0\ub9cc \ud2b9\uc720\uc758 \ub9e4\ub825\uc774 \uc788\uc2b5\ub2c8\ub2e4.
+**특징**: 레트로 게임 느낌. 제한된 색상 팔레트로 단순하지만 특유의 매력이 있습니다.
 
-**\uc0ac\uc6a9\ucc98**: \uac8c\uc784 \uad00\ub828 \ucf58\ud150\uce20, IT \ube14\ub85c\uadf8, \ud14c\ud06c \ucee4\ubba4\ub2c8\ud2f0, \ub3c5\ud2b9\ud55c \uc378\ub124\uc77c
+**사용처**: 게임 관련 콘텐츠, IT 블로그, 테크 커뮤니티, 독특한 썸네일
 
-**\ud0a4\uc6cc\ub4dc**: `pixel art`, `8-bit`, `16-bit`, `retro game`, `sprite`, `limited palette`
+**키워드**: `pixel art`, `8-bit`, `16-bit`, `retro game`, `sprite`, `limited palette`
 
 ---
 
-## 5. \uc560\ub2c8\uba54\uc774\uc158/\ub9cc\ud654 (Anime)
+## 5. 애니메이션/만화 (Anime)
 
 > ...anime illustration style, Studio Ghibli inspired, soft pastel colors
 
-![\uc560\ub2c8\uba54\uc774\uc158 \uc2a4\ud0c0\uc77c](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/05-anime.png)
+![애니메이션 스타일](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/05-anime.png)
 
-*\uc560\ub2c8\uba54\uc774\uc158 \uc2a4\ud0c0\uc77c: \ubd80\ub4dc\ub7ec\uc6b4 \ud30c\uc2a4\ud154 \ud1a4\uacfc \uc138\ubc00\ud55c \ubc30\uacbd \ubb18\uc0ac. \ub530\ub73b\ud558\uace0 \ud5a5\uc218 \uc5b4\ub9b0 \ubd84\uc704\uae30.*
+*애니메이션 스타일: 부드러운 파스텔 톤과 세밀한 배경 묘사. 따뜻하고 향수 어린 분위기.*
 
-**\ud2b9\uc9d5**: \ube44\uc140\uc758 \ubc30\uacbd \ubb18\uc0ac\uc640 \ubd80\ub4dc\ub7ec\uc6b4 \uc0c9\uac10. \ub530\ub73b\ud558\uace0 \uad38\ub77c\uc6b4 \ubd84\uc704\uae30\ub97c \ub9cc\ub4ed\ub2c8\ub2e4.
+**특징**: 비셀의 배경 묘사와 부드러운 색감. 따뜻하고 괸라운 분위기를 만듭니다.
 
-**\uc0ac\uc6a9\ucc98**: \uc720\ud29c\ube0c \uc378\ub124\uc77c, \uc2a4\ud1a0\ub9ac\ud154\ub9c1, \uce90\ub9ad\ud130 \uc911\uc2ec \ucf58\ud150\uce20
+**사용처**: 유튜브 썸네일, 스토리텔링, 캐릭터 중심 콘텐츠
 
-**\ud0a4\uc6cc\ub4dc**: `anime style`, `manga illustration`, `Studio Ghibli`, `Makoto Shinkai`, `cel shading`, `pastel colors`
+**키워드**: `anime style`, `manga illustration`, `Studio Ghibli`, `Makoto Shinkai`, `cel shading`, `pastel colors`
 
 ---
 
-## 6. 3D \ub80c\ub354 (3D Render)
+## 6. 3D 렌더 (3D Render)
 
 > ...3D render style, Pixar-like aesthetic, smooth surfaces, volumetric lighting
 
-![3D \ub80c\ub354 \uc2a4\ud0c0\uc77c](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/06-3d-render.png)
+![3D 렌더 스타일](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/06-3d-render.png)
 
-*3D \ub80c\ub354 \uc2a4\ud0c0\uc77c: \ub9e4\ub044\ub7ec\uc6b4 \ud45c\uba74\uacfc \ubd80\ub4dc\ub7ec\uc6b4 \uc870\uba85. \ud53d\uc0ac/\ub514\uc988\ub2c8 \uc560\ub2c8\uba54\uc774\uc158 \ub290\ub08c.*
+*3D 렌더 스타일: 매끄러운 표면과 부드러운 조명. 픽사/디즈니 애니메이션 느낌.*
 
-**\ud2b9\uc9d5**: \ub9e4\ub044\ub7ec\uc6b4 \ud45c\uba74, \ubd80\ub4dc\ub7ec\uc6b4 \uc870\uba85, \uadc0\uc5ec\uc6b4 \ub290\ub08c. \ud53d\uc0ac \uc560\ub2c8\uba54\uc774\uc158\uc744 \ub5a0\uc62c\ub9ac\ub294 \ubd84\uc704\uae30\uc785\ub2c8\ub2e4.
+**특징**: 매끄러운 표면, 부드러운 조명, 귀여운 느낌. 픽사 애니메이션을 떠올리는 분위기입니다.
 
-**\uc0ac\uc6a9\ucc98**: \uc55e/UI \ubaa9\uc5c5, \uadc0\uc5ec\uc6b4 \ube0c\ub79c\ub529, \uc5b4\ub9b0\uc774 \ucf58\ud150\uce20, \uc81c\ud488 \uc18c\uac1c
+**사용처**: 앞/UI 목업, 귀여운 브랜딩, 어린이 콘텐츠, 제품 소개
 
-**\ud0a4\uc6cc\ub4dc**: `3D render`, `Pixar style`, `Blender`, `Cinema 4D`, `smooth`, `volumetric lighting`, `octane render`
+**키워드**: `3D render`, `Pixar style`, `Blender`, `Cinema 4D`, `smooth`, `volumetric lighting`, `octane render`
 
 ---
 
-## 7. \ud50c\ub7ab \ubca1\ud130 (Flat Vector)
+## 7. 플랫 벡터 (Flat Vector)
 
 > ...flat vector illustration style, clean geometric shapes, limited flat color palette, no gradients
 
-![\ud50c\ub7ab \ubca1\ud130 \uc2a4\ud0c0\uc77c](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/07-flat-vector.png)
+![플랫 벡터 스타일](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/07-flat-vector.png)
 
-*\ud50c\ub7ab \ubca1\ud130 \uc2a4\ud0c0\uc77c: \uae68\ub057\ud55c \uae30\ud558\ud559\uc801 \ud615\ud0dc\uc640 \ub2e8\uc21c\ud55c \uc0c9\uc0c1. \ub514\uc9c0\ud138 \ucf58\ud150\uce20\uc5d0 \ucd5c\uc801\ud654.*
+*플랫 벡터 스타일: 깨끗한 기하학적 형태와 단순한 색상. 디지털 콘텐츠에 최적화.*
 
-**\ud2b9\uc9d5**: \uae68\ub057\ud558\uace0 \ub2e8\uc21c\ud569\ub2c8\ub2e4. \uadf8\ub77c\ub370\uc774\uc158 \uc5c6\uc774 \ud3c9\uba74\uc801\uc778 \uc0c9\uba74\uc73c\ub85c \uad6c\uc131\ub429\ub2c8\ub2e4.
+**특징**: 깨끗하고 단순합니다. 그라데이션 없이 평면적인 색면으로 구성됩니다.
 
-**\uc0ac\uc6a9\ucc98**: \uc6f9\uc0ac\uc774\ud2b8 \uc77c\ub7ec\uc2a4\ud2b8, \uc571 \uc544\uc774\ucf58, \uc778\ud3ec\uadf8\ub798\ud53d, \ud504\ub808\uc824\ud14c\uc774\uc158 \ub3c4\ud574
+**사용처**: 웹사이트 일러스트, 앱 아이콘, 인포그래픽, 프레젤테이션 도해
 
-**\ud0a4\uc6cc\ub4dc**: `flat vector`, `flat design`, `geometric`, `minimal illustration`, `no gradients`, `SVG style`
+**키워드**: `flat vector`, `flat design`, `geometric`, `minimal illustration`, `no gradients`, `SVG style`
 
 ---
 
-## 8. \uc5f0\ud544 \uc2a4\ucf00\uce58 (Pencil Sketch)
+## 8. 연필 스케치 (Pencil Sketch)
 
 > ...pencil sketch style, detailed line work, cross-hatching for shadows, black and white
 
-![\uc5f0\ud544 \uc2a4\ucf00\uce58 \uc2a4\ud0c0\uc77c](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/08-pencil-sketch.png)
+![연필 스케치 스타일](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/08-pencil-sketch.png)
 
-*\uc5f0\ud544 \uc2a4\ucf00\uce58 \uc2a4\ud0c0\uc77c: \uc120\uc758 \ub514\ud14c\uc77c\uacfc \ud574\uce6d \uae30\ubc95\uc73c\ub85c \uba85\uc554\uc744 \ud45c\ud604. \uc804\ud1b5\uc801\uc774\uace0 \uc9c0\uc801\uc778 \ub290\ub08c.*
+*연필 스케치 스타일: 선의 디테일과 해칭 기법으로 명암을 표현. 전통적이고 지적인 느낌.*
 
-**\ud2b9\uc9d5**: \ud761\ubc31\uc758 \uc120 \ub4dc\ub85c\uc789. \ud574\uce6d(\uad50\ucc28 \ube57\uae08)\uc73c\ub85c \uba85\uc554\uc744 \ud45c\ud604\ud569\ub2c8\ub2e4. \uc804\ud1b5\uc801\uc774\uace0 \uc9c0\uc801\uc778 \ub290\ub08c\uc785\ub2c8\ub2e4.
+**특징**: 흡백의 선 드로잉. 해칭(교차 빗금)으로 명암을 표현합니다. 전통적이고 지적인 느낌입니다.
 
-**\uc0ac\uc6a9\ucc98**: \uac74\ucd95 \uc2dc\uac01\ud654, \ucee8\uc149 \uc544\ud2b8, \uc544\uce74\ub370\ubbf9\ud55c \ucf58\ud150\uce20, \ub178\ud2b8/\uc800\ub110 \uc2a4\ud0c0\uc77c
+**사용처**: 건축 시각화, 컨셉 아트, 아카데믹한 콘텐츠, 노트/저널 스타일
 
-**\ud0a4\uc6cc\ub4dc**: `pencil sketch`, `pencil drawing`, `line art`, `cross-hatching`, `graphite`, `black and white`
+**키워드**: `pencil sketch`, `pencil drawing`, `line art`, `cross-hatching`, `graphite`, `black and white`
 
 ---
 
-## \uc2a4\ud0c0\uc77c \uc120\ud0dd \uac00\uc774\ub4dc
+## 스타일 선택 가이드
 
-\uc0c1\ud669\ubcc4\ub85c \uc5b4\ub5a4 \uc2a4\ud0c0\uc77c\uc774 \uc801\ud569\ud55c\uc9c0 \uc815\ub9ac\ud588\uc2b5\ub2c8\ub2e4.
+상황별로 어떤 스타일이 적합한지 정리했습니다.
 
-| \uc0ac\uc6a9 \ubaa9\uc801 | \ucd94\ucc9c \uc2a4\ud0c0\uc77c | \uc774\uc720 |
+| 사용 목적 | 추천 스타일 | 이유 |
 |----------|----------|------|
-| \uc81c\ud488 \uc18c\uac1c, \uc74c\uc2dd \uc0ac\uc9c4 | \uc0ac\uc9c4 | \uc2e4\uc81c\uac10\uc774 \uc911\uc694 |
-| \uac10\uc131 \ube14\ub85c\uadf8, \ucd08\ub300\uc7a5 | \uc218\ucc44\ud654 | \ubd80\ub4dc\ub7fd\uace0 \ub530\ub73b\ud55c \ub290\ub08c |
-| \ud3ec\ud2b8\ud3f4\ub9ac\uc624, \uc608\uc220\uc801 | \uc720\ud654 | \ubb34\uac8c\uac10\uacfc \uae4a\uc774\uac10 |
-| IT/\uac8c\uc784 \ube14\ub85c\uadf8 | \ud53d\uc140\uc544\ud2b8 | \ub3c5\ud2b9\ud558\uace0 \ub208\uae38 \ub054 |
-| \uce90\ub9ad\ud130 \ucf58\ud150\uce20 | \uc560\ub2c8\uba54\uc774\uc158 | \uce5c\uadfc\ud558\uace0 \ud48d\ubd80\ud55c \ud45c\ud604 |
-| \uc571/\uc6f9 \ub514\uc790\uc778 | 3D \ub80c\ub354 / \ud50c\ub7ab | \ub9e4\ub044\ub7fd\uace0 \ud604\ub300\uc801 |
-| \ud559\uc220/\ucee8\uc149 | \uc5f0\ud544 \uc2a4\ucf00\uce58 | \uc804\ubb38\uc801\uc774\uace0 \uc9c0\uc801 |
+| 제품 소개, 음식 사진 | 사진 | 실제감이 중요 |
+| 감성 블로그, 초대장 | 수채화 | 부드럽고 따뜻한 느낌 |
+| 포트폴리오, 예술적 | 유화 | 무게감과 깊이감 |
+| IT/게임 블로그 | 픽셀아트 | 독특하고 눈길 끔 |
+| 캐릭터 콘텐츠 | 애니메이션 | 친근하고 풍부한 표현 |
+| 앱/웹 디자인 | 3D 렌더 / 플랫 | 매끄럽고 현대적 |
+| 학술/컨셉 | 연필 스케치 | 전문적이고 지적 |
 
 ---
 
-## \uc2a4\ud0c0\uc77c \uc870\ud569\ud558\uae30
+## 스타일 조합하기
 
-\ud55c \uac00\uc9c0 \uc2a4\ud0c0\uc77c\ub9cc \uc4f0\ub77c\ub294 \ubc95\uc740 \uc5c6\uc2b5\ub2c8\ub2e4. \uc2a4\ud0c0\uc77c\uc744 \uc870\ud569\ud558\uba74 \ub354 \ub3c5\ud2b9\ud55c \uacb0\uacfc\ub97c \uc5bb\uc744 \uc218 \uc788\uc2b5\ub2c8\ub2e4.
+한 가지 스타일만 쓰라는 법은 없습니다. 스타일을 조합하면 더 독특한 결과를 얻을 수 있습니다.
 
-\ud6a8\uacfc\uc801\uc778 \uc870\ud569 \uc608\uc2dc:
+효과적인 조합 예시:
 
-| \uc870\ud569 | \ud504\ub86c\ud504\ud2b8 \ud0a4\uc6cc\ub4dc | \uacb0\uacfc |
+| 조합 | 프롬프트 키워드 | 결과 |
 |------|-----------|------|
-| \uc0ac\uc9c4 + \uc601\ud654 | `cinematic photography, anamorphic lens` | \uc601\ud654 \ud55c \uc7a5\uba74 \uac19\uc740 \ub4dc\ub77c\ub9c8\ud2f1\ud55c \ub290\ub08c |
-| \uc218\ucc44\ud654 + \ub514\uc9c0\ud138 | `digital watercolor, clean edges` | \uc218\ucc44\ud654 \ubd84\uc704\uae30\ub97c \uc720\uc9c0\ud558\uba74\uc11c \ub354 \uc120\uba85 |
-| \ud53d\uc140 + \uc560\ub2c8\uba54\uc774\uc158 | `pixel art anime style` | \ubc15\uc2a4\uc5d0 \uac00\ub81c\ube44\uae30\ud55c \ub290\ub08c |
-| 3D + \uc774\uc18c\uba54\ud2b8\ub9ad | `3D isometric render` | \uc548\ub0b4\ub3c4/\ub2e4\uc774\uc5b4\uadf8\ub7a8 \ub290\ub08c |
+| 사진 + 영화 | `cinematic photography, anamorphic lens` | 영화 한 장면 같은 드라마틱한 느낌 |
+| 수채화 + 디지털 | `digital watercolor, clean edges` | 수채화 분위기를 유지하면서 더 선명 |
+| 픽셀 + 애니메이션 | `pixel art anime style` | 박스에 가렜비기한 느낌 |
+| 3D + 이소메트릭 | `3D isometric render` | 안내도/다이어그램 느낌 |
 
 ---
 
-## \uc815\ub9ac: \uc2a4\ud0c0\uc77c \uc120\ud0dd\uc758 \ud575\uc2ec
+## 정리: 스타일 선택의 핵심
 
-\uc624\ub298 8\uac00\uc9c0 \uc2a4\ud0c0\uc77c\uc744 \ubc14\uc774\uae70\uc758 \ub3d9\uc77c\ud55c \uc7a5\uba74\uc5d0 \uc801\uc6a9\ud574 \ubcf4\uba74\uc11c \ud655\uc778\ud55c \uac83:
+오늘 8가지 스타일을 바이깰의 동일한 장면에 적용해 보면서 확인한 것:
 
-- \uc2a4\ud0c0\uc77c\uc740 \uc774\ubbf8\uc9c0\uc758 \uc804\uccb4 \ubd84\uc704\uae30\ub97c \uacb0\uc815\ud558\ub294 \uac00\uc7a5 \uac15\ub825\ud55c \uc694\uc18c\ub2e4
-- \uac01 \uc2a4\ud0c0\uc77c\uc5d0\ub294 \uace0\uc720\ud55c \ud2b9\uc9d5\uacfc \uc801\ud569\ud55c \uc0ac\uc6a9\ucc98\uac00 \uc788\ub2e4
-- \uc2a4\ud0c0\uc77c\uc744 \uc870\ud569\ud558\uba74 \ub354 \ub3c5\ud2b9\ud55c \uacb0\uacfc\ub97c \uc5bb\uc744 \uc218 \uc788\ub2e4
+- 스타일은 이미지의 전체 분위기를 결정하는 가장 강력한 요소다
+- 각 스타일에는 고유한 특징과 적합한 사용처가 있다
+- 스타일을 조합하면 더 독특한 결과를 얻을 수 있다
 
-\ub2e4\uc74c \uae00\uc5d0\uc11c\ub294 \uad6c\ub3c4\uc640 \uc2dc\uc810\u2014\uc774\ubbf8\uc9c0\ub97c \uc5b4\ub5a4 \uac01\ub3c4\uc5d0\uc11c \ubcf4\uc5ec\uc904\uc9c0\ub97c \ub2e4\ub8f9\ub2c8\ub2e4.
+다음 글에서는 구도와 시점—이미지를 어떤 각도에서 보여줄지를 다룹니다.
 
 ---
 
-## \ucc98\uc74c \uc9c8\ubb38\uc73c\ub85c \ub3cc\uc544\uac00\uae30
+## 처음 질문으로 돌아가기
 
-**\uc0ac\uc9c4\uacfc \uc77c\ub7ec\uc2a4\ud2b8 \uc2a4\ud0c0\uc77c\uc740 \uc5b4\ub5a4 \uc7a5\uba74\uc5d0\uc11c \uac01\uac01 \ub354 \uc801\ud569\ud55c\uac00\uc694?**
+**사진과 일러스트 스타일은 어떤 장면에서 각각 더 적합한가요?**
 
-\uc0ac\uc9c4\uc740 \uc81c\ud488, \uc74c\uc2dd, \uc5ec\ud589\ucc98\ub7fc "\uc9c4\uc9dc \uac19\uc544 \ubcf4\uc5ec\uc57c \ud558\ub294" \uacbd\uc6b0\uc5d0 \uc801\ud569\ud569\ub2c8\ub2e4. \uc77c\ub7ec\uc2a4\ud2b8\ub294 \ucd94\uc0c1\uc801 \uac1c\ub150, \uac10\uc131\uc801 \ubd84\uc704\uae30, \ub514\uc790\uc778 \uc694\uc18c\uac00 \ud544\uc694\ud560 \ub54c \uc801\ud569\ud569\ub2c8\ub2e4.
+사진은 제품, 음식, 여행처럼 "진짜 같아 보여야 하는" 경우에 적합합니다. 일러스트는 추상적 개념, 감성적 분위기, 디자인 요소가 필요할 때 적합합니다.
 
-**"\uc218\ucc44\ud654"\uc640 "\uc720\ud654"\ub294 \uc5b4\ub5bb\uac8c \ub2e4\ub974\uac00\uc694?**
+**"수채화"와 "유화"는 어떻게 다르가요?**
 
-\uc218\ucc44\ud654\ub294 \uacbd\uacc4\uac00 \ubd80\ub4dc\ub7fd\uace0 \uc0c9\uc774 \ud22c\uba85\ud558\uba70 \uac00\ubcbd\uc2b5\ub2c8\ub2e4. \uc720\ud654\ub294 \ubd93\ud130\uce58\uac00 \ub450\uaed8\uace0 \uc0c9\uc774 \uc9c4\ud558\uba70 \ubb34\uac81\uc2b5\ub2c8\ub2e4. \uac10\uc131\uc801\uc778 \uc7a5\uba74\uc5d0\ub294 \uc218\ucc44\ud654, \ub4dc\ub77c\ub9c8\ud2f1\ud55c \uc7a5\uba74\uc5d0\ub294 \uc720\ud654\uac00 \ub9de\uc2b5\ub2c8\ub2e4.
+수채화는 경계가 부드럽고 색이 투명하며 가벽습니다. 유화는 붓터치가 두께고 색이 진하며 무겁습니다. 감성적인 장면에는 수채화, 드라마틱한 장면에는 유화가 맞습니다.
 
-**\ube14\ub85c\uadf8, SNS, \ud504\ub808\uc824\ud14c\uc774\uc158 \uac01\uac01\uc5d0 \uac00\uc7a5 \uc798 \ub9de\ub294 \uc2a4\ud0c0\uc77c\uc740?**
+**블로그, SNS, 프레젤테이션 각각에 가장 잘 맞는 스타일은?**
 
-\ube14\ub85c\uadf8: \uc0ac\uc9c4(\uc81c\ud488/\ub9ac\ubdf0) \ub610\ub294 \ud50c\ub7ab \ubca1\ud130(\uae30\uc220 \uc124\uba85). SNS: \uc560\ub2c8\uba54\uc774\uc158(\uce90\ub9ad\ud130 \uc911\uc2ec) \ub610\ub294 \uc218\ucc44\ud654(\uac10\uc131\uc801). \ud504\ub808\uc824\ud14c\uc774\uc158: \ud50c\ub7ab \ubca1\ud130(\ub2e4\uc774\uc5b4\uadf8\ub7a8) \ub610\ub294 3D \ub80c\ub354(\ubaa9\uc5c5).
+블로그: 사진(제품/리뷰) 또는 플랫 벡터(기술 설명). SNS: 애니메이션(캐릭터 중심) 또는 수채화(감성적). 프레젤테이션: 플랫 벡터(다이어그램) 또는 3D 렌더(목업).
 
 ---
 
 <!-- toc:begin -->
-## \uc774 \uc2dc\ub9ac\uc988\uc5d0\uc11c \ub2e4\ub8e8\ub294 \uae00
+## 이 시리즈에서 다루는 글
 
-- [AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (1/10): \uccab \uc774\ubbf8\uc9c0 \uc0dd\uc131\ud558\uae30](./01-first-image-generation.md)
-- [AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (2/10): \uc88b\uc740 \ud504\ub86c\ud504\ud2b8\uc758 \uad6c\uc870](./02-prompt-structure.md)
-- **AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (3/10): \uc2a4\ud0c0\uc77c \ub9c8\uc2a4\ud130\ud558\uae30 (\ud604\uc7ac \uae00)**
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (4/10): \uad6c\ub3c4\uc640 \uc2dc\uc810 (\uc608\uc815)
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (5/10): \uc0c9\uac10\uacfc \uc870\uba85 (\uc608\uc815)
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (6/10): \ubcf5\uc7a1\ud55c \uc7a5\uba74 \uc124\uacc4\ud558\uae30 (\uc608\uc815)
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (7/10): \uc77c\uad00\uc131 \uc720\uc9c0\ud558\uae30 (\uc608\uc815)
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (8/10): \ud14d\uc2a4\ud2b8\uc640 \ud0c0\uc774\ud3ec\uadf8\ub798\ud53c (\uc608\uc815)
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (9/10): \ub808\ud37c\ub7f0\uc2a4 \uc774\ubbf8\uc9c0 \ud65c\uc6a9 (\uc608\uc815)
-- AI \uc774\ubbf8\uc9c0 \uc0dd\uc131 101 (10/10): \uc2e4\uc804 \uc6cc\ud06c\ud50c\ub85c\uc6b0 (\uc608\uc815)
+- [AI 이미지 생성 101 (1/10): 첫 이미지 생성하기](./01-first-image-generation.md)
+- [AI 이미지 생성 101 (2/10): 좋은 프롬프트의 구조](./02-prompt-structure.md)
+- **AI 이미지 생성 101 (3/10): 스타일 마스터하기 (현재 글)**
+- AI 이미지 생성 101 (4/10): 구도와 시점 (예정)
+- AI 이미지 생성 101 (5/10): 색감과 조명 (예정)
+- AI 이미지 생성 101 (6/10): 복잡한 장면 설계하기 (예정)
+- AI 이미지 생성 101 (7/10): 일관성 유지하기 (예정)
+- AI 이미지 생성 101 (8/10): 텍스트와 타이포그래피 (예정)
+- AI 이미지 생성 101 (9/10): 레퍼런스 이미지 활용 (예정)
+- AI 이미지 생성 101 (10/10): 실전 워크플로우 (예정)
 <!-- toc:end -->
 
-## \ucc38\uace0 \uc790\ub8cc
+## 참고 자료
 
-- [OpenAI \uc774\ubbf8\uc9c0 \uc0dd\uc131 \uac00\uc774\ub4dc](https://platform.openai.com/docs/guides/images)
-- [god-tibo-imagen GitHub \uc800\uc7a5\uc18c](https://github.com/NomaDamas/god-tibo-imagen)
+- [OpenAI 이미지 생성 가이드](https://platform.openai.com/docs/guides/images)
+- [god-tibo-imagen GitHub 저장소](https://github.com/NomaDamas/god-tibo-imagen)
 
-Tags: AI, ChatGPT, \uc774\ubbf8\uc9c0 \uc0dd\uc131, \ud504\ub86c\ud504\ud2b8 \uc5d4\uc9c0\ub2c8\uc5b4\ub9c1
+Tags: AI, ChatGPT, 이미지 생성, 프롬프트 엔지니어링

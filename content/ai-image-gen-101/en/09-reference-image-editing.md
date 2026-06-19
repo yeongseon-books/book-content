@@ -3,6 +3,7 @@ title: "AI Image Generation 101 (9/10): Working with Reference Images"
 series: ai-image-gen-101
 episode: 9
 language: en
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: false

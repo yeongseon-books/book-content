@@ -3,6 +3,7 @@ title: "AI Image Generation 101 (5/10): Color and Lighting"
 series: ai-image-gen-101
 episode: 5
 language: en
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: false

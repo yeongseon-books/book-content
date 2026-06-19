@@ -3,10 +3,11 @@ title: "AI 이미지 생성 101 (6/10): 복잡한 장면 설계하기"
 series: ai-image-gen-101
 episode: 6
 language: ko
+last_reviewed: '2026-06-18'
 status: draft
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: false
 tags:
