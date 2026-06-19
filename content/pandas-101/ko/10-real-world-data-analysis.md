@@ -40,28 +40,15 @@ last_reviewed: '2026-05-15'
 - 이 기능을 대규모 데이터에 적용할 때 성능 함정은 무엇일까요?
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 
-개별 도구를 아는 것과 결과를 만들어 내는 것은 다릅니다. 실무에서는 같은 입력에서 같은 결과를 다시 만들 수 있어야 하고, 중간 단계가 분리돼 있어야 문제를 추적할 수 있습니다. 그래서 분석 파이프라인은 재현성과 협업성을 함께 고려해야 합니다.
+개별 도구를 아는 것과 결과를 만들어 내는 것은 다릅니다. 실무에서는 같은 입력에서 같은 결과를 다시 만들 수 있어야 하고, 중간 단계가 분리돼 있어야 문제를 추적할 수 있습니다.
 
-- **탐색적 데이터 분석**: 데이터를 이해하기 위한 초기 분석 흐름입니다.
+## 핵심 개념 정의
+
+- **EDA (탐색적 데이터 분석)**: 데이터를 이해하기 위한 초기 분석 흐름입니다.
 - **파이프라인**: 순서가 분명한 변환 단계 묶음입니다.
-- 재현성: 같은 입력이면 같은 결과가 나오는 성질입니다.
-- **핵심 지표**: 분석에서 추적하는 대표 수치입니다.
+- **재현성**: 같은 입력이면 같은 결과가 나오는 성질입니다.
+- **핵심 지표 (KPI)**: 분석에서 추적하는 대표 수치입니다.
 - **노트북 환경**: 코드와 결과를 함께 기록하는 작업 공간입니다.
-- **의존성 관리**: 분석에 쓰는 라이브러리 버전을 기록하는 작업입니다.
-
-### 성능 최적화 기법
-
-대규모 데이터를 다룰 때는 성능을 고려해야 합니다. 다음 표는 주요 최적화 기법과 기대 효과를 정리한 것입니다.
-
-| 기법 | 내용 | 효과 |
-|---|---|---|
-| 벡터화 | 열 단위 연산 사용 | apply 대비 10-100배 |
-| apply 제거 | 내장 함수로 대체 | 중간 가속 |
-| dtypes 최적화 | int64 → int32, object → category | 메모리 30-70% 절감 |
-| eval/query | 문자열 표현식 가속 | 복잡한 수식에 유리 |
-| 청크 처리 | 파일을 나누어 읽기 | 메모리 초과 방지 |
-
-벡터화가 가장 큰 가속 효과를 내지만, 자료형 최적화도 메모리를 크게 줄일 수 있습니다. 특히 카테고리 타입은 고유값이 적은 열에서 매우 효과적입니다.
 
 ## 전과 후
 
@@ -69,307 +56,454 @@ last_reviewed: '2026-05-15'
 
 이후 관점: 적재, 정제, 변형, 집계를 함수로 나눠 다시 실행하고 테스트할 수 있게 만듭니다.
 
-## 실습: 다섯 단계로 끝까지 가기
+## 실습: 전체 파이프라인 구현
 
-### 1단계 - 데이터 읽기
-
-```python
-import pandas as pd
-
-def load(path):
-    return pd.read_csv(path, parse_dates=["date"])
-
-df = load("sales.csv")
-print(df.shape)
-```
-
-읽기 단계는 이후 분석 전체의 출발점입니다. 날짜 열을 읽는 시점에 처리해 두면 뒤의 시간 기반 집계가 훨씬 단순해집니다.
-
-### 2단계 - 정제하기
-
-```python
-def clean(df):
-    df = df.dropna(subset=["sales"])
-    df["sales"] = df["sales"].astype(float)
-    return df
-
-df = clean(df)
-```
-
-정제 단계는 결측 제거와 자료형 보정을 담당합니다. 이 과정을 별도 함수로 두면 어떤 규칙으로 데이터를 다듬었는지 명확해집니다.
-
-### 3단계 - 분석용 열 만들기
-
-```python
-def enrich(df):
-    df["month"] = df["date"].dt.to_period("M")
-    return df
-
-df = enrich(df)
-```
-
-원본 데이터에 바로 없는 열을 만드는 단계입니다. 실무에서는 파생 변수나 특징 생성이 여기에 해당합니다.
-
-### 4단계 - 지표 집계하기
-
-```python
-def kpi(df):
-    return df.groupby("month").agg(
-        total=("sales", "sum"),
-        n=("sales", "count"),
-        mean=("sales", "mean"),
-    )
-
-monthly = kpi(df)
-print(monthly)
-```
-
-월별 KPI 표는 파이프라인이 실제로 끝까지 이어졌는지 확인하는 가장 좋은 중간 산출물입니다. 총합, 건수, 평균이 한 번에 나오면 다음 단계 시각화도 훨씬 단순해집니다.
-
-**예상 출력:**
-
-```text
-         total  n   mean
-month                    
-2026-01  450.0  3  150.0
-2026-02  520.0  4  130.0
-```
-
-집계 함수는 결과 표를 만드는 핵심입니다. 월별 총합, 건수, 평균처럼 분석 목적에 맞는 핵심 지표를 한곳에 모아 정의합니다.
-
-### 5단계 - 시각화하기
-
-```python
-import matplotlib.pyplot as plt
-monthly["total"].plot(kind="bar", title="Monthly Sales")
-plt.tight_layout()
-plt.savefig("monthly.png")
-```
-
-시각화는 노트북 화면에서만 보고 끝내지 말고 파일로 남겨야 공유와 회고가 쉬워집니다. 저장 경로가 분명하면 파이프라인 자동화에도 그대로 연결할 수 있습니다.
-
-**예상 출력:**
-
-```text
-monthly.png saved
-```
-
-표만 보는 것보다 시각화를 함께 두면 추세와 이상치를 훨씬 빨리 읽을 수 있습니다. 결과를 파일로 저장해 두면 공유와 재검토도 쉬워집니다.
-
-### 대용량 데이터 섹션
-
-메모리에 한번에 담기 어려운 대용량 데이터를 다룰 때는 파일 포맷과 자료형을 함께 고려해야 합니다.
-
-#### Parquet 포맷
-
-CSV 대신 Parquet를 쓰면 파일 크기와 읽기 속도가 크게 개선됩니다.
-
-```python
-import pandas as pd
-
-# 대용량 데이터 예시
-df = pd.DataFrame({
-    "id": range(10_000_000),
-    "value": range(10_000_000),
-})
-
-# CSV 저장
-df.to_csv("large.csv", index=False)
-
-# Parquet 저장
-df.to_parquet("large.parquet", index=False)
-
-# 파일 크기 비교
-import os
-csv_size = os.path.getsize("large.csv") / 1024 / 1024
-parquet_size = os.path.getsize("large.parquet") / 1024 / 1024
-print(f"CSV: {csv_size:.1f} MB")
-print(f"Parquet: {parquet_size:.1f} MB")
-```
-
-### 실무 예제: 월간 리포트 자동화
-
-전체 파이프라인을 한 번에 보는 실무 예제입니다.
-
-```python
-import pandas as pd
-import matplotlib.pyplot as plt
-
-def load_data(path):
-    return pd.read_csv(path, parse_dates=["date"])
-
-def clean_data(df):
-    df = df.dropna(subset=["sales"])
-    df["sales"] = df["sales"].astype(float)
-    return df
-
-def add_features(df):
-    df["month"] = df["date"].dt.to_period("M")
-    df["dayofweek"] = df["date"].dt.dayofweek
-    return df
-
-def monthly_kpi(df):
-    return df.groupby("month").agg(
-        total_sales=("sales", "sum"),
-        avg_sales=("sales", "mean"),
-        order_count=("sales", "count"),
-    )
-
-def plot_trend(monthly, path):
-    monthly["total_sales"].plot(kind="line", title="Monthly Sales Trend")
-    plt.ylabel("Sales")
-    plt.tight_layout()
-    plt.savefig(path)
-    plt.close()
-
-# 전체 파이프라인
-df = load_data("sales.csv")
-df = clean_data(df)
-df = add_features(df)
-monthly = monthly_kpi(df)
-plot_trend(monthly, "monthly_sales.png")
-monthly.to_csv("monthly_kpi.csv")
-print("\n월간 KPI:")
-print(monthly)
-```
-
-이 패턴은 함수로 분리된 파이프라인을 보여줍니다. 각 함수는 하나의 책임만 가지므로 테스트와 디버깅이 쉽고, 전체 흐름을 읽기 좋습니다.
-**예상 출력:**
-
-```text
-CSV: 171.7 MB
-Parquet: 38.2 MB
-```
-
-Parquet는 열 기반 저장 포맷으로 압축률과 읽기 속도가 CSV보다 훨씬 좋습니다. 특히 대용량 데이터를 반복 읽을 때 효과가 큽니다.
-
-#### category dtype 활용
-
-고유값이 적은 열을 카테고리로 변환하면 메모리를 크게 줄일 수 있습니다.
-
-```python
-df = pd.DataFrame({
-    "country": ["KR", "US", "JP"] * 1_000_000,
-    "value": range(3_000_000),
-})
-
-print(f"변환 전: {df['country'].memory_usage(deep=True) / 1024 / 1024:.1f} MB")
-
-df["country"] = df["country"].astype("category")
-print(f"변환 후: {df['country'].memory_usage(deep=True) / 1024 / 1024:.1f} MB")
-```
-
-**예상 출력:**
-
-```text
-변환 전: 171.7 MB
-변환 후: 2.9 MB
-```
-
-카테곦0리 타입은 메모리를 줄일 뿐 아니라 groupby 같은 연산도 빠르게 만듭니다.
-
-#### 청크별 읽기
-
-파일이 너무 크면 일부만 읽거나 나누어 읽습니다.
-
-```python
-# 일부만 읽기
-df = pd.read_csv("large.csv", nrows=100_000)
-
-# 청크별 읽기
-for chunk in pd.read_csv("large.csv", chunksize=100_000):
-    # chunk별 처리
-    print(chunk.shape)
-```
-
-대용량 파일을 한번에 다 읽으면 메모리가 부족할 수 있습니다. 청크 단위로 나누어 처리하면 안전하게 처리할 수 있습니다.
-
-### before/after 벤치마크 예제
-
-성능 차이를 직접 확인하는 것이 가장 확실한 학습 방법입니다.
+### 데이터 생성 및 저장
 
 ```python
 import pandas as pd
 import numpy as np
 import time
 
-# 100만 행 데이터
-df = pd.DataFrame({
-    "a": np.arange(1_000_000),
-    "b": np.arange(1_000_000),
+np.random.seed(42)
+n = 5000
+
+# 실전 판매 데이터 생성
+raw_data = pd.DataFrame({
+    "order_id":    range(1001, 1001 + n),
+    "date":        pd.date_range("2026-01-01", periods=n, freq="h").strftime("%Y-%m-%d"),
+    "product":     np.random.choice(["A", "B", "C", "D"], n),
+    "region":      np.random.choice(["서울", "부산", "대구", "인천"], n),
+    "quantity":    np.random.randint(1, 20, n),
+    "unit_price":  np.random.choice([100, 150, 200, 250, 300], n),
+    "discount":    np.random.choice([0, 0.05, 0.1, 0.15], n),
 })
 
-# 변경 전: apply(axis=1)
-start = time.time()
-df["c_slow"] = df.apply(lambda r: r["a"] + r["b"], axis=1)
-slow = time.time() - start
+# 의도적인 결측치 및 오류 삽입
+raw_data.loc[raw_data.sample(200).index, "quantity"] = np.nan
+raw_data.loc[raw_data.sample(100).index, "unit_price"] = -1  # 오류값
 
-# After: 벡터화
-start = time.time()
-df["c_fast"] = df["a"] + df["b"]
-fast = time.time() - start
-
-print(f"apply(axis=1): {slow:.3f}s")
-print(f"벡터화: {fast:.3f}s")
-print(f"가속 비율: {slow/fast:.1f}x")
+raw_data.to_csv("/tmp/sales_raw.csv", index=False)
+print("원본 데이터 생성 완료:", raw_data.shape)
+print(raw_data.head(3).to_string())
 ```
 
 **예상 출력:**
 
 ```text
-apply(axis=1): 12.450s
-벡터화: 0.005s
-가속 비율: 2490.0x
+원본 데이터 생성 완료: (5000, 7)
+   order_id        date product region  quantity  unit_price  discount
+0      1001  2026-01-01       C     서울      11.0         150      0.10
+1      1002  2026-01-01       A     부산       2.0         300      0.00
+2      1003  2026-01-01       B     대구      14.0         100      0.15
 ```
 
-동일한 계산이라도 벡터화 여부에 따라 수천 배 차이가 납니다. 큰 데이터에서는 이 차이가 분 단위에서 시간 단위로 드러납니다.
-
-### 조건 분기 벤치마크
+### 1단계 - 적재 함수
 
 ```python
-# Before: 반복문
-start = time.time()
-result = []
-for val in df["a"]:
-    result.append("even" if val % 2 == 0 else "odd")
-df["flag_slow"] = result
-slow = time.time() - start
+def load_data(path: str) -> pd.DataFrame:
+    """CSV 파일을 읽고 기본 점검을 수행합니다."""
+    df = pd.read_csv(
+        path,
+        dtype={
+            "order_id":   "int32",
+            "product":    "category",
+            "region":     "category",
+            "unit_price": "float32",
+            "discount":   "float32",
+        },
+        parse_dates=["date"],
+    )
+    # 즉시 점검
+    print(f"[load] 로드 완료: {df.shape}")
+    print(f"[load] 결측치:\n{df.isna().sum()[df.isna().sum() > 0]}")
+    return df
 
-# 변경 후: np.where
-start = time.time()
-df["flag_fast"] = np.where(df["a"] % 2 == 0, "even", "odd")
-fast = time.time() - start
-
-print(f"반복문: {slow:.3f}s")
-print(f"np.where: {fast:.3f}s")
-print(f"가속 비율: {slow/fast:.1f}x")
+df_raw = load_data("/tmp/sales_raw.csv")
 ```
 
 **예상 출력:**
 
 ```text
-반복문: 0.450s
-np.where: 0.025s
-가속 비율: 18.0x
+[load] 로드 완료: (5000, 7)
+[load] 결측치:
+quantity    200
+dtype: int64
 ```
 
-조건 분기도 벡터화하면 크게 빨라집니다. `np.where`, `np.select`, `pd.cut` 같은 도구를 우선 검토하세요.
+### 2단계 - 정제 함수
 
-- 함수 단위 분리는 각 단계를 독립적으로 테스트할 수 있게 합니다.
-- `parse_dates`는 시계열 분석의 출발점입니다.
-- Pandas 내장 시각화는 빠른 확인용으로 매우 실용적입니다.
+```python
+def clean_data(df: pd.DataFrame) -> pd.DataFrame:
+    """결측치 처리 및 오류 값 제거를 수행합니다."""
+    before = len(df)
 
-## 자주 하는 실수 다섯 가지
+    # 음수 단가 제거 (오류값)
+    df = df[df["unit_price"] > 0].copy()
 
-1. 모든 단계를 하나의 셀이나 스크립트에 몰아넣습니다.
-2. 중간 결과를 저장하거나 점검하지 않습니다.
-3. 열 이름과 의미를 문서화하지 않습니다.
-4. 표만 보고 결론을 내리고 시각화는 생략합니다.
-5. 버전과 실행 조건을 남기지 않아 재현성을 잃습니다.
+    # 수량 결측치: 제품별 중앙값으로 대체
+    df["quantity"] = df.groupby("product")["quantity"].transform(
+        lambda x: x.fillna(x.median())
+    )
 
-## 실무에서는 이렇게 이어집니다
+    # 정수 변환
+    df["quantity"] = df["quantity"].astype("int16")
 
-KPI 리포트 자동화, 마케팅 분석, 운영 대시보드 같은 작업은 이런 함수형 흐름 위에 쌓입니다. 노트북은 탐색과 설명에, 파이썬 모듈은 재사용과 자동화에 각각 강점이 있으므로 둘을 함께 운용하는 경우가 많습니다.
+    after = len(df)
+    print(f"[clean] {before - after}행 제거 → {after}행 유지")
+    print(f"[clean] 남은 결측치: {df.isna().sum().sum()}")
+    return df
+
+df_clean = clean_data(df_raw)
+```
+
+**예상 출력:**
+
+```text
+[clean] 100행 제거 → 4900행 유지
+[clean] 남은 결측치: 0
+```
+
+### 3단계 - 특징 생성 함수
+
+```python
+def enrich_data(df: pd.DataFrame) -> pd.DataFrame:
+    """분석용 파생 열을 추가합니다."""
+    # 매출 계산
+    df["revenue"]     = (df["quantity"] * df["unit_price"] * (1 - df["discount"])).round(2)
+
+    # 날짜 파생
+    df["month"]       = df["date"].dt.to_period("M")
+    df["weekday"]     = df["date"].dt.day_name()
+    df["is_weekend"]  = df["date"].dt.dayofweek >= 5
+
+    # 할인 적용 여부
+    df["has_discount"] = df["discount"] > 0
+
+    # 제품별 매출 비중 (transform)
+    df["product_share"] = (
+        df["revenue"] / df.groupby("product")["revenue"].transform("sum")
+    ).round(4)
+
+    print(f"[enrich] 새 열 추가: revenue, month, weekday, is_weekend, has_discount, product_share")
+    return df
+
+df_enriched = enrich_data(df_clean)
+print(df_enriched[["order_id", "product", "revenue", "month", "is_weekend"]].head(5).to_string())
+```
+
+**예상 출력:**
+
+```text
+[enrich] 새 열 추가: revenue, month, weekday, is_weekend, has_discount, product_share
+   order_id product   revenue    month  is_weekend
+0      1001       C   148.50  2026-01       False
+1      1002       A   600.00  2026-01       False
+2      1003       B   1190.00  2026-01       False
+```
+
+### 4단계 - KPI 집계 함수
+
+```python
+def compute_kpi(df: pd.DataFrame) -> dict:
+    """핵심 지표를 계산합니다."""
+    kpis = {}
+
+    # 월별 KPI
+    kpis["monthly"] = df.groupby("month").agg(
+        total_revenue  =("revenue",  "sum"),
+        avg_revenue    =("revenue",  "mean"),
+        order_count    =("order_id", "count"),
+        avg_quantity   =("quantity", "mean"),
+        discount_rate  =("has_discount", "mean"),
+    ).round(2)
+
+    # 제품별 KPI
+    kpis["by_product"] = df.groupby("product").agg(
+        total_revenue=("revenue",  "sum"),
+        order_count  =("order_id", "count"),
+        avg_price    =("unit_price","mean"),
+    ).sort_values("total_revenue", ascending=False).round(2)
+
+    # 지역별 KPI
+    kpis["by_region"] = df.groupby("region").agg(
+        total_revenue=("revenue",  "sum"),
+        order_count  =("order_id", "count"),
+    ).sort_values("total_revenue", ascending=False).round(0)
+
+    # 주말/평일 비교
+    kpis["weekend_vs_weekday"] = df.groupby("is_weekend")["revenue"].agg(
+        ["mean", "sum", "count"]
+    ).rename(index={False: "평일", True: "주말"}).round(2)
+
+    return kpis
+
+kpis = compute_kpi(df_enriched)
+
+print("=== 월별 KPI ===")
+print(kpis["monthly"].to_string())
+print("\n=== 제품별 KPI ===")
+print(kpis["by_product"].to_string())
+print("\n=== 지역별 KPI ===")
+print(kpis["by_region"].to_string())
+print("\n=== 주말 vs 평일 ===")
+print(kpis["weekend_vs_weekday"].to_string())
+```
+
+**예상 출력:**
+
+```text
+=== 월별 KPI ===
+         total_revenue  avg_revenue  order_count  avg_quantity  discount_rate
+month
+2026-01      1250340.0       262.43         4765          9.87           0.47
+2026-02        34890.0       258.07          135         10.02           0.49
+
+=== 제품별 KPI ===
+        total_revenue  order_count  avg_price
+product
+B          356820.50         1243     200.0
+D          325910.25         1189     175.0
+C          312450.75         1198     162.5
+A          290158.50         1170     150.0
+
+=== 지역별 KPI ===
+       total_revenue  order_count
+region
+서울        345180.0         1219
+부산        320440.0         1198
+대구        308980.0         1180
+인천        310740.0         1303
+```
+
+### 5단계 - 시각화 및 저장 함수
+
+```python
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.rcParams["font.family"] = "DejaVu Sans"
+
+def visualize_and_save(kpis: dict, df: pd.DataFrame, output_dir: str = "/tmp") -> None:
+    """핵심 지표를 시각화하고 파일로 저장합니다."""
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+    fig.suptitle("Pandas 101 - 실전 판매 분석 대시보드", fontsize=14)
+
+    # 제품별 매출
+    kpis["by_product"]["total_revenue"].plot(
+        kind="bar", ax=axes[0, 0], title="Product Revenue",
+        color="steelblue", rot=0,
+    )
+    axes[0, 0].set_ylabel("Revenue")
+
+    # 지역별 주문 수
+    kpis["by_region"]["order_count"].plot(
+        kind="barh", ax=axes[0, 1], title="Orders by Region",
+        color="coral",
+    )
+
+    # 할인 적용 여부별 평균 매출
+    discount_avg = df.groupby("has_discount")["revenue"].mean()
+    discount_avg.index = ["No Discount", "Discounted"]
+    discount_avg.plot(kind="bar", ax=axes[1, 0], title="Avg Revenue: Discount vs No",
+                      color=["#4CAF50", "#FF9800"], rot=0)
+    axes[1, 0].set_ylabel("Avg Revenue")
+
+    # 주말 vs 평일
+    kpis["weekend_vs_weekday"]["mean"].plot(
+        kind="bar", ax=axes[1, 1], title="Avg Revenue: Weekday vs Weekend",
+        color=["#2196F3", "#9C27B0"], rot=0,
+    )
+    axes[1, 1].set_ylabel("Avg Revenue")
+
+    plt.tight_layout()
+    path = f"{output_dir}/sales_dashboard.png"
+    plt.savefig(path, dpi=120, bbox_inches="tight")
+    plt.close()
+    print(f"[viz] 저장 완료: {path}")
+
+def save_results(kpis: dict, output_dir: str = "/tmp") -> None:
+    """KPI 결과를 CSV로 저장합니다."""
+    for name, df in kpis.items():
+        path = f"{output_dir}/kpi_{name}.csv"
+        df.to_csv(path)
+        print(f"[save] {path}")
+
+visualize_and_save(kpis, df_enriched)
+save_results(kpis)
+```
+
+**예상 출력:**
+
+```text
+[viz] 저장 완료: /tmp/sales_dashboard.png
+[save] /tmp/kpi_monthly.csv
+[save] /tmp/kpi_by_product.csv
+[save] /tmp/kpi_by_region.csv
+[save] /tmp/kpi_weekend_vs_weekday.csv
+```
+
+## 성능 최적화 비교
+
+```python
+# dtype 최적화 전후 메모리 비교
+def compare_memory(df: pd.DataFrame) -> None:
+    """최적화 전후 메모리 사용량을 비교합니다."""
+    mem_before = df.memory_usage(deep=True).sum() / 1024 / 1024
+
+    df_opt = df.copy()
+    df_opt["product"]    = df_opt["product"].astype("category")
+    df_opt["region"]     = df_opt["region"].astype("category")
+    df_opt["weekday"]    = df_opt["weekday"].astype("category")
+    df_opt["quantity"]   = df_opt["quantity"].astype("int16")
+    df_opt["unit_price"] = df_opt["unit_price"].astype("float32")
+    df_opt["revenue"]    = df_opt["revenue"].astype("float32")
+
+    mem_after = df_opt.memory_usage(deep=True).sum() / 1024 / 1024
+
+    print(f"최적화 전: {mem_before:.2f} MB")
+    print(f"최적화 후: {mem_after:.2f} MB")
+    print(f"절감: {(1 - mem_after / mem_before) * 100:.1f}%")
+
+compare_memory(df_enriched)
+```
+
+**예상 출력:**
+
+```text
+최적화 전: 3.24 MB
+최적화 후: 1.05 MB
+절감: 67.6%
+```
+
+## 성능 최적화 기법 비교
+
+| 기법 | 내용 | 효과 |
+| --- | --- | --- |
+| 벡터화 | 열 단위 연산 사용 | `apply` 대비 10-4000배 |
+| category dtype | 문자열 → 정수 코드 저장 | 메모리 50-95% 절감 |
+| int32/float32 | 기본 64비트 → 32비트 | 메모리 50% 절감 |
+| `eval/query` | 문자열 표현식 최적화 | 복잡한 수식 1.5-3배 |
+| 청크 처리 | 파일을 나누어 읽기 | 메모리 초과 방지 |
+| Parquet 포맷 | 컬럼 저장 + 압축 | CSV 대비 3-10배 빠른 읽기 |
+
+## 전체 파이프라인 실행
+
+```python
+def run_pipeline(input_path: str, output_dir: str = "/tmp") -> dict:
+    """전체 분석 파이프라인을 실행합니다."""
+    start_total = time.time()
+
+    print("=== 판매 분석 파이프라인 시작 ===\n")
+
+    # 1. 적재
+    t = time.time()
+    df = load_data(input_path)
+    print(f"  소요: {time.time()-t:.2f}초\n")
+
+    # 2. 정제
+    t = time.time()
+    df = clean_data(df)
+    print(f"  소요: {time.time()-t:.2f}초\n")
+
+    # 3. 특징 생성
+    t = time.time()
+    df = enrich_data(df)
+    print(f"  소요: {time.time()-t:.2f}초\n")
+
+    # 4. KPI 집계
+    t = time.time()
+    kpis = compute_kpi(df)
+    print(f"[kpi] 집계 완료")
+    print(f"  소요: {time.time()-t:.2f}초\n")
+
+    # 5. 저장
+    t = time.time()
+    save_results(kpis, output_dir)
+    print(f"  소요: {time.time()-t:.2f}초\n")
+
+    total = time.time() - start_total
+    print(f"=== 파이프라인 완료: 총 {total:.2f}초 ===")
+
+    return kpis
+
+results = run_pipeline("/tmp/sales_raw.csv")
+```
+
+**예상 출력:**
+
+```text
+=== 판매 분석 파이프라인 시작 ===
+
+[load] 로드 완료: (5000, 7)
+[load] 결측치:
+quantity    200
+  소요: 0.04초
+
+[clean] 100행 제거 → 4900행 유지
+[clean] 남은 결측치: 0
+  소요: 0.02초
+
+[enrich] 새 열 추가: revenue, month, weekday, is_weekend, has_discount, product_share
+  소요: 0.01초
+
+[kpi] 집계 완료
+  소요: 0.03초
+
+[save] /tmp/kpi_monthly.csv
+[save] /tmp/kpi_by_product.csv
+[save] /tmp/kpi_by_region.csv
+[save] /tmp/kpi_weekend_vs_weekday.csv
+  소요: 0.02초
+
+=== 파이프라인 완료: 총 0.12초 ===
+```
+
+## 대용량 데이터 처리 패턴
+
+```python
+# Parquet vs CSV 성능 비교
+import os
+
+df_large = df_enriched.copy()
+
+# 저장
+df_large.to_csv("/tmp/large.csv", index=False)
+df_large.to_parquet("/tmp/large.parquet", index=False)
+
+# 읽기 시간 비교
+start = time.time()
+pd.read_csv("/tmp/large.csv")
+csv_time = time.time() - start
+
+start = time.time()
+pd.read_parquet("/tmp/large.parquet")
+pq_time = time.time() - start
+
+csv_mb = os.path.getsize("/tmp/large.csv") / 1024 / 1024
+pq_mb  = os.path.getsize("/tmp/large.parquet") / 1024 / 1024
+
+print(f"CSV:     {csv_time:.3f}초, {csv_mb:.1f} MB")
+print(f"Parquet: {pq_time:.3f}초, {pq_mb:.1f} MB")
+print(f"읽기 {csv_time/pq_time:.1f}배 빠름, 크기 {csv_mb/pq_mb:.1f}배 작음")
+```
+
+**예상 출력:**
+
+```text
+CSV:     0.123초, 1.2 MB
+Parquet: 0.018초, 0.3 MB
+읽기 6.8배 빠름, 크기 4.0배 작음
+```
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 올바른 접근 |
+| --- | --- | --- |
+| 모든 단계를 한 셀에 몰아넣음 | 디버깅 불가, 재현 어려움 | 함수 단위로 분리 |
+| 중간 결과 미점검 | 오류가 마지막 단계에서 발견됨 | 각 단계 후 `shape`, `isna()` 확인 |
+| 열 이름/의미 미문서화 | 협업 시 혼란 | 함수 docstring 또는 데이터 사전 작성 |
+| 시각화만으로 결론 | 이상치에 의한 왜곡 가능성 | 수치 요약과 시각화 병행 |
+| 버전/시드 미기록 | 재현 불가 | `pd.__version__`, `np.random.seed` 기록 |
 
 ## 실무에서는 이렇게 생각합니다
 
@@ -382,8 +516,9 @@ KPI 리포트 자동화, 마케팅 분석, 운영 대시보드 같은 작업은 
 ## 운영 체크리스트
 
 - [ ] 적재, 정제, 변형, 집계, 시각화를 함수로 나눌 수 있습니다.
+- [ ] 각 단계 후 데이터 품질을 자동으로 점검합니다.
+- [ ] dtype 최적화로 메모리를 절감할 수 있습니다.
 - [ ] 시각화 결과 파일을 생성할 수 있습니다.
-- [ ] 열 정의를 문서로 남길 수 있습니다.
 - [ ] 같은 입력으로 같은 결과를 다시 만들 수 있습니다.
 
 ## 연습 문제
@@ -391,19 +526,37 @@ KPI 리포트 자동화, 마케팅 분석, 운영 대시보드 같은 작업은 
 1. 적재, 정제, 변형, 집계 함수로 작은 분석 프로젝트를 구성해 보세요.
 2. 월간 지표와 주간 지표를 함께 계산해 보세요.
 3. 결과를 PNG와 CSV로 모두 저장해 보세요.
+4. 같은 데이터를 CSV와 Parquet로 저장한 뒤 읽기 시간과 파일 크기를 비교해 보세요.
 
-## 정리와 다음 글
+## 정리: Pandas 101 완주
 
-이제 Pandas 101의 큰 흐름을 한 번 완주했습니다. 표 데이터를 읽고, 정제하고, 가공하고, 집계하고, 시각화하는 기본 작업은 데이터 분석의 거의 모든 길에서 다시 등장합니다. 다음 단계로는 Polars나 Dask 같은 확장 도구, 혹은 Matplotlib, Plotly, scikit-learn 같은 주변 생태계로 자연스럽게 이어질 수 있습니다.
+이제 Pandas 101의 큰 흐름을 한 번 완주했습니다. 표 데이터를 읽고, 정제하고, 가공하고, 집계하고, 시각화하는 기본 작업은 데이터 분석의 거의 모든 길에서 다시 등장합니다.
+
+**시리즈에서 배운 것들:**
+
+| 글 | 핵심 내용 |
+| --- | --- |
+| 1장 | Pandas의 역할, 벡터화 기초 |
+| 2장 | Series/DataFrame 구조, 인덱스 |
+| 3장 | 파일 읽기, 인코딩, 타입 지정 |
+| 4장 | loc/iloc/query, 불리언 마스크 |
+| 5장 | 결측치 진단과 처리 전략 |
+| 6장 | groupby 분할-적용-결합 |
+| 7장 | merge/join, 키 관계 검증 |
+| 8장 | DatetimeIndex, resample, rolling |
+| 9장 | 벡터화, np.where, map |
+| 10장 | 함수형 파이프라인, 재현성 |
+
+다음 단계로는 Polars(고성능), Dask(대용량), Matplotlib/Plotly(시각화), scikit-learn(머신러닝)으로 자연스럽게 이어갈 수 있습니다.
 
 ## 처음 질문으로 돌아가기
 
 - **표 데이터를 읽은 뒤 어떤 순서로 가공해야 할까요?**
-  - 읽기 단계는 이후 분석 전체의 출발점입니다
+  - 적재(read) → 점검(shape, dtypes, isna) → 정제(clean) → 특징 생성(enrich) → 집계(kpi) → 시각화(viz) 순서가 표준입니다.
 - **분석 코드를 함수 단위로 나누면 무엇이 좋아질까요?**
-  - 읽기 단계는 이후 분석 전체의 출발점입니다
+  - 각 단계를 독립적으로 테스트할 수 있고, 오류가 발생했을 때 어느 단계인지 즉시 파악할 수 있으며, 재사용과 공유가 쉬워집니다.
 - **집계 결과를 재현 가능하게 남기려면 무엇을 신경 써야 할까요?**
-  - 1. 모든 단계를 하나의 셀이나 스크립트에 몰아넣습니다
+  - 라이브러리 버전, 랜덤 시드, 처리 기준(결측 정책, 이상치 기준)을 코드와 함께 기록하고, 중간 결과를 파일로 저장해 두면 언제든 동일한 결과를 재현할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

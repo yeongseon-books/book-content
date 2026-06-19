@@ -26,7 +26,7 @@ last_reviewed: '2026-05-12'
 
 좋은 테스트는 실패했을 때 무엇이 깨졌는지 한 줄로 말해 줍니다. Mock과 Stub을 구분하는 일은 그 한 줄을 선명하게 만드는 작업입니다.
 
-이 글은 Testing 101 시리즈의 여섯 번째 글입니다. 여기서는 `unittest.mock` 예제를 바탕으로 Mock과 Stub의 목적 차이, 상태 검증과 상호작용 검증의 차이, 그리고 과한 Mock 사용이 보내는 설계 신호를 정리하겠습니다.
+이 글은 Testing 101 시리즈의 여섯 번째 글입니다. 여기서는 `unittest.mock` 예제를 바탕으로 Mock과 Stub의 목적 차이, 상태 검증과 상호작용 검증의 차이, `MagicMock`, `patch`, `side_effect`의 실용 패턴, 그리고 과한 Mock 사용이 보내는 설계 신호를 정리하겠습니다.
 
 ![Testing 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/06/06-01-diagram.ko.png)
 *Testing 101 6장 흐름 개요*
@@ -37,34 +37,34 @@ last_reviewed: '2026-05-12'
 - Stub과 Mock은 정확히 무엇이 다를까요?
 - 상태 검증과 상호작용 검증은 어떻게 구분할까요?
 - `MagicMock`, `patch`, `side_effect`는 언제 쓰일까요?
-- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
-- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
+- Mock을 남용하면 어떤 문제가 생길까요?
+- 런던 학파와 시카고 학파는 무엇이 다를까요?
 
 Stub과 Mock을 섞어 쓰면 테스트가 구현 세부사항에 과하게 묶입니다. 예를 들어 실제로 확인하고 싶은 것은 사용자 생성 결과인데, 저장소 메서드가 몇 번 호출됐는지만 검사하면 리팩터링 때 테스트가 먼저 부서집니다.
 
-반대로 상호작용 자체가 핵심인 경우도 있습니다. 메일 발송, 결제 호출, 알림 전송처럼 부작용이 의미의 중심인 기능은 호출 여부와 인자가 중요합니다. 그래서 도구를 구분해야 테스트 의도가 선명해집니다.
+반대로 상호작용 자체가 핵심인 경우도 있습니다. 메일 발송, 결제 호출, 알림 전송처럼 부작용이 의미의 중심인 기능은 호출 여부와 인자가 중요합니다.
 
-## 한눈에 보는 구조
+## 핵심 차이
 
-Stub은 미리 정한 값을 돌려줘서 결과 검증을 돕습니다. Mock은 기대한 호출이 있었는지 확인해서 상호작용 검증을 돕습니다. 같은 `MagicMock` 객체로도 두 역할을 모두 흉내 낼 수 있지만, 테스트 목적은 분리해서 생각해야 합니다.
+| 구분 | Stub | Mock |
+|---|---|---|
+| 정의 | 미리 정해진 값을 반환하는 대체 객체 | 호출 여부와 방식을 검증하는 대체 객체 |
+| 검증 대상 | 테스트 대상의 **결과** | 테스트 대상의 **상호작용** |
+| 실패 원인 | 최종 상태나 반환값이 기대와 다를 때 | 예상한 호출이 일어나지 않거나 잘못된 인자로 호출될 때 |
+| 적합한 상황 | 외부 의존의 응답만 고정하고 실제 결과를 확인할 때 | 호출 자체가 요구사항인 경우 (알림, 로깅, 결제 등) |
 
-- **상태 검증**: 최종 반환값이나 상태 변화가 기대와 맞는지 확인하는 방식입니다.
-- **상호작용 검증**: 의존을 어떤 방식으로 호출했는지 확인하는 방식입니다.
-- **MagicMock**: 속성과 메서드를 유연하게 흉내 낼 수 있는 객체입니다.
-- **patch**: 기존 객체를 잠시 다른 객체로 바꿔 끼우는 도구입니다.
-- **side_effect**: 호출마다 다른 값이나 예외를 일으키도록 설정하는 기능입니다.
+## Mock에만 기대는 테스트 vs 결과를 확인하는 테스트
 
-## 바꾸기 전과 후
-
-**바꾸기 전 — Mock에만 기대는 테스트**
+**나쁜 예 — Mock에만 기대는 테스트**
 
 ```python
 def test_creates_user(repo_mock):
     create_user("a@b.com", repo=repo_mock)
     repo_mock.add.assert_called_once()  # 호출 방식만 검증
+    # 실제로 저장되었는지는 알 수 없음
 ```
 
-**바꾼 뒤 — 결과를 확인하는 테스트**
+**좋은 예 — 결과를 확인하는 테스트**
 
 ```python
 def test_creates_user_persists():
@@ -75,38 +75,49 @@ def test_creates_user_persists():
 
 두 테스트 모두 의미가 있을 수 있지만, 질문이 다릅니다. 첫 번째는 호출이 일어났는지, 두 번째는 실제로 저장 결과가 남았는지를 묻습니다. 어떤 질문이 더 본질적인지 먼저 정해야 합니다.
 
-## 다섯 단계로 유닛테스트 목 익히기
+## 다섯 단계로 unittest.mock 익히기
 
-### 1단계 — 기본 Mock
+### 1단계 — 기본 Mock 생성과 검증
 
 ```python
 from unittest.mock import MagicMock
 
-def test_basic_mock():
-    m = MagicMock()
-    m.greet("hi")
-    m.greet.assert_called_with("hi")
+def test_basic_mock_call_verification():
+    mailer = MagicMock()
+    notify_user("a@b.com", mailer=mailer)
+
+    mailer.send.assert_called_once_with(
+        to="a@b.com",
+        subject="알림",
+    )
 ```
 
 ### 2단계 — `return_value`로 Stub처럼 쓰기
 
 ```python
-def test_return_value():
-    m = MagicMock()
-    m.fetch.return_value = {"id": 1}
-    assert m.fetch()["id"] == 1
+def test_user_lookup_with_stub():
+    repo = MagicMock()
+    repo.find.return_value = User(id=1, email="a@b.com")
+
+    result = get_user(user_id=1, repo=repo)
+
+    assert result.email == "a@b.com"
+    # 호출 검증은 선택 사항
+    repo.find.assert_called_once_with(1)
 ```
 
 ### 3단계 — `side_effect`로 예외와 순서 다루기
 
 ```python
-def test_side_effect_raises():
-    m = MagicMock()
-    m.fetch.side_effect = TimeoutError("slow")
-    try:
-        m.fetch()
-    except TimeoutError as e:
-        assert str(e) == "slow"
+def test_retry_on_timeout():
+    client = MagicMock()
+    # 첫 호출은 TimeoutError, 두 번째 호출은 성공
+    client.charge.side_effect = [TimeoutError("slow"), {"status": "ok"}]
+
+    result = pay_with_retry(amount=100, client=client)
+
+    assert result["status"] == "ok"
+    assert client.charge.call_count == 2
 ```
 
 ### 4단계 — 외부 함수를 `patch`로 교체하기
@@ -114,78 +125,123 @@ def test_side_effect_raises():
 ```python
 from unittest.mock import patch
 
-def test_patch_function():
+def test_weather_api_with_patch():
     with patch("src.weather.requests.get") as mock_get:
-        mock_get.return_value.json.return_value = {"temp": 20}
+        mock_get.return_value.json.return_value = {"temp": 20, "city": "Seoul"}
         from src.weather import current_temp
-        assert current_temp() == 20
+        assert current_temp("Seoul") == 20
+
+def test_payment_service_with_patch():
+    with patch("src.payment.client.charge") as charge:
+        charge.return_value = {"status": "ok", "tx_id": "abc123"}
+        service = PaymentService()
+        result = service.pay(amount=10000)
+
+    assert result["status"] == "ok"
+    charge.assert_called_once_with(amount=10000, currency="KRW")
 ```
 
-### 5단계 — 호출 여부 확인하기
+### 5단계 — 호출하지 않음을 검증하기
 
 ```python
-def test_not_called_when_disabled():
+def test_notification_skipped_when_disabled():
     mailer = MagicMock()
-    notify("a@b.com", mailer=mailer, enabled=False)
+    send_notification("a@b.com", mailer=mailer, enabled=False)
     mailer.send.assert_not_called()
+
+def test_audit_log_written_only_for_admin():
+    audit = MagicMock()
+    process_action(user_role="member", audit=audit)
+    audit.log.assert_not_called()
+
+    process_action(user_role="admin", audit=audit)
+    audit.log.assert_called_once()
 ```
 
-## 이 코드에서 먼저 볼 점
+## Stub vs Mock 코드 비교
 
-- `return_value`는 Stub 역할에 가깝고, `assert_called_*`는 Mock 역할에 가깝습니다.
-- `patch`는 좁은 범위에서만 써야 다른 테스트에 영향을 남기지 않습니다.
-- `side_effect`를 쓰면 정상 경로뿐 아니라 오류 경로도 쉽게 검증할 수 있습니다.
+같은 `MagicMock`으로 두 역할을 모두 수행할 수 있지만, 테스트 의도가 명확해야 합니다.
 
-같은 도구를 써도 무엇을 검증하는지에 따라 테스트 성격이 달라집니다. 그래서 Mock 라이브러리를 잘 쓰는 것보다, 결과를 볼지 상호작용을 볼지 먼저 결정하는 감각이 더 중요합니다.
-
-## 목과 스텁의 핵심 차이
-
-Mock과 Stub을 간단히 정리하면 다음과 같습니다.
-
-| 구분 | Stub | Mock |
-|---|---|---|
-| 정의 | 미리 정해진 값을 반환하는 대체 객체 | 호출 여부와 방식을 검증하는 대체 객체 |
-| 검증 대상 | 테스트 대상의 **결과** | 테스트 대상의 **상호작용** |
-| 실패 원인 | 최종 상태나 반환값이 기대와 다를 때 | 예상한 호출이 일어나지 않거나 잘못된 인자로 호출될 때 |
-| 적합한 상황 | 외부 의존의 응답만 고정하고 실제 결과를 확인할 때 | 호출 자체가 요구사항인 경우 (알림, 로깅, 결제 등) |
-
-이 차이를 코드로 보면 더 명확합니다.
-
-**Stub 예시 — 결과 검증**
+**Stub 방식 — 결과 검증**
 
 ```python
 def test_user_creation_with_stub():
     repo = MagicMock()
-    repo.save.return_value = User(id=1, email="a@b.com")  # stub
-    
+    repo.save.return_value = User(id=1, email="a@b.com")  # stub: 반환값 고정
+
     result = create_user("a@b.com", repo=repo)
-    
-    assert result.email == "a@b.com"  # 결과 검증
+
+    assert result.email == "a@b.com"  # 결과만 검증
 ```
 
-**Mock 예시 — 상호작용 검증**
+**Mock 방식 — 상호작용 검증**
 
 ```python
-def test_user_creation_with_mock():
+def test_user_creation_calls_save():
     repo = MagicMock()
-    
+
     create_user("a@b.com", repo=repo)
-    
-    repo.save.assert_called_once_with(User(email="a@b.com"))  # 호출 검증
+
+    repo.save.assert_called_once()  # 호출 자체를 검증
+    call_args = repo.save.call_args[0][0]
+    assert call_args.email == "a@b.com"
 ```
 
-같은 `MagicMock` 객체를 써도, 첫 번째는 Stub처럼 반환값에 집중하고 두 번째는 Mock처럼 호출에 집중합니다. 테스트 의도가 다르면 검증 방식도 달라집니다.
-## 어디서 자주 헷갈릴까요?
+**혼합 방식 — 결과와 부작용 모두 검증**
 
-첫 번째 실수는 한 테스트 안에 결과 검증과 호출 검증을 과하게 섞는 일입니다. 의도가 두 개가 되면 실패 이유도 흐려집니다.
+```python
+def test_order_creates_and_notifies():
+    repo = InMemoryOrderRepo()      # Fake로 결과 검증
+    mailer = MagicMock()            # Mock으로 메일 발송 검증
 
-두 번째 실수는 `patch` 범위를 너무 넓게 잡는 일입니다. 함수 하나만 바꾸면 되는 상황에서 모듈 전체를 오래 바꾸면 다른 테스트까지 오염될 수 있습니다.
+    order = create_order(user_id=1, amount=10000, repo=repo, mailer=mailer)
 
-세 번째 실수는 모든 줄을 Mock으로 감싸 버리는 일입니다. 테스트 대상 코드보다 Mock 설정이 더 길어지는 순간, 테스트는 설계 검증보다 구현 복제에 가까워집니다.
+    # 결과 검증
+    assert repo.find(order.id) is not None
+    assert order.status == "pending"
+
+    # 부작용 검증
+    mailer.send.assert_called_once_with(
+        to="user-1@example.com",
+        subject="주문이 접수되었습니다",
+    )
+```
+
+이 패턴이 가장 실용적입니다. 상태는 Fake로, 부작용만 Mock으로 검증하면 리팩터링에 강하면서도 중요한 부작용을 놓치지 않습니다.
+
+## `patch` 사용 범위 관리
+
+`patch`는 좁은 범위에서만 써야 다른 테스트에 영향을 남기지 않습니다.
+
+```python
+# 좁은 범위 — with 블록 안에서만 적용
+def test_specific_function():
+    with patch("src.module.external_call") as mock_call:
+        mock_call.return_value = "mocked"
+        result = function_under_test()
+    assert result == "processed mocked"
+
+# 데코레이터로 테스트 함수 범위 제한
+@patch("src.module.external_call")
+def test_with_decorator(mock_call):
+    mock_call.return_value = "mocked"
+    result = function_under_test()
+    assert result == "processed mocked"
+
+# 넓은 범위 — 피해야 할 패턴
+class TestSomething:
+    def setup_method(self):
+        # 모든 테스트에 영향을 줄 수 있음
+        self.patcher = patch("src.module.external_call")
+        self.mock_call = self.patcher.start()
+
+    def teardown_method(self):
+        self.patcher.stop()  # 반드시 정리 필요
+```
 
 ## 런던 학파와 시카고 학파
 
-Mock과 Stub을 바라보는 관점은 테스트 철학에서도 갈립니다. 전통적으로 두 학파가 있습니다.
+Mock과 Stub을 바라보는 관점은 테스트 철학에서도 갈립니다.
 
 **London school (Mockist)**
 
@@ -199,112 +255,43 @@ Mock과 Stub을 바라보는 관점은 테스트 철학에서도 갈립니다. �
 - 가능한 한 실제 객체를 쓰고, 느리거나 제어 불가능한 것만 Stub/Fake로 바꿉니다.
 - 리팩터링에 강하지만, 실패 지점이 덜 명확할 수 있습니다.
 
-대부분의 실무 팀은 둘 사이 어딘가에 있습니다. 핵심 도메인 로직은 Chicago 방식, 외부 API나 메시징은 London 방식을 섞어 씁니다. 중요한 것은 교조적으로 한쪽만 따르기보다, 각 테스트에서 무엇을 묻고 싶은지 먼저 정하는 일입니다.
-## 직접 검증해 볼 것
+대부분의 실무 팀은 둘 사이 어딘가에 있습니다. 핵심 도메인 로직은 Chicago 방식, 외부 API나 메시징은 London 방식을 섞어 씁니다.
 
-1. 같은 시나리오를 `return_value` 기반 결과 검증과 `assert_called_with` 기반 상호작용 검증으로 각각 작성해 봅니다. 어떤 질문을 던지는 테스트인지 차이가 분명하게 보여야 합니다.
-2. `patch` 범위를 함수 하나로 좁혔을 때와 모듈 전체로 넓혔을 때 다른 테스트에 미치는 영향을 비교합니다.
-3. `side_effect`로 예외를 일으킨 뒤, 실패 메시지가 외부 의존 장애를 충분히 설명하는지 확인합니다.
+## 자주 하는 실수
 
-**예상 결과:** 결과를 검증할 때는 Fake/Stub 버전이 더 읽기 쉽고, 호출 자체가 요구사항일 때만 Mock 검증이 핵심으로 남아야 합니다.
+| 실수 | 증상 | 올바른 접근 |
+|------|------|------------|
+| 한 테스트에 결과 + 호출 검증 과하게 섞음 | 실패 이유가 흐려지고 테스트 의도 불분명 | 하나의 테스트는 하나의 목적으로 제한 |
+| `patch` 범위를 모듈 전체로 넓게 잡음 | 다른 테스트 오염, 격리 실패 | 함수 수준 또는 with 블록으로 좁게 제한 |
+| 모든 줄을 Mock으로 감쌈 | 테스트 대상 코드보다 Mock 설정이 더 길어짐 | Fake/Stub으로 대체 가능한 부분은 실제 구현 사용 |
+| Mock의 반환 타입이 실제 코드와 다름 | 통합 환경에서만 발견되는 타입 오류 | 반환 타입 일치 확인, 또는 TypedDict/dataclass 사용 |
+| `assert_called_once` 대신 `assert_called` 사용 | 여러 번 호출되어도 통과 | 의도에 맞는 검증 메서드 선택 |
+| `side_effect`로 예외를 설정했지만 검증 누락 | 예외 처리 코드가 제대로 작동하는지 확인 불가 | `pytest.raises`와 함께 예외 처리 결과 검증 |
 
-## 심화 실습: 운영 관점 테스트 점검
-
-실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
-
-또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
-
-fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
-
-회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
-
-커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
-
-CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
-
-실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
-
-또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
-
-fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
-
-회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
-
-커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
-
-CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
-
-실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
-
-또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
-
-fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
-
-회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
-
-커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
-
-CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
+## Mock 남용이 만드는 문제
 
 ```python
-from unittest.mock import patch
-
-def test_payment_service_retries_once_on_timeout():
-    service = PaymentService()
-    with patch('src.payment.client.charge') as charge:
-        charge.side_effect = [TimeoutError(), {'status': 'ok'}]
-        result = service.pay(user_id='u-1', amount=10000)
-
-    assert result['status'] == 'ok'
-    assert charge.call_count == 2
-```
-
-```bash
-pytest -q --maxfail=1 --disable-warnings
-pytest --cov=src --cov-report=term-missing
-```
-
-## 실패 신호와 첫 점검
-
-- 하나의 테스트가 결과 검증과 호출 검증을 모두 과하게 담으면 실패 이유가 흐려집니다.
-- `patch`가 함수 밖까지 오래 살아 있으면 다른 테스트 오염으로 이어질 수 있습니다.
-- Mock 설정이 테스트 대상 코드보다 길어지면 설계나 테스트 계층 선택을 다시 봐야 합니다.
-
-## 실무에서는 이렇게 생각합니다
-
-대부분의 새 테스트는 Stub이나 Fake에서 출발합니다. 실제 결과를 확인할 수 있으면 그 편이 읽기 쉽고 리팩터링에도 강합니다. Mock은 상호작용 그 자체가 요구사항일 때만 꺼내는 편이 좋습니다.
-
-경험 많은 엔지니어는 Mock 수가 많아지는 상황을 설계 신호로 봅니다. 지나친 Mock은 보통 의존이 세분되지 않았거나 함수 책임이 과한 경우가 많습니다. 테스트가 불편하다면 테스트 코드를 고치기 전에 설계를 먼저 살펴보는 편이 낫습니다.
-
-## 목 객체를 남용하면 생기는 문제
-
-Mock은 강력하지만 과하게 쓰면 테스트가 설계를 따라가지 못하고 구현을 복제하는 문서가 됩니다.
-
-**문제 상황**
-
-```python
+# 문제 상황 — Mock 설정이 테스트보다 길어짐
 def test_process_order_too_many_mocks():
     validator_mock = MagicMock()
     inventory_mock = MagicMock()
     payment_mock = MagicMock()
     mailer_mock = MagicMock()
     logger_mock = MagicMock()
-    
-    # 10줄 넘는 mock 설정
+
     validator_mock.validate.return_value = True
     inventory_mock.reserve.return_value = True
     payment_mock.charge.return_value = {"status": "ok"}
-    
+
     process_order(
         order_id=1,
         validator=validator_mock,
         inventory=inventory_mock,
         payment=payment_mock,
         mailer=mailer_mock,
-        logger=logger_mock
+        logger=logger_mock,
     )
-    
-    # 5줄 넘는 호출 검증
+
     validator_mock.validate.assert_called_once()
     inventory_mock.reserve.assert_called_with(order_id=1)
     payment_mock.charge.assert_called_once()
@@ -314,63 +301,64 @@ def test_process_order_too_many_mocks():
 
 이 테스트는 세 가지 문제가 있습니다.
 
-1. **Mock 설정이 테스트보다 깁니다.** 실제 검증 의도보다 준비 코드가 더 많습니다.
-2. **리팩터링에 취약합니다.** 함수 내부에서 호출 순서가 바뀌거나 새 협력자가 추가되면 테스트가 즉시 깨집니다.
-3. **무엇이 중요한지 흐려집니다.** 다섯 개의 `assert_called`가 있지만, 그중 어떤 것이 핵심 요구사항인지 알기 어렵습니다.
+1. Mock 설정이 테스트보다 깁니다.
+2. 리팩터링에 취약합니다. 함수 내부에서 호출 순서가 바뀌면 즉시 깨집니다.
+3. 무엇이 핵심 요구사항인지 흐려집니다.
 
 **개선 방향**
-
-대부분의 협력자를 Fake나 In-Memory 구현으로 바꾸고, 부작용이 핵심인 것만 Mock으로 남깁니다.
 
 ```python
 def test_process_order_focused():
     inventory = InMemoryInventory()
     inventory.add_stock(product_id=10, quantity=5)
-    
+
     payment = FakePaymentGateway()
-    mailer_mock = MagicMock()  # 메일 발송만 Mock
-    
+    mailer_mock = MagicMock()  # 메일 발송만 Mock으로 검증
+
     result = process_order(
         order_id=1,
         inventory=inventory,
         payment=payment,
-        mailer=mailer_mock
+        mailer=mailer_mock,
     )
-    
+
+    # 상태 검증
     assert result.status == "confirmed"
     assert inventory.reserved(product_id=10) == 1
-    assert payment.last_charge()["amount"] == 100
-    mailer_mock.send.assert_called_once_with("order_confirmed", to="user@example.com")
+
+    # 부작용 검증 (핵심 비즈니스 요구사항)
+    mailer_mock.send.assert_called_once_with(
+        "order_confirmed",
+        to="user@example.com",
+    )
 ```
 
-이제 테스트는 최종 상태를 먼저 확인하고, 메일 발송처럼 외부 부작용만 Mock으로 검증합니다. Mock이 줄어들수록 테스트는 더 읽기 쉬워지고 리팩터링에 강해집니다.
+## 직접 검증해 볼 것
+
+1. 같은 시나리오를 `return_value` 기반 결과 검증과 `assert_called_with` 기반 상호작용 검증으로 각각 작성해 봅니다. 어떤 질문을 던지는 테스트인지 차이가 분명하게 보여야 합니다.
+2. `patch` 범위를 함수 하나로 좁혔을 때와 모듈 전체로 넓혔을 때 다른 테스트에 미치는 영향을 비교합니다.
+3. `side_effect`로 예외를 일으킨 뒤, 실패 메시지가 외부 의존 장애를 충분히 설명하는지 확인합니다.
+
+**예상 결과:** 결과를 검증할 때는 Fake/Stub 버전이 더 읽기 쉽고, 호출 자체가 요구사항일 때만 Mock 검증이 핵심으로 남아야 합니다.
+
 ## 운영 체크리스트
 
 - [ ] Stub과 Mock의 차이를 한 문장으로 설명할 수 있습니다.
 - [ ] `return_value`, `side_effect`, `assert_called_with`를 직접 사용했습니다.
 - [ ] `patch` 범위를 함수 수준으로 좁게 유지했습니다.
 - [ ] 가능하면 결과 검증을 먼저 선택했습니다.
+- [ ] Mock이 실제 계약과 동일한 타입을 반환하는지 확인했습니다.
 
 ## 연습 문제
 
-1. 외부 API를 호출하는 함수를 만들고 Stub 방식과 Mock 방식으로 모두 테스트해 보세요.
+1. 외부 날씨 API를 호출하는 함수를 만들고 Stub 방식과 Mock 방식으로 모두 테스트해 보세요.
 2. 세 번에 한 번 실패하는 호출을 `side_effect`로 흉내 내 보세요.
 3. 같은 시나리오를 Fake로도 테스트하고 무엇이 더 읽기 쉬운지 비교해 보세요.
+4. Mock 설정이 10줄을 넘는 테스트를 발견하면 Fake로 교체해 보고 테스트가 얼마나 단순해지는지 확인하세요.
 
 ## 정리
 
 Mock과 Stub은 비슷해 보이지만 목표가 다릅니다. 결과를 확인할지, 호출을 확인할지 먼저 정하면 어떤 도구를 써야 하는지도 분명해집니다. 다음 글에서는 테스트가 코드의 어느 범위까지 닿았는지 보여 주는 테스트 커버리지를 다루겠습니다.
-
-## 처음 질문으로 돌아가기
-
-- **Stub과 Mock은 정확히 무엇이 다를까요?**
-  - Stub은 미리 정한 값을 돌려줘서 결과 검증을 돕습니다
-- **상태 검증과 상호작용 검증은 어떻게 구분할까요?**
-  - Stub은 미리 정한 값을 돌려줘서 결과 검증을 돕습니다
-- **`MagicMock`, `patch`, `side_effect`는 언제 쓰일까요?**
-  - Stub은 미리 정한 값을 돌려줘서 결과 검증을 돕습니다
-  - Stub은 미리 정한 값을 돌려줘서 결과 검증을 돕습니다. Mock은 기대한 호출이 있었는지 확인해서 상호작용 검증을 돕습니다. 같은 `MagicMock` 객체로도 두 역할을 모두 흉내 낼 수 있지만, 테스트 목적은 분리해서 생각해야 합니다.
-  - 두 테스트 모두 의미가 있을 수 있지만, 질문이 다릅니다. 첫 번째는 호출이 일어났는지, 두 번째는 실제로 저장 결과가 남았는지를 묻습니다. 어떤 질문이 더 본질적인지 먼저 정해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

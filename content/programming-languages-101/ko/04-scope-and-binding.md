@@ -290,6 +290,78 @@ print([h() for h in make_handlers_fixed()])  # [0, 1, 2]
 
 변수의 "값"을 캡처하는지, "이름 해석 규칙"을 캡처하는지 구분하지 못하면 비동기 콜백과 지연 실행 코드에서 재현이 어려운 버그가 생깁니다.
 
+## TypeScript에서의 스코프: `let`, `const`, `var` 비교
+
+TypeScript(JavaScript)의 스코프 규칙은 Python보다 더 복잡합니다. 세 가지 선언 키워드가 각각 다른 스코프 규칙을 따르기 때문입니다.
+
+```typescript
+// TypeScript: var, let, const의 스코프 차이
+function scopeDemo(): void {
+    // var: 함수 스코프 + 호이스팅
+    for (var i = 0; i < 3; i++) {
+        // 루프 바깥에서도 i가 보임
+    }
+    console.log(i);  // 3 — var는 함수 스코프
+
+    // let: 블록 스코프
+    for (let j = 0; j < 3; j++) {
+        // j는 for 블록 안에서만 보임
+    }
+    // console.log(j);  // ReferenceError: j is not defined
+
+    // const: 블록 스코프 + 재할당 불가
+    const MAX = 100;
+    // MAX = 200;  // TypeError: Assignment to constant variable
+}
+
+// 클로저와 var vs let의 차이
+const varFns: (() => number)[] = [];
+for (var k = 0; k < 3; k++) {
+    varFns.push(() => k);  // 모두 같은 k를 참조
+}
+console.log(varFns.map(f => f()));  // [3, 3, 3]
+
+const letFns: (() => number)[] = [];
+for (let m = 0; m < 3; m++) {
+    letFns.push(() => m);  // 반복마다 새 m이 생성됨
+}
+console.log(letFns.map(f => f()));  // [0, 1, 2]
+```
+
+`var`와 `let`의 차이는 언어 버전(ES5 vs ES6)에서 온 역사적 결정이지만, 스코프 규칙이 코드 동작에 얼마나 깊은 영향을 주는지 보여 주는 가장 실용적인 예시입니다.
+
+## 모듈 스코프: 파일 경계를 이용한 캡슐화
+
+스코프는 함수 안에서만 작동하지 않습니다. 파이썬 모듈과 JavaScript/TypeScript 모듈 모두 파일 경계를 스코프로 씁니다.
+
+```python
+# counter.py — 모듈 스코프를 이용한 상태 캡슐화
+_count = 0  # 언더스코어로 "모듈 내부 변수" 표시
+
+def increment() -> int:
+    global _count
+    _count += 1
+    return _count
+
+def reset() -> None:
+    global _count
+    _count = 0
+
+# 사용하는 쪽에서는 _count에 직접 접근하지 않는다는 관례
+```
+
+```python
+# main.py
+from counter import increment, reset
+
+print(increment())  # 1
+print(increment())  # 2
+reset()
+print(increment())  # 1
+```
+
+`_count`는 모듈 외부에서도 기술적으로 접근 가능하지만(`import counter; counter._count`), 언더스코어 관례를 통해 "이 변수는 모듈 내부 구현"임을 알립니다. 언어가 강제하지 않아도 스코프를 이용한 캡슐화는 코드 안정성을 높입니다.
+
 ## 운영 체크리스트
 
 - [ ] LEGB 네 단계를 말할 수 있는가?

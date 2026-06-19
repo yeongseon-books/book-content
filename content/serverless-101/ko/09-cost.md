@@ -16,240 +16,342 @@ tags:
   - FinOps
   - Pricing
   - Cloud
-seo_description: 서버리스 비용의 구성 요소, 메모리 튜닝, 데이터 전송, 유휴 비용을 설명합니다
+seo_description: 서버리스 비용 구조, GB-초 계산, 메모리 최적화, 비용 알람 설정과 FinOps 전략을 설명합니다
 last_reviewed: '2026-05-12'
 ---
 
 # Serverless 101 (9/10): 비용
 
-서버리스는 종종 저렴한 선택지처럼 소개됩니다. 호출이 있을 때만 돈을 내니 당연해 보이기도 합니다. 그런데 막상 청구서를 보면 생각보다 빠르게 커지는 경우가 많습니다. 이유는 호출 단가만으로는 전체 비용을 설명할 수 없기 때문입니다.
+서버리스는 "사용한 만큼만 지불한다"는 매력적인 가격 모델을 가지고 있습니다. 하지만 이 문장이 자주 "저렴하다"와 혼동됩니다. 사용량이 많아지면 비용도 그만큼 커지고, 주변 서비스(DynamoDB, S3, API Gateway, CloudWatch)의 비용이 Lambda 실행 비용보다 더 커지는 경우도 흔합니다.
 
 이 글은 Serverless 101 시리즈의 9번째 글입니다.
 
 ![Serverless 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.ko.png)
 *Serverless 101 9장 흐름 개요*
-> 서버리스 비용은 호출 수 × 실행 시간 × 메모리의 곱이고, 모든 최적화는 결국 이 세 값 중 하나를 줄이는 일로 돌아옵니다.
+> 서버리스 비용은 호출 수 × 실행 시간 × 메모리로 계산되지만, 실제 청구서는 주변 서비스까지 포함합니다.
 
 ## 이 글에서 다룰 문제
 
-- 서버리스 비용은 어떤 항목들의 합으로 결정될까요?
-- 메모리 설정은 왜 성능뿐 아니라 비용에도 직접 연결될까요?
-- 데이터 전송과 연계 서비스 비용은 왜 자주 놓칠까요?
-- 서버리스 환경에서 이 개념이 전통 서버와 어떻게 다르게 작동할까요?
-- 비용과 성능 사이 트레이드오프는 어디서 발생할까요?
+- Lambda 비용은 어떻게 계산되나요?
+- 메모리 설정은 비용과 성능에 어떤 영향을 줄까요?
+- 주변 서비스 비용은 어떻게 예측할 수 있을까요?
+- 비용 급증을 어떻게 빠르게 감지할 수 있을까요?
+- 비용을 줄이는 실질적인 방법은 무엇인가요?
 
-## 왜 이 주제가 중요한가
+## Lambda 비용 계산 구조
 
-서버리스는 항상 더 저렴하지 않습니다. 짧고 드문 작업에는 매우 효율적일 수 있지만, 지속적으로 높은 트래픽이 흐르거나 실행 시간이 긴 워크로드에서는 전통적인 고정 서버보다 비쌀 수도 있습니다. 그래서 비용은 기술 세부 옵션이 아니라 아키텍처 선택 기준입니다.
+Lambda 비용은 두 가지 요소로 구성됩니다.
 
-특히 입문 단계에서는 호출당 단가만 보고 안심하기 쉽습니다. 그러나 실제 청구서는 훨씬 복합적입니다. 메모리와 실행 시간의 곱, 외부로 나가는 데이터 전송, 데이터베이스와 큐 같은 관리형 서비스 요금, 프로비저닝된 동시성의 유휴 비용까지 모두 더해집니다. 서버리스 비용을 잘 읽는다는 말은 숫자를 외우는 것이 아니라, 어떤 설계 선택이 어떤 항목을 키우는지 아는 것입니다.
+**1. 요청 수 비용**
+- 월 100만 건까지 무료
+- 이후 100만 건당 $0.20
 
-## 한눈에 보는 구조
+**2. 실행 시간 비용 (GB-초)**
+- 월 400,000 GB-초까지 무료
+- 이후 GB-초당 $0.0000166667
 
-이 그림은 비용이 하나의 숫자에서 오지 않는다는 점을 분명하게 보여 줍니다. 호출 수만 낮추는 것으로는 충분하지 않을 수 있고, 코드 최적화만으로도 전체 비용을 다 설명할 수 없습니다. 네트워크와 주변 서비스 비용까지 포함한 전체 시나리오를 봐야 합니다.
+GB-초 계산:
+```
+GB-초 = (메모리 MB / 1024) × 실행 시간(초)
 
-## 핵심 용어 먼저 정리하기
-
-| 용어 | 뜻 | 실무에서 왜 중요한가 |
-| --- | --- | --- |
-| **호출 비용** | 함수가 호출될 때마다 붙는 단가 | 가장 눈에 잘 띄지만 전체의 일부일 뿐입니다 |
-| **GB-초** | 메모리와 실행 시간의 곱 | 성능과 비용을 함께 묶어 봐야 하는 이유입니다 |
-| **데이터 송신** | 외부로 나가는 데이터 전송 비용 | 코드보다 네트워크 설계가 더 중요할 때가 많습니다 |
-| **유휴 비용** | 프로비저닝해 둔 자원이 놀고 있어도 드는 비용 | 지연 시간과 비용의 교환 관계를 보여 줍니다 |
-| **단위 경제성** | 호출 한 건당 남는 마진 구조 | 제품 가격과 기능 범위 판단에 직접 연결됩니다 |
-
-비용 논의에서 중요한 것은 단가가 아니라 시나리오입니다. 같은 함수도 트래픽 패턴과 데이터 크기, 지연 시간 요구가 달라지면 전혀 다른 비용 구조를 갖습니다.
-
-## 무엇이 달라지는지 먼저 보기
-
-**문제가 있는 상태**에서는 호출당 가격만 보고 전체 비용을 추정합니다.
-
-**개선된 상태**에서는 총소유비용 관점으로 대안을 비교합니다. 즉, 함수 비용뿐 아니라 데이터 전송, 데이터베이스, 큐, 유휴 프로비저닝까지 모두 계산합니다.
-
-이 차이가 중요한 이유는 기술 선택이 종종 비용 구조를 바꾸기 때문입니다. 같은 기능이라도 요청당 메모리 사용량을 줄일지, 네트워크 전송량을 줄일지, 프로비저닝을 끌지 말지가 서로 다른 방향으로 총비용을 바꿉니다.
-
-## 비용 모델을 코드로 계산해 보기
-
-아래 코드의 상수는 **AWS Lambda 요금 체계를 예시로 든 값**이지, 모든 서버리스 플랫폼에 공통으로 적용되는 기본값이 아닙니다. Azure Functions와 Google Cloud Functions는 요금 구조, 무료 구간, 세부 과금 방식이 다르므로 이 숫자는 보편 공식이 아니라 하나의 예시 계산 모델로 읽어야 합니다.
-
-### 1단계 — 호출 비용 (아마존웹서비스 람다 예시)
-
-```python
-def calls_cost(n, unit_price=0.0000002):
-    return n * unit_price
+예시:
+- 메모리 512MB, 실행 시간 200ms
+- GB-초 = (512 / 1024) × 0.2 = 0.1 GB-초
+- 월 100만 건 처리 시: 100,000 GB-초
+- 비용: (100,000 - 400,000 무료) = 0 (무료 한도 내)
 ```
 
-호출당 단가는 계산하기 쉽습니다. 하지만 바로 이 쉬움 때문에 비용 추정이 여기서 멈추기 쉽습니다.
-
-### 2단계 — 기가바이트초 계산
-
 ```python
-def gb_seconds(memory_mb, duration_ms, n):
-    return (memory_mb / 1024) * (duration_ms / 1000) * n
+def calculate_lambda_cost(
+    monthly_invocations: int,
+    avg_duration_ms: float,
+    memory_mb: int,
+    region: str = "ap-northeast-2",
+) -> dict:
+    """Lambda 월간 비용 추정"""
+    # 가격 (2024년 기준, 리전마다 다를 수 있음)
+    REQUEST_PRICE = 0.20 / 1_000_000    # 요청당
+    GB_SECOND_PRICE = 0.0000166667      # GB-초당
+    FREE_REQUESTS = 1_000_000
+    FREE_GB_SECONDS = 400_000
+
+    # 요청 비용
+    billable_requests = max(0, monthly_invocations - FREE_REQUESTS)
+    request_cost = billable_requests * REQUEST_PRICE
+
+    # 실행 시간 비용
+    gb_seconds = (memory_mb / 1024) * (avg_duration_ms / 1000) * monthly_invocations
+    billable_gb_seconds = max(0, gb_seconds - FREE_GB_SECONDS)
+    compute_cost = billable_gb_seconds * GB_SECOND_PRICE
+
+    total_cost = request_cost + compute_cost
+
+    return {
+        "monthly_invocations": monthly_invocations,
+        "memory_mb": memory_mb,
+        "avg_duration_ms": avg_duration_ms,
+        "gb_seconds": round(gb_seconds, 2),
+        "request_cost_usd": round(request_cost, 4),
+        "compute_cost_usd": round(compute_cost, 4),
+        "total_cost_usd": round(total_cost, 4),
+    }
+
+
+# 시나리오 비교
+scenarios = [
+    {"monthly_invocations": 10_000_000, "avg_duration_ms": 100, "memory_mb": 256},
+    {"monthly_invocations": 10_000_000, "avg_duration_ms": 100, "memory_mb": 512},
+    {"monthly_invocations": 10_000_000, "avg_duration_ms": 50,  "memory_mb": 512},
+]
+
+for s in scenarios:
+    result = calculate_lambda_cost(**s)
+    print(f"메모리 {s['memory_mb']}MB, 실행 {s['avg_duration_ms']}ms: "
+          f"${result['total_cost_usd']:.4f}/월")
 ```
 
-메모리와 실행 시간은 따로가 아니라 곱으로 봐야 합니다. 메모리를 올리면 단가는 비싸져도 실행 시간이 줄어 전체 비용이 낮아질 수 있습니다.
+## 메모리와 비용-성능 트레이드오프
 
-### 3단계 — 데이터 송신 비용 (예시 단가)
+메모리를 늘리면 비용이 늘어나는 것처럼 보이지만, 실행 시간이 줄어들어 전체 GB-초는 오히려 감소할 수 있습니다. Lambda에서 CPU 할당은 메모리에 비례하기 때문입니다.
 
-```python
-def egress_cost(gb, price_per_gb=0.09):
-    return gb * price_per_gb
+| 메모리 | 평균 실행 시간 | GB-초/요청 | 상대 비용 |
+|--------|-------------|-----------|---------|
+| 256 MB | 500 ms | 0.125 | 기준 |
+| 512 MB | 220 ms | 0.110 | -12% |
+| 1024 MB | 120 ms | 0.120 | -4% |
+| 2048 MB | 70 ms  | 0.140 | +12% |
+
+이 예시에서 512MB가 256MB보다 빠르고 저렴합니다. 최적 메모리 설정은 함수마다 다르므로 Lambda Power Tuning으로 측정해야 합니다.
+
+```bash
+# Lambda Power Tuning을 Step Functions으로 실행
+# https://github.com/alexcasalboni/aws-lambda-power-tuning
+aws stepfunctions start-execution \
+  --state-machine-arn arn:aws:states:ap-northeast-2:123456789012:stateMachine:powerTuningStateMachine \
+  --input '{
+    "lambdaARN": "arn:aws:lambda:ap-northeast-2:123456789012:function:order-processor",
+    "powerValues": [128, 256, 512, 1024, 2048, 3008],
+    "num": 50,
+    "payload": {"order_id": "test-123"},
+    "parallelInvocation": true,
+    "strategy": "cost"
+  }'
 ```
 
-네트워크 송신 비용은 자주 놓치는 숨은 항목입니다. 특히 이미지, 동영상, 대용량 응답을 다루는 시스템에서는 함수 비용보다 더 커질 수도 있습니다.
+## 주변 서비스 비용 추정
 
-### 4단계 — 시나리오 총비용 비교 (아마존웹서비스 형태 예시)
+Lambda 실행 비용보다 주변 서비스 비용이 더 클 수 있습니다.
 
 ```python
-def total(n, mem_mb, dur_ms, gb_out):
-    return (
-        calls_cost(n)
-        + gb_seconds(mem_mb, dur_ms, n) * 0.0000166667
-        + egress_cost(gb_out)
+def estimate_total_serverless_cost(monthly_invocations: int) -> dict:
+    """서버리스 아키텍처 전체 비용 추정"""
+
+    # Lambda (위 계산 기반)
+    lambda_cost = calculate_lambda_cost(
+        monthly_invocations=monthly_invocations,
+        avg_duration_ms=200,
+        memory_mb=512,
+    )["total_cost_usd"]
+
+    # API Gateway (HTTP API 기준)
+    # 첫 300만 건: $1.00/백만, 이후: $0.90/백만
+    if monthly_invocations <= 3_000_000:
+        apigw_cost = monthly_invocations / 1_000_000 * 1.00
+    else:
+        apigw_cost = 3.00 + (monthly_invocations - 3_000_000) / 1_000_000 * 0.90
+
+    # DynamoDB (온디맨드 모드)
+    # 읽기: $0.25/백만 RCU, 쓰기: $1.25/백만 WCU
+    # 가정: 요청당 1 읽기 + 0.5 쓰기
+    rcu_cost = monthly_invocations / 1_000_000 * 0.25
+    wcu_cost = monthly_invocations * 0.5 / 1_000_000 * 1.25
+    dynamodb_cost = rcu_cost + wcu_cost
+
+    # CloudWatch Logs
+    # $0.76/GB 수집, $0.033/GB 저장
+    estimated_log_gb = monthly_invocations * 0.001 / 1024  # 1KB/요청 가정
+    logs_cost = estimated_log_gb * 0.76
+
+    # SQS (가정: 10% 요청이 큐 경유)
+    sqs_messages = monthly_invocations * 0.1
+    sqs_cost = max(0, sqs_messages - 1_000_000) / 1_000_000 * 0.40
+
+    total = lambda_cost + apigw_cost + dynamodb_cost + logs_cost + sqs_cost
+
+    return {
+        "monthly_invocations": monthly_invocations,
+        "lambda_usd": round(lambda_cost, 2),
+        "api_gateway_usd": round(apigw_cost, 2),
+        "dynamodb_usd": round(dynamodb_cost, 2),
+        "cloudwatch_logs_usd": round(logs_cost, 2),
+        "sqs_usd": round(sqs_cost, 2),
+        "total_usd": round(total, 2),
+    }
+
+
+# 트래픽 수준별 추정
+for invocations in [100_000, 1_000_000, 10_000_000, 100_000_000]:
+    estimate = estimate_total_serverless_cost(invocations)
+    print(f"월 {invocations:,}건: 총 ${estimate['total_usd']:,.2f}")
+    print(f"  Lambda: ${estimate['lambda_usd']}, APIGW: ${estimate['api_gateway_usd']}, "
+          f"DynamoDB: ${estimate['dynamodb_usd']}")
+```
+
+## CloudWatch 비용 알람
+
+비용 급증을 미리 감지하려면 AWS Budgets와 CloudWatch를 함께 사용합니다.
+
+```yaml
+Resources:
+  # Lambda 비용 예산 알람
+  LambdaCostBudget:
+    Type: AWS::Budgets::Budget
+    Properties:
+      Budget:
+        BudgetName: lambda-monthly-budget
+        BudgetType: COST
+        TimeUnit: MONTHLY
+        BudgetLimit:
+          Amount: 100
+          Unit: USD
+        CostFilters:
+          Service:
+            - "AWS Lambda"
+      NotificationsWithSubscribers:
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 80    # 80% 도달 시 알림
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: ops-team@example.com
+        - Notification:
+            NotificationType: FORECASTED
+            ComparisonOperator: GREATER_THAN
+            Threshold: 100   # 예측 초과 시 알림
+          Subscribers:
+            - SubscriptionType: SNS
+              Address: !Sub "arn:aws:sns:${AWS::Region}:${AWS::AccountId}:ops-alerts"
+
+  # 전체 계정 비용 예산
+  TotalCostBudget:
+    Type: AWS::Budgets::Budget
+    Properties:
+      Budget:
+        BudgetName: total-monthly-budget
+        BudgetType: COST
+        TimeUnit: MONTHLY
+        BudgetLimit:
+          Amount: 500
+          Unit: USD
+      NotificationsWithSubscribers:
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 90
+          Subscribers:
+            - SubscriptionType: SNS
+              Address: !Sub "arn:aws:sns:${AWS::Region}:${AWS::AccountId}:ops-alerts"
+```
+
+## 비용 최적화 전략
+
+```python
+import boto3
+import json
+from datetime import datetime, timedelta
+
+ce = boto3.client("ce", region_name="us-east-1")
+
+
+def get_lambda_cost_by_function(days: int = 7) -> list[dict]:
+    """함수별 Lambda 비용 조회"""
+    end = datetime.now().strftime("%Y-%m-%d")
+    start = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+
+    response = ce.get_cost_and_usage(
+        TimePeriod={"Start": start, "End": end},
+        Granularity="DAILY",
+        Filter={
+            "Dimensions": {
+                "Key": "SERVICE",
+                "Values": ["AWS Lambda"],
+            }
+        },
+        GroupBy=[
+            {"Type": "TAG", "Key": "FunctionName"},
+        ],
+        Metrics=["UnblendedCost", "UsageQuantity"],
     )
+
+    results = []
+    for result in response.get("ResultsByTime", []):
+        for group in result.get("Groups", []):
+            cost = float(group["Metrics"]["UnblendedCost"]["Amount"])
+            if cost > 0:
+                results.append({
+                    "date": result["TimePeriod"]["Start"],
+                    "function": group["Keys"][0],
+                    "cost_usd": round(cost, 4),
+                })
+
+    return sorted(results, key=lambda x: x["cost_usd"], reverse=True)
+
+
+def identify_cost_anomalies(threshold_multiplier: float = 3.0) -> list[dict]:
+    """비용 이상 탐지 - 평균 대비 임계값 초과 함수"""
+    costs = get_lambda_cost_by_function(days=14)
+
+    # 함수별 평균 일일 비용 계산
+    from collections import defaultdict
+    daily_costs = defaultdict(list)
+    for item in costs:
+        daily_costs[item["function"]].append(item["cost_usd"])
+
+    anomalies = []
+    for function, cost_list in daily_costs.items():
+        avg = sum(cost_list) / len(cost_list)
+        latest = cost_list[-1] if cost_list else 0
+        if avg > 0 and latest > avg * threshold_multiplier:
+            anomalies.append({
+                "function": function,
+                "avg_daily_cost": round(avg, 4),
+                "latest_cost": round(latest, 4),
+                "multiplier": round(latest / avg, 2),
+            })
+
+    return sorted(anomalies, key=lambda x: x["multiplier"], reverse=True)
 ```
 
-비용 비교는 단일 항목이 아니라 시나리오 수준에서 해야 합니다. 요청 수, 평균 실행 시간, 메모리 설정, 데이터 전송량을 묶어서 봐야 실제 의사결정에 도움이 됩니다.
+## 비용 최적화 체크리스트
 
-### 5단계 — 메모리 튜닝 스윕
+**함수 수준 최적화**
+- Lambda Power Tuning으로 최적 메모리 설정 확인
+- 불필요한 의존성 제거로 패키지 크기 감소 (초기화 시간 단축 = 비용 감소)
+- 핸들러 외부 초기화로 불필요한 SDK 재초기화 방지
+- 실행 시간 측정 및 최적화 (p99 기준)
 
-```python
-sizes = [128, 256, 512, 1024]
-for s in sizes:
-    print(s, total(1_000_000, s, 200, 5))
-```
+**아키텍처 수준 최적화**
+- 짧은 주기 Polling을 이벤트 기반으로 전환
+- CloudWatch 로그 보존 기간 설정 (기본값은 무기한)
+- S3 Intelligent-Tiering으로 오래된 데이터 비용 절감
+- DynamoDB 온디맨드 vs 프로비저닝 모드 트래픽 패턴에 따라 선택
 
-## 시나리오 기준으로 비용을 비교해야 합니다
+**운영 수준 최적화**
+- AWS Budgets로 월간 예산 상한 설정
+- Cost Explorer로 주간 비용 추이 리뷰
+- 비사용 함수와 Lambda Layer 정기 정리
 
-비용은 숫자 하나보다 워크로드 모양에서 더 잘 드러납니다. 최소한 아래 정도의 시나리오는 따로 계산해 보는 편이 좋습니다.
+## 자주 하는 실수
 
-| 시나리오 | 대개 커지는 항목 | 먼저 던질 질문 |
-| --- | --- | --- |
-| 스파이크가 큰 저트래픽 API | 호출 + 꼬리 지연 완화 비용 | 프로비저닝이 정말 필요한가 |
-| 짧지만 대량인 배치 작업 | 메모리 × 실행 시간 | 메모리 튜닝으로 전체 비용을 줄일 수 있는가 |
-| 이미지·파일 응답 중심 서비스 | 데이터 송신 비용 | CDN이나 객체 저장소 직접 제공으로 줄일 수 있는가 |
-| 비동기 파이프라인 | 큐·DB·재시도 비용 | 트래픽 증가가 어느 주변 서비스 비용을 키우는가 |
-
-이 표는 단가 암기보다 훨씬 실용적입니다. 같은 서버리스라도 어떤 종류의 트래픽과 데이터를 다루느냐에 따라 가장 비싼 항목이 달라지기 때문입니다.
-
-메모리 크기를 바꿔 가며 비교하면 비용이 단순히 메모리 크기에 비례하지 않는다는 점을 체감할 수 있습니다. 성능 개선이 비용 절감으로 이어지는 경우도 있기 때문입니다.
-
-- 숫자 상수는 **특정 클라우드 사업자의 예시 값**이지 서버리스 공통 기본값이 아닙니다.
-- 메모리 크기는 CPU와 비용에 동시에 영향을 줍니다.
-- 데이터 전송은 자주 놓치는 중요한 항목입니다.
-- 비교는 단가가 아니라 시나리오 수준에서 해야 합니다.
-
-서버리스 비용 최적화는 “최소 사양으로 버티기”가 아닙니다. 같은 일을 더 짧게 끝내고, 덜 보내고, 유휴 자원을 덜 남기는 구조를 찾는 일에 가깝습니다.
-
-## 실무에서 자주 헷갈리는 지점
-
-### 호출당 단가가 아주 낮은데 왜 총비용이 커질까
-
-호출 수 외에도 메모리, 실행 시간, 네트워크, 관리형 서비스 비용이 함께 붙기 때문입니다. 특히 주변 서비스 비용이 더 커지는 경우가 많습니다.
-
-### 메모리를 낮추면 무조건 절약일까
-
-그렇지 않습니다. 메모리를 낮춰 실행 시간이 길어지면 총비용이 오를 수 있습니다. 성능과 비용은 같이 봐야 합니다.
-
-### 프로비저닝은 성능을 위한 선택일 뿐 비용과는 무관할까
-
-전혀 아닙니다. 실제 호출이 없더라도 미리 준비해 둔 자원에 대한 비용이 생기므로 유휴 비용을 계속 추적해야 합니다.
-
-## 자주 하는 실수 다섯 가지
-
-1. 특정 사업자의 공개 단가를 서버리스 전체의 공통 기본값처럼 받아들입니다.
-2. 메모리를 최소값에 고정한 채 실행 시간을 측정하지 않습니다.
-3. 데이터 송신 비용을 무시합니다.
-4. 데이터베이스와 큐 비용을 빼먹습니다.
-5. 프로비저닝된 동시성의 유휴 비용을 추적하지 않습니다.
-
-이 실수들은 대부분 비용을 기능 바깥의 후처리 문제로 볼 때 생깁니다. 실제로는 응답 시간, 아키텍처 경계, 네트워크 설계가 모두 청구서에 직접 반영됩니다.
-
-## 실무에서는 이렇게 생각합니다
-
-- 비용은 기능의 일부입니다.
-- 메모리 튜닝은 시간과 돈의 교환 문제입니다.
-- 데이터 송신 문제는 코드보다 네트워크 설계에서 풀어야 할 때가 많습니다.
-- 유휴 프로비저닝은 지연 시간 감소의 세금처럼 봅니다.
-- 대안 비교는 항상 같은 시나리오 기준에서 해야 공정합니다.
-
-## 운영 체크리스트
-
-- [ ] 총비용 모델을 만들어 두었는가
-- [ ] 메모리 튜닝을 실제 측정값으로 검토했는가
-- [ ] 데이터 송신량을 측정하는가
-- [ ] 비용 대시보드나 FinOps 지표를 보고 있는가
-## 실무 앵커: 비용을 기능별 손익계산서로 분해하기
-
-서버리스 비용은 한 줄 요약으로 판단하면 거의 항상 틀립니다. 호출 수, 실행 시간, 메모리, API Gateway, 데이터 저장, 메시징을 기능 단위로 분해해야 실제 의사결정이 가능합니다.
-
-### 람다 실행 비용 예시
-
-가정:
-- 월 호출 3,000만 건
-- 메모리 1024MB
-- 평균 실행 120ms
-
-GB-초는 `3,000만 * 1GB * 0.12초 = 360만 GB-초`입니다. 여기에 호출 요금, API Gateway 요청 비용, DynamoDB 읽기/쓰기 비용을 합산해야 총비용이 됩니다.
-
-### 기능별 원가 표
-
-| 기능 | 월 호출 | 평균 실행 | 추정 비용 |
-| --- | --- | --- | --- |
-| 주문 접수 API | 1,200만 | 90ms | 48달러 |
-| 결제 승인 비동기 | 1,000만 | 140ms | 55달러 |
-| 정산 배치 이벤트 | 800만 | 220ms | 71달러 |
-
-이 표를 만들면 최적화 우선순위가 명확해집니다. 호출 수가 큰 기능과 실행 시간이 긴 기능은 최적화 방식이 다르기 때문입니다.
-
-### 최적화 실험 예시
-
-| 실험 | 변경 전 | 변경 후 | 효과 |
-| --- | --- | --- | --- |
-| 메모리 상향 | 512MB, 180ms | 1024MB, 110ms | 지연 39% 감소, 비용 8% 증가 |
-| 배치 처리 | 개별 쓰기 | 25건 묶음 쓰기 | DynamoDB 요청 60% 감소 |
-| 불필요 로그 제거 | 전체 본문 로그 | 오류 중심 로그 | 로그 저장 비용 35% 감소 |
-
-비용 최적화는 "가장 싼 설정"을 찾는 작업이 아니라 "서비스 품질을 지키면서 낭비를 줄이는 작업"입니다. 따라서 지연 지표와 오류율을 함께 기록한 상태에서만 비용 실험을 진행해야 합니다.
-
-### API Gateway와 DynamoDB를 포함한 총비용 관점
-
-Lambda만 보면 저렴해 보여도 API Gateway 요청 비용과 DynamoDB 읽기/쓰기 비용을 합치면 비중이 달라집니다. 특히 요청 수가 큰 API는 게이트웨이 비용이, 상태 변경이 잦은 워크로드는 저장소 비용이 빠르게 증가합니다.
-
-### 월간 시나리오 비교
-
-| 시나리오 | 월 총요청 | 평균 실행 | 총비용(추정) |
-| --- | --- | --- | --- |
-| 기본 | 3천만 | 120ms | 210달러 |
-| 최적화 1 | 3천만 | 95ms | 184달러 |
-| 최적화 2 | 3천만 | 95ms + 배치쓰기 | 161달러 |
-
-이 표에서 핵심은 기능을 줄이지 않고도 비용 구조를 바꿀 수 있다는 사실입니다. 실행 시간 단축, 배치 처리, 로그 정리 같은 기초 최적화가 장기적으로 가장 높은 효과를 냅니다.
-
-### 비용 경보 기준
-
-- 일일 비용이 7일 평균 대비 30% 이상 증가
-- 재시도 비율이 2배 이상 증가
-- DLQ 유입량이 평시 대비 5배 이상 증가
-
-비용 급증은 대개 기능 추가보다 오류 증가와 함께 발생합니다. 따라서 비용 경보는 장애 경보와 분리하지 말고 같은 대응 런북에서 다루어야 합니다.
-
-## 정리
-
-서버리스 비용은 결코 호출당 단가 하나로 설명되지 않습니다. 호출 수, 실행 시간, 메모리, 데이터 전송, 연계 서비스 비용이 모두 합쳐져 청구서가 됩니다. 그래서 비용 최적화도 단순 절약이 아니라 설계 선택의 결과로 봐야 합니다.
-
-다음 글에서는 지금까지 다룬 요소를 모아 서버리스 앱을 어떻게 설계할지 봅니다.
-
-## 처음 질문으로 돌아가기
-
-- **서버리스 비용은 어떤 항목들의 합으로 결정될까요?**
-  - 비용은 숫자 하나보다 워크로드 모양에서 더 잘 드러납니다
-- **메모리 설정은 왜 성능뿐 아니라 비용에도 직접 연결될까요?**
-  - 메모리 설정은 왜 성능뿐 아니라 비용에도 직접 연결될까요에 대해 본문에서 실무 예시와 함께 답합니다.
-- **데이터 전송과 연계 서비스 비용은 왜 자주 놓칠까요?**
-  - 호출 수 외에도 메모리, 실행 시간, 네트워크, 관리형 서비스 비용이 함께 붙기 때문입니다. 특히 주변 서비스 비용이 더 커지는 경우가 많습니다.
-  - 이 그림은 비용이 하나의 숫자에서 오지 않는다는 점을 분명하게 보여 줍니다. 호출 수만 낮추는 것으로는 충분하지 않을 수 있고, 코드 최적화만으로도 전체 비용을 다 설명할 수 없습니다. 네트워크와 주변 서비스 비용까지 포함한 전체 시나리오를 봐야 합니다.
+| 실수 유형 | 증상 | 올바른 접근 |
+|-----------|------|------------|
+| Lambda 비용만 보고 안심 | API Gateway, DynamoDB 등 주변 서비스 비용이 더 큰데 모름 | 전체 서비스 비용을 태그 기반으로 집계 |
+| 기본 메모리(128MB)로 운영 | 느린 실행 시간으로 GB-초 비용이 최적 설정보다 높음 | Lambda Power Tuning으로 최적 메모리 측정 |
+| CloudWatch 로그 보존 기간 미설정 | 로그가 영구 보관되어 스토리지 비용 누적 | 보존 기간을 30-90일로 제한 |
+| 예산 알람 없음 | 비용 급증을 월말 청구서에야 발견 | AWS Budgets로 80%, 100% 알림 설정 |
+| 짧은 주기 Cron으로 폴링 | 실제 이벤트 없어도 함수가 계속 실행됨 | 이벤트 소스로 전환 (SQS, EventBridge) |
+| 프로비저닝 동시성 과다 설정 | 대기 시간에도 과금, 불필요한 비용 발생 | SLO 기준 필요한 경로에만 선택 적용 |
 
 <!-- toc:begin -->
 ## 시리즈 목차

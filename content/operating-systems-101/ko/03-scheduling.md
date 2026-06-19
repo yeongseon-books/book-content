@@ -58,6 +58,24 @@ Runnable queue        Running              Blocked (waiting I/O)
                            +--> back to runnable queue
 ```
 
+### 프로세스/스레드 상태 전이도
+
+```text
+NEW
+ |
+ v
+READY (runnable) <---+------ RUNNING -----> TERMINATED
+                     |           |
+                     |   preempt / yield
+                     |           |
+                     +<---  I/O complete
+                                 |
+                                 v
+                             BLOCKED (waiting for I/O, lock, sleep...)
+```
+
+리눅스 `ps` 출력의 `S`(sleeping), `R`(running), `D`(uninterruptible wait)는 이 상태들에 대응합니다.
+
 ## 같은 코드를 다르게 읽는 법
 
 **이전 관점 — "운영체제가 알아서 골고루 돌리겠지":**
@@ -177,6 +195,9 @@ CPU 사용률이 낮다고 항상 여유가 있는 것은 아닙니다. run queu
 ```bash
 vmstat 1
 # r=runqueue, b=blocked, wa=iowait, cs=context switches
+# 출력 예시:
+# r  b   swpd   free   buff  cache  si  so    bi    bo    in   cs us sy id wa
+# 2  0      0  1234M   234M  2048M   0   0     1     5   500 1200 25  5 68  2
 ```
 
 컨텍스트 스위치(`cs`) 값이 갑자기 치솟으면, 스레드 수가 코어 수를 크게 초과해 스케줄러가 끊임없이 전환을 반복하는 상태입니다.
@@ -190,7 +211,7 @@ vmstat 1
 - P2: 도착 1, 실행 4
 - P3: 도착 2, 실행 2
 
-**FCFS**
+**FCFS (First Come, First Served)**
 
 ```text
 시간: 0        8    12 14
@@ -199,7 +220,7 @@ vmstat 1
 
 대기시간: P1=0, P2=7, P3=10 → 평균 5.67
 
-**SRTF (선점형 SJF)**
+**SRTF (선점형 SJF, Shortest Remaining Time First)**
 
 ```text
 시간: 0 1   3     7       14
@@ -210,24 +231,61 @@ vmstat 1
 
 인터랙티브 시스템에서는 짧은 작업의 응답성을 높이는 SRTF/MLFQ 계열이 체감 품질을 크게 높일 수 있습니다.
 
-### 라운드 로빈 타임퀀텀의 트레이드오프
+**라운드 로빈 (q=2)**
 
 ```text
-q=2일 때
 0  2  4  6  8  10 12 14
 P1 P2 P3 P1 P2 P1 P1
 ```
 
-퀀텀이 너무 작으면 컨텍스트 스위치 비용이 커지고, 너무 크면 FCFS에 가까워져 응답성이 나빠집니다. 일반적으로 서비스 성격에 맞춰 2~10ms 범위를 실험하고 p95 지연시간으로 결정하는 것이 안전합니다.
+퀀텀이 너무 작으면 컨텍스트 스위치 비용이 커지고, 너무 크면 FCFS에 가까워져 응답성이 나빠집니다.
+
+### 컨텍스트 스위치 비용을 직접 측정하기
+
+```python
+import os, time
+
+# getpid()는 간단한 syscall이지만 컨텍스트 전환 비용의 기준값이 됩니다
+N = 1_000_000
+t = time.perf_counter()
+for _ in range(N):
+    os.getpid()
+elapsed = time.perf_counter() - t
+print(f"syscall overhead: {elapsed/N*1e6:.2f} us/call")
+
+# 파이프를 통한 컨텍스트 스위치 비용
+r, w = os.pipe()
+t = time.perf_counter()
+for _ in range(10_000):
+    os.write(w, b'x')
+    os.read(r, 1)
+elapsed = time.perf_counter() - t
+print(f"pipe roundtrip: {elapsed/10_000*1e6:.1f} us/roundtrip")
+os.close(r); os.close(w)
+```
+
+파이프 왕복 한 번이 수 마이크로초에서 수십 마이크로초 사이입니다. 이것이 컨텍스트 스위치의 하한 비용입니다.
 
 ### 스케줄링과 우선순위 튜닝 주의점
 
-`nice`와 `ionice`는 빠른 응급처치지만, 남용하면 전체 시스템 공정성을 해칩니다. 특정 작업의 우선순위를 올리면 다른 서비스의 tail latency가 악화될 수 있습니다.
+`nice`와 `ionice`는 빠른 응급처치지만, 남용하면 전체 시스템 공정성을 해칩니다.
 
 운영 환경 권장 원칙:
 1. 우선순위 조정은 임시 대응으로 제한합니다.
 2. 조정 전후 지표(`vmstat`, `pidstat`)를 캡처해 회귀를 확인합니다.
 3. 근본 원인은 워크로드 분리, 큐 제어, 배치 시간 분산으로 해결합니다.
+
+### 리눅스 CFS 스케줄러의 실제 동작
+
+```bash
+# CFS 스케줄링 통계 확인
+cat /proc/sched_debug | head -40
+
+# 특정 프로세스의 스케줄링 통계
+cat /proc/<PID>/sched | grep -E "nr_voluntary|nr_involuntary|se.sum_exec_runtime"
+```
+
+CFS(Completely Fair Scheduler)는 각 프로세스가 사용한 "가상 시간"을 추적해 가장 적게 쓴 프로세스를 다음에 실행합니다. `nice` 값은 이 가상 시간의 증가 속도를 바꿉니다.
 
 ## 처음 질문으로 돌아가기
 

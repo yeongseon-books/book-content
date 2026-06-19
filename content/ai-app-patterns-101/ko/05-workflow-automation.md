@@ -1,633 +1,389 @@
 ---
-title: "AI App Patterns 101 (5/6): 워크플로 자동화 — 다단계 체인 설계"
 series: ai-app-patterns-101
 episode: 5
-language: ko
-status: published
-published_to:
-  tistory:
-    url: "https://yeongseonchoe.tistory.com/81"
-    published_at: '2026-05-13'
+title: "AI App Patterns 101 (5/6): Workflow Automation 패턴"
+status: publish-ready
 targets:
   tistory: true
   medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
+language: ko
 tags:
-- LLM
-- RAG
-- Agent
-- Python
-last_reviewed: '2026-05-15'
-seo_description: 워크플로 자동화는 모델 선택권 대신 사람이 정의한 단계와 데이터 계약을 따르는 파이프라인입니다.
+  - Workflow
+  - Chain
+  - LLM
+  - Classification
+  - StateMachine
+seo_description: 순차 체인, 분류 기반 라우팅, 상태 머신으로 LLM 워크플로를 자동화하는 핵심 패턴을 정리합니다
+last_reviewed: '2026-06-20'
 ---
 
-# AI App Patterns 101 (5/6): 워크플로 자동화 — 다단계 체인 설계
+# AI App Patterns 101 (5/6): Workflow Automation 패턴
 
-작업 단계가 예측 가능할 때는 모델에게 자유를 더 주는 편이 오히려 시스템 신뢰도를 떨어뜨립니다. 워크플로의 가치는 handoff 지점, 중간 데이터 형태, 실패를 드러내야 하는 위치를 고정해 두는 데 있습니다.
+LLM 하나로 모든 작업을 처리하려 하면 품질이 불안정해지고 실패 지점을 찾기 어려워집니다. Workflow Automation 패턴은 복잡한 작업을 작은 단계로 분해하고, 각 단계를 순서대로 또는 조건에 따라 실행하는 방식입니다. 순차 체인은 단계마다 결과를 검증하고, 분류 기반 라우팅은 입력에 따라 다른 파이프라인을 선택하며, 상태 머신은 복잡한 비즈니스 프로세스를 표현합니다.
 
-한 번의 LLM 호출로는 잘 풀리지 않는 업무가 많습니다. 고객 문의를 받아 요약하고, 분류하고, 카테고리별 로직을 적용하고, 답변을 생성하는 식의 흐름이 대표적입니다. 이런 작업은 모델의 즉흥성보다 단계 간 계약이 더 중요합니다.
+이 글은 AI App Patterns 101 시리즈의 5번째 글입니다.
 
-이 글은 AI App Patterns 101 시리즈의 다섯 번째 글입니다. 여기서는 명시적인 단계와 깔끔한 데이터 계약을 가진 다단계 LLM 워크플로를 어떻게 설계할지 다룹니다.
-
-![단계 사이의 순차 handoff](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.ko.png)
-*단계 사이의 순차 handoff*
-> 워크플로 자동화는 모델의 선택권을 줄이고, 사람이 정의한 단계와 데이터 계약을 따르는 파이프라인으로 바꾸는 설계입니다.
+![Workflow Automation 패턴 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-01-concept-at-a-glance.ko.png)
+*순차 체인, 라우팅, 상태 머신이 결합된 워크플로 자동화 구조*
 
 ## 이 글에서 다룰 문제
 
-- 다단계 체인은 언제 단순 순차 실행이고 언제 라우팅이 필요할까요?
-- 중간 결과의 타입을 고정하지 않으면 다음 단계에서 어떤 문제가 생길까요?
-- 워크플로 자동화에서 실패를 한 번에 숨기지 않으려면 어디에 로그를 남겨야 할까요?
-- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
-- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
+- LLM 작업을 여러 단계로 분해하면 어떤 이점이 있을까요?
+- 분류 기반 라우팅은 어떤 상황에서 단일 프롬프트보다 효과적일까요?
+- 상태 머신으로 LLM 워크플로를 설계하면 무엇이 달라질까요?
+- 체인의 중간 단계 실패를 어떻게 처리해야 할까요?
+- 워크플로를 재시도 가능하고 재현 가능하게 만드는 방법은 무엇일까요?
 
-## 순차 체인
+## 핵심 개념 한 줄 정리
 
-![병렬 작업을 포함한 DAG 스타일 분기](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-02-dag-style-branching-with-parallel-work.ko.png)
+- **Sequential Chain**: 이전 단계의 출력이 다음 단계의 입력이 되는 파이프라인 구조입니다.
+- **Routing**: 입력의 분류 결과에 따라 다른 처리 경로를 선택하는 패턴입니다.
+- **State Machine**: 현재 상태와 전환 조건을 명시적으로 정의하는 워크플로 모델입니다.
+- **Intermediate Validation**: 체인의 각 단계 출력을 다음 단계 진행 전에 검증하는 과정입니다.
+- **Idempotency**: 같은 입력에 대해 항상 같은 결과를 보장하는 설계 원칙입니다.
 
-*병렬 작업을 포함한 DAG 스타일 분기*
-LCEL의 `|` 연산자는 단계를 연결합니다. 왼쪽 단계의 출력이 오른쪽 단계의 입력이 됩니다.
+## 워크플로 패턴 비교
 
-```python
-import os
+| 패턴 | 적합 상황 | 장점 | 단점 |
+|---|---|---|---|
+| 순차 체인 | 단계별 처리가 명확한 작업 | 단계 격리, 디버깅 용이 | 레이턴시 누적 |
+| 분류 라우팅 | 다양한 입력 유형 처리 | 전문화된 프롬프트 사용 가능 | 분류 오류 시 잘못된 경로 |
+| 상태 머신 | 복잡한 비즈니스 프로세스 | 상태 추적, 재시작 가능 | 구현 복잡도 |
+| 병렬 처리 | 독립적인 서브태스크 | 속도 향상 | 상태 동기화 필요 |
 
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_groq import ChatGroq
+## 실습 1: 순차 체인
 
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
-
-translate_prompt = ChatPromptTemplate.from_messages([
-    ("system", "Translate the following text to {target_language}. Return only the translation."),
-    ("human", "{text}"),
-])
-
-summarize_prompt = ChatPromptTemplate.from_messages([
-    ("system", "Summarize the following text in two sentences."),
-    ("human", "{text}"),
-])
-
-title_prompt = ChatPromptTemplate.from_messages([
-    ("system", "Generate a one-line title for the following text."),
-    ("human", "{text}"),
-])
-
-str_parser = StrOutputParser()
-
-def make_pipeline(target_language: str):
-    """Return translate → summarize → title functions for the given language."""
-
-    def translate(inputs: dict) -> dict:
-        translated = (translate_prompt | llm | str_parser).invoke({
-            "text": inputs["text"],
-            "target_language": target_language,
-        })
-        return {"text": translated}
-
-    def summarize(inputs: dict) -> dict:
-        summary = (summarize_prompt | llm | str_parser).invoke(inputs)
-        return {"text": summary}
-
-    def make_title(inputs: dict) -> str:
-        return (title_prompt | llm | str_parser).invoke(inputs)
-
-    return translate, summarize, make_title
-
-article = """
-Artificial intelligence is transforming the way businesses operate.
-Companies across industries are adopting AI tools to automate repetitive tasks,
-improve decision-making, and personalize customer experiences.
-The healthcare sector uses AI to assist in diagnosis and drug discovery.
-In finance, AI powers fraud detection and algorithmic trading.
-As AI becomes more capable, organizations must also address ethical considerations
-such as bias, transparency, and data privacy.
-"""
-
-translate_fn, summarize_fn, title_fn = make_pipeline("Korean")
-
-step1 = translate_fn({"text": article})
-print(f"translation:\n{step1['text']}\n")
-
-step2 = summarize_fn(step1)
-print(f"summary:\n{step2['text']}\n")
-
-step3 = title_fn(step2)
-print(f"title: {step3}")
-```
-
----
-
-## 라우팅 — 분류 기반 분기
-
-### 분류가 결정하는 라우팅
-
-![분류가 결정하는 라우팅](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-03-classification-driven-routing.ko.png)
-
-*분류가 결정하는 라우팅*
-### 승인 게이트와 재시도 복구
-
-![승인 게이트와 재시도 복구](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-04-approval-gate-and-retry-recovery.ko.png)
-
-*승인 게이트와 재시도 복구*
-먼저 입력을 분류하고, 그 결과에 따라 적절한 체인으로 보냅니다. 두 단계 사이의 유일한 의존성은 분류기의 출력입니다.
+이메일 초안을 생성하고 → 검토하고 → 톤을 조정하는 3단계 체인입니다.
 
 ```python
-import os
+from openai import OpenAI
+from dataclasses import dataclass
 
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_groq import ChatGroq
+client = OpenAI()
 
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
-str_parser = StrOutputParser()
 
-classify_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "Classify the following customer inquiry.\n"
-        "Categories: BILLING, TECHNICAL, GENERAL\n"
-        "Return the category name only. No other text.",
-    ),
-    ("human", "{inquiry}"),
-])
-classify_chain = classify_prompt | llm | str_parser
+@dataclass
+class ChainResult:
+    step: str
+    output: str
+    success: bool
+    error: str | None = None
 
-billing_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "You are a billing specialist.\n"
-        "Handle refunds, invoices, and charge-related inquiries.\n"
-        "Be accurate and reassuring.",
-    ),
-    ("human", "{inquiry}"),
-])
 
-technical_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "You are a technical support engineer.\n"
-        "Handle bugs, errors, and how-to questions.\n"
-        "Guide users step by step.",
-    ),
-    ("human", "{inquiry}"),
-])
+def run_step(
+    step_name: str,
+    prompt: str,
+    max_tokens: int = 512,
+) -> ChainResult:
+    """단일 체인 단계를 실행합니다."""
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=max_tokens,
+        )
+        return ChainResult(
+            step=step_name,
+            output=response.choices[0].message.content,
+            success=True,
+        )
+    except Exception as e:
+        return ChainResult(
+            step=step_name,
+            output="",
+            success=False,
+            error=str(e),
+        )
 
-general_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "You are a customer service representative.\n"
-        "Handle general inquiries politely and helpfully.",
-    ),
-    ("human", "{inquiry}"),
-])
 
-billing_chain = billing_prompt | llm | str_parser
-technical_chain = technical_prompt | llm | str_parser
-general_chain = general_prompt | llm | str_parser
+def email_drafting_chain(
+    topic: str,
+    recipient: str,
+    tone: str = "professional",
+) -> dict:
+    """이메일 작성 3단계 체인: 초안 → 검토 → 톤 조정."""
+    results = []
 
-def route_and_respond(inquiry: str) -> dict:
-    """Classify → route → generate specialist response."""
-    category = classify_chain.invoke({"inquiry": inquiry}).strip().upper()
+    # 1단계: 초안 생성
+    draft_result = run_step(
+        "draft",
+        f"다음 주제로 {recipient}에게 보낼 이메일 초안을 작성하세요:\n주제: {topic}",
+        max_tokens=512,
+    )
+    results.append(draft_result)
 
-    chains = {
-        "BILLING": billing_chain,
-        "TECHNICAL": technical_chain,
-        "GENERAL": general_chain,
+    if not draft_result.success:
+        return {"success": False, "error": draft_result.error, "steps": results}
+
+    # 2단계: 검토 및 개선점 파악
+    review_result = run_step(
+        "review",
+        f"다음 이메일 초안을 검토하고 개선이 필요한 부분을 3가지 지적하세요:\n\n{draft_result.output}",
+        max_tokens=256,
+    )
+    results.append(review_result)
+
+    # 3단계: 톤 조정
+    final_result = run_step(
+        "tone_adjust",
+        (
+            f"다음 이메일을 '{tone}' 톤으로 다시 작성하세요. "
+            f"개선 사항: {review_result.output if review_result.success else '없음'}\n\n"
+            f"원본:\n{draft_result.output}"
+        ),
+        max_tokens=512,
+    )
+    results.append(final_result)
+
+    return {
+        "success": final_result.success,
+        "final_email": final_result.output if final_result.success else None,
+        "steps": results,
     }
-    chain = chains.get(category, general_chain)
-    response = chain.invoke({"inquiry": inquiry})
 
-    return {"category": category, "response": response}
 
-test_inquiries = [
-    "My bill doubled this month without any explanation. Please check.",
-    "The app keeps crashing when I open it. What should I do?",
-    "What are your business hours?",
-]
-
-for inquiry in test_inquiries:
-    print(f"\ninquiry: {inquiry}")
-    result = route_and_respond(inquiry)
-    print(f"category: {result['category']}")
-    print(f"response: {result['response']}")
+# 사용 예시
+result = email_drafting_chain(
+    topic="분기 성과 보고 미팅 일정 조율",
+    recipient="팀 리더",
+    tone="professional",
+)
+if result["success"]:
+    print(result["final_email"])
 ```
 
----
+## 실습 2: 분류 기반 라우팅
 
-## 다단계 데이터 변환 파이프라인
-
-### 코드 리뷰 산출물 계약
-
-![코드 리뷰 산출물 계약](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-05-code-review-artifact-contract.ko.png)
-
-*코드 리뷰 산출물 계약*
-각 단계는 이전 단계의 출력을 다른 형태로 변환합니다. 아래 코드 리뷰 파이프라인은 analysis → suggestions → report라는 세 단계 변환을 보여 줍니다.
-
-> 멘탈 모델은 각 단계를 작은 서비스처럼 보는 것입니다. 이전 단계가 불분명한 문자열을 넘기면 다음 단계는 조용히 실패합니다. 계약이 분명한 `dict`를 넘기면 로깅, 검증, 재시도가 훨씬 쉬워집니다.
+입력을 먼저 분류한 뒤 전문화된 파이프라인으로 라우팅합니다.
 
 ```python
-import os
+from openai import OpenAI
+import json
 
-from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_groq import ChatGroq
+client = OpenAI()
 
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
+INTENT_CATEGORIES = {
+    "complaint": "불만 및 문제 보고",
+    "inquiry": "정보 문의",
+    "request": "기능 또는 서비스 요청",
+    "praise": "긍정적 피드백",
+    "other": "기타",
+}
 
-analyze_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "Analyze the following code and return JSON only.\n"
-        'Format: {{"language": "lang", "purpose": "purpose", "issues": ["issue list"], "score": 1-10}}',
-    ),
-    ("human", "Code:\n{code}"),
-])
 
-suggest_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "Based on the code analysis, provide specific improvements.\n"
-        "Include corrected code examples for each issue.",
-    ),
-    ("human", "Analysis:\n{analysis}\n\nOriginal code:\n{code}"),
-])
+def classify_intent(text: str) -> dict:
+    """고객 메시지의 의도를 분류합니다."""
+    categories_desc = "\n".join(
+        f"- {k}: {v}" for k, v in INTENT_CATEGORIES.items()
+    )
+    prompt = f"""다음 고객 메시지의 의도를 분류하세요.
 
-report_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "Summarize the code review into a concise report.\n"
-        "Structure: overall assessment, key improvements, recommended actions.",
-    ),
-    ("human", "Analysis:\n{analysis}\n\nSuggestions:\n{suggestions}"),
-])
+카테고리:
+{categories_desc}
 
-analyze_chain = analyze_prompt | llm | JsonOutputParser()
-suggest_chain = suggest_prompt | llm | StrOutputParser()
-report_chain = report_prompt | llm | StrOutputParser()
+메시지: {text}
 
-def code_review_pipeline(code: str) -> dict:
-    """Code analysis → suggestions → report."""
-    analysis = analyze_chain.invoke({"code": code})
-    print(f"  analysis done: score {analysis.get('score')}/10, {len(analysis.get('issues', []))} issues")
+JSON으로만 응답: {{"intent": "카테고리키", "confidence": 0.0-1.0, "urgency": "high/medium/low"}}"""
 
-    suggestions = suggest_chain.invoke({
-        "analysis": str(analysis),
-        "code": code,
-    })
-    print("  suggestions done")
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=128,
+        response_format={"type": "json_object"},
+    )
+    return json.loads(response.choices[0].message.content)
 
-    report = report_chain.invoke({
-        "analysis": str(analysis),
-        "suggestions": suggestions,
-    })
-    print("  report done")
 
-    return {"analysis": analysis, "suggestions": suggestions, "report": report}
+def handle_complaint(text: str) -> str:
+    """불만 메시지 전용 응답 생성입니다."""
+    prompt = (
+        "고객이 불만을 제기했습니다. 공감을 표현하고, 즉시 해결 방법을 제안하고, "
+        "에스컬레이션 옵션을 안내하는 응답을 작성하세요.\n\n"
+        f"불만 내용: {text}"
+    )
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=512,
+    )
+    return response.choices[0].message.content
 
-sample_code = """
-def get_user(id):
-    import sqlite3
-    conn = sqlite3.connect('users.db')
-    cursor = conn.cursor()
-    cursor.execute(f"SELECT * FROM users WHERE id = {id}")
-    result = cursor.fetchone()
-    conn.close()
-    return result
-"""
 
-print("running code review pipeline...")
-result = code_review_pipeline(sample_code)
-print(f"\n=== final report ===\n{result['report']}")
+def handle_inquiry(text: str) -> str:
+    """정보 문의 전용 응답 생성입니다."""
+    prompt = (
+        "고객이 정보를 문의했습니다. 명확하고 간결한 답변을 제공하고, "
+        "관련 추가 정보를 제안하세요.\n\n"
+        f"문의 내용: {text}"
+    )
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=512,
+    )
+    return response.choices[0].message.content
+
+
+def route_and_handle(customer_message: str) -> dict:
+    """의도를 분류하고 적절한 핸들러로 라우팅합니다."""
+    intent_result = classify_intent(customer_message)
+    intent = intent_result.get("intent", "other")
+
+    handlers = {
+        "complaint": handle_complaint,
+        "inquiry": handle_inquiry,
+    }
+
+    handler = handlers.get(intent)
+    if handler:
+        response = handler(customer_message)
+    else:
+        # 기본 핸들러
+        response = f"안녕하세요! 말씀해 주셔서 감사합니다. {customer_message[:50]}..."
+
+    return {
+        "intent": intent,
+        "confidence": intent_result.get("confidence", 0.0),
+        "urgency": intent_result.get("urgency", "medium"),
+        "response": response,
+    }
 ```
 
----
+## 실습 3: 상태 머신 워크플로
 
-## 이 코드에서 먼저 볼 점
+문서 검토 프로세스를 상태 머신으로 모델링합니다.
 
-- `code_review_pipeline()`은 JSON 분석, 개선 제안, 최종 보고서라는 세 handoff를 분명하게 보여 줍니다.
-- 특히 중간 `analysis` 객체가 계약 역할을 하므로, 원시 문자열만 넘길 때보다 로깅과 검증이 훨씬 쉬워집니다.
-- 이런 구조는 승인, 라우팅, 재시도 정책 같은 운영 제어와 잘 맞습니다.
+```python
+from enum import Enum
+from dataclasses import dataclass, field
+from datetime import datetime
+from openai import OpenAI
 
----
+client = OpenAI()
 
-## 어디서 자주 헷갈릴까요?
 
-- 단계가 많다고 자동으로 좋아지지 않습니다. 호출 하나가 늘 때마다 비용, 지연, 실패 표면도 함께 늘어납니다.
-- 단계 사이에 원시 문자열만 넘기면 이후 검증과 분기가 구조화된 딕셔너리를 넘길 때보다 훨씬 어려워집니다.
-- 워크플로와 에이전트를 가르는 진짜 기준은 도구 사용 여부가 아니라, 실행 경로가 런타임에 바뀌는지 여부입니다.
+class ReviewState(Enum):
+    SUBMITTED = "submitted"
+    ANALYZING = "analyzing"
+    REVIEW_NEEDED = "review_needed"
+    APPROVED = "approved"
+    REJECTED = "rejected"
 
----
+
+@dataclass
+class DocumentWorkflow:
+    doc_id: str
+    content: str
+    state: ReviewState = ReviewState.SUBMITTED
+    analysis: dict = field(default_factory=dict)
+    history: list[dict] = field(default_factory=list)
+
+    def transition(self, new_state: ReviewState, reason: str = "") -> None:
+        """상태 전환을 기록합니다."""
+        old_state = self.state
+        self.state = new_state
+        self.history.append({
+            "from": old_state.value,
+            "to": new_state.value,
+            "reason": reason,
+            "timestamp": datetime.utcnow().isoformat(),
+        })
+
+
+def analyze_document(workflow: DocumentWorkflow) -> DocumentWorkflow:
+    """문서를 분석해 위험 수준을 평가합니다."""
+    workflow.transition(ReviewState.ANALYZING, "자동 분석 시작")
+
+    prompt = (
+        "다음 문서를 분석하고 위험 수준을 평가하세요.\n\n"
+        f"{workflow.content[:2000]}\n\n"
+        "JSON으로만 응답: {"
+        '"risk_level": "low/medium/high", '
+        '"issues": ["이슈1", "이슈2"], '
+        '"requires_human_review": true/false'
+        "}"
+    )
+
+    import json
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=256,
+        response_format={"type": "json_object"},
+    )
+
+    workflow.analysis = json.loads(response.choices[0].message.content)
+
+    if workflow.analysis.get("requires_human_review", True):
+        workflow.transition(ReviewState.REVIEW_NEEDED, "고위험 또는 검토 필요")
+    else:
+        workflow.transition(ReviewState.APPROVED, "자동 승인 기준 충족")
+
+    return workflow
+
+
+def process_document(doc_id: str, content: str) -> DocumentWorkflow:
+    """문서 워크플로를 처음부터 실행합니다."""
+    workflow = DocumentWorkflow(doc_id=doc_id, content=content)
+    workflow = analyze_document(workflow)
+
+    print(f"[{doc_id}] 최종 상태: {workflow.state.value}")
+    print(f"[{doc_id}] 분석 결과: {workflow.analysis}")
+    print(f"[{doc_id}] 상태 이력: {len(workflow.history)}단계")
+
+    return workflow
+```
 
 ## 운영 체크리스트
 
-- [ ] 요약 출력이 다음 단계의 입력으로 전달된다
-- [ ] 분류기가 제한된 카테고리 집합 중 하나를 반환한다
-- [ ] 태깅 단계가 원문만이 아니라 앞선 단계 결과도 활용한다
-- [ ] 최종 출력이 중간 산출물을 여전히 포함하는 구조화 객체다
-
----
-
-## 워크플로 오케스트레이션과 상태 전이
-
-### 단계 상태를 가진 오케스트레이터
-
-다단계 체인을 운영할 때는 각 단계의 성공/실패를 구조화해서 남겨야 합니다. 아래 예시는 상태 전이 기록을 포함한 최소 오케스트레이터입니다.
-
-```python
-from dataclasses import dataclass, field
-from datetime import datetime
-
-@dataclass
-class StageEvent:
-    stage: str
-    status: str
-    timestamp: str
-    detail: str = ""
-
-@dataclass
-class WorkflowRun:
-    run_id: str
-    input_text: str
-    events: list[StageEvent] = field(default_factory=list)
-    outputs: dict = field(default_factory=dict)
-
-    def mark(self, stage: str, status: str, detail: str = ""):
-        self.events.append(StageEvent(
-            stage=stage,
-            status=status,
-            timestamp=datetime.utcnow().isoformat(),
-            detail=detail,
-        ))
-
-def run_workflow(text: str) -> WorkflowRun:
-    run = WorkflowRun(run_id='wf-001', input_text=text)
-
-    run.mark('classify', 'started')
-    category = 'TECHNICAL'
-    run.outputs['category'] = category
-    run.mark('classify', 'completed', detail=f'category={category}')
-
-    run.mark('summarize', 'started')
-    summary = f'요약: {text[:100]}...'
-    run.outputs['summary'] = summary
-    run.mark('summarize', 'completed')
-
-    run.mark('response', 'started')
-    response = f'[{category}] {summary}'
-    run.outputs['response'] = response
-    run.mark('response', 'completed')
-
-    return run
-```
-
-이벤트 로그가 있으면 실패가 나도 "최종 결과 없음"으로 끝나지 않습니다. 어느 단계까지 성공했는지 보이기 때문에 재시작 지점을 명확히 잡을 수 있습니다.
-
-### 워크플로 다이어그램
-
-```mermaid
-flowchart LR
-    I[입력] --> C[분류]
-    C --> S[요약]
-    S --> R[응답 생성]
-    R --> P[발송]
-    C --> L[분기 로그]
-    S --> L
-    R --> L
-```
-
-*단계별 상태 이벤트를 남기는 워크플로*
-
-### 운영 체크: 재시도와 멱등성
-
-워크플로 자동화는 재시도 설계를 빼면 반쪽짜리입니다. 같은 입력이 두 번 들어와도 결과가 중복 발송되지 않도록 `idempotency_key`를 두고, 단계별 재시도 횟수를 제한해야 합니다.
-
-- `idempotency_key`: 외부 요청 ID 또는 `(customer_id, request_ts)` 해시
-- `retry_policy`: 단계별 `max_retries`, backoff, timeout
-- `dead_letter_queue`: 반복 실패 건의 격리 저장소
-
-이 기준이 없으면 장애 상황에서 자동화가 복구를 돕는 대신 중복 실행을 늘려 문제를 키우게 됩니다.
-
-## 워크플로를 API와 이벤트로 분리하기
-
-순차 체인이 한 프로세스에서만 돌아가면 장애 복구와 확장이 어렵습니다. 그래서 보통 트리거 API와 실행 워커를 분리합니다.
-
-```python
-from fastapi import FastAPI
-from pydantic import BaseModel
-
-app = FastAPI()
-
-class WorkflowRequest(BaseModel):
-    request_id: str
-    text: str
-
-work_queue: list[dict] = []
-
-@app.post('/workflow/submit')
-def submit(req: WorkflowRequest):
-    work_queue.append({'request_id': req.request_id, 'text': req.text, 'status': 'queued'})
-    return {'request_id': req.request_id, 'status': 'queued'}
-```
-
-```python
-def worker_once():
-    if not work_queue:
-        return None
-
-    item = work_queue.pop(0)
-    run = run_workflow(item['text'])
-    return {
-        'request_id': item['request_id'],
-        'status': 'completed',
-        'outputs': run.outputs,
-        'events': [e.__dict__ for e in run.events],
-    }
-```
-
-### 승인 게이트를 포함한 워크플로 확장
-
-자동화 파이프라인에 사람 승인을 넣어야 할 때는 별도 상태를 둡니다.
-
-```text
-queued -> running -> waiting_approval -> approved -> completed
-queued -> running -> waiting_approval -> rejected
-queued -> running -> failed
-```
-
-이 상태 전이가 있으면 대시보드에서 "왜 멈췄는가"를 한눈에 확인할 수 있습니다.
-
-### 운영 메트릭
-
-워크플로 자동화에서는 모델 품질 지표와 함께 프로세스 지표를 같이 봐야 합니다.
-
-- `p95_stage_latency`: 단계별 지연 시간
-- `reprocess_rate`: 재처리 비율
-- `approval_wait_time`: 사람 승인 대기 시간
-- `dead_letter_count`: 반복 실패 건수
-
-이 네 가지가 잡혀 있으면 자동화가 실제로 효율을 높이는지, 단지 복잡도만 늘렸는지 판단할 수 있습니다.
-
-## LangGraph 스타일 상태 머신으로 확장하기
-
-워크플로가 길어지면 순차 함수 호출보다 상태 머신이 관리하기 쉽습니다. 노드별 책임을 분리하고 상태 객체를 공유하면 분기와 재시도를 명확히 다룰 수 있습니다.
-
-```python
-from typing import TypedDict
-
-class FlowState(TypedDict):
-    request_id: str
-    inquiry: str
-    category: str
-    summary: str
-    answer: str
-    needs_approval: bool
-
-def node_classify(state: FlowState) -> FlowState:
-    state['category'] = 'BILLING'
-    state['needs_approval'] = state['category'] == 'BILLING'
-    return state
-
-def node_summarize(state: FlowState) -> FlowState:
-    state['summary'] = state['inquiry'][:120]
-    return state
-
-def node_answer(state: FlowState) -> FlowState:
-    state['answer'] = f"[{state['category']}] {state['summary']}"
-    return state
-```
-
-### 상태 기반 분기 다이어그램
-
-```mermaid
-flowchart LR
-    A[Start] --> B[Classify]
-    B --> C[Summarize]
-    C --> D[Generate Answer]
-    D --> E{needs_approval}
-    E -->|true| F[Approval Queue]
-    E -->|false| G[Deliver]
-```
-
-*상태 플래그 기반 승인 분기*
-
-### 왜 상태 머신이 유리한가
-
-- 단계 추가 시 기존 코드 영향 범위를 줄일 수 있습니다.
-- 실패 노드를 기준으로 재시작하기 쉽습니다.
-- 대시보드에서 현재 노드를 그대로 보여 줄 수 있습니다.
-
-이 특성 덕분에 워크플로 자동화는 기능 개발보다 운영 단계에서 더 큰 이점을 얻습니다.
-
-## 장애 복구 런북: 단계 재실행
-
-워크플로 장애 대응은 전체 재실행보다 단계 재실행이 기본이어야 합니다. 이를 위해 각 단계 출력 아티팩트를 저장해 둡니다.
-
-```text
-artifact://run_id/classify.json
-artifact://run_id/summary.txt
-artifact://run_id/response.txt
-```
-
-```python
-def resume_from_stage(run_id: str, stage: str):
-    if stage == 'summarize':
-        classify = load_artifact(run_id, 'classify.json')
-        return rerun_summarize_and_after(run_id, classify)
-    if stage == 'response':
-        summary = load_artifact(run_id, 'summary.txt')
-        return rerun_response_only(run_id, summary)
-    raise ValueError('unsupported stage')
-```
-
-재실행 단위를 단계로 제한하면 장애 대응 시간이 줄고, 중복 발송 같은 2차 사고를 줄일 수 있습니다.
-
-### Flask 상태 조회 엔드포인트
-
-```python
-from flask import Flask, jsonify
-app = Flask(__name__)
-
-RUNS = {}
-
-@app.get('/workflow/<run_id>')
-def get_workflow_run(run_id: str):
-    data = RUNS.get(run_id)
-    if not data:
-        return jsonify({'error': 'not found'}), 404
-    return jsonify(data)
-```
-
-운영자는 이 엔드포인트로 현재 단계와 실패 이유를 즉시 확인할 수 있습니다. 워크플로 자동화의 품질은 기능 수보다 관측 가능성에서 결정됩니다.
-
-### 단계별 타임아웃 정책
-
-긴 워크플로에서 전체 타임아웃 하나만 두면 병목 단계를 찾기 어렵습니다. 분류 3초, 요약 8초, 응답 생성 8초처럼 단계별 제한 시간을 분리하면 지연 원인을 빠르게 좁힐 수 있습니다.
-
-### 배포 전 드라이런
-
-워크플로 변경을 배포할 때는 실데이터 대신 샘플 100건으로 드라이런을 수행해 단계별 성공률과 지연 시간을 비교해야 합니다. 드라이런 리포트 없이 배포하면 변경 영향 범위를 과소평가하기 쉽습니다.
-
-### 운영 회고에서 반드시 남길 항목
-
-패턴 설계가 실제로 효과가 있었는지는 회고 기록 품질에서 드러납니다. 각 글에서 다룬 구조를 실서비스에 적용했다면, 최소한 다음 항목은 공통 템플릿으로 남기는 편이 좋습니다.
-
-- 변경 전/후의 실패 유형 분포
-- 변경 전/후의 평균 지연 시간과 p95
-- 사람이 개입한 건수와 자동 처리 건수 비율
-- 근거 부족, 파싱 실패, 도구 오류 같은 실패 코드의 추세
-- 다음 분기에서 조정할 임계값 또는 프롬프트 버전
-
-이 기록이 쌓이면 모델 자체 성능보다 애플리케이션 패턴 결정이 어떤 영향을 주었는지 분리해서 볼 수 있습니다. 결국 운영 품질은 한 번의 정답 설계가 아니라, 측정 가능한 개선 루프를 오래 유지하는 능력에서 만들어집니다.
-
-이 항목을 주간 리듬으로 점검하면, 자동화 품질이 우연이 아니라 재현 가능한 운영 습관으로 자리잡습니다.
-
-## 정리
-
-각 단계는 하나의 책임만 맡게 두는 편이 좋습니다. 너무 많은 일을 하는 단계는 테스트하기 어렵고, 디버깅하기 어렵고, 교체하기도 어렵습니다. 단계 출력이 구조화 데이터여야 하는데 자유 텍스트로 흘러나오면, 다음 단계는 조용히 실패하는 경우가 많습니다. 모든 단계의 출력 형식을 먼저 정의하고 검증한 뒤에야 다음 단계로 넘기는 습관이 필요합니다.
-
-마지막 글에서는 Human-in-the-loop 설계를 다룹니다. 자동화 파이프라인 안에 사람 검토와 승인 게이트를 삽입하는 방식입니다.
-
----
+- [ ] 체인의 각 단계에서 출력 유효성을 검증합니다.
+- [ ] 중간 단계 실패 시 재시도 또는 대체 경로가 있습니다.
+- [ ] 분류 결과에 신뢰도 임계값 필터가 적용됩니다.
+- [ ] 상태 머신의 모든 상태 전환이 로깅됩니다.
+- [ ] 워크플로 실행 결과가 재현 가능하도록 입력과 출력이 저장됩니다.
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 해결 방법 |
+|---|---|---|
+| 체인 단계 실패를 무시 | 잘못된 입력으로 다음 단계 진행 | 각 단계 후 success 체크 및 중단 로직 |
+| 분류 신뢰도 낮아도 라우팅 | 잘못된 파이프라인으로 처리 | 신뢰도 0.6 미만은 기본 핸들러로 |
+| 상태 전환 기록 없음 | 어느 단계에서 실패했는지 추적 불가 | history 배열에 모든 전환 기록 |
+| 긴 체인에 레이턴시 확인 없음 | 전체 파이프라인이 너무 느림 | 각 단계 시간을 측정하고 병렬화 검토 |
+| 중간 결과물 저장 없음 | 실패 시 처음부터 재실행 필요 | 단계별 체크포인트 저장 구현 |
 
 ## 처음 질문으로 돌아가기
 
-- **다단계 체인은 언제 단순 순차 실행이고 언제 라우팅이 필요할까요?**
-  - LCEL의 `|` 연산자는 단계를 연결합니다. 왼쪽 단계의 출력이 오른쪽 단계의 입력이 됩니다.
-- **중간 결과의 타입을 고정하지 않으면 다음 단계에서 어떤 문제가 생길까요?**
-  - LCEL의 `|` 연산자는 단계를 연결합니다
-- **워크플로 자동화에서 실패를 한 번에 숨기지 않으려면 어디에 로그를 남겨야 할까요?**
-  - 다단계 체인을 운영할 때는 각 단계의 성공/실패를 구조화해서 남겨야 합니다. 아래 예시는 상태 전이 기록을 포함한 최소 오케스트레이터입니다.
+- **LLM 작업을 여러 단계로 분해하면 어떤 이점이 있을까요?**
+  각 단계를 독립적으로 검증하고 재시도할 수 있어 전체 파이프라인의 신뢰성이 높아집니다. 어느 단계에서 오류가 났는지 정확히 파악할 수 있고, 단계별로 다른 모델이나 프롬프트를 사용해 최적화할 수 있습니다.
+
+- **분류 기반 라우팅은 어떤 상황에서 효과적일까요?**
+  입력 유형이 다양하고 각 유형에 맞는 전문화된 응답이 필요할 때 효과적입니다. 단일 범용 프롬프트보다 전문화된 프롬프트가 일반적으로 품질이 높습니다. 다만 분류 오류가 잘못된 파이프라인으로 이어질 수 있으므로 신뢰도 임계값 설정이 중요합니다.
+
+- **상태 머신으로 LLM 워크플로를 설계하면 무엇이 달라질까요?**
+  현재 상태를 명시적으로 추적할 수 있어 장애 복구와 재시작이 가능해집니다. 비즈니스 프로세스의 어느 단계에 있는지 언제든 조회할 수 있고, 상태 이력으로 처리 과정을 감사할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [AI App Patterns 101 (1/6): 챗봇 패턴 — 대화 이력과 상태 관리](./01-chatbot-pattern.md)
-- [AI App Patterns 101 (2/6): RAG Q&A 패턴 — 문서 기반 질의응답](./02-rag-qa-pattern.md)
-- [AI App Patterns 101 (3/6): 문서 어시스턴트 — 요약, 추출, 분류](./03-document-assistant.md)
-- [AI App Patterns 101 (4/6): 에이전트와 도구 패턴 — 자율적 도구 선택](./04-agent-tool-pattern.md)
-- **AI App Patterns 101 (5/6): 워크플로 자동화 — 다단계 체인 설계 (현재 글)**
-- [AI App Patterns 101 (6/6): Human-in-the-loop — 사람 개입 설계](./06-human-in-the-loop.md)
+- [AI App Patterns 101 (1/6): Chatbot 패턴](./01-chatbot-pattern.md)
+- [AI App Patterns 101 (2/6): RAG QA 패턴](./02-rag-qa-pattern.md)
+- [AI App Patterns 101 (3/6): Document Assistant 패턴](./03-document-assistant.md)
+- [AI App Patterns 101 (4/6): Agent Tool 패턴](./04-agent-tool-pattern.md)
+- **AI App Patterns 101 (5/6): Workflow Automation 패턴 (현재 글)**
+- [AI App Patterns 101 (6/6): Human-in-the-Loop 패턴](./06-human-in-the-loop.md)
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-- [LangChain LCEL](https://python.langchain.com/docs/expression_language/)
-- [LangChain routing](https://python.langchain.com/docs/expression_language/how_to/routing/)
-- [RunnableParallel](https://python.langchain.com/docs/expression_language/primitives/parallel/)
+- [LangChain — Sequential Chains](https://python.langchain.com/docs/modules/chains/)
+- [LangGraph — State Machines for LLM](https://langchain-ai.github.io/langgraph/)
+- [OpenAI — Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs)
+- [Martin Fowler — State Machine](https://martinfowler.com/bliki/StateMachine.html)
+- [book-examples — ai-app-patterns-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/ai-app-patterns-101/ko)
 
-- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-app-patterns-101/ko/05-workflow-automation)
-
-Tags: LLM, RAG, Agent, Python
+Tags: Workflow, Chain, LLM, Classification, StateMachine

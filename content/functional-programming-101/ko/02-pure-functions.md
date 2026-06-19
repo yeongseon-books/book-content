@@ -305,12 +305,37 @@ print([r["product"] for r in high_performers])  # ['B', 'D']
 print(f"Total: {grand_total:,}")                 # Total: 85,000
 ```
 
+### 단계 7: mutable 기본 인자 — 가장 자주 만나는 함정
+
+```python
+# 잘못된 패턴: 기본 인자로 mutable 객체 사용
+def append_item_bad(item: str, container: list = []) -> list:
+    container.append(item)
+    return container
+
+print(append_item_bad("a"))   # ['a']
+print(append_item_bad("b"))   # ['a', 'b']  ← 이전 호출 상태가 남아 있음!
+print(append_item_bad("c"))   # ['a', 'b', 'c']
+
+# 올바른 패턴: None을 기본값으로 두고 함수 내부에서 초기화
+def append_item_pure(item: str, container: list | None = None) -> list:
+    base = container if container is not None else []
+    return [*base, item]  # 새 리스트 반환 — 원본 불변
+
+print(append_item_pure("a"))         # ['a']
+print(append_item_pure("b"))         # ['b']  ← 독립적
+print(append_item_pure("c", ["x"]))  # ['x', 'c']  ← 원본 변경 없음
+```
+
+Python의 mutable 기본 인자는 함수가 정의될 때 한 번만 생성됩니다. 호출마다 새로 만들어지지 않습니다. 이 때문에 순수 함수를 의도했어도 상태가 호출 간에 유출됩니다. `None`을 기본값으로 쓰는 것은 Python에서 이 문제를 피하는 표준 관용구입니다.
+
 ## 이 코드에서 주목할 점
 
 - 순수 함수는 입력과 출력만으로 설명할 수 있어서 테스트가 단순합니다.
 - 부수효과를 없애는 것이 아니라 프로그램 경계로 밀어내는 것이 핵심입니다.
 - 참조 투명성은 `@lru_cache` 같은 캐싱의 안전성을 보장합니다.
 - `map`과 `filter`로 구성된 순수 파이프라인은 각 단계를 독립 검증할 수 있습니다.
+- mutable 기본 인자는 함수 정의 시 한 번 생성되므로 상태가 호출 간에 유출됩니다.
 
 ## 자주 하는 실수
 

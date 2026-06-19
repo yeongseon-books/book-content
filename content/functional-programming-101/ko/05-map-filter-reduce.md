@@ -286,12 +286,57 @@ print(max(numbers))  # 9  — reduce(lambda a,b: a if a>b else b, numbers)보다
 
 `reduce`를 사용할 때는 반드시 초기값을 명시하고, 내장 함수로 표현 가능하면 내장 함수를 우선하는 것이 좋습니다.
 
+### 단계 7: `map`/`filter`/`reduce`로 보고서 파이프라인 만들기
+
+실제 업무에 가까운 예시로 세 연산이 어떻게 유기적으로 연결되는지 확인합니다.
+
+```python
+from functools import reduce
+
+# 월간 거래 내역
+transactions = [
+    {"date": "2026-06-01", "type": "sale",   "amount": 150_000, "region": "seoul"},
+    {"date": "2026-06-03", "type": "refund",  "amount":  20_000, "region": "busan"},
+    {"date": "2026-06-07", "type": "sale",   "amount": 320_000, "region": "seoul"},
+    {"date": "2026-06-10", "type": "sale",   "amount":  80_000, "region": "daegu"},
+    {"date": "2026-06-15", "type": "refund",  "amount":  15_000, "region": "seoul"},
+    {"date": "2026-06-20", "type": "sale",   "amount": 540_000, "region": "seoul"},
+]
+
+# 단계 1 — filter: 판매 거래만
+sales = filter(lambda t: t["type"] == "sale", transactions)
+
+# 단계 2 — filter: 서울 지역만
+seoul_sales = filter(lambda t: t["region"] == "seoul", sales)
+
+# 단계 3 — map: 부가세(10%) 포함 금액 계산
+with_vat = map(lambda t: {**t, "total": t["amount"] * 1.1}, seoul_sales)
+
+# 단계 4 — reduce: 총 매출 합산
+total = reduce(lambda acc, t: acc + t["total"], with_vat, 0)
+
+print(f"서울 판매 부가세 포함 총액: {total:,.0f}원")
+# 서울 판매 부가세 포함 총액: 1,111,000원
+
+# 지역별 집계로 확장 — reduce로 dict 누적
+region_totals = reduce(
+    lambda acc, t: {**acc, t["region"]: acc.get(t["region"], 0) + t["amount"]},
+    filter(lambda t: t["type"] == "sale", transactions),
+    {},
+)
+print(region_totals)
+# {'seoul': 1_010_000, 'daegu': 80_000}
+```
+
+이 파이프라인에서 각 단계는 이전 단계의 결과만 받고 다음으로 넘깁니다. 중간 변수를 쓴 것은 가독성을 위한 선택이지 필수가 아닙니다. `filter` → `filter` → `map` → `reduce`로 이어지는 구성은 SQL의 `WHERE` → `SELECT` → `GROUP BY` 흐름과 같은 사고입니다.
+
 ## 이 코드에서 주목할 점
 
 - `map`과 `filter`는 iterator를 반환하므로 지연 평가됩니다.
 - 단순한 경우에는 컴프리헨션이 `map`/`filter`보다 더 Pythonic합니다.
 - `reduce`는 안전하게 초기값을 함께 주는 습관이 중요합니다.
 - 세 연산을 조합하면 복잡한 처리도 선언형으로 표현할 수 있습니다.
+- `reduce`로 dict를 누적하면 `GROUP BY` 스타일 집계를 표현할 수 있습니다.
 
 ## 자주 하는 실수
 

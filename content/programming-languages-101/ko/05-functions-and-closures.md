@@ -286,6 +286,85 @@ print(add.__name__)    # "add" (wraps 없으면 "wrapper")
 
 `functools.wraps`를 빠뜨리면 데코레이터가 적용된 함수의 이름이 `wrapper`로 바뀌고, `help()`와 타입 검사기가 원본 시그니처를 잃어버립니다.
 
+## 부분 적용과 커링
+
+클로저 위에 자연스럽게 얹히는 패턴이 부분 적용(partial application)과 커링(currying)입니다. 두 개 이상의 인자를 받는 함수를 일부 인자를 고정해 더 특수한 함수로 만드는 기법입니다.
+
+```python
+# Python: functools.partial로 부분 적용
+import functools
+
+def multiply(a: int, b: int) -> int:
+    return a * b
+
+double = functools.partial(multiply, 2)
+triple = functools.partial(multiply, 3)
+
+print(double(5))   # 10
+print(triple(5))   # 15
+
+# 클로저로 직접 구현한 partial
+def partial_apply(fn, *fixed):
+    def inner(*rest):
+        return fn(*fixed, *rest)
+    return inner
+
+add5 = partial_apply(lambda a, b: a + b, 5)
+print(add5(10))    # 15
+```
+
+```javascript
+// JavaScript: 화살표 함수로 커링 표현
+const multiply = (a: number) => (b: number): number => a * b;
+
+const double = multiply(2);
+const triple = multiply(3);
+
+console.log(double(5));  // 10
+console.log(triple(5));  // 15
+```
+
+부분 적용은 설정값이나 컨텍스트를 미리 고정해 두고 실제 동작은 나중에 제공하는 패턴에서 자주 쓰입니다. 로깅 함수에 레벨을 미리 고정하거나, HTTP 클라이언트에 기본 URL을 미리 넣어 두는 식으로 응용됩니다.
+
+## 제너레이터: 실행을 중간에 멈추는 함수
+
+클로저가 환경을 기억하는 함수라면, 제너레이터는 실행 위치까지 기억하는 함수입니다.
+
+```python
+# Python: 제너레이터 함수
+from typing import Generator, Iterator
+
+def countdown(n: int) -> Generator[int, None, None]:
+    while n > 0:
+        yield n           # 여기서 멈추고 값을 내보냄
+        n -= 1            # 다음 next() 호출 시 여기서 재개
+
+gen = countdown(3)
+print(next(gen))  # 3
+print(next(gen))  # 2
+print(next(gen))  # 1
+# print(next(gen))  # StopIteration
+
+# 제너레이터 표현식 (리스트 컴프리헨션과 비슷하지만 지연 평가)
+squares = (x * x for x in range(10))   # 전체를 미리 계산하지 않음
+print(sum(squares))  # 285
+
+# 무한 시퀀스도 표현 가능
+def naturals() -> Iterator[int]:
+    n = 1
+    while True:
+        yield n
+        n += 1
+
+first_five = [next(naturals()) for _ in range(5)]
+# 위 코드는 의도한 대로 동작하지 않음 — 제대로 된 사용법:
+nat = naturals()
+first_five = [next(nat) for _ in range(5)]
+print(first_five)  # [1, 2, 3, 4, 5]
+```
+
+제너레이터는 클로저의 연장선입니다. 함수가 자신의 로컬 상태를 기억한다는 점에서는 클로저와 같지만, `yield`를 통해 실행 제어권을 호출자에게 넘길 수 있다는 점이 다릅니다. 큰 파일을 줄 단위로 처리하거나, 무한 스트림을 다룰 때 메모리를 절약하는 핵심 도구입니다.
+
 ## 운영 체크리스트
 
 - [ ] 일급 함수와 고차 함수의 차이를 한 줄로 설명할 수 있는가?

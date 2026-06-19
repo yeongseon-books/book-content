@@ -274,6 +274,84 @@ for stat in top_stats[:3]:
 
 실제 서비스에서 메모리가 계속 올라갈 때, `tracemalloc`으로 어느 줄이 가장 많이 할당하는지 확인하면 누수 원인을 빠르게 찾을 수 있습니다.
 
+## Go의 GC와 Python GC 비교
+
+Python과 Go는 모두 자동 GC를 사용하지만 방식이 다릅니다.
+
+```go
+// Go: GC가 투명하게 동작, 개발자는 메모리를 직접 관리하지 않음
+package main
+
+import (
+    "fmt"
+    "runtime"
+)
+
+func allocateLots() [][]byte {
+    slices := make([][]byte, 1000)
+    for i := range slices {
+        slices[i] = make([]byte, 1024)  // 1KB씩 1000개 할당
+    }
+    return slices
+}
+
+func main() {
+    var stats runtime.MemStats
+
+    runtime.ReadMemStats(&stats)
+    before := stats.Alloc
+
+    data := allocateLots()
+    _ = data
+
+    runtime.ReadMemStats(&stats)
+    fmt.Printf("allocated: %d KB\n", (stats.Alloc - before) / 1024)
+
+    data = nil          // 참조 제거
+    runtime.GC()        // 명시적 GC 요청 (일반적으로 필요 없음)
+
+    runtime.ReadMemStats(&stats)
+    fmt.Printf("after GC: %d KB\n", stats.Alloc / 1024)
+}
+```
+
+Go의 GC는 Tri-color mark and sweep 방식으로 짧은 포즈(STW, Stop-The-World)를 목표로 설계돼 있습니다. Python의 보조 GC와 달리 Go의 GC는 모든 힙 메모리를 관리합니다.
+
+## Rust의 소유권 시스템: GC 없이 메모리 안전
+
+Rust는 GC 없이 컴파일 타임에 메모리 안전을 보장합니다. 소유권(Ownership), 차용(Borrowing), 수명(Lifetime) 세 규칙이 핵심입니다.
+
+```rust
+// Rust: 소유권 이동과 차용
+fn main() {
+    // 소유권 이동 (move)
+    let s1 = String::from("hello");
+    let s2 = s1;        // s1의 소유권이 s2로 이동
+    // println!("{}", s1);  // 컴파일 오류: s1은 더 이상 유효하지 않음
+    println!("{}", s2);  // "hello"
+
+    // 차용 (borrowing): 소유권 이전 없이 참조 전달
+    let s3 = String::from("world");
+    let len = calculate_length(&s3);  // s3를 빌려줌
+    println!("{} has length {}", s3, len);  // s3는 여전히 유효
+
+    // 가변 차용: 한 번에 하나만 허용
+    let mut s4 = String::from("hello");
+    {
+        let r1 = &mut s4;
+        r1.push_str(", world");
+        println!("{}", r1);
+    }  // r1의 스코프 종료
+    println!("{}", s4);  // s4는 다시 쓸 수 있음
+}
+
+fn calculate_length(s: &String) -> usize {
+    s.len()
+}   // s는 참조이므로 여기서 drop되지 않음
+```
+
+Rust 컴파일러는 이 규칙들을 컴파일 타임에 검사합니다. 런타임 GC 포즈도, use-after-free도, 데이터 레이스도 없습니다. 대신 소유권 규칙을 배우는 학습 비용이 있습니다.
+
 ## 운영 체크리스트
 
 - [ ] 스택과 힙의 차이를 한 문장으로 말할 수 있는가?

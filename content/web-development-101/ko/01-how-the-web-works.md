@@ -234,6 +234,61 @@ curl -I https://example.com
 curl -v https://example.com 2>&1 | head -40
 ```
 
+## TLS 핸드쉐이크: HTTPS가 어떻게 동작하는가
+
+HTTPS는 HTTP 메시지를 TLS로 감싼 것입니다. 연결이 맺어지기 전에 브라우저와 서버가 암호화 방식을 협상합니다.
+
+```
+TLS 1.3 핸드쉐이크 (간략):
+  클라이언트 → ClientHello (지원 암호 목록, 난수)
+  서버        ← ServerHello (선택된 암호, 인증서, 서버 공개키)
+  클라이언트 → 인증서 검증 → 세션 키 유도
+  ────────────────────────────────────────
+  이후 모든 HTTP 메시지는 세션 키로 암호화
+
+TLS 1.2 대비 TLS 1.3의 개선:
+  - 핸드쉐이크 1 RTT (1.2는 2 RTT)
+  - 0-RTT 재개 (이전 연결 재사용 시)
+  - 취약한 암호 알고리즘 제거
+```
+
+```bash
+# 인증서 정보 확인
+curl -v https://example.com 2>&1 | grep -E "(SSL|TLS|certificate|expire)"
+
+# 인증서 만료일 확인
+echo | openssl s_client -connect example.com:443 2>/dev/null \
+  | openssl x509 -noout -dates
+```
+
+## HTTP/1.1 vs HTTP/2 vs HTTP/3
+
+```
+HTTP/1.1 (1997~):
+  - 요청당 TCP 연결 1개
+  - 브라우저는 보통 도메인당 6개 연결 병렬 사용
+  - Head-of-line blocking (앞 요청 지연 시 뒤 요청도 대기)
+
+HTTP/2 (2015~):
+  - 하나의 TCP 연결에서 여러 스트림 다중화
+  - 헤더 압축 (HPACK)
+  - 서버 푸시 (요청 전에 필요한 리소스 미리 전송)
+
+HTTP/3 (2022~):
+  - TCP 대신 QUIC (UDP 기반) 사용
+  - 패킷 손실 시 다른 스트림에 영향 없음
+  - 0-RTT 연결 재개
+```
+
+```bash
+# HTTP 버전 확인
+curl -I --http2 https://example.com | grep "HTTP/"
+curl -I --http3 https://example.com | grep "HTTP/"
+
+# 또는 DevTools Network 탭 → Protocol 컬럼 확인
+# h2 = HTTP/2, h3 = HTTP/3
+```
+
 ## 자주 하는 실수
 
 | 실수 | 증상 | 올바른 이해 |

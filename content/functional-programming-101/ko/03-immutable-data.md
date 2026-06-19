@@ -298,12 +298,46 @@ print(f"할인 가격: {[p.price for p in discounted]}")  # [4050, 2700, 900]
 print(f"총 재고 가치: {total_value:,}")  # 총 재고 가치: 585,000
 ```
 
+### 단계 7: `MappingProxyType`으로 dict를 읽기 전용으로 만들기
+
+```python
+from types import MappingProxyType
+
+# 설정 딕셔너리를 읽기 전용으로 노출
+_config = {
+    "host": "localhost",
+    "port": 5432,
+    "db": "myapp",
+}
+
+# MappingProxyType은 dict를 래핑해 수정을 막음
+CONFIG = MappingProxyType(_config)
+
+print(CONFIG["host"])  # 'localhost' — 읽기는 가능
+
+try:
+    CONFIG["host"] = "production-db"  # TypeError 발생
+except TypeError as e:
+    print(f"수정 불가: {e}")
+
+# 업데이트가 필요하면 원본 dict를 갱신하고 다시 래핑
+def update_config(base: dict, overrides: dict) -> MappingProxyType:
+    return MappingProxyType({**base, **overrides})
+
+dev_config = update_config(_config, {"host": "dev-db", "port": 5433})
+print(dev_config["host"])  # 'dev-db'
+print(dev_config["db"])    # 'myapp' — 원본 값 유지
+```
+
+`MappingProxyType`은 `frozen dataclass`나 `NamedTuple`이 어울리지 않는 dict 형태의 설정 객체를 읽기 전용으로 노출할 때 유용합니다. 외부에 노출하는 API 설정, 플러그인 시스템 기본값, 환경별 상수 맵에 자주 쓰입니다.
+
 ## 이 코드에서 주목할 점
 
 - Python의 `tuple`, `frozenset`, `str`은 대표적인 내장 불변 타입입니다.
 - `NamedTuple._replace()`와 `dataclasses.replace()`는 불변 업데이트의 핵심 패턴입니다.
 - `frozen dataclass`는 hashable해서 dict 키나 set 원소로 활용할 수 있습니다.
 - 불변 데이터는 `map`/`filter` 파이프라인과 자연스럽게 결합됩니다.
+- `MappingProxyType`은 dict를 읽기 전용으로 감싸 설정 객체 노출에 적합합니다.
 
 ## 자주 하는 실수
 

@@ -274,6 +274,54 @@ print(s.getvalue())
 
 `dis`로 바이트코드를 확인하고, `cProfile`로 어디서 시간이 쓰이는지 찾은 다음, NumPy나 C 확장으로 핫 경로를 내리는 순서가 실무에서 가장 효과적인 Python 최적화 흐름입니다.
 
+## WebAssembly: 브라우저 안의 AOT
+
+WebAssembly(Wasm)는 브라우저 안에서 네이티브에 가까운 속도로 실행되는 컴팩트한 바이너리 형식입니다. C, C++, Rust 같은 언어를 Wasm으로 컴파일하면, 브라우저의 JavaScript 엔진이 이를 AOT 또는 JIT로 실행합니다.
+
+```text
+소스 코드 (C/C++/Rust)
+    |
+    | emcc / wasm-pack
+    v
+WebAssembly 바이너리 (.wasm)
+    |
+    | 브라우저 JS 엔진 (V8, SpiderMonkey)
+    v
+기계어 (JIT 최적화 포함)
+```
+
+Python은 `wasmtime`이나 Pyodide 프로젝트를 통해 Wasm 환경에서 실행될 수 있습니다. 실행 모델 스펙트럼에 브라우저라는 타깃이 하나 더 추가된 셈입니다.
+
+## 최신 Python 실행 최적화 옵션
+
+CPython 3.11 이후 더 적극적인 최적화가 도입됐습니다. 실행 모델의 변화를 이해해 두면 버전 선택 기준이 더 명확해집니다.
+
+```python
+# Python 3.11+: 전문화된 적응적 인터프리터 (Specializing Adaptive Interpreter)
+# 같은 코드를 반복 실행하면 VM이 자동으로 타입 특화 명령어로 교체
+
+def add_numbers(a: int, b: int) -> int:
+    return a + b
+
+# 반복 호출 시 Python 3.11+는 내부적으로 더 효율적인 경로 사용
+import timeit
+result = timeit.timeit(lambda: add_numbers(1, 2), number=10_000_000)
+print(f"10M calls: {result:.3f}s")
+
+# Python 3.13+: 실험적 JIT (no-GIL 실험 빌드와 함께)
+# 아직 기본 활성화가 아니지만, 실행 모델이 계속 진화 중임을 보여 줌
+```
+
+```text
+CPython 버전별 실행 모델 진화:
+3.10 이하  : 고전적 바이트코드 인터프리터
+3.11       : 적응적 인터프리터 (타입 특화, 10-60% 속도 향상)
+3.12       : 개선된 적응적 최적화
+3.13+      : 실험적 JIT 컴파일러 (선택적 빌드)
+```
+
+실행 모델은 언어의 버전에 따라 계속 변합니다. Python을 "항상 느린 인터프리터"로 단정하는 것은 3.11 이후의 현실을 반영하지 못합니다.
+
 ## 운영 체크리스트
 
 - [ ] 인터프리터와 컴파일러의 차이를 한 줄로 설명할 수 있는가?

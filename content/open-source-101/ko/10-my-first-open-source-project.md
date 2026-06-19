@@ -22,7 +22,7 @@ last_reviewed: '2026-05-15'
 
 # Open Source 101 (10/10): 내 첫 오픈소스 프로젝트
 
-시리즈를 따라오면서 오픈소스의 정의, 라이선스, 이슈, 풀 리퀘스트, 리드미 문서, 릴리스, 커뮤니티, 메인테이너 역할까지 살펴봤습니다. 이제 마지막으로 남는 질문은 하나입니다. 그래서 실제로 무엇을 공개하면 될까 하는 질문입니다. 많은 사람이 여기서 멈춥니다. 아이디어는 있는데 너무 작아 보이거나, 반대로 완벽하지 않아서 공개하기 민망하다고 느끼기 때문입니다.
+시리즈를 따라오면서 오픈소스의 정의, 라이선스, 이슈, 풀 리퀘스트, README 문서, 릴리스, 커뮤니티, 메인테이너 역할, 포트폴리오까지 살펴봤습니다. 이제 마지막으로 남는 질문은 하나입니다. 그래서 실제로 무엇을 공개하면 될까 하는 질문입니다. 많은 사람이 여기서 멈춥니다. 아이디어는 있는데 너무 작아 보이거나, 반대로 완벽하지 않아서 공개하기 민망하다고 느끼기 때문입니다.
 
 이 글은 오픈소스 101 시리즈의 마지막 글입니다.
 
@@ -30,7 +30,12 @@ last_reviewed: '2026-05-15'
 
 ![Open Source 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/10/10-01-the-smallest-path-to-publication.ko.png)
 *Open Source 101 10장 흐름 개요*
-> 첫 오픈소스 프로젝트는 완벽한 기능보다 **명확한 목적, 따라오기 쉬운 진입 경로, 응답 있는 커뮤니티**를 우선합니다.
+
+## 왜 이 글이 중요한가
+
+오픈소스 학습은 공개될 때 비로소 닫힙니다. 로컬에서 돌아가는 코드와 다른 사람이 써 볼 수 있는 프로젝트 사이에는 생각보다 큰 차이가 있습니다. README, LICENSE, CHANGELOG, 피드백 채널, 릴리스 태그가 붙어야 비로소 다른 사람이 접근 가능한 산출물이 됩니다.
+
+이 과정은 작아 보여도 실무 감각을 크게 길러 줍니다. 범위를 자르는 법, 문서 우선순위를 정하는 법, 첫 사용자 반응을 수집하는 법을 한 번에 연습할 수 있기 때문입니다. 그래서 첫 프로젝트는 크기보다 끝까지 가 보는 경험이 더 중요합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -40,159 +45,463 @@ last_reviewed: '2026-05-15'
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
-학습은 공개될 때 비로소 닫힙니다. 로컬에서 돌아가는 코드와 다른 사람이 써 볼 수 있는 프로젝트 사이에는 생각보다 큰 차이가 있습니다. README, LICENSE, CHANGELOG, 피드백 채널, 릴리스 태그까지 붙여야 비로소 다른 사람이 접근 가능한 산출물이 됩니다.
+## 핵심 관점
 
-이 과정은 작아 보여도 실무 감각을 많이 길러 줍니다. 범위를 자르는 법, 문서 우선순위를 정하는 법, 첫 사용자 반응을 수집하는 법을 한 번에 연습할 수 있기 때문입니다. 그래서 첫 프로젝트는 크기보다 끝까지 가 보는 경험이 더 중요합니다.
+> 첫 오픈소스 프로젝트는 완벽한 기능보다 **명확한 목적, 따라오기 쉬운 진입 경로, 응답 있는 커뮤니티**를 우선합니다.
+
+첫 프로젝트는 대작일 필요가 없습니다. 오히려 작은 MVP라도 문서와 릴리스가 갖춰지면 충분히 첫 오픈소스 프로젝트가 됩니다. 핵심은 대단해 보이는 결과물이 아니라, 다른 사람이 실제로 써 볼 수 있는 상태까지 끝내는 것입니다.
+
+## 핵심 개념 다섯 가지
+
+| 개념 | 정의 | 첫 프로젝트에서의 역할 |
+|---|---|---|
+| **MVP** | 최소 기능을 갖춘 첫 공개 가능 버전 | 범위를 잘라 끝낼 수 있게 만드는 기준 |
+| **Scope** | 이번 릴리스에 들어갈 것과 넣지 않을 것의 경계 | 완벽주의 함정에서 벗어나는 장치 |
+| **Roadmap** | 이번 버전에 없는 것을 이후 계획으로 미루는 문서 | non-goals를 공개적으로 선언하는 수단 |
+| **Announcement** | 프로젝트를 세상에 알리는 공개 메시지 | 첫 사용자를 만드는 시작점 |
+| **Feedback loop** | 사용자 반응을 받아 다음 수정으로 연결하는 반복 구조 | 프로젝트를 살아있게 만드는 엔진 |
+
+이 다섯 가지를 이해하면 완벽주의 때문에 공개를 미루는 패턴에서 벗어날 수 있습니다. 처음부터 모든 것을 해결하는 대신, 작게 내고 배우는 구조를 만들 수 있기 때문입니다.
 
 ## 공개까지 가는 최소 경로
 
-이 순서에서 중요한 점은 공개가 맨 마지막에 한 번 일어나는 이벤트가 아니라는 사실입니다. 문서를 정리하는 순간부터 이미 외부 사용자를 상정하게 되고, 릴리스와 공지는 그 준비의 자연스러운 결과가 됩니다.
+공개가 맨 마지막에 한 번 일어나는 이벤트가 아니라는 사실이 중요합니다. 문서를 정리하는 순간부터 이미 외부 사용자를 상정하게 되고, 릴리스와 공지는 그 준비의 자연스러운 결과가 됩니다.
+
+| 단계 | 작업 | 산출물 |
+|---|---|---|
+| 1 — 아이디어 정의 | 한 줄 목표 + non-goals 작성 | `SCOPE.md` 또는 이슈 #1 |
+| 2 — MVP 구현 | 로컬에서 최소 기능 동작 확인 | 코드 + 로컬 테스트 |
+| 3 — 문서 5종 준비 | README, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG | 저장소 루트 파일 |
+| 4 — CI 설정 | 자동 린트·테스트·빌드 | `.github/workflows/ci.yml` |
+| 5 — 첫 릴리스 | `v0.1.0` 태그 + 릴리스 노트 | GitHub Releases |
+| 6 — 공지 | SNS·커뮤니티 포스팅 | 첫 사용자 |
+| 7 — 피드백 수집 | 이슈·댓글·이메일 모니터링 | `v0.1.1` 방향 |
 
 작은 프로젝트일수록 이 순서를 지키는 편이 좋습니다. 기능을 과하게 늘리기 시작하면 끝내기 어려워지고, 끝내지 못한 프로젝트는 공개 경험을 남기지 못합니다.
 
-## 꼭 알아야 할 다섯 가지 개념
-
-MVP는 가장 작은 유효 제품입니다. scope는 이번 릴리스에 들어갈 것과 넣지 않을 것을 가르는 선입니다. roadmap은 이번 버전에 없는 것을 이후 계획으로 미루는 문서적 장치입니다. announcement는 프로젝트를 세상에 알리는 공개 메시지입니다. feedback loop는 사용자 반응을 받아 다음 수정으로 연결하는 반복 구조입니다.
-
-이 다섯 가지를 이해하면 완벽주의 때문에 공개를 미루는 패턴에서 조금 벗어날 수 있습니다. 처음부터 모든 것을 해결하는 대신, 작게 내고 배우는 구조를 만들 수 있기 때문입니다.
-
-## 메인테이너 번아웃 신호
-
-첫 프로젝트를 공개하면 흥분되지만, 시간이 지나면서 유지보수 부담이 느껴집니다. 메인테이너 번아웃은 갑자기 오는 것이 아니라 신호가 있습니다.
-
-| 신호 | 증상 | 대응 |
-|---|---|---|
-| 응답 지연 | 이슈/PR에 2주 이상 무응답 | 응답 주기 개선 또는 자동화 |
-| 이슈 축적 | 미해결 이슈 100개+ | triage 루틴 강화, 라벨링 |
-| 동기 저하 | 코드 작성에 흥미 상실 | 서브 프로젝트 분리, 휴식 |
-| 불명확한 방향 | 기능 추가를 계속 미룸 | 로드맵 작성, non-goals 명시 |
-
-이 신호들을 방치하면 프로젝트가 서서히 방치됩니다. 번아웃을 느껴다면 부끄러운 것이 아니라 프로젝트 구조를 고쳐야 한다는 신호입니다. 메인테이너 역할을 나누거나, 자동화를 더하거나, 프로젝트 범위를 줄이는 것이 해결책입니다.
-
-첫 프로젝트의 가장 큰 가치는 완성도가 아니라 끝까지 공개했다는 경험 그 자체입니다. 공개하기 전까지는 그저 학습용 코드였지만, 공개하는 순간 책임을 지는 산출물로 바뀝니다.
-## 생각이 어떻게 바뀌어야 할까
-
-처음에는 아이디어는 있지만 공개할 정도의 프로젝트는 아니라고 느끼기 쉽습니다. 하지만 첫 오픈소스 프로젝트는 거대한 제품일 필요가 없습니다.
-
-오히려 작은 MVP라도 문서와 릴리스가 갖춰지면 충분히 첫 프로젝트가 됩니다. 핵심은 대단해 보이는 결과물이 아니라, 다른 사람이 실제로 써 볼 수 있는 상태까지 끝내는 것입니다.
-
-## 직접 따라해 보기: 첫 프로젝트 공개 절차
+## 직접 따라해 보기: 첫 프로젝트 공개 전체 흐름
 
 ### 1단계 — 아이디어와 범위 정하기
 
 처음에는 무엇을 만들지보다 무엇을 이번 버전에 넣지 않을지 먼저 정하는 편이 좋습니다. 범위가 작아야 끝낼 수 있습니다.
 
-````markdown
 ```markdown
-- Name: tinytool
-- Goal: do X in one command
-- Non-goals: GUI, i18n
+# tinytool — 프로젝트 범위 정의
+
+## 목표
+로컬 파일의 빈 줄을 한 명령으로 정리하는 CLI 도구
+
+## 이번 버전 (v0.1.0)에 포함
+- stdin 또는 파일 경로 입력
+- 연속 빈 줄을 하나로 압축
+- stdout 출력 또는 파일 덮어쓰기 옵션
+
+## Non-goals (이번 버전에 넣지 않음)
+- GUI
+- 다국어 지원 (i18n)
+- 플러그인 시스템
+- Windows 바이너리 배포
+
+## 다음 버전 후보
+- 재귀 디렉터리 처리
+- 설정 파일 지원 (.tinytoolrc)
 ```
-````
 
-### 2단계 — MVP 코드 만들기
+이 문서를 저장소 첫 번째 이슈로 올려 두면, 외부 기여자가 기능을 요청할 때 "이미 non-goal로 선언되어 있다"고 링크를 걸 수 있습니다.
 
-프로젝트 골격을 만들고, 로컬에서 최소 기능이 동작하는지 확인합니다. 처음부터 구조를 과하게 키우지 않는 편이 좋습니다.
+### 2단계 — MVP 코드와 저장소 골격 만들기
 
 ```bash
+# 저장소 초기화
 mkdir tinytool && cd tinytool
 git init
-python -m venv .venv
+python -m venv .venv && source .venv/bin/activate
+
+# 기본 골격 생성
+mkdir -p src/tinytool tests .github/workflows
+
+# pyproject.toml 작성 (최소 구성)
+cat > pyproject.toml << 'EOF'
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tinytool"
+version = "0.1.0"
+description = "Collapse consecutive blank lines in text files"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+[project.scripts]
+tinytool = "tinytool.cli:main"
+EOF
+
+# 메인 모듈 작성
+cat > src/tinytool/__init__.py << 'EOF'
+"""tinytool — collapse consecutive blank lines."""
+__version__ = "0.1.0"
+EOF
+
+cat > src/tinytool/core.py << 'EOF'
+import re
+
+def collapse_blank_lines(text: str) -> str:
+    """Replace 2+ consecutive blank lines with a single blank line."""
+    return re.sub(r"\n{3,}", "\n\n", text)
+EOF
+
+cat > src/tinytool/cli.py << 'EOF'
+import sys
+import argparse
+from .core import collapse_blank_lines
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Collapse consecutive blank lines in text files."
+    )
+    parser.add_argument("file", nargs="?", help="Input file (default: stdin)")
+    parser.add_argument("-i", "--inplace", action="store_true",
+                        help="Edit file in place")
+    args = parser.parse_args()
+
+    if args.file:
+        text = open(args.file).read()
+        result = collapse_blank_lines(text)
+        if args.inplace:
+            open(args.file, "w").write(result)
+        else:
+            print(result, end="")
+    else:
+        text = sys.stdin.read()
+        print(collapse_blank_lines(text), end="")
+
+if __name__ == "__main__":
+    main()
+EOF
+
+# 테스트 작성
+cat > tests/test_core.py << 'EOF'
+from tinytool.core import collapse_blank_lines
+
+def test_no_change_single_blank():
+    assert collapse_blank_lines("a\n\nb") == "a\n\nb"
+
+def test_collapses_triple_blank():
+    assert collapse_blank_lines("a\n\n\nb") == "a\n\nb"
+
+def test_collapses_many_blanks():
+    assert collapse_blank_lines("a\n\n\n\n\nb") == "a\n\nb"
+
+def test_empty_string():
+    assert collapse_blank_lines("") == ""
+EOF
+
+# 패키지 설치 및 테스트 실행
+pip install -e ".[dev]" 2>/dev/null || pip install -e .
+python -m pytest tests/ -v
 ```
 
-### 3단계 — 기본 문서 다섯 개 준비하기
+### 3단계 — 기본 문서 5종 준비하기
 
-문서가 없는 프로젝트는 써 볼 수 없는 프로젝트에 가깝습니다. 최소 문서를 먼저 채워 두면 공개 품질이 크게 올라갑니다.
+문서가 없는 프로젝트는 써 볼 수 없는 프로젝트입니다. 최소 5종을 공개 전에 반드시 채워야 합니다.
 
-```text
-README.md
-LICENSE
-CONTRIBUTING.md
-CODE_OF_CONDUCT.md
-CHANGELOG.md
+```bash
+# LICENSE 생성 (MIT 예시)
+cat > LICENSE << 'EOF'
+MIT License
+
+Copyright (c) 2026 Your Name
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+EOF
 ```
 
-### 4단계 — 첫 릴리스 만들기
+**README.md 최소 구성:**
+
+```markdown
+# tinytool
+
+[![CI](https://github.com/yourname/tinytool/actions/workflows/ci.yml/badge.svg)](https://github.com/yourname/tinytool/actions)
+[![PyPI](https://img.shields.io/pypi/v/tinytool)](https://pypi.org/project/tinytool/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+로컬 파일의 연속 빈 줄을 한 명령으로 정리하는 CLI 도구입니다.
+
+## 설치
+
+```bash
+pip install tinytool
+```
+
+## 사용법
+
+```bash
+# 결과를 stdout으로 출력
+tinytool myfile.txt
+
+# 파일 직접 수정
+tinytool -i myfile.txt
+
+# stdin 파이프
+cat myfile.txt | tinytool
+```
+
+## 기여
+
+[CONTRIBUTING.md](CONTRIBUTING.md)를 먼저 읽어 주세요.
+
+## 라이선스
+
+[MIT License](LICENSE)
+```
+
+**CHANGELOG.md (Keep a Changelog 형식):**
+
+```markdown
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [0.1.0] - 2026-06-20
+
+### Added
+- `collapse_blank_lines()` core function
+- CLI entry point: `tinytool [file] [-i]`
+- stdin piping support
+- MIT license
+- Initial test suite
+
+[0.1.0]: https://github.com/yourname/tinytool/releases/tag/v0.1.0
+```
+
+### 4단계 — CI 설정하기
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install -e ".[dev]"
+
+      - name: Lint
+        run: ruff check src/ tests/
+
+      - name: Type check
+        run: mypy src/
+
+      - name: Test
+        run: pytest tests/ -v --tb=short
+```
+
+PR이 열릴 때마다 이 워크플로가 돌아가면, 기여자가 코드를 올리기 전에 로컬에서 테스트를 돌려야 한다는 신호를 줍니다.
+
+### 5단계 — 첫 릴리스 만들기
 
 버전이 붙어야 사용자가 어디서부터 써야 하는지 분명해집니다. 첫 릴리스는 기능 규모보다 기준점 역할이 더 중요합니다.
 
 ```bash
+# 변경사항 최종 커밋
+git add .
+git commit -m "feat: initial release v0.1.0"
+
+# 원격 저장소에 푸시
+git remote add origin https://github.com/yourname/tinytool.git
+git push -u origin main
+
+# 릴리스 태그 생성
 git tag v0.1.0
-gh release create v0.1.0 --generate-notes
+git push origin v0.1.0
+
+# GitHub CLI로 릴리스 생성 (CHANGELOG 기반 노트 자동 생성)
+gh release create v0.1.0 \
+  --title "tinytool v0.1.0 — First Release" \
+  --notes "$(sed -n '/## \[0.1.0\]/,/## \[/p' CHANGELOG.md | head -n -1)" \
+  --latest
+
+# PyPI 배포 (선택 사항)
+pip install build twine
+python -m build
+twine upload dist/*
 ```
 
-### 5단계 — 공개하고 피드백 받기
+### 6단계 — 공지하고 피드백 받기
 
-프로젝트는 올리는 순간 끝나는 것이 아니라, 그다음 반응부터 본격적으로 시작됩니다. 피드백을 받을 창구를 열어 두는 편이 좋습니다.
+프로젝트는 올리는 순간 끝나는 것이 아니라, 그다음 반응부터 본격적으로 시작됩니다.
 
-````markdown
-```markdown
-> Released tinytool v0.1.0. Feedback welcome!
-```
-````
+**Show HN / Reddit 공지 템플릿:**
 
-## 이 예시에서 먼저 읽어야 할 점
+```text
+Show HN: tinytool – collapse consecutive blank lines in text files
 
-첫 프로젝트는 작을수록 끝낼 가능성이 높습니다. 문서는 코드의 절반입니다. 릴리스는 기준점이고, 공지는 사용자 접점을 만듭니다. 피드백이 들어와야 다음 버전 방향이 생깁니다.
+I wrote a small CLI tool that collapses consecutive blank lines
+into a single blank line. Useful for cleaning up notes, logs, or
+generated text files before further processing.
 
-중요한 것은 처음부터 완벽하게 잘 만드는 일이 아닙니다. 작은 범위를 정하고, 문서를 붙이고, 공개하고, 반응을 받아 다음 개선으로 이어 가는 흐름을 직접 한 번 통과하는 일입니다.
+GitHub: https://github.com/yourname/tinytool
+PyPI:   https://pypi.org/project/tinytool/
 
-## 프로젝트 인수인계
-
-첫 프로젝트를 시작하는 것만큼이나 끝내는 것도 중요합니다. 메인테이너가 더 이상 프로젝트를 지속할 수 없다면 인수인계 절차를 밟아야 합니다.
-
-**1단계: 명확한 공지**
-
-프로젝트를 더 이상 유지하지 않는다는 것을 명확히 공지하는 편이 정직합니다. README 맨 위에 배지를 추가하면 좋습니다.
-
-```markdown
-## Status: Archived
-
-This project is no longer maintained.
-We accept no new issues or pull requests.
+Feedback welcome — especially on edge cases I might have missed.
 ```
 
-**2단계: 후임자 찾기**
+**Discussions 첫 스레드 열기:**
 
-프로젝트를 완전히 닫기 전에 후임자를 찾아보는 것도 좋습니다. 정기 기여자 중에서 메인테이너 역할을 넘길 사람을 물어볼 수 있습니다.
+```bash
+gh api repos/yourname/tinytool/discussions \
+  --method POST \
+  --field title="v0.1.0 출시 — 피드백을 환영합니다" \
+  --field body="첫 릴리스를 공개했습니다. 사용 중 불편한 점이나 원하는 기능이 있으면 여기에 남겨 주세요." \
+  --field category_id="DIC_kwDOA..."
+```
+
+## 운영 파일 체크리스트
+
+공개에서 가장 많이 빠지는 것은 코드가 아니라 운영 파일입니다.
+
+| 파일 | 역할 | 없을 때 생기는 문제 |
+|---|---|---|
+| `LICENSE` | 재사용 조건 | 사용자가 법적 불확실성으로 사용 기피 |
+| `README.md` | 프로젝트 첫인상·사용법 | 설치조차 못 하고 이탈 |
+| `CONTRIBUTING.md` | 참여 절차 | PR이 와도 어떻게 처리해야 할지 불명확 |
+| `CHANGELOG.md` | 변경 이력 | 버전 간 차이를 릴리스 노트에서만 확인 가능 |
+| `CODE_OF_CONDUCT.md` | 커뮤니티 경계 | 분쟁 발생 시 기준 없음 |
+
+**PR 리뷰 체크리스트 (`.github/PULL_REQUEST_TEMPLATE.md`):**
 
 ```markdown
-## 새 메인테이너 모집
+## PR 요약
+
+<!-- 변경 사항을 한두 문장으로 설명해 주세요 -->
+
+## 체크리스트
+
+- [ ] 기능 동작 확인 (`pytest` 통과)
+- [ ] 새로운 기능에 테스트 추가
+- [ ] CHANGELOG.md의 `[Unreleased]` 섹션 업데이트
+- [ ] 관련 문서 반영 (README 등)
+- [ ] 커밋 메시지가 Conventional Commits 형식을 따름
+```
+
+## 브랜치 전략과 Git 워크플로
+
+첫 프로젝트에 복잡한 브랜치 전략은 불필요합니다. 단순한 조합으로 시작하세요.
+
+| 설정 | 방법 | 이유 |
+|---|---|---|
+| `main` 브랜치 보호 | Settings → Branch protection rules | 직접 push 방지 |
+| 기능 브랜치 | `feat/collapse-blank-lines` 형식 | 변경 목적 명확화 |
+| Squash Merge | PR merge 시 기본값으로 설정 | 커밋 히스토리 정리 |
+| 태그 릴리스 | `v0.1.0`, `v0.1.1` 형식 | 사용자가 안정 버전 고정 가능 |
+
+```bash
+# 브랜치 보호 설정 (GitHub CLI)
+gh api repos/yourname/tinytool/branches/main/protection \
+  --method PUT \
+  --field required_status_checks='{"strict":true,"contexts":["test"]}' \
+  --field enforce_admins=false \
+  --field required_pull_request_reviews='{"required_approving_review_count":1}' \
+  --field restrictions=null
+```
+
+## 메인테이너 번아웃 신호와 대응
+
+첫 프로젝트를 공개하면 흥분되지만, 시간이 지나면서 유지보수 부담이 느껴집니다. 번아웃은 갑자기 오는 것이 아니라 신호가 있습니다.
+
+| 신호 | 증상 | 대응 |
+|---|---|---|
+| 응답 지연 | 이슈·PR에 2주 이상 무응답 | 응답 주기 공표 또는 자동화 |
+| 이슈 축적 | 미해결 이슈 100개+ | triage 루틴 강화, 라벨링 정리 |
+| 동기 저하 | 코드 작성에 흥미 상실 | 서브 프로젝트 분리, 휴식 |
+| 불명확한 방향 | 기능 추가를 계속 미룸 | 로드맵 작성, non-goals 재선언 |
+
+번아웃을 느낀다면 부끄러운 것이 아니라 프로젝트 구조를 고쳐야 한다는 신호입니다. 메인테이너 역할을 나누거나, 자동화를 더하거나, 프로젝트 범위를 줄이는 것이 해결책입니다.
+
+## 프로젝트 종료와 인수인계
+
+첫 프로젝트를 시작하는 것만큼이나 끝내는 것도 중요합니다. 메인테이너가 더 이상 프로젝트를 지속할 수 없다면 인수인계 절차가 필요합니다.
+
+**1단계: README에 상태 공지**
+
+```markdown
+## Status: Seeking New Maintainer
 
 I can no longer maintain this project.
 If you are a regular contributor and interested in taking over,
-please open an issue.
+please open an issue tagged `maintainer-wanted`.
+
+Read-only archive will happen on 2027-01-01 if no successor is found.
 ```
 
-**3단계: 포크 권장**
-
-후임자를 찾지 못했다면 fork를 권장하는 것이 더 나은 대안입니다. 오픈소스의 본질은 코드가 계속 살아갈 수 있도록 하는 것입니다.
+**2단계: 후임자를 찾지 못했다면 fork 권장**
 
 ```markdown
 ## Fork Recommended
 
-This project is archived.
-Community members are encouraged to fork and continue development.
+This project is archived. Community members are encouraged to fork.
 Notable forks:
-- @alice/tinytool (active)
+- @alice/tinytool (active, maintained by @alice)
 ```
 
-**4단계: GitHub Archive**
-
-공식적으로 프로젝트를 끝냄다면 GitHub의 Archive 기능을 사용할 수 있습니다. 이렇게 하면 저장소는 읽기 전용이 되고, 새 이슈나 PR은 받지 않습니다.
+**3단계: GitHub Archive 설정**
 
 ```bash
-# Repository Settings → Archive this repository
+# Repository Settings → Danger Zone → Archive this repository
+# 이후 저장소는 읽기 전용, 새 이슈·PR 불가
 ```
 
-프로젝트를 깨끗하게 마무리하는 것도 메인테이너의 책임입니다. 방치하기보다는 명시적으로 끝내고 후임자를 찾거나 fork를 권장하는 편이 커뮤니티에 훨씬 나습니다.
+프로젝트를 깨끗하게 마무리하는 것도 메인테이너의 책임입니다. 방치하기보다는 명시적으로 끝내고 후임자를 찾거나 fork를 권장하는 편이 커뮤니티에 훨씬 낫습니다.
+
 ## 자주 하는 실수 다섯 가지
 
-1. 완벽해질 때까지 공개를 미룹니다.
-2. 라이선스 없이 저장소만 공개합니다.
-3. 리드미 문서가 모호해서 사용자가 시작하지 못합니다.
-4. 피드백 채널을 만들지 않습니다.
-5. 로드맵이 없어 다음 단계가 보이지 않습니다.
+| 실수 | 구체적 상황 | 올바른 접근 |
+|---|---|---|
+| 완벽해질 때까지 공개를 미룸 | 기능 10개를 다 완성한 뒤 공개하려다 결국 포기 | MVP 1개 기능으로 `v0.1.0` 먼저 공개 |
+| 라이선스 없이 저장소만 공개 | `git push` 후 LICENSE 파일 없이 방치 | `choosealicense.com`에서 MIT 선택 후 첫 커밋에 포함 |
+| README가 모호해서 시작을 못 함 | "A tool for text processing"만 쓰고 설치법 누락 | 설치 → 실행 → 예시 출력을 복사 가능한 코드블록으로 제공 |
+| 피드백 채널을 만들지 않음 | 이슈 탭 비활성화, Discussions 없음 | GitHub Discussions 활성화 후 첫 스레드 직접 개설 |
+| 로드맵 없이 기능 요청 처리 | 들어오는 요청마다 반응해 방향이 흔들림 | `ROADMAP.md` 또는 GitHub Milestone으로 다음 버전 계획 공표 |
 
 ## 실무에서는 이렇게 생각한다
 
@@ -200,39 +509,17 @@ Notable forks:
 
 시니어 엔지니어는 첫 프로젝트를 대작으로 시작하지 않습니다. 작게 만들고, 빠르게 공개하고, 피드백을 받아 개선합니다. 공개가 곧 마무리가 아니라 학습의 다음 단계라는 사실을 알고 있기 때문입니다.
 
+SemVer를 문서에 직접 넣어 두면 릴리스 판단 기준이 흔들리지 않습니다. `0.1.0`(첫 공개) → `0.1.1`(버그 수정) → `0.2.0`(기능 추가)처럼 작게 반복하면 유지보수 감각이 빠르게 붙습니다.
+
 ## 운영 체크리스트
 
-- [ ] MVP가 동작합니다.
-- [ ] 기본 문서 다섯 개를 준비했습니다.
-- [ ] 첫 버전 태그와 릴리스 계획이 있습니다.
-- [ ] 피드백을 받을 채널을 정했습니다.
-
-## 연습 문제
-
-1. MVP를 한 문장으로 정의해 보세요.
-2. non-goals를 적어 두는 효과를 한 문장으로 적어 보세요.
-3. feedback loop 예시를 하나 적어 보세요.
-
-## 첫 프로젝트 공개 전에 반드시 고정할 운영 파일
-
-첫 공개에서 가장 많이 빠지는 것은 코드가 아니라 운영 파일입니다. 프로젝트를 실제로 쓰게 만들려면 최소 다섯 파일이 필요합니다: `LICENSE`, `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `CODE_OF_CONDUCT.md`.
-
-`LICENSE`는 재사용 조건을, `CONTRIBUTING.md`는 참여 절차를, `CHANGELOG.md`는 변경 이력을, `CODE_OF_CONDUCT.md`는 커뮤니티 경계를 담당합니다. 이 파일들이 없으면 사용자와 기여자는 코드가 좋아도 참여를 주저합니다.
-
-PR 리뷰 체크리스트도 첫 버전부터 두는 편이 좋습니다.
-
-```markdown
-- [ ] 기능 동작 확인
-- [ ] 테스트 추가 또는 통과
-- [ ] 문서 반영
-- [ ] 릴리스 노트 초안 반영
-```
-
-Git 워크플로는 단순하게 시작하세요. `main` 보호, 기능 브랜치 작업, Squash Merge, 태그 릴리스 조합이면 충분합니다. 복잡한 브랜치 모델은 사용자와 기여자가 늘어난 뒤에 도입해도 늦지 않습니다.
-
-또한 README 상단에 CI 배지를 붙여 "이 저장소가 자동 검사로 관리된다"는 신호를 주세요. 이는 신규 기여자에게 큰 심리적 안전장치가 됩니다.
-
-마지막으로 SemVer 예시를 문서에 직접 넣어 두면 릴리스 판단 기준이 흔들리지 않습니다. `0.1.0`(첫 공개) -> `0.1.1`(버그 수정) -> `0.2.0`(기능 추가)처럼 작게 반복하면 유지보수 감각이 빠르게 붙습니다.
+- [ ] 프로젝트 목표와 non-goals를 한 문서에 정리했습니다.
+- [ ] MVP가 로컬에서 동작합니다.
+- [ ] 기본 문서 5종(LICENSE, README, CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG)을 준비했습니다.
+- [ ] CI 워크플로가 PR마다 자동으로 실행됩니다.
+- [ ] `v0.1.0` 태그와 GitHub Release를 생성했습니다.
+- [ ] 공지 메시지를 하나 이상의 채널에 올렸습니다.
+- [ ] 피드백을 받을 채널(Discussions 또는 이슈)을 활성화했습니다.
 
 ## 정리
 
@@ -243,11 +530,13 @@ Git 워크플로는 단순하게 시작하세요. `main` 보호, 기능 브랜�
 ## 처음 질문으로 돌아가기
 
 - **첫 오픈소스 프로젝트는 어느 정도 크기여야 할까요?**
-  - 처음에는 무엇을 만들지보다 무엇을 이번 버전에 넣지 않을지 먼저 정하는 편이 좋습니다. 범위가 작아야 끝낼 수 있습니다.
+  - 기능 하나가 동작하고, 문서 5종이 갖춰지고, 릴리스 태그가 붙으면 충분합니다. `tinytool`처럼 CLI 도구 하나, 함수 하나, 테스트 몇 개 수준도 첫 오픈소스 프로젝트로서 완전합니다. 크기보다 끝까지 가 본 경험이 더 중요합니다.
+
 - **아이디어, 범위, MVP, 문서, 릴리스는 어떤 순서로 준비하면 좋을까요?**
-  - 첫 프로젝트는 작을수록 끝낼 가능성이 높습니다
+  - "목표 한 줄 + non-goals 목록 → MVP 구현 → 문서 5종 → CI → 릴리스 → 공지 → 피드백" 순서를 지키면 됩니다. 특히 non-goals를 먼저 적는 것이 완벽주의 함정을 막는 가장 효과적인 장치입니다. 범위가 확정되지 않으면 기능을 계속 추가하다 공개에 이르지 못합니다.
+
 - **코드보다 문서와 라이선스가 왜 공개 직전에 더 중요해질까요?**
-  - 이 순서에서 중요한 점은 공개가 맨 마지막에 한 번 일어나는 이벤트가 아니라는 사실입니다. 문서를 정리하는 순간부터 이미 외부 사용자를 상정하게 되고, 릴리스와 공지는 그 준비의 자연스러운 결과가 됩니다.
+  - 코드가 아무리 좋아도 LICENSE가 없으면 사용자는 법적 불확실성 때문에 사용을 기피합니다. README가 설치법 없이 설명만 있으면 시작을 못 합니다. 문서는 "이 프로젝트를 써도 안전하고, 시작하기 어렵지 않다"는 신호를 동시에 주기 때문에, 코드 품질보다 첫 인상을 결정하는 데 더 큰 영향을 미칩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -291,12 +291,70 @@ bus.emit("user.created", name="Alice", email="alice@example.com")
 
 이벤트 시스템, 웹훅, UI 콜백 같은 구조에서 클로저와 `partial`은 아주 자주 만납니다. 문법 장난이 아니라 실전 연결 도구라는 점이 중요합니다.
 
+### 단계 7: 클로저로 데코레이터 구현하기
+
+데코레이터는 클로저의 가장 대표적인 실무 적용입니다.
+
+```python
+import time
+from functools import wraps
+
+# 실행 시간을 측정하는 데코레이터 — 클로저 형태
+def timeit(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)          # 바깥 func를 기억
+        elapsed = time.perf_counter() - start
+        print(f"{func.__name__}: {elapsed:.4f}s")
+        return result
+    return wrapper
+
+@timeit
+def slow_sum(numbers: list[int]) -> int:
+    return sum(numbers)
+
+result = slow_sum(list(range(1_000_000)))
+# slow_sum: 0.0123s
+
+# 인자를 받는 데코레이터 — 클로저를 두 겹으로 감쌈
+def retry(max_attempts: int):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if attempt == max_attempts:
+                        raise
+                    print(f"Attempt {attempt} failed: {e}. Retrying...")
+        return wrapper
+    return decorator
+
+@retry(max_attempts=3)
+def fetch_data(url: str) -> str:
+    # 실제라면 HTTP 요청
+    raise ConnectionError("timeout")
+
+try:
+    fetch_data("https://example.com")
+except ConnectionError:
+    print("All attempts failed")
+# Attempt 1 failed: timeout. Retrying...
+# Attempt 2 failed: timeout. Retrying...
+# All attempts failed
+```
+
+`timeit`의 `wrapper` 안에서 `func`를 참조할 때 클로저가 작동합니다. `retry`는 `max_attempts`를 기억하는 클로저 안에 또 다른 클로저를 만드는 구조입니다. Python 데코레이터의 대부분이 이 패턴으로 작성됩니다.
+
 ## 이 코드에서 주목할 점
 
 - 클로저는 바깥 변수를 `__closure__` 안에 보존해 바깥 함수가 끝난 뒤에도 살려 둡니다.
 - 바깥 변수를 수정할 때만 `nonlocal`이 필요하고, 읽기만 할 때는 필요하지 않습니다.
 - `partial`은 인자 고정이 목적일 때 가장 간단한 선택입니다.
 - `map`과 `partial`을 조합하면 특화된 변환 함수를 간결하게 만들 수 있습니다.
+- 데코레이터는 `@wraps`와 함께 클로저를 활용하는 대표 패턴입니다.
 
 ## 자주 하는 실수
 

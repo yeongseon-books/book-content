@@ -1,586 +1,476 @@
 ---
-title: "AI App Patterns 101 (6/6): Human-in-the-loop — 사람 개입 설계"
 series: ai-app-patterns-101
 episode: 6
-language: ko
-status: published
-published_to:
-  tistory:
-    url: "https://yeongseonchoe.tistory.com/82"
-    published_at: '2026-05-13'
+title: "AI App Patterns 101 (6/6): Human-in-the-Loop 패턴"
+status: publish-ready
 targets:
   tistory: true
   medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
+language: ko
 tags:
-- LLM
-- RAG
-- Agent
-- Python
-last_reviewed: '2026-05-15'
-seo_description: Human-in-the-loop는 자동화를 버리는 것이 아니라 위험한 지점에만 사람 판단을 넣는 설계입니다.
+  - HumanInTheLoop
+  - ApprovalGate
+  - AuditLog
+  - LLM
+  - Safety
+seo_description: 승인 게이트, 신뢰도 기반 라우팅, 감사 로그, 검토 대기열 API까지 Human-in-the-Loop 패턴의 프로덕션 구현을 정리합니다
+last_reviewed: '2026-06-20'
 ---
 
-# AI App Patterns 101 (6/6): Human-in-the-loop — 사람 개입 설계
+# AI App Patterns 101 (6/6): Human-in-the-Loop 패턴
 
-더 나은 자동화가 사람 검토를 없애 주는 것은 아닙니다. 오히려 검토 경계를 더 중요하게 만듭니다. AI 시스템이 초안을 쓰고, 분류하고, 대규모로 행동을 트리거할 수 있게 되면, 진짜 엔지니어링 문제는 무엇을 그대로 통과시켜도 되는지와 무엇을 승인 대기 상태로 멈춰야 하는지를 정하는 일입니다.
+AI가 모든 결정을 자율적으로 내리도록 하면 높은 위험을 수반합니다. Human-in-the-Loop(HITL) 패턴은 AI의 결정에 사람이 개입하는 지점을 명시적으로 설계하는 방식입니다. 신뢰도가 낮거나 고위험 작업이 감지되면 자동으로 사람 검토 대기열에 넣고, 승인 후에만 다음 단계를 진행합니다. HITL은 안전성과 자동화 효율 사이의 균형을 맞추는 설계 철학입니다.
 
-완전 자동화가 언제나 바람직한 것도 아닙니다. 민감한 고객 데이터, 법적 효력이 있는 문서, 금전 의사결정이 걸리는 곳에서는 모델 출력이 효력을 갖기 전에 사람이 반드시 검토해야 합니다. HITL은 자동화 파이프라인 안에 이런 판단을 끼워 넣는 패턴입니다.
+이 글은 AI App Patterns 101 시리즈의 6번째 글입니다.
 
-이 글은 AI App Patterns 101 시리즈의 마지막 글입니다. 여기서는 자동화 전체를 수동 작업으로 되돌리지 않으면서, 파이프라인 안에 사람 판단을 어디에 배치할지 다룹니다.
-
-![위험 수준에 따른 사람 검토](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-01-human-review-by-risk-level.ko.png)
-*위험 수준에 따른 사람 검토*
-> Human-in-the-loop는 자동화를 포기하는 것이 아니라, 자동화가 위험한 지점에만 사람 판단을 삽입하는 설계입니다.
+![Human-in-the-Loop 패턴 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-01-concept-at-a-glance.ko.png)
+*승인 게이트와 신뢰도 라우팅이 결합된 Human-in-the-Loop 아키텍처*
 
 ## 이 글에서 다룰 문제
 
-- Human-in-the-loop은 모델이 약해서 붙이는 예외 처리일까요, 제품 설계의 일부일까요?
-- 승인 게이트와 신뢰도 기반 분기는 각각 어떤 상황에 맞을까요?
-- 사람이 개입한 결정을 나중에 감사하려면 무엇을 로그로 남겨야 할까요?
-- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
-- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
+- 어떤 기준으로 AI 결정에 사람이 개입해야 할지 판단할 수 있을까요?
+- 승인 게이트를 코드로 어떻게 구현할 수 있을까요?
+- 신뢰도 기반 라우팅에서 임계값은 어떻게 설정해야 할까요?
+- 감사 로그는 HITL 시스템에서 왜 필수적일까요?
+- 검토 대기열의 우선순위는 어떤 기준으로 정해야 할까요?
 
-## HITL이 맞는 선택인 상황
+## 핵심 개념 한 줄 정리
 
-### 위험 수준에 따른 사람 검토
+- **Approval Gate**: AI가 고위험 작업을 실행하기 전에 사람의 승인을 기다리는 체크포인트입니다.
+- **Confidence Routing**: AI 출력의 신뢰도에 따라 자동 처리와 사람 검토로 분기하는 패턴입니다.
+- **Review Queue**: 사람 검토가 필요한 항목을 우선순위와 함께 관리하는 대기열입니다.
+- **Audit Log**: 모든 AI 결정과 사람 개입 이력을 변경 불가능한 형태로 기록하는 시스템입니다.
+- **Escalation**: 자동화 처리 실패나 고위험 감지 시 상위 검토자에게 전달하는 프로세스입니다.
 
-HITL은 지연과 비용을 늘립니다. 따라서 검증 없이 흘려보낸 오류의 비용이 큰 곳에서 써야 합니다.
+## HITL 개입 기준 설계
 
-**고위험 의사결정**: 송금, 계약 생성, 개인정보 처리처럼 실수 비용이 크거나 되돌리기 어려운 작업입니다.
+모든 결정에 사람이 개입하면 자동화의 이점이 사라집니다. 다음 기준을 기반으로 개입 필요성을 판단합니다.
 
-**낮은 모델 신뢰도**: 불확실한 출력을 그대로 downstream에 넘기지 말고 사람에게 보내야 합니다.
+| 기준 | 자동 처리 | 사람 검토 |
+|---|---|---|
+| AI 신뢰도 | 0.85 이상 | 0.85 미만 |
+| 영향 범위 | 단일 사용자 | 다수 사용자 또는 시스템 |
+| 가역성 | 쉽게 되돌릴 수 있음 | 되돌리기 어렵거나 불가능 |
+| 금액/위험 | 소액, 저위험 | 고액, 고위험 |
+| 법적 의무 | 해당 없음 | 규정 준수 검토 필요 |
 
-**규제 요구사항**: 일부 산업은 완전 자율 AI 의사결정을 허용하지 않습니다.
+## 실습 1: 승인 게이트 구현
 
-**신뢰를 쌓는 초기 단계**: 새 시스템은 처음에 전수 사람 검토로 시작하고, 모델 신뢰가 쌓일수록 사람 검토 비율을 줄이는 편이 안전합니다.
-
----
-
-## 기본 승인 게이트
-
-### 승인 게이트가 있는 초안 생성
-
-![승인 게이트가 있는 초안 생성](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-02-draft-generation-with-approval-gate.ko.png)
-
-*승인 게이트가 있는 초안 생성*
-가장 단순한 HITL 패턴은 파이프라인이 계속 진행되기 전에 사람 입력을 기다리는 blocking prompt입니다.
-
-```python
-import os
-
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_groq import ChatGroq
-
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
-
-draft_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "You are a customer service representative.\n"
-        "Write a draft response to the customer inquiry below.\n"
-        "Be polite and professional.",
-    ),
-    ("human", "Customer inquiry:\n{inquiry}"),
-])
-
-draft_chain = draft_prompt | llm | StrOutputParser()
-
-refine_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "Revise the draft response based on the reviewer's feedback.\n"
-        "Apply the feedback faithfully while maintaining a professional tone.",
-    ),
-    ("human", "Draft:\n{draft}\n\nFeedback:\n{feedback}"),
-])
-
-refine_chain = refine_prompt | llm | StrOutputParser()
-
-def draft_with_human_review(inquiry: str) -> str:
-    """Generate draft → human review → optional refinement → final response."""
-    draft = draft_chain.invoke({"inquiry": inquiry})
-    print(f"\n=== generated draft ===\n{draft}\n")
-
-    print("reviewer options:")
-    print("  [1] approve — use the draft as-is")
-    print("  [2] revise — provide feedback to improve the draft")
-    print("  [3] reject — discard this response")
-
-    choice = input("choice (1/2/3): ").strip()
-
-    if choice == "1":
-        return draft
-    elif choice == "2":
-        feedback = input("enter feedback: ").strip()
-        refined = refine_chain.invoke({"draft": draft, "feedback": feedback})
-        print(f"\n=== revised response ===\n{refined}")
-        return refined
-    else:
-        print("response rejected")
-        return ""
-
-inquiry = "I ordered three weeks ago and my package still hasn't arrived. What happened?"
-final_response = draft_with_human_review(inquiry)
-if final_response:
-    print(f"\n=== final response sent ===\n{final_response}")
-```
-
----
-
-## 신뢰도 기반 분기
-
-### 신뢰도 임계값 라우팅
-
-![신뢰도 임계값 라우팅](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-03-confidence-threshold-routing.ko.png)
-
-*신뢰도 임계값 라우팅*
-LLM이 출력과 함께 신뢰도 점수도 반환하게 만들고, 낮은 신뢰도의 결과만 자동으로 사람 검토자에게 보낼 수 있습니다.
+고위험 AI 결정을 차단하고 사람 승인을 기다리는 게이트입니다.
 
 ```python
-import os
-
-from langchain_core.output_parsers import JsonOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_groq import ChatGroq
-
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
-
-classify_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "Classify the following text and rate your confidence.\n"
-        "Return JSON only.\n"
-        'Format: {{"category": "category name", "confidence": 0.0-1.0, "reason": "brief reason"}}',
-    ),
-    ("human", "{text}"),
-])
-
-chain = classify_prompt | llm | JsonOutputParser()
-
-CONFIDENCE_THRESHOLD = 0.85
-
-def classify_with_hitl(text: str) -> dict:
-    """Route to human review when model confidence is below threshold."""
-    result = chain.invoke({"text": text})
-    confidence = result.get("confidence", 0.0)
-
-    if confidence >= CONFIDENCE_THRESHOLD:
-        result["reviewed_by"] = "auto"
-        print(f"auto-classified: {result['category']} (confidence {confidence:.2f})")
-    else:
-        print(f"low confidence ({confidence:.2f}) — manual review required")
-        print(f"AI suggested category: {result['category']}")
-        print(f"reason: {result['reason']}")
-        human_category = input("enter correct category: ").strip()
-        result["category"] = human_category
-        result["reviewed_by"] = "human"
-
-    return result
-
-texts = [
-    "Q3 2024 revenue increased 23 percent year-over-year.",  # clear case
-    "The product was kind of different from what I expected.",  # ambiguous
-]
-
-for text in texts:
-    print(f"\ntext: {text}")
-    result = classify_with_hitl(text)
-    print(f"result: {result}")
-```
-
----
-
-## 감사 로그
-
-### 감사 이벤트로 남기는 검토 결정
-
-![감사 이벤트로 남기는 검토 결정](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-04-review-decisions-with-audit-events.ko.png)
-
-*감사 이벤트로 남기는 검토 결정*
-HITL 시스템은 누가 무엇을 언제 검토했는지 기록해야 합니다. 이 감사 로그는 시간이 지나면 모델 개선을 위한 학습 데이터가 되기도 합니다.
-
-> 멘탈 모델은 단순합니다. 사람 검토는 파이프라인 바깥의 예외가 아니라, 기록 가능한 시스템 이벤트여야 합니다. 승인과 거부가 모두 남아야 다음 정책 조정이 가능합니다.
-
-```python
+import uuid
 import json
-import os
 from datetime import datetime
-from pathlib import Path
+from dataclasses import dataclass, field
+from enum import Enum
 
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_groq import ChatGroq
 
-LOG_FILE = Path("audit_log.jsonl")
+class ApprovalStatus(Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    ESCALATED = "escalated"
 
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
 
-generate_prompt = ChatPromptTemplate.from_messages([
-    ("system", "Draft a contract clause for the following request."),
-    ("human", "{request}"),
-])
+@dataclass
+class PendingApproval:
+    approval_id: str
+    action_type: str
+    payload: dict
+    ai_recommendation: str
+    confidence: float
+    risk_level: str
+    status: ApprovalStatus = ApprovalStatus.PENDING
+    created_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    reviewer: str | None = None
+    review_note: str | None = None
+    resolved_at: str | None = None
 
-generate_chain = generate_prompt | llm | StrOutputParser()
 
-def log_event(event_type: str, data: dict) -> None:
-    """Append an audit event to the JSONL log file."""
-    entry = {
-        "timestamp": datetime.now().isoformat(),
-        "event_type": event_type,
-        **data,
-    }
-    with LOG_FILE.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+# 인메모리 승인 대기열 (프로덕션에서는 DB 사용)
+approval_queue: dict[str, PendingApproval] = {}
 
-def contract_clause_with_audit(request: str, reviewer_id: str) -> dict:
-    """Generate clause draft → audit log → human approval."""
-    draft = generate_chain.invoke({"request": request})
-    log_event("draft_generated", {"request": request, "draft": draft})
 
-    print(f"\ndraft:\n{draft}\n")
-    approved = input("approve? (y/n): ").strip().lower() == "y"
+def request_approval(
+    action_type: str,
+    payload: dict,
+    ai_recommendation: str,
+    confidence: float,
+    risk_level: str = "medium",
+) -> PendingApproval:
+    """AI 결정을 승인 대기열에 추가합니다."""
+    approval = PendingApproval(
+        approval_id=str(uuid.uuid4()),
+        action_type=action_type,
+        payload=payload,
+        ai_recommendation=ai_recommendation,
+        confidence=confidence,
+        risk_level=risk_level,
+    )
+    approval_queue[approval.approval_id] = approval
+    return approval
 
-    if approved:
-        log_event("approved", {
-            "reviewer_id": reviewer_id,
-            "request": request,
-            "draft": draft,
-        })
-        return {"status": "approved", "content": draft}
-    else:
-        reason = input("rejection reason: ").strip()
-        log_event("rejected", {
-            "reviewer_id": reviewer_id,
-            "request": request,
-            "draft": draft,
-            "reason": reason,
-        })
-        return {"status": "rejected", "reason": reason}
 
-result = contract_clause_with_audit(
-    request="full refund within 30 days of cancellation",
-    reviewer_id="reviewer_001",
-)
-print(f"\nresult: {result['status']}")
-print(f"audit log: {LOG_FILE}")
+def process_approval_decision(
+    approval_id: str,
+    approved: bool,
+    reviewer: str,
+    note: str = "",
+) -> PendingApproval:
+    """검토자의 승인/거부 결정을 처리합니다."""
+    approval = approval_queue.get(approval_id)
+    if not approval:
+        raise ValueError(f"승인 ID를 찾을 수 없습니다: {approval_id}")
+
+    if approval.status != ApprovalStatus.PENDING:
+        raise ValueError(f"이미 처리된 승인입니다: {approval.status.value}")
+
+    approval.status = ApprovalStatus.APPROVED if approved else ApprovalStatus.REJECTED
+    approval.reviewer = reviewer
+    approval.review_note = note
+    approval.resolved_at = datetime.utcnow().isoformat()
+
+    return approval
 ```
 
----
+## 실습 2: 신뢰도 기반 라우팅
 
-## 이 코드에서 먼저 볼 점
+AI 결정의 신뢰도에 따라 자동 처리와 사람 검토로 분기합니다.
 
-- `main.py`는 생성된 초안에 점수를 매기고, 낮은 신뢰도 사례만 `input()` 스타일 검토 단계로 보냅니다.
-- 자동 검증을 위해 스크립트는 `HITL_DECISIONS` 환경변수로 검토자 선택을 시뮬레이션할 수 있습니다.
-- 실제 애플리케이션에서는 이 경계가 승인 큐와 운영자 콘솔이 됩니다.
+```python
+from openai import OpenAI
+import json
 
----
+client = OpenAI()
 
-## 어디서 자주 헷갈릴까요?
+AUTO_APPROVE_THRESHOLD = 0.85
+REVIEW_REQUIRED_THRESHOLD = 0.60
 
-### 정책 루프로 되돌아가는 사람 피드백
 
-![정책 루프로 되돌아가는 사람 피드백](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-05-human-feedback-back-into-policy-loop.ko.png)
+def ai_content_decision(content: str) -> dict:
+    """콘텐츠에 대한 AI 결정과 신뢰도를 반환합니다."""
+    prompt = f"""다음 사용자 생성 콘텐츠를 평가하세요.
 
-*정책 루프로 되돌아가는 사람 피드백*
-- HITL은 항상 맨 마지막에만 놓이지 않습니다. 분류 전, 발송 전, 송금 전에도 사람 검토가 들어갈 수 있습니다.
-- 신뢰도 점수는 객관적 진실값이 아니라 라우팅 힌트입니다. 검토 임계값은 결국 별도의 정책 판단이 필요합니다.
-- 사람 검토를 추가하면 통제력은 좋아지지만 처리량은 떨어집니다. 운영 인력과 SLA 영향까지 함께 설계해야 합니다.
+콘텐츠: {content}
 
----
+평가 기준:
+- 허위 정보 포함 여부
+- 유해 콘텐츠 여부
+- 저작권 침해 가능성
 
-## 운영 체크리스트
+JSON으로만 응답: {{
+  "decision": "approve/reject/uncertain",
+  "confidence": 0.0-1.0,
+  "reasons": ["이유1", "이유2"],
+  "risk_level": "low/medium/high"
+}}"""
 
-- [ ] 저위험 요청은 자동 승인 경로로 끝날 수 있다
-- [ ] 고위험 또는 저신뢰 요청은 사람 검토 경로로 라우팅된다
-- [ ] 검토자 결정이 최종 출력에 반영된다
-- [ ] 자동 실행에서도 환경변수로 검토자 선택을 재현할 수 있다
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=256,
+        response_format={"type": "json_object"},
+    )
+    return json.loads(response.choices[0].message.content)
 
----
 
-## 운영형 HITL: 검토 큐와 UI 흐름
+def confidence_based_routing(
+    content_id: str,
+    content: str,
+) -> dict:
+    """신뢰도에 따라 자동 처리 또는 사람 검토로 라우팅합니다."""
+    ai_result = ai_content_decision(content)
+    confidence = ai_result.get("confidence", 0.0)
+    decision = ai_result.get("decision", "uncertain")
 
-### 검토 큐 API와 상태 전이
+    if confidence >= AUTO_APPROVE_THRESHOLD and decision == "approve":
+        # 고신뢰도 승인: 자동 처리
+        return {
+            "content_id": content_id,
+            "route": "auto_approved",
+            "confidence": confidence,
+            "action": "publish",
+            "ai_result": ai_result,
+        }
 
-콘솔 `input()`은 개념 설명에는 충분하지만, 실제 서비스에서는 검토 큐가 필요합니다. 아래 예시는 검토 대상 생성, 조회, 승인/반려 업데이트를 분리한 FastAPI 스케치입니다.
+    elif confidence >= REVIEW_REQUIRED_THRESHOLD:
+        # 중간 신뢰도: 사람 검토
+        approval = request_approval(
+            action_type="content_moderation",
+            payload={"content_id": content_id, "content": content[:500]},
+            ai_recommendation=decision,
+            confidence=confidence,
+            risk_level=ai_result.get("risk_level", "medium"),
+        )
+        return {
+            "content_id": content_id,
+            "route": "human_review",
+            "approval_id": approval.approval_id,
+            "confidence": confidence,
+            "ai_result": ai_result,
+        }
+
+    else:
+        # 낮은 신뢰도 또는 불확실: 에스컬레이션
+        approval = request_approval(
+            action_type="content_escalation",
+            payload={"content_id": content_id, "content": content[:500]},
+            ai_recommendation="uncertain",
+            confidence=confidence,
+            risk_level="high",
+        )
+        return {
+            "content_id": content_id,
+            "route": "escalated",
+            "approval_id": approval.approval_id,
+            "confidence": confidence,
+            "ai_result": ai_result,
+        }
+```
+
+## 실습 3: 감사 로그 시스템
+
+모든 AI 결정과 사람 개입을 변경 불가능한 형태로 기록합니다.
+
+```python
+import hashlib
+import json
+from datetime import datetime
+from dataclasses import dataclass, asdict
+
+
+@dataclass
+class AuditEntry:
+    entry_id: str
+    timestamp: str
+    actor: str  # "ai" or 검토자 이름
+    action: str
+    subject_id: str
+    subject_type: str
+    decision: str
+    confidence: float | None
+    metadata: dict
+    previous_hash: str
+    entry_hash: str = ""
+
+    def compute_hash(self) -> str:
+        """항목 내용과 이전 해시를 포함해 해시를 계산합니다."""
+        content = json.dumps(
+            {
+                "entry_id": self.entry_id,
+                "timestamp": self.timestamp,
+                "actor": self.actor,
+                "action": self.action,
+                "subject_id": self.subject_id,
+                "decision": self.decision,
+                "previous_hash": self.previous_hash,
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+        return hashlib.sha256(content.encode()).hexdigest()
+
+
+class AuditLogger:
+    """해시 체인으로 연결된 변조 방지 감사 로그입니다."""
+
+    def __init__(self):
+        self._entries: list[AuditEntry] = []
+        self._last_hash: str = "GENESIS"
+
+    def log(
+        self,
+        actor: str,
+        action: str,
+        subject_id: str,
+        subject_type: str,
+        decision: str,
+        confidence: float | None = None,
+        metadata: dict | None = None,
+    ) -> AuditEntry:
+        entry = AuditEntry(
+            entry_id=str(len(self._entries) + 1).zfill(8),
+            timestamp=datetime.utcnow().isoformat(),
+            actor=actor,
+            action=action,
+            subject_id=subject_id,
+            subject_type=subject_type,
+            decision=decision,
+            confidence=confidence,
+            metadata=metadata or {},
+            previous_hash=self._last_hash,
+        )
+        entry.entry_hash = entry.compute_hash()
+        self._last_hash = entry.entry_hash
+        self._entries.append(entry)
+        return entry
+
+    def verify_integrity(self) -> bool:
+        """해시 체인 무결성을 검증합니다."""
+        prev_hash = "GENESIS"
+        for entry in self._entries:
+            if entry.previous_hash != prev_hash:
+                return False
+            expected_hash = entry.compute_hash()
+            if entry.entry_hash != expected_hash:
+                return False
+            prev_hash = entry.entry_hash
+        return True
+
+    def get_entries(self, subject_id: str | None = None) -> list[AuditEntry]:
+        """감사 로그 항목을 조회합니다."""
+        if subject_id:
+            return [e for e in self._entries if e.subject_id == subject_id]
+        return list(self._entries)
+
+
+# 전역 감사 로거
+audit_logger = AuditLogger()
+```
+
+## 실습 4: 검토 대기열 API
+
+사람 검토자가 대기 중인 항목을 조회하고 처리하는 API입니다.
 
 ```python
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
-review_queue: dict[str, dict] = {}
 
-class ReviewItemCreate(BaseModel):
-    request_id: str
-    draft: str
-    risk_level: str
-    confidence: float
 
 class ReviewDecision(BaseModel):
-    reviewer_id: str
-    decision: str  # approve | reject
-    reason: str | None = None
+    approved: bool
+    reviewer: str
+    note: str = ""
 
-@app.post('/reviews')
-def create_review(item: ReviewItemCreate):
-    review_queue[item.request_id] = {
-        'status': 'pending',
-        'draft': item.draft,
-        'risk_level': item.risk_level,
-        'confidence': item.confidence,
+
+@app.get("/review/queue")
+async def get_review_queue(risk_level: str | None = None):
+    """검토 대기 중인 항목 목록을 반환합니다."""
+    pending = [
+        {
+            "approval_id": a.approval_id,
+            "action_type": a.action_type,
+            "risk_level": a.risk_level,
+            "confidence": a.confidence,
+            "created_at": a.created_at,
+            "ai_recommendation": a.ai_recommendation,
+        }
+        for a in approval_queue.values()
+        if a.status == ApprovalStatus.PENDING
+        and (risk_level is None or a.risk_level == risk_level)
+    ]
+
+    # 위험도와 시간순 정렬 (high > medium > low, 오래된 것 먼저)
+    risk_order = {"high": 0, "medium": 1, "low": 2}
+    pending.sort(
+        key=lambda x: (risk_order.get(x["risk_level"], 9), x["created_at"])
+    )
+    return {"total": len(pending), "items": pending}
+
+
+@app.post("/review/{approval_id}")
+async def submit_review_decision(
+    approval_id: str,
+    decision: ReviewDecision,
+):
+    """검토자의 승인/거부 결정을 처리합니다."""
+    try:
+        updated = process_approval_decision(
+            approval_id=approval_id,
+            approved=decision.approved,
+            reviewer=decision.reviewer,
+            note=decision.note,
+        )
+        # 감사 로그 기록
+        audit_logger.log(
+            actor=decision.reviewer,
+            action="human_review",
+            subject_id=approval_id,
+            subject_type="approval",
+            decision="approved" if decision.approved else "rejected",
+            metadata={"note": decision.note},
+        )
+        return {
+            "approval_id": approval_id,
+            "status": updated.status.value,
+            "reviewer": updated.reviewer,
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/audit/{subject_id}")
+async def get_audit_trail(subject_id: str):
+    """특정 대상의 감사 이력을 조회합니다."""
+    entries = audit_logger.get_entries(subject_id)
+    return {
+        "subject_id": subject_id,
+        "entries": [
+            {
+                "timestamp": e.timestamp,
+                "actor": e.actor,
+                "action": e.action,
+                "decision": e.decision,
+            }
+            for e in entries
+        ],
+        "integrity_valid": audit_logger.verify_integrity(),
     }
-    return {'request_id': item.request_id, 'status': 'pending'}
-
-@app.get('/reviews/{request_id}')
-def get_review(request_id: str):
-    if request_id not in review_queue:
-        raise HTTPException(status_code=404, detail='not found')
-    return review_queue[request_id]
-
-@app.post('/reviews/{request_id}/decision')
-def decide_review(request_id: str, decision: ReviewDecision):
-    if request_id not in review_queue:
-        raise HTTPException(status_code=404, detail='not found')
-
-    record = review_queue[request_id]
-    record['status'] = 'approved' if decision.decision == 'approve' else 'rejected'
-    record['reviewer_id'] = decision.reviewer_id
-    record['reason'] = decision.reason
-    return {'request_id': request_id, 'status': record['status']}
 ```
 
-### 운영자 UI 흐름
+## 운영 체크리스트
 
-```mermaid
-flowchart LR
-    A[AI 초안 생성] --> B{위험도/신뢰도 평가}
-    B -->|저위험/고신뢰| C[자동 통과]
-    B -->|고위험 또는 저신뢰| D[검토 큐 적재]
-    D --> E[운영자 콘솔 검토]
-    E -->|승인| F[발송]
-    E -->|반려| G[수정 요청/폐기]
-```
+- [ ] 자동 처리와 사람 검토 임계값이 명문화되어 있습니다.
+- [ ] 모든 AI 결정과 사람 개입이 감사 로그에 기록됩니다.
+- [ ] 검토 대기열에 SLA(예: 고위험 4시간 내 처리)가 설정되어 있습니다.
+- [ ] 에스컬레이션 경로가 명확히 정의되어 있습니다.
+- [ ] 감사 로그 무결성을 정기적으로 검증합니다.
 
-*위험도와 신뢰도 기반 HITL UI 흐름*
+## 자주 하는 실수
 
-### 사람 피드백을 정책으로 환류하기
-
-HITL의 목적은 단순 승인 절차가 아닙니다. 반려 사유를 수집해 임계값과 프롬프트, 라우팅 규칙을 조정하는 데 있습니다. 예를 들어 반려 로그가 "법적 표현 과장"에 집중된다면, 생성 프롬프트에 금지 표현 규칙을 추가하고 해당 유형의 요청을 기본 검토 대상으로 승격할 수 있습니다.
-
-```text
-feedback_tag=legal_risk_overclaim
-action_1=system_prompt_rule_add("확정적 법률 표현 금지")
-action_2=threshold_update(risk=legal, confidence_cutoff=0.92)
-action_3=mandatory_human_review(category=contract_clause)
-```
-
-이 루프가 있어야 HITL은 비용만 늘리는 절차가 아니라, 시간이 갈수록 자동화 품질을 끌어올리는 학습 시스템이 됩니다.
-
-## 사람 검토 UX와 SLA 설계
-
-HITL은 백엔드 로직만으로 완성되지 않습니다. 검토자가 빠르게 판단할 수 있는 화면 정보가 필요합니다. 최소한 아래 항목은 한 화면에서 보여야 합니다.
-
-- 원본 입력 전문
-- 모델 제안 출력
-- 위험도/신뢰도 점수와 분기 이유
-- 과거 유사 사례(승인/반려)
-- 승인/반려 버튼과 사유 템플릿
-
-### 검토 화면 데이터 계약
-
-```json
-{
-  "request_id": "req-2026-05-21-119",
-  "input": "계약 해지 후 30일 이내 전액 환불 조항 작성",
-  "draft": "...",
-  "risk_level": "high",
-  "confidence": 0.71,
-  "route_reason": "confidence_below_threshold",
-  "history": [
-    {"decision": "rejected", "reason": "법률적 단정 표현"}
-  ]
-}
-```
-
-검토자가 필요한 정보가 부족하면 승인 시간이 길어지고, 결국 자동화의 이점이 사라집니다. HITL에서 UX는 선택이 아니라 성능 요소입니다.
-
-### Flask로 웹훅 기반 승인 반영
-
-```python
-from flask import Flask, request, jsonify
-
-app = Flask(__name__)
-state: dict[str, str] = {}
-
-@app.post('/webhook/review-decision')
-def review_decision_webhook():
-    payload = request.json
-    request_id = payload['request_id']
-    decision = payload['decision']
-
-    if decision == 'approve':
-        state[request_id] = 'approved'
-    else:
-        state[request_id] = 'rejected'
-
-    return jsonify({'request_id': request_id, 'status': state[request_id]})
-```
-
-### SLA 관점의 HITL 운영 규칙
-
-사람 검토 단계가 들어오면 SLA를 다시 정의해야 합니다. 자동 응답 SLA와 검토 응답 SLA를 분리하지 않으면 운영 지표가 왜곡됩니다.
-
-```text
-auto_path_sla: 5초 이내 응답
-human_review_sla: 30분 이내 1차 판정
-escalation_rule: 30분 초과 시 on-call reviewer 호출
-```
-
-이 규칙을 명문화해 두면, HITL이 품질을 올리면서도 서비스 지연을 관리 가능한 범위에 묶을 수 있습니다.
-
-## 정책 기준을 코드로 고정하기
-
-HITL을 일관되게 운영하려면 "누가 볼지"를 매번 사람 감으로 정하면 안 됩니다. 위험도와 신뢰도 기준을 코드로 고정해야 팀 간 판단 편차를 줄일 수 있습니다.
-
-```python
-def should_require_human_review(risk_level: str, confidence: float, category: str) -> tuple[bool, str]:
-    mandatory_categories = {'contract_clause', 'payment_refund', 'account_suspension'}
-
-    if category in mandatory_categories:
-        return True, 'mandatory_category'
-    if risk_level == 'high':
-        return True, 'high_risk'
-    if confidence < 0.85:
-        return True, 'low_confidence'
-    return False, 'auto_pass'
-```
-
-### 승인자 책임 분리
-
-```text
-role=reviewer_level1: 일반 문의 승인/반려
-role=reviewer_level2: 법무/금전/계정정지 최종 승인
-role=auditor: 로그 열람, 정책 적합성 점검
-```
-
-책임 경계를 나누면 승인 병목과 책임 공백을 동시에 줄일 수 있습니다.
-
-### 감사 로그 스키마 확장
-
-```json
-{
-  "event_type": "review_decision",
-  "request_id": "req-119",
-  "route_reason": "mandatory_category",
-  "reviewer_id": "legal_reviewer_02",
-  "decision": "approved",
-  "decision_latency_sec": 412,
-  "policy_version": "hitl-policy-v3"
-}
-```
-
-정책 버전을 로그에 남기면, 나중에 동일 입력이 왜 다른 결과를 냈는지 설명 가능성을 확보할 수 있습니다. HITL 시스템에서 설명 가능성은 선택이 아니라 기본 요구사항입니다.
-
-## 검토 품질 측정 지표
-
-HITL은 검토자 수를 늘린다고 자동으로 좋아지지 않습니다. 검토 일관성을 수치로 봐야 정책을 개선할 수 있습니다.
-
-- `review_overturn_rate`: AI 제안을 사람이 뒤집은 비율
-- `inter_reviewer_agreement`: 검토자 간 일치도
-- `escalation_rate`: 2차 검토로 올라간 비율
-- `false_auto_pass_rate`: 자동 통과 후 사후 반려된 비율
-
-```python
-def compute_overturn_rate(items: list[dict]) -> float:
-    if not items:
-        return 0.0
-    overturned = sum(1 for i in items if i['ai_decision'] != i['human_decision'])
-    return overturned / len(items)
-```
-
-이 지표를 주간 단위로 보면 임계값이 너무 낮은지, 특정 카테고리에서 모델이 반복적으로 흔들리는지 빠르게 포착할 수 있습니다.
-
-### 검토 큐 우선순위 규칙
-
-```text
-priority=P1: 금전/법무 영향 + confidence < 0.9
-priority=P2: 계정/권한 변경 + confidence < 0.85
-priority=P3: 일반 문의 + confidence < 0.75
-```
-
-우선순위 기준이 없으면 검토 큐는 오래된 요청과 긴급 요청을 구분하지 못하고 SLA를 쉽게 위반합니다.
-
-### 검토자 피드백 템플릿
-
-반려 사유를 자유 텍스트로만 받으면 통계가 어려워집니다. `사실 오류`, `규정 위반`, `표현 과장`, `근거 부족` 같은 템플릿 태그를 함께 기록하면 정책 개선 루프가 빨라집니다.
-
-### 정책 실험 방법
-
-임계값을 바꿀 때는 전체 트래픽에 즉시 적용하지 않고 일부 비율에서만 A/B 테스트를 수행하는 편이 안전합니다. 검토 대기 시간과 반려율, 사후 오류율을 함께 보고 정책을 승격해야 운영 충격을 줄일 수 있습니다.
-
-### 운영 회고에서 반드시 남길 항목
-
-패턴 설계가 실제로 효과가 있었는지는 회고 기록 품질에서 드러납니다. 각 글에서 다룬 구조를 실서비스에 적용했다면, 최소한 다음 항목은 공통 템플릿으로 남기는 편이 좋습니다.
-
-- 변경 전/후의 실패 유형 분포
-- 변경 전/후의 평균 지연 시간과 p95
-- 사람이 개입한 건수와 자동 처리 건수 비율
-- 근거 부족, 파싱 실패, 도구 오류 같은 실패 코드의 추세
-- 다음 분기에서 조정할 임계값 또는 프롬프트 버전
-
-이 기록이 쌓이면 모델 자체 성능보다 애플리케이션 패턴 결정이 어떤 영향을 주었는지 분리해서 볼 수 있습니다. 결국 운영 품질은 한 번의 정답 설계가 아니라, 측정 가능한 개선 루프를 오래 유지하는 능력에서 만들어집니다.
-
-이 항목을 주간 리듬으로 점검하면, 자동화 품질이 우연이 아니라 재현 가능한 운영 습관으로 자리잡습니다.
-
-## 정리
-
-HITL은 자동화를 버리는 뜻이 아닙니다. 신뢰도가 높은 출력은 자동으로 통과시키고, 신뢰도가 낮거나 위험이 큰 출력만 사람 검토를 위해 멈춥니다. 모델이 실제 트래픽에서 신뢰를 쌓을수록 비율은 자동화 쪽으로 이동할 수 있습니다. 그리고 감사 로그가 루프를 닫습니다. 모든 사람 교정은 다음 미세조정이나 임계값 조정의 근거가 됩니다.
-
-이 시리즈는 챗봇, RAG Q&A, 문서 어시스턴트, 도구를 쓰는 에이전트, 워크플로 자동화, Human-in-the-loop라는 여섯 가지 핵심 LLM 애플리케이션 패턴을 다뤘습니다. 각 패턴은 독립적으로도 쓸 수 있고, 서로 조합해 더 복잡한 시스템을 만들 수도 있습니다.
-
----
+| 실수 | 증상 | 해결 방법 |
+|---|---|---|
+| HITL 개입 기준 미문서화 | 검토자마다 다른 판단 기준 적용 | 임계값을 코드와 문서에 동시 명시 |
+| 감사 로그 변조 가능 | 감사 역할 상실 | 해시 체인 또는 append-only 저장소 사용 |
+| 검토 대기열 우선순위 없음 | 고위험 항목이 오래 대기 | 위험도 기반 정렬 및 SLA 알림 구현 |
+| 승인 없이 고위험 작업 실행 | 되돌리기 어려운 오류 발생 | 모든 고위험 작업에 승인 게이트 필수 |
+| 에스컬레이션 경로 미설정 | 낮은 신뢰도 항목이 무한 대기 | escalated 상태와 상위 검토자 알림 구현 |
 
 ## 처음 질문으로 돌아가기
 
-- **Human-in-the-loop은 모델이 약해서 붙이는 예외 처리일까요, 제품 설계의 일부일까요?**
-  - Human-in-the-loop은 모델이 약해서 붙이는 예외 처리일까요, 제품 설계의 일부일까요에 대해 본문에서 실무 예시와 함께 답합니다.
-- **승인 게이트와 신뢰도 기반 분기는 각각 어떤 상황에 맞을까요?**
-  - LLM이 출력과 함께 신뢰도 점수도 반환하게 만들고, 낮은 신뢰도의 결과만 자동으로 사람 검토자에게 보낼 수 있습니다.
-- **사람이 개입한 결정을 나중에 감사하려면 무엇을 로그로 남겨야 할까요?**
-  - 사람이 개입한 결정을 나중에 감사하려면 무엇을 로그로 남겨야 할까요에 대해 본문에서 실무 예시와 함께 답합니다.
+- **어떤 기준으로 AI 결정에 사람이 개입해야 할지 판단할 수 있을까요?**
+  신뢰도, 영향 범위, 가역성, 금액/위험 수준, 법적 의무 다섯 가지 기준을 조합해 판단합니다. 이 기준을 코드로 명문화해 일관된 라우팅이 이루어지도록 해야 합니다.
+
+- **신뢰도 기반 라우팅에서 임계값은 어떻게 설정해야 할까요?**
+  처음에는 보수적으로(자동 처리 임계값을 높게) 시작하고, 실제 운영 데이터를 보며 임계값을 조정합니다. 일반적으로 0.85 이상 자동 처리, 0.60-0.85 사람 검토, 0.60 미만 에스컬레이션이 좋은 출발점입니다.
+
+- **감사 로그는 HITL 시스템에서 왜 필수적일까요?**
+  규정 준수 요구사항을 충족하고, 분쟁 발생 시 결정 근거를 제공합니다. 모델 성능 드리프트를 감지하고 HITL 임계값을 재조정하는 데이터 소스가 됩니다. 해시 체인 구조로 감사 로그 자체의 변조를 방지해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [AI App Patterns 101 (1/6): 챗봇 패턴 — 대화 이력과 상태 관리](./01-chatbot-pattern.md)
-- [AI App Patterns 101 (2/6): RAG Q&A 패턴 — 문서 기반 질의응답](./02-rag-qa-pattern.md)
-- [AI App Patterns 101 (3/6): 문서 어시스턴트 — 요약, 추출, 분류](./03-document-assistant.md)
-- [AI App Patterns 101 (4/6): 에이전트와 도구 패턴 — 자율적 도구 선택](./04-agent-tool-pattern.md)
-- [AI App Patterns 101 (5/6): 워크플로 자동화 — 다단계 체인 설계](./05-workflow-automation.md)
-- **AI App Patterns 101 (6/6): Human-in-the-loop — 사람 개입 설계 (현재 글)**
+- [AI App Patterns 101 (1/6): Chatbot 패턴](./01-chatbot-pattern.md)
+- [AI App Patterns 101 (2/6): RAG QA 패턴](./02-rag-qa-pattern.md)
+- [AI App Patterns 101 (3/6): Document Assistant 패턴](./03-document-assistant.md)
+- [AI App Patterns 101 (4/6): Agent Tool 패턴](./04-agent-tool-pattern.md)
+- [AI App Patterns 101 (5/6): Workflow Automation 패턴](./05-workflow-automation.md)
+- **AI App Patterns 101 (6/6): Human-in-the-Loop 패턴 (현재 글)**
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-- [LangGraph human-in-the-loop guide](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/)
-- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework)
-- [Python `json` 모듈 문서](https://docs.python.org/3/library/json.html)
+- [Google — Human-AI Interaction Guidebook](https://pair.withgoogle.com/guidebook/)
+- [Microsoft — Responsible AI](https://www.microsoft.com/en-us/ai/responsible-ai)
+- [FastAPI — Routing](https://fastapi.tiangolo.com/tutorial/bigger-applications/)
+- [NIST — AI Risk Management Framework](https://www.nist.gov/artificial-intelligence)
+- [book-examples — ai-app-patterns-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/ai-app-patterns-101/ko)
 
-- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-app-patterns-101/ko/06-human-in-the-loop)
-
-Tags: LLM, RAG, Agent, Python
+Tags: HumanInTheLoop, ApprovalGate, AuditLog, LLM, Safety

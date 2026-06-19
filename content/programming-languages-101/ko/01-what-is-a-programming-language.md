@@ -293,6 +293,41 @@ OrderEvent(event_id='ev-1', amount=120)
 ValueError: amount must be >= 0
 ```
 
+## TypeScript로 보는 점진적 타입 도입
+
+Python이 타입 힌트를 선택적으로 받아들이는 것처럼, TypeScript는 JavaScript 위에 정적 타입을 덧붙이는 방식으로 언어 설계의 점진적 도입을 보여 줍니다.
+
+```typescript
+// TypeScript: 점진적 타입 — 기존 JavaScript 생태계를 그대로 유지하면서 안전성 추가
+function evenDoubleSum(nums: number[]): number {
+    return nums
+        .filter(n => n % 2 === 0)
+        .map(n => n * 2)
+        .reduce((acc, n) => acc + n, 0);
+}
+
+// 타입이 없어도 동작하지만, 타입이 있으면 오류를 조기에 잡음
+const result: number = evenDoubleSum([1, 2, 3, 4, 5, 6]);
+console.log(result);  // 24
+```
+
+TypeScript의 접근 방식은 "안전성을 강제하지 않고 선택하게 한다"는 점에서 설계 철학을 잘 보여 줍니다. 기존 JavaScript 코드는 수정 없이 TypeScript 프로젝트에 포함될 수 있고, 팀이 준비됐을 때 타입을 추가하면 됩니다.
+
+## 언어를 고를 때 실제로 보는 것들
+
+이론적인 패러다임 분류 외에, 현업에서 언어를 선택할 때 고려하는 현실적인 요인들도 있습니다.
+
+| 고려 요인 | 내용 | 대표 사례 |
+| --- | --- | --- |
+| 생태계 | 필요한 라이브러리와 도구의 풍부함 | Python의 데이터 과학 생태계 |
+| 학습 곡선 | 팀이 익숙해지는 데 필요한 시간 | Go의 낮은 학습 곡선 |
+| 배포 단순성 | 바이너리 하나로 배포 가능한가 | Go, Rust의 단일 바이너리 |
+| 커뮤니티 활동성 | 오류를 만났을 때 도움을 구할 수 있는가 | Stack Overflow 답변 수 |
+| 타입 시스템 강도 | 얼마나 일찍 오류를 잡아 주는가 | Rust > TypeScript > Python |
+| 런타임 성능 | 지연 시간과 처리량 요구사항 | Rust/C++ > Go/Java > Python |
+
+이 표의 어떤 행도 단독으로 언어를 결정하지 않습니다. 팀의 현재 상황, 프로젝트 수명, 성능 요구사항, 채용 환경이 모두 조합돼 최종 선택을 만듭니다.
+
 ## 운영 체크리스트
 
 - [ ] 고급 언어에서 기계어까지 내려가는 추상화 계층을 한 문장으로 설명할 수 있는가?
