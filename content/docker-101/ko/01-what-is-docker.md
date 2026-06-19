@@ -259,6 +259,44 @@ docker system prune -af      # 모든 미사용 리소스 삭제
 docker system df             # 사용 중인 디스크 공간 확인
 ```
 
+## Docker를 배우는 순서
+
+Docker 101 시리즈는 아래 흐름으로 진행됩니다. 각 글이 이전 글 위에 쌓이는 구조입니다.
+
+```
+1. Docker란 무엇인가?     ← 지금 여기
+   image, container, registry 기본 이해
+
+2. Image와 Container
+   layer, lifecycle, writable layer
+
+3. Dockerfile 작성하기
+   명령 순서, 캐시 전략, 보안
+
+4. Volume과 Network
+   영속성, 서비스 간 통신
+
+5. Docker Compose
+   멀티 컨테이너 선언, healthcheck
+
+6. 환경변수와 설정
+   12-Factor App, secret 관리
+
+7. Python 앱 컨테이너화
+   PID 1, signal, healthcheck
+
+8. DB와 함께 실행하기
+   migration, seed, 준비 상태
+
+9. Image 최적화
+   멀티스테이지, BuildKit 캐시
+
+10. 배포용 Docker 구성
+    태그 정책, 서명, 런타임 보안
+```
+
+각 글은 독립적으로 읽을 수 있지만, 순서대로 읽으면 개념이 자연스럽게 쌓입니다. 처음 읽는다면 1→2→3 순서로 진행하는 것을 권장합니다.
+
 ## 운영 체크리스트
 
 - [ ] `docker run hello-world`가 정상 동작합니다.
@@ -267,6 +305,35 @@ docker system df             # 사용 중인 디스크 공간 확인
 - [ ] 실행한 컨테이너를 `docker stop`과 `docker rm`으로 정리할 수 있습니다.
 - [ ] `docker logs`로 컨테이너 출력을 확인할 수 있습니다.
 - [ ] `latest` 태그를 프로덕션에서 쓰지 않는 이유를 설명할 수 있습니다.
+
+## Docker 설치 확인과 환경 점검
+
+처음 시작하는 분을 위해 Docker가 올바르게 설치되었는지 확인하는 방법입니다.
+
+```bash
+# Docker 버전 확인
+docker --version
+# Docker version 25.0.x, build abc123
+
+# Docker 데몬 상태 확인
+docker info
+# 출력에 "Server:" 섹션이 보이면 데몬이 실행 중
+
+# 가장 빠른 동작 확인
+docker run hello-world
+
+# 컨테이너 실행 가능 여부 확인 (권한 없으면 sudo 필요)
+docker ps
+
+# Linux에서 sudo 없이 실행하려면
+sudo usermod -aG docker $USER
+# 로그아웃 후 재로그인 필요
+```
+
+**플랫폼별 설치:**
+- **Mac**: Docker Desktop (https://docs.docker.com/desktop/install/mac-install/)
+- **Windows**: Docker Desktop + WSL2 (https://docs.docker.com/desktop/install/windows-install/)
+- **Linux**: Docker Engine (https://docs.docker.com/engine/install/)
 
 ## 연습 문제
 

@@ -230,11 +230,112 @@ CMD ["app.py"]
 
 신호 처리 관점에서 exec 형식(`["cmd", "arg"]`)과 shell 형식(`cmd arg`)의 차이도 중요합니다. shell 형식은 `/bin/sh -c`를 통해 실행되므로, SIGTERM 신호가 실제 프로세스에 전달되지 않을 수 있습니다.
 
+## 완성된 Dockerfile 예시 (Python FastAPI)
+
+```dockerfile
+# syntax=docker/dockerfile:1.7
+FROM python:3.12-slim
+
+# ── 환경변수 ────────────────────────────────────────────────
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    LOG_LEVEL=INFO
+
+WORKDIR /app
+
+# ── 시스템 의존성 (변경 빈도 낮음) ──────────────────────────
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends tini && \
+    rm -rf /var/lib/apt/lists/*
+
+# ── Python 의존성 (변경 빈도 중간) ──────────────────────────
+COPY requirements.txt .
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements.txt
+
+# ── 애플리케이션 코드 (변경 빈도 높음) ──────────────────────
+COPY app/ ./app/
+
+# ── 보안: non-root ───────────────────────────────────────────
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 --start-period=10s \
+  CMD python -c \
+    "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz').read()" \
+    || exit 1
+
+ENTRYPOINT ["tini", "--"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+이 Dockerfile은 이 글에서 다룬 모든 원칙을 담고 있습니다. 레이어 순서(변경 빈도 기준), `.dockerignore` 필요성, non-root 실행, healthcheck, BuildKit 캐시가 모두 반영되어 있습니다.
+
 ## 실무에서는 이렇게 이어집니다
 
 성숙한 팀은 멀티스테이지 빌드, BuildKit 캐시 마운트, 베이스 이미지 표준화까지 함께 사용해 빌드 시간을 줄입니다. 특히 Python 프로젝트에서는 의존성 레이어 캐시를 어떻게 설계하느냐가 로컬 개발 속도와 CI 시간을 크게 좌우합니다.
 
 운영 관점에서는 Dockerfile이 보안 정책의 일부가 되기도 합니다. 어떤 베이스 이미지를 허용하는지, root 실행을 금지하는지, 헬스체크를 어디서 정의하는지 같은 기준이 모두 Dockerfile 수준에서 드러나기 때문입니다.
+
+## 빌드 관련 자주 쓰는 명령
+
+```bash
+# ── 기본 빌드 ────────────────────────────────────────────────
+docker build -t myapp:1.0 .
+docker build -t myapp:1.0 -f Dockerfile.prod .  # 다른 Dockerfile 지정
+docker build --no-cache -t myapp:1.0 .           # 캐시 무시
+
+# ── BuildKit 사용 ────────────────────────────────────────────
+DOCKER_BUILDKIT=1 docker build -t myapp:1.0 .
+docker buildx build -t myapp:1.0 .              # BuildKit 기반 빌드
+
+# ── 빌드 인자 전달 ───────────────────────────────────────────
+docker build \
+  --build-arg APP_VERSION=1.0.0 \
+  --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+  -t myapp:1.0 .
+
+# ── 검사 ─────────────────────────────────────────────────────
+docker history myapp:1.0                # 레이어 히스토리
+docker inspect myapp:1.0               # 전체 이미지 정보
+docker run --rm myapp:1.0 id           # 실행 사용자 확인
+docker run --rm myapp:1.0 env          # 환경변수 확인
+```
+
+## Dockerfile 빌드 캐시 작동 원리
+
+캐시가 어떻게 작동하는지 이해하면 더 효과적으로 최적화할 수 있습니다.
+
+```dockerfile
+FROM python:3.12-slim          # ← 이 줄이 바뀌면 아래 모두 무효
+WORKDIR /app                   # ← FROM 변경 시 무효
+COPY requirements.txt .        # ← requirements.txt 내용이 바뀌면 아래 무효
+RUN pip install -r requirements.txt  # ← requirements 변경 시 재실행
+COPY . .                       # ← 소스 코드 변경 시 이 줄부터 무효
+CMD ["python", "app.py"]       # ← 위 COPY 변경 시 무효
+```
+
+```bash
+# 캐시 히트 확인
+docker build -t myapp:1.0 .
+# CACHED로 표시되는 줄은 캐시를 재사용했다는 의미
+# Step 4/6 : RUN pip install...
+#  ---> Using cache   ← 캐시 적중!
+#  ---> a1b2c3d4e5f6
+
+# 강제 재빌드 (캐시 무시)
+docker build --no-cache -t myapp:1.0 .
+
+# 특정 단계부터 재빌드
+# (해당 파일을 touch해서 변경으로 인식시킴)
+touch requirements.txt
+docker build -t myapp:1.0 .
+```
+
+핵심 규칙: **위의 레이어가 바뀌면 아래의 모든 레이어 캐시가 무효**입니다. 그래서 변경 빈도가 낮은 것(시스템 패키지, 의존성)을 위에, 높은 것(소스 코드)을 아래에 두어야 합니다.
 
 ## 운영 체크리스트
 

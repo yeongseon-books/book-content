@@ -40,131 +40,251 @@ last_reviewed: '2026-05-15'
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
+## 왜 이 글이 중요한가
+
+라이선스를 법무팀 일로만 미루면 늦는 경우가 많습니다. 기업에서 오픈소스 도입을 결정하는 순간은 개발자가 `pip install` 또는 `npm install`을 치는 순간입니다. 그 라이브러리에 GPL이 붙어 있고 제품에 정적으로 링크되면, 나중에 이를 제거하거나 소스를 공개하는 비용이 크게 늘어납니다.
+
+반대로 라이선스를 초기에 이해하고 관리하면 보안 리스크를 줄이고, 법적 분쟁을 예방하고, 기업 컴플라이언스 요건을 충족하기가 훨씬 쉬워집니다. 오픈소스는 기술 선택과 법적 선택이 동시에 일어나는 영역입니다.
+
+## 핵심 관점
+
+라이선스를 읽을 때는 이름보다 질문이 중요합니다.
+
+- 이 코드를 수정해도 되는가
+- 재배포해도 되는가
+- 저작권 고지를 남겨야 하는가
+- 파생물의 소스를 공개해야 하는가
+- 특허 관련 보호는 있는가
+
+이 다섯 질문에 답할 수 있으면 이미 절반은 이해한 셈입니다.
+
+> 라이선스 선택은 현재보다 **미래**를 좌우합니다. 지금 당장 코드를 실행하는 데는 차이가 없어 보여도, 나중에 상용 제품에 포함할지, 수정본을 배포할지, 특허 위험을 어떻게 다룰지는 모두 라이선스 문장에서 갈립니다.
+
+## 핵심 개념
+
+### 라이선스 분류 체계
+
+오픈소스 라이선스는 크게 허용형(permissive)과 카피레프트(copyleft)로 나뉩니다.
+
+**허용형(permissive)** 라이선스는 사용, 수정, 배포, 상용 이용까지 비교적 넓게 허용합니다. MIT, Apache 2.0, BSD가 여기에 속합니다. 파생물을 비공개로 유지할 수 있습니다.
+
+**카피레프트(copyleft)** 라이선스는 파생 저작물에도 공유 의무를 강하게 연결합니다. GPL, LGPL, AGPL이 여기에 속합니다. 수정 배포 시 소스를 공개해야 합니다.
+
+어느 쪽이 더 낫다기보다, 프로젝트 목표와 배포 방식에 따라 부담과 이점이 달라집니다.
+
+### 라이선스 비교 요약 표
+
+| 항목 | MIT | Apache 2.0 | GPL v3 | LGPL v2.1 | BSD 2-Clause |
+|---|---|---|---|---|---|
+| 상업적 사용 | 허용 | 허용 | 허용 | 허용 | 허용 |
+| 수정 후 비공개 배포 | 가능 | 가능 | 불가 (소스 공개 의무) | 조건부 (동적 링크 시 가능) | 가능 |
+| 특허 조항 | 없음 | 명시적 특허 허여 | 없음 | 없음 | 없음 |
+| 저작권 고지 유지 | 필수 | 필수 | 필수 | 필수 | 필수 |
+| 변경 사항 표시 | 불필요 | 필요 | 필요 | 필요 | 불필요 |
+| 대표 사용처 | jQuery, Express | Kubernetes, Android | Linux kernel, GCC | Qt, glibc | FreeBSD, nginx |
+
+### 반드시 알아야 할 다섯 가지 개념
+
+**permissive** — 사용, 수정, 배포, 상용 이용까지 비교적 넓게 허용합니다. 재사용 장벽이 낮습니다.
+
+**copyleft** — 파생 저작물에도 공유 의무를 강하게 연결합니다. 수정 후 배포 시 소스를 공개해야 합니다.
+
+**public domain** — 저작권 제한을 사실상 두지 않는 개념입니다. 국가별 해석 차이까지 확인해야 합니다. CC0 표기를 사용합니다.
+
+**dual license** — 하나의 소프트웨어를 두 가지 라이선스 체계로 제공합니다. MySQL은 GPL과 상업용 라이선스를 동시에 제공합니다. 오픈소스와 상용 모델을 함께 운영할 때 자주 보입니다.
+
+**SPDX** — 라이선스를 짧고 일관된 식별자로 표현하는 표준입니다. `MIT`, `Apache-2.0`, `GPL-3.0-only`처럼 씁니다. 자동 검사 도구가 읽기 쉬워서 실무 가치가 큽니다.
+
+## 라이선스별 실제 의무 예시
+
+### MIT 라이선스
+
+가장 단순한 허용형 라이선스입니다. 조건이 하나뿐입니다.
+
+```text
+MIT License
+
+Copyright (c) 2024 Author Name
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software...
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+```
+
+**실제 의무**: 배포 시 위 저작권 고지를 포함하면 됩니다. 소스 공개 의무 없음.
+
+### Apache 2.0 라이선스
+
+MIT와 비슷하지만 특허 조항이 명시됩니다.
+
+```text
+Apache License, Version 2.0
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+4. Redistribution. You may reproduce and distribute copies of the Work...
+
+Subject to the terms and conditions of this License, each Contributor hereby
+grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free,
+irrevocable patent license...
+```
+
+**실제 의무**: 저작권 고지 + NOTICE 파일 유지 + 변경 사항 표시. 특허 보호 포함.
+
+### GPL v3 라이선스
+
+강한 카피레프트입니다. 파생물 소스 공개가 필수입니다.
+
+```text
+GNU GENERAL PUBLIC LICENSE Version 3
+
+You may copy and distribute verbatim copies of the Program's source code
+as you receive it...
+
+You may convey verbatim copies of the Program's source code as you receive it...
+but you must also release all derivative works under GPL v3 terms.
+```
+
+**실제 의무**: 배포 시 소스 코드 공개 필수. 파생물도 GPL v3 적용 필수.
+
 ## 라이선스 선택 결정 트리
 
-프로젝트를 시작할 때 라이선스 선택은 다음 순서로 결정하면 됩니다.
+프로젝트를 시작할 때 라이선스 선택은 다음 순서로 결정합니다.
 
-1. **목표 확인** — 프로젝트를 상용 제품에 포함할 계획인가요? 상용 판매 가능성을 열어 둘 계획인가요? 커뮤니티 환원을 강제하고 싶은가요?
-2. **제약 수용 정도** — 파생물에도 동일 라이선스를 적용할 수 있나요? 소스 공개를 강제하는 것이 목표에 맞나요?
-3. **특허 보호** — 특허 분쟁을 미리 차단하고 싶나요? Apache 2.0의 명시적 특허 보호가 필요한가요?
-4. **호환성** — 기존 프로젝트나 의존성의 라이선스와 충돌하지 않나요?
+```text
+1. 상용 제품에 포함할 계획인가?
+   - Yes: MIT, Apache 2.0, BSD 중 선택
+   - No: GPL 계열 고려 가능
 
-이 순서로 결정하면 불필요한 분쟁을 줄일 수 있습니다. 가장 흔한 실수는 "모든 사람이 MIT를 쓰니까 나도 MIT"라고 생각하는 것입니다. 프로젝트의 목표와 맞지 않는 라이선스는 나중에 변경하기 매우 어려습니다.
+2. 특허 보호가 필요한가?
+   - Yes: Apache 2.0 선택
+   - No: MIT로 충분
 
-라이선스는 프로젝트의 현재보다 미래를 좌우합니다. 지금 당장 코드를 실행하는 데는 차이가 없어 보여도, 나중에 상용 제품에 포함할지, 수정본을 배포할지, 특허 위험을 어떻게 다룰지 같은 문제는 모두 라이선스 문장에서 갈립니다.
+3. 커뮤니티 환원을 강제하고 싶은가?
+   - Yes: GPL v3 선택
+   - No: MIT, Apache 2.0
 
-오픈소스는 기술 선택과 법적 선택이 동시에 일어나는 영역입니다. 개발자는 편리한 라이브러리를 골랐다고 생각할 수 있지만, 조직 입장에서는 그 순간 배포 정책과 컴플라이언스 비용까지 함께 고른 셈입니다. 그래서 라이선스를 법무팀 일로만 미루면 늦는 경우가 많습니다.
+4. 라이브러리로서 상용 제품과 함께 쓰이는가?
+   - Yes: LGPL 고려 (동적 링크 허용)
+   - No: MIT
+```
 
-## 라이선스 지도를 먼저 그려 보기
+가장 흔한 실수는 "모든 사람이 MIT를 쓰니까 나도 MIT"라고 생각하는 것입니다. 프로젝트의 목표와 맞지 않는 라이선스는 나중에 변경하기 매우 어렵습니다. 기존 기여자 전원의 동의가 필요하기 때문입니다.
 
-이 분류를 선악 구도로 읽을 필요는 없습니다. 허용형 라이선스는 재사용이 쉽고, 카피레프트 라이선스는 수정과 공유의 의무를 더 강하게 밀어 줍니다. 어느 쪽이 더 낫다기보다, 프로젝트 목표와 배포 방식에 따라 부담과 이점이 달라진다고 보는 편이 현실적입니다.
+## 실무에서 라이선스 확인하는 법
 
-라이선스를 읽을 때는 이름보다 질문이 중요합니다. 이 코드를 수정해도 되는가, 재배포해도 되는가, 저작권 고지를 남겨야 하는가, 파생물의 소스를 공개해야 하는가, 특허 관련 보호는 있는가. 이 질문에 답할 수 있으면 이미 절반은 이해한 셈입니다.
+### 의존성 라이선스 자동 확인
 
-## 꼭 알아야 할 다섯 가지 개념
+수동으로 모든 의존성의 라이선스를 확인하는 것은 불가능합니다. 도구를 사용합니다.
 
-permissive 라이선스는 사용, 수정, 배포, 상용 이용까지 비교적 넓게 허용합니다. copyleft 라이선스는 파생 저작물에도 공유 의무를 더 강하게 연결합니다. public domain은 저작권 제한을 사실상 두지 않는 개념이지만, 국가별 해석 차이까지 확인해야 합니다. dual license는 하나의 소프트웨어를 두 가지 라이선스 체계로 제공하는 방식입니다. 오픈소스와 상용 모델을 함께 운영할 때 자주 보입니다. SPDX는 라이선스를 짧고 일관된 식별자로 표현하는 표준이며, 자동 검사 도구가 읽기 쉬워서 실무 가치가 큽니다.
+```bash
+# Python 프로젝트
+pip install pip-licenses
+pip-licenses --format=markdown --with-urls
 
-중요한 점은 라이선스 이름을 외우는 것이 아닙니다. 권한과 의무가 어디서 갈리는지 읽는 습관을 들이는 것이 더 중요합니다. 같은 오픈소스라도 판매 가능 여부, 고지 유지 의무, 소스 공개 의무, 특허 조항 유무는 꽤 다릅니다.
+# 출력 예시:
+# | Name       | Version | License    | URL                          |
+# |------------|---------|------------|------------------------------|
+# | requests   | 2.31.0  | Apache 2.0 | https://github.com/psf/...   |
+# | flask      | 3.0.0   | BSD-3      | https://github.com/pallets/  |
+# | django     | 4.2.1   | BSD-3      | https://github.com/django/   |
+```
 
-## 기여 안내 문서 필수 섹션
+```bash
+# Node.js 프로젝트
+npx license-checker --summary
 
-오픈소스 프로젝트는 코드뿐 아니라 기여 규칙을 명확하게 정리해 둘어야 합니다. `CONTRIBUTING.md` 파일은 신규 기여자가 가장 먼저 읽어야 할 문서이며, 다음 내용을 포함해야 합니다.
+# 출력 예시:
+# MIT: 142
+# ISC: 23
+# Apache-2.0: 18
+# BSD-3-Clause: 12
+```
 
-| 섹션 | 내용 | 예시 |
-|---|---|---|
-| 개발 환경 | 필수 도구, 설치 명령, 빌드 절차 | `pip install -e .[dev]` → `pytest` |
-| 코드 스타일 | 포매터, 린터, pre-commit hook | `black`, `flake8`, `.pre-commit-config.yaml` |
-| PR 프로세스 | 브랜치 전략, 커밋 메시지 규칙, 리뷰 흥름 | `fix/`, `feat/`, Conventional Commits |
-| 이슈 라벨 | 라벨 체계, 우선순위, triage 흐름 | `bug`, `feature`, `good-first-issue` |
+### CI에서 라이선스 정책 강제
 
-좌표가 명확한 프로젝트일수록 신규 기여자는 빠르게 적응할 수 있습니다. 반대로 규칙이 흐릿하거나 없으면 메인테이너는 같은 질문을 반복 답변하게 되고, 기여자는 불확실성 때문에 PR을 만들기 주저하게 됩니다.
+```yaml
+# .github/workflows/license-check.yml
+name: License Policy Check
 
-## 기여 안내 문서 템플릿
+on: [push, pull_request]
 
-실제로 사용할 수 있는 기본 템플릿을 제공합니다. 이것을 프로젝트 특성에 맞춰 수정해 사용하면 됩니다.
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - run: pip install pip-licenses
+    - name: 금지 라이선스 확인
+      run: |
+        pip-licenses --fail-on="GPL-2.0;GPL-3.0;AGPL-3.0" \
+          --format=markdown
+```
+
+### 저장소에 라이선스 정보 추가
+
+```toml
+# pyproject.toml
+[project]
+name = "my-tool"
+version = "1.0.0"
+license = { text = "MIT" }
+
+# SPDX 식별자 사용 (자동화 도구 호환)
+# license = { expression = "MIT" }
+```
+
+## 기여 안내 문서의 라이선스 조항
+
+기여 시 라이선스 관련 규칙을 CONTRIBUTING.md에 명시합니다.
 
 ```markdown
-# Contributing to [Project Name]
+## 라이선스 기여 원칙
 
-## 개발 환경 설정
+이 프로젝트는 MIT 라이선스를 따릅니다.
 
-```bash
-# Clone and install
-git clone https://github.com/user/repo
-cd repo
-pip install -e .[dev]
+### 기여 시 확인 사항
 
-# Run tests
-pytest
+- 외부 코드 조각 인용 시 원문 URL과 라이선스를 PR에 명시합니다
+- 저작권 고지가 필요한 파일은 제거하지 않습니다
+- 의존성 추가 시 라이선스 종류를 PR 본문에 함께 적습니다
+- GPL 계열 코드는 이 프로젝트에 포함할 수 없습니다
+
+### 허용 라이선스 목록 (allowlist)
+
+- MIT
+- Apache-2.0
+- BSD-2-Clause
+- BSD-3-Clause
+- ISC
+
+### 금지 라이선스 목록 (blocklist)
+
+- GPL-2.0
+- GPL-3.0
+- AGPL-3.0
+- LGPL (정적 링크 시)
 ```
-
-## 코드 스타일
-
-- Formatter: `black .`
-- Linter: `flake8 .`
-- Type checker: `mypy src/`
-
-Pre-commit hooks를 설치하면 커밋 전에 자동 검사됩니다:
-
-```bash
-pre-commit install
-```
-
-## PR 프로세스
-
-1. Fork → Clone → 작업 브랜치 생성 (`feat/`, `fix/`, `docs/`)
-2. 변경 사항 구현 + 테스트 추가
-3. Commit: Conventional Commits 형식 (`feat:`, `fix:`, `docs:`)
-4. Push → PR 생성 (template 채우기)
-5. 리뷰 피드백 대응
-
-## 이슈 라벨
-
-- `bug`: 버그 보고
-- `feature`: 새 기능 제안
-- `good-first-issue`: 초보자 진입용 이슈
-- `help-wanted`: 도움 필요 이슈
-```
-
-이 템플릿은 최소한의 필수 항목만 포함합니다. 프로젝트가 커지면 빌드 환경, 데이터베이스 설정, 도커 컨테이너, 문서 생성 방법 등을 추가할 수 있습니다.
-
-## 좋은 기여 가이드 vs 나쁨 기여 가이드
-
-기여 가이드의 품질은 프로젝트의 진입 장벽을 결정합니다. 다음은 좋은 예와 나쁨 예를 비교한 것입니다.
-
-**좋은 가이드**
-
-- Pass 설치부터 테스트까지 실행 가능한 명령어 제공
-- Pass 커밋 메시지 형식 예시와 함께 설명
-- Pass 이슈 템플릿과 PR 템플릿 제공
-- Pass 코드 스타일 자동 검사 도구 링크
-- Pass 소규모 기여부터 시작하라는 권장 사항
-
-**나쁨 가이드**
-
-- Fail "코드를 잘 쓰세요"처럼 모호한 지침
-- Fail 설치 명령 없이 "환경을 설정하세요"만 적혀 있음
-- Fail 커밋 메시지 규칙 없이 "알아서 잘 쓰세요"
-- Fail 테스트 실행 방법 빠짐
-- Fail 처음 기여자를 위한 안내 없음
-
-차이는 명확합니다. 좋은 가이드는 기여자가 **실행할 수 있는** 구체적 단계를 제공하고, 나쁨 가이드는 **물어봐야 알 수 있는** 추상적 지침만 나열합니다. 처음 방문하는 기여자는 당연히 전자를 선호합니다.
-## 생각이 어떻게 바뀌어야 할까
-
-처음에는 MIT든 GPL이든 둘 다 오픈소스라고만 느껴집니다. 하지만 조금만 더 들여다보면 둘은 재사용 조건과 배포 의무가 크게 다릅니다. 그래서 오픈소스라는 공통 분류만으로는 실제 사용 결정을 내릴 수 없습니다.
-
-라이선스를 제대로 읽기 시작하면 질문이 바뀝니다. "이 코드를 쓸 수 있나"에서 멈추지 않고, "어떤 조건으로 쓸 수 있나"를 묻게 됩니다. 이 전환이 실무에서 매우 중요합니다.
 
 ## 직접 따라해 보기: 라이선스 비교 절차
 
 ### 1단계 — MIT의 핵심 읽기
 
-MIT는 입문자가 가장 자주 만나는 라이선스입니다. 허용 범위가 넓고 조건이 비교적 단순해서 작은 도구나 라이브러리에서 많이 보입니다.
+MIT는 입문자가 가장 자주 만나는 라이선스입니다. 허용 범위가 넓고 조건이 비교적 단순합니다.
 
 ```text
 Allows: use, modify, distribute, sell
 Requires: keep the copyright notice
+Copyleft: No
+Patent protection: No
 ```
 
 ### 2단계 — Apache 2.0의 차이 보기
@@ -174,6 +294,9 @@ Apache 2.0은 MIT와 비슷해 보여도 특허 조항이 명시된다는 점에
 ```text
 Allows: same as MIT
 Adds: explicit patent grant
+Requires: copyright notice + NOTICE file + mark changes
+Copyleft: No
+Patent protection: Yes (explicit grant)
 ```
 
 ### 3단계 — GPL v3의 의무 읽기
@@ -182,73 +305,72 @@ GPL은 공유를 강하게 지키는 라이선스입니다. 사용만 하는 경
 
 ```text
 Allows: use, modify, distribute
-Requires: derivative works share their source
+Requires: derivative works share their source under GPL v3
+Copyleft: Strong (all derivatives)
+Patent protection: Implicit
 ```
 
 ### 4단계 — SPDX 식별자 확인하기
 
-라이선스 파일만 두는 것으로 끝내지 말고, 자동 도구가 읽을 수 있는 식별자도 함께 정리해 두는 편이 좋습니다.
+자동 도구가 읽을 수 있는 식별자를 함께 정리합니다.
 
 ```yaml
-license: MIT
+# package.json
+{
+  "license": "MIT"
+}
+
+# pyproject.toml
+license = { expression = "Apache-2.0" }
+
+# 파일 헤더
+# SPDX-License-Identifier: GPL-3.0-only
 ```
 
 ### 5단계 — 원문 라이선스 가져오기
 
-직접 복사해 붙이는 것보다 검증된 원문을 가져와 사용하는 편이 안전합니다.
+직접 복사해 붙이는 것보다 검증된 원문을 가져와 사용합니다.
 
 ```bash
-curl -O https://choosealicense.com/licenses/mit/
+# choosealicense.com에서 원문 다운로드
+curl -sL https://api.github.com/licenses/mit \
+  | jq -r '.body' > LICENSE
+
+# GitHub CLI로 저장소 생성 시 라이선스 지정
+gh repo create my-project --public --license mit
 ```
 
-## 이 예시에서 먼저 읽어야 할 점
+## 자주 하는 실수
 
-MIT는 마찰이 적은 대신 공유 의무를 강제하지는 않습니다. Apache 2.0은 특허 조항 덕분에 기업 환경에서 선호되는 경우가 있습니다. GPL은 파생물 공개 의무로 공동체 환원을 더 강하게 요구합니다. SPDX는 사람이 아니라 도구를 위해서도 필요합니다.
-
-이 네 가지를 함께 놓고 보면, 라이선스는 법률 문구가 아니라 프로젝트 운영 전략이라는 점이 보입니다. 어떤 협업을 장려할지, 어떤 재사용을 허용할지, 어떤 보호 장치를 둘지가 모두 여기서 드러납니다.
-
-### 라이선스 비교 요약 표
-
-| 항목 | MIT | Apache 2.0 | GPL v3 | LGPL v2.1 | BSD 2-Clause |
-| --- | --- | --- | --- | --- | --- |
-| 상업적 사용 | 허용 | 허용 | 허용 | 허용 | 허용 |
-| 수정 후 비공개 배포 | 가능 | 가능 | 불가 (소스 공개 의무) | 조건부 (동적 링크 시 가능) | 가능 |
-| 특허 조항 | 없음 | 명시적 특허 허여 | 없음 | 없음 | 없음 |
-| 저작권 고지 유지 | 필수 | 필수 | 필수 | 필수 | 필수 |
-| 변경 사항 표시 | 불필요 | 필요 | 필요 | 필요 | 불필요 |
-| 대표 사용처 | jQuery, Express | Kubernetes, Android | Linux kernel, GCC | Qt, glibc | FreeBSD, nginx |
-
-## 자주 하는 실수 다섯 가지
-
-1. 라이선스 텍스트를 복사만 하고 의미를 읽지 않습니다.
-2. 저작권 고지를 지운 채 재배포합니다.
-3. GPL 코드를 상용 제품에 넣고도 배포 의무를 검토하지 않습니다.
-
-**조직의 라이선스 검토 프로세스** — 기업에서 오픈소스 도입을 결정할 때는 다음 단계를 거칩니다: (1) 기술 팀이 후보 라이브러리 선정 (2) 라이선스 스캐너로 전체 의존성 트리 분석 (3) 금지 라이선스 포함 여부 확인 (4) 법무팀 검토 요청 (5) 승인 후 내부 라이선스 목록에 추가. 이 프로세스는 처음에는 번거로우나, 한 번 정착되면 대부분의 라이브러리는 자동 승인되고 예외 케이스만 수동 검토합니다.
-4. dual license 문서를 한쪽만 읽고 사용 범위를 오해합니다.
-5. SPDX 식별자를 빼먹어 자동 검사 체인을 끊습니다.
+| 실수 | 구체적 상황 | 올바른 접근 |
+|---|---|---|
+| 라이선스 텍스트 무의미 복사 | MIT 텍스트를 붙여 넣고 내용은 읽지 않음 | 권리·의무 5가지 질문으로 읽기 |
+| 저작권 고지 삭제 | 배포 패키지에서 LICENSE 파일 제거 | 모든 배포에 저작권 고지 포함 필수 |
+| GPL 상용 무의식 사용 | GPL 라이브러리를 정적 링크해 상용 제품 출시 | 도입 전 라이선스 확인, LGPL이나 MIT 대안 탐색 |
+| dual license 오독 | 오픈소스 버전 조건으로 상용 버전 사용 | 두 라이선스 모두 읽고 적용 조건 확인 |
+| SPDX 누락 | `license = "MIT"`를 파일에 넣지 않음 | 패키지 메타데이터와 파일 헤더에 SPDX 식별자 추가 |
 
 ## 실무에서는 이렇게 생각한다
 
 기업은 보통 개발자 개인 판단만으로 라이선스를 도입하지 않습니다. FOSSA, Snyk 같은 스캐너로 의존성 트리를 훑고, 금지 목록이나 검토 목록을 따로 둡니다. 한 번 릴리스된 제품 안에 들어간 코드의 법적 부담은 나중에 되돌리기 어렵기 때문입니다.
 
-시니어 엔지니어도 라이선스를 법무팀 일로만 미루지 않습니다. 오히려 초기에 어떤 라이선스가 들어왔는지 파악하고, 저장소 문서와 패키지 메타데이터가 일관된지 확인하는 습관을 가집니다. 나중에 문제를 수습하는 비용보다, 초기에 읽는 비용이 훨씬 작기 때문입니다.
+**조직의 라이선스 검토 프로세스** — 기업에서 오픈소스 도입을 결정할 때는 다음 단계를 거칩니다:
 
-**마지막으로 확인할 점** — 기업에서 라이선스를 검토할 때는 금지 목록(blacklist)과 허용 목록(whitelist)을 관리합니다. GPL v2/v3, AGPL은 대부분의 상용 제품에서 금지되고, MIT, Apache 2.0, BSD는 대부붅 허용됩니다. LGPL은 동적 링크로 사용하면 허용되지만, 정적 링크는 금지되는 경우가 많습니다. 이 규칙은 회사마다 다르므로 반드시 법무팀 확인을 받아야 합니다.
-
-**도구로 확인하는 법** — 수동으로 모든 의존성의 라이선스를 확인하는 것은 불가능합니다. `pip-licenses`, `license-checker`, FOSSA, Snyk 같은 도구를 사용하면 전체 의존성 트리를 한 번에 확인할 수 있습니다. CI에 통합하면 금지된 라이선스가 들어오는 순간 빌드를 중단시킬 수 있습니다.
-
-```bash
-# pip-licenses로 의존성 라이선스 확인
-pip install pip-licenses
-pip-licenses --format=markdown --with-urls
-
-# 출력 예시:
-# | Name       | Version | License    | URL                          |
-# |------------|---------|------------|------------------------------|
-# | requests   | 2.31.0  | Apache 2.0 | https://github.com/psf/...   |
-# | flask      | 3.0.0   | BSD-3      | https://github.com/pallets/  |
+```text
+1. 기술 팀이 후보 라이브러리 선정
+2. 라이선스 스캐너로 전체 의존성 트리 분석
+   - pip-licenses (Python)
+   - license-checker (Node.js)
+   - FOSSA, Snyk (다국어)
+3. 금지 라이선스 포함 여부 확인
+   - GPL-2.0, GPL-3.0, AGPL → 대부분 상용 금지
+   - MIT, Apache-2.0, BSD → 대부분 허용
+   - LGPL → 동적 링크 조건 검토
+4. 법무팀 검토 요청 (불명확한 경우)
+5. 승인 후 내부 허용 목록에 추가
 ```
+
+시니어 엔지니어도 라이선스를 법무팀 일로만 미루지 않습니다. 오히려 초기에 어떤 라이선스가 들어왔는지 파악하고, 저장소 문서와 패키지 메타데이터가 일관된지 확인하는 습관을 가집니다.
 
 ## 운영 체크리스트
 
@@ -256,42 +378,13 @@ pip-licenses --format=markdown --with-urls
 - [ ] SPDX 식별자를 확인하거나 추가할 위치를 파악했습니다.
 - [ ] 저작권 고지 유지 의무를 이해했습니다.
 - [ ] 사용하려는 프로젝트와 내 프로젝트의 라이선스 호환성을 검토했습니다.
+- [ ] CI에서 의존성 라이선스를 자동 검사하는 단계가 있습니다.
 
 ## 연습 문제
 
 1. 허용형과 카피레프트의 차이를 한 문장으로 적어 보세요.
 2. Apache 2.0이 MIT와 구분되는 대표 지점을 한 문장으로 적어 보세요.
 3. dual license가 왜 비즈니스 전략이 될 수 있는지 설명해 보세요.
-
-## 라이선스 검토를 실무 흐름으로 연결하기
-
-라이선스를 읽는 일은 문장 해석으로 끝나지 않습니다. 실제 팀에서는 검토 결과를 저장소 구조와 CI 정책에 반영합니다. 먼저 루트에 `LICENSE` 파일을 두고, 패키지 메타데이터에도 동일한 식별자를 맞춥니다.
-
-```toml
-[project]
-name = "my-tool"
-license = { text = "MIT" }
-```
-
-다음으로 `CONTRIBUTING.md`에 라이선스 관련 기여 원칙을 명시합니다. 외부 코드 인용 시 출처를 남기고, 복사한 스니펫이 있다면 원문 라이선스를 확인하도록 규칙을 적어 두면 분쟁을 크게 줄일 수 있습니다.
-
-```markdown
-## 라이선스 기여 원칙
-- 외부 코드 조각 인용 시 원문 URL과 라이선스를 PR에 명시합니다.
-- 저작권 고지가 필요한 파일은 제거하지 않습니다.
-- 의존성 추가 시 라이선스 종류를 PR 본문에 함께 적습니다.
-```
-
-검토 단계에서는 PR 체크리스트가 필요합니다. 리뷰어는 기능 동작뿐 아니라 라이선스 호환성, NOTICE 고지 필요 여부, 문서 반영 여부를 함께 확인해야 합니다.
-
-또한 CI에서 의존성 라이선스를 자동 점검하면 정책 위반을 조기에 차단할 수 있습니다. 예를 들어 금지 라이선스가 들어오면 빌드를 실패시키는 방식입니다.
-
-```yaml
-- name: 라이선스 정책 검사
-  run: pip-licenses --fail-on="GPL-3.0"
-```
-
-마지막으로 버전 정책과도 연결해야 합니다. 라이선스 변경은 기술적으로 코드 변경이 없어도 사용자 영향이 큰 이벤트이므로, 보통 MAJOR 변경 공지와 함께 릴리스 노트에 명시합니다. 이 원칙이 있어야 법적 조건 변화를 사용자에게 투명하게 전달할 수 있습니다.
 
 ## 정리
 
@@ -302,11 +395,11 @@ license = { text = "MIT" }
 ## 처음 질문으로 돌아가기
 
 - **permissive와 copyleft는 무엇이 다를까요?**
-  - 프로젝트를 시작할 때 라이선스 선택은 다음 순서로 결정하면 됩니다
+  - permissive는 파생물의 소스 공개 의무가 없어 상용 제품에 포함하기 쉽습니다. copyleft는 파생물도 같은 라이선스를 적용해야 하므로 소스를 공개해야 합니다. 같은 오픈소스라도 MIT 코드를 수정한 상용 제품은 소스를 숨길 수 있지만, GPL 코드를 수정한 상용 제품은 소스를 공개해야 합니다.
 - **MIT, Apache 2.0, GPL v3는 어떤 상황에서 부담이 달라질까요?**
-  - 프로젝트를 시작할 때 라이선스 선택은 다음 순서로 결정하면 됩니다
+  - MIT는 저작권 고지만 유지하면 상업 이용 포함 자유롭게 사용 가능합니다. Apache 2.0은 MIT에 특허 보호 조항이 추가되어 기업 환경에서 선호됩니다. GPL v3는 수정 배포 시 소스 공개 의무가 있어 상용 제품에 포함하기 전 법무 검토가 필수입니다.
 - **SPDX 식별자는 왜 문서화와 자동화에서 중요할까요?**
-  - 프로젝트를 시작할 때 라이선스 선택은 다음 순서로 결정하면 됩니다
+  - SPDX 식별자는 `MIT`, `Apache-2.0`처럼 표준화된 짧은 문자열로 라이선스를 표현합니다. CI 도구, 패키지 관리자, 법적 검토 도구가 이 식별자를 파싱해 자동으로 정책을 검사합니다. 식별자가 없으면 자동 검사 체인이 끊기고 수동 검토 비용이 늘어납니다.
 
 <!-- toc:end -->
 

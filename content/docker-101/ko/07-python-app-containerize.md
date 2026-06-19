@@ -272,11 +272,72 @@ docker compose exec api ps aux
 
 tini의 역할은 두 가지입니다. 첫째, SIGTERM을 받아 자식 프로세스(uvicorn)에 전달합니다. 둘째, 좀비 프로세스(`defunct`)를 정리합니다. 이 두 가지가 없으면 장기 운영 시 프로세스 관리가 불안정해질 수 있습니다.
 
+## Gunicorn + Uvicorn 조합 (고부하 운영)
+
+```dockerfile
+# requirements.txt에 추가
+# gunicorn==22.*
+# uvicorn[standard]==0.30.*
+```
+
+```bash
+# Gunicorn으로 여러 Uvicorn worker 실행
+CMD ["gunicorn", "app.main:app",
+     "--workers", "4",
+     "--worker-class", "uvicorn.workers.UvicornWorker",
+     "--bind", "0.0.0.0:8000",
+     "--timeout", "30",
+     "--graceful-timeout", "30",
+     "--access-logfile", "-",
+     "--error-logfile", "-"]
+```
+
+```bash
+# worker 수 결정 기준
+# CPU 집약적: CPU 코어 수
+# I/O 집약적: CPU 코어 수 × 2
+# 메모리 제한 있을 때: 각 worker 메모리 × 수 < 총 메모리
+
+# worker 수 과도하게 설정 시 메모리 OOM 발생
+# docker stats로 실제 사용량 모니터링 후 조정
+docker stats api
+```
+
 ## 실무에서는 이렇게 이어집니다
 
 실제 배포에서는 Gunicorn과 Uvicorn worker 조합, Prometheus 메트릭, OpenTelemetry 추적을 함께 붙이는 경우가 많습니다. 하지만 그 이전에 먼저 갖춰야 할 것은 PID 1, signal, healthcheck, non-root라는 기본 계약입니다.
 
 즉, observability 도구를 붙이기 전에 컨테이너가 제대로 뜨고, 준비를 알리고, 안전하게 종료할 수 있어야 합니다. 그 순서가 바뀌면 겉으로는 복잡해 보여도 기초가 약한 시스템이 됩니다.
+
+## Python 컨테이너 관련 자주 쓰는 명령
+
+```bash
+# ── 빌드와 실행 ─────────────────────────────────────────────
+docker build -t myapi:1.0 .
+docker run -d --name api -p 8000:8000 myapi:1.0
+
+# ── 상태 확인 ────────────────────────────────────────────────
+docker exec api id                              # 실행 사용자 확인
+docker exec api ps aux                         # 프로세스 목록 (PID 1 확인)
+docker exec api env | grep -i python           # Python 환경변수
+curl http://localhost:8000/healthz             # 헬스체크
+curl http://localhost:8000/metrics             # 메트릭 (있을 경우)
+
+# ── 로그와 디버깅 ────────────────────────────────────────────
+docker logs -f api                             # 실시간 로그
+docker logs --since 10m api                   # 최근 10분 로그
+docker stats api                              # 자원 사용량 실시간 확인
+
+# ── graceful shutdown 테스트 ────────────────────────────────
+# 터미널 1: 로그 모니터링
+docker logs -f api
+
+# 터미널 2: 종료 신호 전송
+docker stop api      # SIGTERM → 10초 대기 → SIGKILL
+docker kill api      # 즉시 SIGKILL
+
+# 로그에 "Application shutting down..." 확인
+```
 
 ## 운영 체크리스트
 

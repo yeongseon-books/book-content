@@ -276,6 +276,56 @@ COPY --from=builder /bin/myapp /myapp
 ENTRYPOINT ["/myapp"]
 ```
 
+## 크기 측정과 분석 도구
+
+```bash
+# ── 이미지 크기 비교 ─────────────────────────────────────────
+docker images | sort -k 7 -h            # 크기 기준 정렬
+
+# 최적화 전후 비교
+docker build -t myapp:before -f Dockerfile.before .
+docker build -t myapp:after  -f Dockerfile.after  .
+docker images | grep myapp
+
+# ── 레이어 분석 ──────────────────────────────────────────────
+docker history myapp:after              # 레이어 목록과 크기
+docker history --no-trunc myapp:after  # 명령 전체 출력
+
+# ── dive로 상세 분석 (별도 설치) ────────────────────────────
+# https://github.com/wagoodman/dive
+dive myapp:after
+# 각 레이어에서 추가/삭제된 파일 확인
+# 낭비되는 공간 식별
+
+# ── 빌드 캐시 상태 확인 ─────────────────────────────────────
+docker system df                        # 이미지/컨테이너/볼륨 용량
+docker builder du                       # BuildKit 캐시 용량
+docker builder prune -f                 # BuildKit 캐시 정리
+```
+
+## 베이스 이미지 선택 가이드
+
+```
+시나리오별 권장 베이스 이미지:
+
+개발/테스트:
+  python:3.12-slim           → 호환성 좋음, 디버깅 가능
+  node:20-slim               → 표준 Debian 기반
+
+운영 (일반):
+  python:3.12-slim           → slim이 기본 출발점
+  python:3.12-alpine         → C 확장 없는 순수 Python 앱
+
+운영 (보안 강화):
+  gcr.io/distroless/python3-debian12  → 셸 없음, 최소 공격 표면
+  cgr.dev/chainguard/python:latest    → Chainguard, 취약점 최소화
+
+주의사항:
+  Alpine: psycopg2, numpy, PIL 같은 C 확장에서 musl 비호환 오류 가능
+  Distroless: docker exec으로 bash 진입 불가, 디버깅 방식 변경 필요
+  Chainguard: 최신 상태 유지되어 CVE 최소, 유료 플랜 존재
+```
+
 ## 실무에서는 이렇게 이어집니다
 
 현업 빌드 시스템은 BuildKit과 레지스트리 캐시를 함께 사용해 PR 빌드 시간을 줄입니다. 또한 보안 팀은 distroless나 Chainguard 계열 이미지를 권장하기도 합니다. 즉, 이미지 최적화는 로컬 편의가 아니라 CI/CD와 보안 정책 전반에 영향을 줍니다.

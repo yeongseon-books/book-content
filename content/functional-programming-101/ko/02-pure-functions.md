@@ -72,6 +72,7 @@ Call f(x)
 | 멱등성(idempotent) | 여러 번 실행해도 결과가 같게 유지되는 성질입니다 |
 
 ## 적용 전후 비교
+
 전역 상태에 의존하는 함수는 입력이 같아도 결과가 달라질 수 있습니다. 의존성을 인자로 끌어오면 그 순간 함수는 예측 가능해집니다.
 
 ```python
@@ -117,10 +118,10 @@ def get_random_number() -> int:
 def get_current_time() -> str:
     return datetime.now().isoformat()  # depends on clock
 
-print(add(2, 3))          # always 5
-print(full_name("John", "Doe"))  # always "John Doe"
-print(get_random_number())       # varies
-print(get_current_time())        # varies
+print(add(2, 3))                     # always 5
+print(full_name("John", "Doe"))      # always "John Doe"
+print(get_random_number())           # varies
+print(get_current_time())            # varies
 ```
 
 순수 함수와 비순수 함수를 구분하는 가장 빠른 방법은 숨은 입력이 있는지 보는 것입니다. 시간, 난수, 전역 상태, 환경 변수, 파일 시스템이 숨어 들어오면 순수성은 깨집니다.
@@ -142,7 +143,7 @@ def save_to_file(data: str) -> None:
         f.write(data)  # modifies file system
 
 # 부수 효과 3: 인자 변경
-def add_item(items: list, item: str) -> list:
+def add_item_impure(items: list, item: str) -> list:
     items.append(item)  # mutates the input list
     return items
 
@@ -233,6 +234,11 @@ assert calculate_bmi(70, 1.75) == 22.9
 assert classify_bmi(22.9) == "normal"
 assert classify_bmi(17.0) == "underweight"
 assert classify_bmi(27.5) == "overweight"
+
+# map으로 여러 케이스 한 번에 테스트
+test_cases = [(17.0, "underweight"), (22.9, "normal"), (27.5, "overweight"), (31.0, "obese")]
+results = list(map(lambda tc: classify_bmi(tc[0]) == tc[1], test_cases))
+assert all(results), "Some BMI classification tests failed"
 print("All tests passed")
 ```
 
@@ -253,23 +259,60 @@ result1 = sum_of_squares(3, 4)    # square(3) + square(4)
 result2 = 9 + 16                   # replace calls with results
 print(result1 == result2)  # True
 
-# 이 성질로 다음이 가능해집니다:
-# 1. 안전한 캐싱(memoization)
-# 2. 안전한 병렬 실행
-# 3. Safe refactoring
-print(sum_of_squares(3, 4))  # 25
+# 참조 투명성 덕분에 안전한 캐싱이 가능
+from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def expensive_square(x: int) -> int:
+    return x * x  # 순수 함수이므로 캐싱해도 안전
+
+print(expensive_square(10))  # 100 — computed
+print(expensive_square(10))  # 100 — from cache
+print(expensive_square.cache_info())  # hits=1, misses=1
 ```
 
 참조 투명성이 있으면 함수 호출을 값으로 치환해도 의미가 바뀌지 않습니다. 캐시가 안전해지고, 병렬 실행을 고민하기 쉬워지고, 리팩터링 리스크도 크게 줄어듭니다.
+
+### 단계 6: 순수 함수로 데이터 파이프라인 구성하기
+
+```python
+from functools import reduce
+
+# 순수 함수들로 구성된 데이터 처리 파이프라인
+sales = [
+    {"product": "A", "units": 10, "price": 2500},
+    {"product": "B", "units": 5, "price": 8000},
+    {"product": "C", "units": 20, "price": 1200},
+    {"product": "D", "units": 3, "price": 15000},
+]
+
+# 각 단계가 순수 함수
+def add_revenue(records: list[dict]) -> list[dict]:
+    return list(map(lambda r: {**r, "revenue": r["units"] * r["price"]}, records))
+
+def filter_high_revenue(records: list[dict], threshold: int) -> list[dict]:
+    return list(filter(lambda r: r["revenue"] >= threshold, records))
+
+def total_revenue(records: list[dict]) -> int:
+    return reduce(lambda acc, r: acc + r["revenue"], records, 0)
+
+# 파이프라인 실행
+with_revenue = add_revenue(sales)
+high_performers = filter_high_revenue(with_revenue, 20000)
+grand_total = total_revenue(high_performers)
+
+print([r["product"] for r in high_performers])  # ['B', 'D']
+print(f"Total: {grand_total:,}")                 # Total: 85,000
+```
 
 ## 이 코드에서 주목할 점
 
 - 순수 함수는 입력과 출력만으로 설명할 수 있어서 테스트가 단순합니다.
 - 부수효과를 없애는 것이 아니라 프로그램 경계로 밀어내는 것이 핵심입니다.
-- 참조 투명성은 캐싱과 병렬 처리의 안전성을 높여 줍니다.
-- mutable 인자를 받을 때는 직접 수정하는 대신 새 값을 반환하는 편이 안전합니다.
+- 참조 투명성은 `@lru_cache` 같은 캐싱의 안전성을 보장합니다.
+- `map`과 `filter`로 구성된 순수 파이프라인은 각 단계를 독립 검증할 수 있습니다.
 
-## 흔한 실수 5가지
+## 자주 하는 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
@@ -282,7 +325,7 @@ print(sum_of_squares(3, 4))  # 25
 ## 실무에서 이렇게 쓰입니다
 
 - 비즈니스 규칙을 순수 함수로 작성해 단위 테스트를 단순화합니다.
-- 데이터 변환 파이프라인을 순수 함수들로 구성합니다.
+- 데이터 변환 파이프라인을 `map`/`filter`/`reduce` 기반 순수 함수들로 구성합니다.
 - `functools.lru_cache`로 순수 함수 캐싱을 안전하게 적용합니다.
 - FastAPI 의존성 주입 안에서 검증 로직을 순수 함수로 분리합니다.
 - Functional Core, Imperative Shell 구조를 시스템 기본 패턴으로 사용합니다.
@@ -292,6 +335,17 @@ print(sum_of_squares(3, 4))  # 25
 순수 함수를 쓴다는 것은 부수효과를 없애겠다는 선언이 아닙니다. 프로그램은 결국 저장하고 출력하고 네트워크와 통신해야 합니다. 중요한 것은 비즈니스 규칙이 그 혼잡한 영역에 끌려 들어가지 않게 막는 것입니다.
 
 그래서 강한 팀들은 순수 함수로 두꺼운 코어를 만들고, 그 바깥에 얇은 IO 셸을 둡니다. 코어는 단위 테스트로 촘촘하게 검증하고, 셸은 통합 테스트로 확인합니다. Python에서 가장 실용적인 함수형 적용 방식도 바로 이 구조입니다.
+
+## 처음 질문으로 돌아가기
+
+- **어떤 조건을 만족해야 함수를 순수 함수라고 부를 수 있을까요?**
+  두 가지 조건이 필요합니다. 첫째, 같은 입력이 항상 같은 출력을 만들어야 합니다(결정론적). 둘째, 함수 바깥의 어떤 상태도 읽거나 변경하지 않아야 합니다(부수효과 없음). 시간, 난수, 전역 변수, 파일 시스템이 숨어 들어오는 순간 이 두 조건 중 하나가 깨집니다.
+
+- **코드에서 부수효과는 어떤 형태로 나타나며 어떻게 식별할 수 있을까요?**
+  전역 변수 수정, 파일·DB 접근, 네트워크 호출, 인자로 받은 mutable 객체 수정, 로그 출력 등이 모두 부수효과입니다. 함수 시그니처(인자와 반환값)만 보고 동작을 완전히 예측할 수 없다면 부수효과가 있을 가능성이 높습니다.
+
+- **순수한 계산과 IO를 분리하면 테스트는 어떻게 단순해질까요?**
+  순수 함수는 mock, fixture, 환경 세팅 없이 입력과 출력만으로 테스트할 수 있습니다. `assert calculate_bmi(70, 1.75) == 22.9` 한 줄이 전부입니다. IO 셸만 통합 테스트로 분리하면 전체 테스트 비용이 크게 줄어듭니다.
 
 ## 운영 체크리스트
 
@@ -305,86 +359,11 @@ print(sum_of_squares(3, 4))  # 25
 
 1. 전역 설정에 의존하는 할인 계산기를 순수 함수로 리팩터링해 보세요.
 2. 보고서 출력 함수를 `format_report`와 `print_report`로 나눠 보세요.
-3. 리스트를 제자리에서 수정하는 함수를 새 리스트를 반환하는 버전으로 바꿔 보세요.
+3. `map`과 `filter`로 구성된 순수 파이프라인을 만들고 각 단계를 독립적으로 테스트해 보세요.
 
 ## 정리와 다음 글
 
 순수 함수는 같은 입력에 항상 같은 출력을 반환하고, 함수 바깥 상태를 수정하지 않습니다. 부수효과를 경계로 밀어내면 코드는 예측 가능해지고 테스트하기 쉬워집니다. 다음 글에서는 순수 함수와 바로 이어지는 개념인 **immutable 데이터**를 다룹니다.
-
-## 검증 시나리오: 경계 조건을 먼저 잠그기
-
-실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
-
-```python
-from functools import reduce
-
-def pipeline(values: list[int]) -> dict[str, int]:
-    filtered = [v for v in values if v >= 0]
-    squared = [v * v for v in filtered]
-    total = reduce(lambda acc, x: acc + x, squared, 0)
-    return {
-        "count": len(squared),
-        "total": total,
-        "max": max(squared) if squared else 0,
-    }
-
-# 경계 조건 검증
-assert pipeline([]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([-3, -1]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([0, 2, 3]) == {"count": 3, "total": 13, "max": 9}
-
-print("Pass")
-```
-
-또한 지연 평가를 사용할 때는 소비 시점을 테스트에 명시해 두는 편이 좋습니다. generator는 한 번 소비하면 비어야 정상이며, 이 성질이 깨지면 중간 단계에서 의도치 않은 materialize가 발생했을 가능성이 큽니다.
-
-```python
-from itertools import islice
-
-def naturals():
-    n = 0
-    while True:
-        yield n
-        n += 1
-
-stream = naturals()
-first_five = list(islice(stream, 5))
-next_three = list(islice(stream, 3))
-
-assert first_five == [0, 1, 2, 3, 4]
-assert next_three == [5, 6, 7]
-print("Pass")
-```
-
-이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
-## 리뷰 포인트: 코드 리뷰에서 바로 확인할 항목
-
-함수형 스타일을 적용한 코드 리뷰에서는 다음 네 가지를 빠르게 확인합니다. 첫째, 계산 함수가 외부 상태를 직접 읽거나 쓰지 않는지 확인합니다. 둘째, mutable 인자를 제자리에서 수정하지 않는지 확인합니다. 셋째, 파이프라인 단계의 입력과 출력 타입이 자연스럽게 연결되는지 확인합니다. 넷째, 실패 경로가 값으로 표현되는지 확인합니다.
-
-```python
-def reviewer_checklist() -> list[str]:
-    return [
-        "pure-core",
-        "immutable-update",
-        "typed-boundary",
-        "explicit-failure-path",
-    ]
-
-assert len(reviewer_checklist()) == 4
-print("Pass")
-```
-
-이 항목을 PR 템플릿에 고정해 두면 스타일 논쟁보다 설계 품질을 빠르게 맞출 수 있습니다.
-
-## 처음 질문으로 돌아가기
-
-- **어떤 조건을 만족해야 함수를 순수 함수라고 부를 수 있을까요?**
-  - 실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
-- **코드에서 부수효과는 어떤 형태로 나타나며 어떻게 식별할 수 있을까요?**
-  - - 순수 함수는 입력과 출력만으로 설명할 수 있어서 테스트가 단순합니다
-- **순수한 계산과 IO를 분리하면 테스트는 어떻게 단순해질까요?**
-  - > 순수 함수인지 판단할 때는 두 질문이면 충분합니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

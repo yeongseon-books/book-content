@@ -32,7 +32,7 @@ seo_description: 청킹은 텍스트를 작게 자르는 일이 아니라 검색
 
 ![Chunking strategy selection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.ko.png)
 *Chunking strategy selection flow*
-> 청킹은 텍스트를 작게 자르는 일이 아니라 검색이 아직 신뢰할 수 있는 최소 문맥 단위를 설계하는 일입니다.
+> 청킹은 텍스트를 잘게 쪼개는 기계적 단계가 아닙니다. 검색이 다시 회수해야 할 최소 문맥 단위를 어디에 둘지 정하는 설계 단계입니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,17 +42,15 @@ seo_description: 청킹은 텍스트를 작게 자르는 일이 아니라 검색
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
-## 문서 유형별 청킹 흐름
+## 재귀 분할기의 후퇴 순서
 
 분할기가 하나여도, 시작하는 `chunk_size`와 `chunk_overlap`은 문서 형태에 맞춰 달라져야 합니다.
-
-## 재귀 분할기의 후퇴 순서
 
 ![Recursive separator fallback flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-02-recursive-splitter-fallback-order.ko.png)
 
 *Recursive separator fallback flow*
 
-재귀 분할의 강점은 더 큰 의미 경계를 먼저 지키고, 정말 필요할 때만 더 작은 경계로 내려간다는 사실입니다.
+재귀 분할의 강점은 더 큰 의미 경계를 먼저 지키고, 정말 필요할 때만 더 작은 경계로 내려간다는 사실입니다. separator 순서를 `['\n\n', '\n', '. ', ' ']`처럼 두면, 문단 경계를 먼저 시도하고 그 안에서도 크면 문장, 그래도 크면 공백 순서로 후퇴합니다.
 
 ## 실행 예제
 
@@ -64,12 +62,18 @@ from statistics import mean
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 SAMPLES = {
-    'faq': 'Question: what is the upload limit? Answer: the default limit is 20MB and can be tuned. '
-    'Question: how do we reprocess failed files? Answer: rerun only the failed documents in the incremental job. ' * 4,
-    'manual': '# Deployment guide\n\n1. Review the config file.\n2. Validate sample documents before rollout.\n3. Check logs and chunk counts after deployment.\n\n'
-    'When the structure is explicit, larger chunks can stay readable. ' * 4,
-    'policy': 'Policy documents use long paragraphs and repeated definitions. They describe access control, retention, and deletion '
-    'rules together, so context breaks if the overlap is too small. ' * 5,
+    'faq': (
+        'Question: what is the upload limit? Answer: the default limit is 20MB and can be tuned. '
+        'Question: how do we reprocess failed files? Answer: rerun only the failed documents in the incremental job. ' * 4
+    ),
+    'manual': (
+        '# Deployment guide\n\n1. Review the config file.\n2. Validate sample documents before rollout.\n3. Check logs and chunk counts after deployment.\n\n'
+        'When the structure is explicit, larger chunks can stay readable. ' * 4
+    ),
+    'policy': (
+        'Policy documents use long paragraphs and repeated definitions. They describe access control, retention, and deletion '
+        'rules together, so context breaks if the overlap is too small. ' * 5
+    ),
 }
 
 CONFIGS = {
@@ -111,7 +115,7 @@ python main.py
 [policy] chunks=4 avg=224.8 min=118 max=297
 ```
 
-이 숫자만 보면 정책 문서 프리셋이 가장 좋아 보일 수 있습니다. 하지만 청크 개수만 적다고 품질이 높은 것은 아닙니다. 실제 운영에서는 **어떤 구조를 살렸는지**와 **검색 실패가 어디서 나는지**를 함께 봐야 합니다.
+이 숫자만 보면 정책 문서 프리셋이 가장 좋아 보일 수 있습니다. 하지만 청크 개수만 적다고 품질이 높은 것은 아닙니다. 실제 운영에서는 어떤 구조를 살렸는지와 검색 실패가 어디서 나는지를 함께 봐야 합니다.
 
 ## 문서 유형별 시작 프리셋
 
@@ -123,9 +127,19 @@ python main.py
 
 여기서 중요한 점은 숫자보다 문서의 실패 모드입니다. FAQ는 질문-답변 쌍이 깨지면 바로 검색 품질이 떨어지고, 매뉴얼은 단계 순서가 분리되면 실행 가이드 역할을 잃습니다. 정책 문서는 문단이 길기 때문에 겹침이 너무 작으면 예외 조항이 앞뒤 문맥과 떨어집니다.
 
+## 자주 하는 실수
+
+| 실수 | 왜 생기는가 | 올바른 접근 |
+| --- | --- | --- |
+| 모든 문서에 같은 chunk_size 적용 | 설정 간단하다는 이유로 기본값 유지 | 문서 유형마다 프리셋을 분리하고 코드 상수로 고정 |
+| 청크 수만으로 품질 판단 | 숫자가 많으면 세분화됐다고 착각 | 길이 분포, 최솟값, 최댓값, 첫 청크 미리보기를 함께 확인 |
+| overlap을 감으로 올림 | "겹침이 많을수록 좋다"는 믿음 | 후보 overlap 값을 비교해 중복 토큰 비용과 문맥 보존 균형 확인 |
+| 청킹 실패를 임베딩 문제로 오해 | 검색 결과가 나빠지면 모델을 바꾸려는 경향 | 먼저 짧은 청크 미리보기와 길이 경고를 확인 |
+| separator 순서를 문서화하지 않음 | 실험 중 자주 바꿔도 기록하지 않음 | 프리셋을 코드 상수로 두고 버전을 메타데이터에 저장 |
+
 ## 임베딩 전에 돌리는 빠른 검증 루프
 
-임베딩 비용을 쓰기 전에, 저는 먼저 다음 세 가지를 확인하는 편입니다. **길이 분포**, **첫 청크와 마지막 청크 미리보기**, **문서 유형별 경고 수**입니다. 이 세 가지면 조악한 프리셋을 초기에 거의 걸러낼 수 있습니다.
+임베딩 비용을 쓰기 전에, 먼저 다음 세 가지를 확인하는 편이 좋습니다. **길이 분포**, **첫 청크와 마지막 청크 미리보기**, **문서 유형별 경고 수**입니다. 이 세 가지면 조악한 프리셋을 초기에 거의 걸러낼 수 있습니다.
 
 ```python
 from __future__ import annotations
@@ -181,8 +195,6 @@ def batch_review(items: Iterable[tuple[str, list[str]]]) -> None:
 - 평균 길이뿐 아니라 최소와 최대 길이도 함께 출력해서 불균형한 청크를 바로 찾게 해 줍니다.
 - 첫 번째 청크 미리보기는 제목과 번호 목록이 살아남았는지 확인하는 가장 싼 검증 방법입니다.
 
-## 실무에서 자주 헷갈리는 지점
-
 ### 청크 품질을 검토하는 방법
 
 ![Chunk quality review flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-02-how-to-review-chunk-quality.ko.png)
@@ -195,24 +207,7 @@ def batch_review(items: Iterable[tuple[str, list[str]]]) -> None:
 - 문서 유형별 프리셋은 시작점일 뿐입니다. 나중에는 검색 로그를 보고 다시 조정해야 합니다.
 - 문장 경계가 항상 최선은 아닙니다. 매뉴얼에서는 구조 보존이 더 중요할 수 있습니다.
 
-## 운영 체크리스트
-
-- [ ] 최소 세 가지 문서 유형으로 프리셋을 나눴습니다.
-- [ ] 청크 수와 길이 분포를 숫자로 확인했습니다.
-- [ ] 첫 번째 청크 미리보기로 구조 보존 여부를 검증했습니다.
-- [ ] 임베딩 전에 너무 길거나 너무 짧은 청크의 기준을 정했습니다.
-
-## 실무에서는 이렇게 조정합니다
-
-처음부터 완벽한 청킹 프리셋은 거의 없습니다. 보통은 문서 유형별 시작점을 정한 뒤, 검색 로그에서 **자주 끊기는 경계**와 **자주 함께 나와야 하는 문장 쌍**을 다시 봅니다. FAQ는 질문-답변 결합 유지가 중요하고, 매뉴얼은 제목과 단계 목록의 결속이 중요하며, 정책 문서는 예외 조항의 문맥 유지가 중요합니다.
-
-또 하나 중요한 점은 청킹 실패를 임베딩 품질 문제로 착각하지 않는 것입니다. 검색 결과가 엉뚱하면 모델을 바꾸기 전에, 먼저 잘린 청크 미리보기와 길이 경고부터 확인하는 편이 훨씬 빠릅니다.
-
-## 실무 확장: 청킹 알고리즘 선택과 검색 회귀 방지
-
-청킹 전략은 한 번 정하고 끝내는 설정이 아닙니다. 문서 유형이 늘어나면 동일한 splitter라도 실패 패턴이 달라집니다. 그래서 운영에서는 문서군별 알고리즘을 분리하고, 검색 회귀를 숫자로 감지하는 루프를 반드시 둡니다.
-
-### 구조 기반 청킹과 길이 기반 청킹을 병행하는 패턴
+## 구조 기반 청킹과 길이 기반 청킹을 병행하는 패턴
 
 매뉴얼 문서는 제목 경계를 먼저 지키고, 정책 문서는 문단 길이를 우선 맞추는 식으로 알고리즘을 병행하면 안정성이 좋아집니다.
 
@@ -229,10 +224,7 @@ def chunk_manual(markdown_text: str) -> list[str]:
     body_splitter = RecursiveCharacterTextSplitter(
         chunk_size=280,
         chunk_overlap=48,
-        separators=['
-
-', '
-', '. ', ' '],
+        separators=['\n\n', '\n', '. ', ' '],
     )
     chunks: list[str] = []
     for doc in docs:
@@ -243,93 +235,16 @@ def chunk_policy(long_text: str) -> list[str]:
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=360,
         chunk_overlap=72,
-        separators=['
-
-', '; ', '. ', ' '],
+        separators=['\n\n', '; ', '. ', ' '],
     )
     return splitter.split_text(long_text)
 ```
 
 핵심은 모든 문서를 하나의 분할기로 몰아넣지 않는 것입니다. 구조가 뚜렷한 문서는 구조 우선, 장문 정책 문서는 길이 우선으로 처리해야 검색 질문이 요구하는 문맥 단위를 유지할 수 있습니다.
 
-### 청킹 회귀를 탐지하는 오프라인 평가 루프
-
-프리셋 변경 후 검색 품질이 떨어졌는지 확인하려면 최소한 고정 질의 세트를 두고 정답 포함 여부를 추적해야 합니다.
-
-```python
-from __future__ import annotations
-
-from dataclasses import dataclass
-
-@dataclass(frozen=True)
-class RetrievalCase:
-    query: str
-    expected_source: str
-
-def evaluate_chunk_regression(retriever, cases: list[RetrievalCase], k: int = 5) -> None:
-    hit = 0
-    for case in cases:
-        docs = retriever.invoke(case.query)
-        topk = docs[:k]
-        if any(doc.metadata.get('source') == case.expected_source for doc in topk):
-            hit += 1
-    recall_at_k = hit / len(cases) if cases else 0.0
-    print(f'recall_at_{k}={recall_at_k:.3f} cases={len(cases)}')
-```
-
-이 점수는 완벽한 품질 지표는 아니지만, 청킹 변경이 검색을 악화시키는지 빠르게 확인하는 데 충분합니다. 운영에서는 `recall_at_k`가 기준 아래로 떨어지면 새 프리셋을 배포하지 않는 식으로 게이트를 걸 수 있습니다.
-
-### 청크 메타데이터를 벡터 DB 필터와 맞추는 이유
-
-청크를 만들 때 `doc_type`, `section`, `chunk_order`를 함께 저장해 두면 벡터 검색 결과를 설명하기 쉬워집니다.
-
-```python
-chunk.metadata.update(
-    {
-        'doc_type': 'manual',
-        'section': 'deployment-checklist',
-        'chunk_order': 17,
-        'chunk_size_policy': 'manual-v2',
-    }
-)
-```
-
-이 정보는 나중에 "왜 이 청크가 선택되었는가"를 해석하는 근거가 됩니다. 검색 실패를 모델 문제로 오해하지 않으려면, 청킹 단계의 의사결정 흔적을 메타데이터로 남겨야 합니다.
-
-## 운영 노트: 청크 정책을 버전으로 관리하기
-
-청킹 설정은 코드 한 줄이 아니라 검색 품질 계약입니다. 그래서 운영에서는 `chunk-policy-v1`, `chunk-policy-v2`처럼 정책 버전을 메타데이터에 함께 저장합니다.
-
-```python
-chunk.metadata.update(
-    {
-        'chunk_policy_version': 'chunk-policy-v2',
-        'chunk_size': 240,
-        'chunk_overlap': 48,
-        'separator_profile': 'manual-headers-first',
-    }
-)
-```
-
-이 정보가 있으면 검색 회귀가 발생했을 때 "어떤 정책으로 만들어진 청크에서 문제가 나는지"를 바로 좁힐 수 있습니다. 반대로 정책 버전을 남기지 않으면 인덱스에 서로 다른 규칙이 섞였는지 확인하기 어렵습니다.
-
-추가로, 정책 변경 직후에는 상위 질의 20~50개를 고정해 `recall@k`와 `source diversity`를 비교하는 습관을 권장합니다. 청크 수가 예쁘게 나와도 실제 질의 회수율이 떨어지면 변경을 되돌리는 편이 맞습니다.
-
-def flag_over_limit(chunks: list[str], max_tokens: int = 512) -> list[int]:
-    return [i for i, chunk in enumerate(chunks) if estimate_tokens(chunk) > max_tokens]
-```
-
-이 검증은 임베딩 호출 전에 넣어야 합니다. 토큰 초과 청크는 truncation되거나 의미가 잘릴 수 있기 때문입니다. 초과 비율이 높으면 `chunk_size`를 줄이거나 separator를 더 세밀하게 조정하라는 신호입니다.
-
-## 정리
-
-청킹은 텍스트를 잘게 쪼개는 기계적 단계가 아닙니다. 검색이 다시 회수해야 할 최소 문맥 단위를 어디에 둘지 정하는 설계 단계입니다.
-
-그래서 문서 유형별 기본값을 다르게 잡고, 청크 수만이 아니라 길이 분포와 미리보기를 함께 점검해야 합니다. 다음 단계에서는 이렇게 만든 청크에 어떤 메타데이터를 붙여야 검색 후보군을 더 안정적으로 줄일 수 있는지 보겠습니다.
-
 ### Recursive splitter 설정을 코드로 고정하는 방법
 
-실험을 반복하다 보면 separator 순서가 자주 바뀌는데, 이 변경이 기록되지 않으면 같은 문서를 다시 청킹해도 결과가 달라집니다. 그래서 프리셋을 코드 상수로 두고 문서 유형별 정책을 명시적으로 분리하는 편이 운영에 유리합니다.
+실험을 반복하다 보면 separator 순서가 자주 바뀌는데, 이 변경이 기록되지 않으면 같은 문서를 다시 청킹해도 결과가 달라집니다. 프리셋을 코드 상수로 두고 문서 유형별 정책을 명시적으로 분리하는 편이 운영에 유리합니다.
 
 ```python
 from __future__ import annotations
@@ -398,14 +313,90 @@ tune_overlap(sample_text, chunk_size=180, overlaps=[0, 12, 24, 36, 48])
 
 출력에서 `duplicate_chars`가 급증하는 지점을 먼저 찾고, 그 직전 값을 시작점으로 삼으면 과도한 중복 없이 문맥 연결을 확보할 수 있습니다. 이런 식으로 튜닝 과정을 숫자로 기록해 두면, 나중에 임베딩 모델을 바꿔도 청킹 정책을 독립적으로 유지할 수 있습니다.
 
+### 청킹 회귀를 탐지하는 오프라인 평가 루프
+
+프리셋 변경 후 검색 품질이 떨어졌는지 확인하려면 최소한 고정 질의 세트를 두고 정답 포함 여부를 추적해야 합니다.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class RetrievalCase:
+    query: str
+    expected_source: str
+
+def evaluate_chunk_regression(retriever, cases: list[RetrievalCase], k: int = 5) -> None:
+    hit = 0
+    for case in cases:
+        docs = retriever.invoke(case.query)
+        topk = docs[:k]
+        if any(doc.metadata.get('source') == case.expected_source for doc in topk):
+            hit += 1
+    recall_at_k = hit / len(cases) if cases else 0.0
+    print(f'recall_at_{k}={recall_at_k:.3f} cases={len(cases)}')
+```
+
+이 점수는 완벽한 품질 지표는 아니지만, 청킹 변경이 검색을 악화시키는지 빠르게 확인하는 데 충분합니다. 운영에서는 `recall_at_k`가 기준 아래로 떨어지면 새 프리셋을 배포하지 않는 식으로 게이트를 걸 수 있습니다.
+
+### 청크 메타데이터를 벡터 DB 필터와 맞추는 이유
+
+청크를 만들 때 `doc_type`, `section`, `chunk_order`를 함께 저장해 두면 벡터 검색 결과를 설명하기 쉬워집니다.
+
+```python
+chunk.metadata.update(
+    {
+        'doc_type': 'manual',
+        'section': 'deployment-checklist',
+        'chunk_order': 17,
+        'chunk_size_policy': 'manual-v2',
+    }
+)
+```
+
+이 정보는 나중에 "왜 이 청크가 선택되었는가"를 해석하는 근거가 됩니다. 검색 실패를 모델 문제로 오해하지 않으려면, 청킹 단계의 의사결정 흔적을 메타데이터로 남겨야 합니다.
+
+## 운영 노트: 청크 정책을 버전으로 관리하기
+
+청킹 설정은 코드 한 줄이 아니라 검색 품질 계약입니다. 그래서 운영에서는 `chunk-policy-v1`, `chunk-policy-v2`처럼 정책 버전을 메타데이터에 함께 저장합니다.
+
+```python
+chunk.metadata.update(
+    {
+        'chunk_policy_version': 'chunk-policy-v2',
+        'chunk_size': 240,
+        'chunk_overlap': 48,
+        'separator_profile': 'manual-headers-first',
+    }
+)
+```
+
+이 정보가 있으면 검색 회귀가 발생했을 때 "어떤 정책으로 만들어진 청크에서 문제가 나는지"를 바로 좁힐 수 있습니다. 반대로 정책 버전을 남기지 않으면 인덱스에 서로 다른 규칙이 섞였는지 확인하기 어렵습니다.
+
+추가로, 정책 변경 직후에는 상위 질의 20~50개를 고정해 `recall@k`와 `source diversity`를 비교하는 습관을 권장합니다. 청크 수가 예쁘게 나와도 실제 질의 회수율이 떨어지면 변경을 되돌리는 편이 맞습니다.
+
+## 운영 체크리스트
+
+- [ ] 최소 세 가지 문서 유형으로 프리셋을 나눴습니다.
+- [ ] 청크 수와 길이 분포를 숫자로 확인했습니다.
+- [ ] 첫 번째 청크 미리보기로 구조 보존 여부를 검증했습니다.
+- [ ] 임베딩 전에 너무 길거나 너무 짧은 청크의 기준을 정했습니다.
+
+## 정리
+
+청킹은 텍스트를 잘게 쪼개는 기계적 단계가 아닙니다. 검색이 다시 회수해야 할 최소 문맥 단위를 어디에 둘지 정하는 설계 단계입니다.
+
+그래서 문서 유형별 기본값을 다르게 잡고, 청크 수만이 아니라 길이 분포와 미리보기를 함께 점검해야 합니다. 다음 단계에서는 이렇게 만든 청크에 어떤 메타데이터를 붙여야 검색 후보군을 더 안정적으로 줄일 수 있는지 보겠습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **모든 문서에 같은 chunk_size를 쓰면 왜 검색 품질이 흔들릴까요?**
-  - 청킹 전략은 한 번 정하고 끝내는 설정이 아닙니다. 문서 유형이 늘어나면 동일한 splitter라도 실패 패턴이 달라집니다. 그래서 운영에서는 문서군별 알고리즘을 분리하고, 검색 회귀를 숫자로 감지하는 루프를 반드시 둡니다.
+  - 문서 유형마다 의미 단위의 크기가 다릅니다. FAQ는 질문-답변 쌍이 최소 단위이고, 정책 문서는 예외 조항이 포함된 문단 전체가 의미 단위입니다. 같은 크기로 자르면 그 경계가 구조를 무시하고 잘라 버립니다.
 - **Recursive splitter는 어떤 순서로 경계를 포기하며 텍스트를 나눌까요?**
-  - 분할기가 하나여도, 시작하는 `chunk_size`와 `chunk_overlap`은 문서 형태에 맞춰 달라져야 합니다.
+  - separator 목록의 앞에서부터 시도합니다. 문단(`\n\n`)으로 나눴을 때 chunk_size를 넘으면 줄바꿈(`\n`), 그래도 크면 문장(`. `), 그래도 크면 공백(` `) 순서로 후퇴합니다. 가능한 한 큰 의미 경계를 지키려는 방식입니다.
 - **임베딩 전에 청크 품질을 빠르게 검토하려면 무엇을 봐야 할까요?**
-  - 임베딩 비용을 쓰기 전에, 저는 먼저 다음 세 가지를 확인하는 편입니다. **길이 분포**, **첫 청크와 마지막 청크 미리보기**, **문서 유형별 경고 수**입니다. 이 세 가지면 조악한 프리셋을 초기에 거의 걸러낼 수 있습니다.
+  - 길이 분포(평균·최솟값·최댓값), 첫 청크와 마지막 청크 미리보기, 문서 유형별 너무 짧거나 긴 청크 경고 수를 확인합니다. 이 세 가지만으로 조악한 프리셋은 임베딩 전에 거의 걸러집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

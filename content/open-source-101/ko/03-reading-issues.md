@@ -40,243 +40,366 @@ last_reviewed: '2026-05-15'
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
+## 왜 이 글이 중요한가
+
 이슈를 잘못 읽으면 풀 리퀘스트 방향도 틀어집니다. 문제를 재현하지 못한 채 수정에 들어가면 원인과 증상을 섞기 쉽고, 이미 합의된 해결 방향을 모른 채 다른 방법을 제시하면 리뷰 비용만 늘어납니다. 초보자에게는 코드 실력보다 맥락 읽기 실수가 더 자주 발목을 잡습니다.
 
 반대로 이슈를 차분히 읽을 줄 알면 작은 기여도 훨씬 잘 맞아 들어갑니다. 내가 무엇을 고치려는지, 누가 이미 논의했고, 어디까지가 범위인지 분명해지기 때문입니다. 이 능력은 오픈소스뿐 아니라 회사 안의 이슈 트래커를 읽을 때도 그대로 이어집니다.
 
-## 이슈를 읽는 순서부터 고정하기
+## 핵심 관점
 
-읽는 순서가 중요한 이유는 이슈의 정보가 이 흐름으로 쌓이기 때문입니다. 제목만 보면 증상만 보이고, 댓글만 먼저 보면 맥락이 흐려집니다. 기본 정보에서 세부 정보로 내려가는 순서를 지키면 실수를 크게 줄일 수 있습니다.
+이슈를 읽는 올바른 순서는 이렇습니다.
 
-이 관점을 잡고 나면 이슈는 막연한 게시글처럼 보이지 않습니다. 오히려 어떤 정보가 빠졌는지, 누구의 확인이 더 필요한지, 지금 바로 구현해도 되는지까지 눈에 들어오기 시작합니다.
+```text
+제목 (문제 종류 파악)
+  → 라벨 (맥락과 난이도 확인)
+  → 본문 (재현 절차, 환경, 기대/실제 동작)
+  → 담당자 (작업 중인 사람 있는지 확인)
+  → 댓글 (이미 논의된 해결 방향 파악)
+  → 참여 가능 여부 판단
+```
 
-## 꼭 알아야 할 다섯 가지 개념
+이 순서를 지키면 "내가 이 이슈를 안전하게 맡을 수 있나"라는 판단을 빠르게 할 수 있습니다. 이 순서를 건너뛰면 이미 닫힌 방향으로 PR을 만들거나, 담당자가 있는 이슈를 중복으로 잡는 실수를 하게 됩니다.
 
-issue는 버그 보고, 기능 제안, 질문, 작업 요청까지 포함하는 작업 단위입니다. label은 문제의 종류와 난이도, 우선순위, 담당 범주를 드러냅니다. triage는 이슈를 분류하고 정렬하는 과정입니다. repro는 문제를 다시 일으키는 절차이며, 버그 이슈에서는 거의 증거에 가깝습니다. assignee는 현재 작업 책임자가 있는지 보여 줍니다.
+> 이슈는 막연한 게시글이 아닙니다. **문제 정의, 재현 증거, 합의 기록이 담긴 공동 작업 문서**입니다.
 
-이 다섯 가지를 알고 읽으면 이슈가 막연한 토론 글이 아니라, 해결 가능성을 판단할 수 있는 문서로 바뀝니다.
+## 핵심 개념
 
-## 깃 브랜치 전략 비교
+### 이슈 유형 분류
 
-오픈소스 프로젝트마다 브랜치 전략이 다릅니다. 기여하기 전에 해당 프로젝트가 어떤 브랜치 모델을 사용하는지 파악해야 합니다.
-
-| 전략 | 복잡도 | 적합한 프로젝트 | 특징 |
+| 유형 | 라벨 | 특징 | 참여 조건 |
 |---|---|---|---|
-| GitHub Flow | 낮음 | 작은 팀, 빠른 배포 | `main` + feature 브랜치, PR 머지 |
-| Git Flow | 높음 | 대형 프로젝트, 버전 관리 | `develop`, `release`, `hotfix` 분리 |
-| Trunk Based | 최저 | CI/CD 중심, 단기 브랜치 | `main` 직접 커밋, feature flag |
+| 버그 리포트 | `bug` | 재현 가능한 문제 보고 | 재현 환경 확인 필수 |
+| 기능 요청 | `feature`, `enhancement` | 새 기능 제안 | 메인테이너 방향 합의 필요 |
+| 문서 개선 | `documentation` | README, docstring 수정 | 진입 장벽 낮음 |
+| 질문 | `question` | 사용 방법 문의 | Discussions로 이동 권장 |
+| 초보자용 | `good first issue` | 범위가 작고 명확 | 첫 기여에 적합 |
+| 도움 요청 | `help wanted` | 메인테이너가 시간 부족 | 경험 있는 기여자 적합 |
 
-**GitHub Flow**는 대부분의 오픈소스가 사용하는 가장 단순한 모델입니다. `main` 브랜치는 항상 배포 가능 상태를 유지하고, 모든 작업은 feature 브랜치에서 이루어집니다. PR이 머지되면 바로 배포됩니다.
+### 이슈 라벨 체계
 
-**Git Flow**는 복잡하지만 버전 관리가 중요한 프로젝트에 적합합니다. `develop`, `release`, `hotfix` 브랜치를 분리해 안정성을 높입니다. 하지만 초보 기여자에게는 진입 장벽이 높습니다.
-
-**Trunk Based Development**는 `main`에 직접 작은 커밋을 자주 하고, feature flag로 기능을 제어합니다. 고도로 CI/CD가 구축된 프로젝트에 적합하지만, 오픈소스에서는 드묽니다.
-
-## 포크에서 PR까지 전체 명령어 예시
-
-기여 흐름을 전체 명령어로 한 번에 보면 각 단계의 역할이 명확해집니다.
+라벨은 단순 태그가 아닙니다. 프로젝트의 분류 체계이며 검색 필터입니다.
 
 ```bash
-# 1. Fork → Clone
-gh repo fork owner/repo --clone
-cd repo
+# 진입하기 좋은 이슈 찾기
+gh issue list --repo pandas-dev/pandas \
+  --label "good first issue" \
+  --state open \
+  --json number,title,assignees \
+  | jq '.[] | select(.assignees | length == 0)'
 
-# 2. Upstream 원격 추가
-git remote add upstream https://github.com/owner/repo.git
-git remote -v
-
-# 3. 작업 브랜치 생성
-git checkout -b fix/issue-42
-
-# 4. 변경 사항 구현
-# (edit files)
-
-# 5. Stage + Commit
-git add .
-git commit -m "fix: resolve Safari 15 login issue
-
-Closes #42
-"
-
-# 6. 로컬 테스트
-pytest
-
-# 7. Push to fork
-git push origin fix/issue-42
-
-# 8. PR 생성
-gh pr create \
-  --title "fix: Safari 15 login issue" \
-  --body "Closes #42
-
-## Summary
-- Add cookie handling for Safari 15
-- Update test for cross-browser compatibility
-
-## Testing
-- Tested on Safari 15.1, Chrome 108, Firefox 107
-"
-
-# 9. 리뷰 피드백 반영
-# (edit files based on review)
-git add .
-git commit -m "fix: apply review feedback"
-git push origin fix/issue-42
-
-# 10. 머지 후 브랜치 삭제
-git checkout main
-git pull upstream main
-git branch -d fix/issue-42
-git push origin --delete fix/issue-42
+# 도움 필요한 이슈 찾기
+gh issue list --repo django/django \
+  --label "help wanted" \
+  --state open
 ```
 
-이 흐름에서 가장 자주 놀치는 단계는 두 가지입니다. 하나는 upstream 원격을 추가하지 않아 나중에 동기화가 어려워지는 것이고, 다른 하나는 머지 후 브랜치를 삭제하지 않아 로컬이 엉망이 되는 것입니다.
+### 재현 절차 (repro steps)의 중요성
 
-## 리베이스와 머지
+버그 이슈에서 재현 절차는 증거에 가깝습니다. 재현이 안 되는 버그는 수정 방향도 불명확합니다.
 
-PR을 통합할 때 `rebase`와 `merge` 중 무엇을 선택할지는 프로젝트 정책에 따라 다릅니다. 두 방식의 차이를 이해하면 메인테이너의 선택을 존중할 수 있습니다.
-
-**merge**
-
-- 변경 사항을 한 덜어리로 통합하고 merge commit을 남깁니다
-- 장점: 히스토리가 온전하게 보존됩니다
-- 단점: 커밋 그래프가 복잡해지고, `git log`가 지저분해집니다
-- 적합: 기능 브랜치 통합, 협업 히스토리 보존
-
-```bash
-git checkout main
-git merge feature-branch
-# Creates a merge commit
-```
-
-**rebase**
-
-- 커밋을 재작성해 선형 히스토리를 만듭니다
-- 장점: 깨끗한 선형 히스토리, `git log`가 읽기 쉬움
-- 단점: 커밋 SHA가 바뀔므로 이미 push한 브랜치에는 위험함
-- 적합: 개인 브랜치 정리, 선형 히스토리 선호 프로젝트
-
-```bash
-git checkout feature-branch
-git rebase main
-# Rewrites commits on top of main
-```
-
-**이슈 우선순위 파악** — 이슈 리스트에서 다음 순서로 확인하면 기여할 이슈를 미리 선별할 수 있습니다: (1) `good-first-issue` 라벨 + 담당자 없음 (2) 최근 7일 이내 활동 (3) 재현 절차 명확 (4) 리포터와 메인테이너가 활발히 다이얼로그 중. 이 조건을 모두 충족하면 기여 성공률이 크게 높아집니다.
-
-**이슈 댓글로 배우기** — 이슈에 바로 코드를 제출하기 전에 댓글로 접근 방법을 물어보는 것이 안전합니다. 예: "이 문제를 `validate_input` 함수에 null 체크를 추가하는 방식으로 해결하려고 합니다. 이 방향이 맞나요?" 메인테이너가 다른 방향을 제시하면 시간 낭비를 막을 수 있고, 동의하면 바로 PR을 작성할 수 있습니다.
-
-**실무 규칙**
-
-- 로컬 브랜치 정리: `rebase` 사용
-- PR 머지: 프로젝트 정책 따르기 (GitHub은 "Squash and merge" 옵션 제공)
-- 이미 push한 커밋: `rebase` 금지 (`--force-push`는 협의 후에만)
-- 팀 협업: `merge` 선호 (conflict 해결이 더 안전)
-
-초보 기여자는 프로젝트의 `CONTRIBUTING.md`를 확인하거나, 메인테이너가 머지 버튼을 누르게 남겨 두는 편이 안전합니다. `git rebase`는 숙련되고 나서 사용해도 늦지 않습니다.
-## 생각이 어떻게 바뀌어야 할까
-
-처음에는 "이 이슈가 정확히 무엇을 요구하는지 모르겠다"는 느낌이 들기 쉽습니다. 하지만 제목, 본문, 라벨, 댓글 순서로 읽는 습관이 생기면 기여 가능한지부터 판단할 수 있게 됩니다.
-
-이 변화가 중요합니다. 이슈를 보는 관점이 "문제가 있네"에서 끝나지 않고, "내가 이 문제를 안전하게 맡을 수 있나"로 옮겨가기 때문입니다.
-
-**주간 이슈 정리 습관** — 오픈소스 프로젝트는 이슈가 빠르게 쌌입니다. 메인테이너는 주 1-2회 정도 triage 시간을 갖습니다. 다음을 확인합니다: (1) 새 이슈 확인 및 라벨 부여 (2) 재현 불가능 이슈 닫기 (3) 중복 이슈 병합 (4) `good-first-issue` 후보 선정 (5) 담당자 배정. 이 습관은 이슈 탭을 깨끗하게 유지하고 기여자가 적합한 이슈를 빠르게 찾게 해 줍니다.
-
-### 깃허브 이슈 템플릿 예시
-
-프로젝트에 이슈 템플릿을 두면 보고자가 필요한 정보를 빠트리지 않고 작성합니다. `.github/ISSUE_TEMPLATE/bug_report.md`에 다음처럼 작성합니다.
+**좋은 재현 절차 예시**:
 
 ```markdown
----
-name: Bug Report
-about: 버그를 보고할 때 사용합니다
-labels: bug
----
-
-## 환경
-- OS:
-- Browser:
-- Version:
+## 재현 환경
+- Python: 3.11.2
+- requests: 2.31.0
+- OS: macOS 14.1
 
 ## 재현 단계
-1.
-2.
-3.
-
-## 기대 동작
-
-## 실제 동작
-
-## 스크린샷 (선택)
+1. `pip install requests==2.31.0` 실행
+2. 다음 코드 실행:
+```python
+import requests
+session = requests.Session()
+session.get('https://httpbin.org/cookies/set/test/value')
+print(session.cookies)  # 예상: {'test': 'value'}, 실제: {}
 ```
 
-이 템플릿이 있으면 메인테이너가 재현 단계를 따로 물어볼 필요가 줄어듭니다. 기능 요청용 템플릿도 별도로 만들면 이슈의 성격이 자동으로 분류됩니다.
+## 기대 동작
+쿠키가 세션에 저장되어야 합니다.
+
+## 실제 동작
+쿠키 저장소가 비어 있습니다.
+
+## 추가 정보
+requests 2.30.0에서는 정상 동작 확인
+```
+
+**나쁜 재현 절차 예시**:
+
+```markdown
+requests 쓰면 쿠키가 안 됩니다. 버그 아닌가요?
+```
+
+차이가 명확합니다. 좋은 재현 절차는 메인테이너가 로컬에서 즉시 확인할 수 있게 해 줍니다.
+
+## 이슈 읽기 실전 예시
+
+실제 GitHub 이슈를 읽는 흐름을 단계별로 봅니다.
+
+### 실제 이슈 분석 예시
+
+```text
+제목: [Bug] Session cookies not persisted across redirects on Safari 15
+
+라벨: bug, good first issue, help wanted
+
+담당자: 없음
+
+본문:
+## 환경
+- Browser: Safari 15.1 on macOS 12
+- requests-html: 0.10.0
+
+## 재현 단계
+1. https://example.com/login으로 POST 요청
+2. 302 리다이렉트 발생
+3. 리다이렉트 후 쿠키 확인
+
+## 기대: 쿠키가 유지됨
+## 실제: 쿠키 초기화됨
+
+댓글 스레드:
+[메인테이너 2일 전]: 재현됨. fix는 HTTPAdapter.send()에서 처리해야 할 것 같습니다.
+[기여자 1일 전]: session.merge_environment_settings()를 확인해보겠습니다.
+```
+
+이 이슈를 읽는 순서:
+
+```text
+1. 제목: 버그 + Safari 15 + 세션 쿠키 → 환경 특이성 있음
+2. 라벨: good first issue + help wanted → 진입 가능
+3. 담당자: 없음 → 작업 가능
+4. 재현 절차: 명확함 → 로컬에서 확인 가능
+5. 댓글: 수정 위치 힌트 있음 → HTTPAdapter.send() 확인 필요
+6. 판단: 참여 가능, 댓글로 접근 방법 확인 후 시작
+```
+
+### 이슈 참여 전 댓글 작성 패턴
+
+이슈에 바로 코드를 제출하기 전에 댓글로 접근 방법을 확인합니다.
+
+```markdown
+안녕하세요. 이 이슈를 살펴봤습니다.
+
+재현 환경을 확인했고, 댓글에서 언급된 HTTPAdapter.send() 방향을 검토했습니다.
+
+제가 생각하는 수정 방향:
+- `HTTPAdapter.send()`의 리다이렉트 처리 부분에서 쿠키를 다음 요청에 전달하는 로직 추가
+- Safari 15의 SameSite 쿠키 정책 변경과 연관 가능성 확인
+
+이 방향이 맞는지 확인 부탁드립니다. 괜찮다면 PR을 작성하겠습니다.
+
+참고 코드 위치:
+- `requests/adapters.py` - `HTTPAdapter.send()` 메서드 (라인 540-580)
+```
+
+이 방식의 장점: 메인테이너가 초기에 범위를 조정해 주기 때문에, 큰 방향 오류를 PR 단계에서 뒤늦게 고치지 않아도 됩니다.
+
+## 이슈 템플릿 만들기
+
+프로젝트에 이슈 템플릿을 두면 보고자가 필요한 정보를 빠트리지 않고 작성합니다.
+
+### 버그 리포트 템플릿
+
+```yaml
+# .github/ISSUE_TEMPLATE/bug_report.yml
+name: Bug Report
+description: 버그를 발견했다면 여기에 보고해 주세요
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: 버그 설명
+      description: 어떤 문제가 발생했나요?
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro-steps
+    attributes:
+      label: 재현 단계
+      placeholder: |
+        1. '...'를 실행합니다
+        2. '...'를 클릭합니다
+        3. 오류가 표시됩니다
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 동작
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 실제 동작
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 버전
+      placeholder: v1.2.3
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: 운영 체제
+      options:
+        - macOS
+        - Windows
+        - Linux (Ubuntu)
+        - Linux (기타)
+    validations:
+      required: true
+```
+
+### 기능 요청 템플릿
+
+```yaml
+# .github/ISSUE_TEMPLATE/feature_request.yml
+name: Feature Request
+description: 새 기능을 제안합니다
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 해결하려는 문제
+      description: 어떤 불편함이 있나요?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 제안하는 해결책
+      placeholder: |
+        ```python
+        # 이런 API가 있으면 좋겠습니다
+        result = my_function(input, option='new-feature')
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 현재 회피 방법
+      description: 지금은 어떻게 해결하고 있나요? (없으면 생략)
+```
+
+## 이슈 자동화
+
+대형 프로젝트는 이슈 관리를 자동화합니다.
+
+```yaml
+# .github/workflows/issue-automation.yml
+name: Issue Automation
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+    # 새 이슈에 triage 라벨 자동 추가
+    - name: Label new issues
+      if: github.event.action == 'opened'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.addLabels({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            labels: ['needs-triage']
+          });
+
+    # 30일 이상 비활성 이슈 닫기
+    - name: Close stale issues
+      uses: actions/stale@v9
+      with:
+        stale-issue-message: |
+          이 이슈는 30일 동안 활동이 없어 자동으로 닫힙니다.
+          관련이 있다면 다시 열어 주세요.
+        days-before-stale: 30
+        days-before-close: 7
+```
 
 ## 직접 따라해 보기: 이슈 분석 절차
 
 ### 1단계 — 제목에서 문제 종류 파악하기
 
-제목은 가장 짧은 요약입니다. 버그인지, 기능 요청인지, 환경 의존 문제인지 먼저 식별해야 합니다.
+제목은 가장 짧은 요약입니다. 버그인지, 기능 요청인지, 환경 의존 문제인지 먼저 식별합니다.
 
 ```text
 [Bug] login fails on Safari 15
+→ 버그, Safari 특이성, 로그인 기능
 ```
 
 ### 2단계 — 라벨에서 맥락 읽기
 
-라벨은 프로젝트가 이 문제를 어떻게 분류하고 있는지 보여 줍니다. 초보자에게는 본문보다 라벨이 더 직접적인 힌트가 될 때도 많습니다.
+라벨은 프로젝트가 이 문제를 어떻게 분류하고 있는지 보여 줍니다.
 
 ```text
 labels: bug, good first issue, help wanted
+→ 버그 + 초보자 진입 가능 + 도움 요청 = 참여 적합
 ```
 
 ### 3단계 — 재현 절차 확인하기
 
-버그 이슈라면 재현 가능 여부가 가장 중요합니다. 재현되지 않는 문제는 고치는 방향도 흐려집니다.
+버그 이슈라면 재현 가능 여부가 가장 중요합니다.
 
-````markdown
 ```markdown
 1. open https://example.com/login
 2. enter valid credentials
 3. click submit
 expected: dashboard
-actual: 500 error
+actual: 500 error on Safari 15.1
 ```
-````
 
 ### 4단계 — 댓글 스레드 따라가기
 
-메인테이너가 추가 정보를 요청했는지, 이미 해결 방향이 정해졌는지, 비슷한 풀 리퀘스트가 있는지 댓글에서 확인해야 합니다.
+메인테이너가 추가 정보를 요청했는지, 이미 해결 방향이 정해졌는지 확인합니다.
 
 ```text
-maintainer: can you share browser version?
-reporter: Safari 15.1 on macOS 12
+maintainer: "can you share browser version and error trace?"
+reporter: "Safari 15.1 on macOS 12, stack trace: ..."
+maintainer: "Confirmed. The issue is in session cookie handling."
+→ 방향 합의됨, 참여 전 댓글로 확인 필요
 ```
 
 ### 5단계 — 지금 참여해도 되는지 판단하기
 
-`good first issue`가 붙어 있어도 담당자가 있거나 재현이 불가능하면 당장 들어가기 어렵습니다. 마지막에는 기여 가능 여부를 냉정하게 판단해야 합니다.
-
 ```text
-- label has good first issue ✓
-- repro reproducible ✓
-- no assignee ✓
-→ attempt the contribution
+- label has "good first issue": ✓
+- repro reproducible: ✓
+- no assignee: ✓
+- direction agreed by maintainer: ✓
+→ 댓글로 접근 방법 확인 후 PR 작성 시작
 ```
 
-## 이 예시에서 먼저 읽어야 할 점
+## 자주 하는 실수
 
-제목은 증상을 압축한 요약입니다. 라벨은 프로젝트 내부 분류 체계입니다. 재현 절차는 버그를 논의 가능한 상태로 바꿔 줍니다. 댓글은 이미 지나간 의사결정의 기록입니다.
-
-결국 이슈를 잘 읽는 일은 텍스트를 훑는 데서 끝나지 않습니다. 문제 정의가 충분한지 확인하고, 내가 잘못된 전제로 구현에 들어가지 않게 만드는 과정입니다.
-
-## 자주 하는 실수 다섯 가지
-
-1. 제목만 읽고 곧바로 풀 리퀘스트를 엽니다.
-2. 재현 절차를 직접 실행해 보지 않습니다.
-3. 담당자가 있는 이슈를 확인 없이 가져갑니다.
-4. 라벨 체계를 무시하고 난이도를 오판합니다.
-5. 댓글 안에 숨어 있는 결정 사항을 놓칩니다.
+| 실수 | 구체적 상황 | 올바른 접근 |
+|---|---|---|
+| 제목만 읽고 PR 제출 | "TypeError 수정"만 보고 바로 코드 변경 | 댓글 끝까지 읽고 합의된 방향 확인 |
+| 재현 미확인 | 로컬에서 재현 안 해보고 수정 시도 | 재현 환경 구성 후 직접 확인 |
+| 담당자 있는 이슈 선점 | `assignees` 확인 없이 같은 이슈 작업 | 이슈 댓글로 "진행해도 되나요?" 확인 |
+| 라벨 무시 | `wontfix` 이슈에 PR 제출 | 라벨 의미 먼저 파악 후 참여 여부 결정 |
+| 댓글 결정 사항 누락 | 50개 댓글 중 30번째 댓글의 방향 변경 무시 | 댓글 전체 읽기, 가장 최신 합의 확인 |
 
 ## 실무에서는 이렇게 생각한다
 
@@ -284,9 +407,19 @@ reporter: Safari 15.1 on macOS 12
 
 시니어 엔지니어는 이슈를 해결 목록이 아니라 합의 문서로 봅니다. 누가 어떤 근거로 우선순위를 정했는지, 왜 이 문제를 지금 고치는지, 수정 범위가 어디까지인지 먼저 읽고 움직입니다. 이 단계가 탄탄하면 구현은 오히려 빨라집니다.
 
-**이슈 자동화 도구** — 대형 프로젝트는 이슈 관리를 자동화합니다. GitHub Actions를 사용해 다음을 자동화할 수 있습니다: (1) 새 이슈에 자동 라벨 부여 (2) 오래된 이슈 자동 닫기 또는 알림 (3) 재현 절차 없는 버그 이슈에 템플릿 댓글 (4) 이슈 번호로 PR 자동 연결. 이런 자동화는 메인테이너의 반복 작업을 줄여 주고, 기여자에게는 빠른 피드백을 제공합니다.
+**주간 이슈 정리 습관** — 오픈소스 프로젝트는 이슈가 빠르게 쌓입니다. 메인테이너는 주 1-2회 정도 triage 시간을 갖습니다:
 
-**이슈 템플릿 활용법** — GitHub는 `.github/ISSUE_TEMPLATE/` 디렉토리에 여러 이슈 템플릿을 둘 수 있습니다. 버그 리포트(`bug_report.md`), 기능 요청(`feature_request.md`), 질문(`question.md`)을 분리하면 이슈 품질이 크게 올라갑니다. 각 템플릿에는 필수 입력 항목을 체크박스로 만들고, 예시를 주석으로 달아 두면 신규 기여자도 양질의 이슈를 작성할 수 있습니다.
+```bash
+# 새 이슈 확인
+gh issue list --state open --label "needs-triage"
+
+# 오래된 이슈 확인 (30일 이상 비활성)
+gh issue list --state open --json number,title,updatedAt \
+  | jq '.[] | select(.updatedAt < "2026-04-20")'
+
+# 재현 절차 없는 버그 이슈 찾기
+gh issue list --label "bug,needs-repro"
+```
 
 ## 운영 체크리스트
 
@@ -294,32 +427,13 @@ reporter: Safari 15.1 on macOS 12
 - [ ] 재현 절차를 확인하거나 직접 따라해 보았습니다.
 - [ ] 라벨과 담당자 상태를 확인했습니다.
 - [ ] 댓글에서 이미 정리된 합의가 있는지 확인했습니다.
+- [ ] 참여 전 댓글로 접근 방법을 메인테이너에게 확인했습니다.
 
 ## 연습 문제
 
 1. `good first issue` 라벨의 의미를 한 문장으로 적어 보세요.
 2. triage를 한 문장으로 설명해 보세요.
 3. 재현 절차가 없는 버그 이슈의 위험을 한 문장으로 적어 보세요.
-
-## 이슈에서 PR로 넘어가기 전 점검 표준
-
-이슈를 잘 읽는 팀은 구현 전에 합의 문서를 먼저 만듭니다. 핵심은 "재현 가능성"과 "수정 범위"를 명확히 남기는 것입니다. 입문자라면 이슈 댓글에 아래 형식으로 작업 계획을 먼저 남기는 습관이 안전합니다.
-
-```markdown
-제가 재현한 조건은 다음과 같습니다.
-- 환경: macOS 14, Python 3.11
-- 재현: 로그인 후 세션 만료 시 500 발생
-- 예상 수정 범위: 세션 검증 함수 + 테스트 2개
-이 방향으로 PR 작성해도 될까요?
-```
-
-이 방식의 장점은 분명합니다. 메인테이너가 초기에 범위를 조정해 주기 때문에, 큰 방향 오류를 PR 단계에서 뒤늦게 고치지 않아도 됩니다.
-
-기술적으로는 브랜치 이름 규칙도 이슈와 연결하는 편이 좋습니다. `fix/123-session-timeout`처럼 이슈 번호를 포함하면 추적이 쉬워지고, 릴리스 노트 자동화에서도 변경 이력을 모으기 쉬워집니다.
-
-PR 리뷰 체크리스트도 이슈 기반으로 작성해야 합니다. 예를 들어 "이 이슈의 재현 단계가 테스트로 고정됐는가", "기대 동작과 실제 동작 차이가 문서화됐는가", "회귀 가능 시나리오가 추가됐는가"를 확인하면 품질이 올라갑니다.
-
-마지막으로 CI 배지와 테스트 링크를 이슈에 붙여 두면, 비개발 참여자도 진행 상태를 읽을 수 있습니다. 결국 좋은 이슈 운영은 코드 변경 전 비용을 줄이는 설계 활동입니다.
 
 ## 정리
 
@@ -330,11 +444,11 @@ PR 리뷰 체크리스트도 이슈 기반으로 작성해야 합니다. 예를 
 ## 처음 질문으로 돌아가기
 
 - **제목만 보고 판단하면 왜 기여 방향이 자주 빗나갈까요?**
-  - 1. 제목만 읽고 곧바로 풀 리퀘스트를 엽니다.
+  - 이슈 제목은 증상을 압축한 요약입니다. 댓글에는 이미 합의된 해결 방향, 시도했다가 실패한 접근, 메인테이너의 우선순위 판단이 담겨 있습니다. 제목만 보고 구현하면 이미 다른 방향으로 논의가 끝난 경우에 헛수고를 하게 됩니다.
 - **라벨, 재현 절차, 담당자, 댓글은 각각 어떤 역할을 할까요?**
-  - 1.
+  - 라벨은 문제의 성격과 난이도를 알려 주는 분류 체계입니다. 재현 절차는 버그를 논의 가능한 상태로 만드는 증거입니다. 담당자는 이미 작업 중인 사람이 있는지 알려 줍니다. 댓글은 이미 지나간 의사결정과 합의 기록입니다.
 - **`good first issue`가 붙어 있어도 바로 들어가기 어려운 경우는 언제일까요?**
-  - 읽는 순서가 중요한 이유는 이슈의 정보가 이 흐름으로 쌓이기 때문입니다
+  - 담당자가 이미 배정된 경우, 재현 절차가 없어 문제를 확인하기 어려운 경우, 댓글에서 이미 구현 방향이 바뀐 경우, 또는 해결에 프로젝트 전체 구조 이해가 필요한 경우에는 `good first issue` 라벨이 있어도 참여하기 어렵습니다.
 
 <!-- toc:end -->
 

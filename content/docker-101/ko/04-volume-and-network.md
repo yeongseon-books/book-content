@@ -241,11 +241,115 @@ docker network disconnect app-net api
 docker network prune -f
 ```
 
+## Volume과 Network 함께 쓰는 전체 예시
+
+```bash
+# 네트워크와 볼륨 미리 생성
+docker network create app-net
+docker volume create pgdata
+docker volume create redisdata
+
+# DB 컨테이너: 네트워크 + 볼륨 + 헬스체크
+docker run -d \
+  --name db \
+  --network app-net \
+  -v pgdata:/var/lib/postgresql/data \
+  -e POSTGRES_PASSWORD=dev \
+  -e POSTGRES_DB=app \
+  --health-cmd="pg_isready -U postgres -d app" \
+  --health-interval=5s \
+  --health-retries=5 \
+  postgres:16
+
+# Redis 캐시: 같은 네트워크
+docker run -d \
+  --name cache \
+  --network app-net \
+  -v redisdata:/data \
+  redis:7-alpine
+
+# 앱 컨테이너: 이름으로 DB, 캐시 접근
+docker run -d \
+  --name api \
+  --network app-net \
+  -p 8000:8000 \
+  -e DB_HOST=db \
+  -e REDIS_URL=redis://cache:6379 \
+  myapp:1.0
+
+# 통신 확인
+docker exec api ping -c 1 db     # DB 이름 해석 확인
+docker exec api ping -c 1 cache  # Redis 이름 해석 확인
+```
+
 ## 실무에서는 이렇게 이어집니다
 
 Kubernetes로 가더라도 개념은 크게 바뀌지 않습니다. volume은 PersistentVolume 같은 영속 저장 개념으로 이어지고, network와 이름 기반 통신은 Service DNS로 이어집니다. Docker에서 이 멘탈 모델을 먼저 익혀 두면 이후 전환이 훨씬 자연스럽습니다.
 
 또한 운영 사고 대응에서도 같은 감각이 필요합니다. 데이터 손실은 storage 문제인지, 접속 실패는 network 문제인지 먼저 구분해야 원인 분석이 빨라집니다.
+
+## 자주 쓰는 명령 모음
+
+```bash
+# ── Volume ──────────────────────────────────────────────────
+docker volume create app-data          # 볼륨 생성
+docker volume ls                       # 볼륨 목록
+docker volume inspect app-data         # 볼륨 상세 (Mountpoint 확인)
+docker volume rm app-data              # 볼륨 삭제
+docker volume prune -f                 # 사용 안 하는 볼륨 정리
+
+# ── Network ──────────────────────────────────────────────────
+docker network create app-net          # 네트워크 생성
+docker network ls                      # 네트워크 목록
+docker network inspect app-net         # 네트워크 상세
+docker network connect app-net web     # 실행 중인 컨테이너에 연결
+docker network disconnect app-net web  # 연결 해제
+docker network rm app-net              # 네트워크 삭제
+docker network prune -f                # 사용 안 하는 네트워크 정리
+
+# ── 백업/복구 ────────────────────────────────────────────────
+# 볼륨 백업
+docker run --rm \
+  -v app-data:/data -v "$PWD":/backup \
+  alpine tar czf /backup/backup.tgz -C /data .
+
+# 볼륨 복구
+docker run --rm \
+  -v app-data-new:/data -v "$PWD":/backup \
+  alpine tar xzf /backup/backup.tgz -C /data
+```
+
+## default bridge vs user-defined bridge
+
+많은 입문자가 default bridge와 user-defined bridge의 차이를 모르고 문제를 겪습니다.
+
+```bash
+# default bridge (docker0): 이름 기반 DNS 없음
+docker run -d --name db postgres:16
+docker run -d --name api myapp:1.0
+docker exec api ping db
+# ping: db: Name or service not known  ← 이름 해석 안 됨!
+
+# IP로만 통신 가능 (불안정)
+docker inspect db | jq '.[0].NetworkSettings.IPAddress'
+# "172.17.0.2"
+docker exec api ping 172.17.0.2   # IP로는 가능하지만 IP가 바뀔 수 있음
+```
+
+```bash
+# user-defined bridge: 이름 기반 DNS 자동 제공
+docker network create app-net
+docker run -d --name db --network app-net postgres:16
+docker run -d --name api --network app-net myapp:1.0
+docker exec api ping db
+# PING db (172.20.0.2): 56 data bytes  ← 이름 해석 성공!
+```
+
+**핵심 차이점:**
+- default bridge: 이름 해석 불가, 격리 없음, 모든 컨테이너가 보임
+- user-defined bridge: 이름 기반 DNS, 같은 네트워크만 통신, 격리 보장
+
+운영에서는 항상 user-defined bridge를 사용해야 합니다.
 
 ## 운영 체크리스트
 

@@ -66,6 +66,7 @@ filter(func, data)                 adder = make_adder(5)
 | 데코레이터(decorator) | 함수를 받아 기능이 추가된 새 함수를 반환하는 고차 함수입니다 |
 
 ## 적용 전후 비교
+
 비슷한 함수가 계속 늘어나는 신호는 대개 "변하는 조건만 분리하라"는 뜻입니다.
 
 ```python
@@ -89,14 +90,22 @@ def get_seniors(people: list[dict]) -> list[dict]:
 # 이후: 조건을 인자로 받는 고차 함수
 from collections.abc import Callable
 
+people = [
+    {"name": "Alice", "age": 25},
+    {"name": "Bob", "age": 70},
+    {"name": "Charlie", "age": 15},
+]
+
 def filter_people(
     people: list[dict],
     predicate: Callable[[dict], bool],
 ) -> list[dict]:
-    return [p for p in people if predicate(p)]
+    return list(filter(predicate, people))
 
 adults = filter_people(people, lambda p: p["age"] >= 18)
 seniors = filter_people(people, lambda p: p["age"] >= 65)
+print([p["name"] for p in adults])   # ['Alice', 'Bob']
+print([p["name"] for p in seniors])  # ['Bob']
 ```
 
 ## 단계별 실습
@@ -110,7 +119,7 @@ def apply_operation(
     values: list[int],
     operation: Callable[[int], int],
 ) -> list[int]:
-    return [operation(v) for v in values]
+    return list(map(operation, values))
 
 numbers = [1, 2, 3, 4, 5]
 
@@ -164,6 +173,10 @@ for s in by_grade_score:
 #   Grade 2 Bob: 92
 #   Grade 3 Alice: 85
 #   Grade 3 Charlie: 78
+
+# map으로 정렬된 결과에서 이름만 추출
+top_names = list(map(lambda s: s.name, by_score[:2]))
+print(top_names)  # ['Diana', 'Bob']
 ```
 
 `sorted(key=...)`는 실무에서 가장 많이 만나는 고차 함수입니다. 정렬 알고리즘을 다시 쓰는 대신, "무엇을 기준으로 정렬할지"만 함수로 넘기면 됩니다.
@@ -192,9 +205,10 @@ print(triple(5))  # 15
 
 is_valid_score = make_validator(0, 100)
 is_valid_rate = make_validator(0.0, 1.0)
-print(is_valid_score(85))   # True
-print(is_valid_score(150))  # False
-print(is_valid_rate(0.75))  # True
+
+scores = [85, 150, -5, 92]
+valid_scores = list(filter(is_valid_score, scores))
+print(valid_scores)  # [85, 92]
 ```
 
 함수를 반환하는 패턴은 설정이 들어간 동작을 만드는 데 강력합니다. "지금 당장 값을 계산하는 함수"가 아니라 "나중에 호출할 규칙 자체"를 생성하는 셈입니다.
@@ -238,13 +252,6 @@ def retry(max_attempts: int) -> Callable:
 def slow_sum(n: int) -> int:
     return sum(range(n))
 
-@retry(max_attempts=3)
-def unstable_operation() -> str:
-    import random
-    if random.random() < 0.7:
-        raise ValueError("transient error")
-    return "success"
-
 result = slow_sum(1_000_000)
 print(f"Result: {result}")
 # slow_sum: 0.0234s
@@ -257,9 +264,6 @@ print(f"Result: {result}")
 
 ```python
 from collections.abc import Callable
-from typing import TypeVar
-
-T = TypeVar("T")
 
 def compose(*funcs: Callable) -> Callable:
     """Composes functions from right to left."""
@@ -288,23 +292,62 @@ print(slugify("  Hello World Python  "))  # hello-world-python
 print(slugify("  Functional Programming Guide  "))  # functional-programmi
 ```
 
-고차 함수는 파이프라인과도 자연스럽게 이어집니다. 작은 변환 함수를 조합하는 방식은 이후 함수 합성 글에서 더 확장됩니다.
+### 단계 6: 고차 함수로 데이터 처리 전략 교체하기
+
+```python
+from collections.abc import Callable
+from functools import reduce
+
+# 처리 전략을 인자로 받는 고차 함수
+def process_numbers(
+    numbers: list[int],
+    transform: Callable[[int], int],
+    predicate: Callable[[int], bool],
+    combine: Callable[[int, int], int],
+    initial: int,
+) -> int:
+    transformed = map(transform, numbers)
+    filtered = filter(predicate, transformed)
+    return reduce(combine, filtered, initial)
+
+data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+# 전략 1: 짝수를 제곱한 뒤 합산
+result1 = process_numbers(
+    data,
+    transform=lambda x: x ** 2,
+    predicate=lambda x: x % 2 == 0,  # 제곱 후 짝수
+    combine=lambda acc, x: acc + x,
+    initial=0,
+)
+print(result1)  # 4 + 16 + 36 + 64 + 100 = 220
+
+# 전략 2: 홀수를 세 배 한 뒤 최댓값
+result2 = process_numbers(
+    data,
+    transform=lambda x: x * 3,
+    predicate=lambda x: x % 2 != 0,  # 세 배 후 홀수
+    combine=lambda a, b: a if a > b else b,
+    initial=0,
+)
+print(result2)  # 3*9=27 -> max is 27
+```
 
 ## 이 코드에서 주목할 점
 
 - 고차 함수는 변하는 동작을 인자로 받아 중복을 제거합니다.
 - 팩토리 함수는 설정이 다른 함수를 동적으로 만들어 냅니다.
 - 데코레이터는 고차 함수의 문법 설탕이며 `@wraps`는 메타데이터 보존에 중요합니다.
-- 함수 합성은 작은 함수를 묶어 더 큰 변환을 만드는 대표 패턴입니다.
+- `map`, `filter`에 전달하는 함수 자체가 콜백이자 고차 함수의 활용입니다.
 
-## 흔한 실수 5가지
+## 자주 하는 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
 | 복잡한 `lambda`를 남발함 | 디버깅과 리뷰가 어려워집니다 | 이름 있는 함수로 분리합니다 |
 | `@wraps`를 빼먹음 | 함수 이름과 docstring이 사라집니다 | 데코레이터에 항상 `@wraps`를 넣습니다 |
 | 고차 함수 중첩이 과도함 | 가독성이 급격히 떨어집니다 | 두 단계가 넘으면 중간 변수를 둡니다 |
-| 타입 힌트를 생략함 | `Callable` 시그니처가 अस्पष्ट해집니다 | `Callable[[int], str]`처럼 명시합니다 |
+| 타입 힌트를 생략함 | `Callable` 시그니처가 불명확해집니다 | `Callable[[int], str]`처럼 명시합니다 |
 | 부수효과 있는 콜백을 넘김 | 실행 순서와 상태에 민감해집니다 | 가능하면 순수 함수 콜백을 사용합니다 |
 
 ## 실무에서 이렇게 쓰입니다
@@ -312,7 +355,7 @@ print(slugify("  Functional Programming Guide  "))  # functional-programmi
 - FastAPI의 `Depends()`는 의존성 주입을 고차 함수 패턴으로 활용합니다.
 - `sorted(key=...)`, `min(key=...)`, `max(key=...)`는 모두 고차 함수입니다.
 - 로깅, 인증, 캐싱 데코레이터를 같은 구조로 구현합니다.
-- 이벤트 핸들러 등록은 콜백 패턴을 사용합니다.
+- `map`/`filter`에 기명 함수를 넘겨 의도를 명확히 표현합니다.
 - 테스트 픽스처 생성에 팩토리 함수를 활용합니다.
 
 ## 현업에서는 이렇게 판단합니다
@@ -320,6 +363,17 @@ print(slugify("  Functional Programming Guide  "))  # functional-programmi
 고차 함수의 핵심 가치는 추상화입니다. 반복되는 흐름에서 "변하는 부분"만 함수로 끌어내면 클래스 계층 없이도 전략을 교체할 수 있습니다. Python에서 데코레이터와 정렬 키 함수가 널리 쓰이는 이유도 결국 같은 추상화 비용 대비 효과가 크기 때문입니다.
 
 다만 추상화가 항상 정답은 아닙니다. 정말로 함수 인자를 받아야 하는지, 단순한 코드를 괜히 일반화하고 있지는 않은지 계속 점검해야 합니다. 좋은 고차 함수는 중복을 줄이지만, 나쁜 고차 함수는 읽는 사람의 인지 부하만 늘립니다.
+
+## 처음 질문으로 돌아가기
+
+- **고차 함수는 어떤 두 형태로 나타날까요?**
+  첫 번째는 함수를 인자로 받는 형태입니다. `map(func, data)`, `sorted(data, key=func)`, `filter(predicate, data)`가 대표 예시입니다. 두 번째는 함수를 반환하는 형태입니다. `make_multiplier(2)` 같은 팩토리 함수나 데코레이터가 여기 해당합니다.
+
+- **`sorted`, `map`, `filter`는 왜 고차 함수의 대표 예시일까요?**
+  세 함수 모두 첫 번째 인자(또는 `key` 파라미터)로 다른 함수를 받습니다. 이 덕분에 정렬 기준, 변환 규칙, 선택 조건을 외부에서 주입할 수 있어 같은 인프라로 다양한 동작을 표현할 수 있습니다.
+
+- **함수를 반환하는 팩토리 패턴은 어떤 상황에서 유용할까요?**
+  설정값이 고정된 특화 함수가 여러 개 필요할 때 유용합니다. `make_validator(0, 100)`으로 점수 검증기를 만들고 `make_validator(0.0, 1.0)`으로 비율 검증기를 만드는 식입니다. 클래스 없이도 재사용 가능한 동작 단위를 만들 수 있습니다.
 
 ## 운영 체크리스트
 
@@ -333,86 +387,11 @@ print(slugify("  Functional Programming Guide  "))  # functional-programmi
 
 1. `make_formatter(format_str)` 함수를 만들어 숫자 포맷 함수를 동적으로 생성해 보세요.
 2. 실행 시간, 호출 횟수, 결과를 기록하는 `@trace` 데코레이터를 작성해 보세요.
-3. `filter_by(predicate)`, `sort_by(key)`, `transform(func)`를 조합한 데이터 처리 파이프라인을 구현해 보세요.
+3. `map`, `filter`, `reduce`와 고차 함수를 조합해 데이터 처리 전략을 교체 가능하게 설계해 보세요.
 
 ## 정리와 다음 글
 
 고차 함수는 함수를 인자로 받거나 반환하면서 동작을 추상화합니다. 팩토리 패턴과 데코레이터는 가장 자주 만나는 응용 형태입니다. 다음 글에서는 이 개념이 가장 직접적으로 드러나는 **map, filter, reduce**를 다룹니다.
-
-## 검증 시나리오: 경계 조건을 먼저 잠그기
-
-실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
-
-```python
-from functools import reduce
-
-def pipeline(values: list[int]) -> dict[str, int]:
-    filtered = [v for v in values if v >= 0]
-    squared = [v * v for v in filtered]
-    total = reduce(lambda acc, x: acc + x, squared, 0)
-    return {
-        "count": len(squared),
-        "total": total,
-        "max": max(squared) if squared else 0,
-    }
-
-# 경계 조건 검증
-assert pipeline([]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([-3, -1]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([0, 2, 3]) == {"count": 3, "total": 13, "max": 9}
-
-print("Pass")
-```
-
-또한 지연 평가를 사용할 때는 소비 시점을 테스트에 명시해 두는 편이 좋습니다. generator는 한 번 소비하면 비어야 정상이며, 이 성질이 깨지면 중간 단계에서 의도치 않은 materialize가 발생했을 가능성이 큽니다.
-
-```python
-from itertools import islice
-
-def naturals():
-    n = 0
-    while True:
-        yield n
-        n += 1
-
-stream = naturals()
-first_five = list(islice(stream, 5))
-next_three = list(islice(stream, 3))
-
-assert first_five == [0, 1, 2, 3, 4]
-assert next_three == [5, 6, 7]
-print("Pass")
-```
-
-이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
-## 리뷰 포인트: 코드 리뷰에서 바로 확인할 항목
-
-함수형 스타일을 적용한 코드 리뷰에서는 다음 네 가지를 빠르게 확인합니다. 첫째, 계산 함수가 외부 상태를 직접 읽거나 쓰지 않는지 확인합니다. 둘째, mutable 인자를 제자리에서 수정하지 않는지 확인합니다. 셋째, 파이프라인 단계의 입력과 출력 타입이 자연스럽게 연결되는지 확인합니다. 넷째, 실패 경로가 값으로 표현되는지 확인합니다.
-
-```python
-def reviewer_checklist() -> list[str]:
-    return [
-        "pure-core",
-        "immutable-update",
-        "typed-boundary",
-        "explicit-failure-path",
-    ]
-
-assert len(reviewer_checklist()) == 4
-print("Pass")
-```
-
-이 항목을 PR 템플릿에 고정해 두면 스타일 논쟁보다 설계 품질을 빠르게 맞출 수 있습니다.
-
-## 처음 질문으로 돌아가기
-
-- **고차 함수는 어떤 두 형태로 나타날까요?**
-  - 같은 순회 구조 안에서 어떤 연산을 할지만 바뀌는 경우, 고차 함수는 중복을 제거하면서 의도를 더 선명하게 만듭니다
-- **`sorted`, `map`, `filter`는 왜 고차 함수의 대표 예시일까요?**
-  - - 고차 함수는 변하는 동작을 인자로 받아 중복을 제거합니다
-- **함수를 반환하는 팩토리 패턴은 어떤 상황에서 유용할까요?**
-  - 같은 순회 구조 안에서 어떤 연산을 할지만 바뀌는 경우, 고차 함수는 중복을 제거하면서 의도를 더 선명하게 만듭니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

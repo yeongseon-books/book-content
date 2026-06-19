@@ -232,11 +232,106 @@ stopped ────────────────→ (삭제됨)
 
 `docker stop`은 SIGTERM을 보낸 뒤 10초 대기 후 SIGKILL합니다. `docker kill`은 즉시 SIGKILL입니다. 운영에서는 graceful shutdown을 위해 `docker stop`을 사용합니다.
 
+## digest 기반 이미지 고정
+
+```bash
+# 태그는 바뀔 수 있음
+docker pull nginx:1.27
+# 출력: Digest: sha256:abcd1234...
+
+# digest로 불변 참조
+docker pull nginx@sha256:abcd1234ef567890...
+
+# 현재 이미지의 digest 확인
+docker inspect nginx:1.27 | jq -r '.[0].RepoDigests[]'
+# ghcr.io/nginx/nginx@sha256:abcd1234...
+
+# CI에서 digest 기반 배포 (변경 불가)
+docker run nginx@sha256:abcd1234ef567890...
+```
+
+태그는 언제든 다른 이미지를 가리킬 수 있습니다. `nginx:1.27`이 오늘과 내일 동일한 이미지를 가리킨다는 보장이 없습니다. 운영 배포 추적과 사고 분석을 위해서는 digest를 기록하고 사용하는 습관이 필요합니다.
+
+## image와 container 관계 정리
+
+```
+Docker Hub / GHCR
+      │ docker pull
+      ↓
+Local image store (불변)
+  ├── nginx:1.27 (Layer 1, 2, 3, 4)
+  └── myapp:1.0  (Layer 1, 5, 6)
+
+      │ docker run
+      ↓
+Container (실행 중)
+  ├── web-1  (nginx:1.27 + writable layer)
+  ├── web-2  (nginx:1.27 + writable layer)  ← 같은 이미지, 다른 컨테이너
+  └── api-1  (myapp:1.0  + writable layer)
+
+레이어 1은 세 컨테이너가 공유 → 저장 공간 절약
+각 writable layer는 독립 → 컨테이너 간 격리
+```
+
 ## 실무에서는 이렇게 이어집니다
 
 CI 파이프라인은 이미지 빌드 결과를 digest 기준으로 고정하고, 운영에서는 어떤 digest가 배포되었는지 로그와 메트릭 시스템과 연결해 추적합니다. 사고 분석에서도 "어떤 코드가 배포됐나"만큼이나 "어떤 이미지가 실제로 실행됐나"가 중요합니다.
 
 결국 image와 container를 분리해서 보는 습관은 단순한 개념 학습이 아니라 변경 이력을 추적할 수 있는 운영 습관으로 이어집니다.
+
+## 자주 쓰는 명령 모음
+
+```bash
+# ── 이미지 검사 ─────────────────────────────────────────────
+docker image inspect nginx:1.27         # 이미지 전체 메타데이터
+docker history nginx:1.27              # 레이어 히스토리
+docker image ls --digests              # digest 포함 이미지 목록
+
+# ── 컨테이너 검사 ────────────────────────────────────────────
+docker inspect web                     # 컨테이너 전체 정보
+docker inspect web | jq '.[0].State'  # 상태만 추출
+docker inspect web | jq '.[0].NetworkSettings.IPAddress'
+
+# ── 컨테이너 조작 ────────────────────────────────────────────
+docker create --name web nginx:1.27   # 생성만
+docker start web                      # 시작
+docker pause web                      # 일시 정지
+docker unpause web                    # 재개
+docker stop web                       # 정상 종료 (SIGTERM + 10초 후 SIGKILL)
+docker kill web                       # 즉시 종료 (SIGKILL)
+docker restart web                    # 재시작
+
+# ── 정리 ────────────────────────────────────────────────────
+docker container prune -f             # 멈춘 컨테이너 모두 삭제
+docker image prune -af                # 사용 안 하는 이미지 삭제
+docker system df                      # 사용 공간 확인
+```
+
+## `docker commit` vs Dockerfile
+
+실수로 자주 쓰게 되는 `docker commit`에 대해 명확히 알아야 합니다.
+
+```bash
+# docker commit: 컨테이너의 현재 상태를 이미지로 만들기
+docker exec web apt-get install -y curl
+docker commit web myimage:with-curl
+
+# 이미지가 만들어지지만:
+# 1. 재현하기 어려움 (어떤 명령으로 만들었는지 기록 없음)
+# 2. docker history가 불투명해짐
+# 3. 보안 감사 불가
+# 4. 이미지가 불필요하게 커짐
+```
+
+```dockerfile
+# 올바른 방법: Dockerfile로 재현 가능하게 만들기
+FROM nginx:1.27
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/*
+```
+
+`docker commit`은 빠른 실험에는 쓸 수 있지만, 공유하거나 운영에 쓰는 이미지는 반드시 Dockerfile로 빌드해야 합니다. 이미지의 재현성과 추적 가능성이 보장되기 때문입니다.
 
 ## 운영 체크리스트
 

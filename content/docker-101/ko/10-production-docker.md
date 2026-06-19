@@ -307,11 +307,83 @@ jobs:
             myapp_web
 ```
 
+## 시리즈 전체를 관통하는 원칙 정리
+
+이 시리즈에서 배운 모든 것은 세 가지 원칙으로 요약됩니다.
+
+**1. 재현성 (Reproducibility)**
+- 누가, 어디서 실행해도 같은 이미지에서 같은 동작
+- Dockerfile로 빌드, 고정 태그/digest로 배포
+- 환경은 코드와 선언으로 관리
+
+**2. 최소 권한 (Least Privilege)**
+- non-root 실행, `--cap-drop=ALL`, `--read-only`
+- 이미지에 비밀값 없음, 필요한 포트만 노출
+- 서명된 이미지만 배포
+
+**3. 관측 가능성 (Observability)**
+- 로그는 stdout으로 (12-Factor App)
+- 메트릭은 `/metrics` 엔드포인트로
+- healthcheck로 준비 상태 노출
+
+```
+개발 → 빌드 → 서명 → 스캔 → 배포 → 관찰 → 대응
+  ↑_____________________________|
+              피드백 루프
+```
+
 ## 실무에서는 이렇게 이어집니다
 
 실제 운영은 Kubernetes 위에서 이루어지는 경우가 많지만, 여기서 다룬 원칙은 거의 그대로 이어집니다. 태그와 digest 고정, 이미지 서명, read-only root filesystem, non-root 실행, 로그와 메트릭 분리는 Kubernetes manifest에서도 동일한 주제입니다.
 
 즉, Docker 101에서 익힌 습관은 단순한 로컬 실습 기술이 아니라 더 큰 오케스트레이션 환경으로 넘어갈 때 그대로 가져갈 자산입니다.
+
+## 프로덕션 관련 자주 쓰는 명령
+
+```bash
+# ── 이미지 관리 ─────────────────────────────────────────────
+# 레지스트리 로그인
+echo $TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+
+# 이미지 빌드 + 다중 태그
+docker build \
+  -t ghcr.io/myorg/myapp:1.4.2 \
+  -t ghcr.io/myorg/myapp:sha-$(git rev-parse --short HEAD) \
+  .
+
+# push
+docker push ghcr.io/myorg/myapp:1.4.2
+
+# 취약점 스캔
+trivy image ghcr.io/myorg/myapp:1.4.2
+
+# ── 보안 실행 ────────────────────────────────────────────────
+docker run -d \
+  --name api \
+  --read-only \
+  --tmpfs /tmp \
+  --cap-drop=ALL \
+  --security-opt=no-new-privileges \
+  --user 1000:1000 \
+  --memory 512m \
+  --cpus 1.0 \
+  ghcr.io/myorg/myapp:1.4.2
+
+# ── 모니터링 ────────────────────────────────────────────────
+docker stats                           # 전체 자원 사용
+docker stats api --no-stream           # 1회 측정
+docker events                          # 실시간 이벤트 스트림
+docker events --filter 'type=container' --since 1h
+
+# ── 레지스트리에서 정보 확인 ─────────────────────────────────
+# digest 확인
+docker manifest inspect ghcr.io/myorg/myapp:1.4.2
+# 서명 검증
+cosign verify \
+  --certificate-identity-regexp '.*' \
+  --certificate-oidc-issuer-regexp '.*' \
+  ghcr.io/myorg/myapp:1.4.2
+```
 
 ## 운영 체크리스트
 

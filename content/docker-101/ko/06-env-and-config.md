@@ -290,11 +290,70 @@ SENTRY_DSN=                              # 비어 있으면 비활성화
 
 `.env.example`은 항상 함께 관리해야 합니다. 새 팀원이 어떤 변수가 필요한지 알 수 있고, PR에서 새 변수 추가 시 리뷰 가능해집니다.
 
+## 환경별 설정 파일 구조 예시
+
+```
+프로젝트 루트/
+├── .env.example          ← Git 커밋 (형식 문서화)
+├── .env                  ← Git 제외 (로컬 개발)
+├── .env.staging          ← Git 제외 (스테이징)
+├── .env.prod             ← Git 제외 또는 secret 관리 도구에서
+├── compose.yaml          ← Git 커밋
+└── .gitignore
+    ├── .env
+    ├── .env.staging
+    └── .env.prod
+```
+
+```bash
+# 환경별 실행
+ENV=dev     docker compose up -d
+ENV=staging docker compose up -d
+ENV=prod    docker compose up -d
+
+# compose.yaml에서 ENV 변수로 파일 선택
+# env_file: .env.${ENV:-dev}
+
+# Doppler 사용 예시 (CI/CD)
+doppler run --project myapp --config prod -- docker compose up -d
+
+# GitHub Actions에서 secret 주입
+# env:
+#   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+```
+
 ## 실무에서는 이렇게 이어집니다
 
 성숙한 팀은 Vault, Doppler, 1Password 같은 시스템을 런타임 secret 제공자로 사용하고, 코드 저장소에는 변수 이름과 예시값만 남깁니다. 즉, 저장소는 계약을 설명하고, 실제 값은 환경이 책임지게 만드는 구조입니다.
 
 또한 애플리케이션 시작 시점에 필수 환경변수를 검증해, 값이 없으면 빠르게 실패하게 만듭니다. 조용히 빈 문자열로 실행되는 시스템은 언젠가 더 비싼 장애로 돌아옵니다.
+
+## 환경변수 관련 자주 쓰는 명령
+
+```bash
+# ── 런타임 환경변수 확인 ─────────────────────────────────────
+docker exec api env                    # 컨테이너 내 전체 env
+docker exec api env | grep DB         # 특정 변수만 필터
+docker inspect api | jq '.[0].Config.Env'  # inspect로 확인
+
+# ── 환경변수 주입 방법 비교 ──────────────────────────────────
+# 1. 직접 지정
+docker run -e LOG_LEVEL=DEBUG myapp:1.0
+
+# 2. 파일 기반
+docker run --env-file .env.staging myapp:1.0
+
+# 3. 호스트 env 전달
+export DB_URL=postgres://...
+docker run -e DB_URL myapp:1.0         # 값 없이 이름만 쓰면 호스트 값 전달
+
+# 4. Compose
+docker compose --env-file .env.staging up -d
+
+# ── 디버깅 ───────────────────────────────────────────────────
+docker compose config                  # 실제 값 치환 확인
+docker compose config | grep -A5 environment  # 환경변수 섹션만 확인
+```
 
 ## 운영 체크리스트
 

@@ -30,8 +30,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 Frontend Development 101 시리즈의 네 번째 글입니다. 여기서는 이 복잡도를 줄이는 가장 기본적인 모델인 컴포넌트와 상태를 설명합니다. 화면은 작은 함수 단위로 나누고, 각 함수는 자신에게 들어오는 값과 자신이 들고 있는 상태만 책임져야 구조가 오래 버팁니다.
 
-화면이 작을 때는 JavaScript 몇 줄과 DOM 조작만으로도 충분합니다. 하지만 화면이 커지고 기능이 늘어나면 금방 한 파일에 모든 로직이 몰립니다. 그 순간부터는 코드를 실행하는 것보다 읽는 일이 더 힘들어집니다.
-
 ![Frontend Development 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/04/04-01-diagram.ko.png)
 *Frontend Development 101 4장 흐름 개요*
 
@@ -45,13 +43,7 @@ last_reviewed: '2026-05-12'
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
-컴포넌트 사고방식은 React에만 한정되지 않습니다. Vue, Svelte, Angular는 물론이고 순수 JavaScript로도 같은 패턴을 적용할 수 있습니다. 한 번 이 감각을 익히면 프레임워크가 달라져도 코드가 훨씬 빠르게 읽힙니다.
-
-또 중요한 점은 컴포넌트 분리가 재사용성만을 위한 작업이 아니라는 사실입니다. 잘 쪼개진 컴포넌트는 무엇보다도 읽기 쉽습니다. 시니어 엔지니어는 “나중에 어디서 재사용할 수 있을까”보다 “지금 이 화면이 읽히는가”를 먼저 봅니다.
-
 ## 개념 한눈에 보기
-
-상태는 위에서 아래로 흐르고, 이벤트는 아래에서 위로 올라옵니다. 이 단순한 규칙 하나만 제대로 잡아도 복잡한 화면의 절반은 정리됩니다.
 
 | 용어 | 뜻 | 실무에서 왜 중요한가 |
 |---|---|---|
@@ -61,33 +53,33 @@ last_reviewed: '2026-05-12'
 | 단방향 데이터 흐름 | 데이터가 위에서 아래로만 흐르는 구조입니다. | 화면이 커져도 사이드 이펙트를 추적하기 쉬운 이유가 됩니다. |
 | 상태 끌어올리기 | 여러 자식이 공유해야 할 상태를 부모로 옮기는 방식입니다. | 서로 다른 컴포넌트가 같은 값을 볼 때 어디에 상태를 둬야 할지 판단하게 해 줍니다. |
 
-## 거대한 스크립트에서 컴포넌트 경계로
+## 컴포넌트를 나누는 기준
 
-컴포넌트는 재사용을 위해서만 존재하는 것이 아닙니다. 더 자주 필요한 이유는 화면이 커졌을 때 읽기와 변경의 단위를 줄여 주기 때문입니다. 아래 비교는 화면 구조를 어떻게 쪼개야 수정 비용이 내려가는지 보여 줍니다.
-
-| 방식 | 구조 특징 | 실무 영향 |
-|---|---|---|
-| 한 파일에 모든 DOM 조작이 모임 | 책임 경계가 흐리고 수정 범위가 넓습니다. | 작은 변경도 파일 전체를 다시 읽어야 해서 속도가 떨어집니다. |
-| 컴포넌트 단위로 역할 분리 | 입력, 출력, 상태가 작은 단위로 나뉩니다. | 테스트, 리팩터링, 팀 협업이 모두 쉬워집니다. |
+컴포넌트 분리는 재사용보다 책임의 명확화가 먼저입니다.
 
 **Before (모든 것이 한 파일에)**
 
 ```html
 <script>
-  // 1000 lines of DOM manipulation
+  // 1000줄의 DOM 조작이 한 파일에
+  // 어디를 고쳐야 할지 파일 전체를 읽어야 함
 </script>
 ```
 
 **After (컴포넌트로 분리)**
 
 ```jsx
-function App()    { ... }
-function Header() { ... }
-function List()   { ... }
-function Item()   { ... }
+// 각 컴포넌트는 한 가지 책임만
+function App()      { return <><Header /><NoteList /></>; }
+function Header()   { return <header><h1>노트 앱</h1></header>; }
+function NoteList() { return <ul>{notes.map(n => <NoteItem key={n.id} note={n} />)}</ul>; }
+function NoteItem({ note }) { return <li>{note.title}</li>; }
 ```
 
-핵심은 파일 수를 늘리는 것이 아니라 책임을 줄이는 것입니다. 그렇게 해야 props와 state를 어디에 둘지 판단하는 기준도 함께 선명해집니다.
+컴포넌트 분리를 판단하는 기준:
+- 200줄이 넘기 시작했다면 분리 신호
+- 같은 UI 조각이 두 군데 이상 나타난다면 분리 검토
+- 역할이 명확히 다른 두 가지 일을 한 컴포넌트가 동시에 한다면 분리
 
 ## 실습: 리액트 카운터를 5단계로 만들기
 
@@ -101,96 +93,252 @@ cd counter && npm install && npm run dev
 ### 2단계 — Define a component
 
 ```jsx
-function Counter({ initial = 0 }) {
-  return <button>{initial}</button>;
+// src/components/Counter.jsx
+// props만 받는 순수 표현 컴포넌트 (프레젠테이션 컴포넌트)
+function Counter({ count, onIncrement, onDecrement }) {
+  return (
+    <div className="counter">
+      <button onClick={onDecrement} aria-label="감소">-</button>
+      <span className="counter__value">{count}</span>
+      <button onClick={onIncrement} aria-label="증가">+</button>
+    </div>
+  );
 }
 ```
 
 ### 3단계 — Add state
 
 ```jsx
+// src/components/CounterContainer.jsx
+// 상태를 가진 컨테이너 컴포넌트
 import { useState } from "react";
+import Counter from "./Counter";
 
-function Counter({ initial = 0 }) {
+function CounterContainer({ initial = 0, label = "카운터" }) {
   const [count, setCount] = useState(initial);
-  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+
+  return (
+    <div>
+      <p>{label}</p>
+      <Counter
+        count={count}
+        onIncrement={() => setCount(c => c + 1)}
+        onDecrement={() => setCount(c => c - 1)}
+      />
+    </div>
+  );
 }
 ```
 
 ### 4단계 — Use it from the parent
 
 ```jsx
+// src/App.jsx
 function App() {
   return (
-    <>
-      <Counter initial={0} />
-      <Counter initial={10} />
-    </>
+    <main>
+      <h1>카운터 앱</h1>
+      {/* 같은 컴포넌트, 독립적인 상태 */}
+      <CounterContainer initial={0}  label="첫 번째" />
+      <CounterContainer initial={10} label="두 번째" />
+    </main>
   );
 }
 ```
 
-### 5단계 — Lift state up
+### 5단계 — Lift state up (상태 끌어올리기)
 
 ```jsx
+// 두 카운터가 같은 합계를 보여줘야 할 때
+// 상태를 공통 부모로 올립니다.
 function App() {
-  const [total, setTotal] = useState(0);
+  const [countA, setCountA] = useState(0);
+  const [countB, setCountB] = useState(0);
+  const total = countA + countB;
+
   return (
-    <>
-      <p>Total: {total}</p>
-      <button onClick={() => setTotal(total + 1)}>+1</button>
-    </>
+    <main>
+      <h1>합계: {total}</h1>
+      <Counter
+        count={countA}
+        onIncrement={() => setCountA(c => c + 1)}
+        onDecrement={() => setCountA(c => c - 1)}
+      />
+      <Counter
+        count={countB}
+        onIncrement={() => setCountB(c => c + 1)}
+        onDecrement={() => setCountB(c => c - 1)}
+      />
+    </main>
   );
 }
 ```
 
-이 예제는 작지만 중요한 차이를 보여 줍니다. `props`는 외부에서 들어오고, `state`는 내부에서 바뀌며, 같은 컴포넌트도 여러 인스턴스로 독립 동작합니다. 그리고 여러 조각이 같은 상태를 봐야 할 때는 상태를 공통 부모로 끌어올립니다.
-
-## 검증 포인트
-
-- 카운터 두 개를 렌더링했을 때 각 버튼이 서로 독립적으로 증가하는지 확인합니다.
-- 상태 끌어올리기 버전에서는 공통 부모가 가진 값이 화면 여러 곳에서 동시에 갱신되는지 확인합니다.
-
-## 문제가 생기면 먼저 볼 것
-
-- 상태가 안 바뀌면 `useState` import와 `setCount` 호출 위치를 먼저 확인합니다.
-- 부모-자식 동기화가 꼬이면 상태를 어디에 두었는지, props 이름이 일치하는지 다시 봅니다.
-
-## 실무 점검 루프
-
-컴포넌트 문제는 대부분 소유권 문제인지, 렌더링 문제인지 구분하는 순간 절반이 풀립니다.
-
-1. **값의 소유권을 확인합니다.** 상태를 더 추가하기 전에 그 값이 어느 컴포넌트에 살아야 하는지 먼저 정합니다.
-2. **렌더 트리거를 확인합니다.** 상태 setter가 실제로 실행되고, 바뀐 값이 자식 트리까지 내려가는지 봅니다.
-3. **공유 상태를 확인합니다.** 두 위젯이 엇갈리면 부모에 이미 진짜 source of truth가 있어야 하는지 다시 봅니다.
+## useEffect 사용 패턴
 
 ```jsx
+import { useState, useEffect } from "react";
+
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // userId가 바뀔 때마다 실행
+    setLoading(true);
+    fetch(`/api/users/${userId}`)
+      .then(r => r.json())
+      .then(data => {
+        setUser(data);
+        setLoading(false);
+      });
+
+    // 클린업: 컴포넌트가 사라지거나 userId가 바뀌기 전에 실행
+    return () => {
+      // 진행 중인 요청 취소 등
+    };
+  }, [userId]); // 의존성 배열: userId가 바뀔 때만 재실행
+
+  if (loading) return <p>로딩 중...</p>;
+  if (!user)   return <p>사용자를 찾을 수 없습니다.</p>;
+
+  return <div>{user.name}</div>;
+}
+```
+
+## 컴포넌트 패턴: 합성(Composition)
+
+```jsx
+// 나쁜 패턴: 모든 변형을 props로 제어
+function Card({ title, body, hasFooter, footerText, variant, imageUrl }) {
+  // props가 10개 넘으면 API가 복잡해짐
+}
+
+// 좋은 패턴: 합성으로 유연하게
+function Card({ children }) {
+  return <div className="card">{children}</div>;
+}
+
+function CardHeader({ children }) {
+  return <div className="card__header">{children}</div>;
+}
+
+function CardBody({ children }) {
+  return <div className="card__body">{children}</div>;
+}
+
+// 사용할 때 필요한 조각만 조합
+function ProductCard({ product }) {
+  return (
+    <Card>
+      <CardHeader>
+        <img src={product.image} alt={product.name} />
+      </CardHeader>
+      <CardBody>
+        <h2>{product.name}</h2>
+        <p>{product.price}원</p>
+      </CardBody>
+    </Card>
+  );
+}
+```
+
+## 디버깅 시나리오
+
+### 시나리오 1: 상태가 바뀌어도 화면이 안 바뀔 때
+
+```jsx
+// 잘못된 방법: 객체/배열 직접 변경 (React가 감지 못함)
+const [items, setItems] = useState([]);
+items.push(newItem);  // React가 변경을 감지하지 못함
+setItems(items);       // 같은 참조이므로 리렌더링 안 됨
+
+// 올바른 방법: 새 배열/객체 생성
+setItems([...items, newItem]);         // 배열 추가
+setItems(items.filter(i => i.id !== id)); // 배열 삭제
+setItems(items.map(i => i.id === id ? {...i, done: true} : i)); // 배열 수정
+```
+
+### 시나리오 2: 무한 렌더링이 발생할 때
+
+```jsx
+// 잘못된 패턴: 의존성 배열 없이 setState 호출
+useEffect(() => {
+  setData(fetch(url)); // 리렌더링 → useEffect 재실행 → 무한 루프
+}); // 의존성 배열 없음!
+
+// 올바른 패턴: 의존성 배열 명시
+useEffect(() => {
+  fetchData(url).then(setData);
+}, [url]); // url이 바뀔 때만 실행
+```
+
+### 시나리오 3: 상태 변경 후 값 확인
+
+```jsx
+// setState는 비동기 → 바로 다음 줄에서 읽으면 이전 값
+setCount(count + 1);
+console.log(count); // 여전히 이전 값!
+
+// 해결: useEffect로 변경 후 실행
 useEffect(() => {
   console.log("count changed:", count);
 }, [count]);
 ```
 
-기대 결과는 세 가지 질문에 답할 수 있는 상태입니다. 값이 어디에 살고, 누가 바꿀 수 있으며, 변경 후 어떤 렌더가 일어나야 하는가. 이 세 가지가 명확해지면 컴포넌트 설계가 훨씬 덜 흔들립니다.
+## 실무 점검 루프
 
-## 이 코드에서 주목할 점
+1. **값의 소유권을 확인합니다.** 상태를 더 추가하기 전에 그 값이 어느 컴포넌트에 살아야 하는지 먼저 정합니다.
+2. **렌더 트리거를 확인합니다.** 상태 setter가 실제로 실행되고, 바뀐 값이 자식 트리까지 내려가는지 봅니다.
+3. **공유 상태를 확인합니다.** 두 위젯이 엇갈리면 부모에 이미 진짜 source of truth가 있어야 하는지 다시 봅니다.
 
-- `props`는 입력이고 `state`는 내부 기억입니다.
-- 자식이 부모 상태를 바꾸려면 함수를 props로 전달받는 구조를 사용합니다.
-- 같은 컴포넌트가 여러 인스턴스로 독립 동작할 수 있습니다.
+## 자주 하는 실수
 
-## 자주 하는 실수 5가지
-
-1. **컴포넌트 안에서 props를 직접 바꿉니다.** props는 읽기 전용이어야 합니다.
-2. **모든 상태를 최상단에 몰아둡니다.** 불필요한 전역화는 성능과 가독성을 함께 해칩니다.
-3. **컴포넌트가 1000줄 가까이 커지는데도 쪼개지 않습니다.** 보통 200줄 전후부터는 분리 신호를 의심해 볼 만합니다.
-4. **매 렌더마다 이벤트 콜백을 무분별하게 새로 만듭니다.** 자식 리렌더링이 불필요하게 늘어날 수 있습니다.
-5. **원본 상태와 파생 값을 함께 저장합니다.** 진실의 출처가 둘이 되어 버그가 생깁니다.
+| 실수 | 증상 | 올바른 방법 |
+|---|---|---|
+| `props`를 컴포넌트 안에서 직접 변경 | 단방향 흐름이 깨져 예측 불가 | props는 읽기 전용, 변경은 콜백 함수를 통해 부모에서 |
+| 모든 상태를 최상단에 집중 | 관계없는 컴포넌트도 리렌더링 | 상태는 사용하는 컴포넌트와 가장 가까운 공통 조상에 |
+| 컴포넌트 크기가 1000줄 이상 | 어떤 props가 어디에 영향을 주는지 파악 불가 | 200줄 전후에서 분리 검토 |
+| 배열/객체를 직접 변경 후 setState | 화면이 업데이트 안 됨 | 항상 새 참조를 만들어서 setState |
+| 원본 상태와 파생 값을 함께 저장 | 동기화 문제로 버그 발생 | 파생 값은 렌더 중에 계산 |
+| useEffect 의존성 배열 누락 | 무한 루프 또는 오래된 값 사용 | 린터 경고를 무시하지 않습니다 |
 
 ## 실무에서는 이렇게 보입니다
 
-대부분의 회사는 디자인 시스템을 컴포넌트 라이브러리 형태로 운영합니다. 새로운 화면은 Button, Input, Card 같은 기본 컴포넌트를 조합해 만들어집니다. 그래서 실무에서 중요한 역량은 무엇을 만들 것인가 못지않게 무엇을 새로 만들지 않을 것인가를 판단하는 일입니다.
+대부분의 회사는 디자인 시스템을 컴포넌트 라이브러리 형태로 운영합니다. 새로운 화면은 Button, Input, Card 같은 기본 컴포넌트를 조합해 만들어집니다.
 
-결국 좋은 컴포넌트 구조는 재사용보다 읽기와 변경 비용을 먼저 줄입니다. 화면이 커질수록 이 차이는 더 크게 드러납니다.
+```jsx
+// 실무 팀의 컴포넌트 계층 예시
+// atoms: 가장 작은 단위
+function Button({ variant, children, onClick }) { ... }
+function Input({ label, error, ...props }) { ... }
+
+// molecules: atom 조합
+function SearchBar({ onSearch }) {
+  const [query, setQuery] = useState("");
+  return (
+    <div className="search-bar">
+      <Input value={query} onChange={e => setQuery(e.target.value)} />
+      <Button onClick={() => onSearch(query)}>검색</Button>
+    </div>
+  );
+}
+
+// organisms: 비즈니스 로직 포함
+function ProductSearch() {
+  const [results, setResults] = useState([]);
+  const handleSearch = async (q) => {
+    const data = await searchProducts(q);
+    setResults(data);
+  };
+  return (
+    <>
+      <SearchBar onSearch={handleSearch} />
+      <ProductGrid items={results} />
+    </>
+  );
+}
+```
 
 ## 시니어 엔지니어는 이렇게 생각합니다
 
@@ -207,12 +355,14 @@ useEffect(() => {
 - [ ] 자식에서 부모로 이벤트를 올릴 수 있습니다.
 - [ ] 상태를 적절한 위치에 둘 수 있습니다.
 - [ ] 단방향 데이터 흐름을 그림으로 설명할 수 있습니다.
+- [ ] `useEffect`의 의존성 배열을 올바르게 사용할 수 있습니다.
 
 ## 연습 문제
 
 1. `<TodoItem>`, `<TodoList>`, `<App>`으로 나눈 todo 앱을 만들어 보세요.
 2. 두 카운터가 같은 총합을 공유하도록 상태 끌어올리기를 적용해 보세요.
-3. props만 받는 순수 프레젠테이션 컴포넌트를 만들고 단위 테스트를 작성해 보세요.
+3. props만 받는 순수 프레젠테이션 컴포넌트를 만들고 다양한 props로 테스트해 보세요.
+4. 합성 패턴으로 Card 컴포넌트를 만들어 ProductCard와 UserCard 두 가지 용도로 사용해 보세요.
 
 ## 정리 및 다음 단계
 
@@ -223,11 +373,11 @@ useEffect(() => {
 ## 처음 질문으로 돌아가기
 
 - **컴포넌트 사고방식은 단순히 React 문법을 넘어서 무엇을 바꿔 줄까요?**
-  - 컴포넌트는 재사용을 위해서만 존재하는 것이 아닙니다. 더 자주 필요한 이유는 화면이 커졌을 때 읽기와 변경의 단위를 줄여 주기 때문입니다. 아래 비교는 화면 구조를 어떻게 쪼개야 수정 비용이 내려가는지 보여 줍니다.
+  - 화면을 "상태를 받아 그림을 돌려주는 함수의 조합"으로 보는 시각을 줍니다. 이 모델이 있으면 Vue, Svelte, 심지어 순수 JS로도 같은 방식으로 생각할 수 있습니다.
 - **props와 state는 어떤 기준으로 구분해야 할까요?**
-  - 상태는 위에서 아래로 흐르고, 이벤트는 아래에서 위로 올라옵니다
+  - 외부에서 받은 값은 props, 자신이 관리하고 바꿀 수 있는 값은 state입니다. "이 값이 어디서 오는가"가 구분 기준입니다.
 - **단방향 데이터 흐름은 왜 대부분의 현대 프론트엔드 프레임워크의 기본 전제일까요?**
-  - 대부분의 회사는 디자인 시스템을 컴포넌트 라이브러리 형태로 운영합니다
+  - 데이터가 흐르는 방향이 하나면 어떤 변경이 어떤 화면에 영향을 주는지 추적하기 쉽기 때문입니다. 양방향 바인딩은 편리하지만 화면이 커질수록 디버깅이 어려워집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

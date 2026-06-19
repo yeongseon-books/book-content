@@ -68,6 +68,7 @@ bytes                           user-defined classes (default)
 | 방어적 복사(defensive copy) | 원본 변경을 막기 위해 함수 경계에서 데이터를 복사하는 패턴입니다 |
 
 ## 적용 전후 비교
+
 원본 리스트를 직접 수정하는 코드는 호출자에게 숨은 부작용을 만듭니다. 새 리스트를 반환하면 변경이 명시적이 됩니다.
 
 ```python
@@ -146,6 +147,11 @@ print(p2)  # Point(x=5.0, y=4.0)
 
 red = Color(255, 0, 0)
 print(red)  # Color(r=255, g=0, b=0)
+
+# map으로 포인트 컬렉션 변환
+points = [Point(1.0, 2.0), Point(3.0, 4.0), Point(5.0, 6.0)]
+scaled = list(map(lambda p: Point(p.x * 2, p.y * 2), points))
+print(scaled)  # [Point(x=2.0, y=4.0), Point(x=6.0, y=8.0), Point(x=10.0, y=12.0)]
 ```
 
 `NamedTuple`은 읽기 쉬운 필드 이름과 불변성을 동시에 제공합니다. 작은 값 객체를 표현할 때 매우 경제적인 선택입니다.
@@ -172,6 +178,11 @@ print(admin)  # User(name='Alice', email='alice@example.com', role='admin')
 # frozen dataclass는 hashable — dict key와 set element로 사용 가능
 users = {user, admin}
 print(len(users))  # 2
+
+# filter로 역할 필터링
+all_users = [user, admin, User("Bob", "bob@example.com", "viewer")]
+admins = list(filter(lambda u: u.role == "admin", all_users))
+print([u.name for u in admins])  # ['Alice']
 ```
 
 `frozen dataclass`는 실무에서 특히 유용합니다. 설정 객체, DTO, 도메인 값 객체처럼 "의미 있는 레코드"를 안정적으로 표현할 수 있기 때문입니다.
@@ -197,6 +208,13 @@ updated = update_config(original, port=9090, debug=False)
 
 print(original)  # {'host': 'localhost', 'port': 8080} — original preserved
 print(updated)   # {'host': 'localhost', 'port': 9090, 'debug': False}
+
+# 설정 체인: 각 단계가 새 dict를 반환
+base_config = {"timeout": 30, "retries": 3, "debug": False}
+dev_config = update_config(base_config, debug=True, timeout=5)
+prod_config = update_config(base_config, retries=5)
+print(dev_config)   # {'timeout': 5, 'retries': 3, 'debug': True}
+print(prod_config)  # {'timeout': 30, 'retries': 5, 'debug': False}
 ```
 
 딕셔너리는 편리하지만 무심코 수정하기 쉽습니다. 그래서 설정처럼 안정성이 필요한 데이터는 읽기 전용 뷰나 새 딕셔너리 반환 패턴을 습관적으로 쓰는 편이 안전합니다.
@@ -234,22 +252,60 @@ history.append(state)
 
 for i, s in enumerate(history):
     print(f"Step {i}: count={s.count}, message='{s.message}'")
-# 단계 0: count=0, message='start'
-# 단계 1: count=1, message='start'
-# 단계 2: count=2, message='start'
-# 단계 3: count=2, message='done'
+# Step 0: count=0, message='start'
+# Step 1: count=1, message='start'
+# Step 2: count=2, message='start'
+# Step 3: count=2, message='done'
+
+# map으로 이력에서 원하는 정보 추출
+counts = list(map(lambda s: s.count, history))
+print(counts)  # [0, 1, 2, 2]
 ```
 
 불변 데이터가 강력한 이유가 여기서 드러납니다. 현재 상태만 있는 것이 아니라, 상태 변화의 이력이 그대로 남습니다. undo/redo나 이벤트 소싱과 잘 맞는 이유도 이 때문입니다.
+
+### 단계 6: 불변 데이터와 함수형 변환 조합하기
+
+```python
+from dataclasses import dataclass, replace
+from functools import reduce
+
+@dataclass(frozen=True)
+class Product:
+    id: str
+    name: str
+    price: int
+    stock: int
+
+products = [
+    Product("P1", "Coffee", 4500, 100),
+    Product("P2", "Tea", 3000, 50),
+    Product("P3", "Juice", 5500, 0),
+    Product("P4", "Water", 1000, 200),
+]
+
+# filter: 재고 있는 상품만
+in_stock = list(filter(lambda p: p.stock > 0, products))
+
+# map: 10% 할인 적용 (새 Product 객체 생성)
+discounted = list(map(lambda p: replace(p, price=int(p.price * 0.9)), in_stock))
+
+# reduce: 총 재고 가치 계산
+total_value = reduce(lambda acc, p: acc + p.price * p.stock, discounted, 0)
+
+print([p.name for p in discounted])    # ['Coffee', 'Tea', 'Water']
+print(f"할인 가격: {[p.price for p in discounted]}")  # [4050, 2700, 900]
+print(f"총 재고 가치: {total_value:,}")  # 총 재고 가치: 585,000
+```
 
 ## 이 코드에서 주목할 점
 
 - Python의 `tuple`, `frozenset`, `str`은 대표적인 내장 불변 타입입니다.
 - `NamedTuple._replace()`와 `dataclasses.replace()`는 불변 업데이트의 핵심 패턴입니다.
 - `frozen dataclass`는 hashable해서 dict 키나 set 원소로 활용할 수 있습니다.
-- 불변 데이터는 상태 이력과 되돌리기 기능을 자연스럽게 구현하게 해 줍니다.
+- 불변 데이터는 `map`/`filter` 파이프라인과 자연스럽게 결합됩니다.
 
-## 흔한 실수 5가지
+## 자주 하는 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
@@ -269,9 +325,20 @@ for i, s in enumerate(history):
 
 ## 현업에서는 이렇게 판단합니다
 
-"모든 것을 불변으로 만들어라"는 구호는 실무적으로 너무 거칠습니다. 더 정확한 기준은 "기본값은 불변으로 두고, 성능이나 편의 때문에 꼭 필요할 때만 mutable을 허용하라"입니다. Python에서는 `frozen=True`와 `NamedTuple`만으로도 상당히 많은 영역을 안정화할 수 있습니다.
+"모든 것을 불변으로 만들어라"는 구호는 실무적으로 너무 거칩니다. 더 정확한 기준은 "기본값은 불변으로 두고, 성능이나 편의 때문에 꼭 필요할 때만 mutable을 허용하라"입니다. Python에서는 `frozen=True`와 `NamedTuple`만으로도 상당히 많은 영역을 안정화할 수 있습니다.
 
 다만 큰 데이터 구조를 매번 전부 복사하는 방식은 비효율적일 수 있습니다. 그래서 불변성은 문법이 아니라 설계 원칙으로 이해해야 합니다. 제너레이터, 구조적 공유, 얕은 복사 전략과 함께 써야 실무적으로 균형이 맞습니다.
+
+## 처음 질문으로 돌아가기
+
+- **Python에서 mutable 타입과 immutable 타입은 어떻게 구분할까요?**
+  생성 후 내부 값을 바꿀 수 있으면 mutable(`list`, `dict`, `set`), 바꿀 수 없으면 immutable(`int`, `str`, `tuple`, `frozenset`)입니다. `id()` 함수로 확인할 수 있습니다. 문자열에 `upper()`를 호출하면 원본이 아닌 새 객체가 반환됩니다.
+
+- **`tuple`, `frozenset`, `NamedTuple`, `frozen dataclass`는 각각 언제 유용할까요?**
+  순서가 있는 불변 값 묶음은 `tuple`, 중복 없는 불변 집합은 `frozenset`, 필드 이름이 있는 가벼운 값 객체는 `NamedTuple`, 검증 로직이나 메서드가 필요한 구조화된 값 객체는 `frozen dataclass`가 적합합니다.
+
+- **함수 경계에서 원본 변경을 막으려면 어떤 패턴이 필요할까요?**
+  리스트는 `[*original, new_item]`으로, 딕셔너리는 `{**original, key: value}`로 새 객체를 반환합니다. dataclass는 `replace(obj, field=new_value)`를 씁니다. 원칙은 하나입니다. 받은 객체를 직접 수정하지 말고 새 객체를 만들어 반환합니다.
 
 ## 운영 체크리스트
 
@@ -285,86 +352,11 @@ for i, s in enumerate(history):
 
 1. mutable `dict` 기반 설정 관리 코드를 frozen dataclass 기반으로 바꿔 보세요.
 2. undo 기능이 있는 간단한 텍스트 편집기를 불변 상태 패턴으로 설계해 보세요.
-3. `NamedTuple`로 2차원 벡터를 정의하고 덧셈, 뺄셈, 스칼라 곱 함수를 작성해 보세요.
+3. `NamedTuple`로 2차원 벡터를 정의하고 `map`으로 벡터 목록에 스케일 변환을 적용해 보세요.
 
 ## 정리와 다음 글
 
 불변 데이터는 예측 불가능한 상태 변경을 줄이고 코드 안정성을 높입니다. Python은 `tuple`, `frozenset`, `NamedTuple`, `frozen dataclass`를 통해 이를 충분히 실용적으로 지원합니다. 다음 글에서는 함수를 인자로 받고 반환하는 **고차 함수**를 다룹니다.
-
-## 검증 시나리오: 경계 조건을 먼저 잠그기
-
-실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
-
-```python
-from functools import reduce
-
-def pipeline(values: list[int]) -> dict[str, int]:
-    filtered = [v for v in values if v >= 0]
-    squared = [v * v for v in filtered]
-    total = reduce(lambda acc, x: acc + x, squared, 0)
-    return {
-        "count": len(squared),
-        "total": total,
-        "max": max(squared) if squared else 0,
-    }
-
-# 경계 조건 검증
-assert pipeline([]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([-3, -1]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([0, 2, 3]) == {"count": 3, "total": 13, "max": 9}
-
-print("Pass")
-```
-
-또한 지연 평가를 사용할 때는 소비 시점을 테스트에 명시해 두는 편이 좋습니다. generator는 한 번 소비하면 비어야 정상이며, 이 성질이 깨지면 중간 단계에서 의도치 않은 materialize가 발생했을 가능성이 큽니다.
-
-```python
-from itertools import islice
-
-def naturals():
-    n = 0
-    while True:
-        yield n
-        n += 1
-
-stream = naturals()
-first_five = list(islice(stream, 5))
-next_three = list(islice(stream, 3))
-
-assert first_five == [0, 1, 2, 3, 4]
-assert next_three == [5, 6, 7]
-print("Pass")
-```
-
-이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
-## 리뷰 포인트: 코드 리뷰에서 바로 확인할 항목
-
-함수형 스타일을 적용한 코드 리뷰에서는 다음 네 가지를 빠르게 확인합니다. 첫째, 계산 함수가 외부 상태를 직접 읽거나 쓰지 않는지 확인합니다. 둘째, mutable 인자를 제자리에서 수정하지 않는지 확인합니다. 셋째, 파이프라인 단계의 입력과 출력 타입이 자연스럽게 연결되는지 확인합니다. 넷째, 실패 경로가 값으로 표현되는지 확인합니다.
-
-```python
-def reviewer_checklist() -> list[str]:
-    return [
-        "pure-core",
-        "immutable-update",
-        "typed-boundary",
-        "explicit-failure-path",
-    ]
-
-assert len(reviewer_checklist()) == 4
-print("Pass")
-```
-
-이 항목을 PR 템플릿에 고정해 두면 스타일 논쟁보다 설계 품질을 빠르게 맞출 수 있습니다.
-
-## 처음 질문으로 돌아가기
-
-- **Python에서 mutable 타입과 immutable 타입은 어떻게 구분할까요?**
-  - - 런타임 변경을 막아야 하는 설정 객체를 `frozen dataclass`로 정의합니다
-- **`tuple`, `frozenset`, `NamedTuple`, `frozen dataclass`는 각각 언제 유용할까요?**
-  - > Python에서는 모든 값을 똑같이 다루면 안 됩니다
-- **함수 경계에서 원본 변경을 막으려면 어떤 패턴이 필요할까요?**
-  - 불변 데이터는 예측 불가능한 상태 변경을 줄이고 코드 안정성을 높입니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

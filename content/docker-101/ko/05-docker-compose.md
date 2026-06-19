@@ -335,6 +335,63 @@ networks:
 - [ ] `docker compose config`로 YAML 유효성을 검사했습니다.
 - [ ] volume 백업 전략이 있습니다.
 
+## Compose로 실제 개발 환경 구성하기
+
+다음은 실제 팀에서 쓸 수 있는 전체 개발 환경 예시입니다.
+
+```yaml
+# compose.yaml (개발용 완성 예시)
+name: myproject
+
+services:
+  web:
+    build:
+      context: .
+      target: runtime    # 멀티스테이지 중 runtime 스테이지
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      - .:/app           # 개발 중 코드 변경 즉시 반영 (hot reload)
+    environment:
+      DB_URL: postgresql+psycopg://postgres:dev@db/app
+      REDIS_URL: redis://cache:6379
+      LOG_LEVEL: DEBUG
+    depends_on:
+      db: { condition: service_healthy }
+      cache: { condition: service_healthy }
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: app
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
+      interval: 5s
+      retries: 5
+    ports:
+      - "5432:5432"    # 로컬 DB 클라이언트 접속용 (개발에서만)
+
+  cache:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+    ports:
+      - "6379:6379"    # 로컬 Redis 클라이언트 접속용 (개발에서만)
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "8025:8025"    # 웹 UI
+    profiles: ["email"]  # --profile email 시에만 실행
+
+volumes:
+  pgdata:
+```
+
 ## 연습 문제
 
 1. Compose로 web(FastAPI), db(PostgreSQL), cache(Redis)를 함께 띄워 보세요. 각 서비스에 healthcheck를 추가해 보세요.

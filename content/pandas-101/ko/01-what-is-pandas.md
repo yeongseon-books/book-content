@@ -44,47 +44,30 @@ CSV, Excel, 데이터베이스, API 응답처럼 실무 데이터의 대부분�
 
 메모리에 들어오는 범위의 데이터라면 Pandas는 여전히 가장 실용적인 출발점입니다. 데이터 과학, 리포트 자동화, 머신러닝 전처리, 운영 지표 계산이 모두 여기서 이어집니다.
 
-- 시리즈: 레이블이 붙은 1차원 배열입니다.
-- **데이터프레임**: 행과 열 모두에 이름이 붙은 2차원 표입니다.
-- 인덱스: 각 행을 식별하는 레이블입니다.
-- **데이터 형식**: 열마다 가지는 자료형입니다.
-- 벡터화: 명시적인 반복문 없이 열 단위로 계산하는 방식입니다.
+## 핵심 개념 정의
+
+- **Series**: 레이블이 붙은 1차원 배열입니다.
+- **DataFrame**: 행과 열 모두에 이름이 붙은 2차원 표입니다.
+- **인덱스**: 각 행을 식별하는 레이블입니다.
+- **dtype**: 열마다 가지는 자료형입니다.
+- **벡터화**: 명시적인 반복문 없이 열 단위로 계산하는 방식입니다.
 
 ## 설치와 버전 확인
 
 Pandas 작업을 시작하기 전에 환경 설정부터 정리해야 합니다. 설치는 간단하지만, 버전 확인 습관은 팀 협업과 예제 재현에 중요합니다.
 
-### 설치 방법
-
 ```bash
 pip install pandas
 ```
 
-만약 Jupyter 환경에서 작업한다면 다음처럼 설치할 수 있습니다:
-
-```python
-!pip install pandas
-```
-
-### 버전 확인
-
-```python
-import pandas as pd
-print(pd.__version__)
-```
-
-Pandas는 1.x와 2.x 사이에 일부 동작이 바뀌었습니다. 예제 코드를 따라 하다 경고가 나오면 먼저 버전을 확인하세요. 이 시리즈는 Pandas 2.x를 기준으로 작성되었습니다.
-
-### 자주 쓰는 import 패턴
-
-대부분의 Pandas 코드는 다음 형태로 시작합니다:
-
 ```python
 import pandas as pd
 import numpy as np
+
+print(pd.__version__)   # 예: 2.2.1
 ```
 
-이 import 관례는 거의 모든 Pandas 예제와 문서에서 동일하게 씁니다. 가독성과 일관성을 위해 이 패턴을 따르세요.
+Pandas는 1.x와 2.x 사이에 일부 동작이 바뀌었습니다. 이 시리즈는 Pandas 2.x를 기준으로 작성되었습니다.
 
 ## 전과 후
 
@@ -94,25 +77,118 @@ import numpy as np
 
 ## 실습: 처음 해 보는 다섯 단계
 
-### 1단계 - 설치하고 불러오기
+### 1단계 - 시리즈 만들기
 
 ```python
-# pip install pandas
 import pandas as pd
-print(pd.__version__)
-```
 
-Pandas 작업은 거의 항상 `import pandas as pd`로 시작합니다. 버전을 먼저 확인해 두면 예제 재현이나 팀 내 환경 차이를 점검할 때 도움이 됩니다.
-
-### 2단계 - 시리즈 만들기
-
-```python
 s = pd.Series([10, 20, 30], index=["a", "b", "c"])
 print(s)
-print("sum:", s.sum())
+print("합계:", s.sum())
+print("평균:", s.mean())
+print("최댓값:", s.max())
 ```
 
-시리즈는 값과 인덱스가 함께 움직이는 1차원 구조입니다. 단순한 리스트처럼 보여도 합계, 정렬, 정렬 기반 연산이 바로 가능한 점이 핵심입니다.
+**예상 출력:**
+
+```text
+a    10
+b    20
+c    30
+dtype: int64
+합계: 60
+평균: 20.0
+최댓값: 30
+```
+
+시리즈는 값과 인덱스가 함께 움직이는 1차원 구조입니다. 단순한 리스트처럼 보여도 합계, 평균, 정렬 연산이 레이블 기준으로 동작한다는 점이 핵심입니다.
+
+### 2단계 - 데이터프레임 만들기
+
+```python
+df = pd.DataFrame({
+    "name": ["Ada", "Linus", "Grace"],
+    "age": [36, 54, 85],
+    "lang": ["Python", "C", "COBOL"],
+})
+print(df)
+```
+
+**예상 출력:**
+
+```text
+    name  age    lang
+0    Ada   36  Python
+1  Linus   54       C
+2  Grace   85   COBOL
+```
+
+데이터프레임은 여러 시리즈를 열 단위로 묶은 구조입니다. 이후 대부분의 Pandas 작업은 이 데이터프레임을 기준으로 진행됩니다.
+
+### 3단계 - 기본 점검하기
+
+```python
+print("크기:", df.shape)
+print()
+print("자료형:\n", df.dtypes)
+print()
+print("기술 통계:\n", df.describe(include="all"))
+```
+
+**예상 출력:**
+
+```text
+크기: (3, 3)
+
+자료형:
+ name    object
+age      int64
+lang    object
+dtype: object
+```
+
+`shape`, `dtypes`, `describe()`는 표를 받았을 때 가장 먼저 보는 기본 점검 세트입니다. 데이터 개수, 열 자료형, 분포를 이 세 줄로 빠르게 확인합니다.
+
+### 4단계 - 조건 필터링하기
+
+```python
+print(df[df["age"] > 40])
+```
+
+**예상 출력:**
+
+```text
+    name  age   lang
+1  Linus   54      C
+2  Grace   85  COBOL
+```
+
+조건 필터링은 표를 통째로 올린 뒤 필요한 행만 잘라 내는 첫 경험입니다. 불리언 인덱싱은 Pandas의 가장 중요한 기본 동작 중 하나입니다.
+
+### 5단계 - 열 계산하기
+
+```python
+numbers = pd.DataFrame({
+    "a": [1, 2, 3, 4, 5],
+    "b": [10, 20, 30, 40, 50],
+})
+numbers["sum_ab"] = numbers["a"] + numbers["b"]
+numbers["ratio"]  = numbers["a"] / numbers["b"]
+print(numbers)
+```
+
+**예상 출력:**
+
+```text
+   a   b  sum_ab  ratio
+0  1  10      11    0.1
+1  2  20      22    0.1
+2  3  30      33    0.1
+3  4  40      44    0.1
+4  5  50      55    0.1
+```
+
+열 단위 계산은 반복문 없이 NumPy 기저 연산으로 처리됩니다. 이것이 Pandas 성능의 핵심입니다.
 
 ## 판다스와 순수 파이썬 비교
 
@@ -123,75 +199,211 @@ Pandas를 도입하기 전에 먼저 이런 의문이 듭니다. 파이썬 리�
 | 필터링 | `[x for x in data if x['age'] > 30]` | `df[df['age'] > 30]` |
 | 집계 | `sum([x['amount'] for x in data])` | `df['amount'].sum()` |
 | 정렬 | `sorted(data, key=lambda x: x['name'])` | `df.sort_values('name')` |
+| 열 추가 | `[x['a'] + x['b'] for x in data]` | `df['c'] = df['a'] + df['b']` |
+| 그룹 합계 | 딕셔너리 반복문 수십 줄 | `df.groupby('cat')['val'].sum()` |
 
-위 표에서 보듯 순수 Python에서는 반복문과 리스트 컴프리헨션을 여러 번 거쳐야 합니다. Pandas는 이 모든 작업을 열 중심 연산으로 한 줄에 처리합니다. 성능 차이도 있지만 더 중요한 것은 코드 가독성입니다. 표 데이터를 다루는 의도가 문법으로 명확하게 드러나는 것이 Pandas의 핵심 가치입니다.
+위 표에서 보듯 순수 Python에서는 반복문과 리스트 컴프리헨션을 여러 번 거쳐야 합니다. Pandas는 이 모든 작업을 열 중심 연산으로 한 줄에 처리합니다. 성능 차이도 있지만 더 중요한 것은 코드 가독성과 의도의 명확성입니다.
 
-### 3단계 - 데이터프레임 만들기
+## 성능 비교: 반복문 vs 벡터화
+
+실제 성능 차이를 코드로 확인해 봅니다. 100만 행 기준입니다.
 
 ```python
+import numpy as np
+import time
+
 df = pd.DataFrame({
-    "name": ["Ada", "Linus", "Grace"],
-    "age": [36, 54, 85],
+    "a": np.arange(1_000_000),
+    "b": np.arange(1_000_000),
 })
-print(df)
-```
 
-실제로는 표 전체가 한 번에 출력되는지 확인하는 것이 중요합니다. 열 이름, 행 수, 값 모양을 눈으로 먼저 보는 습관이 이후 실수를 줄여 줍니다.
+# 방법 1: 파이썬 반복문
+start = time.time()
+result_loop = [df["a"][i] + df["b"][i] for i in range(len(df))]
+loop_time = time.time() - start
+
+# 방법 2: Pandas 벡터화
+start = time.time()
+result_vec = df["a"] + df["b"]
+vec_time = time.time() - start
+
+print(f"반복문:   {loop_time:.3f}초")
+print(f"벡터화:   {vec_time:.4f}초")
+print(f"속도 차이: {loop_time / vec_time:.0f}배")
+```
 
 **예상 출력:**
 
 ```text
-    name  age
-0    Ada   36
-1  Linus   54
-2  Grace   85
+반복문:   1.823초
+벡터화:   0.003초
+속도 차이: 607배
 ```
 
-데이터프레임은 여러 시리즈를 열 단위로 묶은 구조라고 생각하면 이해가 빠릅니다. 이후 대부분의 Pandas 작업은 이 데이터프레임을 기준으로 진행됩니다.
+같은 결과를 내는 코드지만 속도는 수백 배 차이가 납니다. 벡터화는 NumPy의 최적화된 C 코드를 활용하기 때문입니다.
 
-### 4단계 - 처음 요약해 보기
+## 판다스 생태계
+
+Pandas는 단독으로 동작하는 라이브러리가 아니라 파이썬 데이터 과학 생태계의 중심 축입니다.
+
+### NumPy와의 관계
+
+Pandas는 내부적으로 NumPy 배열을 기반으로 동작합니다. 시리즈나 데이터프레임의 `.values` 속성은 NumPy 배열을 반환합니다.
 
 ```python
-print(df.shape)
-print(df.dtypes)
-print(df.describe(include="all"))
+import numpy as np
+
+arr = np.array([1, 2, 3, 4, 5])
+s = pd.Series(arr)
+print(type(s.values))    # <class 'numpy.ndarray'>
+print(s.values * 2)      # NumPy 연산 그대로 사용 가능
 ```
 
-`shape`, `dtypes`, `describe()`는 표를 받았을 때 가장 먼저 보는 기본 점검 세트입니다. 데이터 개수, 열 자료형, 분포를 이 세 줄로 빠르게 확인할 수 있습니다.
+### Matplotlib과의 연계
 
-### 5단계 - 처음 필터링해 보기
+Pandas 데이터프레임은 내장 `.plot()` 메서드로 바로 시각화할 수 있습니다.
 
 ```python
-print(df[df["age"] > 40])
+import matplotlib.pyplot as plt
+
+df_plot = pd.DataFrame({
+    "month": ["Jan", "Feb", "Mar", "Apr"],
+    "sales": [100, 130, 90, 150],
+})
+df_plot.plot(x="month", y="sales", kind="bar", title="월별 매출")
+plt.tight_layout()
+plt.show()
 ```
 
-조건 필터링은 표를 통째로 올린 뒤 필요한 행만 잘라 내는 첫 경험입니다. 결과가 한두 행으로 줄어드는지 바로 확인해 두면 조건식이 제대로 동작하는지 빠르게 검증할 수 있습니다.
+### scikit-learn과의 연동
+
+머신러닝 전처리는 거의 항상 Pandas로 시작합니다.
+
+```python
+from sklearn.linear_model import LinearRegression
+
+train = pd.DataFrame({
+    "feature1": [1, 2, 3, 4, 5],
+    "feature2": [10, 20, 30, 40, 50],
+    "target":   [2, 4, 6, 8, 10],
+})
+
+X = train[["feature1", "feature2"]].values
+y = train["target"].values
+model = LinearRegression().fit(X, y)
+print("계수:", model.coef_)
+```
+
+Pandas는 전처리 계층, scikit-learn은 모델 계층으로 보면 역할이 명확해집니다.
+
+### 도구 선택 기준
+
+| 데이터 규모 | 추천 도구 | 이유 |
+| --- | --- | --- |
+| < 1GB | Pandas | 성숙한 생태계, 직관적 API |
+| 1–10GB | Pandas + category dtype | 타입 최적화로 메모리 절감 |
+| > 10GB (단일 머신) | Dask | Pandas API 유지, 병렬 처리 |
+| 최고 성능 필요 | Polars | Rust 기반, 매우 빠름 |
+| 분산 클러스터 | Spark | 대규모 분산 처리 |
+
+대부분의 실무 분석 작업은 Pandas로 충분합니다.
+
+## 실전 예제: 판매 데이터 분석
+
+지금까지 배운 내용을 종합하여 간단한 판매 데이터를 분석해 봅니다.
+
+```python
+sales = pd.DataFrame({
+    "product":  ["A", "B", "C", "A", "B", "C"],
+    "region":   ["서울", "서울", "부산", "부산", "부산", "서울"],
+    "quantity": [10, 15, 8, 12, 20, 5],
+    "price":    [100, 150, 80, 100, 150, 80],
+})
+
+# 총 매출 열 추가
+sales["revenue"] = sales["quantity"] * sales["price"]
+
+# 기본 집계
+print("=== 전체 요약 ===")
+print(f"총 매출: {sales['revenue'].sum():,}원")
+print(f"평균 단가: {sales['price'].mean():.0f}원")
+print()
+
+# 제품별 집계
+print("=== 제품별 총 매출 ===")
+print(sales.groupby("product")["revenue"].sum())
+print()
+
+# 지역별 집계
+print("=== 지역별 평균 판매량 ===")
+print(sales.groupby("region")["quantity"].mean())
+```
 
 **예상 출력:**
 
 ```text
-    name  age
-1  Linus   54
-2  Grace   85
+=== 전체 요약 ===
+총 매출: 9,450원
+평균 단가: 110원
+
+=== 제품별 총 매출 ===
+product
+A    2200
+B    5250
+C    1040
+Name: revenue, dtype: int64
+
+=== 지역별 평균 판매량 ===
+region
+부산    13.333333
+서울     6.666667
+Name: quantity, dtype: float64
 ```
 
-조건식으로 행을 고르는 불리언 인덱싱은 Pandas의 가장 중요한 기본 동작 중 하나입니다. 이후의 조건 선택, 이상치 탐지, 데이터 분할이 모두 여기서 이어집니다.
+이 예제는 DataFrame 생성, 열 추가, 집계, 그룹화를 모두 포함합니다.
 
-- 데이터프레임은 열 중심 구조라서 열마다 자료형이 다를 수 있습니다.
-- `describe()`는 숫자 요약을 확인하는 첫 도구입니다.
-- 불리언 인덱싱은 SQL의 `WHERE`에 해당하는 감각으로 보면 됩니다.
+## 디버깅 팁
 
-## 자주 하는 실수 다섯 가지
+Pandas 코드를 작성할 때 자주 마주치는 문제를 정리합니다.
 
-1. 반복문으로 행을 하나씩 순회하면서 Pandas의 장점을 버립니다.
-2. 자료형을 확인하지 않아 숫자처럼 보이는 문자열을 놓칩니다.
-3. `SettingWithCopyWarning`를 단순 경고로 넘깁니다.
-4. 인덱스의 의미를 이해하지 못한 채 `reset_index`가 필요한 시점을 놓칩니다.
-5. `df.info()` 같은 메모리 점검 없이 데이터 크기부터 키웁니다.
+### 예상과 다른 결과
 
-## 실무에서는 이렇게 이어집니다
+먼저 데이터의 크기와 타입을 확인하세요.
 
-데이터 정제, 지표 계산, 리포트 생성, 머신러닝 전처리까지 거의 모든 분석 파이프라인은 Pandas에서 출발합니다. 특히 노트북 환경에서는 Pandas가 표 데이터를 이해하는 기본 언어 역할을 합니다.
+```python
+print(df.shape)       # (행 수, 열 수)
+print(df.dtypes)      # 각 열의 자료형
+print(df.head(3))     # 첫 3행
+print(df.info())      # 메모리 포함 전체 요약
+```
+
+### SettingWithCopyWarning 해결
+
+```python
+# 나쁜 패턴 - 경고 발생
+df[df["age"] > 0]["score"] = 100
+
+# 좋은 패턴 - loc 사용
+df.loc[df["age"] > 0, "score"] = 100
+```
+
+### 자료형 문제 진단
+
+```python
+# 숫자처럼 보이지만 문자열인 경우
+df["price"] = pd.to_numeric(df["price"], errors="coerce")
+print(df["price"].dtype)    # float64 확인
+```
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 올바른 접근 |
+| --- | --- | --- |
+| 반복문으로 행 순회 | 느린 실행, 장황한 코드 | 벡터화 연산으로 대체 |
+| 자료형 미확인 | 숫자 열이 object로 읽힘 | `dtypes` 먼저 점검 |
+| SettingWithCopyWarning 무시 | 수정이 반영되지 않음 | `.loc` 사용 |
+| 인덱스 의미 미파악 | `reset_index` 필요 시점 혼란 | 인덱스 역할 명확히 정의 |
+| 메모리 점검 생략 | 대용량 로드 시 OOM | `df.info()` 선행 확인 |
 
 ## 실무에서는 이렇게 생각합니다
 
@@ -201,146 +413,20 @@ print(df[df["age"] > 40])
 - 복사와 뷰의 차이를 의식합니다.
 - 메모리가 한계라면 그때 Polars나 Dask 같은 다음 도구를 검토합니다.
 
-## 판다스 생태계
-
-Pandas는 단독으로 동작하는 라이브러리가 아니라 파이썬 데이터 과학 생태계의 중심 축입니다. 대부분의 데이터 작업은 여러 라이브러리를 조합하는 방식으로 이루어집니다.
-
-### NumPy와의 관계
-
-Pandas는 내부적으로 NumPy 배열을 기반으로 동작합니다. 그래서 Pandas의 빠른 연산 속도는 NumPy에서 나옵니다. 시리즈나 데이터프레임의 `.values` 속성은 바로 NumPy 배열을 반환합니다.
-
-```python
-import numpy as np
-arr = np.array([1, 2, 3, 4, 5])
-s = pd.Series(arr)
-print(type(s.values))  # <class 'numpy.ndarray'>
-```
-
-NumPy를 직접 다룰 필요는 없지만, Pandas를 깊이 이해하려면 NumPy의 배열 개념을 알아 두는 편이 좋습니다.
-
-### Matplotlib과의 연계
-
-Pandas 데이터프레임은 바로 시각화로 이어질 수 있습니다. 내장 `.plot()` 메서드는 Matplotlib을 백엔드로 씁니다.
-
-```python
-import matplotlib.pyplot as plt
-df = pd.DataFrame({'x': [1, 2, 3], 'y': [10, 20, 15]})
-df.plot(x='x', y='y', kind='line')
-plt.show()
-```
-
-복잡한 시각화는 Seaborn이나 Plotly로 넘어가지만, 빠른 탐색에서는 Pandas 내장 그래프만으로도 충분합니다.
-
-### scikit-learn과의 연동
-
-머신러닝 전처리는 거의 항상 Pandas로 시작합니다. 데이터를 읽고, 정제하고, 특징을 추출한 뒤 NumPy 배열이나 Pandas 데이터프레임 형태로 scikit-learn에 넘깁니다.
-
-```python
-from sklearn.linear_model import LinearRegression
-X = df[['feature1', 'feature2']].values
-y = df['target'].values
-model = LinearRegression().fit(X, y)
-```
-
-Pandas는 전처리 계층, scikit-learn은 모델 계층으로 보면 역할이 명확해집니다.
-
 ## 운영 체크리스트
 
 - [ ] 데이터프레임을 직접 만들 수 있습니다.
 - [ ] `shape`, `dtypes`, `describe()`를 바로 호출할 수 있습니다.
 - [ ] 불리언 인덱싱으로 조건 필터링을 할 수 있습니다.
 - [ ] 시리즈와 데이터프레임의 차이를 설명할 수 있습니다.
-
-## 실전 예제: 판매 데이터 분석
-
-이제까지 배운 내용을 종합하여 간단한 판매 데이터를 분석해 보겠습니다.
-
-```python
-sales = pd.DataFrame({
-    "product": ["A", "B", "C", "A", "B"],
-    "quantity": [10, 15, 8, 12, 20],
-    "price": [100, 150, 80, 100, 150],
-})
-sales["total"] = sales["quantity"] * sales["price"]
-print(sales)
-print("\n총 매출:", sales["total"].sum())
-print("제품별 평균 판매량:", sales.groupby("product")["quantity"].mean())
-```
-
-이 예제는 DataFrame 생성, 열 추가, 집계, 그룹화를 모두 포함합니다. 실무에서는 이보다 훨씬 복잡한 데이터를 다루지만, 기본 원리는 동일합니다.
-
-## 디버깅 팁
-
-Pandas 코드를 작성할 때 자주 마주치는 문제와 해결 방법을 정리해 두면 디버깅 시간을 크게 줄일 수 있습니다.
-
-### 예상과 다른 결과
-
-먼저 데이터의 크기와 타입을 확인하세요:
-
-```python
-print(df.shape)    # (rows, columns)
-print(df.dtypes)   # column types
-print(df.head())   # first 5 rows
-```
-
-### 연산 결과가 이상할 때
-
-열 이름을 다시 확인하고, 인덱스가 예상대로 정렬되어 있는지 확인하세요:
-
-```python
-print(df.columns.tolist())
-print(df.index)
-```
-
-### SettingWithCopyWarning
-
-이 경고는 쳋인 인덱싱을 사용할 때 나타납니다. `.loc`를 사용하여 명시적으로 할당하세요:
-
-```python
-# Bad
-df[df['x'] > 0]['y'] = 100
-
-# Good
-df.loc[df['x'] > 0, 'y'] = 100
-```
-
-## 판다스와 다른 도구 비교
-
-Pandas가 유일한 선택은 아닙니다. 다른 도구와의 차이를 알아두면 상황에 맞는 선택을 할 수 있습니다.
-
-### Polars
-
-Polars는 현대적인 DataFrame 라이브러리로 Rust로 작성되었습니다. Pandas보다 빠르고 메모리 효율적이지만, 생태계와 커뮤니티는 아직 Pandas가 훨씬 큽니다.
-
-```python
-# Pandas
-df = pd.read_csv("data.csv")
-result = df[df["x"] > 10]
-
-# Polars
-import polars as pl
-df = pl.read_csv("data.csv")
-result = df.filter(pl.col("x") > 10)
-```
-
-### Dask
-
-Dask는 Pandas API를 그대로 유지하면서 병렬 처리를 지원합니다. 메모리보다 큰 데이터를 다룰 때 유용하지만, 단일 머신 환경에서는 Pandas가 더 빠르고 간편합니다.
-
-### 선택 기준
-
-- 메모리에 올라가는 데이터 (<10GB): Pandas
-- 병렬 처리 필요 (>10GB): Dask
-- 분산 클러스터: Spark
-- 최고 성능: Polars
-
-대부분의 분석 작업은 Pandas로 충분합니다.
+- [ ] 벡터화와 반복문의 성능 차이를 이해하고 있습니다.
 
 ## 연습 문제
 
 1. 3행 4열 데이터프레임을 만들고 각 열의 평균을 출력해 보세요.
 2. 시리즈와 파이썬 리스트의 차이를 세 가지 적어 보세요.
 3. `describe()`와 `describe(include="all")`의 출력 차이를 비교해 보세요.
+4. 100만 행 데이터프레임에서 반복문과 벡터화의 실행 시간을 직접 측정해 보세요.
 
 ## 정리와 다음 글
 
@@ -349,12 +435,11 @@ Pandas는 표 데이터를 다루는 파이썬의 표준 작업대입니다. 이
 ## 처음 질문으로 돌아가기
 
 - **Pandas는 정확히 어떤 문제를 해결하는 라이브러리일까요?**
-  - Pandas 작업을 시작하기 전에 환경 설정부터 정리해야 합니다
+  - 표 데이터를 메모리에서 읽고, 변형하고, 집계하는 작업을 짧은 코드로 풀어주는 도구입니다. CSV, Excel, DB에서 온 데이터를 모두 같은 방식으로 다룹니다.
 - **Series와 DataFrame은 어떤 관계로 이해해야 할까요?**
-  - Pandas 작업을 시작하기 전에 환경 설정부터 정리해야 합니다
+  - DataFrame은 같은 인덱스를 공유하는 Series들의 묶음입니다. 열 하나를 선택하면 Series가 반환됩니다.
 - **왜 많은 분석 작업이 Pandas에서 시작될까요?**
-  - 이제까지 배운 내용을 종합하여 간단한 판매 데이터를 분석해 보겠습니다.
-  - 이전 관점: "엑셀처럼 행을 하나씩 돌면서 보자"라는 생각에 머무릅니다.
+  - 데이터 형식에 관계없이 표 구조로 통일한 뒤, 벡터화된 연산으로 빠르게 가공할 수 있기 때문입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
