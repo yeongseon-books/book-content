@@ -330,6 +330,55 @@ CPython 버전별 실행 모델 진화:
 - [ ] AOT와 JIT의 차이를 말할 수 있는가?
 - [ ] 뜨거운 루프를 C 구현 라이브러리로 내리는 패턴을 알고 있는가?
 
+## 인터프리터 구현 맛보기: 간단한 계산기
+
+인터프리터가 무엇인지 직접 만들어 보면 실행 모델의 감각이 확실해집니다. 다음은 AST를 평가하는 최소한의 인터프리터입니다.
+
+```python
+# 최소 계산기 인터프리터
+from __future__ import annotations
+from dataclasses import dataclass
+from typing import Union
+
+# AST 노드 정의
+@dataclass
+class Num:
+    value: float
+
+@dataclass
+class BinOp:
+    op: str   # "+", "-", "*", "/"
+    left: Expr
+    right: Expr
+
+Expr = Union[Num, BinOp]
+
+# 인터프리터: AST를 직접 평가
+def evaluate(expr: Expr) -> float:
+    match expr:
+        case Num(value=v):
+            return v
+        case BinOp(op="+", left=l, right=r):
+            return evaluate(l) + evaluate(r)
+        case BinOp(op="-", left=l, right=r):
+            return evaluate(l) - evaluate(r)
+        case BinOp(op="*", left=l, right=r):
+            return evaluate(l) * evaluate(r)
+        case BinOp(op="/", left=l, right=r):
+            divisor = evaluate(r)
+            if divisor == 0:
+                raise ZeroDivisionError("division by zero")
+            return evaluate(l) / divisor
+        case _:
+            raise ValueError(f"unknown expression: {expr}")
+
+# (3 + 4) * 2 를 AST로 표현
+tree = BinOp("*", BinOp("+", Num(3), Num(4)), Num(2))
+print(evaluate(tree))   # 14.0
+```
+
+이 코드가 바로 트리 워킹(tree-walking) 인터프리터입니다. CPython도 바이트코드 수준에서 정확히 같은 일을 합니다. 명령을 하나씩 꺼내어 처리하는 루프가 VM의 핵심입니다.
+
 ## 연습 문제
 
 1. `slow`와 `fast`를 큰 입력으로 측정한 뒤, 성능 차이를 `dis` 출력과 연결해 설명해 보세요.

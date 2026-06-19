@@ -52,7 +52,7 @@ LLM API가 실제 운영 경로에 들어가면 실패는 드문 예외가 아�
 
 재시도는 단순한 안정성 옵션이 아닙니다. 실패를 어떤 종류로 보고 어느 지점까지 복구를 시도할지 결정하는 운영 정책입니다. 이 정책이 없으면 네트워크 일시 장애와 영구 설정 오류가 같은 흐름으로 섞이고, 결과적으로 시스템은 더 느려지고 더 시끄러워집니다.
 
-특히 LLM 경로에서는 같은 요청을 다시 보내는 비용이 적지 않습니다. 지연 시간이 늘고 토큰 사용량도 다시 발생합니다. 그래서 재시도는 “조금 더 기다리면 나아질 가능성이 있는가”라는 질문을 먼저 통과해야 합니다. 이 분류 없이 재시도를 늘리는 것은 안정성이 아니라 낭비에 가깝습니다.
+특히 LLM 경로에서는 같은 요청을 다시 보내는 비용이 적지 않습니다. 지연 시간이 늘고 토큰 사용량도 다시 발생합니다. 그래서 재시도는 "조금 더 기다리면 나아질 가능성이 있는가"라는 질문을 먼저 통과해야 합니다. 이 분류 없이 재시도를 늘리는 것은 안정성이 아니라 낭비에 가깝습니다.
 
 또한 재시도는 사용자 경험과도 연결됩니다. 몇 번까지 자동 복구를 시도할지, 최종 실패 뒤 사용자에게 어떤 문구를 보여 줄지, 내부 로그에는 어떤 세부 정보를 남길지 미리 정해 두어야 시스템 동작이 일관됩니다.
 
@@ -74,6 +74,7 @@ LLM API가 실제 운영 경로에 들어가면 실패는 드문 예외가 아�
 
 ```python
 from tenacity import retry, stop_after_attempt, wait_exponential
+
 
 @retry(
     stop=stop_after_attempt(3),
@@ -97,11 +98,12 @@ def flaky_operation() -> str:
 class RetryableLLMError(Exception):
     pass
 
+
 class NonRetryableLLMError(Exception):
     pass
 ```
 
-이 두 종류가 생기면 재시도 계층은 SDK 세부 사항을 몰라도 됩니다. 애플리케이션은 “다시 시도해도 되는 실패인가 아닌가”만 재시도 정책에 전달하면 됩니다.
+이 두 종류가 생기면 재시도 계층은 SDK 세부 사항을 몰라도 됩니다. 애플리케이션은 "다시 시도해도 되는 실패인가 아닌가"만 재시도 정책에 전달하면 됩니다.
 
 ### Groq 호출에 지수 백오프 붙이기
 
@@ -128,11 +130,14 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 client = Groq(api_key=os.environ["GROQ_API_KEY"], max_retries=0)
 
+
 class RetryableLLMError(Exception):
     pass
 
+
 class NonRetryableLLMError(Exception):
     pass
+
 
 @retry(
     retry=retry_if_exception_type(RetryableLLMError),
@@ -157,6 +162,7 @@ def call_llm(messages: list[dict]) -> str:
         if exc.status_code >= 500:
             raise RetryableLLMError(f"provider server error: {exc.status_code}") from exc
         raise NonRetryableLLMError(f"provider request failed: {exc.status_code}") from exc
+
 
 messages = [
     {"role": "system", "content": "You are a concise Python tutor."},
@@ -189,6 +195,17 @@ except RetryableLLMError as exc:
 `except` 분기가 늘어나면 분류 로직을 함수로 빼는 편이 낫습니다.
 
 ```python
+from groq import APIConnectionError, APIStatusError, RateLimitError
+
+
+class RetryableLLMError(Exception):
+    pass
+
+
+class NonRetryableLLMError(Exception):
+    pass
+
+
 def classify_exception(exc: Exception) -> Exception:
     if isinstance(exc, (RateLimitError, APIConnectionError)):
         return RetryableLLMError(str(exc))
@@ -228,10 +245,13 @@ from tenacity import (
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("retry-demo")
 
+
 class RetryableLLMError(Exception):
     pass
 
+
 attempt_counter = {"count": 0}
+
 
 @retry(
     retry=retry_if_exception_type(RetryableLLMError),
@@ -247,16 +267,21 @@ def flaky_lookup() -> str:
         raise RetryableLLMError("temporary upstream timeout")
     return "recovered on third attempt"
 
+
 print(flaky_lookup())
 ```
 
-이 예제는 장애 재현이 아니라 정책 검증에 가깝습니다. 로그에 시도 횟수, 대기 간격, 최종 성공 여부가 남기 때문에 운영 전에 “정말 세 번만 시도하는가”, “백오프가 겹치지 않는가”, “성공 뒤 불필요한 추가 시도가 없는가”를 바로 확인할 수 있습니다.
+이 예제는 장애 재현이 아니라 정책 검증에 가깝습니다. 로그에 시도 횟수, 대기 간격, 최종 성공 여부가 남기 때문에 운영 전에 "정말 세 번만 시도하는가", "백오프가 겹치지 않는가", "성공 뒤 불필요한 추가 시도가 없는가"를 바로 확인할 수 있습니다.
 
 ### 최종 실패를 사용자 메시지와 내부 로그로 분리하기
 
 재시도 정책이 끝나면 이제 실패를 어디에 어떻게 전달할지 결정해야 합니다. 사용자에게는 짧고 안정적인 문구를 주고, 내부에는 디버깅 가능한 필드를 남기는 편이 좋습니다.
 
 ```python
+class RetryableLLMError(Exception):
+    pass
+
+
 def build_failure_response(exc: Exception, attempt_count: int) -> tuple[dict, dict]:
     user_payload = {
         "message": "잠시 후 다시 시도해 주세요. 요청을 끝까지 처리하지 못했습니다.",
@@ -269,6 +294,7 @@ def build_failure_response(exc: Exception, attempt_count: int) -> tuple[dict, di
         "final_error_message": str(exc),
     }
     return user_payload, log_payload
+
 
 user_payload, log_payload = build_failure_response(RetryableLLMError("timeout"), attempt_count=3)
 print(user_payload)
@@ -295,6 +321,7 @@ print(log_payload)
 import time
 from collections import deque
 
+
 class RetryBudget:
     def __init__(self, window_seconds: int, max_retries_in_window: int) -> None:
         self.window_seconds = window_seconds
@@ -312,6 +339,7 @@ class RetryBudget:
         self.events.append(now)
         return True
 
+
 budget = RetryBudget(window_seconds=60, max_retries_in_window=120)
 print(budget.allow_retry())
 ```
@@ -325,6 +353,7 @@ print(budget.allow_retry())
 ```python
 import random
 
+
 def compute_backoff_seconds(error_type: str, attempt: int) -> float:
     if error_type == "rate_limit":
         # 429는 더 보수적으로 대기
@@ -335,6 +364,7 @@ def compute_backoff_seconds(error_type: str, attempt: int) -> float:
         return min(2**attempt, 8) + random.uniform(0, 0.3)
 
     return 0.0
+
 
 for i in range(3):
     print("429 backoff", i, compute_backoff_seconds("rate_limit", i))
@@ -350,11 +380,13 @@ for i in range(3):
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class RetryAttempt:
     attempt: int
     error_type: str
     planned_sleep_seconds: float
+
 
 @dataclass
 class RetryTrace:
@@ -370,21 +402,24 @@ class RetryTrace:
             )
         )
 
+
 trace = RetryTrace(request_id="req-2026-05-15-001")
 trace.add(attempt=1, error_type="RateLimitError", planned_sleep_seconds=1.2)
 trace.add(attempt=2, error_type="RateLimitError", planned_sleep_seconds=2.1)
 print(trace)
 ```
 
-이 필드는 APM이나 구조화 로그로 그대로 보내기 좋습니다. 운영자는 “몇 번째 시도에서 어떤 오류가 반복되는지”를 즉시 볼 수 있고, 재시도 예산 조정이나 백오프 튜닝을 감에 의존하지 않게 됩니다.
+이 필드는 APM이나 구조화 로그로 그대로 보내기 좋습니다. 운영자는 "몇 번째 시도에서 어떤 오류가 반복되는지"를 즉시 볼 수 있고, 재시도 예산 조정이나 백오프 튜닝을 감에 의존하지 않게 됩니다.
 
-## 흔히 헷갈리는 지점
+## 자주 하는 실수
 
-- 재시도 횟수를 늘리면 안정성이 높아진다고 생각하기 쉽지만, 분류가 먼저입니다.
-- 지수 백오프에서 지터를 빼면 여러 요청이 같은 타이밍에 다시 몰릴 수 있습니다.
-- SDK 기본 재시도와 애플리케이션 재시도를 겹치면 실제 시도 횟수가 의도보다 커질 수 있습니다.
-- 구조화 출력 검증 실패는 대개 같은 요청 재시도로 해결되지 않습니다.
-- 최종 실패 처리에서 사용자 메시지와 내부 로그를 같은 수준으로 노출하면 둘 다 품질이 떨어집니다.
+| 실수 | 이유 | 올바른 접근 |
+|------|------|------------|
+| 모든 예외를 한 `except`로 잡아 재시도 | 영구 오류(잘못된 요청, 인증 실패)는 재시도해도 달라지지 않음 | `RetryableLLMError`와 `NonRetryableLLMError`로 분류하고, 재시도 범위를 `retry_if_exception_type`으로 좁힘 |
+| 지수 백오프에서 지터를 빼고 고정 간격 사용 | 여러 요청이 동시에 실패하면 같은 타이밍에 일제히 재시도해 공급자에 다시 부하를 줌 | `wait_exponential_jitter`로 무작위 지연을 추가해 thundering herd 방지 |
+| SDK 기본 재시도와 애플리케이션 재시도를 함께 켜기 | 실제 시도 횟수가 의도한 값의 몇 배가 될 수 있음 | `Groq(max_retries=0)`으로 SDK 재시도를 끄고 애플리케이션 재시도만 사용 |
+| Pydantic 검증 실패를 재시도 대상으로 분류 | 같은 요청을 다시 보내도 같은 스키마 불일치가 반복됨 | ValidationError는 `NonRetryableLLMError`로 분류하고 프롬프트 조정이나 폴백 경로로 처리 |
+| 최종 실패 시 공급자 예외 원문을 사용자에게 노출 | 불필요한 정보 노출과 노이즈, 사용자 혼란 유발 | `build_failure_response()`처럼 사용자 메시지와 내부 로그 필드를 분리해 설계 |
 
 ## 운영 체크리스트
 
@@ -393,6 +428,7 @@ print(trace)
 - [ ] 지수 백오프와 지터, 최대 시도 횟수를 명시적으로 설정했다
 - [ ] 구조화 출력·스트리밍 실패를 별도 정책으로 분리했다
 - [ ] 최종 실패 시 사용자 메시지와 내부 로그 필드를 따로 설계했다
+- [ ] 재시도 예산 카운터로 장애 폭주 시 호출량을 제한할 준비를 했다
 
 ## 정리
 
@@ -405,12 +441,13 @@ print(trace)
 ## 처음 질문으로 돌아가기
 
 - **왜 모든 API 실패를 같은 재시도 정책으로 다루면 안 될까요?**
-  - 재시도는 단순한 안정성 옵션이 아닙니다
+  - 재시도가 의미 있는 경우는 잠시 기다리면 실패가 사라질 가능성이 있는 일시적 장애뿐입니다. 인증 오류, 잘못된 요청 본문, 구조화 출력 스키마 불일치 같은 영구 오류는 같은 요청을 다시 보내도 달라지지 않습니다. 이 둘을 같은 정책으로 묶으면 영구 오류가 늦게 드러나고 비용만 증가합니다.
+
 - **어떤 오류는 재시도하고, 어떤 오류는 바로 실패로 분류해야 할까요?**
-  - 재시도는 단순한 안정성 옵션이 아닙니다
+  - 네트워크 단절, 연결 실패, transport timeout, 일시적인 5xx, 일부 429는 재시도 후보입니다. 반면 401/403 인증 오류, 400 잘못된 요청, 없는 모델명, Pydantic 검증 실패, 애플리케이션 버그는 즉시 멈추고 별도 경로로 처리해야 합니다. `RetryableLLMError`와 `NonRetryableLLMError` 두 계층을 두면 SDK 세부 예외 변화에 재시도 정책이 흔들리지 않습니다.
+
 - **최종 실패 뒤 사용자 메시지와 내부 로그는 어떻게 나눠야 할까요?**
-  - - 재시도 횟수를 늘리면 안정성이 높아진다고 생각하기 쉽지만, 분류가 먼저입니다
-  - 재시도는 단순한 안정성 옵션이 아닙니다. 실패를 어떤 종류로 보고 어느 지점까지 복구를 시도할지 결정하는 운영 정책입니다. 이 정책이 없으면 네트워크 일시 장애와 영구 설정 오류가 같은 흐름으로 섞이고, 결과적으로 시스템은 더 느려지고 더 시끄러워집니다.
+  - 사용자에게는 "잠시 후 다시 시도해 주세요"처럼 짧고 일관된 문구를 주어야 합니다. 내부 로그에는 `retryable` 여부, `attempt_count`, `final_error_type`, `final_error_message`처럼 원인 분석에 필요한 필드를 남겨야 합니다. 공급자 예외 원문을 사용자에게 그대로 보여 주면 노이즈가 많고 과도한 정보가 노출될 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
