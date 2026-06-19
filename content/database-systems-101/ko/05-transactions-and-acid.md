@@ -27,7 +27,7 @@ last_reviewed: '2026-05-12'
 
 이 글은 Database Systems 101 시리즈의 5번째 글입니다.
 
-트랜잭션은 이런 여러 SQL 문을 하나의 작업 단위로 묶는 장치입니다. 그리고 ACID는 그 약속을 네 가지 관점에서 더 정밀하게 설명하는 언어입니다. 이 글에서는 “전부 또는 전무”라는 문장이 실제 시스템에서 어떻게 구현되는지, 그리고 WAL과 무결성 제약이 왜 그 약속의 핵심 메커니즘인지 연결해 보겠습니다.
+트랜잭션은 이런 여러 SQL 문을 하나의 작업 단위로 묶는 장치입니다. 그리고 ACID는 그 약속을 네 가지 관점에서 더 정밀하게 설명하는 언어입니다. 이 글에서는 "전부 또는 전무"라는 문장이 실제 시스템에서 어떻게 구현되는지, 그리고 WAL과 무결성 제약이 왜 그 약속의 핵심 메커니즘인지 연결해 보겠습니다.
 
 ![Database Systems 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/05/05-01-big-picture.ko.png)
 *Database Systems 101 5장 흐름 개요*
@@ -49,7 +49,7 @@ last_reviewed: '2026-05-12'
 
 송금, 재고 차감, 주문 생성처럼 실무의 거의 모든 핵심 작업은 두 개 이상의 변경을 함께 묶어야 합니다. 중간에서 멈추면 데이터는 바로 불일치 상태가 됩니다. 트랜잭션이 없으면 애플리케이션이 이를 일일이 보정해야 하는데, 운영 현실에서는 거의 항상 실패합니다.
 
-> “전부 또는 전무.” 이 한 문장이 트랜잭션의 본질을 가장 정확하게 설명합니다.
+> "전부 또는 전무." 이 한 문장이 트랜잭션의 본질을 가장 정확하게 설명합니다.
 
 ```mermaid
 flowchart LR
@@ -69,7 +69,7 @@ flowchart LR
 - **영속성(Durability)**: 커밋된 변경이 전원 장애 이후에도 살아남는 성질입니다.
 - **WAL**: 데이터를 바꾸기 전에 변경 의도를 로그에 먼저 쓰는 방식으로, 복구의 토대입니다.
 
-## 변경 전/변경 후
+## 트랜잭션 없이 vs 있을 때
 
 **Before — transferring money without a transaction**
 
@@ -77,7 +77,7 @@ flowchart LR
 UPDATE accounts SET balance = balance - 100 WHERE id = 1;
 -- (power outage here)
 UPDATE accounts SET balance = balance + 100 WHERE id = 2;
--- 100 dollars vanish
+-- 100 dollars vanish — 데이터 불일치 영구 발생
 ```
 
 **After — wrapping the transfer in a transaction**
@@ -160,9 +160,9 @@ with sqlite3.connect("bank.db") as db:
     print(db.execute("SELECT balance FROM accounts WHERE id = 1").fetchone())
 ```
 
-ROLLBACK은 “BEGIN 이후의 변경을 모두 잊는다”는 뜻입니다. 데이터 파일에 반영되지 않은 것으로 되돌립니다.
+ROLLBACK은 "BEGIN 이후의 변경을 모두 잊는다"는 뜻입니다. 데이터 파일에 반영되지 않은 것으로 되돌립니다.
 
-### 5단계 — 지속성 관점 점검
+### 5단계 — WAL 모드와 지속성 확인
 
 ```python
 import sqlite3
@@ -176,28 +176,153 @@ with sqlite3.connect("bank.db") as db:
 
 WAL 모드에서는 데이터 파일을 건드리기 전에 로그에 먼저 변경을 남깁니다. COMMIT 시점에 로그가 안전하게 기록되어 있으면, 그 자체로 영속성을 보장할 수 있습니다.
 
+## ACID 시나리오별 SQL 예시
+
+### 원자성: 주문 생성 플로우
+
+```sql
+-- 주문 + 재고 차감 + 결제 기록을 하나의 트랜잭션으로
+BEGIN;
+
+-- 1. 재고 확인 및 차감
+UPDATE inventory
+SET qty = qty - 1
+WHERE sku = 'LAPTOP-001' AND qty >= 1;
+
+-- 영향받은 행이 없으면 재고 부족 → ROLLBACK
+-- (애플리케이션에서 rows_affected 확인 후 ROLLBACK 결정)
+
+-- 2. 주문 생성
+INSERT INTO orders(user_id, sku, qty, status, created_at)
+VALUES (42, 'LAPTOP-001', 1, 'CONFIRMED', now());
+
+-- 3. 결제 기록
+INSERT INTO payments(order_id, amount, method, created_at)
+VALUES (lastval(), 1500000, 'CARD', now());
+
+COMMIT;
+```
+
+세 단계 중 어느 하나라도 실패하면 전체가 롤백됩니다. 재고만 차감되고 주문이 없거나, 주문만 있고 결제가 없는 상태는 발생하지 않습니다.
+
+### 일관성: CHECK 제약과 트리거
+
+```sql
+-- 잔액은 항상 0 이상이어야 함
+CREATE TABLE wallets (
+    user_id BIGINT PRIMARY KEY,
+    balance NUMERIC(15,2) NOT NULL CHECK (balance >= 0),
+    version INTEGER NOT NULL DEFAULT 0
+);
+
+-- 이 갱신은 잔액이 음수가 되려 하면 즉시 실패
+UPDATE wallets
+SET balance = balance - 500000
+WHERE user_id = 1;
+-- ERROR: new row violates check constraint "wallets_balance_check"
+```
+
+### 격리성: REPEATABLE READ에서의 일관된 읽기
+
+```sql
+-- 세션 A: 월별 집계 리포트 생성 (긴 트랜잭션)
+BEGIN ISOLATION LEVEL REPEATABLE READ;
+SELECT sum(total) FROM orders WHERE created_at >= '2026-05-01';
+-- (세션 B가 이 시간에 새 주문을 INSERT하고 COMMIT)
+SELECT count(*) FROM orders WHERE created_at >= '2026-05-01';
+-- REPEATABLE READ: 첫 번째 SELECT와 동일한 스냅샷 — 새 행이 보이지 않음
+COMMIT;
+```
+
+### 영속성: WAL 흐름
+
+```text
+WAL 개념 흐름
+1) BEGIN: 트랜잭션 시작 레코드를 WAL에 기록
+2) 변경 전후 값(before/after image)을 WAL에 기록
+3) COMMIT: 커밋 레코드를 WAL에 fsync 기록
+4) 실제 데이터 파일에 비동기 반영 (체크포인트)
+5) 장애 발생 시: WAL에서 REDO(커밋된 것 재적용)
+6) 미완료 트랜잭션: WAL에서 UNDO(되돌리기)
+```
+
+```sql
+-- PostgreSQL WAL 레벨 확인
+SHOW wal_level;
+-- replica
+
+-- 강제 체크포인트
+CHECKPOINT;
+```
+
+## 트랜잭션 경계 설계 원칙
+
+실무에서 트랜잭션 경계를 잘못 그리는 것이 자주 보이는 문제입니다.
+
+```python
+# 안티패턴: 트랜잭션 안에 외부 API 호출
+def create_order_bad(db, user_id, item):
+    with db.transaction():
+        order_id = db.insert_order(user_id, item)
+        # 이 API 호출이 5초 걸리면 트랜잭션도 5초 잠금 유지!
+        payment_result = payment_api.charge(user_id, item.price)
+        db.insert_payment(order_id, payment_result)
+
+# 올바른 패턴: 외부 호출을 트랜잭션 밖으로
+def create_order_good(db, user_id, item):
+    # 1단계: 트랜잭션 밖에서 외부 호출
+    payment_result = payment_api.charge(user_id, item.price)
+
+    # 2단계: 짧은 트랜잭션으로 DB 기록
+    with db.transaction():
+        order_id = db.insert_order(user_id, item, status='PAID')
+        db.insert_payment(order_id, payment_result)
+```
+
+## 배치 작업과 트랜잭션 성능
+
+```python
+import sqlite3
+
+# 안티패턴: 자동 커밋으로 10,000건 INSERT → 10,000번 fsync
+conn = sqlite3.connect("data.db")
+for i in range(10000):
+    conn.execute("INSERT INTO items VALUES (?)", (i,))
+    # 자동 커밋: 매번 디스크 동기화 발생
+
+# 올바른 패턴: 하나의 트랜잭션으로 묶기
+conn = sqlite3.connect("data.db")
+with conn:  # 하나의 트랜잭션
+    conn.executemany(
+        "INSERT INTO items VALUES (?)",
+        [(i,) for i in range(10000)]
+    )
+# 단 1번의 커밋 → 수십 배 빠름
+```
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 올바른 접근 |
+|------|------|-------------|
+| 트랜잭션 안에 외부 API 호출 | 잠금 유지 시간 증가, 동시성 저하 | 외부 호출은 트랜잭션 밖으로 이동 |
+| 예외 처리에서 ROLLBACK 누락 | 연결 상태 꼬임, 다음 요청 오염 | try/finally 또는 with 구문으로 보장 |
+| 자동 커밋 배치 작업 | N개 INSERT = N번 fsync, 극도로 느림 | 하나의 트랜잭션으로 배치 묶기 |
+| 모든 SELECT까지 트랜잭션으로 감싼다 | 불필요한 잠금 범위 확대 | 읽기는 짧게, 쓰기만 트랜잭션으로 |
+| ROLLBACK을 "복구"라고 오해 | 이메일 발송, 결제 API 등 부수 효과 미복원 | 부수 효과는 멱등한 별도 재시도 로직으로 |
+
+## 핵심 요약
+
 - 트랜잭션은 기본적으로 **명시적 경계**를 갖습니다. 자동 커밋은 편하지만 문장 단위로 잘게 끊깁니다.
-- 예외 경로에서 ROLLBACK은 반드시 보장되어야 합니다. 그렇지 않으면 연결 상태가 꼬이기 쉽습니다.
+- 예외 경로에서 ROLLBACK은 반드시 보장되어야 합니다.
 - CHECK, FOREIGN KEY 같은 제약은 ACID의 C를 실무에서 지키는 가장 현실적인 도구입니다.
 - WAL은 ACID의 D를 떠받치는 핵심 메커니즘입니다.
-
-## 자주 하는 실수 5가지
-
-1. **트랜잭션을 너무 오래 연다.** 사용자 입력 대기나 외부 API 호출을 안에 넣으면 잠금이 길어지고 다른 작업이 막힙니다.
-2. **예외 처리에서 ROLLBACK을 빠뜨린다.** 암묵적 정리를 믿지 말고 명시적으로 다뤄야 합니다.
-3. **자동 커밋 상태로 배치 작업을 돌린다.** N개의 INSERT가 N번의 커밋이 되어 성능이 급격히 나빠집니다.
-4. **모든 SELECT까지 트랜잭션으로 과하게 감싼다.** 읽기는 짧게, 쓰기는 비즈니스 단위로 묶는 것이 기본입니다.
-5. **ROLLBACK을 “복구”라고 오해한다.** 데이터베이스 변경은 되돌리지만, 이메일 발송이나 결제 호출 같은 부수 효과는 되돌리지 못합니다.
-
-대부분의 ORM과 프레임워크는 함수나 요청 단위로 트랜잭션 경계를 제공합니다. SQLAlchemy의 `Session`, Django의 `@transaction.atomic`이 대표적입니다. 하지만 도구가 자동으로 경계를 제공한다고 해서, 비즈니스 경계 설계까지 대신해 주는 것은 아닙니다. “주문 생성”이 하나의 트랜잭션이어야 하는지, “주문 생성 + 메일 발송”까지 하나로 볼 것인지 판단은 여전히 애플리케이션 설계의 몫입니다.
-
-장애 분석에서도 트랜잭션은 출발점입니다. “이 트랜잭션이 어디까지 갔는가?”를 물으면 부분 갱신, 데드락, 부수 효과 책임이 빠르게 드러납니다. 그래서 강한 팀은 데이터베이스 안의 작업과 데이터베이스 밖의 부수 효과를 분리하고, 후자는 재시도 가능한 멱등 작업으로 설계합니다.
+- 트랜잭션을 "SQL 묶음"이 아니라 "불변식 보호 경계"로 보는 팀이 운영 장애를 덜 겪습니다.
 
 ## 시니어 엔지니어는 이렇게 생각합니다
 
 - 트랜잭션 경계를 비즈니스 단위와 맞춥니다.
 - 외부 호출은 가능한 한 트랜잭션 밖으로 뺍니다.
-- “이 롤백은 정말 안전한가?”를 계속 묻습니다. 부수 효과가 섞이면 바로 경계 재검토 신호입니다.
+- "이 롤백은 정말 안전한가?"를 계속 묻습니다. 부수 효과가 섞이면 바로 경계 재검토 신호입니다.
 - 오래 걸리는 트랜잭션은 곧바로 잠금 경합 후보로 봅니다.
 - NOT NULL, CHECK, FK 같은 무결성 제약을 애플리케이션 코드가 아니라 데이터 모델에 둡니다.
 
@@ -213,162 +338,11 @@ WAL 모드에서는 데이터 파일을 건드리기 전에 로그에 먼저 변
 
 1. 10,000건 INSERT가 자동 커밋 상태보다 하나의 트랜잭션 안에서 훨씬 빠른 이유를 한 문장으로 설명해 보세요.
 2. 결제 API 호출을 트랜잭션 안에 넣었는데 응답이 느려 타임아웃이 났습니다. 어떤 문제가 생길 수 있고, 더 안전한 설계는 무엇인지 설명해 보세요.
-3. “커밋된 변경은 전원 장애 뒤에도 살아남는다”를 보장하는 ACID의 글자는 무엇인가요?
+3. "커밋된 변경은 전원 장애 뒤에도 살아남는다"를 보장하는 ACID의 글자는 무엇인가요?
 
 ## 정리 및 다음 단계
 
-트랜잭션은 “전부 또는 전무”의 약속이고, ACID는 그 약속을 원자성·일관성·격리성·영속성으로 풀어 쓴 언어입니다. WAL과 무결성 제약은 그 약속을 실제로 지키는 메커니즘입니다. 다음 글에서는 ACID의 I, 격리성으로 들어가서 READ COMMITTED, REPEATABLE READ, SERIALIZABLE이 각각 무엇을 막고 무엇을 허용하는지 살펴봅니다.
-
-## 송금 시나리오로 보는 원자성과 지속성
-
-아래 예시는 송금 트랜잭션의 최소 형태입니다.
-
-```sql
-BEGIN;
-UPDATE accounts SET balance = balance - 10000 WHERE id = 1;
-UPDATE accounts SET balance = balance + 10000 WHERE id = 2;
-INSERT INTO transfer_history(from_id, to_id, amount) VALUES (1, 2, 10000);
-COMMIT;
-```
-
-중간에 장애가 나면 어떻게 될까요? DBMS는 WAL(쓰기 선행 로그)에 변경 의도를 먼저 기록하고, 커밋 시점에 내구성을 보장합니다. 그래서 일부 문장만 반영된 찢어진 상태를 방지할 수 있습니다.
-
-```text
-WAL 개념 흐름
-1) 변경 전후 정보 기록
-2) 커밋 레코드 기록
-3) 장애 발생 시 WAL 재적용(REDO)
-4) 미완료 트랜잭션은 취소(UNDO)
-```
-
-## 트랜잭션 경계 설계 원칙
-
-- 하나의 트랜잭션은 하나의 비즈니스 불변식을 완결해야 합니다.
-- 네트워크 호출, 사용자 입력 대기 같은 느린 작업은 트랜잭션 밖으로 빼야 합니다.
-- 재시도 가능한 오류와 재시도하면 안 되는 오류를 분리해야 합니다.
-
-트랜잭션을 "SQL 묶음"이 아니라 "불변식 보호 경계"로 보는 팀이 운영 장애를 덜 겪습니다.
-
-## 실전 운영 점검표
-
-운영 환경에서 데이터베이스 품질을 안정적으로 유지하려면, 기능 개발과 별개로 점검 루틴을 명확하게 가져가야 합니다. 아래 항목은 서비스 규모와 상관없이 바로 적용할 수 있는 기준입니다.
-
-- 변경 전에는 항상 기준 지표를 남깁니다. 평균 지연 시간, P95, P99, 초당 트랜잭션 수, 잠금 대기 시간 같은 숫자를 캡처해 둬야 변경 이후를 비교할 수 있습니다.
-- 쿼리 튜닝은 SQL 문장 자체보다 실행 계획의 변화를 중심으로 추적합니다. 계획 노드가 바뀌었는지, 예상 행 수와 실제 행 수의 차이가 커졌는지, 정렬이나 해시가 디스크로 내려갔는지를 우선 확인합니다.
-- 스키마 변경은 단계적으로 진행합니다. 컬럼 추가, 백필, 코드 전환, 제약 강화 순서로 나누면 장애 반경을 줄일 수 있습니다.
-- 장애 대응 문서는 운영자가 밤중에도 바로 실행할 수 있는 형태여야 합니다. 복구 절차, 롤백 절차, 검증 SQL을 같은 문서에 둬야 실제 상황에서 흔들리지 않습니다.
-
-아래 예시는 팀이 릴리스 전후에 반복적으로 실행하는 최소 점검 SQL입니다.
-
-```sql
--- 최근 10분 동안 느린 쿼리 확인(엔진별 뷰 이름은 다를 수 있음)
-SELECT query, calls, mean_exec_time, rows
-FROM pg_stat_statements
-ORDER BY mean_exec_time DESC
-LIMIT 20;
-
--- 잠금 대기 체인 확인
-SELECT now(), pid, wait_event_type, wait_event, state, query
-FROM pg_stat_activity
-WHERE wait_event_type IS NOT NULL;
-
--- 인덱스 사용률 점검
-SELECT relname AS table_name, seq_scan, idx_scan
-FROM pg_stat_user_tables
-ORDER BY seq_scan DESC
-LIMIT 20;
-```
-
-이 점검 루틴을 자동화 파이프라인에 연결하면, 성능 저하를 "느낌"이 아니라 "증거"로 관리할 수 있습니다. 결국 장기 운영에서 중요한 것은 뛰어난 한 번의 튜닝이 아니라, 작은 검증을 꾸준히 반복해 위험을 조기에 감지하는 습관입니다.
-## 운영 리허설 시나리오
-
-문서만 읽고 끝내면 운영에서 다시 같은 실수를 반복하기 쉽습니다. 아래 시나리오는 팀 온보딩과 장애 대응 훈련에 바로 사용할 수 있는 공통 리허설 절차입니다.
-
-### 시나리오 1: 느려진 조회 원인 찾기
-
-1. 문제 쿼리를 식별합니다. 애플리케이션 로그의 요청 식별자와 데이터베이스 쿼리 로그를 매칭합니다.
-2. 같은 파라미터로 `EXPLAIN ANALYZE`를 실행합니다.
-3. 계획 노드 중 시간이 큰 지점을 찾고, 해당 노드가 인덱스/통계/정렬 중 무엇과 관련 있는지 분류합니다.
-4. 개선안을 한 번에 하나만 적용합니다. 인덱스 추가, 통계 갱신, 질의문 재작성 가운데 하나만 바꿔 결과를 비교합니다.
-
-```text
-개선 전
-Seq Scan on events  (actual time=0.030..842.112 rows=12000)
-
-개선 후
-Index Scan using idx_events_tenant_created on events
-(actual time=0.041..21.553 rows=12000)
-```
-
-### 시나리오 2: 동시성 문제 재현과 완화
-
-1. 두 세션에서 같은 행을 거의 동시에 수정합니다.
-2. 격리 수준을 바꿔 가며 결과를 비교합니다.
-3. 필요하면 `FOR UPDATE` 잠금 조회 또는 낙관적 잠금 버전 컬럼을 적용합니다.
-4. 재시도 정책과 타임아웃 기준을 코드와 운영 문서에 같이 기록합니다.
-
-```sql
--- 낙관적 잠금 예시
-UPDATE inventory
-SET qty = qty - 1, version = version + 1
-WHERE sku = 'A-100' AND version = 17;
-```
-
-영향 받은 행 수가 0이면 이미 다른 트랜잭션이 갱신한 것이므로, 재조회 후 재시도합니다. 이 패턴은 잠금 경합을 낮추면서도 정합성을 지키는 데 효과적입니다.
-
-### 시나리오 3: 복구 가능성 검증
-
-1. 최신 베이스 백업으로 테스트 인스턴스를 띄웁니다.
-2. 지정 시점까지 로그를 재적용합니다.
-3. 핵심 비즈니스 검증 SQL을 실행합니다.
-4. 복구 시간(RTO)과 데이터 유실 허용치(RPO)를 실제 숫자로 기록합니다.
-
-```sql
--- 검증 SQL 예시
-SELECT COUNT(*) FROM orders WHERE created_at >= now() - interval '1 day';
-SELECT SUM(amount) FROM payments WHERE status = 'SUCCESS';
-SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
-```
-
-복구 리허설에서 가장 중요한 점은 성공 여부 자체보다, 누가 어떤 순서로 무엇을 확인했는지를 재현 가능하게 남기는 것입니다. 절차가 사람마다 다르면 실제 장애에서 속도와 품질이 동시에 무너집니다.
-
-## 체크리스트: 배포 전 최소 검증
-
-- 대표 조회 5개에 대해 실행 계획을 저장합니다.
-- 트랜잭션 경계가 긴 코드 경로를 식별합니다.
-- 잠금 대기 알람 임계치를 설정합니다.
-- 스키마 변경의 롤백 경로를 문서화합니다.
-- 백업 복구 리허설 최근 실행일을 확인합니다.
-
-이 체크리스트는 거창한 체계를 요구하지 않습니다. 작은 팀도 주 1회 반복하면 데이터 사고 빈도를 눈에 띄게 줄일 수 있습니다. 데이터베이스 운영의 본질은 "고급 기능을 많이 아는 것"이 아니라, "반복 가능한 검증 루프를 끊기지 않게 유지하는 것"입니다.
-
-## 추가 실습 기록 템플릿
-
-아래 템플릿은 팀 위키에 그대로 붙여 넣어 실습 결과를 남길 때 사용합니다.
-
-```text
-[실습 이름]
-- 실행 일시:
-- 실행 환경:
-- 입력 데이터 규모:
-- 대표 SQL:
-- EXPLAIN ANALYZE 핵심 노드:
-- 개선 전/후 실행 시간:
-- 적용 변경 사항:
-- 부작용 또는 주의점:
-- 다음 점검 항목:
-```
-
-실습 기록을 남기면 지식이 개인 경험으로 소모되지 않고 팀 자산으로 누적됩니다. 특히 실행 계획 캡처와 복구 절차 검증 결과를 함께 보관하면, 다음 장애 대응에서 판단 속도를 크게 높일 수 있습니다.
-
-## 처음 질문으로 돌아가기
-
-- **트랜잭션은 정확히 무엇이며 왜 필요할까요?**
-  - - 트랜잭션이 무엇이고 왜 필요한지 - ACID 네 글자가 실제로 보장하는 것 - `BEGIN`, `COMMIT`, `ROLLBACK` 사용법 - WAL을 이해하는 기본 직관 송금, 재고 차감, 주문 생성처럼 실무의 거의 모든 핵심 작업은 두 개 이상의 변경을 함께 묶어야 합니다
-- **ACID 네 글자는 실제로 무엇을 보장할까요?**
-  - 트랜잭션은 “전부 또는 전무”의 약속이고, ACID는 그 약속을 원자성·일관성·격리성·영속성으로 풀어 쓴 언어입니다
-- **`BEGIN`, `COMMIT`, `ROLLBACK`은 어떻게 사용해야 할까요?**
-  - - 트랜잭션이 무엇이고 왜 필요한지 - ACID 네 글자가 실제로 보장하는 것 - `BEGIN`, `COMMIT`, `ROLLBACK` 사용법 - WAL을 이해하는 기본 직관 송금, 재고 차감, 주문 생성처럼 실무의 거의 모든 핵심 작업은 두 개 이상의 변경을 함께 묶어야 합니다
+트랜잭션은 "전부 또는 전무"의 약속이고, ACID는 그 약속을 원자성·일관성·격리성·영속성으로 풀어 쓴 언어입니다. WAL과 무결성 제약은 그 약속을 실제로 지키는 메커니즘입니다. 다음 글에서는 ACID의 I, 격리성으로 들어가서 READ COMMITTED, REPEATABLE READ, SERIALIZABLE이 각각 무엇을 막고 무엇을 허용하는지 살펴봅니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -382,7 +356,7 @@ SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
 - [Database Systems 101 (7/10): 정규화와 모델링](./07-normalization-and-modeling.md)
 - [Database Systems 101 (8/10): 쿼리 최적화](./08-query-optimization.md)
 - [Database Systems 101 (9/10): 복제와 백업](./09-replication-and-backup.md)
-- [OLTP와 OLAP](./10-oltp-and-olap.md)
+- [Database Systems 101 (10/10): OLTP와 OLAP](./10-oltp-and-olap.md)
 
 <!-- toc:end -->
 

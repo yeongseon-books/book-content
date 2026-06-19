@@ -292,6 +292,49 @@ console.log(document.getElementById("greeting")?.textContent); // 현재 텍스�
 | 모바일을 나중 문제로 미룸 | 실제 사용자가 모바일에서 깨진 화면을 봄 | `viewport` 메타 태그와 반응형을 처음부터 적용합니다 |
 | `<script>`를 `<head>` 안에 배치 | DOM이 준비되기 전에 JS 실행되어 `null` 오류 | `</body>` 직전에 배치하거나 `defer` 속성을 사용합니다 |
 
+## 프론트엔드 vs 백엔드 경계
+
+프론트엔드와 백엔드는 어떻게 나뉠까요? 가장 간단한 기준은 "어디서 실행되는가"입니다.
+
+```
+사용자 브라우저 (프론트엔드)
+├── HTML 파싱 → DOM 구성
+├── CSS 적용 → 렌더링
+├── JavaScript 실행 → 동작
+└── HTTP 요청 → 서버와 통신
+          ↕  HTTP (REST / GraphQL / WebSocket)
+서버 (백엔드)
+├── 요청 처리
+├── 데이터베이스 조회
+├── 비즈니스 로직 실행
+└── JSON / HTML 응답 반환
+```
+
+경계가 항상 명확하지는 않습니다. Next.js, Nuxt 같은 풀스택 프레임워크는 같은 코드베이스에서 서버와 클라이언트 코드를 모두 작성합니다. 하지만 어떤 코드가 어디서 실행되는지 이해하는 것은 여전히 중요합니다.
+
+## 현대 프론트엔드 생태계
+
+```
+브라우저 표준 (항상 동작)
+├── HTML5: 시맨틱 요소, 폼, 미디어
+├── CSS3: Grid, Flexbox, Custom Properties
+└── ES2022+: async/await, optional chaining, nullish coalescing
+
+프레임워크 계층 (선택)
+├── React (Meta, 가장 넓은 생태계)
+├── Vue (커뮤니티, 점진적 도입 용이)
+├── Svelte (컴파일 타임 최적화)
+└── Angular (TypeScript 퍼스트, 엔터프라이즈)
+
+도구 계층 (선택)
+├── TypeScript (정적 타입)
+├── Vite (빌드 도구)
+├── Tailwind CSS (유틸리티 CSS)
+└── TanStack Query (서버 상태)
+```
+
+기초(HTML/CSS/JS)를 먼저 익히면 프레임워크는 "이 문제를 더 쉽게 푸는 도구"로 보입니다. 기초 없이 프레임워크부터 배우면 도구 이름은 알지만 문제를 설명하지 못하는 상황이 생깁니다.
+
 ## 실무에서는 이렇게 보입니다
 
 실무 팀은 대개 React, Vue, Svelte 같은 프레임워크에 TypeScript와 Vite 또는 Next.js를 조합해 사용합니다. 하지만 그 도구들 위에 놓인 기반은 여전히 HTML, CSS, JavaScript입니다. 기초를 건너뛰면 도구 이름은 외워도 문제를 설명하지 못하게 됩니다.

@@ -30,7 +30,7 @@ last_reviewed: '2026-05-15'
 
 ![Open Source 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.ko.png)
 *Open Source 101 8장 흐름 개요*
-> 메인테이너는 기술 결정만 합니다이 아니라 **커뮤니티 건강, 방향성, 지속 가능성**을 함께 고민하는 역할입니다.
+> 메인테이너는 기술 결정만 하는 것이 아니라 **커뮤니티 건강, 방향성, 지속 가능성**을 함께 고민하는 역할입니다.
 
 ## 이 글에서 다룰 문제
 
@@ -40,111 +40,176 @@ last_reviewed: '2026-05-15'
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
+## 왜 이 글이 중요한가
+
 메인테이너의 건강 상태가 곧 프로젝트의 수명과 연결되는 경우가 많습니다. 한 사람에게 리뷰, 릴리스, 커뮤니티 응답이 모두 몰리면 코드 품질보다 지속 가능성이 먼저 무너집니다.
 
 또 메인테이너는 프로젝트 문화의 기준점 역할을 합니다. 응답 속도, 리뷰 톤, 문서 수준, 릴리스 규칙이 대부분 여기서 시작됩니다. 그래서 메인테이너 역할을 이해하는 것은 오픈소스 운영의 본체를 이해하는 일과 비슷합니다.
 
-## 메인테이너 일을 한 줄로 그리면
+## 핵심 관점
+
+메인테이너 일을 한 줄로 그리면 이렇습니다:
+
+```text
+Triage (이슈 분류)
+  → Review (PR 검토)
+  → Release (릴리스)
+  → Delegate (위임)
+  → 반복
+```
 
 이 순서가 중요한 이유는 일이 쌓이는 방식이 이 흐름을 따르기 때문입니다. triage가 흔들리면 리뷰가 밀리고, 리뷰가 밀리면 릴리스가 늦어지고, 릴리스가 늦어지면 메인테이너에게 더 많은 요청이 몰립니다. 결국 위임이 없으면 루프 전체가 막힙니다.
 
-그래서 메인테이너십은 기술 업무의 확장판이 아닙니다. 운영과 경계 설정이 더해진 별도 역할에 가깝습니다. 혼자 더 열심히 버틴다고 해결되지 않는 문제가 많습니다.
+> 강한 메인테이너는 모든 답을 혼자 쥔 사람이 아닙니다. **프로젝트가 자신 없이도 굴러가게 만드는 사람**입니다.
 
-## 꼭 알아야 할 다섯 가지 개념
+## 핵심 개념
 
-maintainer는 저장소 방향과 품질 기준을 지키는 책임자입니다. triage는 들어오는 일을 분류하고 우선순위를 정하는 과정입니다. review는 코드 품질뿐 아니라 프로젝트 방향과의 정합성을 확인하는 일입니다. delegate는 권한과 책임을 신뢰할 수 있는 사람에게 넘기는 행위입니다. bus factor는 특정 인물이 빠졌을 때 프로젝트가 얼마나 위험해지는지 보여 주는 지표입니다.
+### 메인테이너 성장 단계
 
-이 다섯 가지가 모두 메인테이너의 하루 안에 들어 있습니다. 그래서 메인테이너 역할은 개발 업무의 확장판이 아니라 운영 역할이 더해진 별도 책임으로 보는 편이 맞습니다.
-
-메인테이너 역할 중 가장 어려운 부분은 모든 일을 혼자 처리하려는 유혹을 벌차는 것입니다. 초기에는 혹자 감당하는 것이 사명감으로 느껴지지만, 시간이 지나면서 번아웃으로 바뀝니다.
-
-## 오픈소스 문서 유형
-
-메인테이너의 역할은 코드만큼이나 문서의 전체 구조를 유지하는 데 달려 있습니다. 오픈소스 프로젝트는 문서 종류가 정해져 있으면 기여자도 참여하기 쉽습니다.
-
-| 문서 종류 | 목적 | 독자 | 대표 도구 |
+| 단계 | 역할 | 특징 | 위험 |
 |---|---|---|---|
-| README | 프로젝트 소개, 빠른 시작 | 신규 사용자 | Markdown |
-| Tutorial | 단계별 학습 | 초급 사용자 | MkDocs, Docusaurus |
-| API Reference | 함수/클래스 명세 | 개발자 | Sphinx, JSDoc, rustdoc |
-| Changelog | 버전별 변경 이력 | 유지보수자 | Keep a Changelog |
-| Contributor Guide | 기여 절차 | 신규 기여자 | CONTRIBUTING.md |
+| 창업 메인테이너 | 모든 작업 직접 수행 | 빠른 결정, 완전한 이해 | bus factor = 1 |
+| 위임 메인테이너 | 일부 권한 공유 | 코드 리뷰 분담 | 위임 기준 불명확 |
+| 플랫폼 메인테이너 | 방향만 결정 | 팀이 일상 운영 | 관여도 저하 |
+| 명예 메인테이너 | 자문 역할 | 후임이 주도 | 전환 실패 시 공백 |
 
-문서가 비어 있으면 메인테이너에게 같은 질문이 반복됩니다. README는 가장 먼저 보이는 문서이고, API reference는 가장 자주 검색되는 문서이며, Contributor Guide는 가장 오래 유효한 문서입니다. 세 가지가 모두 갖춰져야 커뮤니티는 확장됩니다.
-## 생각이 어떻게 바뀌어야 할까
+### 오픈소스 문서 유형과 책임
 
-처음에는 혼자 모든 이슈와 풀 리퀘스트를 처리해야 메인테이너답다고 느끼기 쉽습니다. 하지만 그런 구조는 대개 오래 가지 못합니다.
+| 문서 | 목적 | 독자 | 업데이트 주기 |
+|---|---|---|---|
+| README | 첫 5분 온보딩 | 신규 사용자 | 기능 추가·변경 시 |
+| CONTRIBUTING.md | 기여 절차 | 신규 기여자 | 규칙 변경 시 |
+| CHANGELOG | 버전별 변경 이력 | 기존 사용자 | 릴리스마다 |
+| API Reference | 함수/클래스 명세 | 개발자 | 코드 변경 시 |
+| GOVERNANCE.md | 의사결정 구조 | 커미터, 기여자 | 구조 변경 시 |
 
-오히려 권한을 나누고 루틴을 만들수록 프로젝트는 더 오래 갑니다. 메인테이너의 실력은 혼자 많이 처리하는 데보다, 프로젝트가 사람 한 명에 묶이지 않게 만드는 데서 더 잘 드러납니다.
+### bus factor 이해
 
-## 직접 따라해 보기: 메인테이너 루틴 설계
+bus factor는 특정 인물이 빠졌을 때 프로젝트가 얼마나 위험해지는지 보여 주는 지표입니다.
 
-### 1단계 — 주간 triage 시간 정하기
+```bash
+# 기여자 분산 확인
+gh api repos/owner/repo/contributors \
+  | jq 'sort_by(-.contributions) | .[:5] | .[] | {login, contributions}'
 
-일이 들어올 때마다 반응하면 항상 밀립니다. 짧더라도 정해진 시간에 분류와 우선순위 조정을 하는 편이 효과적입니다.
-
-```text
-Monday, 30 minutes: label and prioritize
+# 출력 예시:
+# {"login": "alice", "contributions": 1847}  ← bus factor 위험
+# {"login": "bob", "contributions": 23}
+# {"login": "carol", "contributions": 12}
 ```
 
-### 2단계 — 첫 응답 기준 정하기
+bus factor가 1이면 alice가 없으면 프로젝트가 멈출 위험이 높습니다. 3 이상을 목표로 합니다.
 
-완벽한 리뷰보다 예측 가능한 응답이 더 중요할 때가 많습니다. 첫 응답 시간이 보이면 기여자는 기다릴 수 있습니다.
+## 주간 메인테이너 루틴
 
-```text
-Aim for first response within two days
-```
+번아웃을 방지하려면 반응형이 아닌 계획적 운영이 필요합니다.
 
-### 3단계 — 릴리스 리듬 만들기
-
-패치와 마이너 릴리스 주기를 어느 정도 고정하면 사용자 기대치도 함께 안정됩니다.
+### 주간 스케줄 예시
 
 ```text
-Patch weekly, minor monthly
+월요일 30분: Triage
+  - 새 이슈 확인 및 라벨 부여
+  - 재현 불가능 이슈 닫기
+  - good first issue 후보 선정
+
+수요일 60분: PR 리뷰
+  - 오래된 PR 우선 (FIFO)
+  - Draft PR은 방향 피드백만
+  - 머지 가능한 PR 처리
+
+금요일 30분: 커뮤니티
+  - Discussions 미답변 확인
+  - Stale 이슈 처리 (30일 이상 비활성)
+  - 다음 릴리스 준비 상태 확인
 ```
 
-### 4단계 — 권한 위임하기
+### triage 자동화
 
-위임은 부담을 덜기 위한 편법이 아니라 프로젝트 리스크를 줄이는 핵심 수단입니다. 리뷰, 라벨링, 문서 수정 권한부터 나누기 시작할 수 있습니다.
+```yaml
+# .github/workflows/triage.yml
+name: Issue Triage
 
-```text
-GitHub Org → Teams → write permission
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+
+jobs:
+  auto-label:
+    runs-on: ubuntu-latest
+    steps:
+    # 키워드 기반 자동 라벨링
+    - uses: actions/labeler@v5
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        configuration-path: .github/labeler.yml
+
+    # Stale 이슈 자동 처리
+  stale:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+    - uses: actions/stale@v9
+      with:
+        stale-issue-message: |
+          이 이슈는 30일 동안 활동이 없어 자동으로 `stale` 라벨이 붙었습니다.
+          관련이 있으면 댓글을 달아 주세요.
+        stale-pr-message: |
+          이 PR은 14일 동안 업데이트가 없었습니다.
+          계속 진행할 계획이 있으면 알려 주세요.
+        days-before-stale: 30
+        days-before-close: 7
 ```
 
-### 5단계 — 휴식 공지하기
+## 권한 위임 설계
 
-비어 있는 시간을 숨기면 기여자는 침묵을 거절로 오해합니다. 경계를 분명히 알리는 편이 오히려 신뢰를 줍니다.
+위임은 부담을 덜기 위한 편법이 아니라 프로젝트 리스크를 줄이는 핵심 수단입니다.
 
-````markdown
+### 역할 단계 문서화 (CONTRIBUTING.md)
+
 ```markdown
-> Maintainer is on vacation Aug 1-14.
+## 역할 단계
+
+### Contributor
+- 조건: PR 1회 이상 머지
+- 권한: 이슈 작성, PR 제출
+- 경로: 첫 PR 머지 후 자동
+
+### Reviewer
+- 조건: 주 1회 이상 PR 리뷰 + 3개월 이상 활동
+- 권한: PR 리뷰 코멘트, 라벨링
+- 경로: 메인테이너 추천
+
+### Committer
+- 조건: 2인 이상 추천 + 1개월 관찰 기간
+- 권한: 브랜치 쓰기, PR 머지 (단 main 제외)
+- 경로: GitHub Teams 추가
+
+### Maintainer
+- 조건: 6개월 이상 커미터 활동 + 릴리스 참여
+- 권한: 전체 저장소 관리, 릴리스 권한
+- 경로: 기존 메인테이너 만장일치
 ```
-````
 
-## 메인테이너 일정 투명화
+### GitHub Teams 권한 설정
 
-메인테이너가 언제 활동하는지 보이면 기여자도 응답을 기다릴 수 있습니다. README나 프로필에 일정을 공개하는 것도 좋은 방법입니다.
+```bash
+# GitHub CLI로 팀 생성 및 권한 부여
+gh api orgs/owner/teams \
+  --method POST \
+  --field name="reviewers" \
+  --field description="PR reviewers with triage permission"
 
-```markdown
-## Maintainer Availability
-
-- @alice: Available Mon-Fri 9-17 UTC
-- @bob: Reviews PRs on weekends
-- Response time: ~48 hours
+# 저장소에 팀 권한 추가
+gh api orgs/owner/teams/reviewers/repos/owner/repo \
+  --method PUT \
+  --field permission="triage"  # read/triage/write/maintain/admin
 ```
 
-편견 없이 말하면 메인테이너도 사람입니다. 일정을 공개하면 기여자는 무응답을 거부로 오해하지 않고, 메인테이너는 항상 대기해야 한다는 압박에서 벗어납니다.
-## 이 예시에서 먼저 읽어야 할 점
+## 문서 자동화
 
-루틴은 피로를 줄입니다. 위임은 규모 확장의 출발점입니다. 공지는 경계를 세우는 문장입니다. bus factor를 낮추는 일은 기술보다 사람 구조의 문제입니다.
-
-강한 메인테이너는 모든 답을 혼자 쥔 사람이 아닙니다. 프로젝트가 자신 없이도 굴러가게 만드는 사람입니다. 이 기준을 놓치면 열정이 빠르게 번아웃으로 바뀝니다.
-
-## 문서 자동화 예시
-
-메인테이너가 혼자 모든 문서를 수동으로 관리하면 금방 지칩니다. 문서 생성과 배포를 GitHub Actions로 자동화하면 부담을 크게 줄일 수 있습니다.
-
-**Sphinx + GitHub Pages 자동 배포**
+메인테이너 혼자 모든 문서를 수동 관리하면 금방 지칩니다.
 
 ```yaml
 # .github/workflows/docs.yml
@@ -153,53 +218,71 @@ name: Deploy Docs
 on:
   push:
     branches: [main]
+    paths: ['docs/**', 'src/**/*.py']
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+
     - uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    - run: pip install sphinx sphinx-rtd-theme
-    - run: cd docs && make html
-    - uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs/_build/html
+
+    - name: Install dependencies
+      run: pip install mkdocs-material mkdocstrings[python]
+
+    - name: Build and deploy
+      run: mkdocs gh-deploy --force
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-**MkDocs Material + GitHub Pages**
+`mkdocs.yml`:
 
 ```yaml
-# .github/workflows/docs.yml
-name: Deploy MkDocs
+site_name: My Project
+theme:
+  name: material
 
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    - run: pip install mkdocs-material
-    - run: mkdocs gh-deploy --force
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
 ```
 
-문서를 커밋할 때마다 자동으로 배포되게 하면 README와 API reference가 항상 동기화됩니다. 메인테이너는 코드와 문서를 함께 PR에 넣는 습관을 유지하기만 하면 됩니다.
-## 자주 하는 실수 다섯 가지
+이렇게 하면 코드의 docstring이 자동으로 API 문서가 됩니다. 메인테이너는 코드와 docstring만 유지하면 됩니다.
 
-1. 모든 풀 리퀘스트 리뷰를 혼자 맡습니다.
-2. 부재 기간을 알리지 않습니다.
-3. bus factor가 1인 상태를 오래 방치합니다.
-4. 라벨과 우선순위 체계를 만들지 않습니다.
-5. 후계자를 키우지 않습니다.
+## 메인테이너 일정 투명화
+
+```markdown
+## Maintainer Availability (README에 추가)
+
+- @alice: 월-금 UTC 09:00-17:00, PR 리뷰 48시간 이내
+- @bob: 주말 위주, 리뷰 72시간 이내
+- 휴가/부재: [Status](https://github.com/owner/repo/issues/999)에서 확인
+
+현재 부재: @alice 2026-06-15 ~ 2026-06-22 (휴가)
+```
+
+```markdown
+<!-- PR 리뷰 대기 중일 때 PR에 추가 -->
+[Maintainer status: On vacation until Jun 22.
+Reviews will resume after that date.]
+```
+
+## 자주 하는 실수
+
+| 실수 | 구체적 상황 | 올바른 접근 |
+|---|---|---|
+| 혼자 모든 PR 리뷰 | 리뷰가 한 명에게 집중되어 병목 발생 | Reviewer 역할 분산, Teams 활용 |
+| 부재 미공지 | 2주 휴가 동안 무응답 | README 또는 이슈에 부재 공지 |
+| bus factor 1 방치 | 핵심 지식이 한 명에게만 있음 | wiki, ADR 문서화, 신규 커미터 육성 |
+| 라벨 체계 부재 | 모든 이슈가 우선순위 없이 쌓임 | `P0-critical`, `P1-high`, `P2-normal` 등 우선순위 라벨 |
+| 후계자 미육성 | 번아웃 시 프로젝트 중단 | CONTRIBUTING.md에 역할 승격 경로 명시 |
 
 ## 실무에서는 이렇게 생각한다
 
@@ -207,106 +290,35 @@ jobs:
 
 시니어 엔지니어는 메인테이너십을 영웅 역할로 보지 않습니다. 반복 가능한 루틴, 명확한 권한 위임, 공개된 일정과 경계, 그리고 후계자 육성이 있어야 프로젝트가 사람 한 명을 넘어섭니다.
 
+**메인테이너 번아웃 조기 신호**:
+
+```text
+- 이슈/PR 응답 시간이 평소 3배 이상 늘어남
+- 커밋 그래프에 2주 이상 공백
+- CHANGELOG 업데이트 없이 코드만 변경
+- "나중에 처리할게요" 댓글이 쌓임
+- 기능 요청을 이유 없이 거부하는 패턴
+```
+
+번아웃 신호가 보이면 즉시 대응합니다:
+1. 부재 공지 게시
+2. Reviewer에게 일부 PR 리뷰 위임
+3. 새 이슈 intake 임시 중단 (interaction limits 활용)
+4. 핵심 버그만 처리하는 "maintenance mode" 공지
+
 ## 운영 체크리스트
 
 - [ ] 주간 triage 루틴이 있습니다.
 - [ ] 리뷰 응답 기준을 정했습니다.
 - [ ] 위임 가능한 권한을 식별했습니다.
 - [ ] bus factor를 2 이상으로 올릴 계획이 있습니다.
+- [ ] 부재 공지 방법을 정했습니다.
 
 ## 연습 문제
 
 1. bus factor를 한 문장으로 정의해 보세요.
 2. triage와 review의 차이를 한 문장으로 적어 보세요.
 3. 후계자를 키우는 방법 하나를 적어 보세요.
-
-## 이슈 템플릿 최적화
-
-이슈 템플릿이 너무 길면 사용자가 귀찮아하고, 너무 짧으면 정보가 부족합니다. 프로젝트 성격에 맞는 최소 필수 항목만 남기는 편이 좋습니다.
-
-```yaml
-# .github/ISSUE_TEMPLATE/bug_report.yml
-name: Bug Report
-description: 버그를 발견했다면 여기에 보고해 주세요
-labels: ["bug"]
-body:
-  - type: textarea
-    id: what-happened
-    attributes:
-      label: 무슨 일이 일어났나요?
-      description: 버그 상황을 한두 문장으로 적어 주세요
-    validations:
-      required: true
-  - type: textarea
-    id: steps
-    attributes:
-      label: 재현 단계
-      placeholder: |
-        1. '...'를 실행합니다
-        2. '...'를 클릭합니다
-        3. 오류가 표시됩니다
-    validations:
-      required: true
-  - type: input
-    id: version
-    attributes:
-      label: 버전
-      placeholder: v1.2.3
-    validations:
-      required: true
-```
-
-템플릿을 YAML 형식으로 만들면 GitHub가 자동으로 form UI를 제공합니다. 사용자는 칸을 채우기만 하면 됩니다.
-## 메인테이너 성장 경로
-
-메인테이너 역할도 성장 경로가 있습니다. 처음에는 모든 일을 혼자 하지만, 시간이 지나면서 역할을 나누고 시스템을 만듭니다.
-
-**단계 1: 창업 메인테이너 (Founder Maintainer)**
-
-- 혼자 모든 코드를 작성
-- 이슈와 PR을 직접 처리
-- 규칙을 문서화하기 시작
-
-**단계 2: 위임 메인테이너 (Delegating Maintainer)**
-
-- 몇명의 committer를 지정
-- 코드 리뷰를 분담
-- 이슈 triage 루틴을 공유
-
-**단계 3: 플랫폼 메인테이너 (Platform Maintainer)**
-
-- 프로젝트 방향만 결정
-- 일상 운영은 팀이 담당
-- 문서와 프로세스를 정비
-
-**단계 4: 명예 메인테이너 (Emeritus Maintainer)**
-
-- 일상 운영에서 완전히 물러남
-- 큰 결정에만 자문 역할
-- 후임 메인테이너가 주도권 완전 보유
-
-이 경로는 프로젝트가 개인에서 조직으로 성장하는 자연스러운 흐름입니다. 혹자 3단계까지 가지 못하면 번아웃으로 프로젝트가 멈춥니다.
-
-## 메인테이너가 위임 가능한 단위를 설계하는 법
-
-메인테이너 번아웃의 핵심 원인은 업무량 자체보다 "모든 결정이 한 사람에게 집중되는 구조"입니다. 해결 방법은 단순 위임이 아니라 위임 가능한 단위를 먼저 설계하는 것입니다.
-
-가장 먼저 나누기 쉬운 영역은 세 가지입니다. 이슈 triage, 문서 리뷰, 릴리스 노트 초안 작성입니다. 코드 머지 권한을 바로 주기 부담스럽다면, 라벨 관리 권한부터 나누는 방식으로 시작할 수 있습니다.
-
-`CONTRIBUTING.md`에 역할 단계를 명시하면 승격 기준이 투명해집니다.
-
-```markdown
-- Contributor: PR 1회 이상
-- Reviewer: 주 1회 이상 리뷰 참여
-- Committer: 2인 추천 + 1개월 관찰
-- Maintainer: 릴리스/운영 책임 분담
-```
-
-PR 리뷰 체크리스트도 역할별로 다르게 둡니다. 신규 리뷰어는 가독성과 테스트 중심, 커미터는 호환성과 릴리스 영향까지 봅니다. 이렇게 기준을 계층화하면 품질을 유지하면서도 권한을 확장할 수 있습니다.
-
-Git 워크플로 측면에서는 보호 브랜치 규칙이 중요합니다. `main` 직접 푸시 금지, 필수 CI 통과, 최소 1개 승인 리뷰를 기본으로 두면 개인 실수를 시스템이 막아 줍니다.
-
-결국 메인테이너십의 목표는 "내가 없어도 저장소가 굴러가게 만드는 것"입니다. 위임 단위 설계, 역할 문서화, 자동화 조합이 이 목표를 현실로 만듭니다.
 
 ## 정리
 
@@ -317,11 +329,11 @@ Git 워크플로 측면에서는 보호 브랜치 규칙이 중요합니다. `ma
 ## 처음 질문으로 돌아가기
 
 - **메인테이너는 실제로 어떤 책임을 지고 있을까요?**
-  - 이 순서가 중요한 이유는 일이 쌓이는 방식이 이 흐름을 따르기 때문입니다. triage가 흔들리면 리뷰가 밀리고, 리뷰가 밀리면 릴리스가 늦어지고, 릴리스가 늦어지면 메인테이너에게 더 많은 요청이 몰립니다. 결국 위임이 없으면 루프 전체가 막힙니다.
+  - 이슈 triage (분류와 우선순위), PR 리뷰 (코드 품질과 방향성 확인), 릴리스 관리 (버전, CHANGELOG, 배포), 커뮤니티 운영 (행동 강령 집행, 신규 기여자 환영), 문서 유지, 권한 위임, 후계자 육성까지입니다. 코드 작성보다 이 모든 일이 프로젝트 수명에 더 큰 영향을 줍니다.
 - **triage, review, release는 왜 하나의 루틴으로 묶어 봐야 할까요?**
-  - 이 순서가 중요한 이유는 일이 쌓이는 방식이 이 흐름을 따르기 때문입니다
+  - 세 단계는 순환 의존성을 가집니다. triage가 안 되면 무엇을 리뷰해야 하는지 모르고, 리뷰가 안 되면 릴리스 준비가 안 되며, 릴리스가 안 되면 더 많은 이슈가 생깁니다. 이 루프를 하나의 반복 리듬으로 설계하지 않으면 각 단계가 서로를 막습니다.
 - **권한 위임과 후계자 육성은 왜 선택이 아니라 지속성 문제일까요?**
-  - maintainer는 저장소 방향과 품질 기준을 지키는 책임자입니다
+  - bus factor가 1인 프로젝트는 메인테이너 한 명의 번아웃, 이직, 사고로 중단됩니다. 이미 수만 명이 쓰는 도구가 메인테이너 한 명의 중단으로 archive되는 사례는 오픈소스 역사에서 반복됩니다. 위임과 후계자 육성은 개인 편의가 아니라 프로젝트가 자신을 넘어 살아남게 만드는 설계 결정입니다.
 
 <!-- toc:end -->
 

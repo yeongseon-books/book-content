@@ -1,596 +1,327 @@
 ---
-title: "AI App Patterns 101 (3/6): 문서 어시스턴트 — 요약, 추출, 분류"
 series: ai-app-patterns-101
 episode: 3
-language: ko
-status: published
-published_to:
-  tistory:
-    url: "https://yeongseonchoe.tistory.com/79"
-    published_at: '2026-05-13'
+title: "AI App Patterns 101 (3/6): Document Assistant 패턴"
+status: publish-ready
 targets:
   tistory: true
   medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
+language: ko
 tags:
-- LLM
-- RAG
-- Agent
-- Python
-last_reviewed: '2026-05-12'
-seo_description: 문서 어시스턴트는 대화형 시스템이 아니라 긴 입력을 짧은 작업 출력으로 바꾸는 변환기입니다.
+  - DocumentAI
+  - Summarization
+  - Extraction
+  - MapReduce
+  - LLM
+seo_description: Map-Reduce 요약, JSON 구조화 추출, 배치 분류까지 문서 어시스턴트 패턴의 핵심 구현을 정리합니다
+last_reviewed: '2026-06-20'
 ---
 
-# AI App Patterns 101 (3/6): 문서 어시스턴트 — 요약, 추출, 분류
+# AI App Patterns 101 (3/6): Document Assistant 패턴
 
-문서 처리 작업은 겉으로 보면 서로 달라 보이지만, 실제 엔지니어링 문제는 놀랄 만큼 비슷합니다. 긴 입력을 받고, 모델이 처리할 수 있게 형태를 다듬고, 짧고 계약이 분명한 출력으로 돌려주는 일입니다. 이 관점으로 보면 요약, 정보 추출, 분류는 서로 다른 기능이 아니라 같은 패턴군으로 읽힙니다.
+긴 PDF 보고서를 요약하거나, 계약서에서 주요 조항을 추출하거나, 수백 개의 고객 피드백을 카테고리별로 분류해야 할 때 Document Assistant 패턴이 등장합니다. 이 패턴의 특징은 단일 LLM 호출이 아니라 문서를 여러 단계로 처리하는 파이프라인 구조에 있습니다. 문서가 컨텍스트 길이를 초과하면 Map-Reduce로 분할 처리하고, 구조화 데이터가 필요하면 JSON 스키마를 강제하며, 대량 문서를 처리할 때는 배치와 비동기를 활용합니다.
 
-문서 어시스턴트를 챗봇처럼 보면 설계 포인트를 놓치기 쉽습니다. 여기서는 대화가 이어지지 않습니다. 문서가 입력이고, 규칙 있는 결과가 출력입니다. 따라서 중요한 것은 기억 유지보다 입력 분할, 출력 형식, 배치 처리 안정성입니다.
+이 글은 AI App Patterns 101 시리즈의 3번째 글입니다.
 
-이 글은 AI App Patterns 101 시리즈의 세 번째 글입니다. 여기서는 문서 어시스턴트 패턴을 요약, 구조화 추출, 분류 흐름으로 나누어 정리합니다.
-
-![짧은 문서 요약 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.ko.png)
-*짧은 문서 요약 흐름*
-> 문서 어시스턴트는 대화형 시스템이 아니라, 긴 입력을 읽고 작업 목적에 맞는 짧은 출력으로 바꾸는 변환기입니다.
+![Document Assistant 패턴 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-01-concept-at-a-glance.ko.png)
+*Map-Reduce 요약과 구조화 추출이 결합된 Document Assistant 파이프라인*
 
 ## 이 글에서 다룰 문제
 
-- 문서 어시스턴트에서 요약, 추출, 분류는 왜 서로 다른 출력 계약이 필요할까요?
-- 긴 문서는 언제 Map-Reduce 요약처럼 단계적으로 나눠야 할까요?
-- 추출과 분류 결과를 운영 코드가 믿으려면 어떤 검증이 필요할까요?
-- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
-- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
+- 컨텍스트 길이를 초과하는 문서는 어떻게 요약할 수 있을까요?
+- Map-Reduce 요약에서 Reduce 단계가 품질에 미치는 영향은 무엇일까요?
+- LLM으로 구조화된 JSON 데이터를 안정적으로 추출하려면 어떻게 해야 할까요?
+- 수백 개 문서를 배치 처리할 때 레이트 리밋을 어떻게 관리할까요?
+- 분류 작업에서 LLM 응답의 일관성을 높이는 방법은 무엇일까요?
 
-## 문서 요약
+## 핵심 개념 한 줄 정리
 
-### 짧은 문서 요약 흐름
+- **Map-Reduce**: 문서를 청크로 분할해 각각 처리(Map)한 뒤 결과를 합쳐 최종 출력을 생성(Reduce)하는 패턴입니다.
+- **Structured Extraction**: JSON 스키마를 LLM 출력에 강제해 파싱 가능한 구조화 데이터를 얻는 기법입니다.
+- **Batch Classification**: 여러 문서를 정해진 카테고리로 분류하는 작업입니다.
+- **Refine Strategy**: 이전 요약 결과를 다음 청크 요약에 누적해 나가는 순차 요약 전략입니다.
+- **Async Processing**: 여러 LLM 호출을 병렬로 실행해 처리 시간을 단축하는 방식입니다.
 
-짧은 문서는 전체 텍스트를 그대로 넘기고 요약만 요청하면 됩니다. 스타일, 길이, 독자층을 매개변수화하면 같은 체인을 여러 소비자에게 재사용할 수 있습니다.
+## 요약 전략 비교
 
-```python
-import os
+| 전략 | 장점 | 단점 | 적합 상황 |
+|---|---|---|---|
+| Map-Reduce | 병렬 처리 가능, 빠름 | Reduce 단계에서 세부 사항 손실 | 보고서, 뉴스 기사 요약 |
+| Refine | 맥락 누적, 세부 사항 보존 | 순차 처리라 느림 | 계약서, 법률 문서 |
+| 계층적 요약 | 다단계 압축 가능 | 구현 복잡도 높음 | 매우 긴 문서 (100+ 페이지) |
+| 직접 요약 | 가장 단순 | 컨텍스트 길이 제한 | 짧은 문서 (1-2페이지) |
 
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_groq import ChatGroq
+## 실습 1: Map-Reduce 요약
 
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
-
-summarize_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "Summarize the following document in a {style} style.\n"
-        "Length: {length}\n"
-        "Audience: {audience}",
-    ),
-    ("human", "Document:\n{document}"),
-])
-
-chain = summarize_prompt | llm | StrOutputParser()
-
-document = """
-A 2024 Python developer survey found Python ranked as the most popular programming
-language for the fifth consecutive year. Sixty-seven percent of respondents use Python
-as their primary language; of those, 45 percent apply it to data science and machine
-learning workloads. Web development accounts for 28 percent of use cases, and
-automation scripting for 18 percent.
-
-Python 3.12 delivered a 25 percent performance improvement over the prior version
-and strengthened type hint support. Eighty-nine percent of respondents run Python 3.x;
-only 2 percent still use Python 2.x.
-
-The most-used frameworks are FastAPI (52 percent), Django (38 percent), and Flask
-(34 percent). In the data science domain, pandas (78 percent), numpy (72 percent),
-and scikit-learn (65 percent) dominate.
-"""
-
-exec_summary = chain.invoke({
-    "document": document,
-    "style": "business-focused",
-    "length": "three sentences or fewer",
-    "audience": "non-technical executives",
-})
-print("=== Executive summary ===")
-print(exec_summary)
-
-dev_summary = chain.invoke({
-    "document": document,
-    "style": "technical",
-    "length": "five bullet points",
-    "audience": "senior engineers",
-})
-print("\n=== Developer summary ===")
-print(dev_summary)
-```
-
----
-
-## 긴 문서 요약 — Map-Reduce
-
-### 청크 요약과 최종 합성
-
-![청크 요약과 최종 합성](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-02-chunk-summaries-and-final-synthesis.ko.png)
-
-*청크 요약과 최종 합성*
-문서가 컨텍스트 창을 넘으면 한 번의 호출로 처리할 수 없습니다. Map-Reduce는 문서를 청크로 나누고 각 청크를 독립적으로 요약한 뒤(Map), 그 요약들을 합쳐 하나의 일관된 결과로 만드는 방식입니다(Reduce).
-
-> 멘탈 모델은 간단합니다. 모델 하나가 긴 문서를 한 번에 이해한다고 기대하지 말고, 먼저 부분 요약을 만들고 나중에 총괄 편집자를 한 번 더 태운다고 생각하면 됩니다.
+긴 문서를 청크로 분할해 각각 요약하고(Map), 청크 요약들을 합쳐 최종 요약을 생성합니다(Reduce).
 
 ```python
-import os
+import asyncio
+from openai import AsyncOpenAI
 
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_groq import ChatGroq
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+client = AsyncOpenAI()
 
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
 
-map_prompt = ChatPromptTemplate.from_messages([
-    ("system", "Summarize the following text segment in two to three sentences, keeping only the key points."),
-    ("human", "{chunk}"),
-])
+def split_into_chunks(text: str, max_words: int = 800) -> list[str]:
+    """문서를 단어 기준으로 청크로 분할합니다."""
+    words = text.split()
+    chunks = []
+    for i in range(0, len(words), max_words):
+        chunk = " ".join(words[i : i + max_words])
+        if chunk.strip():
+            chunks.append(chunk)
+    return chunks
 
-reduce_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "You have received summaries of multiple document segments.\n"
-        "Merge them into a single coherent summary.\n"
-        "Remove duplicates and preserve logical flow.",
-    ),
-    ("human", "Segment summaries:\n{summaries}"),
-])
 
-map_chain = map_prompt | llm | StrOutputParser()
-reduce_chain = reduce_prompt | llm | StrOutputParser()
-
-def map_reduce_summarize(long_document: str) -> str:
-    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-    chunks = splitter.split_text(long_document)
-    print(f"  chunks: {len(chunks)}")
-
-    # 맵: 각 청크를 독립적으로 요약
-    chunk_summaries = []
-    for i, chunk in enumerate(chunks):
-        summary = map_chain.invoke({"chunk": chunk})
-        chunk_summaries.append(summary)
-        print(f"  chunk {i + 1}/{len(chunks)} summarized")
-
-    # 축소: 모든 요약을 병합합니다.
-    combined = "\n\n".join(
-        f"[Segment {i + 1}] {s}" for i, s in enumerate(chunk_summaries)
+async def summarize_chunk(chunk: str, chunk_num: int, total: int) -> str:
+    """단일 청크를 요약합니다 (Map 단계)."""
+    prompt = (
+        f"다음은 긴 문서의 {chunk_num}/{total} 부분입니다. "
+        "핵심 내용만 3-5문장으로 요약하세요.\n\n"
+        f"{chunk}"
     )
-    return reduce_chain.invoke({"summaries": combined})
-
-long_doc = """
-Artificial intelligence (AI) is the field of computer science dedicated to simulating
-human cognitive ability in machines. Alan Turing posed the foundational question —
-"Can machines think?" — in the 1950s, and the field has since gone through multiple
-cycles of enthusiasm and disillusionment.
-
-Machine learning is a subfield of AI in which computers learn rules from data rather
-than executing explicitly programmed instructions. Decision trees, random forests, and
-support vector machines are representative algorithms.
-
-Deep learning is a branch of machine learning that uses artificial neural networks
-modeled on the human brain. The field gained widespread attention after a deep learning
-model dominated the 2012 ImageNet competition by a large margin. It has since driven
-breakthroughs in image recognition, speech recognition, and natural language processing.
-
-Large language models (LLMs) are deep learning models trained on massive text corpora.
-GPT, BERT, and LLaMA are prominent examples. They handle text generation, summarization,
-translation, and code writing, among other tasks. ChatGPT's release in late 2022 brought
-LLMs into mainstream public awareness.
-
-The future of AI is promising but comes with substantial challenges. Explainability,
-bias, privacy, energy consumption, and labor displacement require coordinated social
-responses. At the same time, AI is expected to play a central role in addressing
-pressing problems in medicine, climate change, and education.
-"""
-
-print("Starting Map-Reduce summarization...")
-final = map_reduce_summarize(long_doc)
-print(f"\n=== Final summary ===\n{final}")
-```
-
----
-
-## 정보 추출
-
-### 비정형 텍스트에서 JSON 추출
-
-![비정형 텍스트에서 JSON 추출](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-03-json-extraction-from-unstructured-text.ko.png)
-
-*비정형 텍스트에서 JSON 추출*
-비정형 텍스트 안에는 후속 시스템이 필요로 하는 구조화 데이터가 숨어 있는 경우가 많습니다. 추출할 필드를 명시하고 JSON으로만 반환하게 한 뒤, `JsonOutputParser`로 파싱하면 됩니다.
-
-```python
-import os
-
-from langchain_core.output_parsers import JsonOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_groq import ChatGroq
-
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
-
-extract_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "Extract information from the text below and return it as JSON only. "
-        "Do not include any other text.\n\n"
-        "Fields to extract:\n{schema}",
-    ),
-    ("human", "Text:\n{text}"),
-])
-
-chain = extract_prompt | llm | JsonOutputParser()
-
-job_schema = """
-{
-  "company": "company name",
-  "position": "job title",
-  "location": "location",
-  "salary_range": "salary range (null if not mentioned)",
-  "required_skills": ["list of required skills"],
-  "experience_years": "years of experience as a number (null if not mentioned)",
-  "employment_type": "full-time / contract / freelance"
-}"""
-
-job_postings = [
-    """
-    ABCTech is hiring a senior backend engineer in Gangnam, Seoul.
-    Salary range 80M-120M KRW. Five or more years with Python/Django required.
-    AWS and Docker experience a plus. Full-time position.
-    """,
-    """
-    Startup XYZ is looking for a full-stack developer. Remote work available.
-    Proficiency in React, Node.js, and PostgreSQL required. Three or more years.
-    Contract role with potential conversion to full-time.
-    """,
-]
-
-for i, posting in enumerate(job_postings, start=1):
-    print(f"\n=== Job posting {i} ===")
-    result = chain.invoke({"text": posting, "schema": job_schema})
-    for key, value in result.items():
-        print(f"  {key}: {value}")
-```
-
----
-
-## 문서 분류
-
-### 신뢰도를 함께 돌려주는 배치 분류
-
-![신뢰도를 함께 돌려주는 배치 분류](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-04-batch-classification-with-confidence-out.ko.png)
-
-*신뢰도를 함께 돌려주는 배치 분류*
-문서를 카테고리로 분류하는 일은 콘텐츠 파이프라인, 지원 티켓 라우팅, 규정 준수 워크플로에서 흔한 전처리 단계입니다.
-
-```python
-import os
-
-from langchain_core.output_parsers import JsonOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_groq import ChatGroq
-
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
-
-classify_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "Classify the following text. Return JSON only.\n\n"
-        "Available categories: {categories}\n\n"
-        'Format: {{"category": "category name", "confidence": 0 to 1, "reason": "brief reason"}}',
-    ),
-    ("human", "Text:\n{text}"),
-])
-
-chain = classify_prompt | llm | JsonOutputParser()
-
-categories = "Technology/IT, Business/Finance, Health/Medicine, Sports, Entertainment, Other"
-
-texts = [
-    "Python 3.12 significantly improved generic type handling speed, reducing overhead by 25 percent.",
-    "Operating profit for Q3 rose 15 percent year-over-year, driven by expansion into overseas markets.",
-    "A new study reports that regular aerobic exercise reduces cardiovascular disease risk by 30 percent.",
-    "Real Madrid defeated Manchester City 2-1 in the Champions League final to claim the title.",
-]
-
-for text in texts:
-    result = chain.invoke({"text": text, "categories": categories})
-    print(f"text: {text[:60]}...")
-    print(f"  category: {result.get('category')}, confidence: {result.get('confidence'):.2f}")
-    print(f"  reason: {result.get('reason')}\n")
-```
-
----
-
-## 이 코드에서 먼저 볼 점
-
-- `main.py`는 긴 문서를 여러 모델 호출에 걸쳐 처리할 수 있도록 map 단계와 reduce 단계를 명시적으로 분리합니다.
-- 중간 청크 요약을 각각 출력하기 때문에 어디서 정보가 빠졌는지 디버깅하기 쉽습니다.
-- 같은 패턴은 요약뿐 아니라 추출이나 분류 배치로도 자연스럽게 일반화됩니다.
-
----
-
-## 어디서 자주 헷갈릴까요?
-
-### 요약, 추출, 분류 사이의 패턴 선택
-
-![요약, 추출, 분류 사이의 패턴 선택](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-05-pattern-choice-across-summary-extraction.ko.png)
-
-*요약, 추출, 분류 사이의 패턴 선택*
-- 많은 팀이 먼저 더 큰 모델을 찾지만, 요약 품질에는 대개 청크 크기와 overlap이 더 크게 작용합니다.
-- Map-Reduce는 병렬화에 유리하지만 청크 사이의 전역 문맥을 약하게 만듭니다. 그래서 reduce 프롬프트가 중요합니다.
-- 문서 요약과 문서 Q&A는 입력층에서 비슷해 보여도, 실제로 최적화하는 운영 메트릭은 다릅니다.
-
----
-
-## 운영 체크리스트
-
-- [ ] 긴 문서가 여러 청크로 분할된다
-- [ ] 각 청크가 독립적으로 요약된다
-- [ ] 부분 요약들이 하나의 최종 요약으로 합쳐진다
-- [ ] 최종 합성 프롬프트가 중복 제거와 일관성을 책임진다
-
----
-
-## 문서 처리 API: 요약·추출·분류를 같은 서비스에서 운영하기
-
-### 작업별 시스템 프롬프트 템플릿
-
-문서 어시스턴트는 "한 모델"보다 "작업 계약"이 먼저입니다. 아래처럼 작업마다 프롬프트 템플릿을 분리하면 품질 회귀를 좁게 관리할 수 있습니다.
-
-```python
-SUMMARY_SYSTEM_PROMPT = """
-당신은 기술 문서를 요약하는 편집자입니다.
-- 핵심 주장, 근거, 결론만 남깁니다.
-- 과장 표현을 제거합니다.
-- 출력은 4문장 이내로 제한합니다.
-""".strip()
-
-EXTRACTION_SYSTEM_PROMPT = """
-당신은 비정형 문서에서 구조화 필드를 추출합니다.
-- 지정된 JSON 스키마만 반환합니다.
-- 값이 없으면 null로 기록합니다.
-- 추측으로 필드를 채우지 않습니다.
-""".strip()
-
-CLASSIFICATION_SYSTEM_PROMPT = """
-당신은 운영 라우팅 분류기입니다.
-- 허용 라벨 집합 밖의 값을 만들지 않습니다.
-- 신뢰도(confidence)를 0~1로 함께 반환합니다.
-""".strip()
-```
-
-이렇게 나누면 요약 품질 저하와 추출 파싱 실패를 동일 원인으로 섞지 않게 됩니다. 운영 중에는 문제를 빠르게 분해하는 능력이 결과적으로 비용을 줄입니다.
-
-### Flask 엔드포인트 예시
-
-```python
-from flask import Flask, request, jsonify
-
-app = Flask(__name__)
-
-@app.post('/documents/summarize')
-def summarize_document():
-    text = request.json['text']
-    style = request.json.get('style', 'technical')
-    # 실제로 SUMMARY_SYSTEM_PROMPT를 실행하여 호출합니다.
-    return jsonify({'summary': f'[{style}] 요약 예시: {text[:120]}...'})
-
-@app.post('/documents/extract')
-def extract_fields():
-    text = request.json['text']
-    schema = request.json['schema']
-    # 실제 구현에서는 EXTRACTION_SYSTEM_PROMPT + JSON 파서
-    return jsonify({'result': {'company': 'ABCTech', 'salary_range': None}, 'schema': schema})
-
-@app.post('/documents/classify')
-def classify_document():
-    text = request.json['text']
-    # CLASSIFICATION_SYSTEM_PROMPT의 실제 구현
-    return jsonify({'category': 'Technology/IT', 'confidence': 0.91, 'preview': text[:60]})
-```
-
-### 배치 처리에서의 실패 복구 단위
-
-문서 처리에서는 한 건 실패 때문에 전체 배치를 중단하지 않는 설계가 중요합니다. 그래서 보통 문서 단위 재시도 키를 둡니다.
-
-```text
-job_id: batch-2026-05-21-001
-item_id: doc-00041
-status: failed
-failed_stage: extraction
-retry_count: 2
-last_error: invalid_json_output
-```
-
-이 메타데이터를 남기면 재처리 큐에서 `failed_stage`부터 재개할 수 있습니다. "어디서 깨졌는지"가 남지 않으면 긴 배치 작업은 재현 비용이 급격히 커집니다.
-
-## 문서 처리 안정성: 스키마 검증과 부분 실패 허용
-
-요약은 자연어라서 느슨하게 처리해도 되지만, 추출과 분류는 후속 시스템 입력이므로 엄격해야 합니다. 아래처럼 Pydantic 검증 계층을 두면 모델 출력이 흔들려도 오류를 조기에 잡을 수 있습니다.
-
-```python
-from pydantic import BaseModel, Field, ValidationError
-
-class JobExtract(BaseModel):
-    company: str
-    position: str
-    location: str | None = None
-    salary_range: str | None = None
-    experience_years: int | None = Field(default=None, ge=0, le=40)
-
-def validate_extract(payload: dict) -> tuple[bool, str]:
-    try:
-        JobExtract.model_validate(payload)
-        return True, 'ok'
-    except ValidationError as exc:
-        return False, str(exc)
-```
-
-### 부분 실패 허용 배치 루프
-
-```python
-def process_batch(items: list[dict]) -> dict:
-    results = []
-    failures = []
-
-    for item in items:
-        extracted = run_extraction(item['text'])
-        ok, reason = validate_extract(extracted)
-
-        if ok:
-            results.append({'id': item['id'], 'result': extracted})
-        else:
-            failures.append({'id': item['id'], 'reason': reason})
+    response = await client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=300,
+    )
+    return response.choices[0].message.content
+
+
+async def reduce_summaries(summaries: list[str], original_length: int) -> str:
+    """청크 요약들을 하나의 최종 요약으로 합칩니다 (Reduce 단계)."""
+    combined = "\n\n".join(
+        f"[파트 {i+1}]\n{s}" for i, s in enumerate(summaries)
+    )
+    prompt = (
+        f"다음은 {original_length}단어 문서의 각 파트 요약입니다. "
+        "중복을 제거하고 전체 내용을 5-7문장으로 통합 요약하세요. "
+        "핵심 결론과 주요 발견 사항을 강조하세요.\n\n"
+        f"{combined}"
+    )
+    response = await client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=500,
+    )
+    return response.choices[0].message.content
+
+
+async def map_reduce_summarize(text: str) -> dict:
+    """Map-Reduce 방식으로 긴 문서를 요약합니다."""
+    chunks = split_into_chunks(text, max_words=800)
+    word_count = len(text.split())
+
+    if len(chunks) == 1:
+        # 짧은 문서는 직접 요약
+        summary = await summarize_chunk(chunks[0], 1, 1)
+        return {"summary": summary, "chunks_processed": 1}
+
+    # Map: 모든 청크를 병렬로 요약
+    map_tasks = [summarize_chunk(c, i + 1, len(chunks)) for i, c in enumerate(chunks)]
+    chunk_summaries = await asyncio.gather(*map_tasks)
+
+    # Reduce: 청크 요약들을 통합
+    final_summary = await reduce_summaries(list(chunk_summaries), word_count)
 
     return {
-        'success_count': len(results),
-        'failure_count': len(failures),
-        'results': results,
-        'failures': failures,
+        "summary": final_summary,
+        "chunks_processed": len(chunks),
+        "original_word_count": word_count,
     }
 ```
 
-배치 시스템에서 중요한 것은 100건 중 2건 실패를 100건 전체 실패로 키우지 않는 것입니다. 실패한 건만 분리해 재처리하면 처리량과 안정성을 동시에 챙길 수 있습니다.
+## 실습 2: JSON 구조화 추출
 
-### 처리 파이프라인 다이어그램
-
-```mermaid
-flowchart LR
-    I[문서 입력] --> S[요약]
-    I --> E[추출]
-    I --> C[분류]
-    E --> V{스키마 검증}
-    V -->|통과| O[정상 저장]
-    V -->|실패| R[재처리 큐]
-    C --> O
-    S --> O
-```
-
-*요약·추출·분류 공존 파이프라인과 검증 분기*
-
-## 문서 길이와 작업 타입에 따른 실행 전략
-
-문서 어시스턴트의 운영 비용은 문서 길이 분포에 크게 좌우됩니다. 그래서 보통 입력 길이를 기준으로 실행 전략을 나눕니다.
+계약서나 이력서에서 특정 필드를 추출할 때 JSON 응답 형식을 강제하면 파싱 오류를 줄일 수 있습니다.
 
 ```python
-def choose_strategy(char_len: int, task_type: str) -> str:
-    if task_type == 'summary' and char_len > 8000:
-        return 'map_reduce_summary'
-    if task_type == 'extraction' and char_len > 12000:
-        return 'sectioned_extraction'
-    if task_type == 'classification' and char_len > 20000:
-        return 'hierarchical_classification'
-    return 'single_pass'
+from openai import OpenAI
+from pydantic import BaseModel
+import json
+
+client = OpenAI()
+
+
+class ContractInfo(BaseModel):
+    parties: list[str]
+    start_date: str | None
+    end_date: str | None
+    total_value: str | None
+    key_obligations: list[str]
+    termination_conditions: list[str]
+
+
+def extract_contract_info(contract_text: str) -> ContractInfo:
+    """계약서에서 핵심 정보를 구조화 추출합니다."""
+    schema = ContractInfo.model_json_schema()
+    prompt = f"""다음 계약서에서 정보를 추출하세요.
+
+계약서:
+{contract_text[:4000]}  # 컨텍스트 제한
+
+반드시 다음 JSON 스키마를 따르세요:
+{json.dumps(schema, ensure_ascii=False, indent=2)}
+
+날짜는 YYYY-MM-DD 형식으로, 금액은 통화 단위 포함해 문자열로 반환하세요.
+찾을 수 없는 필드는 null로 반환하세요."""
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=1024,
+        response_format={"type": "json_object"},
+    )
+
+    raw = json.loads(response.choices[0].message.content)
+    return ContractInfo(**raw)
+
+
+# 사용 예시
+sample_contract = """
+이 계약은 2026년 1월 1일부터 2026년 12월 31일까지...
+갑: ABC 주식회사, 을: XYZ 컨설팅
+총 계약금액: 5,000만원
+...
+"""
+
+info = extract_contract_info(sample_contract)
+print(f"당사자: {info.parties}")
+print(f"계약 기간: {info.start_date} ~ {info.end_date}")
+print(f"계약 금액: {info.total_value}")
 ```
 
-이 분기는 단순해 보이지만 효과가 큽니다. 모든 문서를 단일 전략으로 처리하면 과도한 비용이나 파싱 실패가 누적되기 쉽습니다.
+## 실습 3: 배치 분류
 
-### 오케스트레이션 다이어그램
+수백 개 고객 피드백을 카테고리별로 분류하는 배치 처리입니다.
 
-```mermaid
-flowchart LR
-    I[문서 입력] --> L{길이/작업 평가}
-    L -->|short| S1[Single pass]
-    L -->|long summary| S2[Map-Reduce]
-    L -->|long extraction| S3[Sectioned extraction]
-    S1 --> O[결과 저장]
-    S2 --> O
-    S3 --> O
+```python
+import asyncio
+from openai import AsyncOpenAI
+from typing import Literal
+
+client = AsyncOpenAI()
+
+CATEGORIES = ["버그 신고", "기능 요청", "사용법 문의", "결제 문제", "기타"]
+
+CategoryType = Literal["버그 신고", "기능 요청", "사용법 문의", "결제 문제", "기타"]
+
+
+async def classify_feedback(feedback: str, feedback_id: str) -> dict:
+    """단일 피드백을 분류합니다."""
+    categories_str = ", ".join(f'"{c}"' for c in CATEGORIES)
+    prompt = f"""다음 고객 피드백을 분류하세요.
+
+카테고리: {categories_str}
+
+피드백:
+{feedback}
+
+JSON으로만 응답: {{"category": "카테고리명", "confidence": 0.0-1.0, "summary": "한 줄 요약"}}"""
+
+    response = await client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=128,
+        response_format={"type": "json_object"},
+    )
+
+    import json
+    result = json.loads(response.choices[0].message.content)
+    return {"id": feedback_id, **result}
+
+
+async def batch_classify(
+    feedbacks: list[dict],
+    concurrency: int = 5,
+) -> list[dict]:
+    """레이트 리밋을 고려한 배치 분류 처리입니다."""
+    semaphore = asyncio.Semaphore(concurrency)
+    results = []
+
+    async def classify_with_semaphore(item: dict) -> dict:
+        async with semaphore:
+            try:
+                result = await classify_feedback(
+                    item["text"], item["id"]
+                )
+                await asyncio.sleep(0.1)  # 레이트 리밋 완충
+                return result
+            except Exception as e:
+                return {
+                    "id": item["id"],
+                    "category": "기타",
+                    "confidence": 0.0,
+                    "error": str(e),
+                }
+
+    tasks = [classify_with_semaphore(f) for f in feedbacks]
+    results = await asyncio.gather(*tasks)
+    return list(results)
+
+
+# 사용 예시
+feedbacks = [
+    {"id": "fb001", "text": "로그인 버튼이 클릭되지 않아요."},
+    {"id": "fb002", "text": "다크 모드 기능을 추가해 주세요."},
+    {"id": "fb003", "text": "결제가 두 번 청구되었습니다."},
+]
+
+results = asyncio.run(batch_classify(feedbacks))
+for r in results:
+    print(f"{r['id']}: {r['category']} (신뢰도: {r['confidence']:.2f})")
 ```
 
-*문서 길이 기반 실행 전략 분기*
+## 운영 체크리스트
 
-### 운영 팁
+- [ ] Map 단계 청크 크기가 모델 컨텍스트 한도의 60% 이내로 설정되어 있습니다.
+- [ ] JSON 추출 실패 시 재시도 로직이 있습니다.
+- [ ] 배치 처리 중 개별 아이템 실패가 전체 배치를 중단시키지 않습니다.
+- [ ] 긴 문서 처리 시 예상 비용을 미리 계산합니다.
+- [ ] 추출 결과에 대한 스키마 검증이 Pydantic으로 이루어집니다.
 
-추출 실패를 줄이려면 모델 출력이 JSON이라고 가정하지 말고, "파싱 실패 시 원문 보존 + 재시도 큐"를 기본으로 두는 편이 안전합니다. 데이터 파이프라인에서 가장 비싼 실패는 조용한 실패입니다.
+## 자주 하는 실수
 
-## 품질 점검 샘플셋 운영
-
-문서 어시스턴트는 운영 전에 작업별 샘플셋을 두는 편이 안전합니다. 요약은 핵심 누락 여부, 추출은 스키마 일치율, 분류는 라벨 정확도로 분리해 측정해야 합니다.
-
-```text
-summary_set: 200건, metric=핵심키워드 재현율
-extraction_set: 300건, metric=필드 정합률
-classification_set: 500건, metric=macro_f1
-```
-
-하나의 점수로 묶으면 어떤 작업이 깨졌는지 보이지 않습니다. 작업별 품질 계기판을 분리하는 것이 유지보수에 유리합니다.
-
-### 출력 길이 가드
-
-요약 결과가 너무 길어지면 후속 시스템이 예상한 화면이나 DB 컬럼 길이를 넘길 수 있습니다. 작업별 최대 길이를 두고 초과 시 자동 재요약하는 후처리를 두면 안정성이 좋아집니다.
-
-### 파이프라인 버전 관리
-
-요약/추출/분류 체인은 각각 버전을 붙여 릴리스 노트와 함께 관리해야 합니다. 같은 문서라도 체인 버전에 따라 결과가 달라질 수 있기 때문입니다.
-
-### 운영 회고에서 반드시 남길 항목
-
-패턴 설계가 실제로 효과가 있었는지는 회고 기록 품질에서 드러납니다. 각 글에서 다룬 구조를 실서비스에 적용했다면, 최소한 다음 항목은 공통 템플릿으로 남기는 편이 좋습니다.
-
-- 변경 전/후의 실패 유형 분포
-- 변경 전/후의 평균 지연 시간과 p95
-- 사람이 개입한 건수와 자동 처리 건수 비율
-- 근거 부족, 파싱 실패, 도구 오류 같은 실패 코드의 추세
-- 다음 분기에서 조정할 임계값 또는 프롬프트 버전
-
-이 기록이 쌓이면 모델 자체 성능보다 애플리케이션 패턴 결정이 어떤 영향을 주었는지 분리해서 볼 수 있습니다. 결국 운영 품질은 한 번의 정답 설계가 아니라, 측정 가능한 개선 루프를 오래 유지하는 능력에서 만들어집니다.
-
-## 정리
-
-요약, 추출, 분류는 문서 처리 사용 사례의 대부분을 차지합니다. 각 체인은 하나의 작업만 맡게 두는 편이 좋습니다. 요약과 추출을 한 프롬프트 안에 섞으면 출력 품질이 안정적으로 떨어집니다. 긴 문서에는 표준 접근이 분명합니다. 청크로 나누고, 독립적으로 map을 돌리고, 마지막에 한 번 reduce합니다.
-
-다음 글에서는 에이전트와 도구 패턴을 다룹니다. 문맥만으로 답할 수 없는 질문에 대해 LLM이 자율적으로 도구를 선택하고 호출하는 구조입니다.
-
----
+| 실수 | 증상 | 해결 방법 |
+|---|---|---|
+| Map 청크를 너무 작게 설정 | 맥락 손실로 요약 품질 저하 | 청크를 600-1000 단어로 설정 |
+| Reduce 없이 청크 요약만 반환 | 요약이 파편화되어 독자 혼란 | Reduce 단계에서 통합 요약 필수 |
+| JSON 강제 없이 텍스트 파싱 | 구조화 데이터 추출 실패율 높음 | response_format json_object 사용 |
+| 동시 요청 수 제한 없음 | OpenAI 레이트 리밋 오류 (429) | Semaphore로 동시성 제어 |
+| 분류 카테고리를 프롬프트에만 나열 | 모델이 임의 카테고리 생성 | 허용 카테고리를 JSON 스키마로 명시 |
 
 ## 처음 질문으로 돌아가기
 
-- **문서 어시스턴트에서 요약, 추출, 분류는 왜 서로 다른 출력 계약이 필요할까요?**
-  - 문서를 카테고리로 분류하는 일은 콘텐츠 파이프라인, 지원 티켓 라우팅, 규정 준수 워크플로에서 흔한 전처리 단계입니다.
-- **긴 문서는 언제 Map-Reduce 요약처럼 단계적으로 나눠야 할까요?**
-  - 문서가 컨텍스트 창을 넘으면 한 번의 호출로 처리할 수 없습니다. Map-Reduce는 문서를 청크로 나누고 각 청크를 독립적으로 요약한 뒤(Map), 그 요약들을 합쳐 하나의 일관된 결과로 만드는 방식입니다(Reduce).
-- **추출과 분류 결과를 운영 코드가 믿으려면 어떤 검증이 필요할까요?**
-  - 문서 어시스턴트는 "한 모델"보다 "작업 계약"이 먼저입니다. 아래처럼 작업마다 프롬프트 템플릿을 분리하면 품질 회귀를 좁게 관리할 수 있습니다.
+- **컨텍스트 길이를 초과하는 문서는 어떻게 요약할 수 있을까요?**
+  Map-Reduce 패턴을 사용합니다. 문서를 800단어 청크로 분할해 병렬 요약하고(Map), 청크 요약들을 하나로 통합합니다(Reduce). 문서 길이에 따라 청크 크기를 조정하되, 청크 간 50-100단어 오버랩을 두어 경계에서의 맥락 손실을 줄입니다.
+
+- **LLM으로 구조화된 JSON 데이터를 안정적으로 추출하려면 어떻게 해야 할까요?**
+  `response_format={"type": "json_object"}`로 JSON 응답을 강제하고, Pydantic 모델로 스키마를 정의해 파싱 후 검증합니다. 프롬프트에 JSON 스키마를 직접 포함하면 모델이 올바른 필드를 생성할 확률이 높아집니다.
+
+- **배치 처리 시 레이트 리밋을 어떻게 관리할까요?**
+  `asyncio.Semaphore`로 동시 요청 수를 제한하고(5-10개 권장), 요청 간 짧은 딜레이를 추가합니다. 개별 아이템 실패를 catch해 전체 배치가 중단되지 않도록 오류 처리를 분리합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [AI App Patterns 101 (1/6): 챗봇 패턴 — 대화 이력과 상태 관리](./01-chatbot-pattern.md)
-- [AI App Patterns 101 (2/6): RAG Q&A 패턴 — 문서 기반 질의응답](./02-rag-qa-pattern.md)
-- **AI App Patterns 101 (3/6): 문서 어시스턴트 — 요약, 추출, 분류 (현재 글)**
-- [AI App Patterns 101 (4/6): 에이전트와 도구 패턴 — 자율적 도구 선택](./04-agent-tool-pattern.md)
-- [AI App Patterns 101 (5/6): 워크플로 자동화 — 다단계 체인 설계](./05-workflow-automation.md)
-- [AI App Patterns 101 (6/6): Human-in-the-loop — 사람 개입 설계](./06-human-in-the-loop.md)
+- [AI App Patterns 101 (1/6): Chatbot 패턴](./01-chatbot-pattern.md)
+- [AI App Patterns 101 (2/6): RAG QA 패턴](./02-rag-qa-pattern.md)
+- **AI App Patterns 101 (3/6): Document Assistant 패턴 (현재 글)**
+- [AI App Patterns 101 (4/6): Agent Tool 패턴](./04-agent-tool-pattern.md)
+- [AI App Patterns 101 (5/6): Workflow Automation 패턴](./05-workflow-automation.md)
+- [AI App Patterns 101 (6/6): Human-in-the-Loop 패턴](./06-human-in-the-loop.md)
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-- [LangChain summarization guide](https://python.langchain.com/docs/use_cases/summarization/)
-- [JsonOutputParser](https://python.langchain.com/docs/modules/model_io/output_parsers/json/)
-- [Map-Reduce pattern](https://python.langchain.com/docs/use_cases/summarization/#option-2-map-reduce)
+- [LangChain — Document Summarization](https://python.langchain.com/docs/use_cases/summarization)
+- [OpenAI — Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs)
+- [Pydantic — BaseModel](https://docs.pydantic.dev/latest/)
+- [Python asyncio — Semaphore](https://docs.python.org/3/library/asyncio-sync.html#asyncio.Semaphore)
+- [book-examples — ai-app-patterns-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/ai-app-patterns-101/ko)
 
-- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-app-patterns-101/ko/03-document-assistant)
-
-Tags: LLM, RAG, Agent, Python
+Tags: DocumentAI, Summarization, Extraction, MapReduce, LLM

@@ -50,131 +50,321 @@ last_reviewed: '2026-05-15'
 
 빠른 사이트는 사용자 만족뿐 아니라 전환율, 검색 순위, 운영비에도 영향을 줍니다. 하지만 최적화는 감으로 하면 자주 빗나갑니다. 병목이 서버에 있는데 프론트엔드 코드만 만지거나, 이미지가 문제인데 데이터베이스만 의심하는 식입니다.
 
-그래서 성능 작업의 첫 단계는 늘 측정입니다. 브라우저 기준 지표와 서버 기준 지표를 함께 보고, 어느 층에서 시간이 쓰이는지 확인해야 다음 결정이 맞아집니다.
+그래서 성능 작업의 첫 단계는 늘 측정입니다.
 
-## 한눈에 보는 개념 지도
+## 성능 계층 구조
 
-같은 데이터를 더 가까운 계층에서 더 적게 계산할수록 응답은 빨라집니다. 그래서 브라우저 캐시, CDN, 애플리케이션 캐시, 데이터베이스 최적화는 경쟁 관계가 아니라 서로 다른 층의 협업입니다.
+```
+사용자 체감 속도
+    |
+    v
+브라우저 캐시 (가장 빠름)
+    |  캐시 없으면 →
+    v
+CDN (지리적으로 가까운 서버)
+    |  CDN 캐시 없으면 →
+    v
+웹 서버 (애플리케이션)
+    |
+    +── 애플리케이션 캐시 (Redis, Memcached)
+    |   캐시 없으면 →
+    +── 데이터베이스 쿼리 (가장 느림)
 
-### 직접 검증해 볼 포인트
-
-- Lighthouse나 Performance 탭으로 첫 측정치를 먼저 남깁니다.
-- 정적 파일에 `Cache-Control`을 붙인 뒤 두 번째 요청에서 전송 크기와 응답 시간이 줄어드는지 봅니다.
-- 인덱스 추가 전후 또는 join 적용 전후 쿼리 시간을 비교합니다.
-
-**기대 결과:** 캐시가 적용된 정적 파일은 재요청 비용이 크게 줄고, 인덱스나 join 개선 뒤 데이터베이스 응답 시간이 눈에 띄게 낮아집니다.
-
-**실패 모드:** 동적 사용자 응답을 잘못 캐시하면 데이터가 섞일 수 있습니다. 측정 없이 최적화하면 가장 느린 구간이 아닌 곳에 시간을 쓰기 쉽습니다.
+최적화 원칙: 가장 빠른 계층에서 더 많이 처리
+```
 
 ## 먼저 알아둘 용어
 
-- **TTFB**: 첫 바이트가 도착하기까지 걸리는 시간입니다.
+- **TTFB (Time to First Byte)**: 요청 후 첫 바이트를 받기까지 걸리는 시간입니다.
+- **LCP (Largest Contentful Paint)**: 가장 큰 콘텐츠가 화면에 그려지는 시간입니다.
 - **HTTP cache**: 브라우저가 응답을 재사용하게 만드는 규칙입니다.
 - **CDN**: 전 세계 여러 지점에 콘텐츠를 가까이 두는 프록시 서버 집합입니다.
 - **Lazy load**: 필요해질 때까지 리소스 로딩을 미루는 전략입니다.
 - **Index**: 데이터베이스가 원하는 행을 빨리 찾게 도와주는 구조입니다.
 
-## 전후 비교로 보는 캐시 효과
+## 1단계: 측정하기
 
-**Before (DB on every request)**
+```
+브라우저:
+  F12 → Lighthouse 탭 → "Analyze page load" 실행
+  → Performance score, LCP, CLS, FID 확인
 
-```python
-@app.get("/popular")
-def popular():
-    return db.fetch("SELECT * FROM posts ORDER BY views DESC LIMIT 10")
+  F12 → Network 탭
+  → Waterfall: 어느 리소스가 얼마나 걸리는지
+  → Size 컬럼: 큰 파일 찾기
+  → Time 컬럼: 느린 요청 찾기
 ```
 
-**After (1분간 캐시)**
+```python
+# 서버 측 측정
+import time
+from flask import Flask, g, request
+
+app = Flask(__name__)
+
+@app.before_request
+def start_timer():
+    g.start = time.perf_counter()
+
+@app.after_request
+def log_timing(response):
+    elapsed = time.perf_counter() - g.start
+    print(f"{request.method} {request.path} → {response.status_code} ({elapsed*1000:.1f}ms)")
+    return response
+```
+
+```bash
+# curl로 TTFB 측정
+curl -w "TTFB: %{time_starttransfer}s\nTotal: %{time_total}s\n" \
+  -o /dev/null -s https://example.com
+```
+
+## 2단계: HTTP 캐시 헤더
+
+```http
+# 정적 자산 (해시된 파일명): 1년 캐시
+Cache-Control: public, max-age=31536000, immutable
+# → /style.abc123.css 같이 파일명에 해시 포함 시 영구 캐시
+
+# 동적이지만 짧은 시간 캐시 가능한 콘텐츠
+Cache-Control: public, max-age=300, stale-while-revalidate=60
+# → 5분 동안 유효, 이후 60초 동안은 기존 캐시 제공하면서 백그라운드 갱신
+
+# 사용자별 데이터 (캐시 금지 또는 비공개)
+Cache-Control: private, no-store
+# → CDN에 저장 안 됨, 브라우저도 저장 안 함
+
+# 조건부 요청 지원 (ETag)
+ETag: "v1-abc123"
+# → 클라이언트가 If-None-Match: "v1-abc123" 보내면 304 Not Modified 반환
+```
+
+```python
+# Flask에서 캐시 헤더 설정
+from flask import Flask, send_file, make_response
+
+app = Flask(__name__)
+
+@app.after_request
+def set_cache_headers(response):
+    path = request.path
+
+    # 정적 자산 (파일명에 해시 포함됨)
+    if path.startswith("/static/") and any(
+        path.endswith(ext) for ext in [".css", ".js", ".png", ".jpg", ".woff2"]
+    ):
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+
+    # API 응답 (개인 데이터)
+    elif path.startswith("/api/"):
+        response.headers["Cache-Control"] = "private, no-store"
+
+    return response
+```
+
+## 3단계: 서버 사이드 캐싱
 
 ```python
 import time
-_cache = {"at": 0, "data": None}
-@app.get("/popular")
-def popular():
-    if time.time() - _cache["at"] > 60:
-        _cache["data"] = db.fetch("SELECT * FROM posts ORDER BY views DESC LIMIT 10")
-        _cache["at"] = time.time()
-    return _cache["data"]
+import sqlite3
+
+# 간단한 인메모리 캐시 (소규모 앱용)
+_cache = {}
+
+def get_or_cache(key: str, ttl: int, loader):
+    """캐시에 있으면 반환, 없으면 loader 실행 후 저장"""
+    entry = _cache.get(key)
+    if entry and time.time() - entry["at"] < ttl:
+        return entry["data"]
+
+    data = loader()
+    _cache[key] = {"data": data, "at": time.time()}
+    return data
+
+# 사용 예: 인기 게시물 (1분 캐시)
+@app.get("/api/popular-posts")
+def popular_posts():
+    def fetch():
+        con = sqlite3.connect("app.db")
+        rows = con.execute(
+            "SELECT id, title FROM posts ORDER BY views DESC LIMIT 10"
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+    posts = get_or_cache("popular_posts", ttl=60, loader=fetch)
+    return jsonify(posts)
 ```
-
-같은 결과를 반복해서 줄 때는 매번 데이터베이스를 치지 않는 편이 훨씬 낫습니다. 인기 목록처럼 자주 읽히고 자주 바뀌지 않는 데이터는 캐시의 좋은 후보입니다.
-
-## 성능 개선을 다섯 단계로 적용해 보기
-
-### 1단계 — 먼저 측정하기
-
-```text
-브라우저: F12 → Lighthouse 또는 Performance 탭
-서버: time.perf_counter() 또는 APM (Datadog, New Relic)
-```
-
-브라우저와 서버 양쪽을 함께 봐야 합니다. 첫 화면이 느린데 서버는 빠를 수도 있고, 반대로 브라우저는 가벼운데 서버 TTFB가 긴 경우도 있습니다.
-
-### 2단계 — 정적 파일에 캐시 헤더 붙이기
 
 ```python
-# Flask
-@app.after_request
-def add_cache(resp):
-    if resp.mimetype.startswith(("image/", "text/css")):
-        resp.headers["Cache-Control"] = "public, max-age=31536000, immutable"
-    return resp
+# Redis 사용 (운영 환경)
+import redis
+import json
+
+r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+
+def cached(key: str, ttl: int):
+    """데코레이터: 함수 결과를 Redis에 캐시"""
+    def decorator(f):
+        def wrapper(*args, **kwargs):
+            cached_val = r.get(key)
+            if cached_val:
+                return json.loads(cached_val)
+            result = f(*args, **kwargs)
+            r.setex(key, ttl, json.dumps(result))
+            return result
+        return wrapper
+    return decorator
+
+@app.get("/api/stats")
+@cached("site_stats", ttl=300)
+def site_stats():
+    # 비용 큰 집계 쿼리
+    return {"total_users": db.count_users(), "total_posts": db.count_posts()}
 ```
 
-이미지와 CSS처럼 자주 바뀌지 않는 파일은 브라우저 캐시를 적극 활용하는 편이 좋습니다. 다시 내려받지 않아도 되면 첫 화면도 빨라지고 서버 부하도 줄어듭니다.
-
-### 3단계 — CDN 추가하기
-
-```text
-Cloudflare/Fastly/CloudFront를 앞단에 두면
-정적 자산이 여러 대륙의 사용자에게 더 가까워집니다.
-```
-
-CDN은 정적 자산에 특히 효과가 큽니다. 사용자의 물리적 거리 자체를 줄여 주기 때문입니다.
-
-### 4단계 — 지연 로딩 적용하기
+## 4단계: CDN과 지연 로딩
 
 ```html
-<img src="big.jpg" loading="lazy" alt="...">
+<!-- 이미지 지연 로딩 -->
+<img src="hero.jpg" alt="히어로 이미지" loading="lazy">
+
+<!-- 뷰포트에 처음 나타나는 이미지는 eager (기본값) -->
+<img src="logo.png" alt="로고" loading="eager">
+
+<!-- 비디오 지연 로딩 -->
+<video preload="none" poster="thumbnail.jpg">
+  <source src="video.mp4" type="video/mp4">
+</video>
+
+<!-- 폰트: 중요한 것만 preload -->
+<link rel="preload" href="font.woff2" as="font" type="font/woff2" crossorigin>
+
+<!-- CSS: 중요하지 않은 스타일 비동기 로드 -->
+<link rel="preload" href="non-critical.css" as="style"
+      onload="this.onload=null;this.rel='stylesheet'">
 ```
 
 ```js
-// JS 코드 분할(동적 가져오기)
-button.onclick = async () => {
-  const mod = await import("./editor.js");
-  mod.open();
-};
+// JavaScript 코드 분할 (동적 import)
+// 버튼 클릭 시에만 에디터 모듈 로드
+document.getElementById("edit-btn").addEventListener("click", async () => {
+  const { Editor } = await import("./editor.js");  // 클릭 시 다운로드
+  new Editor("#content");
+});
+
+// 무한 스크롤: 화면에 보일 때만 로드
+const observer = new IntersectionObserver(async (entries) => {
+  for (const entry of entries) {
+    if (entry.isIntersecting) {
+      const { loadMore } = await import("./load-more.js");
+      await loadMore();
+      observer.unobserve(entry.target);
+    }
+  }
+});
+observer.observe(document.querySelector("#load-trigger"));
 ```
 
-처음부터 필요 없는 이미지와 코드라면 나중에 가져오는 편이 낫습니다. 초기 다운로드 크기를 줄이는 것만으로도 체감 속도가 좋아질 수 있습니다.
-
-### 5단계 — DB 인덱스와 N+1 문제 보기
+## 5단계: DB 성능 최적화
 
 ```sql
-CREATE INDEX idx_posts_views ON posts(views DESC);
+-- EXPLAIN으로 쿼리 분석
+EXPLAIN QUERY PLAN
+SELECT * FROM posts WHERE user_id = 1 ORDER BY created_at DESC LIMIT 20;
+-- SCAN TABLE posts  (전체 스캔 → 느림)
+
+-- 인덱스 추가
+CREATE INDEX idx_posts_user_created ON posts(user_id, created_at DESC);
+
+-- 다시 EXPLAIN
+EXPLAIN QUERY PLAN
+SELECT * FROM posts WHERE user_id = 1 ORDER BY created_at DESC LIMIT 20;
+-- SEARCH TABLE posts USING INDEX idx_posts_user_created  (인덱스 사용 → 빠름)
 ```
 
 ```python
-# N+1 (bad)
-for p in posts: print(p.author.name)  # SELECT every loop
+# N+1 문제 해결
 
-# join (good)
-posts = db.fetch("SELECT p.*, u.name FROM posts p JOIN users u ON u.id = p.user_id")
+# 나쁜 예: N+1 쿼리
+posts = db.execute("SELECT id, title, user_id FROM posts LIMIT 20").fetchall()
+for post in posts:
+    # 포스트마다 1번씩, 총 20번 추가 쿼리
+    user = db.execute("SELECT username FROM users WHERE id = ?", (post["user_id"],)).fetchone()
+
+# 좋은 예: JOIN으로 1번에 해결
+posts_with_users = db.execute("""
+    SELECT p.id, p.title, u.username
+    FROM posts p
+    JOIN users u ON u.id = p.user_id
+    ORDER BY p.created_at DESC
+    LIMIT 20
+""").fetchall()
+
+# 또는 IN 쿼리로 해결
+posts = db.execute("SELECT id, title, user_id FROM posts LIMIT 20").fetchall()
+user_ids = list({p["user_id"] for p in posts})
+users = {u["id"]: u for u in db.execute(
+    f"SELECT id, username FROM users WHERE id IN ({','.join('?'*len(user_ids))})",
+    user_ids
+).fetchall()}
+# 총 2번 쿼리로 해결
 ```
 
-캐시만으로 해결되지 않는 병목은 데이터베이스에서 자주 나옵니다. 어떤 컬럼으로 조회하는지, 반복해서 추가 쿼리가 나가는지 확인해야 합니다.
+## 성능 측정 지표
 
-- 캐시에는 수명과 무효화 전략이 함께 있어야 합니다.
-- CDN은 정적 자산에서 가장 큰 효과를 냅니다.
-- 인덱스는 아무 컬럼에나 거는 것이 아니라 실제 조회 패턴을 따라가야 합니다.
+```
+Core Web Vitals (Google 기준):
+  LCP (Largest Contentful Paint):  좋음 < 2.5s, 나쁨 > 4s
+  FID (First Input Delay):          좋음 < 100ms, 나쁨 > 300ms
+  CLS (Cumulative Layout Shift):    좋음 < 0.1, 나쁨 > 0.25
 
-## 여기서 자주 헷갈립니다
+서버 지표:
+  TTFB:       좋음 < 200ms
+  p95 응답:   목표 설정 후 모니터링 (예: 500ms 이내)
+  오류율:      5xx < 0.1%
+```
 
-1. **느릴 것 같다는 감으로 최적화하는 경우**: 병목이 전혀 다른 곳일 수 있습니다.
-2. **모든 응답에 `no-cache`를 붙이는 경우**: 얻을 수 있는 캐시 이득을 버립니다.
-3. **동적 사용자 응답을 CDN에 캐시하는 경우**: 사용자별 데이터가 섞일 수 있습니다.
-4. **모든 컬럼에 인덱스를 다는 경우**: 쓰기 성능이 떨어집니다.
-5. **N+1 모니터링 없이 ORM만 믿는 경우**: 트래픽이 늘면서 조용히 느려집니다.
+```bash
+# curl로 서버 성능 측정
+for i in $(seq 1 10); do
+  curl -w "%{time_total}" -o /dev/null -s https://example.com
+  echo ""
+done | awk '{ sum += $1; count++ } END { print "평균:", sum/count "s" }'
+```
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 올바른 방법 |
+|------|------|-------------|
+| 측정 없이 감으로 최적화 | 병목이 아닌 곳에 시간 낭비 | Lighthouse + Network 탭으로 먼저 측정 |
+| 모든 응답에 no-cache 설정 | 캐시 이득 전혀 없음 | 데이터 성격에 맞는 캐시 정책 |
+| 동적 사용자 응답을 CDN에 캐시 | 사용자별 데이터 혼용 | private 또는 no-store 설정 |
+| 모든 컬럼에 인덱스 추가 | INSERT/UPDATE 성능 저하 | 조회 패턴 확인 후 선택적 추가 |
+| 캐시 무효화 전략 없이 캐시 적용 | 오래된 데이터 계속 서빙 | TTL 설정 + 변경 시 명시적 무효화 |
+| N+1 쿼리를 ORM이 숨김 | 트래픽 증가 시 갑자기 느려짐 | SQL 로그 켜서 쿼리 수 확인 |
+
+## 직접 검증해 볼 포인트
+
+```bash
+# 1. 캐시 헤더 확인
+curl -I https://example.com
+# Cache-Control, ETag 헤더 확인
+
+# 2. 두 번째 요청에서 304 반환 확인
+curl -I -H "If-None-Match: \"etag-value\"" https://example.com
+
+# 3. 이미지 크기 확인
+curl -o /dev/null -s -w "%{size_download}" https://example.com/image.jpg
+```
+
+```
+Lighthouse 실행 결과 읽기:
+  - Performance score가 낮으면 Opportunities 섹션 확인
+  - "Reduce unused JavaScript": JS 코드 분할 검토
+  - "Serve images in next-gen formats": WebP/AVIF 변환
+  - "Eliminate render-blocking resources": defer/async 적용
+  - "Properly size images": 화면 크기에 맞는 이미지 제공
+```
 
 ## 운영에서는 이렇게 보입니다
 
@@ -205,169 +395,6 @@ posts = db.fetch("SELECT p.*, u.name FROM posts p JOIN users u ON u.id = p.user_
 ## 정리와 다음 글
 
 성능은 감으로 고치는 분야가 아닙니다. 측정하고, 캐시하고, 줄이고, 늦추는 방식으로 같은 일을 더 적게 하게 만들어야 합니다. 다음 글에서는 이 시리즈에서 배운 개념을 하나로 묶어 작은 웹앱을 끝까지 만들어 보겠습니다.
-
-## HTTP-인증-배포를 함께 검증하는 점검 루틴
-
-웹 서비스는 단일 기능이 아니라 경로 전체의 안정성으로 평가됩니다. 따라서 API 스펙, 인증 예외, 배포 헬스체크를 같은 릴리스 체크리스트로 묶는 편이 안전합니다.
-
-```text
-배포 전 점검
-1) 핵심 API 3개에 대해 상태 코드/응답 스키마 계약 테스트 실행
-2) access 만료, refresh 만료, revoke 토큰 시나리오 재현
-3) /health, /ready 엔드포인트를 배포 환경에서 실제 호출
-4) CDN/브라우저 캐시 무효화 정책 확인
-```
-
-### 장애 예방을 위한 최소 헤더 정책
-
-```http
-Cache-Control: no-store
-X-Content-Type-Options: nosniff
-X-Frame-Options: DENY
-Referrer-Policy: strict-origin-when-cross-origin
-```
-
-헤더 정책은 프론트엔드 코드 변경 없이도 보안/캐시 동작을 크게 바꿉니다. 기능 개발과 별개로 표준 헤더를 고정해 두면 릴리스 변동성이 줄어듭니다.
-
-### 배포 후 15분 관찰 항목
-
-- 5xx 비율과 p95 지연 시간의 급격한 상승 여부
-- 로그인 성공률, 토큰 재발급 성공률
-- 정적 자산 404 발생률
-
-이 루틴을 반복하면 "배포는 되었지만 정상 운영은 아닌" 상태를 초기에 감지할 수 있습니다.
-
-## 실전 앵커 모음: 성능 예산을 운영 문서로 바꾸기
-
-작은 기능이라도 운영 단계까지 생각하면 문서화 기준이 달라집니다. 아래 예시는 팀이 기능 구현과 동시에 남겨 두면 바로 도움이 되는 최소 산출물입니다. 특히 요청/응답 계약, 세션/쿠키 정책, SQL 기준 쿼리, 배포 설정, 캐시 규칙을 함께 기록하면 변경 시점의 실패 반경을 크게 줄일 수 있습니다.
-
-### HTTP 요청/응답 계약 예시
-
-```http
-GET /api/v1/todos?limit=20&cursor=todo_120 HTTP/1.1
-Host: api.example.com
-Accept: application/json
-Authorization: Bearer <access_token>
-X-Request-Id: req-2026-05-21-0001
-```
-
-```http
-HTTP/1.1 200 OK
-Content-Type: application/json
-Cache-Control: private, max-age=30
-ETag: "todo-list-v42"
-
-{
-  "items": [
-    {"id": "todo_121", "text": "문서 작성", "done": false},
-    {"id": "todo_122", "text": "테스트 실행", "done": true}
-  ],
-  "next_cursor": "todo_122"
-}
-```
-
-응답 예시는 상태 코드만 맞추는 수준에서 끝내지 말고, 캐시 정책과 추적 ID를 함께 포함하는 편이 좋습니다. 특히 `X-Request-Id`를 표준화하면 장애 시점에 브라우저 로그와 서버 로그를 빠르게 결합할 수 있습니다.
-
-### REST API 설계 스케치
-
-```text
-GET    /api/v1/todos            목록 조회
-POST   /api/v1/todos            항목 생성
-PATCH  /api/v1/todos/{id}       항목 일부 수정(done 토글 등)
-DELETE /api/v1/todos/{id}       항목 삭제
-```
-
-리소스 이름은 복수형으로 고정하고, 동작은 method로 분리하는 편이 유지보수에 유리합니다. 예를 들어 `/toggleTodo`처럼 동사형 엔드포인트를 늘리기 시작하면 권한 정책과 감사 로그 규칙이 빠르게 파편화됩니다.
-
-### 세션/쿠키 정책 코드 예시
-
-```python
-from flask import Flask, session, jsonify
-
-app = Flask(__name__)
-app.secret_key = "change-me"
-app.config.update(
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SECURE=True,
-    SESSION_COOKIE_SAMESITE="Lax",
-)
-
-@app.get("/api/v1/me")
-def me():
-    user_id = session.get("user_id")
-    if not user_id:
-        return jsonify(error={"code": "UNAUTHORIZED"}), 401
-    return jsonify(user_id=user_id)
-```
-
-인증은 로그인 성공 시점보다 실패 시점 설계가 더 중요합니다. 어떤 경우에 401을 돌리고, 어떤 경우에 403을 돌릴지 미리 고정해 두어야 프론트엔드 재시도 정책과 알림 문구가 안정됩니다.
-
-### SQL 기준 쿼리와 인덱스 예시
-
-```sql
-CREATE TABLE IF NOT EXISTS todo_items (
-  id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  text TEXT NOT NULL,
-  done INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL
-);
-
-CREATE INDEX IF NOT EXISTS idx_todo_user_created
-ON todo_items(user_id, created_at DESC);
-
-SELECT id, text, done, created_at
-FROM todo_items
-WHERE user_id = ?
-ORDER BY created_at DESC
-LIMIT 20;
-```
-
-조회 패턴을 먼저 적고 그다음 인덱스를 정의하면 불필요한 인덱스 폭증을 피할 수 있습니다. 특히 쓰기 비중이 높은 서비스에서는 인덱스를 한 개 추가할 때마다 INSERT 비용이 늘어난다는 점을 함께 기록해야 합니다.
-
-### 배포 설정과 헬스 체크 예시
-
-```yaml
-services:
-  api:
-    image: ghcr.io/example/todo-api:1.0.0
-    environment:
-      - APP_ENV=production
-      - DATABASE_URL=postgresql://app:***@db:5432/todo
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-```
-
-배포 문서에는 반드시 "성공 기준"을 남겨야 합니다. 예를 들어 `/health`가 200을 반환하고, 배포 후 15분 동안 5xx 비율이 1% 미만이며, 로그인 성공률이 평시 대비 하락하지 않는지를 체크리스트로 고정하면 릴리스 판단이 사람마다 달라지지 않습니다.
-
-### 캐시 전략 표준 예시
-
-```http
-Cache-Control: public, max-age=31536000, immutable
-```
-
-정적 자산은 파일명에 해시를 넣고 장기 캐시를 적용하는 편이 안전합니다. 반대로 사용자별 데이터는 `private` 또는 `no-store` 정책을 명시해 캐시 오염을 방지해야 합니다. 이 구분을 코드 리뷰 항목으로 올려 두면 보안 이슈와 성능 이슈를 동시에 예방할 수 있습니다.
-
-### 운영 체크리스트
-
-- 요청/응답 샘플에 상태 코드, 헤더, 오류 본문 형식을 모두 기록합니다.
-- 인증 실패(401), 권한 실패(403), 입력 오류(400) 경계를 API 문서에 고정합니다.
-- 핵심 SQL 쿼리 3개를 선정해 `EXPLAIN` 결과를 릴리스마다 비교합니다.
-- 배포 후 15분 관측 지표(5xx, p95, 로그인 성공률)를 팀 표준으로 유지합니다.
-- 캐시 정책 변경 시 무효화 전략과 롤백 절차를 같은 PR에 포함합니다.
-
-## 처음 질문으로 돌아가기
-
-- **느린 페이지를 만나면 어디서부터 봐야 할까요?**
-  - 브라우저와 서버 양쪽을 함께 봐야 합니다
-- **브라우저 캐시와 CDN은 각각 어떤 역할을 할까요?**
-  - 큰 서비스는 보통 브라우저 캐시, CDN, 애플리케이션 캐시, 데이터베이스라는 여러 층의 캐시를 함께 씁니다
-- **lazy loading은 무엇을 늦추고 왜 유용할까요?**
-  - 빠른 사이트는 사용자 만족뿐 아니라 전환율, 검색 순위, 운영비에도 영향을 줍니다
-  - 같은 데이터를 더 가까운 계층에서 더 적게 계산할수록 응답은 빨라집니다. 그래서 브라우저 캐시, CDN, 애플리케이션 캐시, 데이터베이스 최적화는 경쟁 관계가 아니라 서로 다른 층의 협업입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

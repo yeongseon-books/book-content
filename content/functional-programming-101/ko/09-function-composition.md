@@ -48,14 +48,13 @@ last_reviewed: '2026-05-12'
 > `compose`와 `pipe`의 차이는 방향입니다. 계산 자체는 같아도 읽는 순서가 달라집니다.
 
 ```text
-compose(f, g, h)(x)  =  f(g(h(x)))     <- right to left
-pipe(h, g, f)(x)     =  f(g(h(x)))     <- left to right
+compose(f, g, h)(x)  =  f(g(h(x)))     <- right to left (수학 표기법)
+pipe(h, g, f)(x)     =  f(g(h(x)))     <- left to right (실행 순서와 일치)
 
 Pipeline visualization:
   x -> [h] -> [g] -> [f] -> result
+  데이터가 왼쪽에서 오른쪽으로 흐름 -> pipe가 더 직관적
 ```
-
-## 파이프라인이 읽히는 방식
 
 ## 핵심 개념
 
@@ -68,6 +67,7 @@ Pipeline visualization:
 | point-free style | 인자 이름을 드러내지 않고 함수 조합만으로 로직을 표현하는 스타일입니다 |
 
 ## 적용 전후 비교
+
 중첩 호출은 안쪽부터 해석해야 해서 읽기가 어렵습니다. 파이프라인은 실행 순서를 코드 순서와 맞춰 줍니다.
 
 ```python
@@ -85,13 +85,25 @@ result = format_output(
 
 ```python
 # 이후: pipeline — 위에서 아래로 읽음
-result = pipe(
+from collections.abc import Callable
+from typing import Any
+
+def pipe(*funcs: Callable) -> Callable:
+    def piped(x: Any) -> Any:
+        result = x
+        for f in funcs:
+            result = f(result)
+        return result
+    return piped
+
+process = pipe(
     load_data,
     calculate_totals,
     filter_passing,
     sort_by_score,
     format_output,
-)()
+)
+result = process(None)
 ```
 
 ## 단계별 실습
@@ -121,25 +133,71 @@ def pipe(*funcs: Callable) -> Callable:
         return result
     return piped
 
-# compose: f(g(h(x)))
 add_one = lambda x: x + 1
 double = lambda x: x * 2
 to_str = lambda x: f"Result: {x}"
 
+# compose: f(g(h(x))) — 오른쪽부터 실행
 transform_c = compose(to_str, double, add_one)
 print(transform_c(5))  # Result: 12  — (5+1)*2 = 12
 
-# pipe: 읽는 순서가 실행 순서와 일치
+# pipe: 실행 순서와 코드 순서가 일치
 transform_p = pipe(add_one, double, to_str)
 print(transform_p(5))  # Result: 12
 ```
 
 실무에서는 `pipe`가 더 자주 읽기 좋습니다. 코드 순서와 실행 순서가 같아서 디버깅과 리뷰가 수월하기 때문입니다.
 
-### 단계 2: 문자열 처리 파이프라인
+### 단계 2: map/filter/reduce와 파이프라인 조합
+
+```python
+from functools import reduce
+from collections.abc import Callable
+
+def pipe(*funcs: Callable) -> Callable:
+    def piped(data):
+        result = data
+        for f in funcs:
+            result = f(result)
+        return result
+    return piped
+
+# 각 단계를 map/filter/reduce로 표현
+def add_revenue(orders: list[dict]) -> list[dict]:
+    return list(map(lambda o: {**o, "revenue": o["qty"] * o["price"]}, orders))
+
+def filter_profitable(orders: list[dict]) -> list[dict]:
+    return list(filter(lambda o: o["revenue"] >= 10000, orders))
+
+def total_revenue(orders: list[dict]) -> int:
+    return reduce(lambda acc, o: acc + o["revenue"], orders, 0)
+
+# 파이프라인 조립
+analyze = pipe(add_revenue, filter_profitable, total_revenue)
+
+orders = [
+    {"item": "A", "qty": 5, "price": 3000},
+    {"item": "B", "qty": 2, "price": 8000},
+    {"item": "C", "qty": 10, "price": 500},
+    {"item": "D", "qty": 3, "price": 5000},
+]
+
+print(f"Total: {analyze(orders):,}")  # Total: 31,000
+```
+
+### 단계 3: 문자열 처리 파이프라인
 
 ```python
 import re
+from collections.abc import Callable
+
+def pipe(*funcs: Callable) -> Callable:
+    def piped(x):
+        result = x
+        for f in funcs:
+            result = f(result)
+        return result
+    return piped
 
 def strip_whitespace(text: str) -> str:
     return text.strip()
@@ -156,7 +214,7 @@ def replace_special(text: str) -> str:
 def spaces_to_hyphens(text: str) -> str:
     return text.replace(" ", "-")
 
-def truncate(max_len: int):
+def truncate(max_len: int) -> Callable[[str], str]:
     def _truncate(text: str) -> str:
         return text[:max_len]
     return _truncate
@@ -174,19 +232,21 @@ slugify = pipe(
 print(slugify("  Hello, World!  This is  a Test  "))
 # hello-world-this-is-a-test
 
-print(slugify("  Functional Programming — A Composition Guide  "))
-# functional-programming--a-composition-guide
+# map으로 여러 문자열에 동시에 적용
+titles = ["  Hello World  ", "  Python FP Guide  ", "  함수 합성 기초  "]
+slugs = list(map(slugify, titles))
+print(slugs)
+# ['hello-world', 'python-fp-guide', '']  <- 한글은 replace_special에서 제거
 ```
 
 문자열 정규화는 파이프라인의 장점을 가장 직관적으로 보여 줍니다. 단계마다 역할이 뚜렷해서 수정 포인트를 찾기도 쉽습니다.
 
-### 단계 3: 데이터 처리 파이프라인
+### 단계 4: 데이터 처리 파이프라인
 
 ```python
 from collections.abc import Callable
 
 def pipe_data(*funcs: Callable) -> Callable:
-    """Data processing pipeline."""
     def process(data):
         result = data
         for func in funcs:
@@ -194,7 +254,6 @@ def pipe_data(*funcs: Callable) -> Callable:
         return result
     return process
 
-# 각 stage를 독립 함수로 정의
 def parse_records(raw: list[str]) -> list[dict]:
     records = []
     for line in raw:
@@ -208,10 +267,10 @@ def add_grade(records: list[dict]) -> list[dict]:
         if score >= 80: return "B"
         if score >= 70: return "C"
         return "F"
-    return [{**r, "grade": grade(r["score"])} for r in records]
+    return list(map(lambda r: {**r, "grade": grade(r["score"])}, records))
 
 def filter_passing(records: list[dict]) -> list[dict]:
-    return [r for r in records if r["grade"] != "F"]
+    return list(filter(lambda r: r["grade"] != "F", records))
 
 def sort_by_score(records: list[dict]) -> list[dict]:
     return sorted(records, key=lambda r: r["score"], reverse=True)
@@ -232,17 +291,9 @@ process_students = pipe_data(
     format_table,
 )
 
-# execute
-raw_data = [
-    "Alice, 85",
-    "Bob, 92",
-    "Charlie, 78",
-    "Diana, 95",
-    "Eve, 60",
-]
-
+raw_data = ["Alice, 85", "Bob, 92", "Charlie, 78", "Diana, 95", "Eve, 60"]
 print(process_students(raw_data))
-# 이름        점수  등급
+# Name        Score Grade
 # ----------------------
 # Diana          95     A
 # Bob            92     A
@@ -252,112 +303,11 @@ print(process_students(raw_data))
 
 좋은 파이프라인은 각 단계가 순수 함수이기 때문에 독립 테스트가 가능합니다. 어느 단계에서 데이터가 잘못됐는지도 빠르게 찾을 수 있습니다.
 
-### 단계 4: 제너레이터 파이프라인
-
-```python
-from collections.abc import Callable
-from typing import Iterator
-
-def gen_pipe(*funcs: Callable) -> Callable:
-    """Generator-based lazy pipeline."""
-    def process(data):
-        result = data
-        for func in funcs:
-            result = func(result)
-        return result
-    return process
-
-def lines(text: str) -> Iterator[str]:
-    for line in text.strip().split("\n"):
-        yield line
-
-def strip_lines(it: Iterator[str]) -> Iterator[str]:
-    for line in it:
-        yield line.strip()
-
-def skip_empty(it: Iterator[str]) -> Iterator[str]:
-    for line in it:
-        if line:
-            yield line
-
-def skip_comments(it: Iterator[str]) -> Iterator[str]:
-    for line in it:
-        if not line.startswith("#"):
-            yield line
-
-def to_upper(it: Iterator[str]) -> Iterator[str]:
-    for line in it:
-        yield line.upper()
-
-# 지연 pipeline 조립
-clean_text = gen_pipe(
-    strip_lines,
-    skip_empty,
-    skip_comments,
-    to_upper,
-)
-
-text = """
-  # config file
-  host = localhost
-
-  port = 8080
-
-  # debug mode
-  debug = true
-"""
-
-for line in clean_text(lines(text)):
-    print(line)
-# HOST = LOCALHOST
-# PORT = 8080
-# DEBUG = TRUE
-```
-
-파이프라인은 eager 데이터에만 쓰는 패턴이 아닙니다. generator와 결합하면 큰 입력도 메모리 효율적으로 처리할 수 있습니다.
-
-### 단계 5: 조건부 파이프라인
-
-```python
-from collections.abc import Callable
-from typing import Any
-
-def conditional(
-    predicate: Callable[[Any], bool],
-    if_true: Callable,
-    if_false: Callable | None = None,
-) -> Callable:
-    """Applies different functions based on a condition."""
-    def apply(value: Any) -> Any:
-        if predicate(value):
-            return if_true(value)
-        return if_false(value) if if_false else value
-    return apply
-
-def when(predicate: Callable[[Any], bool], func: Callable) -> Callable:
-    """Applies a function only when the condition is true."""
-    return conditional(predicate, func)
-
-# 조건부 단계가 있는 pipeline
-process = pipe(
-    lambda x: x.strip(),
-    when(lambda x: x.startswith("http"), lambda x: x.replace("http://", "https://")),
-    lambda x: x.lower(),
-    when(lambda x: len(x) > 30, lambda x: x[:27] + "..."),
-)
-
-print(process("  http://Example.COM/Very-Long-Path-Name-Here  "))
-# https://example.com/very-l...
-print(process("  Short URL  "))
-# short url
-```
-
-조건부 단계까지 조합할 수 있으면 파이프라인은 단순 직선 구조를 넘어서도 충분히 실용적이 됩니다.
-
-## 실무 예시: 주문 이벤트 정산 파이프라인
+### 단계 5: 주문 이벤트 정산 파이프라인
 
 ```python
 from dataclasses import dataclass, replace
+from functools import reduce
 
 @dataclass(frozen=True)
 class OrderEvent:
@@ -371,16 +321,16 @@ class OrderEvent:
 
 def normalize_currency(events: list[OrderEvent]) -> list[OrderEvent]:
     rates = {"KRW": 1, "USD": 1380}
-    return [replace(e, amount=e.amount * rates[e.currency], currency="KRW") for e in events]
+    return list(map(lambda e: replace(e, amount=e.amount * rates[e.currency], currency="KRW"), events))
 
 def drop_cancelled(events: list[OrderEvent]) -> list[OrderEvent]:
-    return [e for e in events if e.status != "cancelled"]
+    return list(filter(lambda e: e.status != "cancelled", events))
 
 def enrich_margin(events: list[OrderEvent]) -> list[OrderEvent]:
-    return [replace(e, margin=int(e.amount * 0.18)) for e in events]
+    return list(map(lambda e: replace(e, margin=int(e.amount * 0.18)), events))
 
 def keep_marketplace(events: list[OrderEvent]) -> list[OrderEvent]:
-    return [e for e in events if e.source == "marketplace"]
+    return list(filter(lambda e: e.source == "marketplace", events))
 
 def to_store_report(events: list[OrderEvent]) -> dict[str, dict[str, int]]:
     report: dict[str, dict[str, int]] = {}
@@ -391,7 +341,8 @@ def to_store_report(events: list[OrderEvent]) -> dict[str, dict[str, int]]:
         store["orders"] += 1
     return report
 
-settle_orders = pipe(
+# pipe 없이도 단계별 검증 가능
+settle_orders = pipe_data(
     normalize_currency,
     drop_cancelled,
     keep_marketplace,
@@ -406,71 +357,21 @@ events = [
     OrderEvent("A-4", "busan", 27000, "KRW", "paid", "direct"),
 ]
 
-normalized = normalize_currency(events)
-assert [(e.order_id, e.amount, e.currency) for e in normalized] == [
-    ("A-1", 48000, "KRW"),
-    ("A-2", 57960, "KRW"),
-    ("A-3", 31000, "KRW"),
-    ("A-4", 27000, "KRW"),
-]
-
-active = drop_cancelled(normalized)
-assert [e.order_id for e in active] == ["A-1", "A-2", "A-4"]
-
-marketplace_only = keep_marketplace(active)
-assert [e.order_id for e in marketplace_only] == ["A-1", "A-2"]
-
-with_margin = enrich_margin(marketplace_only)
-assert [(e.order_id, e.margin) for e in with_margin] == [
-    ("A-1", 8640),
-    ("A-2", 10432),
-]
-
-report = to_store_report(with_margin)
-assert report == {
-    "seoul": {"revenue": 105960, "margin": 19072, "orders": 2}
-}
-
-print("Normalized IDs:", [e.order_id for e in normalized])
-print("After cancellation filter:", [e.order_id for e in active])
-print("Marketplace IDs:", [e.order_id for e in marketplace_only])
-print("Store report:", report)
-
-print("Pipeline report:", settle_orders(events))
-# 정규화된 ID: ['A-1', 'A-2', 'A-3', 'A-4']
-# 취소 필터링 후 ID: ['A-1', 'A-2', 'A-4']
-# 마켓플레이스 ID: ['A-1', 'A-2']
-# 매장 리포트: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
-# 파이프라인 리포트: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+report = settle_orders(events)
+print(report)
+# {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
 ```
 
-이 예시는 장난감 문자열 변환보다 실무에 더 가깝습니다. 통화 정규화, 취소 주문 제외, 채널 필터링, 마진 보강, 매장별 집계가 순차적으로 드러나기 때문에, 장애가 나도 어느 단계에서 값이 달라졌는지 바로 추적할 수 있습니다.
-
-#### 예상 출력
-
-```text
-Normalized IDs: ['A-1', 'A-2', 'A-3', 'A-4']
-After cancellation filter: ['A-1', 'A-2', 'A-4']
-Marketplace IDs: ['A-1', 'A-2']
-Store report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
-Pipeline report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
-```
-
-#### 결과가 다르면 먼저 확인할 점
-
-- USD 환율이 `1380`인지 확인합니다. 여기 값이 달라지면 `A-2` 금액과 최종 집계가 모두 달라집니다.
-- `drop_cancelled()`가 `cancelled` 상태를 정확히 제외하는지 확인합니다. `A-3`가 남아 있으면 부산 매장이 보고서에 등장합니다.
-- `keep_marketplace()`가 `source == "marketplace"`만 남기는지 확인합니다. `A-4`가 남아 있으면 direct 주문이 섞입니다.
-- 마진 공식이 `int(e.amount * 0.18)`인지 확인합니다. 반올림 방식이 달라지면 `19072`가 맞지 않을 수 있습니다.
+이 예시는 통화 정규화, 취소 주문 제외, 채널 필터링, 마진 보강, 매장별 집계가 순차적으로 드러납니다. 장애가 나도 어느 단계에서 값이 달라졌는지 바로 추적할 수 있습니다.
 
 ## 이 코드에서 주목할 점
 
 - `pipe`는 코드 순서와 실행 순서를 맞춰 읽기 쉽게 만듭니다.
+- `map`/`filter`/`reduce`를 각 파이프라인 단계 안에서 사용하면 선언형 표현이 자연스럽습니다.
 - 각 단계 함수는 독립적이어서 개별 테스트가 쉽습니다.
-- generator 파이프라인은 큰 데이터를 메모리 효율적으로 처리합니다.
-- 조건부 파이프라인은 분기 로직도 선언형으로 표현하게 해 줍니다.
+- frozen dataclass와 파이프라인을 조합하면 불변 변환 흐름을 안전하게 표현합니다.
 
-## 흔한 실수 5가지
+## 자주 하는 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
@@ -486,7 +387,7 @@ Pipeline report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
 - 검증 함수를 여러 단계로 조합해 데이터 검증 파이프라인을 만듭니다.
 - 텍스트 전처리를 정규화, 토큰화, 필터링 단계로 분리합니다.
 - API 미들웨어 체인을 함수 조합으로 표현합니다.
-- CI/CD 각 단계를 독립 함수처럼 설계하는 데 같은 사고방식을 적용합니다.
+- `map`/`filter`/`reduce`를 각 파이프라인 단계에 자연스럽게 통합합니다.
 
 ## 현업에서는 이렇게 판단합니다
 
@@ -494,153 +395,34 @@ Pipeline report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
 
 Python에는 Haskell의 `.` 같은 내장 합성 연산자가 없지만, 그건 본질이 아닙니다. 프로젝트 안에서 읽기 좋은 방향으로 `pipe` 또는 `compose` 하나만 정해 두고 일관되게 쓰는 편이 훨씬 중요합니다.
 
+## 처음 질문으로 돌아가기
+
+- **함수 합성은 수학적으로 어떤 의미를 가지며 Python에서는 어떻게 구현할까요?**
+  수학에서 `(f ∘ g)(x) = f(g(x))`입니다. Python에는 합성 연산자가 없으므로 `compose(*funcs)`나 `pipe(*funcs)` 유틸리티를 직접 만들어 씁니다. `reduce`로도 구현할 수 있습니다. `functools.reduce(lambda f, g: lambda x: g(f(x)), funcs)`
+
+- **`compose`와 `pipe`는 무엇이 다르고, 왜 `pipe`가 더 읽기 쉬운 경우가 많을까요?**
+  `compose(f, g, h)(x)`는 수학 표기법처럼 오른쪽부터 실행합니다. `h(x)` → `g(...)` → `f(...)`. `pipe(h, g, f)(x)`는 왼쪽부터 실행합니다. 코드에 쓴 순서가 실행 순서와 일치하기 때문에 데이터 흐름을 위에서 아래로 읽을 수 있습니다. 실무에서는 `pipe`가 대체로 더 직관적입니다.
+
+- **데이터 처리와 텍스트 처리에서 파이프라인은 어떤 장점을 줄까요?**
+  각 단계가 독립 함수라서 단계별로 테스트할 수 있고 특정 단계만 교체하기도 쉽습니다. 중간에 로깅 단계를 삽입하거나 단계를 재배치해도 다른 단계가 영향을 받지 않습니다. 거대한 함수 하나보다 디버깅 속도가 훨씬 빠릅니다.
+
 ## 운영 체크리스트
 
 - [ ] `compose`와 `pipe`의 차이를 설명할 수 있다
 - [ ] 작은 함수를 조합해 데이터 파이프라인을 만들 수 있다
-- [ ] generator 기반 지연 파이프라인을 구현할 수 있다
+- [ ] `map`/`filter`/`reduce`를 파이프라인 단계에 통합할 수 있다
 - [ ] 조건부 파이프라인을 작성할 수 있다
 - [ ] 각 단계를 독립적으로 테스트할 수 있다
 
 ## 연습 문제
 
 1. `compose`와 `pipe`를 둘 다 구현하고 같은 결과를 내는지 검증해 보세요.
-2. JSON 데이터를 읽어 필터링, 변환, 정렬, 포맷팅까지 하는 4단계 파이프라인을 설계해 보세요.
-3. `Result` 타입을 가정하고 오류 처리가 포함된 파이프라인을 구현해 보세요.
+2. JSON 데이터를 읽어 `filter`로 조건 선택, `map`으로 변환, `reduce`로 집계하는 4단계 파이프라인을 설계해 보세요.
+3. 파이프라인 중간에 결과를 출력하는 `tap` 단계를 추가해 디버깅 도구로 활용해 보세요.
 
 ## 정리와 다음 글
 
 함수 합성은 작은 함수를 결합해 큰 변환을 만드는 방법입니다. 특히 `pipe`는 코드 순서와 실행 순서를 맞춰 주기 때문에 Python에서 읽기 좋은 파이프라인을 만들기 좋습니다. 다음 글에서는 시리즈를 마무리하며 **객체지향과 함수형의 균형**을 다룹니다.
-
-## 심화 앵커: 하이브리드 설계를 검증 가능한 형태로 고정하기
-
-여기서는 시리즈 전체에서 다룬 패턴을 하나의 실행 흐름으로 묶습니다. 핵심은 클래스 경계와 함수 경계를 분리하는 것입니다. 상태를 가진 객체는 조립과 라이프사이클을 담당하고, 계산은 순수 함수 파이프라인으로 고정합니다.
-
-```python
-from dataclasses import dataclass, replace
-from functools import reduce
-from itertools import islice
-
-@dataclass(frozen=True)
-class Event:
-    event_id: str
-    amount: int
-    kind: str
-
-@dataclass(frozen=True)
-class LedgerRow:
-    event_id: str
-    gross: int
-    fee: int
-    net: int
-
-def normalize(event: Event) -> Event:
-    return replace(event, kind=event.kind.strip().lower())
-
-def paid_only(event: Event) -> bool:
-    return event.kind == "paid"
-
-def to_ledger(event: Event) -> LedgerRow:
-    fee = int(event.amount * 0.02)
-    return LedgerRow(event_id=event.event_id, gross=event.amount, fee=fee, net=event.amount - fee)
-
-def summarize(rows: list[LedgerRow]) -> dict[str, int]:
-    return reduce(
-        lambda acc, row: {
-            "count": acc["count"] + 1,
-            "gross": acc["gross"] + row.gross,
-            "fee": acc["fee"] + row.fee,
-            "net": acc["net"] + row.net,
-        },
-        rows,
-        {"count": 0, "gross": 0, "fee": 0, "net": 0},
-    )
-
-def settle(events: list[Event]) -> dict[str, int]:
-    normalized = map(normalize, events)
-    filtered = filter(paid_only, normalized)
-    rows = list(map(to_ledger, filtered))
-    return summarize(rows)
-
-sample = [
-    Event("E-1", 10000, "paid"),
-    Event("E-2", 7000, "cancelled"),
-    Event("E-3", 12000, "paid"),
-]
-
-print(settle(sample))
-# {'count': 2, 'gross': 22000, 'fee': 440, 'net': 21560}
-```
-
-이 구조는 monad-like `Result` 패턴, 재귀적 변환, 지연 파이프라인으로 확장하기 쉽습니다. 특히 검증 단계에서 속성 기반 테스트를 추가하면 변경이 잦은 정산 규칙도 안정적으로 운영할 수 있습니다.
-
-```python
-from hypothesis import given, strategies as st
-
-@given(st.integers(min_value=0, max_value=10_000))
-def test_fee_never_negative(amount: int) -> None:
-    row = to_ledger(Event("X", amount, "paid"))
-    assert row.fee >= 0
-    assert row.net <= row.gross
-```
-
-테스트에서 중요한 것은 "예제가 맞다"가 아니라 "성질이 유지된다"입니다. 이 관점을 유지하면 OOP와 FP를 섞어도 설계 품질이 흔들리지 않습니다.
-
-## 검증 시나리오: 경계 조건을 먼저 잠그기
-
-실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
-
-```python
-from functools import reduce
-
-def pipeline(values: list[int]) -> dict[str, int]:
-    filtered = [v for v in values if v >= 0]
-    squared = [v * v for v in filtered]
-    total = reduce(lambda acc, x: acc + x, squared, 0)
-    return {
-        "count": len(squared),
-        "total": total,
-        "max": max(squared) if squared else 0,
-    }
-
-# 경계 조건 검증
-assert pipeline([]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([-3, -1]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([0, 2, 3]) == {"count": 3, "total": 13, "max": 9}
-
-print("Pass")
-```
-
-또한 지연 평가를 사용할 때는 소비 시점을 테스트에 명시해 두는 편이 좋습니다. generator는 한 번 소비하면 비어야 정상이며, 이 성질이 깨지면 중간 단계에서 의도치 않은 materialize가 발생했을 가능성이 큽니다.
-
-```python
-from itertools import islice
-
-def naturals():
-    n = 0
-    while True:
-        yield n
-        n += 1
-
-stream = naturals()
-first_five = list(islice(stream, 5))
-next_three = list(islice(stream, 3))
-
-assert first_five == [0, 1, 2, 3, 4]
-assert next_three == [5, 6, 7]
-print("Pass")
-```
-
-이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
-## 처음 질문으로 돌아가기
-
-- **함수 합성은 수학적으로 어떤 의미를 가지며 Python에서는 어떻게 구현할까요?**
-  - 함수 합성의 핵심 가치는 관심사 분리입니다
-- **`compose`와 `pipe`는 무엇이 다르고, 왜 `pipe`가 더 읽기 쉬운 경우가 많을까요?**
-  - > `compose`와 `pipe`의 차이는 방향입니다
-- **데이터 처리와 텍스트 처리에서 파이프라인은 어떤 장점을 줄까요?**
-  - 실무에서는 `pipe`가 더 자주 읽기 좋습니다
 
 <!-- toc:begin -->
 ## 시리즈 목차

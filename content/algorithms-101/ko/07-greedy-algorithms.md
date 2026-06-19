@@ -50,8 +50,10 @@ Conditions for greedy to be correct
     2) Optimal substructure   : the remaining subproblem is also solved greedily
 
 Exchange argument
-    Take any optimal OPT, swap its first choice for the greedy choice;
-    show the result is still optimal.
+    Take any optimal solution OPT.
+    Swap its first choice for the greedy choice.
+    Show the modified solution is still optimal.
+    Therefore, greedy is optimal.
 ```
 
 | 용어 | 설명 |
@@ -67,22 +69,22 @@ Exchange argument
 **Before — 동전 거스름돈에 잘못 적용한 그리디:**
 
 ```python
-# 동전으로 6을 바꾸세요 [1, 3, 4]
-def greedy_change(coins, amount):
+def greedy_change_wrong(coins, amount):
     coins = sorted(coins, reverse=True)
-    n = 0
+    count = 0
     for c in coins:
-        n += amount // c
+        count += amount // c
         amount %= c
-    return n
+    return count
 
-print(greedy_change([1, 3, 4], 6))   # 3 (4+1+1) — optimum is 2 (3+3)
+# 동전 [1, 3, 4]로 6을 만들기
+print(greedy_change_wrong([1, 3, 4], 6))   # 3 (4+1+1) — 최적은 2 (3+3)
 ```
 
 **After — 그리디가 실패하면 DP로 전환:**
 
 ```python
-def min_coins(coins, amount):
+def min_coins_dp(coins, amount):
     INF = float('inf')
     dp = [0] + [INF] * amount
     for a in range(1, amount + 1):
@@ -91,7 +93,7 @@ def min_coins(coins, amount):
                 dp[a] = dp[a - c] + 1
     return dp[amount] if dp[amount] != INF else -1
 
-print(min_coins([1, 3, 4], 6))   # 2
+print(min_coins_dp([1, 3, 4], 6))   # 2 (3+3)
 ```
 
 ## 단계별로 따라가기
@@ -100,33 +102,51 @@ print(min_coins([1, 3, 4], 6))   # 2
 
 ```python
 def activity_selection(intervals):
-    """[(start, end), ...] -> the largest set of non-overlapping intervals"""
-    intervals = sorted(intervals, key=lambda x: x[1])
-    chosen, last_end = 0, -1
+    """
+    종료 시간이 가장 빠른 활동부터 선택.
+    교환 논증: 어떤 최적해에서도 첫 번째로 선택된 활동을 가장 일찍 끝나는 것으로
+    교체해도 최적성이 유지된다.
+    """
+    intervals = sorted(intervals, key=lambda x: x[1])  # 종료 시간 기준 정렬
+    chosen, last_end = [], -1
     for s, e in intervals:
         if s >= last_end:
-            chosen += 1
+            chosen.append((s, e))
             last_end = e
     return chosen
 
-print(activity_selection([(1, 4), (3, 5), (0, 6), (5, 7), (8, 9), (5, 9)]))   # 4
+activities = [(1, 4), (3, 5), (0, 6), (5, 7), (8, 9), (5, 9)]
+result = activity_selection(activities)
+print(f"선택된 활동 수: {len(result)}, 목록: {result}")   # 4개
 ```
 
-가장 빨리 끝나는 활동을 고르는 선택은 최적입니다. 교환 논증은 왜 그런지 형식적으로 설명해 줍니다.
+가장 빨리 끝나는 활동을 고르는 선택은 최적입니다. 정렬 키 하나가 정확성 논증 전체를 결정합니다.
 
-### 2단계: 회의실 배정 — 시작 시간이 아니라 종료 시간 정렬
+### 2단계: 시작 시간 정렬의 실패 반례
 
 ```python
-meetings = [(1, 5), (2, 3), (3, 4), (4, 6), (6, 8)]
-print(activity_selection(meetings))   # 3 — e.g. (2,3), (3,4), (4,6)
-```
+# 시작 시간으로 정렬하면 왜 깨질까?
+def activity_selection_wrong(intervals):
+    intervals = sorted(intervals, key=lambda x: x[0])  # 시작 시간 기준 (잘못)
+    chosen, last_end = [], -1
+    for s, e in intervals:
+        if s >= last_end:
+            chosen.append((s, e))
+            last_end = e
+    return chosen
 
-같은 알고리즘이 회의실 예약과 수업 배치 문제에도 그대로 적용됩니다. 정확성을 좌우하는 것은 정렬 키 한 줄입니다.
+activities = [(0, 10), (1, 2), (3, 4)]  # 최적: (1,2), (3,4) = 2개
+wrong = activity_selection_wrong(activities)
+correct = activity_selection(activities)
+print(f"잘못된 방법: {len(wrong)}개 — {wrong}")   # 1개 (0,10 하나만)
+print(f"올바른 방법: {len(correct)}개 — {correct}")  # 2개
+```
 
 ### 3단계: 거스름돈 — 그리디가 실제로 통할 때
 
 ```python
 def coin_change_greedy(coins, amount):
+    """표준 코인 시스템(canonical)에서만 최적."""
     coins = sorted(coins, reverse=True)
     used = []
     for c in coins:
@@ -135,8 +155,11 @@ def coin_change_greedy(coins, amount):
             used.append(c)
     return used if amount == 0 else None
 
-# 한국과 미국의 코인 시스템은 표준이므로 탐욕스러운 것이 최적입니다.
+# 표준 코인에서는 그리디가 최적
 print(coin_change_greedy([500, 100, 50, 10], 1260))
+# 비표준 코인에서는 실패
+print("그리디:", coin_change_greedy([1, 3, 4], 6))   # [4, 1, 1] = 3개
+print("DP 최적:", min_coins_dp([1, 3, 4], 6))        # 2개
 ```
 
 동전 시스템이 canonical하면 그리디가 최적입니다. 임의의 동전 집합에는 그런 보장이 없으므로 DP가 더 안전합니다.
@@ -147,36 +170,92 @@ print(coin_change_greedy([500, 100, 50, 10], 1260))
 import heapq
 
 def huffman(freq):
-    h = [[w, c] for c, w in freq.items()]
+    """
+    빈도 기반 최적 prefix code.
+    그리디 선택: 가장 빈도가 낮은 두 노드를 반복해서 합침.
+    """
+    h = [[w, [c, ""]] for c, w in freq.items()]
     heapq.heapify(h)
     while len(h) > 1:
-        a = heapq.heappop(h)
-        b = heapq.heappop(h)
-        heapq.heappush(h, [a[0] + b[0], (a, b)])
-    return h[0]
+        a = heapq.heappop(h)   # 가장 낮은 빈도
+        b = heapq.heappop(h)   # 두 번째로 낮은 빈도
+        for item in a[1:]:
+            item[1] = '0' + item[1]
+        for item in b[1:]:
+            item[1] = '1' + item[1]
+        heapq.heappush(h, [a[0] + b[0]] + a[1:] + b[1:])
+    return sorted(h[0][1:], key=lambda x: len(x[1]))
 
-print(huffman({"a": 5, "b": 9, "c": 12, "d": 13, "e": 16, "f": 45}))
+freq = {"a": 5, "b": 9, "c": 12, "d": 13, "e": 16, "f": 45}
+codes = huffman(freq)
+for char, code in codes:
+    print(f"  '{char}': {code} (빈도 {freq[char]})")
 ```
-
-가장 빈도가 낮은 두 노드를 반복해서 합치면 최적 prefix code가 만들어집니다. 우선순위 큐가 그리디의 핵심 도구로 쓰이는 대표 사례입니다.
 
 ### 5단계: Fractional knapsack — 분할 가능성과 0/1의 차이
 
 ```python
 def fractional_knapsack(weights, values, W):
+    """
+    단위 무게당 가치가 높은 것부터 선택. 분할 가능하므로 그리디 최적.
+    0/1 knapsack에서는 이 방법이 실패함 — 분할 불가.
+    """
     items = sorted(zip(weights, values), key=lambda x: -x[1] / x[0])
     total = 0.0
     for w, v in items:
         if W >= w:
-            W -= w; total += v
+            W -= w
+            total += v
         else:
-            total += v * (W / w); break
+            total += v * (W / w)   # 분할
+            break
     return total
 
 print(fractional_knapsack([10, 20, 30], [60, 100, 120], 50))   # 240.0
 ```
 
-분수 knapsack은 그리디로 최적이지만 0/1 knapsack은 그렇지 않습니다. 물건을 쪼갤 수 있는지가 적용 가능성을 갈라 놓습니다.
+분수 knapsack은 그리디로 최적이지만 0/1 knapsack은 그렇지 않습니다. 물건을 쪼갤 수 있는지가 적용 가능성을 가릅니다.
+
+### 6단계: 그리디 vs DP 판별 연습
+
+```python
+# 반례를 만드는 방법
+def verify_greedy(greedy_fn, dp_fn, coins_list, amounts):
+    """그리디와 DP 결과를 비교해 반례를 탐색."""
+    for coins in coins_list:
+        for amount in amounts:
+            g = greedy_fn(coins, amount)
+            d = dp_fn(coins, amount)
+            g_count = len(g) if g else float('inf')
+            if g_count != d:
+                print(f"반례! coins={coins}, amount={amount}: "
+                      f"greedy={g_count}, dp={d}")
+                return
+    print("테스트 범위에서 차이 없음")
+
+# 표준 코인
+def greedy_count(coins, amount):
+    result = coin_change_greedy(coins, amount)
+    return len(result) if result else float('inf')
+
+verify_greedy(greedy_count, min_coins_dp,
+              [[1, 3, 4]], range(1, 20))   # 반례 발견
+```
+
+## 그리디 vs DP 비교표
+
+| 특성 | 그리디 | 동적 계획법 |
+| --- | --- | --- |
+| 결정 방식 | 현재 단계에서 최선 | 모든 부분 문제 고려 |
+| 되돌림 | 없음 | 없음 (memoization) |
+| 시간 복잡도 | 보통 O(n log n) 이하 | 보통 O(n²) 이상 |
+| 정확성 보장 | 조건 충족 시만 | 항상 |
+| 적용 신호 | 교환 논증 성립 | 중복 부분 문제 + 최적 부분 구조 |
+| 활동 선택 | 최적 (종료 시간 정렬) | 적용 가능하나 불필요 |
+| 거스름돈(표준) | 최적 | 적용 가능하나 오버 |
+| 거스름돈(비표준) | 실패 가능 | 항상 최적 |
+| 0/1 knapsack | 실패 | 최적 |
+| fractional knapsack | 최적 | 적용 불필요 |
 
 ## 이 글에서 먼저 가져갈 점
 
@@ -184,8 +263,9 @@ print(fractional_knapsack([10, 20, 30], [60, 100, 120], 50))   # 240.0
 - 분할 가능성은 fractional과 0/1 문제를 가르는 결정적 기준입니다.
 - 우선순위 큐는 그리디 알고리즘의 대표 작업 도구입니다.
 - 직관만 믿지 말고 교환 논증으로 확인해야 합니다.
+- 작은 반례를 직접 만드는 것이 가장 빠른 정확성 점검입니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수
 
 | 실수 | 문제 | 해결 |
 | --- | --- | --- |
@@ -194,6 +274,7 @@ print(fractional_knapsack([10, 20, 30], [60, 100, 120], 50))   # 240.0
 | 잘못된 정렬 키 선택 | 거의 맞지만 틀림 | 시작 시각, 종료 시각, 비율 등 후보를 비교합니다 |
 | 우선순위 큐 없이 구현 | O(n²) | heap으로 O(n log n)을 확보합니다 |
 | 부분 해를 되돌리려 함 | 그리디 원칙 자체 위반 | 되돌림이 필요하면 DP나 탐색으로 전환합니다 |
+| 입력 조건을 문서화하지 않음 | 다른 입력에서 재사용 실패 | 그리디가 유효한 전제를 주석으로 남깁니다 |
 
 ## 실무에서는 이렇게 쓰입니다
 
@@ -216,6 +297,7 @@ print(fractional_knapsack([10, 20, 30], [60, 100, 120], 50))   # 240.0
 - [ ] 정렬 키가 정확성을 좌우한다는 감각이 있는가
 - [ ] 그리디처럼 보이는 DP 문제를 구별할 수 있는가
 - [ ] 우선순위 큐 사용이 익숙한가
+- [ ] 그리디의 유효 조건을 코드 주석으로 남기는가
 
 ## 연습 문제
 
@@ -225,91 +307,22 @@ print(fractional_knapsack([10, 20, 30], [60, 100, 120], 50))   # 240.0
 
 3. 동전 `[1, 5, 6, 9]`와 목표값 11에 대해 그리디 답과 DP 답을 각각 출력해 보고, 왜 달라지는지 설명해 보세요.
 
+4. Huffman 코딩으로 압축된 비트열의 평균 길이를 계산해 보세요. 고정 길이 인코딩과 비교해 얼마나 더 효율적인지도 출력하세요.
+
 ## 정리 및 다음 단계
 
 그리디는 단순함과 속도의 알고리즘이지만, 그만큼 정확성에 대한 부담이 더 큽니다. 그리디 선택 속성과 최적 부분 구조를 교환 논증으로 확인하는 습관이 있어야, 빠르지만 틀린 해법을 피할 수 있습니다.
 
 다음 글에서는 그래프 알고리즘을 다룹니다. BFS와 DFS의 차이, 다익스트라 최단 경로, 최소 신장 트리까지 보면서 그래프가 왜 시스템 사고의 공용 언어인지 봅니다.
 
-## 실전 확장 워크북
-
-이 절은 그리디 정당화를 실제 문제 풀이와 운영 감각으로 연결하기 위한 보강 파트입니다. 개념을 암기하는 대신, 입력 크기·자료 구조·검증 순서를 함께 다루어 같은 유형의 문제를 반복적으로 안정적으로 풀 수 있게 만드는 데 목적이 있습니다. 핵심은 "정답 코드 한 번"이 아니라 "다음 문제에서도 재사용 가능한 판단 프레임"을 확보하는 것입니다.
-
-### 1) 시간 복잡도와 입력 제약을 먼저 맞추기
-
-| 입력 조건 | 우선 배제할 접근 | 현실적인 후보 | 확인 포인트 |
-| --- | --- | --- | --- |
-| n <= 10^3 | 없음(학습 목적 실험 가능) | 브루트포스, 정렬, 해시 | 구현 명확성 |
-| n <= 10^5 | O(n^2) 대부분 배제 | O(n log n), O(n), BFS/DFS | 경계값 테스트 |
-| n <= 10^6 이상 | O(n log n)도 부담 가능 | 단일 패스, 압축, 스트리밍 | 메모리 상한 |
-
-복잡도 판단은 코드 스타일 논쟁보다 우선합니다. 같은 팀에서 코드 품질 기준이 달라도, 입력 제약과 차수를 맞추는 원칙은 공통으로 적용됩니다. 이 단계를 건너뛰면 구현이 아무리 깔끔해도 제출 실패나 운영 지연으로 이어집니다.
-
-### 2) 단계별 추적 표로 경계 버그를 조기에 찾기
-
-| 단계 | 관찰 값 | 기대 신호 | 실패 신호 |
-| --- | --- | --- | --- |
-| 초기화 | 포인터/상태/큐/테이블 | 문제 정의와 일치 | 초기값 누락 |
-| 1회 반복 | 상태 전이 | 단조 증가 또는 감소 | 제자리 반복 |
-| 종료 직전 | 반환 후보 | 문제 요구와 직접 연결 | 보조값 반환 |
-
-경계 버그는 대부분 "한 줄"에서 발생하지만, 원인은 상태 전이 설계에 있습니다. 그래서 디버깅할 때는 출력값 하나만 보지 말고, 전이 로그를 함께 봐야 합니다. 특히 인덱스 기반 문제는 `lo, mid, hi`, DP 문제는 `state, transition`, 그래프 문제는 `queue size, visited count`를 같이 기록하면 원인 분리가 훨씬 빨라집니다.
-
-### 3) Python 구현 앵커
-
-```python
-def can_complete_circuit(gas, cost):
-    total = current = start = 0
-    for i, (g, c) in enumerate(zip(gas, cost)):
-        diff = g - c
-        total += diff
-        current += diff
-        if current < 0:
-            start = i + 1
-            current = 0
-    return start if total >= 0 else -1
-```
-
-코드는 짧아도 충분합니다. 중요한 점은 구현 전에 불변식(invariant)을 문장으로 먼저 고정하는 것입니다. 예를 들어 "현재 단계가 끝나면 최소 비용이 보장된다" 같은 문장이 없으면, 코드가 돌아가도 왜 맞는지 설명할 수 없고, 변형 문제에서 무너지기 쉽습니다.
-
-### 4) LeetCode 스타일 매핑
-
-| 문제 | 핵심 패턴 | 첫 시도에서 자주 틀리는 지점 |
-| --- | --- | --- |
-| 455 Assign Cookies | 제약을 통한 후보 축소 | 입력 조건을 늦게 반영 |
-| 435 Non-overlapping Intervals | 상태/포인터 유지 | 경계 인덱스 처리 |
-| 134 Gas Station | 자료구조 선택 | 복잡도 목표 미달 |
-
-문제 매핑의 목적은 정답 암기가 아닙니다. 같은 구조를 빠르게 인식하고, "왜 이 패턴을 쓰는가"를 재현하는 데 있습니다. 시리즈 전체를 관통하는 실력 차이는 여기서 발생합니다.
-
-### 5) 비교 벤치마크를 읽는 기준
-
-| 비교 항목 | A 접근 | B 접근 | 의사결정 기준 |
-| --- | --- | --- | --- |
-| 시간 | 평균적으로 빠름 | 최악 케이스 안정적 | 입력 분포가 고정인지 |
-| 메모리 | 추가 배열 필요 | 제자리 처리 가능 | 메모리 제한 강도 |
-| 구현 난이도 | 짧음 | 디버깅 난이도 높음 | 팀 유지보수 역량 |
-
-벤치마크 숫자는 환경에 따라 달라집니다. 하지만 차수와 메모리 계층에서 발생하는 방향성은 반복됩니다. 그래서 한 번 측정한 결과를 절대값으로 외우기보다, 어떤 조건에서 우위가 바뀌는지(입력 크기, 정렬 여부, 중복 비율)를 함께 기록해야 다음 의사결정에 도움이 됩니다.
-
-### 6) 제출/배포 전 점검 루틴
-
-1. 문제 제약을 한 줄로 요약하고 불가능한 차수를 먼저 제거합니다.
-2. 핵심 자료구조 선택 이유를 "삽입/조회/삭제 비용" 기준으로 적습니다.
-3. 경계 입력 3종(빈값, 최소값, 중복/극단값) 테스트를 고정합니다.
-4. 시간·공간 복잡도를 코드 옆에 기록하고, 실제 측정값을 짧게 남깁니다.
-5. 같은 패턴의 변형 문제를 1개 더 풀어 일반화 여부를 확인합니다.
-
-이 루틴을 꾸준히 적용하면 "이번 문제를 맞춤"에서 끝나지 않고 "같은 유형을 안정적으로 재현"하는 상태로 넘어갈 수 있습니다. 알고리즘 학습은 지식 축적이 아니라 판단 체계 구축이라는 점을 계속 기억하는 것이 중요합니다.
-
 ## 처음 질문으로 돌아가기
 
 - **그리디 알고리즘이 옳으려면 어떤 두 조건이 필요할까요?**
-  - 가장 빨리 끝나는 활동을 고르는 선택은 최적입니다
+  - 첫째, 그리디 선택 속성: 국소적으로 최선인 선택을 포함하는 전체 최적해가 존재해야 합니다. 둘째, 최적 부분 구조: 그리디 선택 이후 남은 부분 문제도 같은 방식으로 최적으로 풀려야 합니다. 두 조건 중 하나라도 없으면 그리디는 오답을 낼 수 있습니다.
 - **교환 논증은 그리디 선택을 어떻게 정당화할까요?**
-  - 가장 빨리 끝나는 활동을 고르는 선택은 최적입니다
+  - "임의의 최적해 OPT에서 첫 번째 선택을 그리디 선택으로 교체해도 OPT의 최적성이 유지된다"는 것을 보입니다. 예를 들어 활동 선택에서 OPT가 종료 시간이 가장 빠른 활동 대신 다른 것을 선택했다면, 그것을 가장 빨리 끝나는 활동으로 교체해도 이후 활동 수가 줄어들지 않습니다.
 - **활동 선택, 거스름돈, Huffman coding은 무엇을 보여 줄까요?**
-  - 가장 빨리 끝나는 활동을 고르는 선택은 최적입니다
+  - 활동 선택은 "단조 기준으로 정렬 후 충돌 없으면 선택"이라는 가장 기본적인 그리디 패턴을 보여 줍니다. 거스름돈은 그리디가 통하는 조건(canonical 코인 시스템)과 실패하는 조건(비표준 코인)의 차이를 보여 줍니다. Huffman coding은 우선순위 큐를 도구로 쓰는 그리디의 전형으로, 수학적으로 최적 prefix code임이 증명됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

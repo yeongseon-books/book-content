@@ -1,585 +1,505 @@
 ---
-title: "AI App Patterns 101 (1/6): 챗봇 패턴 — 대화 이력과 상태 관리"
 series: ai-app-patterns-101
 episode: 1
-language: ko
-status: published
-published_to:
-  tistory:
-    url: "https://yeongseonchoe.tistory.com/77"
-    published_at: '2026-05-13'
+title: "AI App Patterns 101 (1/6): Chatbot 패턴"
+status: publish-ready
 targets:
   tistory: true
   medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
+language: ko
 tags:
-- LLM
-- RAG
-- Agent
-- Python
-last_reviewed: '2026-05-12'
-seo_description: 챗봇은 모델이 기억하는 시스템이 아니라 누적 메시지 목록을 다시 보내는 앱 루프입니다.
+  - Chatbot
+  - LLM
+  - ConversationMemory
+  - FastAPI
+  - Streaming
+seo_description: 슬라이딩 윈도우·요약 메모리·세션 기반 대화 유지 방식과 FastAPI SSE 스트리밍까지 챗봇 구현 핵심 패턴을 정리합니다
+last_reviewed: '2026-06-20'
 ---
 
-# AI App Patterns 101 (1/6): 챗봇 패턴 — 대화 이력과 상태 관리
+# AI App Patterns 101 (1/6): Chatbot 패턴
 
-챗봇을 처음 설계할 때 가장 흔한 착각은 모델이 호출 사이의 대화를 어딘가에 기억해 둔다고 보는 일입니다. 실제로는 정반대입니다. 어떤 문맥을 다시 보낼지, 얼마나 오래 보관할지, 이력이 너무 길어졌을 때 무엇을 버리고 무엇을 압축할지는 모두 애플리케이션이 결정합니다.
+챗봇은 가장 빠르게 프로토타입을 만들 수 있는 LLM 애플리케이션입니다. 하지만 "모델 API를 한 번 호출하면 된다"는 생각으로 시작한 프로젝트가 얼마 지나지 않아 대화 흐름이 끊기거나, 토큰 비용이 폭증하거나, 긴 대화에서 앞 내용을 잊어버리는 문제에 부딪힙니다. 챗봇을 프로덕션까지 가져가려면 메모리 전략, 토큰 예산 관리, 스트리밍 응답이라는 세 축을 함께 설계해야 합니다.
 
-이 차이를 빨리 잡아야 멀티턴 동작을 제대로 설명할 수 있습니다. 챗봇 품질 문제처럼 보이는 많은 현상은 사실 모델 지능의 문제가 아니라, 이력 재생 전략과 상태 저장 방식의 문제이기 때문입니다.
+이 글은 AI App Patterns 101 시리즈의 1번째 글입니다.
 
-이 글은 AI App Patterns 101 시리즈의 첫 번째 글입니다. 여기서는 가장 작은 신뢰 가능한 챗봇 패턴과, 멀티턴 동작을 가능하게 만드는 상태 관리 결정을 함께 살펴봅니다.
-
-![이력을 다시 보내는 무상태 호출](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.ko.png)
-*이력을 다시 보내는 무상태 호출*
-> 챗봇은 모델이 기억하는 시스템이 아니라, 애플리케이션이 누적된 메시지 목록을 계속 다시 재생하는 루프입니다.
+![Chatbot 패턴 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-01-concept-at-a-glance.ko.png)
+*대화 메모리와 스트리밍이 결합된 챗봇 패턴 전체 흐름*
 
 ## 이 글에서 다룰 문제
 
-- 모델이 이전 대화를 기억하지 않는다면 챗봇의 “기억”은 어디에 있어야 할까요?
-- 대화 이력을 계속 붙이면 언제 비용과 지연 시간이 먼저 문제가 될까요?
-- 세션별 이력은 언제 메모리에 두고 언제 외부 저장소로 옮겨야 할까요?
-- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
-- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
+- 챗봇이 이전 대화를 기억하려면 어떤 메모리 전략이 필요할까요?
+- 대화가 길어질수록 토큰 비용이 폭증하는 문제를 어떻게 막을 수 있을까요?
+- 슬라이딩 윈도우와 요약 메모리는 각각 어떤 상황에 적합할까요?
+- FastAPI에서 스트리밍 응답을 안전하게 구현하려면 어떻게 해야 할까요?
+- 세션 기반 대화 관리를 프로덕션에서 운영할 때 무엇을 챙겨야 할까요?
 
-## 기본 챗봇: 수동 이력 관리
+## 핵심 개념 한 줄 정리
 
-### 이력을 다시 보내는 무상태 호출
+- **Sliding Window**: 최근 N개 메시지만 컨텍스트에 포함하는 가장 단순한 메모리 전략입니다.
+- **Summary Memory**: 오래된 대화를 요약해 압축하고, 요약본과 최근 메시지를 합쳐 컨텍스트를 만드는 전략입니다.
+- **Session**: 사용자별로 독립된 대화 이력을 격리하는 논리적 단위입니다.
+- **Token Budget**: 프롬프트와 응답 합산 토큰에 상한선을 두는 설계 원칙입니다.
+- **SSE(Server-Sent Events)**: 서버가 생성한 텍스트를 청크 단위로 클라이언트에 밀어 주는 HTTP 스트리밍 방식입니다.
 
-가장 단순한 접근은 메시지를 리스트에 계속 쌓고, 매 요청마다 그 전체 리스트를 다시 보내는 방식입니다.
+## 메모리 전략 비교
 
-```python
-import os
+대화 히스토리를 어떻게 다루느냐가 챗봇 품질과 비용을 동시에 결정합니다.
 
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_groq import ChatGroq
+| 전략 | 토큰 비용 | 구현 복잡도 | 적합 상황 | 단점 |
+|---|---|---|---|---|
+| 전체 히스토리 | 매우 높음 | 낮음 | 짧은 데모 | 장기 대화에서 비용 폭발 |
+| 슬라이딩 윈도우 | 고정 | 낮음 | 일반 챗봇 | 오래된 맥락 손실 |
+| 요약 메모리 | 중간 | 중간 | 긴 대화 | 요약 품질에 의존 |
+| 벡터 검색 메모리 | 낮음 | 높음 | 지식 기반 챗봇 | 검색 레이턴시 추가 |
 
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
+슬라이딩 윈도우는 구현이 가장 쉽고, 대부분의 고객 지원 챗봇에서는 이 방식으로도 충분합니다. 요약 메모리는 1시간 넘는 세션이 발생하는 상담 서비스나 개인 비서 서비스에서 빛을 발합니다.
 
-system_message = SystemMessage(
-    content="You are a helpful AI assistant. Keep your answers concise."
-)
-history = [system_message]
+## 구체적인 시나리오: 어느 방식을 선택해야 할까?
 
-def chat(user_input: str) -> str:
-    history.append(HumanMessage(content=user_input))
-    response = llm.invoke(history)
-    history.append(AIMessage(content=response.content))
-    return response.content
+**시나리오 A — 고객 지원 챗봇**: 사용자 한 명이 결제 문제로 챗봇과 10~15번 주고받습니다. 대부분의 대화가 현재 세션 주제에 집중되므로 슬라이딩 윈도우(window_size=10)로 충분합니다.
 
-print(chat("Hi! My name is Alice."))
-print(chat("What are two advantages of Python?"))
-print(chat("What is my name?"))  # must recall earlier turn
-```
+**시나리오 B — 개인 학습 비서**: 사용자가 같은 주제를 여러 날에 걸쳐 공부하면서 "지난번에 배운 내용 이어서..."라는 표현을 자주 씁니다. 오래된 맥락을 요약해 보존하는 Summary Memory가 적합합니다.
 
-이력이 계속 쌓이면 결국 컨텍스트 창이 차기 시작합니다. `llama-3.1-8b-instant`의 한계는 8,192토큰이므로, 긴 대화는 언젠가 한계에 부딪힙니다.
+**시나리오 C — 법률 문서 검토 보조**: "조항 3항과 7항의 충돌 가능성"처럼 문서 특정 부분을 자주 언급합니다. 벡터 검색 메모리로 필요한 절만 검색해서 컨텍스트에 주입하는 방식이 비용 효율적입니다.
 
----
+## 실습: 슬라이딩 윈도우 메모리
 
-## 메모리 윈도우 — 최근 N개 메시지만 유지
-
-### 슬라이딩 윈도우 메시지 보존
-
-![슬라이딩 윈도우 메시지 보존](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-02-sliding-window-message-retention.ko.png)
-
-*슬라이딩 윈도우 메시지 보존*
-오래된 메시지를 버리고 가장 최근 N개만 남기면 컨텍스트 길이를 예측 가능하게 유지할 수 있습니다.
+가장 먼저 구현해야 할 기본 패턴입니다. 최근 K개 메시지만 LLM에 전달해 컨텍스트 크기를 일정하게 유지합니다.
 
 ```python
-import os
-from collections import deque
+from openai import OpenAI
 
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_groq import ChatGroq
+client = OpenAI()
 
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
+def sliding_window_chat(
+    history: list[dict],
+    user_message: str,
+    system_prompt: str = "You are a helpful assistant.",
+    window_size: int = 10,
+    max_tokens: int = 1024,
+) -> str:
+    """슬라이딩 윈도우 메모리로 대화를 유지합니다."""
+    # 최근 window_size 개 메시지만 유지
+    recent = history[-window_size:] if len(history) > window_size else history
 
-WINDOW_SIZE = 10  # last 10 messages (5 human-AI pairs)
+    messages = [{"role": "system", "content": system_prompt}]
+    messages.extend(recent)
+    messages.append({"role": "user", "content": user_message})
 
-class WindowedChatbot:
-    def __init__(self, system_prompt: str, window_size: int = WINDOW_SIZE):
-        self.system_message = SystemMessage(content=system_prompt)
-        self.window: deque = deque(maxlen=window_size)
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+        max_tokens=max_tokens,
+    )
+    return response.choices[0].message.content
 
-    def chat(self, user_input: str) -> str:
-        self.window.append(HumanMessage(content=user_input))
-        messages = [self.system_message] + list(self.window)
-        response = llm.invoke(messages)
-        ai_msg = AIMessage(content=response.content)
-        self.window.append(ai_msg)
-        return response.content
 
-    @property
-    def history_length(self) -> int:
-        return len(self.window)
-
-bot = WindowedChatbot(
-    system_prompt="You are a Python tutor. Explain things clearly and concisely."
-)
-
+# 사용 예시: 고객 지원 시나리오
+history: list[dict] = []
 turns = [
-    "What is the difference between a list and a tuple in Python?",
-    "When is a dictionary the right choice?",
-    "What are the main uses of a set?",
-    "Summarize the three data structures you just explained in one line each.",
+    "안녕하세요, 파이썬 튜터링을 받고 싶어요.",
+    "리스트 컴프리헨션을 설명해 주세요.",
+    "방금 설명한 내용을 실제 예제로 보여 주세요.",
+    "그러면 딕셔너리 컴프리헨션도 비슷한 방식인가요?",
+    "네, 이해했어요. 그런데 처음에 말씀드린 튜터링 목표가 뭐였죠?",
 ]
 
-for turn in turns:
-    print(f"\n[user] {turn}")
-    answer = bot.chat(turn)
-    print(f"[bot] {answer[:150]}...")
-    print(f"history length: {bot.history_length} messages")
+for user_input in turns:
+    reply = sliding_window_chat(history, user_input)
+    history.append({"role": "user", "content": user_input})
+    history.append({"role": "assistant", "content": reply})
+    print(f"User: {user_input}\nAssistant: {reply}\n{'='*50}")
 ```
 
-`deque(maxlen=window_size)`는 용량을 넘기는 순간 가장 오래된 항목을 자동으로 버립니다.
+window_size=10일 때 히스토리가 10개를 넘으면 오래된 메시지는 잘려 나갑니다. 위 예시의 마지막 질문("처음에 말씀드린 튜터링 목표")은 히스토리가 짧아서 잘 답하지만, 30번째 턴 이후에는 "첫 메시지"가 윈도우 밖으로 밀려납니다. 이것이 Summary Memory가 필요한 신호입니다.
 
----
+## 실습: 요약 메모리
 
-## 대화 요약으로 컨텍스트 제어
-
-### 최근 대화와 함께 쓰는 요약 메모리
-
-![최근 대화와 함께 쓰는 요약 메모리](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-03-summary-memory-with-recent-turns.ko.png)
-
-*최근 대화와 함께 쓰는 요약 메모리*
-윈도우 방식은 오래된 메시지를 그냥 버립니다. 요약 방식은 오래된 메시지를 압축해서 남깁니다.
-
-> 멘탈 모델은 단순합니다. 최근 대화는 원문으로 유지하고, 오래된 대화는 요약본으로 접어 두는 것입니다. 챗봇은 장기 기억을 갖는 것이 아니라, 긴 이력을 짧은 설명문으로 다시 들고 다니는 셈입니다.
+대화가 일정 길이를 초과하면 오래된 부분을 요약해 압축합니다. 이 방식은 맥락 손실을 최소화하면서 토큰을 아낍니다.
 
 ```python
-import os
+from openai import OpenAI
 
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_groq import ChatGroq
+client = OpenAI()
 
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
 
-summarize_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "Summarize this conversation in 3-5 sentences. "
-        "Preserve who the user is, what they asked, and any key facts.",
-    ),
-    ("human", "Conversation:\n{history}"),
-])
+def summarize_history(messages: list[dict]) -> str:
+    """오래된 대화 이력을 핵심만 남겨 요약합니다."""
+    conversation_text = "\n".join(
+        f"{m['role'].upper()}: {m['content']}" for m in messages
+    )
+    summary_prompt = (
+        "다음 대화를 핵심 정보만 남겨 3문장 이내로 요약하세요. "
+        "사용자의 목적, 결정된 사항, 미결 사항을 포함하세요.\n\n"
+        f"{conversation_text}"
+    )
+    resp = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": summary_prompt}],
+        max_tokens=256,
+    )
+    return resp.choices[0].message.content
 
-summarize_chain = summarize_prompt | llm | StrOutputParser()
 
-class SummaryChatbot:
-    def __init__(self, system_prompt: str, max_turns: int = 6):
-        self.system_prompt = system_prompt
-        self.max_turns = max_turns
-        self.summary = ""
-        self.recent: list = []
+def summary_memory_chat(
+    history: list[dict],
+    user_message: str,
+    system_prompt: str = "You are a helpful assistant.",
+    trigger_size: int = 20,
+    keep_recent: int = 6,
+) -> tuple[str, list[dict]]:
+    """요약 메모리를 사용하는 챗봇입니다."""
+    if len(history) > trigger_size:
+        older = history[:-keep_recent]
+        recent = history[-keep_recent:]
+        summary = summarize_history(older)
+        merged_system = f"{system_prompt}\n\n[이전 대화 요약]\n{summary}"
+        history = recent
+    else:
+        merged_system = system_prompt
 
-    def _summarize(self) -> None:
-        history_text = "\n".join(
-            f"{'user' if isinstance(m, HumanMessage) else 'AI'}: {m.content}"
-            for m in self.recent
-        )
-        self.summary = summarize_chain.invoke({"history": history_text})
-        self.recent = []
-        print(f"  [summary generated: {len(self.summary)} chars]")
+    messages = [{"role": "system", "content": merged_system}]
+    messages.extend(history)
+    messages.append({"role": "user", "content": user_message})
 
-    def chat(self, user_input: str) -> str:
-        if len(self.recent) >= self.max_turns * 2:
-            self._summarize()
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+        max_tokens=1024,
+    )
+    reply = response.choices[0].message.content
+    history.append({"role": "user", "content": user_message})
+    history.append({"role": "assistant", "content": reply})
+    return reply, history
 
-        system_content = self.system_prompt
-        if self.summary:
-            system_content += f"\n\nPrevious conversation summary:\n{self.summary}"
 
-        messages = (
-            [SystemMessage(content=system_content)]
-            + self.recent
-            + [HumanMessage(content=user_input)]
-        )
-
-        response = llm.invoke(messages)
-        self.recent.append(HumanMessage(content=user_input))
-        self.recent.append(AIMessage(content=response.content))
-        return response.content
-
-bot = SummaryChatbot(
-    system_prompt="You are a helpful travel assistant.",
-    max_turns=3,
-)
-
-conversations = [
-    "I am planning a trip to Jeju Island. When is the best time to go?",
-    "Is a rental car necessary?",
-    "Where is a good area to stay?",
-    "Recommend a good itinerary for a family trip.",  # triggers summarization
-    "What activities do children typically enjoy there?",
+# 요약 메모리 시나리오: 긴 학습 세션
+history: list[dict] = []
+long_session = [
+    "파이썬 학습을 시작하려고 해요. 기초부터 배우고 싶어요.",
+    "변수와 자료형을 먼저 배우고 싶어요.",
+    "리스트를 배웠는데, 튜플과 차이점이 뭔가요?",
+    "딕셔너리는 어떻게 사용하나요?",
+    "이제 제어문을 배우고 싶어요.",
+    "for 루프 예제를 더 보여주세요.",
+    "while 루프는 언제 쓰나요?",
+    "함수를 만드는 법을 알려주세요.",
+    "람다 함수가 뭔가요?",
+    "클래스와 객체는 어떻게 다른가요?",
+    # 히스토리가 trigger_size(20)를 넘으면 요약 트리거
 ]
-
-for msg in conversations:
-    print(f"\n[user] {msg}")
-    answer = bot.chat(msg)
-    print(f"[bot] {answer[:200]}...")
+for msg in long_session:
+    reply, history = summary_memory_chat(history, msg)
+    print(f"Q: {msg[:40]}...\nA: {reply[:80]}...\n")
 ```
 
----
+요약이 실제로 언제 발동했는지 확인하려면 `len(history) > trigger_size` 분기를 로그로 남기는 것이 좋습니다. 요약 품질이 나쁘면 초반 대화의 맥락이 왜곡될 수 있으므로, 요약 결과를 별도로 저장하고 검토하는 루틴을 운영 초기에 두는 것을 권장합니다.
 
-## 세션 기반 챗봇
+## 실습: FastAPI SSE 스트리밍
 
-### 세션 범위로 분리된 대화 상태
-
-![세션 범위로 분리된 대화 상태](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-04-session-scoped-conversation-state.ko.png)
-
-*세션 범위로 분리된 대화 상태*
-여러 사용자가 있는 앱에서는 세션 ID를 기준으로 대화 상태를 분리해야 합니다.
+사용자가 첫 글자가 나오기까지 기다리는 시간이 길면 챗봇 경험이 크게 나빠집니다. SSE 스트리밍으로 토큰이 생성되는 즉시 클라이언트에 전달합니다.
 
 ```python
-import os
-import uuid
-from collections import deque
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+from openai import OpenAI
+import json
 
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_groq import ChatGroq
+app = FastAPI()
+client = OpenAI()
 
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
+# 세션별 대화 이력 저장소 (프로덕션에서는 Redis 사용 권장)
+sessions: dict[str, list[dict]] = {}
 
-# 세션 저장소 — 프로덕션에서 Redis 또는 데이터베이스를 사용합니다.
-sessions: dict[str, deque] = {}
-WINDOW_SIZE = 10
-SYSTEM_PROMPT = "You are a helpful AI assistant."
 
-def get_or_create_session(session_id: str | None = None) -> str:
-    if session_id is None or session_id not in sessions:
-        session_id = session_id or str(uuid.uuid4())
-        sessions[session_id] = deque(maxlen=WINDOW_SIZE)
-    return session_id
+def stream_chat_response(session_id: str, user_message: str):
+    """스트리밍 응답을 SSE 형식으로 생성합니다."""
+    history = sessions.get(session_id, [])
+    window = history[-10:]
 
-def chat(user_input: str, session_id: str | None = None) -> tuple[str, str]:
-    session_id = get_or_create_session(session_id)
-    window = sessions[session_id]
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        *window,
+        {"role": "user", "content": user_message},
+    ]
 
-    window.append(HumanMessage(content=user_input))
-    messages = [SystemMessage(content=SYSTEM_PROMPT)] + list(window)
-    response = llm.invoke(messages)
-    window.append(AIMessage(content=response.content))
+    full_reply = []
+    stream = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+        stream=True,
+        max_tokens=1024,
+    )
+    for chunk in stream:
+        delta = chunk.choices[0].delta
+        if delta.content:
+            full_reply.append(delta.content)
+            yield f"data: {json.dumps({'text': delta.content})}\n\n"
 
-    return response.content, session_id
+    # 완료 후 히스토리 업데이트 (스트림 완료 후에만 저장)
+    history.append({"role": "user", "content": user_message})
+    history.append({"role": "assistant", "content": "".join(full_reply)})
+    sessions[session_id] = history
+    yield "data: [DONE]\n\n"
 
-# 독립적인 세션을 가진 두 명의 사용자
-session_a = None
-session_b = None
 
-response_a, session_a = chat("Hi, my name is Alice.", session_a)
-print(f"[Alice] {response_a[:100]}...\n")
+@app.post("/chat/{session_id}")
+async def chat_endpoint(session_id: str, body: dict):
+    user_message = body.get("message", "")
+    return StreamingResponse(
+        stream_chat_response(session_id, user_message),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",  # Nginx 역방향 프록시 버퍼링 비활성화
+        },
+    )
 
-response_b, session_b = chat("Hi, my name is Bob.", session_b)
-print(f"[Bob] {response_b[:100]}...\n")
 
-response_a, session_a = chat("What is my name?", session_a)
-print(f"[Alice continued] {response_a[:100]}...")
+@app.delete("/chat/{session_id}")
+async def clear_session(session_id: str):
+    sessions.pop(session_id, None)
+    return {"status": "cleared"}
 
-print(f"\nsession A: {session_a}")
-print(f"session B: {session_b}")
-print(f"session A history length: {len(sessions[session_a])}")
+
+@app.get("/chat/{session_id}/history")
+async def get_history(session_id: str):
+    """세션 히스토리 조회 (디버깅용)."""
+    history = sessions.get(session_id, [])
+    return {"session_id": session_id, "message_count": len(history), "history": history}
 ```
 
----
+### 클라이언트 측 SSE 수신 예시
 
-## 이 코드에서 먼저 볼 점
+```javascript
+// 브라우저에서 SSE를 수신하는 최소 코드
+async function streamChat(sessionId, message) {
+    const response = await fetch(`/chat/${sessionId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+    });
 
-- `main.py`는 세션마다 `SystemMessage`, `HumanMessage`, `AIMessage`를 누적하는 것만으로 멀티턴 동작을 구현합니다.
-- 예제는 이어지는 세션 하나와 별도 세션 하나를 함께 실행해, “기억”이 모델 내부가 아니라 애플리케이션 상태에 있다는 점을 보여 줍니다.
-- 운영 환경에서는 이 메모리 기반 `dict[str, list]`를 Redis나 데이터베이스 기반 세션 저장소로 바꾸게 됩니다.
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
 
----
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-## 어디서 자주 헷갈릴까요?
+        const text = decoder.decode(value);
+        const lines = text.split('\n');
+        for (const line of lines) {
+            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                const data = JSON.parse(line.slice(6));
+                document.getElementById('output').textContent += data.text;
+            }
+        }
+    }
+}
+```
 
-### 전체 이력에서 압축 전략으로 갈라지는 분기
+## 토큰 예산 계산기
 
-![전체 이력에서 압축 전략으로 갈라지는 분기](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-05-branching-from-full-history-to-compressi.ko.png)
+스트리밍 전에 토큰이 예산을 초과할지 미리 확인하면 예상치 못한 비용을 막을 수 있습니다.
 
-*전체 이력에서 압축 전략으로 갈라지는 분기*
-- 채팅 이력을 저장한다고 해서 모델이 지속적인 기억을 얻는 것은 아닙니다. 단지 이전 턴을 매 요청마다 다시 재생할 뿐입니다.
-- 세션 정체성과 사용자 정체성은 연결되지만 같은 개념은 아닙니다. 한 사용자가 동시에 여러 세션을 가질 수도 있습니다.
-- 이력이 길어질수록 챗봇이 멈추기 전에 먼저 깨지는 것은 대개 비용과 지연 시간입니다.
+```python
+import tiktoken
 
----
+
+def estimate_tokens(messages: list[dict], model: str = "gpt-4o-mini") -> int:
+    """메시지 리스트의 예상 토큰 수를 계산합니다."""
+    enc = tiktoken.encoding_for_model(model)
+    total = 0
+    for msg in messages:
+        total += 4  # 역할과 구분자 토큰
+        total += len(enc.encode(msg.get("content", "")))
+    total += 2  # 응답 프라이밍 토큰
+    return total
+
+
+def build_windowed_messages(
+    history: list[dict],
+    user_message: str,
+    system_prompt: str,
+    token_budget: int = 3000,
+    model: str = "gpt-4o-mini",
+) -> list[dict]:
+    """토큰 예산 내에서 최대한 많은 히스토리를 포함합니다."""
+    base = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_message},
+    ]
+    base_tokens = estimate_tokens(base, model)
+    available = token_budget - base_tokens
+
+    selected = []
+    for msg in reversed(history):
+        msg_tokens = estimate_tokens([msg], model)
+        if available - msg_tokens < 0:
+            break
+        selected.insert(0, msg)
+        available -= msg_tokens
+
+    return (
+        [{"role": "system", "content": system_prompt}]
+        + selected
+        + [{"role": "user", "content": user_message}]
+    )
+
+
+# 실제 사용 예시
+system_prompt = "당신은 파이썬 튜터입니다."
+user_message = "재귀 함수에 대해 설명해주세요."
+
+messages = build_windowed_messages(
+    history=history,
+    user_message=user_message,
+    system_prompt=system_prompt,
+    token_budget=3000,
+)
+estimated = estimate_tokens(messages)
+print(f"예상 토큰 사용량: {estimated} / 3000")
+print(f"포함된 히스토리 메시지 수: {len(messages) - 2}")  # system + user 제외
+```
+
+## Redis를 활용한 세션 영속화
+
+인메모리 `dict`는 서버 재시작 시 모든 세션이 사라집니다. 프로덕션에서는 Redis를 사용해야 합니다.
+
+```python
+import json
+import redis
+
+r = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+
+SESSION_TTL = 3600  # 세션 만료 시간: 1시간
+
+
+def get_session(session_id: str) -> list[dict]:
+    """Redis에서 세션 히스토리를 조회합니다."""
+    raw = r.get(f"chat:session:{session_id}")
+    if raw is None:
+        return []
+    return json.loads(raw)
+
+
+def save_session(session_id: str, history: list[dict]) -> None:
+    """Redis에 세션 히스토리를 저장하고 TTL을 갱신합니다."""
+    r.set(
+        f"chat:session:{session_id}",
+        json.dumps(history, ensure_ascii=False),
+        ex=SESSION_TTL,
+    )
+
+
+def append_messages(session_id: str, user_msg: str, assistant_msg: str) -> None:
+    """세션에 새 메시지 쌍을 추가합니다."""
+    history = get_session(session_id)
+    history.append({"role": "user", "content": user_msg})
+    history.append({"role": "assistant", "content": assistant_msg})
+    # 최대 50개 메시지만 보존 (오래된 것부터 제거)
+    if len(history) > 50:
+        history = history[-50:]
+    save_session(session_id, history)
+```
+
+## 멀티턴 대화 디버깅 패턴
+
+대화가 예상대로 흐르지 않을 때 어느 지점에서 맥락이 깨졌는지 빠르게 찾으려면 구조화된 로그가 필요합니다.
+
+```python
+import logging
+from datetime import datetime
+
+logger = logging.getLogger("chatbot")
+
+def debug_chat_turn(
+    session_id: str,
+    user_message: str,
+    reply: str,
+    history_len: int,
+    tokens_used: int,
+) -> None:
+    """각 턴의 핵심 메타데이터를 구조화 로그로 남깁니다."""
+    logger.info(
+        "chat_turn",
+        extra={
+            "session_id": session_id,
+            "timestamp": datetime.utcnow().isoformat(),
+            "history_len": history_len,
+            "user_message_len": len(user_message),
+            "reply_len": len(reply),
+            "tokens_used": tokens_used,
+        },
+    )
+```
+
+이 로그를 ELK 스택이나 CloudWatch에 보내면 "어느 세션에서 토큰이 급증했는지", "평균 몇 번째 턴에서 맥락 관련 불만이 들어오는지"를 데이터로 분석할 수 있습니다.
 
 ## 운영 체크리스트
 
-- [ ] 대화 이력이 세션 ID별로 분리되어 있다
-- [ ] system prompt가 모든 모델 호출에 포함된다
-- [ ] AI 응답이 매 턴 이후 다시 이력에 추가된다
-- [ ] 저장 계층을 나중에 Redis나 데이터베이스로 바꿔도 호출 패턴이 유지된다
+- [ ] 슬라이딩 윈도우 크기가 평균 세션 길이보다 충분히 큰지 확인했습니다.
+- [ ] 세션 이력이 Redis 또는 DB에 영속화됩니다.
+- [ ] 스트리밍 완료 후에만 히스토리를 업데이트하는 로직을 확인했습니다.
+- [ ] 토큰 예산 초과 시 사용자에게 안내 메시지를 반환합니다.
+- [ ] 세션 간 히스토리 격리를 단위 테스트로 검증했습니다.
+- [ ] Redis TTL이 설정되어 비활성 세션이 자동으로 만료됩니다.
+- [ ] `X-Accel-Buffering: no` 헤더가 Nginx 환경에서 스트리밍을 방해하지 않습니다.
 
----
+## 자주 하는 실수
 
-## FastAPI로 챗봇 엔드포인트 묶기
-
-### 세션 스토어와 SSE 스트리밍 응답
-
-실서비스에서는 콘솔 함수보다 HTTP 경계가 먼저 필요합니다. 아래 예시는 FastAPI에서 세션별 메시지 이력을 보관하고, 모델 토큰을 SSE로 스트리밍하는 최소 구조입니다. 핵심은 모델 호출과 세션 저장을 같은 트랜잭션처럼 다루지 않고, 사용자 입력 기록과 응답 기록을 분리해 실패 지점을 명확히 만드는 것입니다.
-
-```python
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
-
-app = FastAPI()
-
-class ChatRequest(BaseModel):
-    session_id: str
-    user_input: str
-
-session_store: dict[str, list[dict]] = {}
-
-SYSTEM_PROMPT = """
-당신은 한국어 기술 튜터입니다.
-- 답변은 사실 기반으로 작성합니다.
-- 확실하지 않으면 모른다고 말합니다.
-- 불필요한 장황함 없이 핵심부터 답합니다.
-""".strip()
-
-def get_history(session_id: str) -> list[dict]:
-    if session_id not in session_store:
-        session_store[session_id] = [{"role": "system", "content": SYSTEM_PROMPT}]
-    return session_store[session_id]
-
-def fake_streaming_tokens(answer: str):
-    for token in answer.split(" "):
-        yield f"data: {token}
-
-"
-    yield "data: [DONE]
-
-"
-
-@app.post("/chat/stream")
-def chat_stream(req: ChatRequest):
-    history = get_history(req.session_id)
-    history.append({"role": "user", "content": req.user_input})
-
-    # 실제 서비스에서는 LLM 스트리밍 SDK를 연결합니다.
-    answer = f"질문 '{req.user_input}'에 대한 예시 답변입니다."
-    history.append({"role": "assistant", "content": answer})
-
-    return StreamingResponse(
-        fake_streaming_tokens(answer),
-        media_type="text/event-stream",
-    )
-
-@app.get("/chat/{session_id}/history")
-def get_session_history(session_id: str):
-    if session_id not in session_store:
-        raise HTTPException(status_code=404, detail="session not found")
-    return {"session_id": session_id, "messages": session_store[session_id]}
-```
-
-이 형태의 장점은 분명합니다. 클라이언트는 토큰 단위로 빠르게 응답을 받으면서도, 서버는 세션 상태를 안정적으로 유지할 수 있습니다. 또한 `/history` 엔드포인트로 디버깅이 쉬워집니다. 운영 중 "왜 직전 맥락을 잃었는가"를 재현할 수 있어야 장애 분석 속도가 올라갑니다.
-
-### 운영 체크포인트: 이력 저장 정책
-
-세션 이력은 결국 비용과 지연 시간, 개인정보 보관 책임으로 연결됩니다. 그래서 구현 초기에 아래 정책을 먼저 정하는 편이 안전합니다.
-
-- 세션 만료 시간(TTL): 예를 들어 30분 무활동 시 자동 삭제
-- 최대 메시지 수: 예를 들어 시스템+최근 20개만 유지
-- 요약 트리거 기준: 토큰 추정치가 임계값을 넘을 때 자동 요약
-- 민감 정보 마스킹: 이메일, 전화번호, 카드 정보 패턴 제거
-
-정리하면 챗봇 품질은 모델 선택보다 **이력 재생 계약**에 더 크게 좌우됩니다. 이 계약을 코드와 정책으로 고정해 두면, 이후 모델을 바꾸거나 프롬프트를 개선할 때도 회귀 범위를 좁게 유지할 수 있습니다.
-
-## 프롬프트 버전과 회귀 테스트
-
-챗봇 품질이 흔들릴 때 원인을 좁히는 가장 빠른 방법은 프롬프트를 버전드 아티팩트로 다루는 것입니다. 문자열 하나를 소스에 하드코딩하면 "언제 어떤 규칙이 들어갔는지"를 추적하기 어렵습니다.
-
-```python
-from dataclasses import dataclass
-
-@dataclass
-class PromptSpec:
-    version: str
-    role: str
-    instructions: str
-
-PROMPTS = {
-    'v1': PromptSpec(
-        version='v1',
-        role='python_tutor',
-        instructions=(
-            '당신은 파이썬 튜터입니다. '            '정확한 예시와 함께 6문장 이하로 답합니다.'
-        ),
-    ),
-    'v2': PromptSpec(
-        version='v2',
-        role='python_tutor',
-        instructions=(
-            '당신은 파이썬 튜터입니다. '            '핵심 개념, 짧은 코드 예시, 주의할 함정 1개를 반드시 포함합니다.'
-        ),
-    ),
-}
-
-def render_system_prompt(prompt_version: str) -> str:
-    spec = PROMPTS[prompt_version]
-    return f"[role={spec.role}][version={spec.version}]\n{spec.instructions}"
-```
-
-운영에서는 세션별로 `prompt_version`을 기록해 두는 편이 안전합니다. 같은 질문인데 답변 톤이나 정확도가 바뀌었을 때, 모델 업데이트인지 프롬프트 변경인지 즉시 분리할 수 있습니다.
-
-### 최소 회귀 케이스
-
-```python
-REGRESSION_CASES = [
-    {
-        'name': '이름 기억',
-        'history': [
-            {'role': 'user', 'content': '내 이름은 민지야.'},
-            {'role': 'assistant', 'content': '반갑습니다, 민지님.'},
-        ],
-        'question': '내 이름이 뭐였지?',
-        'must_include': ['민지'],
-    },
-    {
-        'name': '모르면 모른다고 답하기',
-        'history': [],
-        'question': '내일 비트코인 가격을 정확히 알려줘.',
-        'must_include': ['예측할 수 없습니다'],
-    },
-]
-```
-
-이 정도만 있어도 릴리스 직전에 기본 계약 위반을 빠르게 잡아낼 수 있습니다. 챗봇 패턴은 화려한 기능보다 작은 계약을 지속적으로 지키는 능력이 핵심입니다.
-
-## 실전 장애 시나리오와 복구
-
-세션 저장소를 Redis로 옮기고 멀티 인스턴스로 확장하면 챗봇 안정성이 좋아지지만, 동시에 새로운 실패 모드가 생깁니다. 예를 들어 Redis 연결 지연으로 이력 저장이 늦어지면 사용자 입장에서는 모델이 맥락을 잃은 것처럼 보일 수 있습니다. 이때는 모델 프롬프트를 고치기보다 저장 계층 지연부터 확인해야 합니다.
-
-```python
-def append_history_with_fallback(session_id: str, message: dict) -> bool:
-    try:
-        redis_client.rpush(f"chat:{session_id}", json.dumps(message, ensure_ascii=False))
-        redis_client.expire(f"chat:{session_id}", 1800)
-        return True
-    except Exception as exc:
-        logger.error("history_write_failed", extra={"session_id": session_id, "error": str(exc)})
-        # 최소한 메모리 fallback으로 세션을 유지합니다.
-        session_store.setdefault(session_id, []).append(message)
-        return False
-```
-
-이런 fallback은 완전한 해결책은 아니지만, 장애 순간의 사용자 경험을 급격히 나쁘게 만드는 것을 막아 줍니다.
-
-### 요청 경로와 저장 경로 분리
-
-```mermaid
-flowchart LR
-    U[사용자 요청] --> API[Chat API]
-    API --> M[모델 호출]
-    API --> S[세션 저장]
-    S --> R[(Redis)]
-    S --> F[(Memory fallback)]
-    M --> O[스트리밍 응답]
-```
-
-*요청 처리와 세션 저장을 분리한 챗봇 경로*
-
-### 스트리밍 품질 점검 항목
-
-- 첫 토큰 지연(`time_to_first_token`)
-- 전체 완료 시간(`time_to_last_token`)
-- 중단 비율(`stream_abort_rate`)
-- 세션 기록 누락 비율(`history_write_failure_rate`)
-
-이 네 가지를 함께 보면 "응답이 느리다"는 사용자 보고를 더 정확히 분해할 수 있습니다.
-
-## 토큰 예산과 비용 가드레일
-
-멀티턴 챗봇에서는 품질만큼 비용 예측이 중요합니다. 세션별 토큰 예산을 두고 초과 시 요약 또는 경고 경로로 전환하면 운영 비용을 통제할 수 있습니다.
-
-```python
-MAX_SESSION_TOKENS = 12000
-
-def should_compact_history(estimated_tokens: int) -> bool:
-    return estimated_tokens > MAX_SESSION_TOKENS
-
-def route_by_token_budget(estimated_tokens: int) -> str:
-    if estimated_tokens > 16000:
-        return 'reject_with_budget_notice'
-    if estimated_tokens > 12000:
-        return 'summarize_then_continue'
-    return 'normal_chat'
-```
-
-사용자에게도 이 정책을 투명하게 보여 주는 편이 좋습니다. "대화가 길어져 최근 내용 중심으로 압축했습니다" 같은 시스템 메시지는 품질 하락을 버그가 아닌 정책 동작으로 이해하게 만듭니다.
-
-### 세션 종료 정책
-
-사용자가 로그아웃하거나 장시간 비활성 상태인 세션은 즉시 종료 정책을 적용해야 합니다. 종료 시점에 마지막 요약만 남기고 상세 이력을 삭제하면 개인정보 보관 부담을 줄일 수 있습니다. 이 정책은 UX보다 규정 준수 측면에서 중요합니다.
-
-### 운영 로그 필드 표준
-
-챗봇 로그에는 최소 `session_id`, `prompt_version`, `input_tokens`, `output_tokens`, `latency_ms`, `route` 필드를 남기는 편이 좋습니다. 이 필드 세트가 있어야 품질 이슈를 모델, 프롬프트, 세션 정책 중 어디에서 찾을지 빠르게 결정할 수 있습니다.
-
-### 운영 회고에서 반드시 남길 항목
-
-패턴 설계가 실제로 효과가 있었는지는 회고 기록 품질에서 드러납니다. 각 글에서 다룬 구조를 실서비스에 적용했다면, 최소한 다음 항목은 공통 템플릿으로 남기는 편이 좋습니다.
-
-- 변경 전/후의 실패 유형 분포
-- 변경 전/후의 평균 지연 시간과 p95
-- 사람이 개입한 건수와 자동 처리 건수 비율
-- 근거 부족, 파싱 실패, 도구 오류 같은 실패 코드의 추세
-- 다음 분기에서 조정할 임계값 또는 프롬프트 버전
-
-이 기록이 쌓이면 모델 자체 성능보다 애플리케이션 패턴 결정이 어떤 영향을 주었는지 분리해서 볼 수 있습니다. 결국 운영 품질은 한 번의 정답 설계가 아니라, 측정 가능한 개선 루프를 오래 유지하는 능력에서 만들어집니다.
-
-## 정리
-
-챗봇 패턴의 본질은 대화 이력 관리입니다. 단순 누적, 윈도잉, 요약은 대화 길이와 오래된 문맥의 중요도, 토큰 비용에 따라 각각 다른 상황에서 타당합니다.
-
-다음 글에서는 RAG Q&A 패턴을 다룹니다. 외부 문서를 검색해 LLM 답변 정확도를 높이는 구조입니다.
-
----
+| 실수 | 증상 | 해결 방법 |
+|---|---|---|
+| 전체 히스토리를 무조건 전달 | 장기 대화에서 비용 폭발, 컨텍스트 초과 오류 | 슬라이딩 윈도우 또는 요약 메모리 적용 |
+| 세션을 인메모리에만 저장 | 서버 재시작 시 대화 이력 소멸 | Redis 또는 DB에 세션 영속화 |
+| 스트리밍 없이 전체 응답 대기 | 긴 응답에서 UX 저하, 타임아웃 발생 | SSE 스트리밍 구현 |
+| system 프롬프트를 messages에 중복 포함 | 불필요한 토큰 낭비 | system은 첫 번째 메시지로 1회만 포함 |
+| 동시 세션 간 히스토리 공유 | 사용자 간 대화 내용 노출 | 세션 ID로 격리, 프로덕션은 Redis Hash 사용 |
+| 스트림 중간에 히스토리 저장 | 응답이 잘린 채로 히스토리에 저장됨 | 스트림 완료 후 `[DONE]` 이벤트 기점으로 저장 |
+| 요약 메모리 요약 결과 검증 안 함 | 중요 맥락이 요약에서 누락되어 후속 응답 품질 저하 | 요약 결과를 별도 저장하고 주기적으로 샘플 검토 |
+| window_size가 너무 작음 | 3~4턴 전 내용도 기억 못하는 챗봇 | 평균 세션 길이의 1.5배 이상으로 설정 |
 
 ## 처음 질문으로 돌아가기
 
-- **모델이 이전 대화를 기억하지 않는다면 챗봇의 “기억”은 어디에 있어야 할까요?**
-  - - 채팅 이력을 저장한다고 해서 모델이 지속적인 기억을 얻는 것은 아닙니다
-- **대화 이력을 계속 붙이면 언제 비용과 지연 시간이 먼저 문제가 될까요?**
-  - 가장 단순한 접근은 메시지를 리스트에 계속 쌓고, 매 요청마다 그 전체 리스트를 다시 보내는 방식입니다.
-- **세션별 이력은 언제 메모리에 두고 언제 외부 저장소로 옮겨야 할까요?**
-  - 챗봇 품질이 흔들릴 때 원인을 좁히는 가장 빠른 방법은 프롬프트를 버전드 아티팩트로 다루는 것입니다
+- **챗봇이 이전 대화를 기억하려면 어떤 메모리 전략이 필요할까요?**
+  슬라이딩 윈도우(최근 N개 메시지)로 시작하고, 대화가 20턴 이상으로 길어지면 요약 메모리로 전환합니다. 오래된 부분은 요약하고 최근 K개는 원문을 유지하는 하이브리드 방식이 가장 실용적입니다.
+
+- **토큰 비용이 폭증하는 문제를 어떻게 막을 수 있을까요?**
+  토큰 예산 계산기를 프롬프트 구성 전에 실행해 초과 여부를 미리 확인하고, 예산 내에서 역순으로 히스토리를 채웁니다. 슬라이딩 윈도우 크기와 토큰 한도를 동시에 적용하면 비용을 예측 가능하게 유지할 수 있습니다.
+
+- **슬라이딩 윈도우와 요약 메모리는 각각 어떤 상황에 적합할까요?**
+  슬라이딩 윈도우는 대화가 10~20턴 이하이고 최근 맥락이 전부인 고객 지원, 단순 Q&A에 적합합니다. 요약 메모리는 학습 세션, 개인 비서처럼 누적 맥락이 중요한 장기 대화에 적합합니다.
+
+- **FastAPI에서 스트리밍을 안전하게 구현하려면 어떻게 해야 할까요?**
+  `StreamingResponse`에 `text/event-stream` 미디어 타입을 사용하고, Nginx 환경에서는 `X-Accel-Buffering: no` 헤더를 추가합니다. 스트림 완료 후에 히스토리를 업데이트해야 일부만 저장되는 오류를 방지할 수 있습니다.
+
+- **세션 기반 대화 관리를 프로덕션에서 운영할 때 무엇을 챙겨야 할까요?**
+  Redis TTL로 비활성 세션을 자동 만료시키고, 세션 ID를 JWT 토큰에 포함해 인증된 사용자만 자신의 세션에 접근하도록 합니다. 세션 히스토리 최대 길이를 코드로 고정해 단일 세션의 메모리 과점유를 막아야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **AI App Patterns 101 (1/6): 챗봇 패턴 — 대화 이력과 상태 관리 (현재 글)**
-- [AI App Patterns 101 (2/6): RAG Q&A 패턴 — 문서 기반 질의응답](./02-rag-qa-pattern.md)
-- [AI App Patterns 101 (3/6): 문서 어시스턴트 — 요약, 추출, 분류](./03-document-assistant.md)
-- [AI App Patterns 101 (4/6): 에이전트와 도구 패턴 — 자율적 도구 선택](./04-agent-tool-pattern.md)
-- [AI App Patterns 101 (5/6): 워크플로 자동화 — 다단계 체인 설계](./05-workflow-automation.md)
-- [AI App Patterns 101 (6/6): Human-in-the-loop — 사람 개입 설계](./06-human-in-the-loop.md)
+- **AI App Patterns 101 (1/6): Chatbot 패턴 (현재 글)**
+- [AI App Patterns 101 (2/6): RAG QA 패턴](./02-rag-qa-pattern.md)
+- [AI App Patterns 101 (3/6): Document Assistant 패턴](./03-document-assistant.md)
+- [AI App Patterns 101 (4/6): Agent Tool 패턴](./04-agent-tool-pattern.md)
+- [AI App Patterns 101 (5/6): Workflow Automation 패턴](./05-workflow-automation.md)
+- [AI App Patterns 101 (6/6): Human-in-the-Loop 패턴](./06-human-in-the-loop.md)
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-- [LangChain message history](https://python.langchain.com/docs/expression_language/how_to/message_history/)
-- [Groq chat API](https://console.groq.com/docs/text-chat)
-- [LangChain chatbot use case](https://python.langchain.com/docs/use_cases/chatbots/)
+- [OpenAI — Chat Completions API](https://platform.openai.com/docs/guides/chat)
+- [LangChain — Conversation Memory](https://python.langchain.com/docs/modules/memory/)
+- [FastAPI — StreamingResponse](https://fastapi.tiangolo.com/advanced/custom-response/#streamingresponse)
+- [tiktoken — Token counting](https://github.com/openai/tiktoken)
+- [Redis — Python client](https://redis-py.readthedocs.io/)
+- [book-examples — ai-app-patterns-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/ai-app-patterns-101/ko)
 
-- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-app-patterns-101/ko/01-chatbot-pattern)
-
-Tags: LLM, RAG, Agent, Python
+Tags: Chatbot, LLM, ConversationMemory, FastAPI, Streaming

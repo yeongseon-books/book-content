@@ -30,8 +30,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 Frontend Development 101 시리즈의 마지막 글입니다. 여기서는 지금까지 배운 내용을 작은 노트 앱으로 모아 봅니다. 완벽한 앱을 만드는 것이 목표가 아니라, 기초 개념을 하나의 살아 있는 제품 흐름으로 연결해 배포까지 끝내 보는 경험이 목표입니다.
 
-개념을 따로따로 이해하는 것과 실제 앱으로 끝까지 묶는 것은 완전히 다른 경험입니다. 라우팅도 알고 폼도 알고 API 호출도 이해했는데, 막상 하나의 프로젝트로 합치려면 어디서부터 파일을 나누고 어떤 순서로 조립해야 할지 막막해지는 경우가 많습니다.
-
 ![Frontend Development 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/10/10-01-diagram.ko.png)
 *Frontend Development 101 10장 흐름 개요*
 
@@ -43,13 +41,7 @@ last_reviewed: '2026-05-12'
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
-지식은 프로젝트로 묶일 때 비로소 자기 것이 됩니다. 앞선 아홉 개 글이 벽돌이었다면, 마지막 글은 그 벽돌로 실제 집을 짓는 단계입니다. 화면만 그리는 것도 아니고, API 호출만 하는 것도 아니고, 배포만 하는 것도 아닌 전체 흐름이 한 번에 연결됩니다.
-
-완성도가 아주 높지 않아도 괜찮습니다. 작은 앱을 실제 URL 뒤에 올려 보는 경험은 입문 단계에서 가장 강력한 학습 장치입니다.
-
 ## 개념 한눈에 보기
-
-이 흐름은 시리즈 전체를 압축한 그림입니다. 사용자는 페이지를 보고, 페이지는 컴포넌트와 상태로 구성되고, 컴포넌트는 API와 스타일 계층을 사용하며, 마지막에는 빌드와 배포를 거쳐 외부에 공개됩니다.
 
 | 용어 | 뜻 | 실무에서 왜 중요한가 |
 |---|---|---|
@@ -58,147 +50,341 @@ last_reviewed: '2026-05-12'
 | 배포 | 빌드 산출물을 공개 URL 뒤에 올리는 작업입니다. | 로컬에서 보이지 않던 라우팅, 환경 변수, CORS 문제를 드러내는 최종 검증입니다. |
 | 로드맵 | 다음에 무엇을 배울지 보여 주는 학습 경로입니다. | 한 번 만든 프로젝트를 다음 학습의 발판으로 바꾸는 기준점이 됩니다. |
 
-## 개념 분리 학습에서 실제 앱 배포까지
+## 프로젝트 구조 설계
 
-시리즈 마지막 글의 핵심은 개별 개념을 아는 것과 실제 앱을 끝까지 연결해 보는 것 사이의 차이를 체감하는 데 있습니다. 프로젝트 구조, 라우팅, API, 폼, 스타일, 빌드가 한 저장소 안에서 만날 때 비로소 제품 흐름이 완성됩니다.
-
-| 방식 | 학습 상태 | 실무 영향 |
-|---|---|---|
-| 개념을 따로만 아는 상태 | 각 주제는 이해했지만 서로의 연결이 약합니다. | 실제 프로젝트를 시작하면 파일 구조와 배포 흐름에서 막히기 쉽습니다. |
-| 작은 앱을 끝까지 배포한 상태 | 화면, 상태, API, 빌드, 배포가 하나의 경험으로 묶입니다. | 다음 프로젝트를 시작할 때 재사용 가능한 기준과 자신감이 생깁니다. |
-
-**Before (개념만 아는 상태)**
-
-```text
-"I know routing, I know forms, I know APIs."
-"But I have never combined them all to build an app."
 ```
-
-**After (작은 앱이 인터넷에서 동작)**
-
-```text
-https://my-notes.netlify.app
-- A user can add/edit/delete notes.
-- The code is on GitHub.
-- The next learner studies on top of this code.
+my-notes/
+├── src/
+│   ├── api/                # API 클라이언트 (6화)
+│   │   ├── client.ts       # 기본 fetch 래퍼
+│   │   └── notes.ts        # 노트 API 함수
+│   ├── components/         # 재사용 컴포넌트 (4화)
+│   │   ├── ui/             # 순수 UI 컴포넌트
+│   │   │   ├── Button.tsx
+│   │   │   ├── Input.tsx
+│   │   │   └── Card.tsx
+│   │   └── notes/          # 노트 도메인 컴포넌트
+│   │       ├── NoteCard.tsx
+│   │       └── NoteForm.tsx
+│   ├── hooks/              # 커스텀 훅 (4, 6화)
+│   │   ├── useNotes.ts     # 노트 CRUD + 상태
+│   │   └── useForm.ts      # 폼 상태 관리
+│   ├── pages/              # 라우트 컴포넌트 (5화)
+│   │   ├── NotesPage.tsx
+│   │   ├── NotePage.tsx
+│   │   └── NotFoundPage.tsx
+│   ├── styles/             # 전역 스타일 (8화)
+│   │   ├── tokens.css
+│   │   └── global.css
+│   ├── types/              # TypeScript 타입
+│   │   └── index.ts
+│   └── App.tsx             # 라우터 + 레이아웃
+├── .env.example            # 환경 변수 예시
+├── .env.development
+├── .env.production
+├── vite.config.ts          # 빌드 설정 (9화)
+├── tailwind.config.js      # 스타일 토큰 (8화)
+└── package.json
 ```
-
-한 번이라도 실제로 앱을 배포해 보면, 앞선 아홉 글이 각각의 개념이 아니라 한 제품을 완성하는 연결 고리였다는 사실이 훨씬 선명해집니다.
 
 ## 실습: 작은 노트 앱을 5단계로 만들기
 
 ### 1단계 — Project structure
 
-```text
-my-notes/
-├── src/
-│   ├── components/   # NoteCard, NoteForm, ... (post 4)
-│   ├── pages/        # NotesPage, NotePage (post 5)
-│   ├── api/          # notes API client (post 6)
-│   ├── hooks/        # useNotes, useForm (posts 4, 7)
-│   ├── styles/       # tokens.css, layout.css (post 8)
-│   └── App.tsx
-├── vite.config.ts    # build config (post 9)
-├── .env.production
-└── package.json
-```
+```bash
+# 프로젝트 생성
+npm create vite@latest my-notes -- --template react-ts
+cd my-notes
+npm install react-router-dom @tanstack/react-query zod
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
 
-### 2단계 — Routing and pages (review of post 5)
+# 폴더 생성
+mkdir -p src/{api,components/ui,components/notes,hooks,pages,styles,types}
+```
 
 ```typescript
-// src/App.tsx
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import NotesPage from "./pages/NotesPage";
-import NotePage from "./pages/NotePage";
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<NotesPage />} />
-        <Route path="/notes/:id" element={<NotePage />} />
-      </Routes>
-    </BrowserRouter>
-  );
+// src/types/index.ts
+export interface Note {
+  id:        number;
+  title:     string;
+  content:   string;
+  createdAt: string;
+  updatedAt: string;
 }
+
+export interface CreateNoteInput {
+  title:   string;
+  content: string;
+}
+
+export type AsyncState<T> =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; data: T }
+  | { status: "error";   error: Error };
 ```
 
-### 3단계 — API client (review of post 6)
+### 2단계 — API client (6화 리뷰)
+
+```typescript
+// src/api/client.ts
+const BASE_URL = import.meta.env.VITE_API_URL ?? "https://jsonplaceholder.typicode.com";
+
+async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    headers: { "Content-Type": "application/json" },
+    ...options,
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`HTTP ${res.status}: ${text || res.statusText}`);
+  }
+  return res.json();
+}
+
+export const api = {
+  get:    <T>(path: string)                      => request<T>(path),
+  post:   <T>(path: string, body: unknown)       => request<T>(path, { method: "POST",   body: JSON.stringify(body) }),
+  put:    <T>(path: string, body: unknown)       => request<T>(path, { method: "PUT",    body: JSON.stringify(body) }),
+  delete: <T>(path: string)                      => request<T>(path, { method: "DELETE" }),
+};
+```
 
 ```typescript
 // src/api/notes.ts
-const BASE = import.meta.env.VITE_API_URL;
+import { api } from "./client";
+import type { Note, CreateNoteInput } from "../types";
 
-export async function listNotes() {
-  const res = await fetch(`${BASE}/notes`);
-  if (!res.ok) throw new Error("Failed to list notes");
-  return res.json();
+export const notesApi = {
+  list:   ()                          => api.get<Note[]>("/posts"),
+  get:    (id: number)                => api.get<Note>(`/posts/${id}`),
+  create: (input: CreateNoteInput)    => api.post<Note>("/posts", input),
+  update: (id: number, input: Partial<CreateNoteInput>) =>
+    api.put<Note>(`/posts/${id}`, input),
+  delete: (id: number)                => api.delete<void>(`/posts/${id}`),
+};
+```
+
+### 3단계 — Custom hooks (4화 + 6화 리뷰)
+
+```typescript
+// src/hooks/useNotes.ts
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { notesApi } from "../api/notes";
+import type { CreateNoteInput } from "../types";
+
+export function useNotes() {
+  return useQuery({
+    queryKey: ["notes"],
+    queryFn:  notesApi.list,
+  });
 }
 
-export async function createNote(body: { title: string }) {
-  const res = await fetch(`${BASE}/notes`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+export function useNote(id: number) {
+  return useQuery({
+    queryKey: ["notes", id],
+    queryFn:  () => notesApi.get(id),
+    enabled:  !!id,
   });
-  if (!res.ok) throw new Error("Failed to create note");
-  return res.json();
+}
+
+export function useCreateNote() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: CreateNoteInput) => notesApi.create(input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notes"] }),
+  });
+}
+
+export function useDeleteNote() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => notesApi.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notes"] }),
+  });
 }
 ```
 
-### 4단계 — Form + component (review of posts 4 and 7)
+### 4단계 — Form + component (4화 + 7화 리뷰)
 
 ```tsx
-// src/components/NoteForm.tsx
+// src/components/notes/NoteForm.tsx
 import { useState } from "react";
-import { createNote } from "../api/notes";
+import { z } from "zod";
+import { useCreateNote } from "../../hooks/useNotes";
 
-export function NoteForm({ onCreated }: { onCreated: () => void }) {
-  const [title, setTitle] = useState("");
-  const [error, setError] = useState<string | null>(null);
+const NoteSchema = z.object({
+  title:   z.string().min(2, "제목은 2자 이상이어야 합니다.").max(100, "제목은 100자 이하여야 합니다."),
+  content: z.string().min(10, "내용은 10자 이상이어야 합니다."),
+});
 
-  async function handleSubmit(e: React.FormEvent) {
+interface NoteFormProps {
+  onSuccess?: () => void;
+}
+
+export function NoteForm({ onSuccess }: NoteFormProps) {
+  const [values,  setValues]  = useState({ title: "", content: "" });
+  const [touched, setTouched] = useState({ title: false, content: false });
+
+  const createNote = useCreateNote();
+
+  const validation = NoteSchema.safeParse(values);
+  const errors = validation.success ? {} : validation.error.issues.reduce<Record<string, string>>(
+    (acc, issue) => ({ ...acc, [String(issue.path[0])]: issue.message }),
+    {}
+  );
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setValues(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleBlur = (e: React.FocusEvent) => {
+    setTouched(prev => ({ ...prev, [e.target.name]: true }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (title.trim().length < 2) {
-      setError("Title must be at least 2 characters.");
-      return;
-    }
-    await createNote({ title });
-    setTitle("");
-    setError(null);
-    onCreated();
-  }
+    setTouched({ title: true, content: true });
+    if (!validation.success) return;
+
+    await createNote.mutateAsync(values);
+    setValues({ title: "", content: "" });
+    setTouched({ title: false, content: false });
+    onSuccess?.();
+  };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input value={title} onChange={(e) => setTitle(e.target.value)} />
-      {error && <p role="alert">{error}</p>}
-      <button>Add</button>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+          제목
+        </label>
+        <input
+          id="title"
+          name="title"
+          type="text"
+          value={values.title}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          aria-invalid={!!(touched.title && errors.title)}
+          aria-describedby={touched.title && errors.title ? "title-error" : undefined}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="노트 제목을 입력하세요"
+        />
+        {touched.title && errors.title && (
+          <p id="title-error" className="mt-1 text-sm text-red-600" role="alert">
+            {errors.title}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
+          내용
+        </label>
+        <textarea
+          id="content"
+          name="content"
+          value={values.content}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          aria-invalid={!!(touched.content && errors.content)}
+          aria-describedby={touched.content && errors.content ? "content-error" : undefined}
+          rows={4}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          placeholder="내용을 입력하세요..."
+        />
+        {touched.content && errors.content && (
+          <p id="content-error" className="mt-1 text-sm text-red-600" role="alert">
+            {errors.content}
+          </p>
+        )}
+      </div>
+
+      {createNote.isError && (
+        <p className="text-sm text-red-600" role="alert">
+          저장 중 오류가 발생했습니다. 다시 시도해 주세요.
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={createNote.isPending}
+        aria-busy={createNote.isPending}
+        className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {createNote.isPending ? "저장 중..." : "노트 저장"}
+      </button>
     </form>
   );
 }
 ```
 
-### 5단계 — Build and deploy (post 9 + a new step)
+### 5단계 — Build and deploy
 
-```bash
-npm run build
-# Netlify CLI example
-npm install -g netlify-cli
-netlify deploy --dir=dist --prod
+```tsx
+// src/App.tsx
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from "react";
+
+const NotesPage  = lazy(() => import("./pages/NotesPage"));
+const NotePage   = lazy(() => import("./pages/NotePage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime:  5 * 60 * 1000,
+      retry:      1,
+    },
+  },
+});
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <div className="min-h-screen bg-gray-50">
+          <header className="bg-white border-b border-gray-200 px-4 py-3">
+            <h1 className="text-xl font-bold text-gray-900">My Notes</h1>
+          </header>
+          <main className="max-w-4xl mx-auto px-4 py-6">
+            <Suspense fallback={<div className="text-center py-8">로딩 중...</div>}>
+              <Routes>
+                <Route path="/"          element={<NotesPage />} />
+                <Route path="/notes/:id" element={<NotePage />} />
+                <Route path="*"          element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
+          </main>
+        </div>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
 ```
 
-배포가 끝나면 공개 URL이 생깁니다. 이 URL을 다른 사람에게 공유하는 순간, 연습 프로젝트는 실제 제품 경험으로 한 단계 올라갑니다.
+```bash
+# 빌드 및 배포
+npm run build
 
-## 검증 포인트
+# Netlify CLI
+npm install -g netlify-cli
+netlify deploy --dir=dist --prod
 
-- 노트 목록 화면에서 새 노트를 추가한 뒤 상세 화면으로 이동하고 다시 돌아오는 기본 흐름이 자연스러운지 확인합니다.
-- `npm run build`가 성공하고, 배포 후 공개 URL에서 새로고침과 라우팅이 함께 동작하는지 확인합니다.
+# 또는 Vercel CLI
+npm install -g vercel
+vercel --prod
 
-## 문제가 생기면 먼저 볼 것
-
-- 배포 후 API 호출이 실패하면 `VITE_API_URL`과 CORS 설정, `fetch` 에러 처리를 먼저 확인합니다.
-- 프로젝트를 다시 실행하기 어렵다면 README와 `.env.example`가 실제 현재 구조를 설명하는지 점검합니다.
+# 배포 후 확인
+# 1. 공개 URL에서 기본 동작 확인
+# 2. /notes/1 에서 새로고침 → 404인지 확인 (SPA fallback 설정 필요 시 조치)
+# 3. DevTools Network 탭에서 lazy loading 청크 확인
+```
 
 ## 출하 준비 점검표
 
@@ -216,30 +402,95 @@ npx serve -s dist
 ```
 
 ```bash
-curl -i "$VITE_API_URL/notes"
+curl -i "$VITE_API_URL/posts"
 ```
 
-기대 결과는 앱이 빌드되고, 깊은 링크 새로고침이 안전하며, API와 연결되고, 다른 개발자도 문서만으로 환경을 재현할 수 있는 상태입니다. 그 수준이 되어야 비로소 "데모가 끝났다"가 아니라 "작게나마 출하됐다"고 말할 수 있습니다.
+```markdown
+# .env.example
+VITE_API_URL=https://api.example.com
 
-## 이 코드에서 주목할 점
+# README.md 필수 섹션
+## 실행 방법
+1. `cp .env.example .env.development`
+2. `.env.development` 에서 API URL 설정
+3. `npm install`
+4. `npm run dev` → http://localhost:5173
 
-- 폴더 구조가 역할별로 나뉘어 있어 어디를 수정해야 할지 즉시 보입니다.
-- API 클라이언트를 컴포넌트 밖으로 분리해 테스트와 재사용이 쉬워집니다.
-- 환경 변수로 개발 백엔드와 프로덕션 백엔드를 분리합니다.
+## 배포 URL
+https://my-notes.netlify.app
 
-## 자주 하는 실수 5가지
+## 환경 변수
+- `VITE_API_URL`: 백엔드 API 기본 URL
+```
 
-1. **모든 코드를 `App.tsx`에 넣습니다.** 100줄을 넘기면 읽기가 급격히 어려워집니다.
-2. **컴포넌트 안에서 API를 직접 호출합니다.** 테스트와 재사용이 모두 어려워집니다.
-3. **README를 남기지 않습니다.** 한 달 뒤의 자신도 프로젝트를 다시 실행하기 어려워집니다.
-4. **`localhost`에서만 확인하고 배포하지 않습니다.** 실제 배포는 언제나 새로운 문제를 드러냅니다.
-5. **완벽해질 때까지 공개를 미룹니다.** 오늘 배포한 작은 앱이 배포하지 않은 완벽한 앱보다 훨씬 큰 학습을 줍니다.
+## 디버깅 시나리오
+
+### 시나리오 1: 배포 후 API 호출 실패
+
+```
+문제: 로컬에서는 되는데 배포 후 API 오류
+
+확인 순서:
+1. DevTools Network 탭에서 실제 요청 URL 확인
+2. VITE_API_URL이 프로덕션 환경에 올바르게 설정됐는지 확인
+3. 백엔드 서버의 CORS 설정에 배포 도메인 포함 여부 확인
+4. API 서버가 HTTPS인지 확인 (HTTP API → HTTPS 앱에서 Mixed Content 오류)
+```
+
+### 시나리오 2: 빌드 오류
+
+```bash
+# TypeScript 오류 먼저 확인
+npx tsc --noEmit
+
+# 타입 오류가 없는데 빌드 실패 시
+npm run build 2>&1 | head -50
+# 오류 메시지 읽고 해당 파일/라인 수정
+```
+
+### 시나리오 3: 성능이 느릴 때
+
+```bash
+# Lighthouse 실행 (Chrome DevTools → Lighthouse 탭)
+# Performance 점수와 개선 제안 확인
+
+# 번들 분석
+npm run analyze  # vite.config.ts에 visualizer 설정 후
+
+# 큰 모듈 발견 시 대체 라이브러리 찾기
+npx bundlephobia [package-name]
+```
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 올바른 방법 |
+|---|---|---|
+| 모든 코드를 `App.tsx`에 | 100줄 넘으면 읽기 급격히 어려워짐 | `pages/`, `components/`, `api/`, `hooks/`로 처음부터 분리 |
+| 컴포넌트 안에서 API 직접 호출 | 테스트와 재사용 모두 어려움 | API는 `api/` 폴더로, 상태는 커스텀 훅으로 분리 |
+| README 미작성 | 한 달 뒤 자신도 프로젝트 재실행 불가 | `npm run dev`부터 배포 URL까지 단계별로 문서화 |
+| localhost에서만 확인 | 배포 시 라우팅·환경변수·CORS 오류 발견 | 반드시 `npm run build && npx serve -s dist`로 배포 환경 시뮬레이션 |
+| 완벽해질 때까지 배포 미룸 | 실제 사용 경험 없이 로컬 개발만 반복 | 최소 기능으로 빠르게 배포, 이후 개선 반복 |
+| `.env` 파일을 git에 커밋 | API 키, 비밀 값 노출 위험 | `.gitignore`에 `.env*` 추가, `.env.example`만 커밋 |
 
 ## 실무에서는 이렇게 보입니다
 
-실무 팀도 본질적으로 같은 패턴을 씁니다. `pages/`, `components/`, `api/`, `hooks/`, `styles/` 같은 구조는 수십 명이 함께 일하는 코드베이스에서도 기본 골격으로 자주 등장합니다. 달라지는 것은 규모와 추상화 수준이지, 형태 자체는 크게 다르지 않습니다.
+실무 팀도 본질적으로 같은 패턴을 씁니다. `pages/`, `components/`, `api/`, `hooks/`, `styles/` 같은 구조는 수십 명이 함께 일하는 코드베이스에서도 기본 골격으로 자주 등장합니다.
 
-그래서 입문 단계에서 작은 프로젝트를 제대로 나눠 보는 경험은 생각보다 오래갑니다. 나중에 큰 코드베이스를 만났을 때도 어디를 봐야 할지 훨씬 빨리 감이 옵니다.
+```
+실무 팀의 추가 요소 (입문 이후 확장 학습)
+├── __tests__/           # Vitest 단위 테스트
+├── e2e/                 # Playwright E2E 테스트
+├── .github/workflows/   # CI/CD (GitHub Actions)
+├── monitoring/          # Sentry 에러 트래킹
+└── storybook/           # 컴포넌트 문서
+
+다음에 배울 주제
+├── 테스트: Vitest + React Testing Library
+├── 접근성: axe-core, 스크린 리더 테스트
+├── 성능: Web Vitals, Lighthouse CI
+├── 보안: CSP, XSS 방어, 의존성 감사
+└── DevOps: CI/CD 파이프라인, 무중단 배포
+```
 
 ## 시니어 엔지니어는 이렇게 생각합니다
 
@@ -256,12 +507,14 @@ curl -i "$VITE_API_URL/notes"
 - [ ] `npm run build`가 성공합니다.
 - [ ] 앱이 공개 URL 뒤에서 동작합니다.
 - [ ] README에 실행 방법을 적어 두었습니다.
+- [ ] `.env.example`이 있고 `.env`는 `.gitignore`에 포함됩니다.
 
 ## 연습 문제
 
 1. 이 구조를 참고해 노트 앱을 만들고 Netlify나 Vercel에 배포해 보세요.
 2. README에 실행 방법, 환경 변수, 배포 URL을 문서화해 보세요.
 3. 빌드 산출물 크기를 측정하고 200KB 이하로 줄이는 연습을 해 보세요.
+4. GitHub Actions로 `main` 브랜치에 푸시할 때 자동으로 Netlify에 배포되도록 CI/CD를 설정해 보세요.
 
 ## 정리 및 다음 단계
 
@@ -274,11 +527,11 @@ curl -i "$VITE_API_URL/notes"
 ## 처음 질문으로 돌아가기
 
 - **작은 프로젝트에서는 어떤 폴더 구조가 가장 읽기 쉬울까요?**
-  - 배포가 끝나면 공개 URL이 생깁니다. 이 URL을 다른 사람에게 공유하는 순간, 연습 프로젝트는 실제 제품 경험으로 한 단계 올라갑니다.
+  - 역할별로 나누는 것이 가장 단순하고 팀이 커져도 적용됩니다. `api/`, `components/`, `hooks/`, `pages/`, `styles/` 다섯 폴더로 시작하면 대부분의 입문 프로젝트를 커버할 수 있습니다.
 - **앞선 1~9화 개념은 실제 앱 안에서 어떻게 이어질까요?**
-  - 시리즈 마지막 글의 핵심은 개별 개념을 아는 것과 실제 앱을 끝까지 연결해 보는 것 사이의 차이를 체감하는 데 있습니다. 프로젝트 구조, 라우팅, API, 폼, 스타일, 빌드가 한 저장소 안에서 만날 때 비로소 제품 흐름이 완성됩니다.
+  - HTML/CSS(2화)로 구조를 만들고, 컴포넌트/상태(4화)로 조각을 나누고, 라우터(5화)로 페이지를 연결하고, API(6화)로 서버와 대화하고, 폼(7화)으로 입력을 받고, 스타일 시스템(8화)으로 일관성을 유지하고, 빌드 도구(9화)로 배포 가능한 산출물을 만듭니다.
 - **개발, 빌드, 배포 흐름은 어떤 순서로 정리되는 편이 좋을까요?**
-  - 시리즈 마지막 글의 핵심은 개별 개념을 아는 것과 실제 앱을 끝까지 연결해 보는 것 사이의 차이를 체감하는 데 있습니다. 프로젝트 구조, 라우팅, API, 폼, 스타일, 빌드가 한 저장소 안에서 만날 때 비로소 제품 흐름이 완성됩니다.
+  - `npm run dev`로 개발 → `npm run build`로 프로덕션 번들 생성 → `npx serve -s dist`로 로컬 배포 시뮬레이션 → Netlify/Vercel CLI로 실제 배포 순서입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

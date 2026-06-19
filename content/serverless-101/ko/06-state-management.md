@@ -16,262 +16,368 @@ tags:
   - Database
   - Cache
   - Cloud
-seo_description: 서버리스에서 상태를 외부 저장소, 캐시, 워크플로로 분리하는 방법을 설명합니다
+seo_description: 서버리스 상태 관리 전략, DynamoDB 멱등성, TTL, 세션 캐시, Step Functions 워크플로를 설명합니다
 last_reviewed: '2026-05-12'
 ---
 
 # Serverless 101 (6/10): 상태 관리
 
-서버리스 함수를 배우다 보면 곧바로 이런 질문이 나옵니다. “함수는 무상태여야 한다는데, 로그인 세션이나 주문 상태는 어디에 두라는 뜻일까?” 이 질문에 제대로 답하지 못하면 서버리스는 늘 불편한 제약처럼만 보입니다.
+서버리스 함수는 기본적으로 무상태입니다. 인스턴스가 재사용될 수도 있고, 다른 인스턴스가 다음 요청을 받을 수도 있습니다. 이 특성은 확장이 쉬워지는 이점이 있지만, 동시에 상태를 어디에 어떻게 저장할지를 설계 초기에 명확히 정해야 한다는 의미이기도 합니다.
 
 이 글은 Serverless 101 시리즈의 6번째 글입니다.
 
 ![Serverless 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/06/06-01-concept-at-a-glance.ko.png)
 *Serverless 101 6장 흐름 개요*
-> 서버리스 함수는 본질적으로 stateless이므로, 필요한 '상태'는 외부 저장소(DB·캐시·큐)에 두고 함수는 그것을 읽고 쓰는 코드일 뿐입니다.
+> 함수는 상태를 소유하는 주체가 아니라 상태를 읽고 갱신하는 작업자입니다.
 
 ## 이 글에서 다룰 문제
 
-- 무상태 함수가 상태 있는 비즈니스를 어떻게 처리할까요?
+- 서버리스 함수에서 상태는 어디에 두어야 할까요?
 - 세션, 캐시, 데이터 저장소, 워크플로 상태는 어디에 둬야 할까요?
 - TTL과 멱등 토큰은 왜 상태 관리의 핵심일까요?
-- 서버리스 환경에서 이 개념이 전통 서버와 어떻게 다르게 작동할까요?
-- 비용과 성능 사이 트레이드오프는 어디서 발생할까요?
+- 분산 환경에서 중복 처리를 어떻게 막을 수 있을까요?
+- 여러 단계로 이어지는 상태 흐름은 어떻게 관리할까요?
 
 ## 왜 이 주제가 중요한가
 
-서버리스 함수는 언제든 사라질 수 있습니다. 같은 사용자의 다음 요청이 같은 인스턴스로 다시 들어온다는 보장도 없습니다. 그래서 메모리나 로컬 파일에 붙잡아 둔 상태는 운이 좋을 때만 동작합니다. 스케일링이나 재시작이 일어나는 순간 곧바로 무너집니다.
+"서버리스는 무상태"라는 말을 들으면 상태를 생각하지 않아도 된다고 오해하기 쉽습니다. 하지만 실제로는 반대입니다. 인스턴스가 언제든 교체될 수 있으므로, 어떤 상태가 어디에 저장되어야 하는지를 코드가 아닌 아키텍처 수준에서 설계해야 합니다.
 
-상태 관리는 성능 최적화 문제가 아니라 구조 문제입니다. 세션을 어디에 둘지, 처리 완료 사실을 어디에 기록할지, 여러 단계를 거치는 흐름을 코드 안에 둘지 밖으로 뺄지 결정하는 순간 아키텍처의 절반이 결정됩니다. 서버리스에서 안정적인 시스템을 만들려면 함수보다 상태의 위치를 먼저 설계해야 합니다.
+함수 내부 메모리에 상태를 두면 다른 인스턴스가 그 값을 볼 수 없습니다. 외부 저장소 없이 세션을 구현하거나 중간 결과를 추적하면 재처리나 장애 복구 시 데이터가 유실됩니다.
 
-## 한눈에 보는 구조
+## 상태 유형별 저장소 선택
 
-이 그림이 보여 주는 메시지는 단순합니다. 함수는 상태를 소유하는 주체가 아니라 상태를 읽고 갱신하는 작업자입니다. 짧은 세션성 데이터는 캐시로, 영속 데이터는 데이터베이스로, 여러 단계의 진행 상태는 워크플로 엔진이나 상태 머신으로 분리하면 책임이 선명해집니다.
+| 상태 유형 | 예시 | 권장 저장소 | 이유 |
+|-----------|------|------------|------|
+| 짧은 세션 (수 분~수 시간) | 로그인 세션, 인증 토큰 | ElastiCache (Redis) | 빠른 읽기, TTL 지원 |
+| 영속 데이터 | 주문, 사용자 정보 | DynamoDB, RDS | 내구성, 쿼리 유연성 |
+| 워크플로 진행 상태 | 다단계 승인, 처리 파이프라인 | Step Functions | 단계 추적, 재시도, 타임아웃 |
+| 임시 집계 결과 | 카운터, 점수 | ElastiCache (Redis) | 원자적 증가 연산 |
+| 대용량 파일 | 이미지, 문서 | S3 | 대용량, 지속성 |
 
-## 핵심 용어 먼저 정리하기
+## DynamoDB로 멱등성 구현
 
-| 용어 | 뜻 | 운영에 주는 의미 |
-| --- | --- | --- |
-| 무상태 | 함수 인스턴스가 신뢰할 만한 상태를 들고 있지 않음 | 다음 호출이 어느 인스턴스로 갈지 몰라도 안전해야 합니다 |
-| 세션 저장소 | Redis, DynamoDB 같은 외부 저장소 | 사용자별 상태를 함수 밖에 둡니다 |
-| 워크플로 상태 | 여러 단계의 진행 상태를 표현하는 오케스트레이션 정보 | 복잡한 흐름을 함수 본문에서 분리합니다 |
-| 멱등 토큰 | 이미 처리한 입력인지 판별하는 키 | 재시도를 안전하게 만듭니다 |
-| TTL | 상태의 만료 시간 | 비용과 정합성을 함께 관리합니다 |
-
-무상태는 상태가 전혀 없다는 뜻이 아닙니다. 상태를 함수 프로세스 안에 두지 않는다는 뜻입니다. 이 차이를 이해하면 서버리스가 제약이 아니라 분리 원칙으로 읽히기 시작합니다.
-
-## 무엇이 달라지는지 먼저 보기
-
-**문제가 있는 상태**에서는 전역 변수 캐시에 기대고, 같은 인스턴스가 다시 쓰이길 바라는 식으로 구현합니다.
-
-**개선된 상태**에서는 외부 캐시와 데이터베이스, TTL, 멱등 토큰을 조합해 인스턴스 생명주기와 무관하게 상태를 유지합니다.
-
-두 방식의 차이는 로컬 테스트보다 운영에서 더 크게 드러납니다. 전자는 우연히 동작하고, 후자는 의도적으로 동작합니다.
-
-## 외부 상태로 옮기는 흐름을 코드로 보기
-
-### 1단계 — 키-값 캐시 추상화
+분산 환경에서 같은 이벤트가 두 번 처리되는 것은 흔한 문제입니다. SQS의 at-least-once 전달 보장은 중복 메시지 가능성을 내포합니다. 멱등 키를 DynamoDB에 저장해 중복 처리를 막을 수 있습니다.
 
 ```python
-class Cache:
-    def __init__(self):
-        self.store = {}
-    def get(self, k):
-        return self.store.get(k)
-    def set(self, k, v, ttl=60):
-        self.store[k] = (v, ttl)
-```
-
-예제는 메모리 딕셔너리를 쓰지만, 실제 시스템에서는 이 자리에 Redis 같은 외부 저장소가 들어갑니다. 중요한 점은 함수가 저장 구현을 직접 품지 않고, 추상화된 저장소를 통해 상태를 읽고 쓴다는 사실입니다.
-
-### 2단계 — 세션 핸들러
-
-```python
-def with_session(handler, cache):
-    def wrap(event, ctx):
-        sid = event.get("session")
-        state = cache.get(sid) or {}
-        result = handler(event, ctx, state)
-        cache.set(sid, state)
-        return result
-    return wrap
-```
-
-세션 상태를 함수 호출 전후에 외부 저장소에서 읽고 쓰는 패턴입니다. 어떤 인스턴스가 요청을 받든 동일한 세션 상태를 기준으로 동작할 수 있습니다.
-
-### 3단계 — 멱등 토큰
-
-```python
-def use_token(cache, token):
-    if cache.get(token):
-        return False
-    cache.set(token, "done", ttl=3600)
-    return True
-```
-
-멱등성은 별도 주제가 아니라 상태 관리의 일부입니다. 이미 처리한 요청인지 기록하는 짧은 상태가 필요하기 때문입니다. 그래서 토큰 저장소와 만료 정책은 함께 설계해야 합니다.
-
-### 4단계 — 워크플로 상태 표현
-
-```python
-"""
-states:
-  Validate -> Charge -> Notify
-on Failure: -> Refund
-"""
-```
-
-복잡한 흐름을 함수 내부 분기문만으로 계속 키워 가면 읽기도 어렵고 복구 경로도 흐려집니다. 단계가 많아질수록 상태 머신이나 워크플로 엔진으로 빼는 편이 더 분명합니다.
-
-### 5단계 — 데이터 모델 분리
-
-```python
-def model(record):
-    return {"id": record["id"], "status": record.get("status", "new")}
-```
-
-상태를 외부화하면 데이터 모델이 더 중요해집니다. 어떤 필드를 영속 상태로 볼지, 어떤 값이 중간 상태인지, 무엇이 만료 대상인지 미리 정의해야 하기 때문입니다.
-
-- 세션은 외부 저장소에 둬야 합니다.
-- 멱등 토큰은 재시도 안전성을 만들어 줍니다.
-- 복잡한 워크플로는 상태 머신으로 분리할수록 읽기 쉬워집니다.
-
-함수는 상태를 가진 객체가 아니라 상태를 읽고 갱신하는 짧은 작업자에 가깝습니다. 이 관점을 받아들이면 함수 내부는 단순해지고 시스템 전체는 더 예측 가능해집니다.
-
-## 실무에서 자주 헷갈리는 지점
-
-### 전역 변수 캐시는 완전히 쓸모없을까
-
-재사용 가능한 인메모리 캐시로 도움을 줄 수는 있습니다. 하지만 그것만 믿고 비즈니스 상태를 맡기면 인스턴스 교체 순간에 바로 문제가 드러납니다.
-
-### 모든 상태를 데이터베이스 하나에 몰아넣으면 되지 않을까
-
-가능은 하지만 비효율적일 때가 많습니다. 세션, 영속 데이터, 워크플로 상태는 접근 패턴과 수명, 일관성 요구가 서로 다릅니다.
-
-### 만료시간은 캐시에만 필요한가요
-
-아닙니다. 멱등 토큰이나 임시 처리 상태에도 TTL이 중요합니다. 수명 정책이 없으면 비용과 정합성 문제가 함께 커집니다.
-
-## 자주 하는 실수 다섯 가지
-
-1. 전역 변수 캐시에만 의존합니다.
-2. 함수 호출마다 데이터베이스 연결을 새로 엽니다.
-3. TTL 없이 상태를 무한히 쌓아 둡니다.
-4. 멱등 토큰을 두지 않습니다.
-5. 복잡한 흐름을 함수 하나에 몰아넣습니다.
-
-특히 TTL을 빼먹는 실수는 늦게 드러나서 더 위험합니다. 초반에는 잘 돌아가지만 시간이 지나면 오래된 상태와 토큰이 쌓여 비용, 정합성, 운영 가시성 모두가 나빠집니다.
-
-## 실무에서는 이렇게 생각합니다
-
-- 무상태는 제약이면서 동시에 자유입니다.
-- 상태를 어디에 두는지가 곧 아키텍처입니다.
-- TTL은 비용과 정합성을 함께 지키는 장치입니다.
-- 워크플로는 코드 덩어리가 아니라 상태 머신으로 보는 편이 낫습니다.
-- 데이터 모델은 시간이 지나며 바뀐다는 전제를 둬야 합니다.
-
-## 운영 체크리스트
-
-- [ ] 세션을 외부 저장소로 분리했는가
-- [ ] 데이터베이스 연결 재사용 전략을 정했는가
-- [ ] TTL 정책을 명시했는가
-- [ ] 복잡한 워크플로를 함수 밖으로 분리했는가
-## 실무 앵커: 상태를 외부화할 때 필요한 최소 계약
-
-서버리스에서 상태 관리는 "어디에 저장할까"보다 "같은 요청을 다시 받았을 때 같은 결과를 보장할 수 있는가"가 핵심입니다. 이를 위해 멱등성 키, TTL, 낙관적 잠금 세 가지를 기본 계약으로 두는 방식이 가장 실용적입니다.
-
-### DynamoDB 멱등성 테이블 예시
-
-```yaml
-IdempotencyTable:
-  Type: AWS::DynamoDB::Table
-  Properties:
-    BillingMode: PAY_PER_REQUEST
-    AttributeDefinitions:
-      - AttributeName: key
-        AttributeType: S
-    KeySchema:
-      - AttributeName: key
-        KeyType: HASH
-    TimeToLiveSpecification:
-      AttributeName: expiresAt
-      Enabled: true
-```
-
-TTL은 캐시 전용 기능이 아닙니다. 중복 방지 키를 무기한 보존하면 저장 비용이 누적되기 때문에, 비즈니스 요구에 맞춘 보존 기간을 함께 설계해야 합니다.
-
-### 핸들러 코드: 멱등성 + 낙관적 잠금
-
-```python
-import os
+import json
 import time
-
 import boto3
 from botocore.exceptions import ClientError
+from dataclasses import dataclass
+from typing import Optional
 
-ddb = boto3.client("dynamodb")
-TABLE = os.environ["STATE_TABLE"]
+dynamodb = boto3.resource("dynamodb")
+_idempotency_table = dynamodb.Table("idempotency-store")
 
-def acquire_once(key: str) -> bool:
-    ttl = int(time.time()) + 86400
+
+@dataclass
+class IdempotencyRecord:
+    key: str
+    status: str      # "in_progress" | "completed" | "failed"
+    result: Optional[dict]
+    created_at: int
+    ttl: int         # Unix timestamp - DynamoDB TTL로 자동 삭제
+
+
+def idempotent_handler(event, context):
+    """멱등성을 보장하는 핸들러 래퍼"""
+    idempotency_key = event.get("idempotency_key") or context.aws_request_id
+    now = int(time.time())
+    ttl = now + 86400  # 24시간 후 만료
+
+    # 1. 기존 처리 결과 확인
     try:
-        ddb.put_item(
-            TableName=TABLE,
-            Item={"key": {"S": key}, "expiresAt": {"N": str(ttl)}, "version": {"N": "1"}},
-            ConditionExpression="attribute_not_exists(#k)",
-            ExpressionAttributeNames={"#k": "key"},
+        response = _idempotency_table.get_item(
+            Key={"pk": f"idem#{idempotency_key}"},
         )
-        return True
-    except ClientError:
-        return False
+        if "Item" in response:
+            item = response["Item"]
+            if item["status"] == "completed":
+                print(json.dumps({
+                    "event": "idempotency_hit",
+                    "key": idempotency_key,
+                    "cached_result": item.get("result"),
+                }))
+                return item["result"]
+            elif item["status"] == "in_progress":
+                raise RuntimeError(f"Processing already in progress for {idempotency_key}")
+    except ClientError as e:
+        if e.response["Error"]["Code"] != "ResourceNotFoundException":
+            raise
 
-def bump_version(key: str, current: int):
-    ddb.update_item(
-        TableName=TABLE,
-        Key={"key": {"S": key}},
-        UpdateExpression="SET version = :n",
-        ConditionExpression="version = :c",
-        ExpressionAttributeValues={":n": {"N": str(current + 1)}, ":c": {"N": str(current)}},
+    # 2. 처리 시작 - 조건부 쓰기로 경쟁 방지
+    try:
+        _idempotency_table.put_item(
+            Item={
+                "pk": f"idem#{idempotency_key}",
+                "status": "in_progress",
+                "created_at": now,
+                "ttl": ttl,
+            },
+            ConditionExpression="attribute_not_exists(pk)",
+        )
+    except ClientError as e:
+        if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
+            raise RuntimeError("Concurrent processing detected")
+        raise
+
+    # 3. 실제 처리
+    try:
+        result = process_order(event)
+
+        # 4. 완료 기록
+        _idempotency_table.update_item(
+            Key={"pk": f"idem#{idempotency_key}"},
+            UpdateExpression="SET #status = :s, #result = :r",
+            ExpressionAttributeNames={"#status": "status", "#result": "result"},
+            ExpressionAttributeValues={":s": "completed", ":r": result},
+        )
+        return result
+
+    except Exception as e:
+        # 5. 실패 기록 (재처리 허용을 위해 삭제)
+        _idempotency_table.delete_item(
+            Key={"pk": f"idem#{idempotency_key}"}
+        )
+        raise
+
+
+def process_order(event: dict) -> dict:
+    """실제 주문 처리 로직"""
+    return {"order_id": event.get("order_id"), "status": "processed"}
+```
+
+## DynamoDB TTL로 세션 관리
+
+```python
+import json
+import time
+import secrets
+import boto3
+from typing import Optional
+
+dynamodb = boto3.resource("dynamodb")
+_session_table = dynamodb.Table("user-sessions")
+
+SESSION_TTL_SECONDS = 3600  # 1시간
+
+
+def create_session(user_id: str, metadata: dict) -> str:
+    """새 세션 생성 후 세션 ID 반환"""
+    session_id = secrets.token_urlsafe(32)
+    now = int(time.time())
+
+    _session_table.put_item(
+        Item={
+            "pk": f"session#{session_id}",
+            "user_id": user_id,
+            "metadata": metadata,
+            "created_at": now,
+            "last_accessed": now,
+            "ttl": now + SESSION_TTL_SECONDS,
+        }
+    )
+    return session_id
+
+
+def get_session(session_id: str) -> Optional[dict]:
+    """세션 조회 및 TTL 갱신"""
+    response = _session_table.get_item(
+        Key={"pk": f"session#{session_id}"},
+    )
+    item = response.get("Item")
+    if not item:
+        return None
+
+    now = int(time.time())
+    if item["ttl"] < now:
+        return None  # 만료됨 (DynamoDB TTL이 아직 삭제 안 했을 수 있음)
+
+    # 슬라이딩 TTL 갱신
+    _session_table.update_item(
+        Key={"pk": f"session#{session_id}"},
+        UpdateExpression="SET last_accessed = :t, #ttl = :ttl",
+        ExpressionAttributeNames={"#ttl": "ttl"},
+        ExpressionAttributeValues={
+            ":t": now,
+            ":ttl": now + SESSION_TTL_SECONDS,
+        },
+    )
+    return item
+
+
+def invalidate_session(session_id: str) -> None:
+    """로그아웃 시 세션 삭제"""
+    _session_table.delete_item(
+        Key={"pk": f"session#{session_id}"}
     )
 ```
 
-이 패턴을 쓰면 재시도 환경에서도 "한 번만 반영" 계약을 유지하기 쉽습니다. 특히 결제, 정산, 포인트 적립처럼 중복 반영이 치명적인 도메인에서 필수입니다.
+## 낙관적 잠금으로 동시성 충돌 방지
 
-### 상태 저장 비용 간단 계산
+여러 함수 인스턴스가 같은 항목을 동시에 수정하려 할 때 낙관적 잠금으로 충돌을 감지합니다.
 
-월간 2천만 요청, 멱등성 키 평균 보존 24시간, 아이템 1KB라고 가정하면 동시 보관량은 대략 `2천만 / 30 ≈ 66만`건입니다. 총 데이터량은 약 660MB입니다. 이 값으로 스토리지 비용과 읽기/쓰기 요청 비용을 함께 계산해 TTL을 24시간에서 12시간으로 줄였을 때 절감폭을 비교할 수 있습니다.
+```python
+from botocore.exceptions import ClientError
 
-### 인터페이스 경로와 상태 변경 경로 분리
 
-상태를 안전하게 관리하려면 읽기 API와 쓰기 API의 책임을 분리하는 것이 좋습니다. 읽기 경로에서 강한 일관성이 반드시 필요한지, 쓰기 경로에서 중복 방지가 필수인지를 분리하면 저장소 선택과 캐시 전략이 훨씬 명확해집니다.
+def update_inventory(product_id: str, quantity_delta: int, max_retries: int = 3) -> dict:
+    """재고 수량 업데이트 - 낙관적 잠금 사용"""
+    table = dynamodb.Table("inventory")
 
-### 상태 충돌 시나리오 예시
+    for attempt in range(max_retries):
+        # 현재 값과 버전 읽기
+        response = table.get_item(Key={"product_id": product_id})
+        item = response.get("Item")
+        if not item:
+            raise ValueError(f"Product {product_id} not found")
 
-- 시나리오 A: 동일 주문을 두 번 결제 요청
-- 시나리오 B: 취소 요청과 승인 요청이 거의 동시에 도착
-- 시나리오 C: 재시도 중 네트워크 타임아웃 발생
+        current_version = item["version"]
+        current_quantity = item["quantity"]
+        new_quantity = current_quantity + quantity_delta
 
-각 시나리오에 대해 "최종 상태가 무엇이어야 하는가"를 먼저 정의하면 코드가 단순해집니다. 서버리스 환경에서는 호출 재시도가 정상 동작이기 때문에, 충돌 처리 규칙이 도메인 규칙만큼 중요합니다.
+        if new_quantity < 0:
+            raise ValueError("Insufficient inventory")
 
-### 비용-정합성 균형
+        try:
+            # 버전이 읽었을 때와 같은 경우에만 업데이트
+            table.update_item(
+                Key={"product_id": product_id},
+                UpdateExpression="SET quantity = :q, version = :v",
+                ConditionExpression="version = :cv",
+                ExpressionAttributeValues={
+                    ":q": new_quantity,
+                    ":v": current_version + 1,
+                    ":cv": current_version,
+                },
+            )
+            return {"product_id": product_id, "new_quantity": new_quantity}
 
-강한 정합성을 높일수록 지연과 비용이 늘 수 있고, 느슨한 정합성을 택하면 보정 로직이 필요해집니다. 따라서 기능별로 정합성 등급을 분류하고 저장 전략을 다르게 가져가는 것이 현실적입니다. 결제는 강하게, 통계 대시는 느슨하게 같은 원칙을 명시해 두면 팀 의사결정 속도가 크게 올라갑니다.
+        except ClientError as e:
+            if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
+                if attempt == max_retries - 1:
+                    raise RuntimeError("Update failed after max retries due to concurrent modifications")
+                time.sleep(0.1 * (2 ** attempt))  # 지수 백오프
+                continue
+            raise
 
-## 정리
+    raise RuntimeError("Update failed")
+```
 
-서버리스에서 상태를 다루는 핵심은 상태를 없애는 것이 아니라 위치를 분명히 하는 일입니다. 함수는 짧게 실행되고 언제든 사라질 수 있으므로, 세션과 영속 데이터, 워크플로 상태를 각각 맞는 저장소로 분리해야 합니다. 멱등 토큰과 TTL은 그 분리를 안전하게 유지하는 기본 장치입니다.
+## Step Functions으로 워크플로 상태 관리
 
-다음 글에서는 큐와 이벤트 기반 아키텍처를 통해 비동기 흐름을 어떻게 설계하는지 봅니다.
+여러 단계를 거치는 처리 흐름은 함수 내부에서 관리하면 재시도와 오류 처리가 복잡해집니다. Step Functions에 상태 머신을 위임하면 각 함수는 단일 단계만 담당합니다.
 
-## 처음 질문으로 돌아가기
+```yaml
+# Step Functions 상태 머신 정의 (ASL)
+OrderProcessingStateMachine:
+  Type: AWS::StepFunctions::StateMachine
+  Properties:
+    StateMachineName: order-processing
+    Definition:
+      Comment: "주문 처리 워크플로"
+      StartAt: ValidateOrder
+      States:
+        ValidateOrder:
+          Type: Task
+          Resource: !GetAtt ValidateOrderFunction.Arn
+          Retry:
+            - ErrorEquals: ["Lambda.ServiceException", "Lambda.AWSLambdaException"]
+              IntervalSeconds: 2
+              MaxAttempts: 3
+              BackoffRate: 2
+          Catch:
+            - ErrorEquals: ["ValidationError"]
+              Next: OrderFailed
+          Next: ReserveInventory
 
-- **무상태 함수가 상태 있는 비즈니스를 어떻게 처리할까요?**
-  - 예제는 메모리 딕셔너리를 쓰지만, 실제 시스템에서는 이 자리에 Redis 같은 외부 저장소가 들어갑니다. 중요한 점은 함수가 저장 구현을 직접 품지 않고, 추상화된 저장소를 통해 상태를 읽고 쓴다는 사실입니다.
-- **세션, 캐시, 데이터 저장소, 워크플로 상태는 어디에 둬야 할까요?**
-  - 예제는 메모리 딕셔너리를 쓰지만, 실제 시스템에서는 이 자리에 Redis 같은 외부 저장소가 들어갑니다. 중요한 점은 함수가 저장 구현을 직접 품지 않고, 추상화된 저장소를 통해 상태를 읽고 쓴다는 사실입니다.
-- **TTL과 멱등 토큰은 왜 상태 관리의 핵심일까요?**
-  - 예제는 메모리 딕셔너리를 쓰지만, 실제 시스템에서는 이 자리에 Redis 같은 외부 저장소가 들어갑니다. 중요한 점은 함수가 저장 구현을 직접 품지 않고, 추상화된 저장소를 통해 상태를 읽고 쓴다는 사실입니다.
-  - 이 그림이 보여 주는 메시지는 단순합니다. 함수는 상태를 소유하는 주체가 아니라 상태를 읽고 갱신하는 작업자입니다. 짧은 세션성 데이터는 캐시로, 영속 데이터는 데이터베이스로, 여러 단계의 진행 상태는 워크플로 엔진이나 상태 머신으로 분리하면 책임이 선명해집니다.
+        ReserveInventory:
+          Type: Task
+          Resource: !GetAtt ReserveInventoryFunction.Arn
+          TimeoutSeconds: 30
+          Catch:
+            - ErrorEquals: ["InsufficientInventory"]
+              Next: OrderFailed
+          Next: ProcessPayment
+
+        ProcessPayment:
+          Type: Task
+          Resource: !GetAtt ProcessPaymentFunction.Arn
+          TimeoutSeconds: 60
+          Catch:
+            - ErrorEquals: ["PaymentDeclined"]
+              Next: ReleaseInventory
+          Next: SendConfirmation
+
+        SendConfirmation:
+          Type: Task
+          Resource: !GetAtt SendConfirmationFunction.Arn
+          End: true
+
+        ReleaseInventory:
+          Type: Task
+          Resource: !GetAtt ReleaseInventoryFunction.Arn
+          Next: OrderFailed
+
+        OrderFailed:
+          Type: Fail
+          Error: "OrderProcessingFailed"
+```
+
+## 상태 관리 런북
+
+**세션 만료 관련 장애 대응**
+
+1. 증상 확인: 사용자가 갑자기 로그아웃되거나 세션을 찾을 수 없다는 오류 발생
+2. DynamoDB TTL 설정 확인:
+```bash
+aws dynamodb describe-table \
+  --table-name user-sessions \
+  --query 'Table.TimeToLiveDescription'
+```
+3. 세션 TTL 값 직접 확인:
+```bash
+aws dynamodb get-item \
+  --table-name user-sessions \
+  --key '{"pk": {"S": "session#<SESSION_ID>"}}'
+```
+4. TTL 컬럼이 과거 시각이면 DynamoDB가 아직 삭제하지 않은 만료 항목입니다. 애플리케이션 레이어에서 TTL 비교 로직을 추가합니다.
+
+**멱등성 테이블 크기 증가 대응**
+
+1. 멱등성 레코드에 TTL을 설정했는지 확인합니다.
+2. TTL이 없으면 레코드가 무한 누적됩니다.
+3. 기존 레코드에 TTL 일괄 추가:
+```python
+def backfill_ttl(table_name: str, ttl_seconds: int = 86400):
+    table = dynamodb.Table(table_name)
+    now = int(time.time())
+    scan_kwargs = {}
+    while True:
+        response = table.scan(**scan_kwargs)
+        for item in response.get("Items", []):
+            if "ttl" not in item:
+                table.update_item(
+                    Key={"pk": item["pk"]},
+                    UpdateExpression="SET #ttl = :t",
+                    ExpressionAttributeNames={"#ttl": "ttl"},
+                    ExpressionAttributeValues={":t": now + ttl_seconds},
+                )
+        if "LastEvaluatedKey" not in response:
+            break
+        scan_kwargs["ExclusiveStartKey"] = response["LastEvaluatedKey"]
+```
+
+## 자주 하는 실수
+
+| 실수 유형 | 증상 | 올바른 접근 |
+|-----------|------|------------|
+| 핸들러 전역 변수에 요청별 데이터 저장 | 인스턴스 재사용 시 다른 사용자 데이터 노출 | 요청별 데이터는 핸들러 내부 지역 변수로 관리 |
+| TTL 없이 DynamoDB에 임시 데이터 저장 | 테이블 무한 증가, 비용 상승 | TTL 속성 필수 설정 |
+| 멱등성 없이 SQS 메시지 처리 | 중복 처리로 데이터 오염 | 멱등 키 + 조건부 쓰기 패턴 사용 |
+| 다단계 처리를 단일 함수에서 관리 | 중간 실패 시 전체 재처리, 타임아웃 위험 | Step Functions으로 워크플로 분리 |
+| 낙관적 잠금 없이 동시 업데이트 | 재고 음수, 데이터 불일치 | 버전 기반 조건부 업데이트 사용 |
+| 세션을 함수 메모리에 저장 | 다른 인스턴스에서 세션 인식 불가 | ElastiCache 또는 DynamoDB에 저장 |
 
 <!-- toc:begin -->
 ## 시리즈 목차

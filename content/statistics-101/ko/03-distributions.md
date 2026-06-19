@@ -44,11 +44,9 @@ last_reviewed: '2026-05-12'
 
 실무에서는 더 직접적입니다. 응답 시간 SLA를 평균으로 관리하면 긴 꼬리 때문에 실제 사용자 체감 문제를 놓칠 수 있고, 매출 데이터를 정규분포처럼 다루면 소수의 고액 거래가 전체 해석을 망칠 수 있습니다. 도구보다 먼저 분포를 봐야 하는 이유입니다.
 
-## 멘탈 모델
+## 멘탈 모델: 분포 읽기 순서
 
 분포를 읽는 가장 단순한 순서는 그림을 먼저 보고, 그다음 요약 통계와 분위수를 확인한 뒤, 마지막에 그 모양에 맞는 통계 도구를 선택하는 것입니다. 히스토그램은 진단의 시작점이고, 분위수는 긴 꼬리를 읽는 핵심 도구입니다.
-
-정규분포는 대칭적인 종 모양이고, 균등분포는 값이 비슷한 빈도로 나타납니다. 지수분포와 멱법칙 분포는 한쪽 꼬리가 길며, 운영 데이터에서는 이런 형태가 더 자주 보입니다.
 
 ### 주요 분포 비교표
 
@@ -63,17 +61,55 @@ last_reviewed: '2026-05-12'
 
 실무에서는 정규분포보다 긴 꼬리를 가진 분포를 훨씬 자주 만납니다. 응답 시간, 매출, 사용자 행동 로그는 대부분 멱법칙이나 지수분포 계열입니다. 정규분포를 기본값처럼 가정하면 p95, p99 같은 꼬리 지표를 놓치게 됩니다.
 
-## 분포를 왜 알아야 하는가
+## 주요 분포 시각화
 
-분포를 모르면 평균과 분산이 같아도 완전히 다른 행동을 하는 데이터를 같은 것으로 오해할 수 있습니다. 두 데이터셋의 평균이 100이고 표준편차가 20으로 같더라도, 하나는 정규분포이고 다른 하나는 지수분포라면 극단값 발생 빈도가 전혀 다릅니다.
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
 
-### 분포가 통계 기법 선택을 결정합니다
+rng = np.random.default_rng(42)
+fig, axes = plt.subplots(2, 3, figsize=(15, 8))
 
-많은 통계 기법은 정규성 가정을 전제로 합니다. t-검정, ANOVA, 선형회귀 모두 잔차가 정규분포를 따른다고 가정합니다. 만약 데이터가 긴 꼬리를 가지면 이런 기법들은 신뢰구간을 잘못 계산하거나 검정력이 떨어질 수 있습니다. 그럴 때는 비모수 검정(Mann-Whitney U, Kruskal-Wallis)이나 로그 변환을 고려해야 합니다.
+# 정규분포
+x_norm = rng.normal(0, 1, 2000)
+axes[0, 0].hist(x_norm, bins=50, density=True, alpha=0.7, color="steelblue", edgecolor="white")
+x_line = np.linspace(-4, 4, 300)
+axes[0, 0].plot(x_line, stats.norm.pdf(x_line), "k-", lw=2)
+axes[0, 0].set_title("정규분포 N(0,1)")
 
-### 분포가 서비스수준와 알림 기준을 결정합니다
+# 이항분포
+x_binom = rng.binomial(n=20, p=0.4, size=2000)
+axes[0, 1].hist(x_binom, bins=range(0, 21), density=True, alpha=0.7, color="green", edgecolor="white")
+axes[0, 1].set_title("이항분포 B(20, 0.4)")
 
-정규분포라면 평균 ± 2σ 구간에 95%가 들어가므로 평균 기준 관리가 가능합니다. 하지만 긴 꼬리 분포라면 평균은 대부분 사용자 경험을 대표하지 못하고, p95나 p99 같은 분위수 기준이 필요합니다. Datadog, Grafana, New Relic 같은 모니터링 도구가 평균보다 p95/p99를 강조하는 이유가 여기에 있습니다.
+# 포아송분포
+x_pois = rng.poisson(lam=5, size=2000)
+axes[0, 2].hist(x_pois, bins=range(0, 20), density=True, alpha=0.7, color="purple", edgecolor="white")
+axes[0, 2].set_title("포아송분포 λ=5")
+
+# 균등분포
+x_unif = rng.uniform(0, 10, 2000)
+axes[1, 0].hist(x_unif, bins=30, density=True, alpha=0.7, color="orange", edgecolor="white")
+axes[1, 0].set_title("균등분포 U(0,10)")
+
+# 지수분포
+x_exp = rng.exponential(scale=2, size=2000)
+axes[1, 1].hist(x_exp, bins=50, density=True, alpha=0.7, color="red", edgecolor="white")
+x_line_exp = np.linspace(0, 15, 300)
+axes[1, 1].plot(x_line_exp, stats.expon.pdf(x_line_exp, scale=2), "k-", lw=2)
+axes[1, 1].set_title("지수분포 λ=0.5")
+
+# 로그정규 (멱법칙 유사)
+x_log = rng.lognormal(mean=0, sigma=1, size=2000)
+axes[1, 2].hist(x_log, bins=60, density=True, alpha=0.7, color="brown", edgecolor="white")
+axes[1, 2].set_title("로그정규분포 (긴 꼬리)")
+
+plt.tight_layout()
+plt.show()
+```
+
+각 분포는 고유한 모양을 가집니다. 실무 데이터를 처음 봤을 때 이 6가지 패턴 중 어디에 가까운지 빠르게 판단하는 것이 분포 진단의 첫 단계입니다.
 
 ## 파이썬으로 분포 그리고 검증하기
 
@@ -83,63 +119,159 @@ import matplotlib.pyplot as plt
 from scipy.stats import skew, kurtosis, normaltest
 
 # 긴 꼬리 분포 시뮬레이션
-np.random.seed(42)
+rng = np.random.default_rng(42)
 latency = np.concatenate([
-    np.random.exponential(scale=100, size=950),
-    np.random.exponential(scale=500, size=50)
+    rng.exponential(scale=100, size=950),
+    rng.exponential(scale=500, size=50)
 ])
 
-# 히스토그램
-plt.figure(figsize=(10, 4))
-plt.hist(latency, bins=50, edgecolor="black", alpha=0.7)
-plt.xlabel("Latency (ms)")
-plt.ylabel("Frequency")
-plt.title("응답 시간 분포 (긴 꼬리)")
-plt.axvline(latency.mean(), color="red", linestyle="--", label=f"평균: {latency.mean():.1f}")
-plt.axvline(np.median(latency), color="blue", linestyle="--", label=f"중앙값: {np.median(latency):.1f}")
-plt.legend()
-plt.show()
-
 # 분포 요약 통계
-print(f"평균: {latency.mean():.1f} ms")
+print(f"평균:   {latency.mean():.1f} ms")
 print(f"중앙값: {np.median(latency):.1f} ms")
-print(f"p95: {np.percentile(latency, 95):.1f} ms")
-print(f"p99: {np.percentile(latency, 99):.1f} ms")
-print(f"왜도: {skew(latency):.2f}")
-print(f"첨도: {kurtosis(latency):.2f}")
+print(f"p95:    {np.percentile(latency, 95):.1f} ms")
+print(f"p99:    {np.percentile(latency, 99):.1f} ms")
+print(f"왜도:   {skew(latency):.2f}")
+print(f"첨도:   {kurtosis(latency):.2f}")
 
 # 정규성 검정
 stat, p = normaltest(latency)
 print(f"정규성 검정 p-value: {p:.4f}")
 if p < 0.05:
     print("→ 정규분포가 아닙니다. 비모수 기법이나 분위수 기준을 고려하세요.")
+
+# 히스토그램
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+
+axes[0].hist(latency, bins=60, edgecolor="black", alpha=0.7, color="steelblue")
+axes[0].axvline(latency.mean(), color="red", linestyle="--", label=f"평균: {latency.mean():.1f}")
+axes[0].axvline(np.median(latency), color="blue", linestyle="--", label=f"중앙값: {np.median(latency):.1f}")
+axes[0].set_xlabel("Latency (ms)")
+axes[0].set_title("응답 시간 분포 (긴 꼬리)")
+axes[0].legend()
+
+# 로그 스케일
+axes[1].hist(np.log1p(latency), bins=60, edgecolor="black", alpha=0.7, color="orange")
+axes[1].set_xlabel("log(Latency + 1)")
+axes[1].set_title("로그 변환 후 분포")
+
+plt.tight_layout()
+plt.show()
 ```
 
 왜도가 양수면 오른쪽 꼬리가 길고, 첨도가 크면 극단값이 자주 나타납니다. 정규성 검정 p-value가 0.05보다 작으면 정규분포 가정을 기각하고, t-검정 대신 Mann-Whitney U 검정을 쓰거나 로그 변환을 고려해야 합니다.
-- 정규분포: 좌우가 대칭인 종 모양 분포입니다.
-- 균등분포: 각 구간이 비슷한 빈도로 나타나는 분포입니다.
-- 지수분포: 대기 시간처럼 작은 값이 많고 큰 값이 드문 분포입니다.
+
+## Q-Q 플롯으로 정규성 진단하기
+
+Q-Q plot(Quantile-Quantile plot)은 데이터의 분위수와 이론적 정규분포의 분위수를 비교하는 그래프입니다. 데이터가 정규분포를 따르면 점들이 대각선 위에 일직선으로 놓입니다.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+rng = np.random.default_rng(42)
+normal_data = rng.normal(loc=100, scale=20, size=500)
+exp_data = rng.exponential(scale=100, size=500)
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# 정규분포 Q-Q plot
+stats.probplot(normal_data, dist="norm", plot=axes[0])
+axes[0].set_title("정규분포 Q-Q Plot (직선에 가까움)")
+
+# 지수분포 Q-Q plot (정규 기준)
+stats.probplot(exp_data, dist="norm", plot=axes[1])
+axes[1].set_title("지수분포 Q-Q Plot (꼬리가 위로 휘어짐)")
+
+plt.tight_layout()
+plt.show()
+```
+
+정규분포 데이터는 점들이 직선에 가깝게 놓이지만, 지수분포 데이터는 오른쪽 끝이 위로 휘어집니다. 이는 오른쪽 꼬리가 정규분포보다 길다는 뜻입니다.
+
+## 로그 변환으로 긴 꼬리 다루기
+
+긴 꼬리 분포는 로그 변환을 하면 정규분포에 가까워지는 경우가 많습니다. 특히 매출, 소득, 응답 시간처럼 양수이면서 극단값이 있는 데이터에서 유용합니다.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+rng = np.random.default_rng(42)
+data = rng.lognormal(mean=4, sigma=1, size=1000)
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+
+# 원본 분포
+axes[0].hist(data, bins=50, edgecolor="black", alpha=0.7, color="steelblue")
+axes[0].set_title(f"원본 분포 (왜도: {stats.skew(data):.2f})")
+axes[0].set_xlabel("값")
+
+# 로그 변환 후
+log_data = np.log(data)
+axes[1].hist(log_data, bins=50, edgecolor="black", alpha=0.7, color="green")
+axes[1].set_title(f"로그 변환 후 (왜도: {stats.skew(log_data):.2f})")
+axes[1].set_xlabel("log(값)")
+
+# Q-Q 플롯
+stats.probplot(log_data, dist="norm", plot=axes[2])
+axes[2].set_title("로그 변환 후 Q-Q Plot")
+
+plt.tight_layout()
+plt.show()
+
+print(f"원본 평균: {data.mean():.1f}, 중앙값: {np.median(data):.1f}")
+print(f"로그 변환 후 평균: {log_data.mean():.2f}, 중앙값: {np.median(log_data):.2f}")
+```
+
+로그 변환 후에는 평균과 중앙값이 가까워지고 히스토그램도 대칭에 가까워집니다. 이렇게 변환한 뒤 t-검정이나 회귀분석을 적용하면 정규성 가정을 만족하기 쉬워집니다.
+
+## 핵심 용어 정리
+
+- **정규분포**: 좌우가 대칭인 종 모양 분포입니다.
+- **균등분포**: 각 구간이 비슷한 빈도로 나타나는 분포입니다.
+- **지수분포**: 대기 시간처럼 작은 값이 많고 큰 값이 드문 분포입니다.
 - **멱법칙 분포**: 긴 꼬리를 가지는 분포로, 매출이나 조회 수에서 자주 보입니다.
-- 왜도: 좌우 비대칭 정도입니다.
-- 첨도: 꼬리 두께와 극단값 성향을 숫자로 표현한 값입니다.
+- **왜도**: 좌우 비대칭 정도입니다. 양수면 오른쪽 꼬리가 길고, 음수면 왼쪽 꼬리가 깁니다.
+- **첨도**: 꼬리 두께와 극단값 성향을 숫자로 표현한 값입니다.
 
 ## 같은 평균이어도 운영 판단은 달라진다
 
-이전 해석: “평균 응답 시간은 200ms입니다.”
+이전 해석: "평균 응답 시간은 200ms입니다."
 
 이 문장만 보면 서비스가 꽤 빠른 것처럼 보일 수 있습니다. 하지만 일부 요청이 2초 이상 걸리는 긴 꼬리 분포라면 사용자는 훨씬 나쁜 경험을 하고 있을 수 있습니다.
 
-이후 해석: “p50은 120ms, p95는 900ms이며 긴 꼬리가 뚜렷합니다. SLA는 평균이 아니라 p95 기준으로 관리해야 합니다.”
+이후 해석: "p50은 120ms, p95는 900ms이며 긴 꼬리가 뚜렷합니다. SLA는 평균이 아니라 p95 기준으로 관리해야 합니다."
 
 분포를 읽기 시작하면 어떤 지표가 운영 문장을 대표해야 하는지도 함께 보입니다.
+
+## 자주 하는 실수
+
+| 실수 유형 | 구체적 상황 | 올바른 접근 |
+|---|---|---|
+| 정규분포 무조건 가정 | t-검정을 모든 데이터에 적용 | 정규성 검정 또는 Q-Q 플롯 먼저 확인 |
+| 극단값을 예외로만 처리 | 응답 시간 2000ms를 제거 | 그 자체가 꼬리 분포의 일부일 수 있음 |
+| 로그 스케일 없이 긴 꼬리 읽기 | 선형 히스토그램만 사용 | 로그 변환 히스토그램 병행 |
+| 평균으로 SLA 관리 | 평균 응답시간 200ms → 정상 판단 | p95, p99를 SLA 기준으로 설정 |
+| 시각화 없이 숫자만 확인 | 왜도가 2.3이면 꼬리가 있음 | 히스토그램과 Q-Q 플롯으로 눈으로 확인 |
+| 단일 검정으로 분포 결정 | Shapiro 검정 p=0.06 → 정규 판정 | 여러 검정과 시각화를 함께 사용 |
 
 ## 실습: 5단계 분포 진단
 
 ### 1단계 — 히스토그램을 그린다
 
 ```python
+import numpy as np
 import matplotlib.pyplot as plt
-plt.hist(latency, bins=50); plt.show()
+
+rng = np.random.default_rng(42)
+latency = np.r_[rng.exponential(100, 950), rng.exponential(500, 50)]
+
+plt.hist(latency, bins=50, edgecolor="black", alpha=0.7)
+plt.xlabel("Latency (ms)")
+plt.title("응답 시간 분포")
+plt.show()
 ```
 
 분포 진단은 거의 항상 여기서 시작합니다.
@@ -147,8 +279,9 @@ plt.hist(latency, bins=50); plt.show()
 ### 2단계 — 기본 요약 통계를 본다
 
 ```python
-import numpy as np
-print(np.mean(latency), np.median(latency), np.std(latency))
+print(f"평균: {latency.mean():.1f}")
+print(f"중앙값: {np.median(latency):.1f}")
+print(f"std: {latency.std():.1f}")
 ```
 
 평균과 중앙값의 차이만 봐도 비대칭 여부를 어느 정도 짐작할 수 있습니다.
@@ -157,7 +290,7 @@ print(np.mean(latency), np.median(latency), np.std(latency))
 
 ```python
 for q in [50, 90, 95, 99]:
-    print(f"p{q}:", np.percentile(latency, q))
+    print(f"p{q}: {np.percentile(latency, q):.1f} ms")
 ```
 
 긴 꼬리는 분위수에서 더 또렷하게 드러납니다.
@@ -166,7 +299,8 @@ for q in [50, 90, 95, 99]:
 
 ```python
 from scipy.stats import skew, kurtosis
-print("skew:", skew(latency), "kurt:", kurtosis(latency))
+print(f"왜도: {skew(latency):.2f}")
+print(f"첨도: {kurtosis(latency):.2f}")
 ```
 
 그래프에서 본 모양을 숫자로 표현하는 단계입니다.
@@ -174,24 +308,49 @@ print("skew:", skew(latency), "kurt:", kurtosis(latency))
 ### 5단계 — 통계 도구를 결정한다
 
 ```text
-skew=+2.3, kurt=+8 → long-tail. SLA = p95 = 900ms.
+왜도=+2.3, 첨도=+8 → 긴 꼬리 분포
+SLA 기준: p95 = 900ms (평균 200ms 대신)
+검정 방법: Mann-Whitney U (정규 가정 불가)
 ```
 
 분포를 읽은 뒤에는 어떤 지표와 기준을 쓸지 선택해야 합니다.
 
-## 이 코드에서 먼저 볼 점
+## 분포 진단 심화: 시각화와 검정을 함께 사용하기
 
-- 히스토그램은 거의 모든 분포 진단의 출발점입니다.
-- 긴 꼬리는 평균보다 분위수에서 더 잘 보입니다.
-- 왜도와 첨도는 모양을 숫자로 표현해 팀 간 대화를 쉽게 만듭니다.
+분포는 그래프만으로 판단하거나 검정만으로 판단하면 오판 가능성이 커집니다. 시각화와 수치 검정을 함께 써야 안전합니다.
 
-## 자주 헷갈리는 지점 5가지
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
 
-1. **정규분포를 기본값으로 당연하게 두는 경우**: 현실 데이터는 그렇지 않을 때가 많습니다.
-2. **극단값을 분포 바깥 예외로만 보는 경우**: 그 자체가 분포의 일부일 수 있습니다.
-3. **긴 꼬리를 로그 스케일 없이 읽는 경우**: 꼬리 구조를 놓치기 쉽습니다.
-4. **p99 대신 평균으로 SLA를 관리하는 경우**: 운영 위험을 가립니다.
-5. **시각화 없이 숫자만 보는 경우**: 비대칭과 군집 구조를 놓칠 수 있습니다.
+rng = np.random.default_rng(0)
+x = np.r_[
+    rng.lognormal(mean=4.2, sigma=0.6, size=1800),
+    rng.lognormal(mean=6.0, sigma=0.4, size=200)
+]
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+
+axes[0].hist(x, bins=60, edgecolor="black", alpha=0.7, color="steelblue")
+axes[0].set_title("원본 히스토그램")
+
+axes[1].hist(np.log(x), bins=60, edgecolor="black", alpha=0.7, color="green")
+axes[1].set_title("로그 변환 히스토그램")
+
+stats.probplot(np.log(x), dist="norm", plot=axes[2])
+axes[2].set_title("로그 변환 Q-Q 플롯")
+
+plt.tight_layout()
+plt.show()
+
+k2, p = stats.normaltest(np.log(x))
+print(f"정규성 검정 p-value(로그 변환 후): {p:.4f}")
+if p > 0.05:
+    print("→ 로그 변환 후 정규 근사가 적절합니다.")
+```
+
+로그 변환 후 정규성 근사가 좋아지면 평균 기반 추정과 선형모형 적용이 더 안정적입니다. 변환 전후를 나란히 보여 주면 팀 합의가 빨라집니다.
 
 ## 실무에서는 이렇게 읽습니다
 
@@ -218,57 +377,6 @@ skew=+2.3, kurt=+8 → long-tail. SLA = p95 = 900ms.
 
 다음 글에서는 표본과 모집단을 다룹니다. 분포를 읽은 뒤에는 이제 일부 데이터를 보고 전체를 얼마나 말할 수 있는지가 다음 질문이 됩니다.
 
-## 분포 진단 심화: 시각화와 검정을 함께 사용하기
-
-분포는 그래프만으로 판단하거나 검정만으로 판단하면 오판 가능성이 커집니다. 시각화와 수치 검정을 함께 써야 안전합니다.
-
-### 추천 진단 순서
-
-1. 히스토그램으로 큰 모양 확인
-2. 박스플롯으로 이상치와 사분위수 확인
-3. 로그 스케일 히스토그램으로 꼬리 구조 확인
-4. Q-Q 플롯으로 정규성 근사 확인
-5. Shapiro 또는 D'Agostino 검정으로 수치 확인
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy import stats
-
-rng = np.random.default_rng(0)
-x = np.r_[rng.lognormal(mean=4.2, sigma=0.6, size=1800), rng.lognormal(mean=6.0, sigma=0.4, size=200)]
-
-fig, ax = plt.subplots(1, 3, figsize=(15, 4))
-ax[0].hist(x, bins=60, edgecolor='black')
-ax[0].set_title('원본 히스토그램')
-
-ax[1].hist(np.log(x), bins=60, edgecolor='black')
-ax[1].set_title('로그 변환 히스토그램')
-
-stats.probplot(np.log(x), dist='norm', plot=ax[2])
-ax[2].set_title('로그 변환 Q-Q 플롯')
-plt.tight_layout()
-plt.show()
-
-k2, p = stats.normaltest(np.log(x))
-print(f"정규성 검정 p-value(로그 변환 후): {p:.4f}")
-```
-
-로그 변환 후 정규성 근사가 좋아지면 평균 기반 추정과 선형모형 적용이 더 안정적입니다. 변환 전후를 나란히 보여 주면 팀 합의가 빨라집니다.
-
-## 추가 메모: 검증 가능한 의사결정 문장
-
-분석 결과를 보고할 때는 "좋아 보입니다" 같은 모호한 문장을 피하고, 기준과 근거를 한 줄에 함께 적는 것이 좋습니다. 예를 들어 "전환율 +0.6%p, 95% 신뢰구간 +0.1~+1.1%p, p=0.014, 월간 기대효과 +320건, 2주 재검증 조건부 배포"처럼 쓰면 의사결정 책임이 명확해집니다. 이런 형식은 통계 도구가 바뀌어도 유지되는 팀 자산입니다.
-
-## 처음 질문으로 돌아가기
-
-- **데이터의 분포 모양은 왜 중요한가요?**
-  - 분포를 모르면 평균과 분산이 같아도 완전히 다른 행동을 하는 데이터를 같은 것으로 오해할 수 있습니다. 두 데이터셋의 평균이 100이고 표준편차가 20으로 같더라도, 하나는 정규분포이고 다른 하나는 지수분포라면 극단값 발생 빈도가 전혀 다릅니다.
-- **정규, 균등, 지수, 멱법칙 분포는 어떤 차이를 보일까요?**
-  - 분포를 모르면 평균과 분산이 같아도 완전히 다른 행동을 하는 데이터를 같은 것으로 오해할 수 있습니다. 두 데이터셋의 평균이 100이고 표준편차가 20으로 같더라도, 하나는 정규분포이고 다른 하나는 지수분포라면 극단값 발생 빈도가 전혀 다릅니다.
-- **왜도와 첨도는 무엇을 수치로 말해 줄까요?**
-  - - 히스토그램은 거의 모든 분포 진단의 출발점입니다
-
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -281,7 +389,7 @@ print(f"정규성 검정 p-value(로그 변환 후): {p:.4f}")
 - [Statistics 101 (7/10): 가설검정](./07-hypothesis-testing.md)
 - [Statistics 101 (8/10): 상관과 회귀](./08-correlation-and-regression.md)
 - [Statistics 101 (9/10): p-value 이해하기](./09-understanding-p-value.md)
-- [통계적 사고방식](./10-statistical-thinking.md)
+- [Statistics 101 (10/10): 통계적 사고방식](./10-statistical-thinking.md)
 
 <!-- toc:end -->
 
@@ -291,70 +399,6 @@ print(f"정규성 검정 p-value(로그 변환 후): {p:.4f}")
 - [Khan Academy — Distributions](https://www.khanacademy.org/math/statistics-probability/random-variables-stats-library)
 - [Wikipedia — Power Law](https://en.wikipedia.org/wiki/Power_law)
 - [Brendan Gregg — Latency Distributions](https://www.brendangregg.com/blog/2014-06-23/latency-heat-maps.html)
-
-### 큐큐 플롯으로 정규성 진단하기
-
-Q-Q plot(Quantile-Quantile plot)은 데이터의 분위수와 이론적 정규분포의 분위수를 비교하는 그래프입니다. 데이터가 정규분포를 따르면 점들이 대각선 위에 일직선으로 놓입니다.
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy import stats
-
-# 정규분포 vs 지수분포
-np.random.seed(42)
-normal_data = np.random.normal(loc=100, scale=20, size=500)
-exp_data = np.random.exponential(scale=100, size=500)
-
-fig, axes = plt.subplots(1, 2, figsize=(12, 5))
-
-# 정규분포 Q-Q plot
-stats.probplot(normal_data, dist="norm", plot=axes[0])
-axes[0].set_title("정규분포 Q-Q Plot")
-
-# 지수분포 Q-Q plot
-stats.probplot(exp_data, dist="norm", plot=axes[1])
-axes[1].set_title("지수분포 Q-Q Plot (정규 기준)")
-
-plt.tight_layout()
-plt.show()
-```
-
-정규분포 데이터는 점들이 직선에 가깝게 놓이지만, 지수분포 데이터는 오른쪽 끝이 위로 휘어집니다. 이는 오른쪽 꼬리가 정규분포보다 길다는 뜻입니다.
-
-### 로그 변환으로 긴 꼬리 다루기
-
-긴 꼬리 분포는 로그 변환을 하면 정규분포에 가까워지는 경우가 많습니다. 특히 매출, 소득, 응답 시간처럼 양수이면서 극단값이 있는 데이터에서 유용합니다.
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-
-# 긴 꼬리 데이터 (로그정규분포)
-np.random.seed(42)
-data = np.random.lognormal(mean=4, sigma=1, size=1000)
-
-fig, axes = plt.subplots(1, 2, figsize=(12, 4))
-
-# 원본 분포
-axes[0].hist(data, bins=50, edgecolor="black")
-axes[0].set_title("원본 분포 (긴 꼬리)")
-axes[0].set_xlabel("값")
-
-# 로그 변환 후
-axes[1].hist(np.log(data), bins=50, edgecolor="black")
-axes[1].set_title("로그 변환 후 (정규에 가까움)")
-axes[1].set_xlabel("log(값)")
-
-plt.tight_layout()
-plt.show()
-
-print(f"원본 평균: {data.mean():.1f}, 중앙값: {np.median(data):.1f}")
-print(f"로그 변환 후 평균: {np.log(data).mean():.2f}, 중앙값: {np.median(np.log(data)):.2f}")
-```
-
-로그 변환 후에는 평균과 중앙값이 가까워지고 히스토그램도 대칭에 가까워집니다. 이렇게 변환한 뒤 t-검정이나 회귀분석을 적용하면 정규성 가정을 만족하기 쉬워집니다.
-
 - [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/statistics-101/ko)
 
 Tags: Statistics, Distribution, Normal, Skew, Beginner

@@ -37,8 +37,8 @@ last_reviewed: '2026-05-12'
 - 통합 테스트는 무엇을 함께 검증할까요?
 - 실제 DB나 HTTP 계층은 왜 붙여 봐야 할까요?
 - 테스트 컨테이너와 픽스처는 어떤 상황에서 유용할까요?
-- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
-- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
+- 인메모리 DB와 실제 DB는 언제 각각 선택해야 할까요?
+- 통합 테스트 상태 격리는 어떻게 구현할까요?
 
 대부분의 운영 버그는 경계에서 드러납니다. 데이터베이스 스키마가 바뀌었는데 저장 코드가 그대로이거나, API 계약이 달라졌는데 호출부가 예전 형식을 계속 쓰는 경우가 대표적입니다. 이런 문제는 단위 테스트만으로는 잘 드러나지 않습니다.
 
@@ -46,36 +46,38 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-이 그림에서 중요한 지점은 테스트 대상이 함수 하나가 아니라 흐름이라는 사실입니다. 라우트, 서비스, 저장소, 데이터베이스가 함께 맞물릴 때 어떤 응답이 나오는지 봅니다. 그래서 통합 테스트는 로직 검증과 계약 검증을 동시에 수행합니다.
+라우트, 서비스, 저장소, 데이터베이스가 함께 맞물릴 때 어떤 응답이 나오는지 봅니다. 그래서 통합 테스트는 로직 검증과 계약 검증을 동시에 수행합니다.
 
-- **통합 테스트**: 두 개 이상 컴포넌트를 함께 실행해 검증하는 테스트입니다.
-- **테스트 컨테이너**: 테스트용 DB나 Redis를 컨테이너로 잠깐 띄우는 방식입니다.
-- **테스트 데이터베이스**: 운영 DB와 분리된 전용 데이터베이스입니다.
-- **시드 데이터(seed data)**: 테스트가 시작할 때 미리 넣어 두는 데이터입니다.
-- **느린 테스트 마커**: 기본 실행에서 제외할 수 있도록 붙이는 태그입니다.
+| 용어 | 의미 |
+|------|------|
+| 통합 테스트 | 두 개 이상 컴포넌트를 함께 실행해 검증하는 테스트 |
+| 테스트 컨테이너 | 테스트용 DB나 Redis를 컨테이너로 잠깐 띄우는 방식 |
+| 테스트 데이터베이스 | 운영 DB와 분리된 전용 데이터베이스 |
+| 시드 데이터 | 테스트가 시작할 때 미리 넣어 두는 데이터 |
+| 느린 테스트 마커 | 기본 실행에서 제외할 수 있도록 붙이는 태그 |
 
-## 바꾸기 전과 후
+## 단위 테스트만 있는 상태 vs 통합 테스트를 추가한 상태
 
-**바꾸기 전 — 단위 테스트만 있는 상태**
+**단위 테스트만 있는 상태**
 
 ```text
 - 함수 단위 테스트 100개 통과
 - 실제 배포 뒤 DB 컬럼 누락으로 500 오류 발생
+- 원인: 마이그레이션에 신규 컬럼 반영 누락
 ```
 
-**바꾼 뒤 — 통합 테스트를 추가한 상태**
+**통합 테스트를 추가한 상태**
 
 ```text
 - 단위 테스트 100개
 - POST /users 통합 테스트 5개 (실제 DB 사용)
 - 스키마 공백을 배포 전에 CI에서 발견
+- 컬럼 누락으로 인한 인서트 실패 → CI가 차단
 ```
 
-단위 테스트가 쓸모없다는 뜻은 아닙니다. 다만 부품 검수만으로 조립 불량을 막을 수 없다는 뜻입니다. 통합 테스트는 상위 계층에서 조립 상태를 한 번 더 확인합니다.
+단위 테스트가 쓸모없다는 뜻이 아닙니다. 부품 검수만으로 조립 불량을 막을 수 없다는 뜻입니다. 통합 테스트는 상위 계층에서 조립 상태를 한 번 더 확인합니다.
 
-## 인메모리 데이터베이스와 실제 데이터베이스 선택
-
-통합 테스트에서 데이터베이스를 어떻게 준비할지는 자주 논쟁이 됩니다. 속도를 택하면 인메모리 DB를, 신뢰성을 택하면 실제 DB를 씁니다.
+## 인메모리 DB와 실제 DB 선택 기준
 
 | 기준 | 인메모리 DB (SQLite) | 실제 DB (Postgres, MySQL) |
 |---|---|---|
@@ -88,7 +90,7 @@ last_reviewed: '2026-05-12'
 
 대부분의 팀은 개발 중에는 SQLite로 빠르게 돌리고, CI에서는 실제 DB를 띄워 운영 환경과의 차이를 검증합니다. 둘 중 하나만 고르지 말고 상황에 따라 바꿀 수 있게 만드는 편이 좋습니다.
 
-## 패스트에이피아이 테스트클라이언트와 에이치티티피엑스
+## FastAPI TestClient로 HTTP 계층 검증하기
 
 FastAPI의 `TestClient`는 내부에서 `httpx`를 씁니다. 실제 HTTP 요청을 만들지 않고도 ASGI 인터페이스를 직접 호출하므로, 네트워크 오버헤드 없이 라우팅과 미들웨어까지 검증할 수 있습니다.
 
@@ -98,17 +100,26 @@ from src.app import app
 
 client = TestClient(app)
 
-def test_post_with_headers():
+def test_create_user_returns_id_and_email():
     res = client.post(
         "/users",
-        json={"email": "a@b.com"},
-        headers={"Authorization": "Bearer token"}
+        json={"email": "a@b.com", "name": "Alice"},
     )
-    assert res.status_code == 200
-    assert "id" in res.json()
+    assert res.status_code == 201
+    body = res.json()
+    assert "id" in body
+    assert body["email"] == "a@b.com"
+
+def test_create_user_with_auth_header():
+    res = client.post(
+        "/users",
+        json={"email": "admin@b.com"},
+        headers={"Authorization": "Bearer test-token"}
+    )
+    assert res.status_code == 201
 ```
 
-이 방식은 단위 테스트보다는 느리지만, 실제 서버를 띄우는 것보다는 빠릅니다. 인증 헤더, 쿠키, 쿼리 파라미터까지 모두 검증할 수 있어, API 계약 테스트로 쓰기에 적합합니다.
+이 방식은 단위 테스트보다는 느리지만, 실제 서버를 띄우는 것보다는 빠릅니다. 인증 헤더, 쿠키, 쿼리 파라미터까지 모두 검증할 수 있어 API 계약 테스트로 쓰기에 적합합니다.
 
 ## 테스트 격리 — 트랜잭션 롤백 패턴
 
@@ -128,40 +139,35 @@ def reset_db():
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
     yield
+    # 정리는 다음 테스트의 drop_all이 처리
 ```
 
-더 빠른 방법은 트랜잭션 안에서 테스트를 실행하고 끝에 롤백하는 것입니다. Django는 `TransactionTestCase`, SQLAlchemy는 fixture로 이를 지원합니다. 다만 롤백 패턴은 중첩 트랜잭션이나 `COMMIT`을 호출하는 코드와 충돌할 수 있으므로, 팀 상황에 맞게 고르는 것이 좋습니다.
-
-## 테스트 컨테이너로 실제 데이터베이스 띄우기
-
-인메모리 DB로 충분하지 않을 때는 Docker 컨테이너로 실제 DB를 잠깐 띄울 수 있습니다. `testcontainers-python`을 쓰면 테스트 시작 시 Postgres를 자동으로 올리고, 끝나면 내립니다.
+더 빠른 방법은 트랜잭션 안에서 테스트를 실행하고 끝에 롤백하는 것입니다.
 
 ```python
-import pytest
-from testcontainers.postgres import PostgresContainer
-from sqlalchemy import create_engine
-
-@pytest.fixture(scope="session")
-def postgres():
-    with PostgresContainer("postgres:15") as pg:
-        yield pg.get_connection_url()
-
-def test_user_creation_with_real_db(postgres):
-    engine = create_engine(postgres)
-    # 실제 Postgres 테스트 진행
+@pytest.fixture
+def db_session():
+    connection = engine.connect()
+    transaction = connection.begin()
+    session = Session(bind=connection)
+    yield session
+    session.close()
+    transaction.rollback()
+    connection.close()
 ```
 
-이 방식은 로컬과 CI에서 모두 같은 환경을 만들 수 있어 운영 DB와의 차이를 미리 잡습니다. 다만 컨테이너 시작 시간이 수 초 걸리므로, 자주 돌리는 테스트보다는 CI 전용 검증에 더 적합합니다.
+롤백 패턴은 중첩 트랜잭션이나 `COMMIT`을 호출하는 코드와 충돌할 수 있으므로, 팀 상황에 맞게 고르는 것이 좋습니다.
 
-## 다섯 단계로 패스트에이피아이와 스큐엘라이트 붙여 보기
+## 다섯 단계로 FastAPI와 SQLite 통합 테스트 만들기
 
 ### 1단계 — 테스트 대상 코드 준비
 
 ```python
 # src/app.py
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.exc import IntegrityError
 
 Base = declarative_base()
 engine = create_engine("sqlite:///./test.db", future=True)
@@ -171,26 +177,34 @@ class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
     email = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False, default="")
 
 Base.metadata.create_all(engine)
 app = FastAPI()
 
-@app.post("/users")
-def create_user(email: str):
+@app.post("/users", status_code=201)
+def create_user(email: str, name: str = ""):
     with Session() as s:
-        u = User(email=email)
-        s.add(u); s.commit(); s.refresh(u)
-        return {"id": u.id, "email": u.email}
+        try:
+            u = User(email=email, name=name)
+            s.add(u)
+            s.commit()
+            s.refresh(u)
+            return {"id": u.id, "email": u.email}
+        except IntegrityError:
+            raise HTTPException(status_code=409, detail="Email already exists")
 ```
 
 ### 2단계 — 테스트 클라이언트 준비
 
 ```python
-# tests/test_users_integration.py
+# tests/integration/test_users.py
+import pytest
 from fastapi.testclient import TestClient
 from src.app import app, Base, engine
 
-def setup_function():
+@pytest.fixture(autouse=True)
+def reset_db():
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
@@ -201,30 +215,31 @@ client = TestClient(app)
 
 ```python
 def test_create_user_returns_201_and_persists():
-    res = client.post("/users", params={"email": "a@b.com"})
-    assert res.status_code == 200
+    res = client.post("/users", params={"email": "a@b.com", "name": "Alice"})
+    assert res.status_code == 201
     body = res.json()
     assert body["email"] == "a@b.com"
+    assert "id" in body
 ```
 
 ### 4단계 — 중복 입력 실패 확인
 
 ```python
-def test_duplicate_email_fails():
+def test_duplicate_email_returns_409():
     client.post("/users", params={"email": "a@b.com"})
     res = client.post("/users", params={"email": "a@b.com"})
-    assert res.status_code in (400, 409, 500)  # 정책이 무엇이든 실패해야 함
+    assert res.status_code == 409
+    assert "already exists" in res.json()["detail"]
 ```
 
 ### 5단계 — 느린 테스트 분리
 
 ```python
-import pytest
-
 @pytest.mark.slow
 def test_large_batch_insert():
-    for i in range(1000):
-        client.post("/users", params={"email": f"u{i}@e.com"})
+    for i in range(500):
+        res = client.post("/users", params={"email": f"u{i}@example.com"})
+        assert res.status_code == 201
 ```
 
 ```bash
@@ -232,99 +247,115 @@ pytest -m "not slow"   # 기본 실행
 pytest -m slow         # 야간 실행
 ```
 
+## 테스트 컨테이너로 실제 Postgres 띄우기
+
+인메모리 DB로 충분하지 않을 때는 Docker 컨테이너로 실제 DB를 잠깐 띄울 수 있습니다. `testcontainers-python`을 쓰면 테스트 시작 시 Postgres를 자동으로 올리고, 끝나면 내립니다.
+
+```python
+import pytest
+from testcontainers.postgres import PostgresContainer
+from sqlalchemy import create_engine, text
+
+@pytest.fixture(scope="session")
+def postgres_url():
+    with PostgresContainer("postgres:15") as pg:
+        yield pg.get_connection_url()
+
+@pytest.fixture
+def pg_engine(postgres_url):
+    engine = create_engine(postgres_url)
+    Base.metadata.create_all(engine)
+    yield engine
+    Base.metadata.drop_all(engine)
+    engine.dispose()
+
+def test_user_creation_with_real_postgres(pg_engine):
+    with pg_engine.connect() as conn:
+        conn.execute(text("INSERT INTO users (email) VALUES ('pg@test.com')"))
+        conn.commit()
+        result = conn.execute(text("SELECT email FROM users WHERE email='pg@test.com'"))
+        assert result.fetchone()[0] == "pg@test.com"
+```
+
+이 방식은 로컬과 CI에서 모두 같은 환경을 만들 수 있어 운영 DB와의 차이를 미리 잡습니다. 다만 컨테이너 시작 시간이 수 초 걸리므로, 자주 돌리는 테스트보다는 CI 전용 검증에 더 적합합니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 각 테스트 전에 스키마를 다시 만들어 상태를 분리합니다.
 - HTTP 호출과 DB 저장이 함께 실행되므로 라우팅과 영속화가 동시에 검증됩니다.
 - 느린 테스트를 마커로 분리해 일상 개발 흐름을 지키고 있습니다.
+- 중복 입력 실패는 구체적인 상태 코드(409)로 고정합니다.
 
-통합 테스트에서 가장 중요한 성질은 상태 분리입니다. 테스트 순서에 따라 통과 여부가 달라지면 신뢰할 수 없습니다. 그래서 통합 테스트는 실제 의존을 붙이더라도 시작 상태를 반복 가능하게 관리해야 합니다.
+통합 테스트에서 가장 중요한 성질은 상태 분리입니다. 테스트 순서에 따라 통과 여부가 달라지면 신뢰할 수 없습니다.
 
-## 어디서 자주 헷갈릴까요?
+## 자주 하는 실수
 
-첫 번째 실수는 운영 데이터베이스에 테스트를 연결하는 일입니다. 가장 위험한 안티패턴입니다. 테스트는 항상 전용 DB를 써야 합니다.
-
-두 번째 실수는 통합 테스트를 쓴다고 하면서 DB까지 모두 목(mock)으로 대체하는 경우입니다. 그러면 연결 지점에서 생기는 문제를 검증하지 못합니다. 외부 결제망처럼 비용이 큰 의존은 대역으로 바꿀 수 있지만, 검증하려는 경계를 지나치게 지워 버리면 통합 테스트의 의미가 줄어듭니다.
-
-세 번째 실수는 모든 통합 테스트를 매번 돌려 PR 시간을 30분 이상으로 늘리는 경우입니다. 느린 테스트를 구분하고 실행 계층을 나누는 운영 감각이 필요합니다.
+| 실수 | 증상 | 올바른 접근 |
+|------|------|------------|
+| 운영 DB에 테스트 연결 | 실제 데이터 오염, 운영 환경에 영향 | 전용 테스트 DB 또는 인메모리 DB 사용 |
+| 모든 의존을 mock으로 대체 | 경계 문제를 검증하지 못함 | 검증하려는 경계는 실제 의존 포함 |
+| 테스트 간 상태 누적 | 순서를 바꾸면 실패 | `autouse` fixture로 상태 초기화 |
+| 모든 통합 테스트를 PR마다 실행 | CI 30분 이상으로 병목 | 마커로 계층 분리, 느린 것은 야간 잡 |
+| 실패 상태 코드를 넓게 허용 | 회귀가 생겨도 초록색 유지 | 단일 실패 정책으로 좁게 고정 |
+| 시드 데이터 없이 빈 DB에서 조회 | 조회 결과가 빈 것과 오류를 구분 못함 | 필요한 시드 데이터를 fixture에서 명시적으로 삽입 |
 
 ## 직접 검증해 볼 것
 
 1. 첫 번째 `POST /users` 호출 뒤에 실제로 `users` 테이블에 한 행이 생겼는지 조회해 봅니다. HTTP 응답만 보고 끝내면 저장 계층 오류를 놓칠 수 있습니다.
-2. 같은 이메일을 두 번 보냈을 때 어떤 상태 코드로 실패시킬지 팀 정책을 정하고, 테스트도 그 정책에 맞춰 좁혀 둡니다. `400, 409, 500`처럼 넓은 허용 범위는 경고 신호입니다.
+2. 같은 이메일을 두 번 보냈을 때 정확히 409가 반환되는지 확인합니다. `400, 409, 500`처럼 넓은 허용 범위는 경고 신호입니다.
 3. `pytest -m "not slow"`와 `pytest -m slow`를 각각 실행해, 빠른 기본 경로와 무거운 검증 경로가 실제로 분리되는지 확인합니다.
 
 **예상 결과:** 정상 경로에서는 사용자 생성과 영속화가 모두 확인되고, 중복 입력은 팀이 정한 단일 실패 정책으로 고정되어야 합니다.
 
-## 심화 실습: 운영 관점 테스트 점검
+## CI에서 통합 테스트 실행하기
 
-실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
+통합 테스트는 DB 서비스가 필요하므로 CI 구성이 단위 테스트보다 복잡합니다.
 
-또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
+```yaml
+name: integration-test
+on:
+  pull_request:
 
-fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
-회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
-
-커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
-
-CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
-
-실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
-
-또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
-
-fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
-
-회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
-
-커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
-
-CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
-
-실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
-
-또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
-
-fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
-
-회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
-
-커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
-
-CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
-
-실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
-
-```python
-from unittest.mock import patch
-
-def test_payment_service_retries_once_on_timeout():
-    service = PaymentService()
-    with patch('src.payment.client.charge') as charge:
-        charge.side_effect = [TimeoutError(), {'status': 'ok'}]
-        result = service.pay(user_id='u-1', amount=10000)
-
-    assert result['status'] == 'ok'
-    assert charge.call_count == 2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - run: pip install -r requirements-dev.txt
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
+        run: pytest tests/integration -q -m "not slow"
 ```
 
-```bash
-pytest -q --maxfail=1 --disable-warnings
-pytest --cov=src --cov-report=term-missing
-```
+`services` 블록은 잡이 시작할 때 자동으로 Postgres 컨테이너를 띄우고, 잡이 끝나면 내립니다.
 
-## 실패 신호와 첫 점검
-
-- 테스트가 운영 DB 연결 문자열을 재사용하면 가장 먼저 실행을 멈추고 격리 환경부터 분리해야 합니다.
-- 테스트 순서를 바꿨을 때만 실패하면 스키마 재생성이나 시드 데이터 정리가 부족한 경우가 많습니다.
-- 실패 상태 코드를 너무 느슨하게 허용하면 회귀가 생겨도 테스트가 초록색으로 남을 수 있습니다.
-
-## 실무에서는 이렇게 생각합니다
+## 운영 관점에서 생각하기
 
 대부분의 백엔드 팀은 핵심 시나리오에 대해 실제 DB를 붙인 통합 테스트를 유지합니다. Postgres와 testcontainers 조합이 자주 쓰이고, 외부 API는 VCR이나 목 서버로 대체하는 식으로 경계를 조정합니다.
 
 경험 많은 엔지니어는 통합 테스트를 많이 쓰는 것보다 어디를 붙여 볼지 신중하게 고릅니다. 모든 조합을 다 검증하려고 들면 느리고 비싼 테스트 묶음만 남습니다. 사고가 자주 나는 경계, 계약이 자주 바뀌는 지점, 권한과 상태 전이가 만나는 지점부터 우선순위를 줍니다.
+
+테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다. 실패한 요청의 응답 본문을 출력하는 것이 디버깅 시간을 크게 줄입니다.
 
 ## 운영 체크리스트
 
@@ -332,27 +363,18 @@ pytest --cov=src --cov-report=term-missing
 - [ ] 각 테스트가 깨끗한 상태에서 시작합니다.
 - [ ] 느린 테스트를 마커나 별도 잡으로 분리했습니다.
 - [ ] 정상 경로뿐 아니라 실패 경로도 최소 한 개 포함했습니다.
+- [ ] CI에서 테스트 전용 DB를 사용합니다.
 
 ## 연습 문제
 
-1. `GET /users` 라우트를 추가하고 통합 테스트 두 개를 작성해 보세요.
-2. 잘못된 입력에 대해 400 응답을 확인하는 테스트를 추가해 보세요.
+1. `GET /users/{id}` 라우트를 추가하고 존재하는 ID와 없는 ID에 대한 통합 테스트를 각각 작성해 보세요.
+2. 잘못된 입력(이메일 형식 오류)에 대해 422 응답을 확인하는 테스트를 추가해 보세요.
 3. 테스트 실행 순서를 바꿔도 통과하는지 확인해 보세요.
+4. `@pytest.mark.slow`를 붙인 테스트를 만들고 `-m "not slow"` 실행에서 제외되는지 확인하세요.
 
 ## 정리
 
 통합 테스트는 부품이 아니라 연결 상태를 봅니다. 단위 테스트가 맞더라도 경계에서는 문제가 생길 수 있기 때문에, 실제 의존을 붙여 보는 검증이 필요합니다. 다음 글에서는 사용자 화면까지 포함해 가장 현실에 가까운 신호를 주는 E2E 테스트를 다루겠습니다.
-
-## 처음 질문으로 돌아가기
-
-- **통합 테스트는 무엇을 함께 검증할까요?**
-  - FastAPI의 `TestClient`는 내부에서 `httpx`를 씁니다. 실제 HTTP 요청을 만들지 않고도 ASGI 인터페이스를 직접 호출하므로, 네트워크 오버헤드 없이 라우팅과 미들웨어까지 검증할 수 있습니다.
-- **실제 DB나 HTTP 계층은 왜 붙여 봐야 할까요?**
-  - 통합 테스트에서 데이터베이스를 어떻게 준비할지는 자주 논쟁이 됩니다. 속도를 택하면 인메모리 DB를, 신뢰성을 택하면 실제 DB를 씁니다.
-- **테스트 컨테이너와 픽스처는 어떤 상황에서 유용할까요?**
-  - FastAPI의 `TestClient`는 내부에서 `httpx`를 씁니다. 실제 HTTP 요청을 만들지 않고도 ASGI 인터페이스를 직접 호출하므로, 네트워크 오버헤드 없이 라우팅과 미들웨어까지 검증할 수 있습니다.
-  - 이 그림에서 중요한 지점은 테스트 대상이 함수 하나가 아니라 흐름이라는 사실입니다. 라우트, 서비스, 저장소, 데이터베이스가 함께 맞물릴 때 어떤 응답이 나오는지 봅니다. 그래서 통합 테스트는 로직 검증과 계약 검증을 동시에 수행합니다.
-  - 단위 테스트가 쓸모없다는 뜻은 아닙니다. 다만 부품 검수만으로 조립 불량을 막을 수 없다는 뜻입니다. 통합 테스트는 상위 계층에서 조립 상태를 한 번 더 확인합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
