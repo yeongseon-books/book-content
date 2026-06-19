@@ -30,8 +30,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 Frontend Development 101 시리즈의 여섯 번째 글입니다. 여기서는 프론트엔드의 비동기 흐름을 상태 중심으로 설명합니다. 비동기 코드는 결국 로딩, 성공, 실패라는 상태를 얼마나 명시적으로 다루느냐의 문제입니다.
 
-프론트엔드는 거의 항상 서버와 대화합니다. 사용자 목록을 불러오고 검색 결과를 받고 저장 버튼을 누르면 데이터를 전송합니다. 문제는 이 모든 일이 즉시 끝나지 않는다는 데 있습니다. 네트워크는 느릴 수 있고 실패할 수 있으며 요청 순서가 뒤집힐 수도 있습니다.
-
 ![Frontend Development 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/06/06-01-diagram.ko.png)
 *Frontend Development 101 6장 흐름 개요*
 
@@ -45,13 +43,7 @@ last_reviewed: '2026-05-12'
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
-프론트엔드 버그의 큰 비중은 비동기 처리에서 나옵니다. 빠른 사내 와이파이에서는 잘 보이지 않다가 실제 사용자의 느린 네트워크에서만 터지는 경우가 많습니다. 그래서 비동기 로직은 낙관보다 명시적 상태 관리가 더 중요합니다.
-
-좋은 비동기 코드는 최선의 네트워크가 아니라 최악의 네트워크를 기준으로 설계합니다. 느릴 때 무엇을 보여 줄지, 실패했을 때 어디까지 복구할지, 오래된 응답이 늦게 도착하면 어떻게 무시할지를 미리 정해야 합니다.
-
 ## 개념 한눈에 보기
-
-이 네 가지 상태를 그려 놓고 시작하면 비동기 UI 설계가 훨씬 선명해집니다. 로딩 전, 로딩 중, 성공, 실패를 모두 다른 화면 상태로 다뤄야 합니다.
 
 | 용어 | 뜻 | 실무에서 왜 중요한가 |
 |---|---|---|
@@ -61,42 +53,71 @@ last_reviewed: '2026-05-12'
 | AbortController | 진행 중인 요청을 취소하는 도구입니다. | 화면 전환이나 빠른 입력에서 오래된 요청이 덮어쓰는 문제를 막습니다. |
 | Stale-while-revalidate | 캐시된 데이터를 먼저 보여 주고 뒤에서 새로 고치는 전략입니다. | 체감 속도를 높이면서도 최신 데이터를 다시 받아오는 균형점을 제공합니다. |
 
-## 콜백 중심 비동기에서 상태 중심 비동기로
-
-비동기 UI의 핵심은 문법이 아니라 상태 관리입니다. 로딩, 성공, 실패를 각각 다른 화면 상태로 다뤄야 사용자가 현재 상황을 이해할 수 있고, 개발자도 버그를 재현하기 쉬워집니다.
-
-| 방식 | 코드 특징 | 실무 영향 |
-|---|---|---|
-| 콜백 중첩 중심 흐름 | 제어 흐름과 상태 분기가 여러 곳에 흩어집니다. | 예외 처리와 취소 로직이 뒤늦게 붙으며 복잡도가 빠르게 올라갑니다. |
-| `async/await` + 명시적 상태 | 흐름을 위에서 아래로 읽고 화면 상태를 분리합니다. | 네트워크 지연, 에러, 요청 취소를 한 모델 안에서 다루기 쉬워집니다. |
+## fetch 기본 패턴
 
 **Before (콜백 지옥)**
 
 ```javascript
-fetch(url, (res) => {
-  parse(res, (data) => {
-    render(data, (e) => { ... });
+fetch("/api/users")
+  .then(function(res) {
+    return res.json();
+  })
+  .then(function(data) {
+    renderUsers(data);
+  })
+  .catch(function(err) {
+    console.error(err); // 사용자는 여전히 빈 화면
   });
-});
 ```
 
-**After (async/await)**
+**After (async/await + 명시적 에러 처리)**
 
 ```javascript
-const res = await fetch(url);
-const data = await res.json();
-render(data);
+async function loadUsers() {
+  const res = await fetch("/api/users");
+
+  // fetch는 4xx/5xx에서 reject하지 않음 → 직접 확인 필요
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  }
+
+  return res.json();
+}
 ```
 
-문법을 바꾸는 목적은 코드를 멋있게 만드는 것이 아니라, 사용자에게 보이는 로딩과 실패 상태를 더 정확하게 다루기 위해서입니다.
+## 비동기 상태 모델: 4가지 상태
+
+```javascript
+// 비동기 UI는 항상 4가지 상태를 가집니다.
+const states = {
+  idle:    { status: "idle"    },
+  loading: { status: "loading" },
+  success: { status: "success", data: null },
+  error:   { status: "error",   error: null },
+};
+
+// 상태 기계로 생각하면 전이가 명확해집니다.
+// idle → loading → success
+//              ↘ error
+```
 
 ## 실습: 사용자 목록을 5단계로 만들기
 
 ### 1단계 — Plain fetch
 
 ```javascript
-async function loadUsers() {
-  const res = await fetch("/api/users");
+// api/users.js - API 클라이언트를 컴포넌트 밖으로 분리
+const BASE_URL = "https://jsonplaceholder.typicode.com";
+
+export async function fetchUsers() {
+  const res = await fetch(`${BASE_URL}/users`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+export async function fetchUser(id) {
+  const res = await fetch(`${BASE_URL}/users/${id}`);
+  if (!res.ok) throw new Error(`사용자 ${id}를 찾을 수 없습니다`);
   return res.json();
 }
 ```
@@ -104,109 +125,300 @@ async function loadUsers() {
 ### 2단계 — Use it from React
 
 ```jsx
+// 최소 버전: 에러/로딩 미처리
 function Users() {
   const [users, setUsers] = useState([]);
-  useEffect(() => { loadUsers().then(setUsers); }, []);
-  return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+
+  useEffect(() => {
+    fetchUsers().then(setUsers);
+  }, []);
+
+  return (
+    <ul>
+      {users.map(u => <li key={u.id}>{u.name}</li>)}
+    </ul>
+  );
 }
 ```
 
 ### 3단계 — Loading and error states
 
 ```jsx
+// 상태 기계 패턴으로 4가지 상태 명시적 처리
 function Users() {
   const [state, setState] = useState({ status: "idle" });
+
   useEffect(() => {
     setState({ status: "loading" });
-    loadUsers()
+
+    fetchUsers()
       .then(data => setState({ status: "success", data }))
-      .catch(err => setState({ status: "error", err }));
+      .catch(err  => setState({ status: "error",   error: err }));
   }, []);
 
-  if (state.status === "loading") return <p>Loading...</p>;
-  if (state.status === "error")   return <p>Error: {state.err.message}</p>;
-  return <ul>{state.data.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+  // 상태에 따라 다른 UI 반환
+  if (state.status === "loading") {
+    return (
+      <div role="status" aria-live="polite">
+        <p>사용자 목록 로딩 중...</p>
+      </div>
+    );
+  }
+
+  if (state.status === "error") {
+    return (
+      <div role="alert">
+        <p>오류가 발생했습니다: {state.error.message}</p>
+        <button onClick={() => setState({ status: "idle" })}>다시 시도</button>
+      </div>
+    );
+  }
+
+  if (state.status !== "success") return null;
+
+  return (
+    <ul>
+      {state.data.map(u => (
+        <li key={u.id}>
+          <strong>{u.name}</strong> — {u.email}
+        </li>
+      ))}
+    </ul>
+  );
 }
 ```
 
 ### 4단계 — Cancel on unmount
 
 ```jsx
-useEffect(() => {
-  const ctrl = new AbortController();
-  fetch("/api/users", { signal: ctrl.signal })
-    .then(r => r.json()).then(setUsers)
-    .catch(e => e.name !== "AbortError" && console.error(e));
-  return () => ctrl.abort();
-}, []);
+function Users() {
+  const [state, setState] = useState({ status: "loading" });
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+
+    fetch("https://jsonplaceholder.typicode.com/users", {
+      signal: ctrl.signal,
+    })
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(data => setState({ status: "success", data }))
+      .catch(err => {
+        // AbortError는 컴포넌트 언마운트로 인한 의도적 취소
+        if (err.name !== "AbortError") {
+          setState({ status: "error", error: err });
+        }
+      });
+
+    // 클린업: 컴포넌트가 사라지면 요청 취소
+    return () => ctrl.abort();
+  }, []);
+
+  // 렌더링 로직...
+}
 ```
 
 ### 5단계 — Compress all of it with React Query
 
 ```jsx
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 function Users() {
-  const { data, isLoading, error } = useQuery({
+  const queryClient = useQueryClient();
+
+  // 자동 캐싱, 재시도, 백그라운드 갱신
+  const { data: users, isLoading, error, refetch } = useQuery({
     queryKey: ["users"],
-    queryFn: loadUsers,
+    queryFn: fetchUsers,
+    staleTime: 5 * 60 * 1000,  // 5분간 신선한 데이터로 취급
+    retry: 2,                   // 실패 시 2번 재시도
   });
-  if (isLoading) return <p>Loading...</p>;
-  if (error)     return <p>Error</p>;
-  return <ul>{data.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+
+  // 뮤테이션: 데이터 변경 후 자동 캐시 무효화
+  const deleteUser = useMutation({
+    mutationFn: (id) => fetch(`/api/users/${id}`, { method: "DELETE" }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
+  });
+
+  if (isLoading) return <p>로딩 중...</p>;
+  if (error)     return <p>오류: {error.message} <button onClick={refetch}>재시도</button></p>;
+
+  return (
+    <ul>
+      {users.map(u => (
+        <li key={u.id}>
+          {u.name}
+          <button onClick={() => deleteUser.mutate(u.id)}>삭제</button>
+        </li>
+      ))}
+    </ul>
+  );
 }
 ```
 
-실무에서 중요한 포인트는 3단계와 4단계입니다. 데이터를 받아오는 코드 자체보다 로딩과 실패를 어떻게 보여 주는지, 그리고 컴포넌트가 사라질 때 오래된 요청이 남지 않게 처리하는지가 안정성을 좌우합니다.
+## Race Condition 처리
 
-## 검증 포인트
+```jsx
+// 문제: 검색어를 빠르게 입력하면 이전 요청 결과가 나중에 도착해
+//       최신 검색어와 다른 결과를 보여줄 수 있음
+function Search() {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
 
-- 정상 API에서는 로딩 메시지 뒤에 목록이 나오고, 잘못된 엔드포인트에서는 사용자에게 에러가 보이는지 확인합니다.
-- Slow 3G로 바꾼 뒤에도 로딩 상태가 비어 있지 않고, 화면 이동 시 오래된 요청이 정리되는지 확인합니다.
+  useEffect(() => {
+    if (!query) {
+      setResults([]);
+      return;
+    }
 
-## 문제가 생기면 먼저 볼 것
+    const ctrl = new AbortController();
+    let isActive = true;
 
-- 에러가 화면에 안 보이면 `res.ok` 검사와 `catch` 분기가 실제 렌더링으로 이어지는지 확인합니다.
-- 이전 응답이 덮어쓰면 `AbortController` cleanup이나 최신 요청만 반영하는 분기가 있는지 봅니다.
+    fetchSearch(query, ctrl.signal)
+      .then(data => {
+        // 이 요청이 아직 최신인지 확인
+        if (isActive) setResults(data);
+      })
+      .catch(err => {
+        if (err.name !== "AbortError" && isActive) {
+          console.error("검색 오류:", err);
+        }
+      });
+
+    return () => {
+      isActive = false;  // 이전 요청 결과 무시
+      ctrl.abort();       // 진행 중인 요청 취소
+    };
+  }, [query]);
+
+  return (
+    <div>
+      <input
+        value={query}
+        onChange={e => setQuery(e.target.value)}
+        placeholder="검색어..."
+      />
+      <ul>
+        {results.map(r => <li key={r.id}>{r.title}</li>)}
+      </ul>
+    </div>
+  );
+}
+```
+
+## 디버깅 시나리오
+
+### 시나리오 1: 에러가 화면에 안 보일 때
+
+```javascript
+// 잘못된 패턴: fetch의 4xx/5xx를 자동으로 catch하지 않음
+try {
+  const res = await fetch("/api/users");
+  const data = await res.json();
+  setUsers(data);
+} catch (err) {
+  console.error(err); // 네트워크 오류만 여기에 옴
+}
+
+// 올바른 패턴
+try {
+  const res = await fetch("/api/users");
+  if (!res.ok) throw new Error(`HTTP ${res.status}`); // 4xx/5xx 직접 throw
+  const data = await res.json();
+  setUsers(data);
+} catch (err) {
+  setError(err); // 화면에 표시
+}
+```
+
+### 시나리오 2: 이전 응답이 최신 상태를 덮어쓸 때
+
+```bash
+# DevTools → Network → 요청 목록에서 순서 확인
+# 빠른 검색 입력 시 느린 요청이 나중에 완료되는지 확인
+# → AbortController로 이전 요청 취소 구현 필요
+```
+
+### 시나리오 3: Slow 3G에서 테스트
+
+```
+DevTools → Network 탭
+→ 우측 상단 "No throttling" 드롭다운
+→ Slow 3G 선택
+→ 로딩 상태가 제대로 보이는지 확인
+→ 오류 상태를 보려면 "Offline" 선택
+```
 
 ## 실무 점검 루프
-
-비동기 UI 버그는 네트워크 결과와 화면 상태 머신을 같이 보면 훨씬 덜 모호합니다.
 
 1. **요청 결과를 봅니다.** UI를 고치기 전에 Network 탭에서 상태 코드, 응답 본문, 지연 시간을 먼저 확인합니다.
 2. **가시 상태를 봅니다.** 로딩, 성공, 실패가 모두 서로 다른 화면 상태로 렌더링되는지 확인합니다.
 3. **경쟁 상태를 봅니다.** 빠르게 타이핑하거나 화면을 떠날 때 오래된 응답이 최신 상태를 덮어쓰지 않는지 확인합니다.
 
 ```bash
+# API 직접 테스트
 curl -i https://jsonplaceholder.typicode.com/users
 ```
 
-```javascript
-const res = await fetch("/api/users");
-if (!res.ok) throw new Error(`HTTP ${res.status}`);
-```
+## 자주 하는 실수
 
-기대 결과는 문제를 "전송 문제인지, 응답 검증 문제인지, 상태 갱신 문제인지, 취소 누락 문제인지"로 바로 부를 수 있는 상태입니다. 이렇게 봐야 `fetch` 하나에 모든 원인을 뭉뚱그리지 않게 됩니다.
-
-## 이 코드에서 주목할 점
-
-- 상태가 `idle/loading/success/error`로 명확히 드러납니다.
-- 컴포넌트가 unmount될 때 요청을 취소합니다.
-- React Query는 캐싱, 재시도, race condition 대응까지 한 번에 맡아줍니다.
-
-## 자주 하는 실수 5가지
-
-1. **로딩 상태를 생략합니다.** 사용자는 앱이 멈췄다고 느낍니다.
-2. **에러를 콘솔에만 남깁니다.** 사용자 입장에서는 이유 없는 빈 화면만 보게 됩니다.
-3. **race condition을 무시합니다.** 빠르게 입력한 검색에서 오래된 결과가 마지막에 덮어쓸 수 있습니다.
-4. **같은 데이터를 여러 컴포넌트가 각각 다시 불러옵니다.** 한 리소스를 여러 번 중복 요청하게 됩니다.
-5. **캐시 무효화 전략이 없습니다.** 새 데이터가 있어도 오래된 화면이 계속 남습니다.
+| 실수 | 증상 | 올바른 방법 |
+|---|---|---|
+| 로딩 상태 생략 | 사용자가 앱이 멈췄다고 느낌 | `status: "loading"` 상태 항상 구현 |
+| 에러를 콘솔에만 기록 | 이유 없는 빈 화면, 사용자는 원인 모름 | 에러 상태를 화면에 친절하게 표시 |
+| Race condition 무시 | 빠른 검색에서 오래된 결과가 마지막에 덮어씀 | AbortController + isActive 패턴 적용 |
+| 같은 데이터를 여러 컴포넌트가 각각 요청 | 동일 리소스를 중복 요청 | React Query/SWR 캐싱 활용 |
+| `res.ok` 검사 없이 `res.json()` 호출 | 4xx/5xx 응답이 에러로 처리 안 됨 | `if (!res.ok) throw new Error(...)` |
+| 캐시 무효화 전략 없음 | 오래된 데이터가 계속 화면에 남음 | 뮤테이션 후 `invalidateQueries` 호출 |
 
 ## 실무에서는 이렇게 보입니다
 
-현대 React 앱은 대부분 TanStack Query나 SWR을 표준처럼 사용합니다. Vue는 composable과 상태 관리 조합을 쓰고, Svelte는 내장 load 함수로 이 문제를 단순화합니다. 손으로 일일이 fetch 상태를 관리하는 코드는 학습 단계 이후 점점 줄어드는 편입니다.
+현대 React 앱은 대부분 TanStack Query나 SWR을 표준처럼 사용합니다.
 
-그렇더라도 기본 원리는 사라지지 않습니다. 도구를 쓰든 직접 쓰든 비동기 UI는 상태 기계로 이해해야 합니다.
+```jsx
+// TanStack Query로 구현한 완전한 CRUD 예시
+function NotesPage() {
+  const queryClient = useQueryClient();
+
+  const { data: notes = [], isLoading } = useQuery({
+    queryKey: ["notes"],
+    queryFn: () => fetch("/api/notes").then(r => r.json()),
+  });
+
+  const createNote = useMutation({
+    mutationFn: (title) =>
+      fetch("/api/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+      }).then(r => r.json()),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notes"] }),
+  });
+
+  const deleteNote = useMutation({
+    mutationFn: (id) => fetch(`/api/notes/${id}`, { method: "DELETE" }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notes"] }),
+  });
+
+  if (isLoading) return <p>로딩 중...</p>;
+
+  return (
+    <div>
+      <button onClick={() => createNote.mutate("새 노트")}>노트 추가</button>
+      <ul>
+        {notes.map(n => (
+          <li key={n.id}>
+            {n.title}
+            <button onClick={() => deleteNote.mutate(n.id)}>삭제</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
 
 ## 시니어 엔지니어는 이렇게 생각합니다
 
@@ -223,12 +435,14 @@ if (!res.ok) throw new Error(`HTTP ${res.status}`);
 - [ ] `AbortController`를 한 번 사용해 봤습니다.
 - [ ] React Query나 SWR을 직접 써 봤습니다.
 - [ ] Slow 3G 환경에서 동작을 점검해 봤습니다.
+- [ ] `res.ok` 검사를 항상 추가하고 있습니다.
 
 ## 연습 문제
 
 1. `https://jsonplaceholder.typicode.com/users`를 호출해 사용자 목록을 렌더링해 보세요.
 2. 로딩 상태와 에러 상태를 명시적으로 추가해 보세요.
 3. 검색 입력창을 붙이고, 빠르게 입력해도 가장 최근 입력 결과만 보이도록 race condition을 제어해 보세요.
+4. React Query를 설치하고 위 예제를 마이그레이션해 보세요. 코드가 얼마나 줄어드는지 비교해 보세요.
 
 ## 정리 및 다음 단계
 
@@ -239,11 +453,11 @@ if (!res.ok) throw new Error(`HTTP ${res.status}`);
 ## 처음 질문으로 돌아가기
 
 - **`fetch`와 `async/await`는 어떤 최소 패턴으로 시작하면 될까요?**
-  - 이 네 가지 상태를 그려 놓고 시작하면 비동기 UI 설계가 훨씬 선명해집니다
+  - `async` 함수 안에서 `await fetch(url)` → `if (!res.ok) throw` → `await res.json()` 순서입니다. 이 세 줄이 안전한 최소 패턴입니다.
 - **로딩 상태와 에러 상태를 왜 반드시 화면에 드러내야 할까요?**
-  - 이 네 가지 상태를 그려 놓고 시작하면 비동기 UI 설계가 훨씬 선명해집니다
+  - 프론트엔드 버그의 많은 비중이 비동기 처리에서 나옵니다. 빠른 사내 와이파이에서는 잘 보이지 않다가 실제 사용자의 느린 네트워크에서만 터지는 경우가 많습니다.
 - **컴포넌트가 사라질 때 요청 취소가 왜 필요할까요?**
-  - 실무에서 중요한 포인트는 3단계와 4단계입니다
+  - 취소 없이 컴포넌트가 언마운트되면 응답이 돌아왔을 때 이미 사라진 컴포넌트의 상태를 업데이트하려는 오류가 발생합니다. AbortController로 이를 방지합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
