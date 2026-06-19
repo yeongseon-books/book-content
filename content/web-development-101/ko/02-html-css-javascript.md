@@ -274,6 +274,126 @@ async:   HTML 파싱... [JS 다운 완료 즉시 멈추고 JS 실행] → 재개
 
 대부분의 경우 `defer`가 안전합니다. DOM이 완성된 뒤 실행되므로 `document.querySelector`가 `null`을 반환하는 문제를 방지합니다.
 
+## CSS 박스 모델과 레이아웃 기초
+
+모든 HTML 요소는 사각형 박스입니다. 박스 모델을 이해하면 배치 버그의 70%가 해결됩니다.
+
+```
+┌─────────────────────────────────┐
+│            margin               │
+│   ┌─────────────────────────┐   │
+│   │         border          │   │
+│   │   ┌─────────────────┐   │   │
+│   │   │     padding     │   │   │
+│   │   │  ┌───────────┐  │   │   │
+│   │   │  │  content  │  │   │   │
+│   │   │  └───────────┘  │   │   │
+│   │   └─────────────────┘   │   │
+│   └─────────────────────────┘   │
+└─────────────────────────────────┘
+```
+
+기본적으로 브라우저는 `box-sizing: content-box`를 사용합니다. 이 경우 `width`는 content 영역만 포함하고 padding과 border가 그 위에 추가됩니다. 거의 모든 프로젝트에서 다음 리셋을 사용합니다.
+
+```css
+/* 모든 요소에 border-box 적용 */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+```
+
+`border-box`로 설정하면 `width: 300px`이 padding, border를 포함한 300px이 됩니다. 계산이 훨씬 직관적입니다.
+
+### Flexbox: 1차원 레이아웃
+
+행 또는 열 방향으로 아이템을 정렬할 때 사용합니다.
+
+```css
+.container {
+  display: flex;
+  flex-direction: row;       /* 기본값: 가로 방향 */
+  justify-content: space-between; /* 주축 정렬 */
+  align-items: center;       /* 교차축 정렬 */
+  gap: 16px;
+}
+
+.item {
+  flex: 1;                   /* 남은 공간을 균등 배분 */
+}
+
+.item.featured {
+  flex: 2;                   /* 2배 넓이 */
+}
+```
+
+```html
+<!-- 네비게이션 바: 로고 왼쪽, 메뉴 오른쪽 -->
+<nav style="display:flex; justify-content:space-between; align-items:center; padding:0 16px;">
+  <a href="/" class="logo">MyApp</a>
+  <ul style="display:flex; gap:24px; list-style:none;">
+    <li><a href="/about">소개</a></li>
+    <li><a href="/docs">문서</a></li>
+    <li><a href="/contact">연락</a></li>
+  </ul>
+</nav>
+```
+
+### CSS Grid: 2차원 레이아웃
+
+행과 열을 동시에 제어할 때 사용합니다.
+
+```css
+.grid-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr; /* 고정 사이드바 + 유동 2열 */
+  grid-template-rows: auto 1fr auto;    /* 헤더, 메인, 푸터 */
+  grid-template-areas:
+    "header header header"
+    "sidebar main  aside"
+    "footer footer footer";
+  min-height: 100vh;
+  gap: 16px;
+}
+
+header  { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+main    { grid-area: main; }
+aside   { grid-area: aside; }
+footer  { grid-area: footer; }
+```
+
+### CSS 사용자 정의 속성 (변수)
+
+반복되는 값을 한 곳에서 관리합니다.
+
+```css
+:root {
+  --color-primary: #2563eb;
+  --color-text: #1f2937;
+  --color-bg: #f9fafb;
+  --spacing-unit: 8px;
+  --border-radius: 6px;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+  border-radius: var(--border-radius);
+  border: none;
+  cursor: pointer;
+}
+
+/* 다크 모드: 변수만 바꾸면 모든 컴포넌트에 적용 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary: #3b82f6;
+    --color-text: #f3f4f6;
+    --color-bg: #111827;
+  }
+}
+```
+
 ## 자주 하는 실수
 
 | 실수 | 증상 | 올바른 방법 |

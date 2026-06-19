@@ -280,6 +280,80 @@ def get_user(user_id: str) -> Union[UserFound, UserNotFound]:
 
 첫 번째 버전은 표현력이 높지만 실패 경로가 문서화되지 않습니다. 세 번째 버전은 타입만 봐도 어떤 경우가 있는지 모두 알 수 있습니다. 어느 쪽이 정답이라기보다, 팀이 어느 축에 더 무게를 두는지 먼저 합의하는 것이 중요합니다.
 
+## 언어 설계 결정이 생태계에 미치는 영향
+
+언어 설계는 코드 자체뿐 아니라 그 언어 주위에 형성되는 생태계와 문화에도 영향을 줍니다.
+
+```text
+설계 결정 → 생태계 영향 예시:
+
+Python
+  표현력 우선, 간결한 문법
+  → Jupyter Notebook이 자연스러운 학습 환경
+  → pip 생태계: 라이브러리 하나 설치로 복잡한 기능 즉시 사용
+  → 데이터 과학 커뮤니티의 사실상 표준 언어
+
+Go
+  단순성 우선, 패키지 가시성 규칙 (대문자 = export)
+  → 코드 리뷰 문화: 짧고 명시적인 코드가 기본
+  → 표준 라이브러리 집중 (외부 의존성 최소화 지향)
+  → gofmt: 서식 논쟁 없는 통일된 코드 스타일
+
+Rust
+  안전성 우선, 소유권 시스템
+  → crates.io: 안전한 의존성 생태계
+  → "fearless concurrency" 문화
+  → 컴파일 오류 메시지가 학습 자료 역할
+```
+
+이처럼 언어 설계 결정은 결국 그 언어를 쓰는 팀의 협업 방식과 문화까지 형성합니다. 언어를 평가할 때 코드 모양만 보지 않고 주변 생태계와 관행까지 보는 이유가 여기에 있습니다.
+
+## 내부 DSL 설계: 언어 설계 감각의 소형 버전
+
+완전한 언어를 만들지 않아도, 내부 DSL(Domain-Specific Language)을 설계하는 일도 같은 감각이 필요합니다.
+
+```python
+# 낮은 표현력: 날 것의 딕셔너리
+config = {
+    "routes": [
+        {"path": "/api/users", "method": "GET", "handler": "list_users"},
+        {"path": "/api/users/{id}", "method": "GET", "handler": "get_user"},
+    ]
+}
+
+# 높은 표현력: 내부 DSL로 의도를 드러냄
+from dataclasses import dataclass
+from typing import Callable
+
+@dataclass
+class Route:
+    path: str
+    method: str
+    handler: Callable
+
+class Router:
+    def __init__(self) -> None:
+        self._routes: list[Route] = []
+
+    def get(self, path: str) -> Callable:
+        def decorator(fn: Callable) -> Callable:
+            self._routes.append(Route(path=path, method="GET", handler=fn))
+            return fn
+        return decorator
+
+router = Router()
+
+@router.get("/api/users")
+def list_users() -> list:
+    return []
+
+@router.get("/api/users/{id}")
+def get_user(id: str) -> dict:
+    return {}
+```
+
+두 번째 버전은 더 길지만, 라우트를 추가하거나 수정할 때 실수할 여지가 적고 의도가 더 명확합니다. 내부 DSL 설계는 "이 API를 사용하는 사람이 가장 자연스럽게 의도를 표현할 수 있는 형태는 무엇인가"라는 질문에서 시작합니다. 이것이 언어 설계 감각입니다.
+
 ## 운영 체크리스트
 
 - [ ] 다섯 축을 각각 한 줄로 정의할 수 있는가?

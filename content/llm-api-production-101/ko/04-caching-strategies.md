@@ -28,7 +28,7 @@ LLM 기능이 실제 트래픽을 받기 시작하면 비용 문제는 생각보
 
 이 글은 LLM API 프로덕션 101 시리즈의 4번째 글입니다.
 
-캐시는 새로운 개념이 아닙니다. 웹 서버, 데이터베이스, CDN, 검색 시스템이 모두 오래전부터 풀어 온 문제입니다. 다만 LLM 경로에서는 “무엇을 같은 요청으로 볼 것인가”가 더 까다롭습니다. 겉으로 보이는 사용자 질문이 같아도 모델, 시스템 프롬프트, temperature, 구조화 출력 옵션이 다르면 사실상 다른 작업일 수 있습니다.
+캐시는 새로운 개념이 아닙니다. 웹 서버, 데이터베이스, CDN, 검색 시스템이 모두 오래전부터 풀어 온 문제입니다. 다만 LLM 경로에서는 "무엇을 같은 요청으로 볼 것인가"가 더 까다롭습니다. 겉으로 보이는 사용자 질문이 같아도 모델, 시스템 프롬프트, temperature, 구조화 출력 옵션이 다르면 사실상 다른 작업일 수 있습니다.
 
 그래서 LLM 캐시는 단순히 응답 문자열을 저장하는 상자가 아닙니다. 어떤 입력 조합이 동일한 작업을 의미하는지 정의하는 계약입니다. 이 계약이 느슨하면 잘못된 재사용이 생기고, 너무 엄격하면 적중률이 떨어집니다. 결국 캐시 설계의 핵심은 저장 방식보다 동일성의 정의에 있습니다.
 
@@ -52,7 +52,7 @@ LLM 기능이 실제 트래픽을 받기 시작하면 비용 문제는 생각보
 
 캐시는 비용 절감 수단이면서 동시에 정확성 경계입니다. 같은 작업을 다시 계산하지 않으면 지연 시간과 토큰 사용량을 동시에 줄일 수 있습니다. 하지만 잘못된 캐시 키는 다른 작업에 대해 이전 결과를 재사용하게 만들고, 그 순간 캐시는 성능 최적화가 아니라 품질 저하 장치가 됩니다.
 
-LLM 경로에서는 특히 시스템 프롬프트와 생성 옵션이 중요합니다. 사용자가 같은 질문을 했더라도 요약기 프롬프트와 분류기 프롬프트는 같은 작업이 아닙니다. temperature가 0인지 0.8인지도 결과 의미에 영향을 줄 수 있습니다. 그래서 캐시는 “보이는 질문”이 아니라 “실행 계약 전체”를 기준으로 설계해야 합니다.
+LLM 경로에서는 특히 시스템 프롬프트와 생성 옵션이 중요합니다. 사용자가 같은 질문을 했더라도 요약기 프롬프트와 분류기 프롬프트는 같은 작업이 아닙니다. temperature가 0인지 0.8인지도 결과 의미에 영향을 줄 수 있습니다. 그래서 캐시는 "보이는 질문"이 아니라 "실행 계약 전체"를 기준으로 설계해야 합니다.
 
 또한 캐시는 만료와 무효화까지 포함해 생각해야 합니다. 오래된 응답을 영원히 재사용하면 비용은 줄어들지 몰라도 정확성과 신뢰가 무너집니다. TTL과 버전 필드는 캐시를 정직하게 유지하는 최소 장치입니다.
 
@@ -66,7 +66,7 @@ LLM 경로에서는 특히 시스템 프롬프트와 생성 옵션이 중요합�
 
 운영 로그를 보면 반복은 생각보다 많습니다. FAQ형 챗봇, 비슷한 문장 교정을 반복하는 내부 도구, 같은 리포트를 여러 사용자가 보는 대시보드, 같은 질문을 조금씩 바꿔 재질문하는 대화 세션이 모두 그렇습니다. 이런 경로에서는 매번 전체 호출 비용을 다시 내는 것이 비효율적입니다.
 
-문제는 “같은 요청”을 눈으로 판단하면 안 된다는 데 있습니다. 사람이 보기에는 같아 보여도 모델, 시스템 프롬프트, 생성 옵션이 달라지면 사실상 다른 작업입니다. 캐시는 바로 이 경계를 명확히 해 줘야 합니다.
+문제는 "같은 요청"을 눈으로 판단하면 안 된다는 데 있습니다. 사람이 보기에는 같아 보여도 모델, 시스템 프롬프트, 생성 옵션이 달라지면 사실상 다른 작업입니다. 캐시는 바로 이 경계를 명확히 해 줘야 합니다.
 
 ### 캐시 키에는 무엇이 들어가야 하는가
 
@@ -93,6 +93,7 @@ import hashlib
 import json
 from typing import Any
 
+
 def build_cache_key(payload: dict[str, Any]) -> str:
     canonical = json.dumps(
         payload,
@@ -101,6 +102,7 @@ def build_cache_key(payload: dict[str, Any]) -> str:
         separators=(",", ":"),
     )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
 
 request_payload = {
     "model": "llama-3.1-8b-instant",
@@ -115,6 +117,24 @@ print(build_cache_key(request_payload))
 ```
 
 `sort_keys=True`는 딕셔너리 키 순서 차이로 같은 요청이 다른 키가 되는 일을 막아 줍니다. `separators`는 불필요한 공백 차이를 없앱니다. 결국 이 해시는 요청 계약 전체를 고정 길이 키로 압축한 결과입니다.
+
+해시 키 설계에서 또 한 가지 중요한 포인트는 `cache_version` 필드입니다. 프롬프트나 모델이 바뀔 때 명시적으로 버전을 올리면, 오래된 항목이 자연 만료되기를 기다리지 않아도 됩니다.
+
+```python
+payload_with_version = {
+    "cache_version": "v2",
+    "model": "llama-3.1-8b-instant",
+    "messages": [
+        {"role": "system", "content": "You are a concise summarizer."},
+        {"role": "user", "content": "Summarize the FastAPI and Flask difference."},
+    ],
+    "temperature": 0,
+}
+
+print(build_cache_key(payload_with_version))
+```
+
+새 계약에는 새 버전을 쓰면 됩니다. 버전 하나가 바뀌면 해시가 달라지고, 기존 캐시 항목은 자연스럽게 미스가 납니다.
 
 ### TTL이 왜 필요한가
 
@@ -135,10 +155,12 @@ import time
 from dataclasses import dataclass
 from typing import Any
 
+
 @dataclass
 class CacheEntry:
     value: Any
     expires_at: float
+
 
 class TTLCache:
     def __init__(self) -> None:
@@ -185,10 +207,12 @@ from typing import Any
 
 from groq import Groq
 
+
 @dataclass
 class CacheEntry:
     value: Any
     expires_at: float
+
 
 class TTLCache:
     def __init__(self) -> None:
@@ -206,6 +230,7 @@ class TTLCache:
     def set(self, key: str, value: Any, ttl_seconds: int) -> None:
         self._store[key] = CacheEntry(value=value, expires_at=time.time() + ttl_seconds)
 
+
 def build_cache_key(payload: dict[str, Any]) -> str:
     canonical = json.dumps(
         payload,
@@ -215,8 +240,10 @@ def build_cache_key(payload: dict[str, Any]) -> str:
     )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
+
 cache = TTLCache()
 client = Groq(api_key=os.environ["GROQ_API_KEY"])
+
 
 def cached_completion(payload: dict[str, Any], ttl_seconds: int = 300) -> dict[str, Any]:
     key = build_cache_key(payload)
@@ -228,6 +255,7 @@ def cached_completion(payload: dict[str, Any], ttl_seconds: int = 300) -> dict[s
     content = completion.choices[0].message.content
     cache.set(key, content, ttl_seconds=ttl_seconds)
     return {"source": "model", "content": content}
+
 
 payload = {
     "model": "llama-3.1-8b-instant",
@@ -281,10 +309,12 @@ import time
 from dataclasses import dataclass
 from typing import Any
 
+
 @dataclass
 class CacheEntry:
     value: Any
     expires_at: float
+
 
 class TTLCache:
     def __init__(self) -> None:
@@ -309,9 +339,15 @@ class TTLCache:
     def set(self, key: str, value: Any, ttl_seconds: int) -> None:
         self._store[key] = CacheEntry(value=value, expires_at=time.time() + ttl_seconds)
 
+    def hit_rate(self) -> float:
+        total = self.metrics["hits"] + self.metrics["misses"]
+        return self.metrics["hits"] / total if total > 0 else 0.0
+
+
 def build_cache_key(payload: dict[str, Any]) -> str:
     canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
 
 cache = TTLCache()
 payload = {"model": "llama-3.1-8b-instant", "messages": [{"role": "user", "content": "hi"}]}
@@ -323,6 +359,7 @@ print(cache.get(key))
 time.sleep(1.1)
 print(cache.get(key))
 print(cache.metrics)
+print("hit rate:", cache.hit_rate())
 ```
 
 이 정도만 있어도 운영 판단이 쉬워집니다. 적중률은 낮은데 만료가 거의 없다면 키가 너무 엄격할 수 있고, 만료가 자주 나는데도 오래된 응답 이슈가 생긴다면 TTL이 여전히 길 수 있습니다. 캐시는 성능 기능이면서 동시에 정확성 기능이기 때문에, hit/miss/expired를 함께 보는 습관이 필요합니다.
@@ -340,14 +377,17 @@ import redis
 
 r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
+
 def build_cache_key(payload: dict[str, Any]) -> str:
     canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     return f"llm:completion:v1:{digest}"
 
+
 def get_cached_text(payload: dict[str, Any]) -> str | None:
     key = build_cache_key(payload)
     return r.get(key)
+
 
 def set_cached_text(payload: dict[str, Any], text: str, ttl_seconds: int) -> None:
     key = build_cache_key(payload)
@@ -363,11 +403,13 @@ def set_cached_text(payload: dict[str, Any], text: str, ttl_seconds: int) -> Non
 ```python
 from dataclasses import dataclass
 
+
 @dataclass
 class SemanticEntry:
     query: str
     embedding: list[float]
     answer: str
+
 
 def cosine_similarity(a: list[float], b: list[float]) -> float:
     dot = sum(x * y for x, y in zip(a, b))
@@ -376,6 +418,7 @@ def cosine_similarity(a: list[float], b: list[float]) -> float:
     if norm_a == 0 or norm_b == 0:
         return 0.0
     return dot / (norm_a * norm_b)
+
 
 def find_semantic_hit(
     query_embedding: list[float],
@@ -397,13 +440,15 @@ def find_semantic_hit(
 
 이 접근은 비용 절감에 강하지만 오적중 위험이 있습니다. 따라서 기본값은 `exact-key cache -> semantic cache -> model call` 순서가 안전합니다. 또 semantic 캐시를 통과한 응답은 로그에 `cache_source=semantic`과 `similarity_score`를 남겨 품질 회귀를 감시해야 합니다.
 
-## 흔히 헷갈리는 지점
+## 자주 하는 실수
 
-- 사용자 질문만 같으면 같은 캐시 키로 봐도 된다고 생각하기 쉽지만 대부분은 너무 느슨합니다.
-- TTL은 성능 옵션이 아니라 정확성 유지 장치입니다.
-- 인메모리 캐시는 단일 프로세스 예제일 뿐 서비스 전체 공유 캐시가 아닙니다.
-- 외부 상태나 사용자 권한이 반영된 응답은 캐시 키에 범위를 넣거나 아예 캐시하지 않아야 합니다.
-- 캐시 적중률만 높이면 된다고 생각하면 오래된 응답 재사용이라는 더 큰 문제를 놓치기 쉽습니다.
+| 실수 | 이유 | 올바른 접근 |
+|------|------|------------|
+| 사용자 질문 문자열만 캐시 키로 사용 | 모델, 시스템 프롬프트, temperature, response_format이 다르면 실제로는 다른 작업 | payload 전체(model, messages, temperature, response_format)를 canonical JSON으로 직렬화해 해시 키 생성 |
+| TTL 없이 캐시 무기한 유지 | 모델이나 프롬프트가 바뀌어도 오래된 응답이 계속 재사용됨 | workload 성격별로 TTL을 명시하고, 긴급 무효화는 `cache_version` 필드로 처리 |
+| 캐시 적중률만 높이면 된다고 생각 | 적중률이 높아도 오래된 응답이 섞이면 정확성이 무너짐 | hit/miss/expired를 함께 측정하고, expired 비율도 모니터링 |
+| 인메모리 캐시를 서비스 전체 공유로 착각 | 워커가 여러 개면 각자 다른 캐시 상태를 가짐 | 다중 워커 환경에서는 Redis 등 공유 저장소로 전환 |
+| 외부 상태 의존 응답이나 사용자별 권한 응답을 그대로 캐시 | 같은 키로 다른 사용자에게 다른 답이 가야 할 수 있음 | 캐시 불가 경로를 명시하고, 사용자 식별자를 키에 포함하거나 캐시 우회 처리 |
 
 ## 운영 체크리스트
 
@@ -412,6 +457,7 @@ def find_semantic_hit(
 - [ ] TTL을 workload별로 명시하고 기본값을 코드에 고정했다
 - [ ] 사용자별·민감 정보 응답의 캐시 정책을 별도로 정했다
 - [ ] 모델/프롬프트 변경 시 `cache_version`으로 명시적 무효화를 지원했다
+- [ ] hit/miss/expired 메트릭을 로그나 모니터링 시스템에 연결했다
 
 ## 정리
 
@@ -424,12 +470,13 @@ def find_semantic_hit(
 ## 처음 질문으로 돌아가기
 
 - **LLM 캐시는 응답 저장소가 아니라 왜 요청 동일성 계약으로 봐야 할까요?**
-  - - 사용자 질문만 같으면 같은 캐시 키로 봐도 된다고 생각하기 쉽지만 대부분은 너무 느슨합니다
+  - 응답을 저장하는 것 자체는 어렵지 않습니다. 문제는 "어떤 요청을 같은 요청으로 볼 것인가"를 정의하는 일입니다. 사용자 질문 문자열만 같아도 모델, 시스템 프롬프트, temperature가 다르면 사실상 다른 작업이므로 다른 응답이 나와야 합니다. 캐시 키가 이 동일성 계약을 정확히 표현하지 못하면, 캐시는 비용을 줄이는 동시에 품질을 해치는 장치가 됩니다.
+
 - **캐시 키에는 프롬프트 외에 어떤 값이 들어가야 할까요?**
-  - 캐시는 비용 절감 수단이면서 동시에 정확성 경계입니다
+  - 최소한 `model`, `messages` 전체(시스템 프롬프트 포함), `temperature`, `response_format`이 들어가야 합니다. `tools`나 `max_tokens`처럼 출력 형태에 영향을 주는 필드도 마찬가지입니다. 프롬프트 정책이나 모델이 바뀔 때는 `cache_version` 필드를 올려 기존 항목이 자동으로 미스가 나도록 설계하는 것이 안전합니다.
+
 - **어떤 경로는 비용이 커도 캐시하지 않는 편이 안전할까요?**
-  - 캐시는 비용 절감 수단이면서 동시에 정확성 경계입니다
-  - 캐시는 비용 절감 수단이면서 동시에 정확성 경계입니다. 같은 작업을 다시 계산하지 않으면 지연 시간과 토큰 사용량을 동시에 줄일 수 있습니다.
+  - 외부 실시간 데이터에 의존하는 응답, 사용자별 권한이나 개인정보가 반영된 응답, 높은 temperature에서 다양성이 의도된 생성 작업, 그리고 툴 호출 결과처럼 멱등성이 보장되지 않는 연산이 여기 해당합니다. 같은 캐시 키라도 실제로는 다른 답이 와야 하는 경로이기 때문입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
