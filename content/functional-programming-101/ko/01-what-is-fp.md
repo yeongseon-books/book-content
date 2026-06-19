@@ -67,6 +67,7 @@ Reassign variables               Prefer immutable data
 | 선언형(declarative) | "어떻게"보다 "무엇을"에 집중하는 스타일입니다 |
 
 ## 적용 전후 비교
+
 명령형 반복문을 선언형 변환으로 바꾸면, 코드의 관심사가 루프 제어가 아니라 데이터 변환 규칙으로 이동합니다.
 
 ```python
@@ -80,8 +81,19 @@ print(result)  # [4, 16]
 ```
 
 ```python
-# 이후: 함수형 방식 — 변환을 조합
+# 이후: 함수형 방식 — filter로 선택하고 map으로 변환
+from functools import reduce
+
 numbers = [1, 2, 3, 4, 5]
+
+# filter: 짝수만 선택
+evens = list(filter(lambda n: n % 2 == 0, numbers))
+
+# map: 제곱 변환
+result = list(map(lambda n: n * n, evens))
+print(result)  # [4, 16]
+
+# 또는 한 줄로 조합
 result = list(map(lambda n: n * n, filter(lambda n: n % 2 == 0, numbers)))
 print(result)  # [4, 16]
 ```
@@ -114,7 +126,9 @@ for op in operations:
 
 일급 함수는 동작을 값처럼 다루게 해 줍니다. 이 순간부터 함수는 단순한 실행 단위가 아니라, 다른 함수에 전달하고 조합할 수 있는 구성 요소가 됩니다.
 
-### 단계 2: 명령형과 함수형 비교
+### 단계 2: map으로 변환하기
+
+`map`은 컬렉션의 모든 원소에 동일한 함수를 적용합니다. 변환 규칙이 명확히 드러나는 것이 핵심입니다.
 
 ```python
 # 명령형: 상태를 변경하며 결과를 생성
@@ -124,19 +138,70 @@ for w in words:
     upper_words.append(w.upper())
 print(upper_words)  # ['HELLO', 'WORLD', 'PYTHON']
 
-# 함수형: 변환 함수를 적용
+# map 방식: 변환 함수를 적용
 words = ["hello", "world", "python"]
 upper_words = list(map(str.upper, words))
 print(upper_words)  # ['HELLO', 'WORLD', 'PYTHON']
 
-# 더 Pythonic한 방식: list comprehension
-upper_words = [w.upper() for w in words]
-print(upper_words)  # ['HELLO', 'WORLD', 'PYTHON']
+# 여러 시퀀스에 동시에 map 적용
+prices = [100, 200, 300]
+quantities = [2, 3, 1]
+totals = list(map(lambda p, q: p * q, prices, quantities))
+print(totals)  # [200, 600, 300]
 ```
 
-현업에서는 세 번째 형태를 가장 자주 봅니다. 중요한 것은 특정 문법을 외우는 일이 아니라, 상태를 직접 조작하지 않고 변환 규칙을 표현하는 방식이 함수형 사고의 핵심이라는 사실입니다.
+### 단계 3: filter로 선택하기
 
-### 단계 3: 선언형 데이터 처리
+`filter`는 조건을 만족하는 원소만 남깁니다. "어떤 항목을 남길지"만 표현하면 됩니다.
+
+```python
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+# filter: 짝수만 선택
+evens = list(filter(lambda x: x % 2 == 0, numbers))
+print(evens)  # [2, 4, 6, 8, 10]
+
+# 학생 데이터에서 조건 선택
+students = [
+    {"name": "Alice", "score": 85},
+    {"name": "Bob", "score": 92},
+    {"name": "Charlie", "score": 78},
+    {"name": "Diana", "score": 95},
+    {"name": "Eve", "score": 60},
+]
+
+# 80점 이상인 학생만 선택
+passing = list(filter(lambda s: s["score"] >= 80, students))
+print([s["name"] for s in passing])  # ['Alice', 'Bob', 'Diana']
+```
+
+### 단계 4: reduce로 집계하기
+
+`reduce`는 시퀀스를 하나의 값으로 축약합니다. `map`과 `filter`가 변환과 선택이라면, `reduce`는 최종 집계 역할입니다.
+
+```python
+from functools import reduce
+
+numbers = [1, 2, 3, 4, 5]
+
+# reduce: 합계
+total = reduce(lambda acc, x: acc + x, numbers, 0)
+print(total)  # 15
+
+# 최댓값 구하기
+maximum = reduce(lambda a, b: a if a > b else b, numbers)
+print(maximum)  # 5
+
+# map + filter + reduce 조합: 짝수의 제곱 합
+even_square_sum = reduce(
+    lambda acc, x: acc + x,
+    map(lambda n: n * n, filter(lambda n: n % 2 == 0, numbers)),
+    0,
+)
+print(even_square_sum)  # 4 + 16 = 20
+```
+
+### 단계 5: 선언형 데이터 처리
 
 ```python
 # 학생 점수 처리 — 함수형 스타일
@@ -148,24 +213,26 @@ students = [
     {"name": "Eve", "score": 60},
 ]
 
-# 80점 이상 학생 이름을 점수 내림차순으로 정렬
-passing = sorted(
-    [s["name"] for s in students if s["score"] >= 80],
-    key=lambda name: next(s["score"] for s in students if s["name"] == name),
-    reverse=True,
-)
-print(passing)  # ['Diana', 'Bob', 'Alice']
+# 단계 1: 80점 이상 필터링
+passing = filter(lambda s: s["score"] >= 80, students)
+
+# 단계 2: 점수 내림차순 정렬
+ranked = sorted(passing, key=lambda s: s["score"], reverse=True)
+
+# 단계 3: 이름만 추출
+names = list(map(lambda s: s["name"], ranked))
+print(names)  # ['Diana', 'Bob', 'Alice']
 ```
 
 이 예제의 포인트는 학생 목록을 어떻게 순회할지가 아니라, 어떤 조건으로 걸러서 어떤 기준으로 정렬할지를 코드에 바로 드러낸다는 데 있습니다.
 
-### 단계 4: 함수 합성으로 파이프라인 만들기
+### 단계 6: 함수 합성으로 파이프라인 만들기
 
 ```python
 from collections.abc import Callable
 
 def pipeline(*funcs: Callable) -> Callable:
-    """Compose multiple functions into a sequential pipeline."""
+    """여러 함수를 순차적으로 실행하는 파이프라인을 구성합니다."""
     def apply(value):
         result = value
         for func in funcs:
@@ -184,7 +251,7 @@ print(transform(10))  # Result: 30
 
 파이프라인은 함수형 프로그래밍을 실무 코드로 연결해 주는 가장 실용적인 패턴입니다. 각 단계가 하나의 일만 하게 만들면 테스트, 교체, 재사용이 모두 쉬워집니다.
 
-### 단계 5: 부수효과 분리
+### 단계 7: 부수효과 분리
 
 ```python
 # 순수 함수: 계산만 처리
@@ -209,19 +276,19 @@ print_receipt([10.00, 20.00, 5.00], 0.1)
 
 ## 이 코드에서 주목할 점
 
+- `map`, `filter`, `reduce`는 변환, 선택, 집계라는 서로 다른 역할을 명시적으로 표현합니다.
 - 일급 함수를 사용하면 동작을 데이터처럼 전달할 수 있습니다.
-- 함수형 스타일은 계산 규칙을 전면에 드러내서 코드의 의도를 읽기 쉽게 만듭니다.
 - 파이프라인 패턴은 작은 함수를 조합해 복잡한 변환을 단계적으로 표현합니다.
 - 순수 계산과 부수효과를 분리하면 테스트 범위를 작게 유지할 수 있습니다.
 
-## 흔한 실수 5가지
+## 자주 하는 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
 | 모든 코드를 함수형 스타일로 밀어붙임 | Python다운 가독성이 오히려 떨어질 수 있습니다 | 문제에 맞는 스타일을 선택합니다 |
 | `lambda`를 과도하게 사용함 | 디버깅과 코드 리뷰가 어려워집니다 | 복잡해지면 이름 있는 함수로 바꿉니다 |
 | 부수효과를 숨긴 채 섞어 씀 | 테스트와 재사용이 어려워집니다 | 순수 로직과 IO를 분리합니다 |
-| 컴프리헨션보다 무조건 `map`/`filter`를 선호함 | Python 관용 표현을 놓치게 됩니다 | 단순한 경우는 컴프리헨션을 우선합니다 |
+| `reduce`에 초기값을 생략함 | 빈 시퀀스에서 오류가 납니다 | 항상 초기값을 함께 제공합니다 |
 | 함수형은 느리다고 단정함 | 잘못된 최적화로 이어집니다 | 성능은 프로파일링으로 확인합니다 |
 
 ## 실무에서 이렇게 쓰입니다
@@ -230,7 +297,7 @@ print_receipt([10.00, 20.00, 5.00], 0.1)
 - API 미들웨어를 함수 체인 형태로 구성합니다.
 - 비즈니스 규칙을 순수 함수로 분리해 mock 없이 단위 테스트합니다.
 - 설정 검증과 포맷팅 로직을 부수효과 없는 함수로 작성합니다.
-- 이벤트 핸들러 등록을 일급 함수 패턴으로 단순화합니다.
+- `map`/`filter`/`reduce` 조합으로 선언형 데이터 처리 흐름을 만듭니다.
 
 ## 현업에서는 이렇게 판단합니다
 
@@ -238,108 +305,34 @@ print_receipt([10.00, 20.00, 5.00], 0.1)
 
 실무적으로 가장 강한 패턴은 비즈니스 로직을 순수 함수로 두고, DB 저장·로그 출력·HTTP 호출 같은 부수효과를 가장 바깥 경계에 두는 방식입니다. 이 구조를 잡으면 테스트 비용과 변경 비용이 함께 내려갑니다.
 
+## 처음 질문으로 돌아가기
+
+- **함수형 프로그래밍은 정확히 무엇이며, 명령형 프로그래밍과 무엇이 다를까요?**
+  명령형은 루프와 변수 재할당으로 "어떻게 계산할지"를 기술합니다. 함수형은 `map`, `filter`, `reduce` 같은 변환 연산으로 "무엇을 계산할지"를 선언합니다. 같은 결과를 내도 코드가 드러내는 의도가 다릅니다.
+
+- **Python에서 함수형 스타일은 어떤 기본 도구로 표현할 수 있을까요?**
+  `map`(변환), `filter`(선택), `reduce`(집계)가 핵심 세 도구입니다. 여기에 리스트 컴프리헨션, 제너레이터 표현식, `functools` 모듈이 더해지면 대부분의 함수형 패턴을 표현할 수 있습니다.
+
+- **데이터 변환을 함수 조합으로 바라보면 코드가 왜 더 읽기 쉬워질까요?**
+  각 함수가 하나의 역할만 맡고, 그 역할을 함수 이름이 바로 드러냅니다. 중간 상태를 저장하는 변수가 줄어들고 데이터가 어떻게 흘러가는지 한눈에 볼 수 있습니다.
+
 ## 운영 체크리스트
 
 - [ ] 함수형 프로그래밍의 핵심 원칙을 설명할 수 있다
 - [ ] 명령형과 함수형 스타일의 차이를 코드로 보여줄 수 있다
-- [ ] 일급 함수를 사용해 동작을 추상화할 수 있다
+- [ ] `map`, `filter`, `reduce`를 각각 언제 쓰는지 설명할 수 있다
 - [ ] 작은 함수 조합으로 간단한 파이프라인을 만들 수 있다
 - [ ] 순수 함수와 부수효과를 분리해야 하는 이유를 설명할 수 있다
 
 ## 연습 문제
 
-1. 문자열 정규화, 공백 제거, 역순 정렬을 각각 함수로 만든 뒤 하나의 파이프라인으로 조합해 보세요.
-2. 명령형으로 작성된 평균 계산 함수를 함수형 스타일로 다시 작성해 보세요.
+1. 정수 리스트에서 홀수만 골라 세 배로 만든 뒤 합계를 `map`, `filter`, `reduce`만으로 구현해 보세요.
+2. 문자열 정규화, 공백 제거, 역순 정렬을 각각 함수로 만든 뒤 하나의 파이프라인으로 조합해 보세요.
 3. 순수 계산과 출력 로직이 섞인 함수를 둘로 나눠 보세요.
 
 ## 정리와 다음 글
 
-함수형 프로그래밍은 데이터를 변환하는 함수들을 조합해 프로그램을 구성하는 사고방식입니다. Python에서는 일급 함수, 컴프리헨션, 제너레이터 덕분에 이 스타일을 무리 없이 적용할 수 있습니다. 다음 글에서는 이 시리즈의 가장 중요한 기초인 **순수 함수와 부수효과**를 다룹니다.
-
-## 함수형 사고가 특히 빛나는 상황
-
-입문 단계에서는 스타일 비교에만 집중하기 쉽지만, 실제로는 "어떤 문제에서 이 사고가 비용을 줄이는지"를 먼저 잡는 편이 좋습니다.
-
-- **데이터 변환 단계가 많은 ETL 작업**: 단계별 함수를 나누고 조합하면 중간 산출물 검증이 쉬워집니다.
-- **규칙 기반 검증 로직**: 조건 분기를 작은 순수 함수로 분리하면 테스트 케이스 작성이 단순해집니다.
-- **파이프라인형 API 처리**: 입력 정제, 검증, 매핑, 출력 포맷팅을 함수 체인으로 표현하면 흐름이 명확해집니다.
-
-반대로 사용자 인터랙션, DB 트랜잭션, 외부 API 재시도처럼 부수효과가 중심인 영역은 무리하게 함수형 문법을 늘리기보다 경계를 분명히 나누는 접근이 더 실용적입니다. 즉, 함수형 프로그래밍의 목적은 문법 취향이 아니라 변경 비용 관리입니다.
-
-## 검증 시나리오: 경계 조건을 먼저 잠그기
-
-실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
-
-```python
-from functools import reduce
-
-def pipeline(values: list[int]) -> dict[str, int]:
-    filtered = [v for v in values if v >= 0]
-    squared = [v * v for v in filtered]
-    total = reduce(lambda acc, x: acc + x, squared, 0)
-    return {
-        "count": len(squared),
-        "total": total,
-        "max": max(squared) if squared else 0,
-    }
-
-# 경계 조건 검증
-assert pipeline([]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([-3, -1]) == {"count": 0, "total": 0, "max": 0}
-assert pipeline([0, 2, 3]) == {"count": 3, "total": 13, "max": 9}
-
-print("Pass")
-```
-
-또한 지연 평가를 사용할 때는 소비 시점을 테스트에 명시해 두는 편이 좋습니다. generator는 한 번 소비하면 비어야 정상이며, 이 성질이 깨지면 중간 단계에서 의도치 않은 materialize가 발생했을 가능성이 큽니다.
-
-```python
-from itertools import islice
-
-def naturals():
-    n = 0
-    while True:
-        yield n
-        n += 1
-
-stream = naturals()
-first_five = list(islice(stream, 5))
-next_three = list(islice(stream, 3))
-
-assert first_five == [0, 1, 2, 3, 4]
-assert next_three == [5, 6, 7]
-print("Pass")
-```
-
-이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
-## 리뷰 포인트: 코드 리뷰에서 바로 확인할 항목
-
-함수형 스타일을 적용한 코드 리뷰에서는 다음 네 가지를 빠르게 확인합니다. 첫째, 계산 함수가 외부 상태를 직접 읽거나 쓰지 않는지 확인합니다. 둘째, mutable 인자를 제자리에서 수정하지 않는지 확인합니다. 셋째, 파이프라인 단계의 입력과 출력 타입이 자연스럽게 연결되는지 확인합니다. 넷째, 실패 경로가 값으로 표현되는지 확인합니다.
-
-```python
-def reviewer_checklist() -> list[str]:
-    return [
-        "pure-core",
-        "immutable-update",
-        "typed-boundary",
-        "explicit-failure-path",
-    ]
-
-assert len(reviewer_checklist()) == 4
-print("Pass")
-```
-
-이 항목을 PR 템플릿에 고정해 두면 스타일 논쟁보다 설계 품질을 빠르게 맞출 수 있습니다.
-
-## 처음 질문으로 돌아가기
-
-- **함수형 프로그래밍은 정확히 무엇이며, 명령형 프로그래밍과 무엇이 다를까요?**
-  - 입문 단계에서는 스타일 비교에만 집중하기 쉽지만, 실제로는 "어떤 문제에서 이 사고가 비용을 줄이는지"를 먼저 잡는 편이 좋습니다.
-- **Python에서 함수형 스타일은 어떤 기본 도구로 표현할 수 있을까요?**
-  - 입문 단계에서는 스타일 비교에만 집중하기 쉽지만, 실제로는 "어떤 문제에서 이 사고가 비용을 줄이는지"를 먼저 잡는 편이 좋습니다.
-- **데이터 변환을 함수 조합으로 바라보면 코드가 왜 더 읽기 쉬워질까요?**
-  - 입문 단계에서는 스타일 비교에만 집중하기 쉽지만, 실제로는 "어떤 문제에서 이 사고가 비용을 줄이는지"를 먼저 잡는 편이 좋습니다.
+함수형 프로그래밍은 데이터를 변환하는 함수들을 조합해 프로그램을 구성하는 사고방식입니다. `map`, `filter`, `reduce`는 그 사고를 코드로 표현하는 핵심 도구입니다. Python에서는 일급 함수, 컴프리헨션, 제너레이터 덕분에 이 스타일을 무리 없이 적용할 수 있습니다. 다음 글에서는 이 시리즈의 가장 중요한 기초인 **순수 함수와 부수효과**를 다룹니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
