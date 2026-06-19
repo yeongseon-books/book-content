@@ -307,6 +307,57 @@ SELECT * FROM posts WHERE user_id = 1 ORDER BY created_at DESC;
 
 인덱스는 조회 패턴을 먼저 파악하고 추가해야 합니다. 아무 컬럼에나 인덱스를 달면 INSERT/UPDATE 비용이 증가합니다.
 
+## 마이그레이션: 스키마 변경 관리
+
+운영 중인 데이터베이스 스키마를 변경할 때는 migration 파일로 변경 이력을 추적합니다. Flask 생태계에서는 `flask-migrate` (Alembic 래퍼)를 사용합니다.
+
+```bash
+pip install flask-migrate
+```
+
+```python
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+```
+
+```bash
+# 마이그레이션 초기화 (최초 1회)
+flask db init
+
+# 모델 변경 감지 후 마이그레이션 파일 생성
+flask db migrate -m "add Post model"
+
+# 마이그레이션 적용
+flask db upgrade
+
+# 롤백 (한 단계 이전으로)
+flask db downgrade
+```
+
+생성된 마이그레이션 파일(`migrations/versions/*.py`)은 반드시 git에 커밋합니다. 이 파일이 팀 전체의 스키마 동기화 기준이 됩니다.
+
+새 컬럼을 추가할 때는 `nullable=True` 또는 `server_default`를 설정해야 기존 행이 깨지지 않습니다.
+
+```python
+# 안전한 컬럼 추가 예시
+class Post(db.Model):
+    # ... 기존 컬럼 ...
+    view_count = db.Column(db.Integer, nullable=False, server_default="0")
+    # nullable=False이지만 server_default 덕분에 기존 행에 0이 채워짐
+```
+
 ## 자주 하는 실수
 
 | 실수 | 증상 | 올바른 방법 |

@@ -298,6 +298,142 @@ Render, Fly.io, Heroku, Vercel      AWS EC2, GCP Compute, DigitalOcean
 시작 권장: PaaS로 시작, 필요 시 IaaS로 이동
 ```
 
+## 무중단 배포 전략
+
+트래픽을 받는 서버를 교체할 때 사용자가 에러를 보지 않도록 하는 전략입니다.
+
+```
+블루-그린 배포
+────────────────────────────────────────────────────────
+현재:  로드밸런서 → [블루: v1.0] (트래픽 100%)
+                    [그린: v1.1] (대기 중)
+
+배포:  [그린: v1.1] 준비 완료 확인 →
+       로드밸런서 트래픽을 그린으로 전환 (수초 이내)
+                    [블루: v1.0] (롤백용 대기)
+
+결과:  로드밸런서 → [그린: v1.1] (트래픽 100%)
+────────────────────────────────────────────────────────
+
+롤링 배포
+────────────────────────────────────────────────────────
+3대의 서버를 순서대로 교체
+
+1단계:  [v1.1] [v1.0] [v1.0]  ← 서버1 교체
+2단계:  [v1.1] [v1.1] [v1.0]  ← 서버2 교체
+3단계:  [v1.1] [v1.1] [v1.1]  ← 서버3 교체
+────────────────────────────────────────────────────────
+```
+
+GitHub Actions로 자동 배포 후 헬스체크를 통해 롤백을 결정합니다.
+
+```yaml
+# .github/workflows/deploy.yml (롤백 포함)
+name: Deploy with Rollback
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t myapp:${{ github.sha }} .
+
+      - name: Push to registry
+        run: |
+          docker tag myapp:${{ github.sha }} registry.example.com/myapp:${{ github.sha }}
+          docker push registry.example.com/myapp:${{ github.sha }}
+
+      - name: Deploy to server
+        run: |
+          ssh deploy@${{ secrets.SERVER_HOST }} "
+            docker pull registry.example.com/myapp:${{ github.sha }}
+            docker stop myapp || true
+            docker run -d --name myapp --restart unless-stopped \
+              -p 8000:8000 \
+              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+              -e SECRET_KEY=${{ secrets.SECRET_KEY }} \
+              registry.example.com/myapp:${{ github.sha }}
+          "
+
+      - name: Smoke test
+        run: |
+          sleep 10
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://example.com/health)
+          if [ "$STATUS" != "200" ]; then
+            echo "Health check failed: $STATUS"
+            # 이전 버전으로 롤백
+            ssh deploy@${{ secrets.SERVER_HOST }} "
+              docker stop myapp
+              docker run -d --name myapp --restart unless-stopped \
+                -p 8000:8000 \
+                registry.example.com/myapp:${{ env.PREV_SHA }}
+            "
+            exit 1
+          fi
+          echo "Deploy successful"
+```
+
+## 로그 수집과 모니터링
+
+배포 후 문제를 빠르게 발견하려면 로그를 구조화해야 합니다.
+
+```python
+import logging
+import json
+import time
+
+# 구조화 로그 (JSON 형식)
+class JSONFormatter(logging.Formatter):
+    def format(self, record):
+        log_data = {
+            "timestamp": self.formatTime(record),
+            "level": record.levelname,
+            "message": record.getMessage(),
+            "logger": record.name,
+        }
+        if record.exc_info:
+            log_data["exception"] = self.formatException(record.exc_info)
+        return json.dumps(log_data, ensure_ascii=False)
+
+handler = logging.StreamHandler()
+handler.setFormatter(JSONFormatter())
+logging.getLogger().addHandler(handler)
+logging.getLogger().setLevel(logging.INFO)
+
+# Flask 요청 로깅 미들웨어
+@app.before_request
+def log_request():
+    request.start_time = time.time()
+
+@app.after_request
+def log_response(response):
+    duration_ms = (time.time() - request.start_time) * 1000
+    logging.info("HTTP request", extra={
+        "method": request.method,
+        "path": request.path,
+        "status": response.status_code,
+        "duration_ms": round(duration_ms, 2),
+        "ip": request.remote_addr,
+    })
+    return response
+```
+
+JSON 로그는 Datadog, Grafana Loki, AWS CloudWatch Logs Insights 같은 도구로 쿼리할 수 있습니다.
+
+```bash
+# 로컬에서 Docker 컨테이너 로그 확인
+docker logs myapp --follow --tail 100
+
+# 특정 시간 이후 로그
+docker logs myapp --since 2024-01-15T09:00:00
+```
+
 ## 자주 하는 실수
 
 | 실수 | 증상 | 올바른 방법 |

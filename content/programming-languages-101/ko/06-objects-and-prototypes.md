@@ -306,6 +306,80 @@ print(p1 + Point(1.0, 0.0))       # Point(x=4.0, y=4.0)
 
 `frozen=True`로 불변 객체를 만들면 값 의미론(value semantics)을 자연스럽게 얻을 수 있습니다. 두 `Point` 인스턴스가 같은 좌표면 같은 것으로 취급합니다.
 
+## Rust의 트레이트: 상속 없는 다형성
+
+Rust는 클래스도 프로토타입도 없습니다. 대신 트레이트(trait)로 다형성을 표현합니다. 상속 계층 없이도 코드 재사용과 인터페이스 정의가 가능합니다.
+
+```rust
+// Rust: 트레이트로 공통 동작 정의
+trait Animal {
+    fn name(&self) -> &str;
+    fn sound(&self) -> &str;
+    fn describe(&self) -> String {  // 기본 구현 제공
+        format!("{} goes {}", self.name(), self.sound())
+    }
+}
+
+struct Dog { name: String }
+struct Cat { name: String }
+
+impl Animal for Dog {
+    fn name(&self) -> &str { &self.name }
+    fn sound(&self) -> &str { "woof" }
+}
+
+impl Animal for Cat {
+    fn name(&self) -> &str { &self.name }
+    fn sound(&self) -> &str { "meow" }
+    fn describe(&self) -> String {  // 기본 구현 오버라이드
+        format!("{} says {} quietly", self.name(), self.sound())
+    }
+}
+
+fn print_animal(animal: &dyn Animal) {  // 트레이트 객체로 다형성
+    println!("{}", animal.describe());
+}
+
+fn main() {
+    let dog = Dog { name: "Rex".to_string() };
+    let cat = Cat { name: "Luna".to_string() };
+
+    print_animal(&dog);  // "Rex goes woof"
+    print_animal(&cat);  // "Luna says meow quietly"
+}
+```
+
+Rust의 트레이트는 Python의 Protocol, Go의 interface와 비슷하지만 더 강력합니다. 동일한 트레이트를 외부 타입에도 구현할 수 있어 기존 타입에 새 동작을 추가할 수 있습니다(오프닝/확장 원칙).
+
+## 메타클래스: 클래스를 만드는 클래스
+
+Python에서 클래스 자체가 객체라는 사실은 메타클래스로 이어집니다. 클래스가 생성되는 방식 자체를 제어할 수 있습니다.
+
+```python
+# 메타클래스: 클래스 생성 과정에 개입
+class SingletonMeta(type):
+    _instances: dict = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+class DatabaseConnection(metaclass=SingletonMeta):
+    def __init__(self, url: str) -> None:
+        self.url = url
+        print(f"Connecting to {url}")
+
+# 메타클래스가 __call__을 가로채 싱글턴 패턴 구현
+db1 = DatabaseConnection("postgresql://localhost/mydb")
+db2 = DatabaseConnection("postgresql://localhost/mydb")
+
+print(db1 is db2)     # True — 같은 인스턴스
+print(db1.url)        # "postgresql://localhost/mydb"
+```
+
+메타클래스는 ORM, 직렬화 라이브러리, 테스트 프레임워크처럼 클래스 정의 자체를 자동화해야 하는 경우에 쓰입니다. Django의 Model, SQLAlchemy의 Base가 대표적입니다. "클래스도 객체"라는 Python 설계 원칙이 만들어 낸 강력한 메타프로그래밍 도구입니다.
+
 ## 운영 체크리스트
 
 - [ ] 클래스 기반과 프로토타입 기반의 차이를 한 줄로 설명할 수 있는가?

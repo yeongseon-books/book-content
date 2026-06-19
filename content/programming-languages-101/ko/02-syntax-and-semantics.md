@@ -293,6 +293,85 @@ def parse_order(raw_json: str) -> OrderRequest:
 
 두 검증을 같은 `try/except`로 묶으면 어느 층위에서 실패했는지 알기 어려워집니다. 층위를 나누면 로그도 명확해집니다.
 
+## 연산자 오버로딩: 구문은 같고 의미는 다름
+
+같은 연산자 기호가 타입에 따라 완전히 다른 동작을 하는 것이 연산자 오버로딩의 핵심입니다. 구문(기호)은 고정되어 있지만 의미(동작)는 타입이 결정합니다.
+
+```python
+# Python: + 연산자의 다중 의미
+print(1 + 2)           # 정수 덧셈: 3
+print("a" + "b")       # 문자열 연결: "ab"
+print([1, 2] + [3, 4]) # 리스트 연결: [1, 2, 3, 4]
+
+# 사용자 정의 타입에서 의미 부여
+from dataclasses import dataclass
+
+@dataclass
+class Vector2D:
+    x: float
+    y: float
+
+    def __add__(self, other: "Vector2D") -> "Vector2D":
+        return Vector2D(self.x + other.x, self.y + other.y)
+
+    def __str__(self) -> str:
+        return f"Vector2D({self.x}, {self.y})"
+
+v1 = Vector2D(1.0, 2.0)
+v2 = Vector2D(3.0, 4.0)
+print(v1 + v2)  # Vector2D(4.0, 6.0)
+```
+
+```typescript
+// TypeScript: + 연산자 — 타입에 따라 다른 결과
+console.log(1 + 2);         // 3 (숫자 덧셈)
+console.log("1" + 2);       // "12" (암묵적 형변환 + 문자열 연결)
+console.log(1 + "2");       // "12"
+console.log(true + 1);      // 2 (boolean → number)
+console.log([] + {});       // "[object Object]" (최악의 사례)
+```
+
+Python은 `+`의 의미를 타입 메서드(`__add__`)로 명시적으로 정의하게 합니다. JavaScript/TypeScript는 암묵적 형변환으로 처리해 종종 예상치 못한 결과를 낳습니다. 같은 `+` 기호의 의미 처리 방식이 언어 설계의 차이를 드러냅니다.
+
+## 문법과 파서: 언어 구현의 최전선
+
+실제 언어 파서가 어떻게 구문을 처리하는지 Python의 `ast` 모듈로 살펴볼 수 있습니다.
+
+```python
+import ast
+
+# 소스 코드를 AST로 파싱
+source = "result = (a + b) * c"
+tree = ast.parse(source, mode="exec")
+print(ast.dump(tree, indent=2))
+# Module(
+#   body=[
+#     Assign(
+#       targets=[Name(id='result', ctx=Store())],
+#       value=BinOp(
+#         left=BinOp(
+#           left=Name(id='a', ctx=Load()),
+#           op=Add(),
+#           right=Name(id='b', ctx=Load())),
+#         op=Mult(),
+#         right=Name(id='c', ctx=Load())))])
+
+# AST를 순회해서 모든 이름 수집
+class NameCollector(ast.NodeVisitor):
+    def __init__(self) -> None:
+        self.names: list[str] = []
+
+    def visit_Name(self, node: ast.Name) -> None:
+        self.names.append(node.id)
+        self.generic_visit(node)
+
+collector = NameCollector()
+collector.visit(tree)
+print(collector.names)  # ['result', 'a', 'b', 'c']
+```
+
+AST를 직접 다루면 코드 분석 도구, 린터, 커스텀 트랜스파일러를 만들 수 있습니다. 구문과 의미 사이의 경계가 이 `ast` 모듈에 물리적으로 존재합니다. 파싱까지가 구문, 그 이후 분석이 의미입니다.
+
 ## 운영 체크리스트
 
 - [ ] 구문과 의미의 차이를 한 문장으로 설명할 수 있는가?

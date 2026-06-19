@@ -289,6 +289,39 @@ curl -I --http3 https://example.com | grep "HTTP/"
 # h2 = HTTP/2, h3 = HTTP/3
 ```
 
+## 브라우저 DevTools로 요청 흐름 분석하기
+
+브라우저에서 직접 각 단계의 시간을 측정할 수 있습니다. Chrome DevTools → Network 탭 → 요청 클릭 → Timing 탭을 열면 다음 정보가 나옵니다.
+
+```
+Timing 항목          의미
+─────────────────────────────────────────────────────
+Queueing             브라우저가 요청 대기열에 넣은 시간
+Stalled              연결을 기다리는 시간 (HTTP/1.1 병렬 제한)
+DNS Lookup           DNS 조회 시간 (캐시 시 거의 0)
+Initial connection   TCP 3-way handshake 시간
+SSL                  TLS 핸드쉐이크 시간 (HTTPS만)
+Request sent         요청 데이터 전송 시간
+Waiting (TTFB)       서버 첫 바이트 응답까지 대기 시간
+Content Download     응답 본문 수신 시간
+─────────────────────────────────────────────────────
+```
+
+**TTFB (Time to First Byte)**가 높으면 서버 처리가 느리거나 물리적 거리가 멀다는 신호입니다. CDN을 사용하면 Content Download 시간이 줄고, 서버 최적화로 TTFB를 낮출 수 있습니다.
+
+curl로 같은 정보를 얻으려면 `--write-out` 옵션을 사용합니다.
+
+```bash
+curl -o /dev/null -s -w "
+    namelookup: %{time_namelookup}s
+    connect:    %{time_connect}s
+    ssl:        %{time_appconnect}s
+    ttfb:       %{time_starttransfer}s
+    total:      %{time_total}s
+    size:       %{size_download} bytes
+" https://example.com
+```
+
 ## 자주 하는 실수
 
 | 실수 | 증상 | 올바른 이해 |

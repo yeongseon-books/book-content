@@ -1,433 +1,366 @@
 ---
-title: "AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가"
 series: ai-evaluation-101
 episode: 1
-language: ko
-status: published
-published_to:
-  tistory:
-    url: "https://yeongseonchoe.tistory.com/116"
-    published_at: '2026-05-18'
+title: "AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가"
+status: publish-ready
 targets:
   tistory: true
   medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
+language: ko
 tags:
-- AI Evaluation
-- LLM
-- Testing
-- Quality
-last_reviewed: '2026-05-14'
-seo_description: LLM은 같은 입력에도 다른 답을 내놓습니다. 평가 없이 운영하면 어제 잘 되던 기능이 오늘 망가지는 것을 알 수 없습니다.
+  - LLMEvaluation
+  - Testing
+  - CI
+  - Quality
+  - Pipeline
+seo_description: LLM 앱 평가가 필요한 이유, 4단계 평가 파이프라인, 최소 10케이스 원칙, CI 통합 방법을 정리합니다
+last_reviewed: '2026-06-20'
 ---
 
 # AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가
 
-LLM 기능을 처음 붙일 때 팀은 대개 응답 품질보다 기능 연결부터 끝내려 합니다. 데모 단계에서는 그 선택이 크게 문제처럼 보이지 않습니다. 질문을 넣었더니 답이 나오고, 화면에도 자연스럽게 붙기 때문입니다.
+LLM 애플리케이션은 전통적인 소프트웨어와 다릅니다. 동일한 입력에도 비결정적 출력이 나올 수 있고, 프롬프트 한 줄만 바꿔도 전체 동작이 바뀝니다. 모델을 업그레이드하면 일부 케이스는 좋아지지만 다른 케이스가 나빠질 수 있습니다. 이런 특성 때문에 전통적인 단위 테스트만으로는 품질을 보증할 수 없습니다. 체계적인 평가 파이프라인이 없으면 "느낌적으로 좋아진 것 같다"는 판단에 의존하게 됩니다.
 
-이 글은 AI Evaluation 101 시리즈의 첫 번째 글입니다.
+이 글은 AI Evaluation 101 시리즈의 1번째 글입니다.
 
-문제는 그다음부터입니다. 프롬프트를 한 줄 손보고, 모델 버전을 바꾸고, 검색 컨텍스트를 추가하는 순간 어제 잘 되던 사례가 오늘은 흔들리기 시작합니다. 그런데 일반 테스트만 돌리고 있으면 이 변화가 품질 개선인지, 조용한 회귀인지 팀이 구분하지 못합니다.
-
-현업에서 저는 이 지점에서 두 종류의 팀을 봤습니다. 한쪽은 '답변이 좀 더 자연스러워진 것 같다'는 감각으로 계속 운영합니다. 다른 한쪽은 작은 평가셋이라도 만들어서 모델, 프롬프트, 정책 변경이 어떤 차이를 만드는지 기록합니다. 시간이 갈수록 후자의 팀이 훨씬 빠르게 안정화됩니다.
-
-여기서는 왜 LLM 평가가 일반 소프트웨어 테스트와 다른지, 무엇을 측정해야 하는지, 그리고 왜 10건짜리 작은 평가셋이라도 지금 바로 시작해야 하는지를 실무 관점에서 정리하겠습니다.
-
-![LLM 애플리케이션 평가의 필요성](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-01-why-evaluate-llm-applications.ko.png)
-*LLM 애플리케이션 평가의 필요성*
-> LLM 평가는 테스트를 대체하는 장식이 아니라, 품질 변화를 계속 읽게 해 주는 계기판입니다.
+![LLM 평가 파이프라인 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-01-concept-at-a-glance.ko.png)
+*LLM 앱 평가의 4단계 파이프라인 구조*
 
 ## 이 글에서 다룰 문제
 
-- LLM 앱은 왜 일반 기능 테스트만으로 품질을 판단하기 어려울까요?
-- 평가를 붙이지 않고 운영하면 어떤 문제가 가장 늦게 드러날까요?
-- 처음 평가 파이프라인은 어떤 작은 단위부터 시작해야 할까요?
-- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
-- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
+- LLM 앱을 기존 소프트웨어와 같은 방식으로 테스트하기 어려운 이유는 무엇일까요?
+- 평가 파이프라인을 구축하지 않으면 어떤 문제가 발생할까요?
+- 최소 몇 개의 테스트 케이스가 있어야 의미 있는 평가가 될까요?
+- CI/CD 파이프라인에 LLM 평가를 어떻게 통합할 수 있을까요?
+- 평가 결과를 어떻게 해석하고 의사결정에 활용할 수 있을까요?
 
-## 왜 이 글이 중요한가
+## 핵심 개념 한 줄 정리
 
-평가가 없는 LLM 서비스는 품질을 운영하는 것이 아니라 운에 맡기는 것에 가깝습니다. 기능이 살아 있다는 사실과 답변 품질이 유지된다는 사실은 전혀 다릅니다. 특히 프롬프트, 검색, 모델 공급사 업데이트가 모두 변수가 되는 시스템에서는 더 그렇습니다.
+- **Golden Dataset**: 검증된 입력-정답 쌍으로 구성된 평가 기준 데이터셋입니다.
+- **Regression**: 이전 버전보다 성능이 낮아지는 현상으로, 평가 없이는 감지하기 어렵습니다.
+- **Deterministic Metric**: 정답과 예측을 비교해 계산하는 Exact Match, BLEU 같은 지표입니다.
+- **LLM-as-Judge**: LLM이 다른 LLM의 출력을 평가하는 방식입니다.
+- **Eval Pipeline**: 데이터셋 → 실행 → 채점 → 리포트의 4단계로 구성된 평가 흐름입니다.
 
-저는 팀이 평가 없이 출시한 뒤 사용자가 문제를 제보하면 그제야 '언제부터 망가졌지?'를 거꾸로 추적하는 장면을 자주 봤습니다. 이 방식은 느릴 뿐 아니라 학습도 남지 않습니다. 반대로 작은 평가셋이라도 있으면 변경 전후의 차이를 비교할 수 있고, 모델 업그레이드도 더 이상 감각의 문제가 아니게 됩니다.
+## LLM 평가가 어려운 이유
 
-결국 이 글의 핵심은 평가가 연구용 사치가 아니라 변경 관리의 기본 장치라는 사실입니다. LLM을 운영하는 순간부터 팀은 답변 품질을 테스트 코드처럼 반복해서 확인할 수 있어야 합니다.
+| 특성 | 전통적 소프트웨어 | LLM 애플리케이션 |
+|---|---|---|
+| 결정성 | 동일 입력 → 동일 출력 | 동일 입력 → 다양한 출력 |
+| 테스트 방법 | 단위 테스트, 통합 테스트 | 평가 데이터셋 + 채점 모델 |
+| 실패 정의 | 예외 발생, 잘못된 반환값 | 품질 저하, 환각, 불완전한 답변 |
+| 변경 영향 | 코드 변경으로 추적 | 프롬프트 변경이 비선형적 영향 |
+| 회귀 감지 | 기존 테스트가 자동 감지 | 평가 파이프라인 없으면 수동 확인 |
 
-## 핵심 관점
+## 실습 1: 기본 평가 파이프라인
 
-이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다. 평가가 없는 LLM 서비스는 품질을 운영하는 것이 아니라 운에 맡기는 것에 가깝습니다. 기능이 살아 있다는 사실과 답변 품질이 유지된다는 사실은 전혀 다릅니다. 특히 프롬프트, 검색, 모델 공급사 업데이트가 모두 변수가 되는 시스템에서는 더 그렇습니다.
-
-> LLM 평가는 정답 하나를 맞히는 시험이 아닙니다. 같은 입력이 다른 답을 낳는 환경에서, 팀이 어떤 품질 축을 지키고 어떤 변화는 막아야 하는지를 숫자와 사례로 붙잡는 운영 장치입니다.
-
-이 관점을 먼저 잡아 두면 뒤에 나오는 코드와 지표를 기능 설명이 아니라 운영 설계 관점에서 읽을 수 있습니다. 결국 중요한 것은 수치 이름보다, 그 수치가 어떤 의사결정을 가능하게 하느냐입니다.
-
-## 핵심 개념
-
-### LLM 평가는 왜 일반 테스트와 다른가요?
-
-![LLM 평가와 일반 테스트의 차이](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-02-why-is-llm-evaluation-different-from-reg.ko.png)
-
-*LLM 평가와 일반 테스트의 차이*
-전통적인 단위 테스트는 `assert add(2, 3) == 5`처럼 결정적입니다. 같은 입력은 같은 출력을 내고, 정답이 하나입니다.
-
-LLM은 다릅니다.
+4단계 평가 파이프라인을 구현합니다: 데이터셋 로드 → 모델 실행 → 채점 → 리포트.
 
 ```python
 from openai import OpenAI
+from dataclasses import dataclass
+import json
+from datetime import datetime
 
 client = OpenAI()
 
-def summarize(text: str) -> str:
-    resp = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": f"Summarize in one sentence: {text}"}],
-    )
-    return resp.choices[0].message.content
-```
-
-같은 `text`를 두 번 넣어도 응답 두 줄이 정확히 일치하지 않습니다. "맞다"라고 부를 만한 답이 여러 개 있고, "틀렸다"고 단정하기 어려운 답도 많습니다. `==` 비교만으로는 평가가 불가능합니다.
-
-### 평가 없이 운영하면 무엇이 깨지나요?
-
-![평가 없이 운영하면 무엇이 깨지나요](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-03-what-breaks-if-you-run-without-evaluatio.ko.png)
-
-*평가 없이 운영하면 무엇이 깨지나요*
-세 가지가 동시에 깨집니다.
-
-1. **회귀를 발견할 수 없습니다**: prompt를 한 줄 바꿨더니 다른 케이스가 깨졌는데, eval이 없으면 사용자가 알려줄 때까지 모릅니다.
-2. **모델 업그레이드를 두려워하게 됩니다**: gpt-4o-mini → gpt-4.1로 바꾸려는데 "더 나은지" 측정할 방법이 없으면 그냥 안 바꾸게 됩니다.
-3. **개선했다는 증거가 없습니다**: "이번 prompt가 더 좋아졌어요"라고 말해도 숫자가 없으면 이해관계자를 설득할 수 없습니다.
-
-```python
-# eval 없이 프롬프트를 바꿀 때의 모습
-# 변경 전: "Summarize in one sentence:"
-# 변경 후:  "Summarize concisely in one sentence in a friendly tone:"
-# -> 어떤 케이스가 좋아지고 어떤 케이스가 나빠졌는지 알 수 없습니다.
-```
-
-### 무엇을 측정해야 하나요?
-
-![무엇을 측정해야 하나요](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-04-what-should-you-measure.ko.png)
-
-*무엇을 측정해야 하나요*
-LLM 응답에는 최소 4가지 차원이 있고, 각각 다른 측정 방법이 필요합니다.
-
-```python
-from dataclasses import dataclass
-
-@dataclass
-class EvalResult:
-    correctness: float  # are the facts right
-    relevance: float    # does it answer the question
-    safety: float       # any harm or bias
-    style: float        # does it follow the requested format and tone
-```
-
-1. **Correctness (정확성)**: 사실이 맞는가. RAG에서는 retrieved context와 일치하는가.
-2. **Relevance (관련성)**: 질문에 답하고 있는가, 아니면 빙빙 도는가.
-3. **Safety (안전성)**: PII 유출, 차별 발언, 위험한 조언이 없는가.
-4. **Style (문체/형식)**: JSON 스키마, 길이 제한, 톤을 지키는가.
-
-이 시리즈에서는 각 차원에 어떤 지표가 적합한지를 이후 글에서 하나씩 다룹니다.
-
-### 평가 파이프라인의 4단계
-
-![평가 파이프라인의 4단계](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-05-the-four-stages-of-an-evaluation-pipelin.ko.png)
-
-*평가 파이프라인의 4단계*
-LLM 평가 시스템은 어떤 도구를 쓰든 동일한 4단계로 구성됩니다.
-
-```python
-def run_evaluation(eval_set: list[dict], system_under_test) -> dict:
-    # 1. Generate — 테스트 대상 시스템에 입력을 넣고 응답을 수집
-    predictions = [system_under_test(ex["input"]) for ex in eval_set]
-
-    # 2. Score — 각 응답을 채점
-    scores = [score_one(ex, pred) for ex, pred in zip(eval_set, predictions)]
-
-    # 3. Aggregate — 점수를 집계
-    summary = {
-        "accuracy": sum(s["correct"] for s in scores) / len(scores),
-        "avg_relevance": sum(s["relevance"] for s in scores) / len(scores),
-    }
-
-    # 4. Compare — 이전 버전과 비교
-    return summary
-```
-
-1. **Generate**: eval set의 입력으로 시스템 응답을 생성합니다.
-2. **Score**: 각 응답에 점수를 매깁니다 (결정적 지표, LLM-as-judge, 사람 평가 중 택1 또는 조합).
-3. **Aggregate**: 차원별 평균, 통과율, p95 등으로 집계합니다.
-4. **Compare**: 이전 버전 또는 baseline과 비교해서 회귀가 없는지 확인합니다.
-
-### 첫 평가 — 10건이라도 시작하세요
-
-"평가는 데이터가 충분히 모이면 시작하겠다"는 1년이 지나도 시작 못 합니다. 10건으로 시작하세요.
-
-```python
-eval_set = [
-    {"input": "What is RAG?", "expected_keywords": ["retrieval", "generation"]},
-    {"input": "Explain async/await", "expected_keywords": ["coroutine", "await"]},
-    # ... 8 more
-]
-
-def score_one(ex, pred: str) -> dict:
-    keywords_found = sum(1 for kw in ex["expected_keywords"] if kw.lower() in pred.lower())
-    return {
-        "correct": keywords_found == len(ex["expected_keywords"]),
-        "keyword_recall": keywords_found / len(ex["expected_keywords"]),
-    }
-
-results = run_evaluation(eval_set, summarize)
-print(f"Accuracy: {results['accuracy']:.0%}")
-```
-
-10건으로도 "5번 케이스에서 prompt 변경 후 점수가 떨어졌다"는 신호를 받을 수 있습니다. 이 신호 하나가 회귀의 90%를 잡습니다.
-
-### 오늘 바로 돌릴 수 있는 최소 평가 하네스
-
-첫 평가를 시작할 때는 거창한 플랫폼보다 작동하는 습관이 중요합니다. 시스템 호출 함수 하나, 작은 평가셋 하나, 실패 케이스를 그대로 보여 주는 출력만 있어도 운영 대화가 달라집니다.
-
-```python
-from dataclasses import dataclass
 
 @dataclass
 class EvalCase:
     case_id: str
-    prompt: str
-    must_include: list[str]
+    input: str
+    expected: str
+    category: str = "general"
+    metadata: dict = None
 
-def run_smoke_eval(cases: list[EvalCase], system_under_test) -> dict:
-    failed_cases = []
-    scores = []
+
+@dataclass
+class EvalResult:
+    case_id: str
+    input: str
+    expected: str
+    actual: str
+    passed: bool
+    score: float
+    latency_ms: float
+
+
+def run_model(prompt: str, system: str = "") -> tuple[str, float]:
+    """모델을 실행하고 응답과 레이턴시를 반환합니다."""
+    import time
+    start = time.time()
+
+    messages = []
+    if system:
+        messages.append({"role": "system", "content": system})
+    messages.append({"role": "user", "content": prompt})
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+        max_tokens=512,
+        temperature=0,  # 결정적 출력을 위해 temperature=0 사용
+    )
+
+    latency = (time.time() - start) * 1000
+    return response.choices[0].message.content, latency
+
+
+def score_exact_match(expected: str, actual: str) -> float:
+    """정확 일치 여부를 확인합니다."""
+    return 1.0 if expected.strip().lower() == actual.strip().lower() else 0.0
+
+
+def score_contains_keywords(expected: str, actual: str) -> float:
+    """정답의 핵심 키워드가 응답에 포함되었는지 확인합니다."""
+    keywords = [w for w in expected.lower().split() if len(w) > 3]
+    if not keywords:
+        return 0.0
+    found = sum(1 for kw in keywords if kw in actual.lower())
+    return found / len(keywords)
+
+
+def run_eval_pipeline(
+    cases: list[EvalCase],
+    system_prompt: str = "",
+    scorer: str = "keywords",
+    pass_threshold: float = 0.7,
+) -> dict:
+    """평가 파이프라인을 실행하고 결과를 반환합니다."""
+    results = []
 
     for case in cases:
-        answer = system_under_test(case.prompt)
-        matched = sum(1 for kw in case.must_include if kw.lower() in answer.lower())
-        passed = matched == len(case.must_include)
-        scores.append(int(passed))
+        actual, latency = run_model(case.input, system_prompt)
 
-        if not passed:
-            failed_cases.append(
-                {
-                    "case_id": case.case_id,
-                    "answer": answer,
-                    "missing": [kw for kw in case.must_include if kw.lower() not in answer.lower()],
-                }
-            )
+        if scorer == "exact":
+            score = score_exact_match(case.expected, actual)
+        else:
+            score = score_contains_keywords(case.expected, actual)
 
+        results.append(EvalResult(
+            case_id=case.case_id,
+            input=case.input,
+            expected=case.expected,
+            actual=actual,
+            passed=score >= pass_threshold,
+            score=score,
+            latency_ms=latency,
+        ))
+
+    passed = sum(1 for r in results if r.passed)
     return {
-        "pass_rate": sum(scores) / len(scores),
-        "failed_cases": failed_cases,
+        "total": len(results),
+        "passed": passed,
+        "pass_rate": passed / len(results) if results else 0.0,
+        "avg_score": sum(r.score for r in results) / len(results) if results else 0.0,
+        "avg_latency_ms": sum(r.latency_ms for r in results) / len(results) if results else 0.0,
+        "results": results,
+        "timestamp": datetime.utcnow().isoformat(),
     }
 
-smoke_cases = [
-    EvalCase("rag-001", "What is RAG?", ["retrieval", "generation"]),
-    EvalCase("async-001", "Explain async/await", ["coroutine", "await"]),
-    EvalCase("json-001", "Return valid JSON with a title field", ["title"]),
+
+# 최소 10케이스 예시
+eval_cases = [
+    EvalCase("e001", "파이썬에서 리스트를 정렬하는 방법은?", "sort() 또는 sorted()"),
+    EvalCase("e002", "HTTP 상태 코드 404는 무엇을 의미하나요?", "Not Found"),
+    EvalCase("e003", "Python의 GIL이란 무엇인가요?", "Global Interpreter Lock"),
+    EvalCase("e004", "REST와 GraphQL의 차이는?", "쿼리 방식, 오버페칭"),
+    EvalCase("e005", "도커(Docker)란 무엇인가요?", "컨테이너 플랫폼"),
+    EvalCase("e006", "SQL의 JOIN 유형을 설명하세요.", "INNER, LEFT, RIGHT, FULL"),
+    EvalCase("e007", "비동기 프로그래밍이란 무엇인가요?", "async await"),
+    EvalCase("e008", "머신러닝과 딥러닝의 차이는?", "신경망 레이어"),
+    EvalCase("e009", "API란 무엇인가요?", "Application Programming Interface"),
+    EvalCase("e010", "클라우드 컴퓨팅의 장점은?", "확장성, 비용 효율"),
 ]
 
-report = run_smoke_eval(smoke_cases, summarize)
-print(report)
+report = run_eval_pipeline(
+    eval_cases,
+    system_prompt="당신은 IT 기술 전문가입니다. 간결하고 정확하게 답하세요.",
+)
+print(f"통과율: {report['pass_rate']:.1%} ({report['passed']}/{report['total']})")
+print(f"평균 점수: {report['avg_score']:.3f}")
+print(f"평균 레이턴시: {report['avg_latency_ms']:.0f}ms")
 ```
 
-**예상 출력:**
+## 실습 2: CI 통합 평가
 
-```text
-{
-  'pass_rate': 0.67,
-  'failed_cases': [
-    {
-      'case_id': 'async-001',
-      'answer': '...',
-      'missing': ['coroutine']
-    }
-  ]
-}
-```
-
-이 정도 출력만 있어도 PR 리뷰가 훨씬 실용적으로 바뀝니다. "이번 응답이 더 자연스러워 보인다"가 아니라 "async-001에서 회귀가 생겼다"처럼 케이스 단위로 대화할 수 있기 때문입니다.
-
-### 첫 주에 가장 자주 터지는 실패 양상
-
-| 실패 양상 | 겉으로 보이는 증상 | 바로 취할 조치 |
-|---|---|---|
-| 보기 좋은 happy path만 넣음 | 평균 점수는 높지만 운영 불만이 계속 나옴 | 최근 사용자 불만 2~3건을 매주 추가 |
-| 평균 점수 하나만 봄 | 정확성은 올랐는데 안전성·형식 준수가 떨어져도 못 봄 | correctness, relevance, safety, style를 분리 |
-| 케이스 diff를 안 남김 | 점수 하락은 보이는데 왜 떨어졌는지 모름 | failed case id, 원문 답변, 누락 키워드 출력 |
-| 수동 실행에만 의존 | "작은 prompt 수정이라 괜찮겠지" 하고 평가를 건너뜀 | smoke eval을 PR 검토나 CI에 연결 |
-
-첫 하네스의 목표는 우아함이 아닙니다. 사용자 제보보다 먼저 회귀를 드러내는 속도입니다.
-
-### 팀이 바로 적용할 수 있는 최소 CI 평가 파이프라인
-
-평가가 문서로만 남으면 한 달 안에 무너집니다. 실제로는 PR마다 같은 조건으로 반복 실행되게 만들어야 합니다. 아래 예시는 가장 작은 형태의 GitHub Actions 기반 평가 파이프라인입니다.
-
-```yaml
-# .github/workflows/llm-eval-smoke.yml
-name: LLM Eval Smoke
-
-on:
-  pull_request:
-    paths:
-      - "src/**"
-      - "prompts/**"
-      - "evals/**"
-
-jobs:
-  smoke-eval:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install -r requirements.txt
-      - name: Run smoke evaluation
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python -m evals.smoke.run --input evals/smoke.jsonl --output evals/result.json
-      - name: Enforce gate
-        run: python -m evals.smoke.gate --report evals/result.json --min-pass-rate 0.8
-```
+GitHub Actions에서 LLM 평가를 자동으로 실행하고 회귀를 감지합니다.
 
 ```python
-# evals/smoke/gate.py
-import json
-import argparse
 import sys
+import json
+from pathlib import Path
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--report", required=True)
-    parser.add_argument("--min-pass-rate", type=float, required=True)
-    args = parser.parse_args()
 
-    with open(args.report) as f:
-        report = json.load(f)
+def load_baseline(path: str) -> dict:
+    """이전 평가 결과(기준선)를 로드합니다."""
+    baseline_file = Path(path)
+    if not baseline_file.exists():
+        return {}
+    return json.loads(baseline_file.read_text())
 
-    pass_rate = report["pass_rate"]
-    if pass_rate < args.min_pass_rate:
-        print(f"FAIL: pass_rate={pass_rate:.2%} < {args.min_pass_rate:.2%}")
-        for case in report.get("failed_cases", []):
-            print(f"- {case['case_id']}: missing={case.get('missing', [])}")
-        sys.exit(1)
 
-    print(f"PASS: pass_rate={pass_rate:.2%}")
+def save_results(results: dict, path: str) -> None:
+    """평가 결과를 파일로 저장합니다."""
+    Path(path).write_text(
+        json.dumps(
+            {
+                "pass_rate": results["pass_rate"],
+                "avg_score": results["avg_score"],
+                "timestamp": results["timestamp"],
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
 
-if __name__ == "__main__":
-    main()
+
+def check_regression(
+    current: dict,
+    baseline: dict,
+    max_drop: float = 0.05,
+) -> tuple[bool, str]:
+    """현재 결과와 기준선을 비교해 회귀 여부를 판단합니다."""
+    if not baseline:
+        return True, "기준선 없음, 첫 실행으로 저장"
+
+    current_rate = current["pass_rate"]
+    baseline_rate = baseline.get("pass_rate", 0.0)
+    drop = baseline_rate - current_rate
+
+    if drop > max_drop:
+        return False, (
+            f"회귀 감지: 통과율 {baseline_rate:.1%} → {current_rate:.1%} "
+            f"({drop:.1%} 하락, 허용 최대: {max_drop:.1%})"
+        )
+    return True, f"통과: {current_rate:.1%} (기준선: {baseline_rate:.1%})"
+
+
+# CI 실행 예시
+BASELINE_PATH = "eval_baseline.json"
+RESULTS_PATH = "eval_results.json"
+
+report = run_eval_pipeline(eval_cases)
+baseline = load_baseline(BASELINE_PATH)
+passed, message = check_regression(report, baseline)
+
+print(f"[CI Eval] {message}")
+save_results(report, RESULTS_PATH)
+
+if not passed:
+    print("[CI] 평가 실패: PR 병합 차단")
+    sys.exit(1)
+else:
+    print("[CI] 평가 통과")
+    # 처음 실행이거나 성능 향상 시 기준선 업데이트
+    if not baseline or report["pass_rate"] > baseline.get("pass_rate", 0.0):
+        save_results(report, BASELINE_PATH)
+        print("[CI] 기준선 업데이트")
 ```
 
-핵심은 화려한 대시보드가 아니라, PR 단계에서 품질 저하를 자동으로 막는 기준선을 만드는 일입니다.
+## 실습 3: 카테고리별 실패 분석
 
-### 4주 도입 로드맵
-
-평가를 처음 도입하는 팀은 도구 선택보다 도입 순서가 더 중요합니다. 아래처럼 4주 단위로 범위를 제한하면 "하네스는 만들었지만 아무도 안 돌리는" 상태를 피하기 쉽습니다.
-
-| 주차 | 목표 | 산출물 |
-|---|---|---|
-| 1주차 | 10~20건 smoke eval 구축 | `evals/smoke.jsonl`, pass/fail 스크립트 |
-| 2주차 | 차원 분리 점수 도입 | correctness/relevance 분리 리포트 |
-| 3주차 | PR 자동 게이트 연결 | GitHub Actions fail gate |
-| 4주차 | 실패 환류 루프 시작 | 주간 실패 케이스 추가 규칙 |
+어떤 카테고리에서 실패가 집중되는지 분석합니다.
 
 ```python
-def weekly_eval_review(summary: dict) -> list[str]:
-    actions = []
-    if summary["pass_rate"] < 0.8:
-        actions.append("핵심 프롬프트 변경 롤백 검토")
-    if summary.get("safety_failures", 0) > 0:
-        actions.append("safety 케이스를 golden set으로 승격")
-    if summary.get("flaky_cases", 0) > 3:
-        actions.append("비결정성 높은 케이스를 분리 분석")
-    return actions
+from collections import defaultdict
+
+
+def analyze_failures(results: dict) -> dict:
+    """카테고리별 통과율과 실패 패턴을 분석합니다."""
+    category_stats = defaultdict(lambda: {"total": 0, "passed": 0, "failures": []})
+
+    for result in results["results"]:
+        case = next((c for c in eval_cases if c.case_id == result.case_id), None)
+        category = case.category if case else "unknown"
+
+        category_stats[category]["total"] += 1
+        if result.passed:
+            category_stats[category]["passed"] += 1
+        else:
+            category_stats[category]["failures"].append({
+                "case_id": result.case_id,
+                "input": result.input[:60],
+                "expected": result.expected[:60],
+                "actual": result.actual[:60],
+                "score": result.score,
+            })
+
+    analysis = {}
+    for cat, stats in category_stats.items():
+        analysis[cat] = {
+            "pass_rate": stats["passed"] / stats["total"] if stats["total"] > 0 else 0.0,
+            "total": stats["total"],
+            "passed": stats["passed"],
+            "top_failures": stats["failures"][:3],  # 최대 3개 실패 사례
+        }
+
+    return analysis
+
+
+failure_analysis = analyze_failures(report)
+for category, stats in failure_analysis.items():
+    print(f"\n[{category}] 통과율: {stats['pass_rate']:.1%} ({stats['passed']}/{stats['total']})")
+    if stats["top_failures"]:
+        print(f"  대표 실패 케이스:")
+        for f in stats["top_failures"][:2]:
+            print(f"  - [{f['case_id']}] 점수: {f['score']:.2f}")
 ```
-
-이 로드맵의 목적은 완성도가 아니라 반복성입니다. 작게 시작해도 매주 계속 돌면 품질 운영 능력은 빠르게 올라갑니다.
-
-평가를 도입하는 가장 좋은 순간은 완벽해졌을 때가 아니라, 변경이 잦아지기 시작했을 때입니다.
-
-작은 평가 루프라도 팀의 변경 속도를 늦추지 않으면서 품질 사고를 줄이는 효과가 분명히 나타납니다.
-
-- `EvalResult`처럼 품질 차원을 구조체로 나누는 부분부터 보시면 좋습니다. 이 시점부터 팀의 대화가 '좋아졌다'가 아니라 '정확성은 올랐고 안전성은 유지됐다'로 바뀝니다.
-- `run_evaluation` 예제는 어떤 도구를 쓰든 평가 파이프라인이 생성 → 채점 → 집계 → 비교라는 네 단계로 반복된다는 점을 보여 줍니다.
-- 마지막 10건짜리 예제는 규모보다 습관이 중요하다는 메시지입니다. 작은 평가라도 있으면 프롬프트 변경 직후 회귀를 바로 잡을 수 있습니다.
-
-이 세 지점을 먼저 읽고 나면 세부 구현과 지표 해석이 훨씬 빨라집니다. 코드가 길어 보여도 운영 질문은 대개 여기로 다시 돌아옵니다.
-
-## 어디서 자주 헷갈릴까요?
-
-1. **production이 안정되면 평가하겠다**: 평가가 없으면 안정되었는지를 알 수 없습니다. 첫날부터 10건으로 시작하세요.
-2. **단일 점수에 집착**: "정확도 87%"만 보면 안전성이 떨어진 걸 놓칩니다. 항상 차원별로 보세요.
-3. **eval set을 prompt 작성자가 직접 만듦**: 자기가 만든 prompt에 유리한 케이스만 골라 측정 결과가 부풀려집니다. 다른 사람 또는 production trace에서 가져오세요.
-4. **결정적 지표만 사용**: BLEU만 보면 "의미는 맞지만 표현이 다른" 답이 모두 깎입니다. LLM-as-judge나 rubric 평가를 함께 쓰세요.
-5. **평가를 한 번만 돌림**: LLM은 stochastic이라 같은 입력에도 점수가 달라질 수 있습니다. 중요한 비교는 3-5회 반복해서 분산을 함께 보세요.
-
-현업에서 제가 가장 자주 보는 문제는 결과 숫자만 보고 원인 분해를 건너뛰는 습관입니다. 평가가 개선을 돕지 못하고 보고서용 숫자로만 남는 순간, 팀은 다시 감각에 의존하게 됩니다.
-
-## 첫 번째 운영 체크리스트
-
-- [ ] 현재 운영 중인 핵심 사용자 질문 10건을 바로 뽑을 수 있는가
-- [ ] 정확성, 관련성, 안전성, 형식 가운데 무엇을 먼저 지킬지 합의했는가
-- [ ] 프롬프트나 모델 변경 전후를 비교할 기준선이 있는가
-- [ ] 변경 후 품질 저하를 사용자 제보보다 먼저 감지할 수 있는가
-- [ ] 평가 결과를 숫자와 사례로 팀에 공유하는 흐름이 있는가
-
-## 실무에서는 이렇게 생각한다
-
-실무에서는 '평가를 언제 붙일까'보다 '평가 없이 무엇을 바꿀 수 있나'를 먼저 묻는 편이 더 맞습니다. 대부분의 경우 답은 거의 없습니다. 모델이나 프롬프트를 건드리는 순간 품질이 움직이기 때문입니다.
-
-강한 팀들은 첫 평가가 완벽하길 바라지 않습니다. 대신 아주 작은 셋이라도 먼저 만들고, 운영 중 생긴 실패 사례를 계속 추가합니다. 이렇게 쌓인 평가셋이 나중에는 프롬프트 자산보다 더 중요한 운영 자산이 됩니다.
-
-이 시리즈의 다음 글들이 모두 여기서 출발합니다. 어떤 데이터셋을 만들고, 어떤 지표를 고르고, 어떤 비교를 해야 하는지도 결국 '왜 평가가 필요한가'를 명확히 이해해야 흔들리지 않습니다.
-
-## 정리: 평가를 붙인 순간부터 LLM 기능은 제품이 아니라 시스템이 됩니다
-
-- LLM 응답은 결정적이지 않으므로 `==` 비교가 불가능합니다.
-- 평가 없이 운영하면 회귀, 모델 업그레이드, 개선 증명 모두 불가능해집니다.
-- 최소 4가지 차원(correctness, relevance, safety, style)을 별도로 측정하세요.
-- 평가 파이프라인은 generate → score → aggregate → compare 4단계입니다.
-- 데이터를 모을 때까지 기다리지 말고 10건으로라도 오늘 시작하세요.
-
-다음 글에서는 이 출발점을 실제 평가 데이터셋 설계로 연결합니다. 어떤 사례를 모아야 하고, 얼마나 모아야 하며, 어떤 라벨을 붙여야 하는지부터 잡아야 이후의 모든 지표가 의미를 갖습니다.
 
 ## 운영 체크리스트
 
-- [ ] 평가 없는 프롬프트 변경을 기본적으로 위험 변경으로 취급하기
-- [ ] 정확성 외 최소 한 개 이상의 보조 품질 축을 함께 측정하기
-- [ ] 작더라도 반복 가능한 평가셋을 버전 관리에 넣기
-- [ ] 모델 변경 시 체감이 아니라 비교 결과로 의사결정하기
-- [ ] 사용자 불만이 아니라 평가 결과가 먼저 경보를 울리게 만들기
+- [ ] 최소 10개, 권장 50개 이상의 평가 케이스를 보유하고 있습니다.
+- [ ] 평가가 CI 파이프라인에서 자동으로 실행됩니다.
+- [ ] 이전 결과 대비 회귀 감지 기준이 설정되어 있습니다.
+- [ ] 카테고리별 통과율을 추적해 약점 영역을 파악합니다.
+- [ ] 평가 결과가 버전과 함께 저장되어 추세를 분석할 수 있습니다.
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 해결 방법 |
+|---|---|---|
+| 평가 없이 프롬프트 변경 배포 | 회귀 후에야 문제 인지 | CI에서 평가를 배포 전 필수 단계로 설정 |
+| 케이스 수가 너무 적음 (1-3개) | 통계적 의미 없는 결과 | 최소 10개, 각 카테고리당 3개 이상 |
+| temperature=0 미설정 | 비결정적 출력으로 평가 불안정 | 평가 시 temperature=0 고정 |
+| 기준선 없이 절대 점수만 봄 | 개선/악화 여부 판단 불가 | 이전 버전 대비 상대 비교 |
+| 실패 케이스 분석 미실시 | 어느 영역이 약한지 파악 불가 | 카테고리별 실패율 추적 |
 
 ## 처음 질문으로 돌아가기
 
-- **LLM 앱은 왜 일반 기능 테스트만으로 품질을 판단하기 어려울까요?**
-  - 다음 글에서는 이 출발점을 실제 평가 데이터셋 설계로 연결합니다. 어떤 사례를 모아야 하고, 얼마나 모아야 하며, 어떤 라벨을 붙여야 하는지부터 잡아야 이후의 모든 지표가 의미를 갖습니다.
-- **평가를 붙이지 않고 운영하면 어떤 문제가 가장 늦게 드러날까요?**
-  - 다음 글에서는 이 출발점을 실제 평가 데이터셋 설계로 연결합니다. 어떤 사례를 모아야 하고, 얼마나 모아야 하며, 어떤 라벨을 붙여야 하는지부터 잡아야 이후의 모든 지표가 의미를 갖습니다.
-- **처음 평가 파이프라인은 어떤 작은 단위부터 시작해야 할까요?**
-  - 다음 글에서는 이 출발점을 실제 평가 데이터셋 설계로 연결합니다. 어떤 사례를 모아야 하고, 얼마나 모아야 하며, 어떤 라벨을 붙여야 하는지부터 잡아야 이후의 모든 지표가 의미를 갖습니다.
-  - 평가가 없는 LLM 서비스는 품질을 운영하는 것이 아니라 운에 맡기는 것에 가깝습니다. 기능이 살아 있다는 사실과 답변 품질이 유지된다는 사실은 전혀 다릅니다. 특히 프롬프트, 검색, 모델 공급사 업데이트가 모두 변수가 되는 시스템에서는 더 그렇습니다.
+- **LLM 앱을 기존 소프트웨어와 같은 방식으로 테스트하기 어려운 이유는 무엇일까요?**
+  LLM은 동일한 입력에도 비결정적 출력을 생성하고, 프롬프트 변경이 비선형적으로 품질에 영향을 미칩니다. 단순히 "예외 없음"이 통과 기준이 아니라 출력 품질 자체를 측정해야 하므로, 전통적인 단위 테스트만으로는 부족합니다.
+
+- **최소 몇 개의 테스트 케이스가 있어야 의미 있는 평가가 될까요?**
+  최소 10개, 실용적으로는 50개 이상을 권장합니다. 카테고리가 3개라면 각 카테고리당 최소 3-5개가 필요합니다. 통과율의 신뢰구간이 95% CI ±10% 이하가 되려면 약 100개가 필요합니다.
+
+- **CI/CD 파이프라인에 LLM 평가를 어떻게 통합할 수 있을까요?**
+  평가 스크립트가 기준선 대비 회귀를 감지하면 0이 아닌 종료 코드를 반환해 PR 병합을 차단합니다. 처음 실행이거나 성능이 향상되면 기준선을 업데이트해 다음 비교의 기준으로 사용합니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- **AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가 (현재 글)**
+- [AI Evaluation 101 (2/10): 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): 결정적 지표](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge](./04-llm-as-judge.md)
+- [AI Evaluation 101 (5/10): 루브릭 기반 채점](./05-rubric-based-scoring.md)
+- [AI Evaluation 101 (6/10): RAG 평가](./06-rag-evaluation.md)
+- [AI Evaluation 101 (7/10): 에이전트 평가](./07-agent-evaluation.md)
+- [AI Evaluation 101 (8/10): 회귀 테스트](./08-regression-testing.md)
+- [AI Evaluation 101 (9/10): A/B 테스트](./09-ab-testing-llms.md)
+- [AI Evaluation 101 (10/10): 프로덕션 평가](./10-production-evaluation.md)
 
 <!-- toc:end -->
 
 ## 참고 자료
 
-### 공식 문서
+- [OpenAI — Evals Framework](https://github.com/openai/evals)
+- [Anthropic — Model Evaluation](https://www.anthropic.com/research)
+- [RAGAS — RAG Evaluation](https://docs.ragas.io/)
+- [DeepEval — LLM Testing Framework](https://docs.confident-ai.com/)
+- [book-examples — ai-evaluation-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/ai-evaluation-101/ko)
 
-- [OpenAI — Evals framework](https://github.com/openai/evals)
-- [Anthropic — Building evals](https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests)
-- [Hugging Face — Evaluating LLMs](https://huggingface.co/learn/cookbook/en/llm_judge)
-- [Eugene Yan — LLM evaluation patterns](https://eugeneyan.com/writing/llm-evaluators/)
-
-### 관련 시리즈
-
-- [다음 글 — 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
-- [시리즈 현재 위치 다시 보기](./01-why-evaluate-llm-apps.md)
-- [LLM Apps Ops 101](../../llm-apps-ops-101/ko/01-monitoring-and-logging.md) — 같은 "LLM 정확성" 문제를 운영 단계에서 다룹니다. 이 시리즈가 릴리스 전 게이트를 만든다면, ops 시리즈는 릴리스 후에 모니터링·로깅·알림으로 같은 신호를 추적합니다.
-
-- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-evaluation-101/ko/01-why-evaluate-llm-apps)
-
-Tags: AI Evaluation, LLM, Testing, Quality
+Tags: LLMEvaluation, Testing, CI, Quality, Pipeline

@@ -308,6 +308,97 @@ print(req.amount + 100)  # 1100 (str "1000" → int 1000으로 자동 변환 후
 
 `pydantic`은 런타임 검증과 정적 타입 힌트를 동시에 제공합니다. 경계에서 들어오는 `dict[str, Any]`를 강타입 모델로 변환하는 가장 실용적인 방법입니다.
 
+## TypeScript: 동적 JavaScript 위에 정적 검사 얹기
+
+TypeScript는 JavaScript의 동적 타이핑 위에 정적 타입 레이어를 추가한 대표적인 사례입니다. 점진적 타입이 실제로 어떻게 작동하는지 잘 보여 줍니다.
+
+```typescript
+// TypeScript: 점진적 타입 도입
+// 1단계: any 타입으로 시작 (동적과 동일)
+function processData(data: any): any {
+    return data.value * 2;
+}
+
+// 2단계: 구체적 타입으로 좁히기
+interface DataPoint {
+    value: number;
+    label: string;
+}
+
+function processDataTyped(data: DataPoint): number {
+    return data.value * 2;  // value가 number임을 컴파일러가 알고 있음
+}
+
+// 3단계: 제네릭으로 타입 안전성 유지하면서 재사용성 높이기
+function first<T>(items: T[]): T | undefined {
+    return items[0];
+}
+
+const num = first([1, 2, 3]);   // 타입: number | undefined
+const str = first(["a", "b"]);  // 타입: string | undefined
+
+// 컴파일 오류 예시
+// processDataTyped({ value: "not a number", label: "x" });
+// Error: Type 'string' is not assignable to type 'number'
+```
+
+TypeScript의 `tsc --strict` 플래그는 Python의 `mypy --strict`와 같은 역할을 합니다. 기존 JavaScript 코드에서 시작해 점진적으로 타입을 추가하면서 도구 지원과 안전성을 높일 수 있습니다.
+
+## 타입 검사기를 CI에 통합하는 실전 패턴
+
+정적 타입 검사의 가치는 개발자 로컬 환경뿐 아니라 CI 파이프라인에 통합할 때 본격적으로 나타납니다.
+
+```python
+# pyproject.toml — mypy 설정 예시
+# [tool.mypy]
+# python_version = "3.11"
+# strict = true
+# ignore_missing_imports = false
+# disallow_any_explicit = true
+
+# CI에서 실행하는 타입 검사 스크립트
+import subprocess
+import sys
+
+def run_type_check() -> int:
+    """mypy를 실행하고 결과를 반환합니다."""
+    result = subprocess.run(
+        ["mypy", "src/", "--strict"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        print("Type errors found:")
+        print(result.stdout)
+        return 1
+    print("All type checks passed")
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(run_type_check())
+```
+
+```text
+CI 파이프라인 통합 흐름:
+git push
+    |
+    v
+CI 서버 (GitHub Actions / GitLab CI)
+    |
+    +-- ruff (린팅, 빠른 구문 검사)
+    |
+    +-- mypy --strict (타입 검사)
+    |
+    +-- pytest (단위 테스트)
+    |
+    +-- pytest --cov (커버리지)
+    |
+    v
+PR 머지 허용 / 차단
+```
+
+타입 검사기를 CI에 넣으면 "내 컴퓨터에서는 됐는데"라는 말이 사라집니다. 특히 여러 사람이 공유 코드베이스를 수정할 때 타입 회귀(type regression)를 자동으로 잡아 줍니다.
+
 ## 운영 체크리스트
 
 - [ ] 정적과 동적의 차이를 한 줄로 설명할 수 있는가?

@@ -290,6 +290,137 @@ Max-Age     만료 시간                         세션 쿠키 (브라우저 �
 Path        쿠키가 전송될 경로               /: 모든 경로, /api: API만
 ```
 
+## OAuth 2.0: 소셜 로그인 흐름
+
+직접 비밀번호를 관리하지 않고 Google, GitHub 같은 외부 서비스에 인증을 위임하는 표준입니다.
+
+```
+사용자          앱 서버            Google
+  │               │                  │
+  │ "Google 로그인" 클릭              │
+  │──────────────►│                  │
+  │               │ redirect to Google OAuth URL
+  │◄──────────────│                  │
+  │     구글 로그인 페이지로 이동     │
+  │──────────────────────────────────►│
+  │               │    로그인 + 앱 권한 승인
+  │◄──────────────────────────────────│
+  │  callback URL?code=AUTH_CODE      │
+  │──────────────►│                  │
+  │               │ POST /token {code}│
+  │               │──────────────────►│
+  │               │◄──────────────────│
+  │               │   access_token   │
+  │               │ GET /userinfo     │
+  │               │──────────────────►│
+  │               │◄──────────────────│
+  │               │  {email, name}   │
+  │   로그인 완료 │                  │
+  │◄──────────────│                  │
+```
+
+Flask에서 Google OAuth를 구현하는 최소 예제입니다.
+
+```python
+import os
+import requests
+from flask import Flask, redirect, request, session, url_for
+
+app = Flask(__name__)
+app.secret_key = os.environ["SECRET_KEY"]
+
+GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
+GOOGLE_CLIENT_SECRET = os.environ["GOOGLE_CLIENT_SECRET"]
+REDIRECT_URI = "https://example.com/auth/callback"
+
+@app.route("/auth/google")
+def google_login():
+    """사용자를 Google 로그인 페이지로 리다이렉트"""
+    params = {
+        "client_id": GOOGLE_CLIENT_ID,
+        "redirect_uri": REDIRECT_URI,
+        "response_type": "code",
+        "scope": "openid email profile",
+    }
+    query = "&".join(f"{k}={v}" for k, v in params.items())
+    return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?{query}")
+
+@app.route("/auth/callback")
+def google_callback():
+    """Google이 code를 들고 여기로 돌아옴"""
+    code = request.args.get("code")
+    if not code:
+        return "인증 실패", 400
+
+    # code → access_token 교환
+    token_res = requests.post("https://oauth2.googleapis.com/token", data={
+        "client_id": GOOGLE_CLIENT_ID,
+        "client_secret": GOOGLE_CLIENT_SECRET,
+        "code": code,
+        "redirect_uri": REDIRECT_URI,
+        "grant_type": "authorization_code",
+    })
+    access_token = token_res.json()["access_token"]
+
+    # access_token으로 사용자 정보 조회
+    user_info = requests.get(
+        "https://www.googleapis.com/oauth2/v2/userinfo",
+        headers={"Authorization": f"Bearer {access_token}"}
+    ).json()
+
+    # 세션에 사용자 저장 (또는 DB에서 user_id 찾기)
+    session["user_email"] = user_info["email"]
+    session["user_name"] = user_info["name"]
+    return redirect("/dashboard")
+```
+
+핵심은 앱 서버가 **비밀번호를 절대 받지 않는다**는 점입니다. 앱은 오직 사용자가 Google 계정을 소유하고 있음을 확인하는 증명서(code → token)만 주고받습니다.
+
+## 토큰 갱신: Refresh Token 패턴
+
+JWT access_token은 짧게(15분~1시간), refresh_token은 길게(30일) 발급합니다.
+
+```python
+import jwt, datetime, secrets
+
+SECRET = os.environ["JWT_SECRET"]
+
+def create_tokens(user_id: int) -> dict:
+    """access + refresh 토큰 쌍 발급"""
+    now = datetime.datetime.utcnow()
+    access_payload = {
+        "sub": user_id,
+        "iat": now,
+        "exp": now + datetime.timedelta(minutes=15),  # 15분
+        "type": "access",
+    }
+    refresh_payload = {
+        "sub": user_id,
+        "iat": now,
+        "exp": now + datetime.timedelta(days=30),     # 30일
+        "type": "refresh",
+        "jti": secrets.token_hex(16),  # JWT ID — 폐기 리스트에 활용
+    }
+    return {
+        "access_token": jwt.encode(access_payload, SECRET, algorithm="HS256"),
+        "refresh_token": jwt.encode(refresh_payload, SECRET, algorithm="HS256"),
+    }
+
+@app.route("/auth/refresh", methods=["POST"])
+def refresh():
+    """refresh_token으로 새 access_token 발급"""
+    refresh_token = request.json.get("refresh_token")
+    try:
+        payload = jwt.decode(refresh_token, SECRET, algorithms=["HS256"])
+        if payload.get("type") != "refresh":
+            return {"error": "invalid token type"}, 401
+        # DB에서 jti가 폐기 목록에 있는지 확인 (선택)
+        tokens = create_tokens(payload["sub"])
+        return tokens
+    except jwt.ExpiredSignatureError:
+        return {"error": "refresh token expired, login again"}, 401
+```
+
 ## 자주 하는 실수
 
 | 실수 | 증상 | 올바른 방법 |

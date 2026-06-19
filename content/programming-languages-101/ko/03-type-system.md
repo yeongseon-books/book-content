@@ -299,6 +299,91 @@ print(final)  # Money(amount=9000, currency='KRW')
 
 `Money` 타입을 쓰면 통화 단위를 잊거나 다른 통화끼리 더하는 실수를 타입 수준에서 막을 수 있습니다.
 
+## TypeScript의 구조적 타입 시스템
+
+Go와 TypeScript는 명목적(nominal) 타입 시스템이 아닌 구조적(structural) 타입 시스템을 사용합니다. 타입 이름이 아니라 구조(shape)가 호환성을 결정합니다.
+
+```typescript
+// TypeScript: 구조적 타입 — 이름이 아닌 구조가 기준
+interface Printable {
+    name: string;
+    print(): void;
+}
+
+// Dog 클래스는 Printable을 명시적으로 구현하지 않았지만
+class Dog {
+    constructor(public name: string) {}
+    print(): void { console.log(`Dog: ${this.name}`); }
+}
+
+// 구조가 맞으면 할당 가능
+const p: Printable = new Dog("Rex");  // 컴파일 통과
+p.print();  // "Dog: Rex"
+
+// 인터페이스 없이도 인라인 구조 타입 사용 가능
+function greet(obj: { name: string }): string {
+    return `Hello, ${obj.name}`;
+}
+
+console.log(greet({ name: "Alice" }));   // "Hello, Alice"
+console.log(greet(new Dog("Rex")));      // "Hello, Rex" — Dog도 name이 있으므로 통과
+```
+
+```python
+# Python: Protocol로 구조적 타이핑
+from typing import Protocol, runtime_checkable
+
+@runtime_checkable
+class Printable(Protocol):
+    name: str
+    def print(self) -> None: ...
+
+class Dog:
+    def __init__(self, name: str) -> None:
+        self.name = name
+    def print(self) -> None:
+        print(f"Dog: {self.name}")
+
+def greet(obj: Printable) -> str:
+    return f"Hello, {obj.name}"
+
+dog = Dog("Rex")
+print(greet(dog))          # "Hello, Rex"
+print(isinstance(dog, Printable))  # True (runtime_checkable 덕분)
+```
+
+구조적 타이핑은 "이름표를 확인하는 것이 아니라 실제로 할 수 있는 것을 확인한다"는 철학입니다. 덕 타이핑의 정적 버전이라고 볼 수 있습니다.
+
+## 타입 추론: 덜 적고도 더 안전하게
+
+현대 정적 타입 언어 대부분은 타입 추론을 제공합니다. 개발자가 모든 곳에 타입을 적지 않아도 컴파일러가 문맥으로 타입을 알아냅니다.
+
+```rust
+// Rust: 광범위한 타입 추론
+fn main() {
+    let x = 5;               // i32로 추론
+    let y = 2.0;             // f64로 추론
+    let v = vec![1, 2, 3];   // Vec<i32>로 추론
+
+    let doubled: Vec<_> = v.iter().map(|n| n * 2).collect();
+    // collect()의 타입은 doubled의 타입 선언에서 역방향으로 추론됨
+
+    println!("{:?}", doubled);  // [2, 4, 6]
+}
+```
+
+```python
+# Python + mypy: 제한적이지만 일부 추론 가능
+def double_items(items: list[int]) -> list[int]:
+    return [x * 2 for x in items]
+
+nums = [1, 2, 3]
+result = double_items(nums)
+# mypy는 result가 list[int]임을 알고 있음
+```
+
+타입 추론은 타입 안전성과 간결한 코드를 동시에 얻는 핵심 도구입니다. Rust처럼 강한 추론 엔진을 가진 언어에서는 함수 시그니처에만 타입을 적고 함수 본문의 대부분은 컴파일러에게 맡깁니다.
+
 ## 운영 체크리스트
 
 - [ ] 정적 타입과 동적 타입, 강한 타입과 약한 타입을 각각 구분할 수 있는가?
