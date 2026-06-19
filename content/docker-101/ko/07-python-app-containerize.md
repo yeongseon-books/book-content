@@ -47,25 +47,25 @@ Python 애플리케이션을 컨테이너에 넣는 일은 생각보다 빨리 �
 - 이 기능을 프로덕션에서 쓸 때 보안 관점에서 주의할 점은 무엇일까요?
 - 초보자가 이 기능에서 가장 자주 겪는 오류는 무엇일까요?
 
-## 왜 이 글이 중요한가
+## 핵심 개념
 
 Python을 컨테이너에 넣고 `python app.py`만 실행해도 일단은 동작해 보일 수 있습니다. 하지만 배포 중 `SIGTERM`을 제대로 처리하지 못하면 진행 중이던 요청이 중간에 끊기고, 오케스트레이터 입장에서는 정상 종료와 강제 종료를 구분하기 어려워집니다. 이런 문제는 개발 단계에서는 보이지 않다가 운영에서만 드러나는 경우가 많습니다.
 
-또한 healthcheck와 non-root 실행은 각각 신뢰성과 보안의 기본값입니다. 컨테이너가 실제로 요청을 받을 준비가 되었는지, 혹은 침해되더라도 권한이 과도하지 않은지를 초기에 설계해야 합니다.
-
-- **PID 1**: 컨테이너 안에서 가장 먼저 실행되는 프로세스입니다.
-- **SIGTERM**: 정상 종료를 요청하는 신호입니다.
-- **Graceful shutdown**: 진행 중인 요청을 마무리하고 종료하는 방식입니다.
-- **Healthcheck**: 컨테이너가 건강한지 보고하는 메커니즘입니다.
-- **Tini**: 아주 작은 init 프로세스입니다.
+| 개념 | 설명 | 왜 중요한가 |
+|------|------|------------|
+| **PID 1** | 컨테이너 안에서 가장 먼저 실행되는 프로세스 | 신호 처리, 좀비 프로세스 정리 담당 |
+| **SIGTERM** | 정상 종료를 요청하는 신호 | `docker stop`이 이 신호를 보냄 |
+| **Graceful shutdown** | 진행 중인 요청을 마무리하고 종료 | 배포 중 요청 손실 방지 |
+| **Healthcheck** | 컨테이너가 건강한지 보고하는 메커니즘 | 로드밸런서, 오케스트레이터가 준비 상태 판단 |
+| **Tini** | 아주 작은 init 프로세스 | PID 1 문제를 안전하게 해결 |
 
 특히 PID 1은 컨테이너에서 특별합니다. 프로세스 신호 전달과 자식 프로세스 정리 동작이 일반 프로세스와 다르게 엮일 수 있기 때문에, 작은 init을 두거나 신호 처리가 명확한 프로세스를 직접 PID 1로 두는 편이 좋습니다.
 
 ## 전과 후
 
-**Before**: `python app.py`를 직접 실행해 종료 신호를 놓치고, 결국 강제 종료됩니다.
+**Before**: `python app.py`를 직접 실행해 종료 신호를 놓치고, 결국 강제 종료됩니다. 배포 시 진행 중인 요청이 끊깁니다.
 
-**After**: `uvicorn`과 `tini`를 사용해 graceful shutdown을 보장하고, healthcheck로 준비 상태를 노출합니다.
+**After**: `uvicorn`과 `tini`를 사용해 graceful shutdown을 보장하고, healthcheck로 준비 상태를 노출합니다. 배포 중 요청 손실이 없습니다.
 
 이 차이는 운영 중 배포 품질을 크게 바꿉니다. 애플리케이션이 요청을 받는 순간뿐 아니라 내려가는 순간까지 설계해야 신뢰할 수 있는 컨테이너가 됩니다.
 
@@ -74,105 +74,203 @@ Python을 컨테이너에 넣고 `python app.py`만 실행해도 일단은 동�
 ### 1단계 — 앱 코드 작성
 
 ```python
+# app/main.py
+import os
+import signal
+import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
-app = FastAPI()
+logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
+logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """시작과 종료 라이프사이클 관리"""
+    logger.info("Application starting up...")
+    yield
+    logger.info("Application shutting down...")
+
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/healthz")
 def healthz() -> dict[str, str]:
+    """헬스체크 엔드포인트 — 가볍게 유지"""
     return {"status": "ok"}
+
+@app.get("/readyz")
+def readyz() -> dict[str, str]:
+    """준비 상태 엔드포인트 — DB 연결 등 확인"""
+    # 실제로는 DB 연결 등을 확인
+    return {"status": "ready"}
 
 @app.get("/")
 def root() -> dict[str, str]:
     return {"hello": "world"}
 ```
 
-health 엔드포인트를 먼저 두는 이유는 단순합니다. 컨테이너가 떴는지보다 요청을 받을 준비가 되었는지를 분리해 관찰해야 하기 때문입니다.
+health 엔드포인트를 먼저 두는 이유는 단순합니다. 컨테이너가 떴는지보다 요청을 받을 준비가 되었는지를 분리해 관찰해야 하기 때문입니다. `/healthz`는 가볍게, `/readyz`는 실제 의존성을 확인하는 방식으로 분리합니다.
 
-### 2단계 — Dockerfile 작성
+### 2단계 — production-grade Dockerfile
 
 ```dockerfile
+# Dockerfile
 FROM python:3.12-slim
 
+# 보안과 로깅을 위한 환경변수
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    LOG_LEVEL=INFO
 
 WORKDIR /app
 
-# deps layer
+# tini 설치 (PID 1 init 역할)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends tini && \
+    rm -rf /var/lib/apt/lists/*
+
+# 의존성 레이어 먼저 (캐시 효율)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# app layer
-COPY . .
+# 애플리케이션 코드
+COPY app/ ./app/
 
-RUN useradd -m -u 1000 appuser
+# non-root 사용자 생성
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app
 USER appuser
 
 EXPOSE 8000
-HEALTHCHECK --interval=10s --timeout=3s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz').read()" || exit 1
 
-# tini at PID 1 forwards SIGTERM
+# 헬스체크: 가볍고 앱 자체만 확인
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 --start-period=10s \
+  CMD python -c \
+    "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz').read()" \
+    || exit 1
+
+# tini를 PID 1로, uvicorn을 자식 프로세스로 실행
 ENTRYPOINT ["tini", "--"]
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 이 Dockerfile은 이미지 생성뿐 아니라 운영 계약도 함께 정의합니다. 캐시 가능한 deps 레이어, non-root 실행, healthcheck, PID 1 처리 방식이 모두 들어 있습니다.
 
-### 3단계 — `requirements.txt`
+### 3단계 — `requirements.txt`와 의존성 관리
 
 ```text
+# requirements.txt
 fastapi==0.115.*
 uvicorn[standard]==0.30.*
+httpx==0.27.*     # 테스트용 HTTP 클라이언트
 ```
 
-버전을 어느 정도 고정하는 이유는 컨테이너 재현성을 유지하기 위해서입니다. 개발자 로컬 환경에서 우연히 최신 버전이 설치되는 상황을 줄여 줍니다.
+버전을 어느 정도 고정하는 이유는 컨테이너 재현성을 유지하기 위해서입니다. `0.115.*`처럼 minor version을 고정하면 패치는 허용하되 breaking change를 막을 수 있습니다. 프로덕션에서는 정확한 버전(`==0.115.6`)을 고정하는 팀도 많습니다.
 
-### 4단계 — 빌드와 실행
+### 4단계 — Compose로 실행
+
+```yaml
+# compose.yaml
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz').read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+```
 
 ```bash
-docker build -t myapi:1.0 .
-docker run -d --name api -p 8000:8000 myapi:1.0
-curl http://localhost:8000/healthz
-```
+# 빌드와 실행
+docker compose up -d --build
 
-실행이 된다는 사실만 확인하지 말고, health 엔드포인트가 기대한 값으로 응답하는지도 함께 확인해야 합니다. 그래야 이후 오케스트레이터나 Compose healthcheck와 연결하기 쉽습니다.
+# 헬스체크 상태 확인
+docker compose ps
+# Status: Up (healthy) 가 되어야 함
+
+# 엔드포인트 확인
+curl http://localhost:8000/healthz
+# {"status":"ok"}
+
+curl http://localhost:8000/readyz
+# {"status":"ready"}
+```
 
 ### 5단계 — graceful shutdown 검증
 
 ```bash
-docker stop api    # sends SIGTERM, uvicorn drains in-flight requests
-docker logs api | tail
+# 컨테이너 실행 중 로그 모니터링
+docker compose logs -f api &
+
+# graceful shutdown 테스트
+docker compose stop api
+# 로그에서 "Application shutting down..." 메시지 확인
+
+# 강제 종료와 비교
+docker compose kill api
+# 로그에 종료 메시지 없음 (즉시 종료)
+
+# non-root 실행 확인
+docker compose exec api id
+# uid=1000(appuser) gid=1000(appuser) groups=1000(appuser)
+
+# PID 1 확인
+docker compose exec api ps aux
+# PID 1이 tini인지 확인
 ```
 
 이 단계는 실제 운영 품질과 직결됩니다. `docker stop`이 보내는 `SIGTERM`을 애플리케이션이 제대로 처리해야 배포 시 요청 손실을 줄일 수 있습니다.
 
 ### 실행 뒤 바로 확인할 것
 
-- `curl http://localhost:8000/healthz`는 `{"status":"ok"}`를 반환해야 하고, `docker stop api` 뒤 로그에는 강제 종료가 아니라 정상 종료 흐름이 보여야 합니다.
-- 컨테이너 내부 프로세스가 non-root인지 `docker exec api id`로 한 번 더 확인하면 좋습니다.
+- `curl http://localhost:8000/healthz`는 `{"status":"ok"}`를 반환해야 합니다.
+- `docker compose ps`에서 Status가 `Up (healthy)`여야 합니다.
+- `docker compose stop` 뒤 로그에 "Application shutting down..." 메시지가 보여야 합니다.
+- `docker compose exec api id`에서 root가 아닌 `appuser`가 나와야 합니다.
 
-### 잘 안 될 때 먼저 볼 것
+### 트러블슈팅
 
-- `tini`가 이미지에 설치되지 않았는데 ENTRYPOINT만 추가한 경우 컨테이너가 바로 실패합니다. 베이스 이미지와 패키지 설치 단계를 다시 확인합니다.
-- healthcheck가 계속 실패하면 앱이 `0.0.0.0:8000`에 바인딩되었는지와 `/healthz` 경로가 실제로 존재하는지부터 봅니다.
+| 증상 | 원인 | 해결 방법 |
+|------|------|-----------|
+| `tini: exec /bin/sh: no such file or directory` | tini가 설치 안 됨 | `apt-get install -y tini` 추가 |
+| healthcheck 계속 실패 | 앱이 `0.0.0.0:8000`에 바인딩 안 됨 | `--host 0.0.0.0` 옵션 확인 |
+| 컨테이너 종료 시 요청 끊김 | SIGTERM 처리 안 됨 | tini + uvicorn 조합 사용 |
+| `permission denied` | non-root 사용자가 파일 접근 불가 | `chown -R appuser:appuser /app` 추가 |
+| 이미지 빌드가 느림 | `COPY . .`를 deps 전에 배치 | 순서 변경: requirements 먼저, 소스 나중 |
 
-- 의존성 레이어와 코드 레이어를 분리해 캐시 효율을 높였습니다.
-- `tini`가 signal을 올바르게 전달합니다.
-- healthcheck는 오케스트레이터가 준비 상태를 판단하는 기준이 됩니다.
+## 자주 하는 실수
 
-특히 healthcheck는 너무 무거워도 안 됩니다. 가벼운 애플리케이션 준비 상태를 확인하는 용도로 유지해야, 외부 의존성 일시 장애 때문에 false negative가 폭증하는 일을 줄일 수 있습니다.
+| 실수 | 문제점 | 올바른 방법 |
+|------|--------|-------------|
+| `python app.py`를 직접 실행 | PID 1 문제, SIGTERM 미처리 | uvicorn + tini 사용 |
+| workers 수를 과도하게 설정 | 메모리 사용량 급증 | CPU 코어 수 × 2 + 1 정도, 측정 후 조정 |
+| deps 레이어 분리 안 함 | 코드 변경마다 pip install 재실행 | `requirements.txt` → `pip install` → 소스 순서 |
+| root로 실행 | 보안 취약 | `useradd` + `USER appuser` |
+| healthcheck에서 DB까지 확인 | 외부 의존성 실패 시 false negative | `/healthz`는 앱만, `/readyz`는 DB 포함 |
 
-## 자주 하는 실수 다섯 가지
+## PID 1 문제와 tini
 
-1. **`python app.py`를 직접 실행합니다.** 종료 신호 처리가 부정확해질 수 있습니다.
-2. **workers 수를 감으로 과도하게 늘립니다.** 메모리 사용량이 급격히 커질 수 있습니다.
-3. **코드가 바뀔 때마다 의존성 설치까지 다시 합니다.** 빌드 시간이 불필요하게 길어집니다.
-4. **root로 실행합니다.** 보안 기본값을 낮춥니다.
-5. **healthcheck에서 DB까지 깊게 검사합니다.** false negative가 쉽게 늘어납니다.
+```bash
+# PID 1 없이 실행하면 signal 처리에 문제 생길 수 있음
+# CMD ["uvicorn", ...]  ← uvicorn이 PID 1
 
-운영에서는 작은 불편을 줄이는 것보다 실패 모드를 예측 가능하게 만드는 편이 중요합니다. Python 컨테이너에서 signal과 healthcheck를 제대로 다루는 이유가 여기에 있습니다.
+# tini를 PID 1으로 설정하면 안전
+# ENTRYPOINT ["tini", "--"]
+# CMD ["uvicorn", ...]  ← uvicorn은 PID 2, tini가 신호 전달
+
+# 또는 --init 플래그로 임시 해결 (권장하지 않음)
+# docker run --init myapp:1.0
+```
+
+tini의 역할은 두 가지입니다. 첫째, SIGTERM을 받아 자식 프로세스(uvicorn)에 전달합니다. 둘째, 좀비 프로세스(`defunct`)를 정리합니다. 이 두 가지가 없으면 장기 운영 시 프로세스 관리가 불안정해질 수 있습니다.
 
 ## 실무에서는 이렇게 이어집니다
 
@@ -180,45 +278,44 @@ docker logs api | tail
 
 즉, observability 도구를 붙이기 전에 컨테이너가 제대로 뜨고, 준비를 알리고, 안전하게 종료할 수 있어야 합니다. 그 순서가 바뀌면 겉으로는 복잡해 보여도 기초가 약한 시스템이 됩니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 컨테이너에서는 PID 1을 의식해야 합니다.
-- graceful shutdown은 사용자 신뢰와 직결됩니다.
-- healthcheck는 가볍고 정직해야 합니다.
-- non-root는 기본값이어야 합니다.
-- worker 수는 추측이 아니라 부하 측정으로 정해야 합니다.
-
-이 관점을 가지고 다음 글의 데이터베이스 연동으로 넘어가면, 왜 앱과 DB의 시작 순서와 readiness가 함께 중요해지는지도 쉽게 이어집니다.
-
 ## 운영 체크리스트
 
-- [ ] `tini` 또는 동등한 init을 사용합니다.
-- [ ] healthcheck가 가볍고 정확합니다.
-- [ ] 컨테이너가 non-root로 실행됩니다.
-- [ ] graceful shutdown을 검증했습니다.
+- [ ] `tini` 또는 동등한 init을 PID 1으로 사용합니다.
+- [ ] `/healthz` 엔드포인트가 있고 Dockerfile에 HEALTHCHECK가 정의되어 있습니다.
+- [ ] 컨테이너가 non-root(uid=1000)로 실행됩니다.
+- [ ] graceful shutdown을 `docker stop`으로 검증했습니다.
+- [ ] `PYTHONUNBUFFERED=1`로 로그가 즉시 출력됩니다.
+- [ ] `requirements.txt`와 소스 코드 레이어가 분리되어 있습니다.
 
 ## 연습 문제
 
-1. FastAPI 앱을 컨테이너화하고 `/healthz`를 확인해 보세요.
-2. `docker stop` 시 진행 중 요청이 종료 전에 처리되는지 점검해 보세요.
-3. `USER`를 추가해 non-root로 실행해 보세요.
-
-## 정리 및 다음 단계
-
-Python 컨테이너화의 진짜 어려움은 단순 실행이 아니라 신호와 준비 상태 처리에 있습니다. FastAPI 앱이 뜬다는 것만으로는 충분하지 않습니다. 언제 요청을 받을 준비가 되었는지, 종료 시 현재 요청을 어떻게 마무리할지, 최소 권한으로 어떻게 실행할지를 함께 설계해야 합니다.
-
-다음 글에서는 데이터베이스와 함께 실행하는 구성을 다룹니다. 앱만 잘 뜨는 단계를 넘어, DB readiness와 migration까지 포함한 실제 애플리케이션 구성을 봅니다.
+1. FastAPI 앱을 컨테이너화하고 `/healthz`와 `/readyz`를 curl로 확인해 보세요.
+2. `docker stop` 시 진행 중 요청이 종료 전에 처리되는지 점검해 보세요. (`uvicorn`에 `--timeout-graceful-shutdown 30` 옵션 추가)
+3. `USER appuser`를 추가해 non-root로 실행하고 `docker exec api id`로 확인해 보세요.
+4. healthcheck에 DB 연결 확인 코드를 추가하면 어떤 문제가 생길 수 있는지 실험해 보세요.
 
 ## 처음 질문으로 돌아가기
 
 - **FastAPI와 uvicorn을 어떤 방식으로 컨테이너에 담아야 할까요?**
-  - Python을 컨테이너에 넣고 `python app.py`만 실행해도 일단은 동작해 보일 수 있습니다
+  - tini를 PID 1으로 두고 (`ENTRYPOINT ["tini", "--"]`), uvicorn을 자식 프로세스로 실행합니다 (`CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]`). 이 구조가 SIGTERM 전달과 좀비 프로세스 정리를 모두 해결합니다.
+
 - **PID 1과 SIGTERM은 왜 컨테이너 운영에서 중요할까요?**
-  - health 엔드포인트를 먼저 두는 이유는 단순합니다. 컨테이너가 떴는지보다 요청을 받을 준비가 되었는지를 분리해 관찰해야 하기 때문입니다.
+  - `docker stop`은 컨테이너에 SIGTERM을 보냅니다. PID 1 프로세스가 이 신호를 받아야 합니다. 하지만 많은 프로세스가 PID 1로 실행될 때 신호를 올바르게 처리하지 못합니다. tini는 신호를 안전하게 자식 프로세스에 전달해 graceful shutdown을 가능하게 합니다.
+
 - **healthcheck는 어떻게 구성해야 할까요?**
-  - Python을 컨테이너에 넣고 `python app.py`만 실행해도 일단은 동작해 보일 수 있습니다
-  - Python을 컨테이너에 넣고 `python app.py`만 실행해도 일단은 동작해 보일 수 있습니다.
-  - 이 차이는 운영 중 배포 품질을 크게 바꿉니다. 애플리케이션이 요청을 받는 순간뿐 아니라 내려가는 순간까지 설계해야 신뢰할 수 있는 컨테이너가 됩니다.
+  - 가볍게 유지해야 합니다. `/healthz`는 앱이 살아 있는지만 확인하고, DB 연결 같은 외부 의존성은 포함하지 않습니다. 외부 의존성을 포함하면 DB 일시 장애 시 false negative가 폭증해 불필요한 재시작이 일어납니다. `interval=10s`, `timeout=3s`, `retries=3`을 기본값으로 시작합니다.
+
+- **이 기능을 프로덕션에서 쓸 때 보안 관점에서 주의할 점은 무엇일까요?**
+  - non-root 실행은 필수입니다. 침해 시 컨테이너 내 권한을 최소화해야 합니다. `PYTHONDONTWRITEBYTECODE=1`로 `.pyc` 파일 생성을 막고, 로그에 비밀값이 출력되지 않도록 주의해야 합니다.
+
+- **초보자가 이 기능에서 가장 자주 겪는 오류는 무엇일까요?**
+  - `python app.py` 직접 실행 시 SIGTERM이 처리되지 않아 `docker stop` 후 10초 대기 뒤 강제 종료되는 경우가 많습니다. 또한 healthcheck 엔드포인트가 없거나 DB까지 확인해 외부 장애 시 앱 자체가 unhealthy로 분류되는 경우도 흔합니다.
+
+## 정리
+
+Python 컨테이너화의 진짜 어려움은 단순 실행이 아니라 신호와 준비 상태 처리에 있습니다. FastAPI 앱이 뜬다는 것만으로는 충분하지 않습니다. 언제 요청을 받을 준비가 되었는지, 종료 시 현재 요청을 어떻게 마무리할지, 최소 권한으로 어떻게 실행할지를 함께 설계해야 합니다.
+
+다음 글에서는 데이터베이스와 함께 실행하는 구성을 다룹니다. 앱만 잘 뜨는 단계를 넘어, DB readiness와 migration까지 포함한 실제 애플리케이션 구성을 봅니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

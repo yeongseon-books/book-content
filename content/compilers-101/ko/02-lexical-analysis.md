@@ -23,7 +23,7 @@ last_reviewed: '2026-05-12'
 
 # Compilers 101 (2/10): 렉시컬 분석
 
-순서를 뒤집으면 `=`가 먼저 잡혀서 `==`가 두 토큰으로 잘립니다. 그래서 SPEC 순서로 longest-match를 흉내 내거나, 정규식 대안을 길이 순으로 정렬해야 합니다.
+토큰을 잘못 자르면, 그다음 모든 단계가 같은 잘못된 분할 위에 세워집니다. 렉서는 단지 토큰을 자르는 도구가 아니라, 좋은 오류 메시지의 시작점이기도 합니다.
 
 이 글은 Compilers 101 시리즈의 두 번째 글입니다.
 
@@ -55,36 +55,51 @@ flowchart LR
 
 이 단계의 핵심은 두 가지입니다. **가장 긴 매치를 고르는 것**과 **위치 정보를 끝까지 들고 가는 것**입니다.
 
-- 토큰: 렉서가 만들어 내는 의미 있는 단위입니다. 보통 `(kind, text, position)`의 조합으로 생각합니다.
-- **렉심(lexeme)**: 토큰 안의 실제 텍스트 부분입니다.
-- **longest match**: 같은 위치에서 여러 패턴이 맞을 수 있을 때 가장 긴 매치를 고르는 규칙입니다.
+## 핵심 용어
+
+- **토큰**: 렉서가 만들어 내는 의미 있는 단위입니다. 보통 `(kind, text, line, col)`의 조합으로 생각합니다.
+- **렉심(lexeme)**: 토큰 안의 실제 텍스트 부분입니다. 예를 들어 토큰이 `Token(NUM, "42", 3, 5)`이면 렉심은 `"42"`입니다.
+- **longest match**: 같은 위치에서 여러 패턴이 맞을 수 있을 때 가장 긴 매치를 고르는 규칙입니다. `==` vs `=`가 대표 사례입니다.
 - **키워드 vs 식별자**: `if`는 키워드이고 `iff`는 식별자입니다. 둘 다 같은 패턴에서 시작하므로 후처리로 분리합니다.
-- **공백 / 주석**: 렉서는 인식하지만 토큰 스트림에서는 보통 제거합니다.
+- **공백 / 주석**: 렉서는 인식하지만 토큰 스트림에서는 보통 제거합니다. 포매터와 린터는 이 정보가 필요합니다.
 
 ## 변경 전후
 
 **Before — 문자 하나씩 분기하는 코드**
 
 ```python
-# 문자마다 if/else를 쓰면 코드가 폭발합니다
+# 문자마다 if/else를 쓰면 새 토큰마다 분기가 늘어납니다
 def lex_naive(s):
     out, i = [], 0
     while i < len(s):
         if s[i].isdigit():
             j = i
-            while j < len(s) and s[j].isdigit(): j += 1
-            out.append(("NUM", s[i:j])); i = j
+            while j < len(s) and s[j].isdigit():
+                j += 1
+            out.append(("NUM", s[i:j]))
+            i = j
         elif s[i] in "+-*/":
-            out.append(("OP", s[i])); i += 1
-        else:
+            out.append(("OP", s[i]))
             i += 1
+        elif s[i].isspace():
+            i += 1
+        else:
+            raise SyntaxError(f"unknown char: {s[i]!r}")
     return out
+# 문제: 새 토큰 종류(문자열 리터럴, 부동소수, 연산자 두 글자 등)마다 if/elif가 늘어납니다.
 ```
 
 **After — 정규식 기반 테이블**
 
 ```python
-SPEC = [("NUM", r"\d+"), ("OP", r"[+\-*/]"), ("WS", r"\s+")]
+SPEC = [
+    ("NUM", r"\d+(\.\d+)?"),
+    ("STR", r'"[^"]*"'),
+    ("OP",  r"[+\-*/=<>!]+"),
+    ("ID",  r"[A-Za-z_]\w*"),
+    ("WS",  r"\s+"),
+]
+# 새 토큰을 추가할 때 한 행만 더 넣으면 됩니다.
 ```
 
 새 토큰을 추가할 때 한 행만 더 넣으면 됩니다. 유지보수성과 가독성이 훨씬 좋아집니다.
@@ -105,41 +120,65 @@ class Token:
     line: int
     col: int
 
+    def __repr__(self):
+        return f"Token({self.kind}, {self.text!r}, {self.line}:{self.col})"
+
 SPEC = [
-    ("NUM",   r"\d+"),
-    ("ID",    r"[A-Za-z_]\w*"),
-    ("STR",   r'"[^"]*"'),
-    ("OP",    r"[+\-*/=<>!]+"),
+    ("NUM",   r"\d+(\.\d+)?"),   # 정수 및 실수
+    ("ID",    r"[A-Za-z_]\w*"),  # 식별자 (키워드 포함)
+    ("STR",   r'"[^"]*"'),        # 문자열 리터럴
+    ("EQ",    r"=="),             # == 는 = 보다 먼저 와야 합니다
+    ("ASSIGN",r"="),
+    ("LE",    r"<="),
+    ("GE",    r">="),
+    ("OP",    r"[+\-*/<>!]"),
     ("LP",    r"\("),
     ("RP",    r"\)"),
+    ("COLON", r":"),
     ("NL",    r"\n"),
     ("WS",    r"[ \t]+"),
 ]
-KEYWORDS = {"if", "else", "while", "return", "True", "False"}
+KEYWORDS = {"if", "else", "while", "return", "True", "False", "and", "or", "not"}
 
 def lex(src: str) -> list[Token]:
-    tokens, i, line, col = [], 0, 1, 1
+    tokens = []
+    i, line, col = 0, 1, 1
     while i < len(src):
+        matched = False
         for kind, pat in SPEC:
             m = re.match(pat, src[i:])
             if m:
                 text = m.group()
-                if kind == "ID" and text in KEYWORDS:
-                    kind = "KW"
-                if kind not in ("WS",):
-                    tokens.append(Token(kind, text, line, col))
+                # 식별자가 키워드인지 후처리로 결정합니다
+                actual_kind = "KW" if kind == "ID" and text in KEYWORDS else kind
+                if actual_kind not in ("WS",):
+                    tokens.append(Token(actual_kind, text, line, col))
+                # 위치 추적: 개행이면 줄 번호를 올립니다
                 if kind == "NL":
-                    line += 1; col = 1
+                    line += 1
+                    col = 1
                 else:
                     col += len(text)
                 i += len(text)
+                matched = True
                 break
-        else:
-            raise SyntaxError(f"unexpected {src[i]!r} at {line}:{col}")
+        if not matched:
+            raise SyntaxError(
+                f"unexpected character {src[i]!r} at line {line}, col {col}"
+            )
     return tokens
 
-for t in lex('if x == 1\n  return "ok"\n'):
+# 예시 실행
+src = 'if x == 1:\n  return "ok"\n'
+for t in lex(src):
     print(t)
+# Token(KW, 'if', 1:1)
+# Token(ID, 'x', 1:4)
+# Token(EQ, '==', 1:6)
+# Token(NUM, '1', 1:9)
+# Token(COLON, ':', 1:10)
+# Token(KW, 'return', 2:3)
+# Token(STR, '"ok"', 2:10)
 ```
 
 하나의 테이블이 모든 토큰 종류를 표현합니다. 위치 정보도 매 단계에서 함께 갱신됩니다.
@@ -148,77 +187,209 @@ for t in lex('if x == 1\n  return "ok"\n'):
 
 ```python
 # 2_longest.py
-# == 와 = 를 모두 가진 언어를 떠올려 봅시다.
-SPEC = [("EQ", r"=="), ("ASSIGN", r"=")]
+# == 와 = 를 모두 가진 언어에서 순서가 중요합니다.
 import re
+
+# 잘못된 순서: = 를 먼저 두면 == 가 두 토큰으로 잘립니다
+SPEC_WRONG = [("ASSIGN", r"="), ("EQ", r"==")]
+SPEC_RIGHT = [("EQ", r"=="), ("ASSIGN", r"=")]  # 더 긴 패턴을 먼저
+
+def first_match(spec, src):
+    for kind, pat in spec:
+        m = re.match(pat, src)
+        if m:
+            return kind, m.group()
+    return None, None
+
 src = "=="
-for kind, pat in SPEC:
-    m = re.match(pat, src)
-    if m:
-        print("first match:", kind, m.group())
-        break
+kind_w, text_w = first_match(SPEC_WRONG, src)
+kind_r, text_r = first_match(SPEC_RIGHT, src)
+
+print(f"wrong order : kind={kind_w}, text={text_w!r}")  # ASSIGN, '='
+print(f"right order : kind={kind_r}, text={text_r!r}")  # EQ, '=='
 ```
 
 순서를 뒤집으면 `=`가 먼저 잡혀서 `==`가 두 토큰으로 잘립니다. 그래서 SPEC 순서로 longest-match를 흉내 내거나, 정규식 대안을 길이 순으로 정렬해야 합니다.
+
+정규식 엔진을 이용하는 더 안전한 방법은 하나의 정규식 그룹으로 합치는 것입니다.
+
+```python
+# 2b_combined.py
+import re
+
+# 모든 패턴을 하나의 OR 정규식으로 합칩니다 (먼저 오는 대안이 우선)
+COMBINED = re.compile(
+    r"(?P<EQ>==)|(?P<ASSIGN>=)|(?P<NUM>\d+)|(?P<ID>[A-Za-z_]\w*)|(?P<WS>\s+)"
+)
+
+def lex_combined(src):
+    for m in COMBINED.finditer(src):
+        kind = m.lastgroup
+        if kind != "WS":
+            print(f"{kind}: {m.group()!r}")
+
+lex_combined("x == 1 = y")
+# ID: 'x'
+# EQ: '=='
+# NUM: '1'
+# ASSIGN: '='
+# ID: 'y'
+```
 
 ### 3단계 — 키워드와 식별자 분리하기
 
 ```python
 # 3_keywords.py
 import re
-KEYWORDS = {"if", "else", "while"}
-src = "if iff while"
-for m in re.finditer(r"[A-Za-z_]\w*", src):
+
+KEYWORDS = {"if", "else", "while", "for", "return", "def", "class"}
+
+def classify_id(text: str) -> str:
+    """식별자 텍스트가 키워드인지 판단합니다."""
+    return "KW" if text in KEYWORDS else "ID"
+
+# 패턴은 하나, 후처리로 분류합니다
+ID_PAT = re.compile(r"[A-Za-z_]\w*")
+
+src = "if iff while whileTrue"
+for m in ID_PAT.finditer(src):
     text = m.group()
-    kind = "KW" if text in KEYWORDS else "ID"
-    print(kind, text)
+    kind = classify_id(text)
+    print(f"{kind:3s}: {text!r}")
+# KW : 'if'
+# ID : 'iff'       <- 키워드 접두사가 같아도 전체가 달라서 식별자입니다
+# KW : 'while'
+# ID : 'whileTrue' <- 마찬가지
 ```
 
-표준 패턴은 같습니다. 같은 정규식으로 먼저 잡고, 후처리 단계에서 키워드 집합과 비교합니다. 키워드를 정규식 안에 직접 박아 넣으면 변경이 불편해집니다.
+표준 패턴은 같습니다. 같은 정규식으로 먼저 잡고, 후처리 단계에서 키워드 집합과 비교합니다. 키워드를 정규식 안에 직접 박아 넣으면 키워드가 바뀔 때마다 패턴 자체를 고쳐야 합니다.
 
-### 4단계 — 위치 정보 유지하기
+### 4단계 — 위치 정보 유지하기와 오류 메시지
 
 ```python
 # 4_position.py
-# 1단계의 렉서가 이미 행/열 정보를 갖고 있습니다.
-# 에러를 보고해야 할 때 그 정보로 좋은 메시지를 만들 수 있습니다.
-def report(token, message):
-    print(f"  File \"<src>\", line {token.line}, col {token.col}")
-    print(f"    {token.text}")
-    print(f"  SyntaxError: {message}")
+from dataclasses import dataclass
+
+@dataclass
+class Token:
+    kind: str
+    text: str
+    line: int
+    col: int
+
+def format_error(src_lines: list[str], token: Token, message: str) -> str:
+    """컴파일러 스타일 오류 메시지를 만듭니다."""
+    line_text = src_lines[token.line - 1] if token.line <= len(src_lines) else ""
+    pointer = " " * (token.col - 1) + "^" * len(token.text)
+    return (
+        f'  File "<src>", line {token.line}, col {token.col}\n'
+        f"    {line_text}\n"
+        f"    {pointer}\n"
+        f"  SyntaxError: {message}"
+    )
+
+# 예시
+src = "x = 1 + @"
+lines = src.split("\n")
+bad_tok = Token("UNKNOWN", "@", 1, 9)
+print(format_error(lines, bad_tok, "unexpected character '@'"))
+# File "<src>", line 1, col 9
+#     x = 1 + @
+#             ^
+#   SyntaxError: unexpected character '@'
 ```
 
-좋은 컴파일러 오류 메시지는 위치를 절대 잃지 않는 렉서에서 시작합니다.
+좋은 컴파일러 오류 메시지는 위치를 절대 잃지 않는 렉서에서 시작합니다. `line:col`이 없으면 사용자는 어디를 고쳐야 할지 몰라 당황합니다.
 
-### 5단계 — Python 내장 `tokenize` 살펴보기
+### 5단계 — 오류 복구: 첫 오류에서 멈추지 않기
 
 ```python
-# 5_python_tokenize.py
-import tokenize, io
+# 5_recovery.py
+import re
 
-src = "x = 1 + 2  # add\n"
-for tok in tokenize.generate_tokens(io.StringIO(src).readline):
-    print(tok)
+def lex_with_recovery(src: str) -> tuple[list, list]:
+    """
+    렉싱을 진행하면서 오류를 모읍니다.
+    (tokens, errors) 쌍을 반환합니다.
+    """
+    SPEC = [
+        ("NUM", r"\d+"),
+        ("ID",  r"[A-Za-z_]\w*"),
+        ("OP",  r"[+\-*/=]"),
+        ("WS",  r"\s+"),
+    ]
+    tokens, errors = [], []
+    i, line, col = 0, 1, 1
+    while i < len(src):
+        for kind, pat in SPEC:
+            m = re.match(pat, src[i:])
+            if m:
+                text = m.group()
+                if kind != "WS":
+                    tokens.append((kind, text, line, col))
+                col += len(text)
+                i += len(text)
+                break
+        else:
+            # 오류를 기록하고 한 글자를 건너뜁니다 (오류 복구)
+            errors.append(f"line {line}, col {col}: unexpected {src[i]!r}")
+            col += 1
+            i += 1
+    return tokens, errors
+
+tokens, errors = lex_with_recovery("x = 1 @ 2 # hello")
+print("tokens:", tokens)
+print("errors:", errors)
+# tokens: [('ID', 'x', ...), ('OP', '=', ...), ('NUM', '1', ...), ('NUM', '2', ...)]
+# errors: ["line 1, col 7: unexpected '@'", "line 1, col 9: unexpected '#'", ...]
 ```
 
-CPython의 렉서를 직접 볼 수 있습니다. `OP`, `NAME`, `NUMBER`, `NEWLINE`, `COMMENT` 같은 토큰이 line/column 정보와 함께 나옵니다.
+첫 오류에서 바로 종료하면 사용자는 파일을 한 번 고칠 때마다 오류를 하나씩 발견합니다. 오류를 모아서 한 번에 보여 주면 개발 경험이 훨씬 좋아집니다.
+
+### 6단계 — Python 내장 `tokenize` 살펴보기
+
+```python
+# 6_python_tokenize.py
+import tokenize
+import io
+
+src = "x = 1 + 2  # add\n"
+tokens_io = io.StringIO(src)
+for tok in tokenize.generate_tokens(tokens_io.readline):
+    if tok.type not in (tokenize.NEWLINE, tokenize.NL, tokenize.ENDMARKER):
+        print(f"{tokenize.tok_name[tok.type]:10s} {tok.string!r:15s} "
+              f"start={tok.start} end={tok.end}")
+# NAME       'x'             start=(1, 0) end=(1, 1)
+# OP         '='             start=(1, 2) end=(1, 3)
+# NUMBER     '1'             start=(1, 4) end=(1, 5)
+# OP         '+'             start=(1, 6) end=(1, 7)
+# NUMBER     '2'             start=(1, 8) end=(1, 9)
+# COMMENT    '# add'         start=(1, 11) end=(1, 16)
+```
+
+CPython의 렉서를 직접 볼 수 있습니다. `OP`, `NAME`, `NUMBER`, `NEWLINE`, `COMMENT` 같은 토큰이 `start/end` 위치 쌍과 함께 나옵니다. 실제 프로덕션 렉서가 어떻게 생겼는지 가장 빠르게 확인하는 방법입니다.
+
+## 핵심 정리
 
 - 테이블 기반 렉서는 토큰 추가와 변경을 **데이터 수정**으로 바꿉니다.
 - longest-match는 SPEC 순서나 명시적 길이 비교로 보장합니다.
 - 키워드는 렉서의 정규식 자체가 아니라 후처리로 분리합니다.
 - 위치 정보는 토큰의 부가 정보가 아니라 핵심 정보입니다.
+- 오류 복구는 렉서 단계부터 고려해야 합니다.
 
-## 자주 하는 실수 다섯 가지
+## 자주 하는 실수
 
-1. **`==`와 `=`처럼 접두사가 겹치는 토큰에서 longest-match를 보장하지 않는 것**입니다.
-2. **키워드를 정규식 안에 하드코딩하는 것**입니다.
-3. **위치 정보를 들고 가지 않는 것**입니다. 오류 메시지가 “어딘가에서 syntax error” 수준으로 떨어집니다.
-4. **공백이나 주석을 너무 일찍 버리는 것**입니다. 포매터와 린터는 그 정보가 필요합니다.
-5. **에러 복구 전략이 전혀 없는 것**입니다. 첫 오류에서 바로 종료되면 사용자 경험이 나빠집니다.
+1. **`==`와 `=`처럼 접두사가 겹치는 토큰에서 longest-match를 보장하지 않는 것**입니다. SPEC에서 더 긴 패턴을 앞에 두어야 합니다.
+2. **키워드를 정규식 안에 하드코딩하는 것**입니다. `"if|while|for"` 같은 패턴은 키워드가 바뀔 때마다 코드를 고쳐야 합니다. 집합으로 분리하세요.
+3. **위치 정보를 들고 가지 않는 것**입니다. 오류 메시지가 "어딘가에서 syntax error" 수준으로 떨어집니다. 모든 토큰에 `line:col`을 붙이세요.
+4. **공백이나 주석을 너무 일찍 버리는 것**입니다. 포매터와 린터는 그 정보가 필요합니다. 토큰 스트림에서 제거하기 전에 필요한 곳에서 먼저 소비하세요.
+5. **에러 복구 전략이 전혀 없는 것**입니다. 첫 오류에서 바로 종료되면 사용자 경험이 나빠집니다. 오류를 기록하고 계속 진행하는 패턴을 기본으로 설계하세요.
 
 ## 실무에서는 이렇게 나타납니다
 
 대부분의 언어 도구는 정규식 기반 렉서나 DFA 계열 변형을 사용합니다. PEG나 parser combinator는 렉서와 파서를 합쳐 scannerless parsing 형태를 쓰기도 합니다. LSP 서버도 가장 먼저 렉서를 호출하고, syntax highlighting은 사실상 렉서 출력의 시각화라고 볼 수 있습니다.
+
+실무에서 직접 렉서를 만들어야 할 때는 먼저 Python의 `re` 모듈로 프로토타이핑하고, 성능이 필요하면 `lark`, `ply`, `antlr4` 같은 도구를 검토하세요.
 
 ## 숙련된 엔지니어는 이렇게 봅니다
 
@@ -238,22 +409,22 @@ CPython의 렉서를 직접 볼 수 있습니다. `OP`, `NAME`, `NUMBER`, `NEWLI
 
 ## 연습 문제
 
-1. 1단계 렉서에 `<=`, `>=`를 추가하고, 순서를 잘못 두면 무엇이 깨지는지 실험해 보세요.
+1. 1단계 렉서에 `<=`, `>=`, `!=`를 추가하고, 순서를 잘못 두면 무엇이 깨지는지 실험해 보세요.
 2. 같은 렉서에 가장 단순한 에러 복구를 넣어 한 번에 여러 문법 오류를 보고하게 만들어 보세요.
-3. `tokenize` 출력으로 키워드 빈도를 세는 작은 도구를 만들어 보세요.
-
-## 정리와 다음 글
-
-렉서는 텍스트를 의미 단위로 바꾸는 첫 번째 변환입니다. 다음 글에서는 이 토큰 스트림을 트리(AST)로 바꾸는 단계인 parsing을 다룹니다.
+3. `tokenize` 출력으로 Python 소스 파일에서 키워드 빈도를 세는 작은 도구를 만들어 보세요.
 
 ## 처음 질문으로 돌아가기
 
 - **토큰은 정확히 무엇이고, 렉서는 어떤 문제를 해결할까요?**
-  - 하나의 테이블이 모든 토큰 종류를 표현합니다. 위치 정보도 매 단계에서 함께 갱신됩니다.
+  - 토큰은 `(kind, text, line, col)` 묶음으로, 소스 텍스트를 의미 있는 최소 단위로 자른 것입니다. 렉서는 "이 문자들이 어떤 종류의 단위인가?"를 결정하는 문제를 해결합니다. 이 단계가 없으면 파서는 공백과 연산자를 구분할 수 없습니다.
 - **정규식 기반 렉서는 어떻게 동작할까요?**
-  - 하나의 테이블이 모든 토큰 종류를 표현합니다. 위치 정보도 매 단계에서 함께 갱신됩니다.
+  - 패턴 테이블(SPEC)을 순서대로 시도해 현재 위치에서 첫 번째로 매칭되는 패턴을 선택합니다. 매칭된 텍스트만큼 커서를 전진하고, 위치 정보를 업데이트하며, 토큰을 목록에 추가합니다. `re.match`는 항상 문자열의 현재 위치 시작 부분과만 비교하므로 이 방식이 안전합니다.
 - **longest-match 규칙은 왜 중요할까요?**
-  - 새 토큰을 추가할 때 한 행만 더 넣으면 됩니다
+  - `==`를 렉싱할 때 `=` 패턴이 먼저 나오면 `=`와 `=` 두 토큰으로 분리됩니다. 이후 파서는 `==`를 기대하는 자리에서 `=`를 받아 실패합니다. SPEC에서 더 긴 패턴을 항상 앞에 두면 이 문제가 해결됩니다.
+
+## 정리와 다음 글
+
+렉서는 텍스트를 의미 단위로 바꾸는 첫 번째 변환입니다. 다음 글에서는 이 토큰 스트림을 트리(AST)로 바꾸는 단계인 parsing을 다룹니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

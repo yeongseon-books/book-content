@@ -47,117 +47,188 @@ Docker를 조금 쓰기 시작하면 곧 이런 질문이 생깁니다. "이미�
 - 이 기능을 프로덕션에서 쓸 때 보안 관점에서 주의할 점은 무엇일까요?
 - 초보자가 이 기능에서 가장 자주 겪는 오류는 무엇일까요?
 
-## 왜 이 글이 중요한가
-
-빌드가 느리면 생산성이 조금 떨어지는 정도로 끝나지 않습니다. 작은 수정에도 전체 의존성을 다시 설치하고, CI에서 매번 시간을 허비하고, 결국 팀 전체가 느린 피드백 루프에 익숙해집니다. 이런 비용은 눈에 잘 띄지 않지만 오래 갈수록 큽니다.
+## 핵심 명령 참조
 
 좋은 Dockerfile은 코드를 더 잘 짜게 만들기도 합니다. 변경이 잦은 부분과 드문 부분을 분리하고, 실행 사용자를 명시하고, 이미지 안에 무엇이 들어가는지 의식하게 만들기 때문입니다.
 
-- **FROM**: 베이스 이미지를 선택합니다.
-- **RUN**: 빌드 시점에 명령을 실행합니다.
-- **COPY**: 파일을 이미지 안으로 복사합니다.
-- **CMD**: 컨테이너 시작 시 기본 실행 명령입니다.
-- **ENTRYPOINT**: 항상 호출되는 고정 진입점입니다.
+| 명령 | 역할 | 예시 |
+|------|------|------|
+| `FROM` | 베이스 이미지 선택 | `FROM python:3.12-slim` |
+| `WORKDIR` | 작업 디렉터리 설정 | `WORKDIR /app` |
+| `COPY` | 파일을 이미지 안으로 복사 | `COPY requirements.txt .` |
+| `RUN` | 빌드 시점에 명령 실행 | `RUN pip install -r requirements.txt` |
+| `ENV` | 환경변수 설정 (런타임 유지) | `ENV LOG_LEVEL=INFO` |
+| `ARG` | 빌드 시점 전용 변수 | `ARG APP_VERSION=dev` |
+| `EXPOSE` | 컨테이너 포트 문서화 | `EXPOSE 8000` |
+| `USER` | 실행 사용자 지정 | `USER appuser` |
+| `HEALTHCHECK` | 컨테이너 상태 확인 명령 | `HEALTHCHECK CMD curl -f http://localhost/` |
+| `ENTRYPOINT` | 항상 호출되는 고정 진입점 | `ENTRYPOINT ["tini", "--"]` |
+| `CMD` | 컨테이너 시작 시 기본 실행 명령 | `CMD ["python", "app.py"]` |
 
-이 다섯 가지는 Dockerfile의 뼈대입니다. 특히 `CMD`와 `ENTRYPOINT`는 둘 다 시작 명령처럼 보이지만 의미가 다르므로, 나중에 운영 인자 전달과 종료 신호 처리까지 생각하면 구분해서 이해하는 편이 좋습니다.
+`CMD`와 `ENTRYPOINT`는 둘 다 시작 명령처럼 보이지만 의미가 다릅니다. `ENTRYPOINT`는 고정 실행 파일이고, `CMD`는 `ENTRYPOINT`에 전달되는 기본 인자입니다. `docker run myapp --arg`처럼 실행 시 `CMD`만 오버라이드할 수 있습니다.
 
 ## 전과 후
 
-**Before**: `COPY .`를 맨 위에 두어 코드 한 줄 바뀔 때마다 전체 빌드를 다시 합니다.
+**Before**: `COPY .`를 맨 위에 두어 코드 한 줄 바뀔 때마다 전체 빌드를 다시 합니다. 5분 빌드가 매번 반복됩니다.
 
-**After**: 변경 빈도가 낮은 단계는 위에, 높은 단계는 아래에 두어 캐시 적중률을 크게 높입니다.
+**After**: 변경 빈도가 낮은 단계는 위에, 높은 단계는 아래에 두어 캐시 적중률을 크게 높입니다. 코드만 바뀌면 30초면 끝납니다.
 
 이 차이가 중요한 이유는 Docker가 캐시를 레이어 단위로 재사용하기 때문입니다. 자주 바뀌는 코드를 너무 일찍 복사하면, 뒤에 있는 의존성 설치 레이어까지 매번 다시 계산하게 됩니다.
 
 ## 실습: Dockerfile을 5단계로 개선해 보기
 
-### 1단계 — 최소 Dockerfile
+### 1단계 — 문제 있는 Dockerfile (시작점)
 
 ```dockerfile
+# BAD: 최적화 전
 FROM python:3.12-slim
 WORKDIR /app
-COPY . .
-RUN pip install -r requirements.txt
+COPY . .                          # 전체 소스를 먼저 복사
+RUN pip install -r requirements.txt  # 코드 변경 때마다 재실행됨
 CMD ["python", "app.py"]
 ```
 
-이 예제는 동작은 하지만 개선 여지가 큽니다. 가장 큰 문제는 의존성과 애플리케이션 코드가 한 덩어리처럼 취급된다는 사실입니다.
+이 예제는 동작은 하지만 개선 여지가 큽니다. 가장 큰 문제는 의존성과 애플리케이션 코드가 한 덩어리처럼 취급된다는 사실입니다. 코드 한 줄만 바뀌어도 `pip install`이 처음부터 다시 실행됩니다.
 
 ### 2단계 — 레이어 순서 최적화
 
 ```dockerfile
+# GOOD: 변경 빈도 기준으로 순서 조정
 FROM python:3.12-slim
 WORKDIR /app
 
-# 1) low change frequency
+# 1) 변경이 드문 의존성 먼저
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 2) high change frequency
+# 2) 변경이 잦은 소스 코드를 나중에
 COPY . .
 
 CMD ["python", "app.py"]
 ```
 
-이 순서가 실무적으로 중요합니다. requirements가 바뀌지 않았다면 의존성 설치 레이어를 다시 만들 필요가 없기 때문입니다. 작은 순서 차이가 빌드 시간을 크게 바꿉니다.
+이 순서가 실무적으로 중요합니다. `requirements.txt`가 바뀌지 않았다면 의존성 설치 레이어를 다시 만들 필요가 없기 때문입니다. 작은 순서 차이가 빌드 시간을 5분에서 30초로 줄입니다.
 
-### 3단계 — `.dockerignore`
+### 3단계 — `.dockerignore`로 보안과 성능 확보
 
 ```text
+# .dockerignore
 __pycache__/
+*.pyc
+*.pyo
 .venv/
+venv/
 .git/
+.gitignore
 *.log
 .env
+.env.*
 node_modules/
+.pytest_cache/
+.mypy_cache/
+dist/
+build/
+*.egg-info/
 ```
 
-`.dockerignore`는 선택 사항이 아닙니다. 빌드 컨텍스트를 줄여 성능을 올릴 뿐 아니라, `.git`이나 `.env`처럼 이미지에 들어가면 안 되는 파일을 막는 역할도 합니다.
+`.dockerignore`는 선택 사항이 아닙니다. 두 가지 이유가 있습니다. 첫째, 빌드 컨텍스트를 줄여 `docker build` 속도를 높입니다. 둘째, `.git`이나 `.env`처럼 이미지에 들어가면 절대 안 되는 파일을 막는 역할도 합니다. `.env`가 이미지에 들어가면 레지스트리를 볼 수 있는 누구나 비밀값을 읽을 수 있습니다.
 
-### 4단계 — non-root 사용자
+### 4단계 — non-root 사용자와 보안 강화
 
 ```dockerfile
-RUN useradd -m -u 1000 appuser
+FROM python:3.12-slim
+
+# 보안 환경변수
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# non-root 사용자 생성
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app
 USER appuser
+
+EXPOSE 8000
+
+CMD ["python", "app.py"]
 ```
 
-개발 단계에서는 크게 체감되지 않아도, 운영에서는 root 실행이 기본값이어서는 안 됩니다. 애플리케이션이 침해되더라도 컨테이너 내부 권한을 최소화해야 하기 때문입니다.
+개발 단계에서는 크게 체감되지 않아도, 운영에서는 root 실행이 기본값이어서는 안 됩니다. 애플리케이션이 침해되더라도 컨테이너 내부 권한을 최소화해야 하기 때문입니다. `PYTHONDONTWRITEBYTECODE=1`은 `.pyc` 파일 생성을 막고, `PYTHONUNBUFFERED=1`은 로그가 버퍼 없이 즉시 출력되게 합니다.
 
-### 5단계 — 빌드와 실행
+### 5단계 — 빌드, 검증, 최적화 확인
 
 ```bash
+# 빌드
 docker build -t myapp:1.0 .
-docker run --rm myapp:1.0
+
+# 캐시 적중 확인: requirements.txt 변경 없이 코드만 수정 후 재빌드
+# → RUN pip install 단계가 "CACHED"로 표시되어야 함
+touch app.py && docker build -t myapp:1.0 .
+
+# 이미지 크기 확인
+docker images myapp
+
+# 레이어 구조 확인
 docker history myapp:1.0
+
+# non-root 실행 확인
+docker run --rm myapp:1.0 id
+# 출력: uid=1000(appuser) gid=1000(appuser) groups=1000(appuser)
+
+# 이미지 안에 민감한 파일이 없는지 확인
+docker run --rm myapp:1.0 ls -la /app
 ```
 
 여기서 `docker history`를 함께 보는 습관이 중요합니다. 이미지가 예상대로 쌓였는지, 불필요한 레이어가 없는지, 민감한 파일이 들어갔을 가능성은 없는지 점검할 수 있기 때문입니다.
 
 ### 실행 뒤 바로 확인할 것
 
-- 코드만 바꾼 뒤 다시 빌드했을 때 `pip install` 단계가 캐시 히트로 빠르게 지나가야 합니다.
-- `docker history myapp:1.0`에서 의존성 레이어와 애플리케이션 코드 레이어가 분리되어 보여야 다음 빌드에서도 이점을 얻습니다.
+- 코드만 바꾼 뒤 다시 빌드했을 때 `pip install` 단계가 `CACHED`로 빠르게 지나가야 합니다.
+- `docker history myapp:1.0`에서 의존성 레이어와 애플리케이션 코드 레이어가 분리되어 보여야 합니다.
+- `docker run --rm myapp:1.0 id`에서 root가 아닌 사용자(uid=1000)가 나와야 합니다.
 
-### 잘 안 될 때 먼저 볼 것
+### 트러블슈팅
 
-- 캐시가 매번 깨지면 `COPY . .`가 requirements 복사보다 위에 있지 않은지부터 봅니다.
-- 이미지 안에 `.env`나 `.git`이 들어갔다면 `.dockerignore`가 비어 있거나 빌드 컨텍스트 경로를 잘못 잡은 경우가 많습니다.
+| 증상 | 원인 | 해결 방법 |
+|------|------|-----------|
+| 캐시가 매번 깨짐 | `COPY .`가 `requirements.txt` 복사보다 위에 있음 | 순서 변경: requirements 먼저, 소스 나중 |
+| 이미지에 `.env`가 들어감 | `.dockerignore` 없거나 미작성 | `.dockerignore`에 `.env*` 추가 |
+| `permission denied` 오류 | 파일 소유자와 USER가 다름 | `chown -R appuser:appuser /app` 추가 |
+| `pip install` 느림 | 네트워크 또는 캐시 없음 | `--no-cache-dir`로 이미지 크기 줄이기 |
+| 빌드 컨텍스트가 너무 큼 | `.dockerignore` 없이 큰 디렉터리 포함 | `.dockerignore`로 `node_modules`, `.git` 제외 |
 
-- requirements를 먼저 복사하면 의존성 레이어를 캐시하기 좋습니다.
-- `.dockerignore`가 없으면 `.git` 전체가 이미지 빌드 컨텍스트로 들어갑니다.
-- `USER`를 생략하면 기본적으로 root로 실행됩니다.
+## 자주 하는 실수
 
-결국 Dockerfile 품질은 "잘 동작하느냐"보다 "다음 빌드도 빠르고 예측 가능하냐"로 판단하는 편이 좋습니다. 로컬에서 한 번 돌아가는 Dockerfile은 출발점일 뿐입니다.
+| 실수 | 문제점 | 올바른 방법 |
+|------|--------|-------------|
+| `COPY .`를 맨 위에 배치 | 사소한 코드 수정에도 전체 빌드 재실행 | requirements 먼저, 소스 나중 순서로 배치 |
+| `apt update`와 `install`을 별도 `RUN`으로 분리 | 오래된 캐시 재사용으로 예측 불가 | 한 `RUN`에 update, install, clean 모두 실행 |
+| `pip install` 후 캐시 미정리 | 이미지 크기 불필요하게 증가 | `--no-cache-dir` 사용 |
+| `.dockerignore` 생략 | `.git`, `.env` 등이 이미지에 포함 | 프로젝트 시작 시 `.dockerignore` 필수 작성 |
+| root로 실행 방치 | 보안 기본값 약화 | `useradd` 후 `USER` 지정 |
 
-## 자주 하는 실수 다섯 가지
+## CMD vs ENTRYPOINT 차이
 
-1. **`COPY .`를 맨 위에 둡니다.** 사소한 코드 수정에도 전체 빌드가 다시 일어납니다.
-2. **`apt update`와 `install`을 다른 `RUN`으로 나눕니다.** 오래된 캐시를 재사용해 예측이 어려워집니다.
-3. **`pip install` 뒤 캐시 정리를 하지 않습니다.** 이미지 크기가 불필요하게 커집니다.
-4. **`.dockerignore`를 빼먹습니다.** `.git`, `.env` 같은 파일이 이미지에 들어갈 수 있습니다.
-5. **root 실행을 그대로 둡니다.** 운영 보안 기본값을 스스로 약화합니다.
+```dockerfile
+# CMD만 사용: 전체 명령을 오버라이드할 수 있음
+CMD ["python", "app.py"]
 
-이 실수들은 모두 "이미지가 그냥 한 번 만들어지면 된다"는 생각에서 나옵니다. 하지만 Dockerfile은 반복해서 빌드되고, 여러 개발자와 CI가 공유하며, 결국 운영까지 이어집니다.
+# ENTRYPOINT + CMD: ENTRYPOINT는 고정, CMD는 기본 인자
+ENTRYPOINT ["python"]
+CMD ["app.py"]
+
+# docker run myimage              → python app.py
+# docker run myimage other.py     → python other.py
+# docker run --entrypoint bash myimage → bash (ENTRYPOINT 오버라이드)
+```
+
+신호 처리 관점에서 exec 형식(`["cmd", "arg"]`)과 shell 형식(`cmd arg`)의 차이도 중요합니다. shell 형식은 `/bin/sh -c`를 통해 실행되므로, SIGTERM 신호가 실제 프로세스에 전달되지 않을 수 있습니다.
 
 ## 실무에서는 이렇게 이어집니다
 
@@ -165,45 +236,44 @@ docker history myapp:1.0
 
 운영 관점에서는 Dockerfile이 보안 정책의 일부가 되기도 합니다. 어떤 베이스 이미지를 허용하는지, root 실행을 금지하는지, 헬스체크를 어디서 정의하는지 같은 기준이 모두 Dockerfile 수준에서 드러나기 때문입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- Dockerfile은 빌드 스크립트이면서 문서입니다.
-- 위에서 아래로 갈수록 변경 빈도가 높아지게 구성합니다.
-- `.dockerignore`는 성능 최적화이면서 보안 제어이기도 합니다.
-- `CMD`와 `ENTRYPOINT`는 의도를 갖고 선택해야 합니다.
-- non-root는 예외가 아니라 기본값입니다.
-
-이 사고방식은 이후 이미지 최적화와 프로덕션 주제로 곧바로 이어집니다. 좋은 Dockerfile 없이 좋은 운영은 나오기 어렵습니다.
-
 ## 운영 체크리스트
 
-- [ ] 레이어 순서가 변경 빈도를 반영합니다.
-- [ ] `.dockerignore`가 존재합니다.
+- [ ] 레이어 순서가 변경 빈도를 반영합니다 (드문 것 위, 잦은 것 아래).
+- [ ] `.dockerignore`가 존재하고 `.env`, `.git`을 포함합니다.
 - [ ] 컨테이너가 non-root로 실행됩니다.
-- [ ] 의존성과 애플리케이션 코드가 분리되어 있습니다.
+- [ ] 의존성과 애플리케이션 코드가 별도 레이어로 분리되어 있습니다.
+- [ ] `apt-get clean`이나 `--no-cache-dir`로 캐시를 정리합니다.
+- [ ] `HEALTHCHECK`가 정의되어 있습니다.
 
 ## 연습 문제
 
-1. requirements는 그대로 두고 코드만 수정해 캐시 적중 여부를 확인해 보세요.
-2. `.dockerignore`를 추가해 이미지 컨텍스트를 줄여 보세요.
-3. non-root 사용자로 실행하는 Dockerfile을 직접 작성해 보세요.
-
-## 정리 및 다음 단계
-
-좋은 Dockerfile은 팀의 시간을 매일 절약합니다. 핵심은 명령 수가 적은 것이 아니라, 캐시가 잘 작동하고 재현 가능하며 운영 기준을 담고 있느냐입니다. `FROM`, `RUN`, `COPY`, `CMD`는 단순한 문법이 아니라 빌드 전략과 운영 철학을 담는 수단입니다.
-
-다음 글에서는 volume과 network를 다룹니다. 이미지를 잘 만드는 문제에서 한 걸음 나아가, 실행 중 생기는 데이터와 컨테이너 간 통신을 어떻게 분리하고 연결할지 봅니다.
+1. requirements는 그대로 두고 코드만 수정해 빌드했을 때 `pip install` 단계가 `CACHED`로 표시되는지 확인해 보세요.
+2. `.dockerignore` 없이 빌드한 이미지와 있는 이미지의 `docker history` 크기를 비교해 보세요.
+3. non-root 사용자로 실행하는 Dockerfile을 직접 작성하고 `docker run --rm myimage id`로 확인해 보세요.
+4. `CMD`와 `ENTRYPOINT`를 조합해 `docker run myimage --help`가 동작하는 Dockerfile을 작성해 보세요.
 
 ## 처음 질문으로 돌아가기
 
 - **`FROM`, `RUN`, `COPY`, `CMD`는 각각 어떤 역할을 할까요?**
-  - 빌드가 느리면 생산성이 조금 떨어지는 정도로 끝나지 않습니다
+  - `FROM`은 베이스 이미지 선택, `RUN`은 빌드 시점 명령 실행, `COPY`는 파일 복사, `CMD`는 컨테이너 시작 시 기본 실행 명령입니다. 각 명령은 독립적인 레이어를 만들고, 레이어 순서가 캐시 효율에 직접 영향을 줍니다.
+
 - **Dockerfile 명령 순서는 왜 빌드 속도에 큰 영향을 줄까요?**
-  - 이 예제는 동작은 하지만 개선 여지가 큽니다. 가장 큰 문제는 의존성과 애플리케이션 코드가 한 덩어리처럼 취급된다는 사실입니다.
+  - Docker는 캐시를 레이어 단위로 재사용합니다. 어떤 레이어가 변경되면 그 이후의 모든 레이어는 다시 빌드됩니다. 따라서 자주 바뀌는 코드를 위에 두면 변경 없는 의존성 설치도 매번 반복됩니다. 변경 빈도가 낮은 것을 위에 두어야 캐시가 잘 작동합니다.
+
 - **`.dockerignore`는 성능뿐 아니라 보안에도 왜 중요할까요?**
-  - 빌드가 느리면 생산성이 조금 떨어지는 정도로 끝나지 않습니다
-  - 빌드가 느리면 생산성이 조금 떨어지는 정도로 끝나지 않습니다. 작은 수정에도 전체 의존성을 다시 설치하고, CI에서 매번 시간을 허비하고, 결국 팀 전체가 느린 피드백 루프에 익숙해집니다. 이런 비용은 눈에 잘 띄지 않지만 오래 갈수록 큽니다.
-  - 이 차이가 중요한 이유는 Docker가 캐시를 레이어 단위로 재사용하기 때문입니다. 자주 바뀌는 코드를 너무 일찍 복사하면, 뒤에 있는 의존성 설치 레이어까지 매번 다시 계산하게 됩니다.
+  - `.dockerignore`가 없으면 `.git` 전체(커밋 히스토리 포함)와 `.env`(비밀값 포함)가 빌드 컨텍스트에 들어갑니다. 빌드 컨텍스트는 Docker 데몬으로 전송되고, 이미지에 포함된 파일은 레지스트리를 통해 노출될 수 있습니다. 성능 최적화와 보안 제어가 동시에 필요한 이유입니다.
+
+- **이 기능을 프로덕션에서 쓸 때 보안 관점에서 주의할 점은 무엇일까요?**
+  - root 실행 방지(`USER` 지정), 민감 파일 제외(`.dockerignore`), 베이스 이미지 고정(태그 + digest), `HEALTHCHECK` 정의, 그리고 `docker commit` 대신 항상 Dockerfile로 빌드하는 것이 핵심입니다.
+
+- **초보자가 이 기능에서 가장 자주 겪는 오류는 무엇일까요?**
+  - `COPY . .`를 의존성 설치 전에 두어 캐시가 전혀 작동하지 않는 경우가 가장 흔합니다. 또한 `.dockerignore` 없이 `.env` 파일이 이미지에 들어가는 보안 사고도 자주 발생합니다.
+
+## 정리
+
+좋은 Dockerfile은 팀의 시간을 매일 절약합니다. 핵심은 명령 수가 적은 것이 아니라, 캐시가 잘 작동하고 재현 가능하며 운영 기준을 담고 있느냐입니다. `FROM`, `RUN`, `COPY`, `CMD`는 단순한 문법이 아니라 빌드 전략과 운영 철학을 담는 수단입니다.
+
+다음 글에서는 volume과 network를 다룹니다. 이미지를 잘 만드는 문제에서 한 걸음 나아가, 실행 중 생기는 데이터와 컨테이너 간 통신을 어떻게 분리하고 연결할지 봅니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
