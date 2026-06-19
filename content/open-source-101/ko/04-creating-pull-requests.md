@@ -40,200 +40,326 @@ last_reviewed: '2026-05-15'
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
+## 왜 이 글이 중요한가
+
 코드는 맞는데 풀 리퀘스트가 불편하면 리뷰가 늦어집니다. 반대로 수정 내용이 크지 않아도 풀 리퀘스트 구성이 좋으면 메인테이너가 빠르게 맥락을 파악할 수 있습니다. 초보자 입장에서는 실력보다 협업 방식이 더 먼저 평가될 때가 많습니다.
 
 실무에서도 상황은 같습니다. 회사 안에서든 오픈소스에서든 풀 리퀘스트는 코드 리뷰의 기본 단위입니다. 작은 변경을 명확한 이야기로 정리하는 능력은 어디서나 바로 통합니다.
 
-## 흐름을 먼저 눈에 넣기
-
-이 흐름을 귀찮은 절차로 보면 매 단계가 번거롭습니다. 하지만 역할을 나눠 보면 훨씬 이해가 쉽습니다. 포크는 개인 작업 공간, 브랜치는 변경 단위, 커밋은 이력, 풀 리퀘스트는 검토 요청입니다. 섞지 않는 이유가 분명합니다.
+## 핵심 관점
 
 좋은 풀 리퀘스트는 구현보다 구조가 먼저 정리된 풀 리퀘스트입니다. 브랜치가 독립돼 있고, 변경 범위가 작고, 설명이 분명하고, 관련 이슈와 테스트가 연결돼 있으면 리뷰는 훨씬 부드럽게 흐릅니다.
 
-## 꼭 알아야 할 다섯 가지 개념
+> PR을 보내는 것은 완성된 코드를 제출하는 일이 아닙니다. **피드백을 받으면서 함께 코드를 개선하는 과정**입니다.
 
-fork는 원본 저장소를 건드리지 않고 작업할 수 있는 개인 사본입니다. branch는 하나의 목적을 가진 변경 묶음입니다. commit은 변경 이력을 남기는 최소 단위입니다. PR은 upstream에 병합을 요청하는 공식 창구입니다. review는 맞다 틀리다를 판정하는 자리가 아니라, 변경이 안전하고 이해 가능한지 함께 확인하는 과정입니다.
+각 역할을 분리해 보면 훨씬 이해가 쉽습니다:
+- **포크**: 개인 작업 공간 (원본 보호)
+- **브랜치**: 변경 단위 (목적 하나에 브랜치 하나)
+- **커밋**: 변경 이력 (각 커밋은 이유가 있어야 함)
+- **PR**: 검토 요청 (코드 + 맥락 + 테스트 증거)
 
-이 다섯 단어를 정확히 이해하면 풀 리퀘스트 작성이 훨씬 덜 막막해집니다.
+## 핵심 개념
 
-## 코드 리뷰 체크리스트
+### PR 크기와 리뷰 품질
 
-리뷰는 막연한 평가가 아니라 구체적 기준으로 이루어져야 합니다. 다음은 대부분의 프로젝트에서 공통적으로 사용하는 네 가지 축입니다.
+PR 크기는 리뷰 속도에 직결됩니다.
 
-| 축 | 확인 포인트 | 예시 |
-|---|---|---|
-| 정확성 | 코드가 요구사항을 만족하는가 | 로직 오류, edge case, 누락된 분기 |
-| 가독성 | 다른 사람이 이해할 수 있는가 | 이름, 구조, 주석, 복잡도 |
-| 테스트 | 변경을 검증하는 테스트가 있는가 | unit test, integration test, fixture |
-| 문서 | 공개 API 변경 시 문서 갱신했는가 | README, docstring, changelog |
+| PR 규모 | 변경 줄 수 | 리뷰 품질 | 권장 여부 |
+|---|---|---|---|
+| XS | 1-50줄 | 최상 | 항상 권장 |
+| S | 50-200줄 | 좋음 | 권장 |
+| M | 200-400줄 | 보통 | 가능하면 분할 |
+| L | 400-600줄 | 낮음 | 분할 필요 |
+| XL | 600줄 이상 | 매우 낮음 | 반드시 분할 |
 
-이 체크리스트는 리뷰어와 기여자 모두에게 유용합니다. 기여자는 PR을 열기 전에 자기 점검용으로 사용할 수 있고, 리뷰어는 피드백의 근거로 사용할 수 있습니다.
+큰 기능을 작은 PR로 나누는 전략:
+```text
+기능: 사용자 인증 시스템 추가
 
-가장 흔한 실수는 정확성만 보고 가독성과 테스트를 간과하는 것입니다. 코드가 작동하더라도 읽기 어려우면 유지보수 비용이 커지고, 테스트가 없으면 나중에 회귀(regression)가 발생할 위험이 높습니다.
-
-## 좋은 리뷰 코멘트 vs 나쁨 리뷰 코멘트
-
-리뷰 코멘트의 품질은 협업 분위기를 결정합니다. 다음은 다섯 가지 상황별 예시입니다.
-
-**1. 로직 오류 지적**
-
-Fail 나쁨 예: "이 코드는 틀렸습니다."
-Pass 좋은 예: "`user.is_active`가 `False`일 때도 로그인이 허용되는 것 같습니다. 34번 줄의 조건을 `if user.is_active and user.is_verified:`로 바꾸면 어떨까요?"
-
-**2. 가독성 개선 제안**
-
-Fail 나쁨 예: "변수명을 좀 더 잘 지어 주세요."
-Pass 좋은 예: "`data`보다 `user_profile`이 역할을 더 명확히 드러낼 것 같습니다. 12번 줄부터 여섯 곳에서 사용되는데, 일관되게 바꾸시겠어요?"
-
-**3. 테스트 추가 요청**
-
-Fail 나쁨 예: "테스트를 추가해 주세요."
-Pass 좋은 예: "빈 문자열 입력 시 동작을 확인하는 테스트를 추가하면 좋을 것 같습니다. `test_validate_email.py`에 이미 비슷한 패턴이 있으니 참고해 주세요."
-
-**4. 설계 제안**
-
-Fail 나쁨 예: "이 방식은 좋지 않습니다."
-Pass 좋은 예: "지금은 매번 DB를 조회하는데, 결과를 5분간 캐싱하면 API 응답 속도가 10배 빠른 테스트 결과가 있습니다. Redis 요구사항을 추가하는 것에 동의하시나요?"
-
-**5. 칭찬과 피드백 혼합**
-
-Fail 나쁨 예: "좋습니다. 머지하겠습니다."
-Pass 좋은 예: "예외 처리가 견고하고, 테스트도 커버리지가 높네요. 한 가지만 더 체크하면, 67번 줄 `finally` 블록에서 리소스를 명시적으로 정리하면 메모리 누수를 막을 수 있습니다."
-
-차이는 명확합니다. 좋은 코멘트는 **구체적 위치, 개선 방향, 참고 자료**를 함께 제공합니다. 나쁨 코멘트는 문제만 지적하고 기여자가 스스로 해결책을 찾게 만듭니다.
-
-## 리뷰 응답 에티켓
-
-리뷰를 받는 일도 협업 능력입니다. 다음은 신뢰를 쌓는 응답 방식입니다.
-
-**1. 빠른 반응**
-
-리뷰 코멘트가 달리면 24시간 이내에 반응하는 편이 좋습니다. 당장 수정하지 못하더라도 "확인했습니다, 내일 수정하겠습니다"라는 한 마디만으로도 리뷰어는 안심합니다.
-
-**2. 구체적 질문**
-
-피드백이 모호하면 질문으로 명확히 하세요. "이해하지 못했습니다"보다 "‘캐싱 추가’가 Redis를 말씀하시는 건가요, 아니면 메모리 내 dict를 말씀하시는 건가요?"가 훨씬 낫습니다.
-
-**3. 변경 사항 설명**
-
-수정하면서 생각이 바뀐면 그 이유를 적어 주세요. "수정했습니다"보다 "처음에는 A 방식을 생각했는데, 리뷰 후 B 방식이 기존 코드 패턴과 더 잘 맞아 바꾸었습니다"가 더 좋습니다.
-
-**4. 반대 의견 표현**
-
-동의하지 않을 때는 근거를 들어 설명하세요. "제 생각은 다릅니다"보다 "지금 방식을 유지하는 이유는 X 부분에서 성능이 중요하기 때문인데, Y 방식은 추가 DB 조회가 필요해 비효율적일 것 같습니다"가 훨씬 낫습니다.
-
-**5. 감사 표현**
-
-리뷰 마지막에 간단한 감사 표현을 남기면 협업 분위기가 좋아집니다. "리뷰 감사합니다, 덜분에 코드가 훨씬 깨끗해졌습니다" 같은 한 마디면 충분합니다.
-
-리뷰 응답에서 가장 피해야 할 태도는 방어적 반응입니다. "이게 왜 문제인가요?" 같은 반발보다는 "이 부분을 이렇게 이해했는데 맞는지 확인 부탁드립니다"가 훨씬 건설적입니다.
-
-**커밋 메시지 모범 사례** — 좋은 커밋 메시지는 50자 제목과 72자 본문을 따릅니다. 예시: `fix: prevent race condition in user login` (제목), 빈 줄, `Safari 15에서 동시 로그인 시 세션 충돌 발생. 세션 생성에 mutex 추가하여 해결` (본문). 첫 줄에 타입을 명시하면 (feat/fix/docs/refactor) 자동화 도구가 분류하기 쉬워집니다. Conventional Commits 규칙을 따르면 차후 changelog 생성도 자동화할 수 있습니다.
-
-**Force Push 주의사항** — PR을 연 상태에서 커밋 이력을 다시 쓰는 것은 주의해야 합니다. `git push --force`는 리뷰어의 댓글과 커밋 참조를 깨뜨릴 수 있습니다. 대신 `git push --force-with-lease`를 사용하면 더 안전합니다. 리뷰 진행 중이면 fixup 커밋을 추가하고 머지 전에 squash하는 것이 더 좋습니다.
-
-**테스트 필수 사항** — PR에 테스트를 포함하는 것은 단순한 규칙이 아니라 신뢰를 보여주는 방법입니다. 기능 추가 PR은 해당 기능의 동작을 검증하는 테스트를, 버그 수정 PR은 해당 버그를 재현하고 예방하는 테스트를 포함해야 합니다. 테스트가 없으면 리뷰어는 그 PR이 나중에 깨질 가능성을 가정하게 됩니다.
-## 생각이 어떻게 바뀌어야 할까
-
-처음에는 `main`에 바로 올려도 되지 않을까 싶을 수 있습니다. 하지만 오픈소스 기여에서는 변경을 분리해 검토 가능하게 만드는 과정이 구현만큼 중요합니다.
-
-그래서 좋은 습관은 단순합니다. 매번 포크하고, 브랜치를 나누고, 작은 커밋을 남기고, 맥락 있는 설명과 함께 풀 리퀘스트를 여는 것입니다. 이 기본이 지켜지면 초보자의 첫 기여도 훨씬 신뢰를 얻기 쉽습니다.
-
-## 직접 따라해 보기: 첫 풀 리퀘스트 만들기
-
-### 1단계 — 포크하고 클론하기
-
-원본 저장소에 직접 작업하지 않고, 내 작업 공간을 분리합니다. 이 단계가 있어야 실패해도 원본에 영향이 없습니다.
-
-```bash
-gh repo fork owner/repo --clone
-cd repo
+PR 1: feat: add User model and database schema
+PR 2: feat: implement password hashing
+PR 3: feat: add login endpoint
+PR 4: feat: add session management
+PR 5: feat: add logout endpoint
+PR 6: test: add auth integration tests
+PR 7: docs: update API documentation
 ```
 
-### 2단계 — 작업 브랜치 만들기
+### 커밋 메시지 규칙
 
-브랜치 이름만 봐도 무엇을 고치는지 드러나게 만드는 편이 좋습니다. 기능 하나, 버그 하나 기준으로 자르는 습관이 중요합니다.
+**Conventional Commits** 형식을 따르면 changelog 자동 생성이 가능합니다.
 
-```bash
-git checkout -b fix/login-safari
+```text
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer(s)]
 ```
 
-### 3단계 — 커밋 남기기
-
-커밋 메시지는 나중에 변경 이력과 리뷰 문맥까지 이어집니다. 모호한 메시지보다 의도를 드러내는 문장이 낫습니다.
-
-```bash
-git commit -m "fix: handle Safari 15 cookie quirk"
+**타입 목록**:
+```text
+feat:     새 기능
+fix:      버그 수정
+docs:     문서 수정
+style:    코드 포매팅 (기능 변경 없음)
+refactor: 리팩토링 (버그 수정·기능 추가 없음)
+test:     테스트 추가·수정
+chore:    빌드 과정·도구 설정 변경
+perf:     성능 개선
 ```
 
-### 4단계 — 원격으로 올리기
+**좋은 커밋 메시지 예시**:
+```text
+fix(auth): prevent session fixation on login
 
-푸시는 단순 업로드가 아니라 리뷰 가능한 상태를 공유하는 단계입니다. 로컬에서 정리되지 않은 변경은 이 단계 전에 줄여 두는 편이 좋습니다.
+Before this change, the session ID was not rotated after
+successful authentication, creating a session fixation
+vulnerability.
 
-```bash
-git push origin fix/login-safari
+After login, we now regenerate the session ID while
+preserving session data.
+
+Closes #1234
 ```
 
-### 5단계 — 풀 리퀘스트 열기
+**나쁜 커밋 메시지 예시**:
+```text
+fix bug
 
-제목은 요약, 본문은 맥락입니다. 관련 이슈를 연결해 두면 메인테이너가 전체 흐름을 빠르게 이해할 수 있습니다.
+WIP
 
-```bash
-gh pr create --title "fix: Safari 15 login" \
-  --body "Closes #42"
+수정
+
+asdfasdf
 ```
 
-### PR 템플릿 예시
+## PR 전체 워크플로 예시
+
+첫 기여부터 머지까지의 전체 흐름을 명령어와 함께 봅니다.
+
+```bash
+# 1. 포크 및 클론
+gh repo fork requests/requests --clone
+cd requests
+
+# 2. upstream 연결 (필수 - 나중에 동기화에 필요)
+git remote add upstream https://github.com/psf/requests.git
+git remote -v
+# origin    https://github.com/yourusername/requests.git
+# upstream  https://github.com/psf/requests.git
+
+# 3. 최신 upstream으로 동기화
+git fetch upstream
+git checkout main
+git merge upstream/main
+
+# 4. 작업 브랜치 생성 (이슈 번호 포함)
+git checkout -b fix/1234-session-cookie-safari
+
+# 5. 변경 구현
+# requests/adapters.py 수정...
+
+# 6. 테스트 실행
+pytest tests/test_adapters.py -v
+# 기존 테스트 통과 확인
+pytest tests/test_adapters.py::TestHttpAdapter::test_cookie_redirect -v
+# 새 테스트 통과 확인
+
+# 7. 커밋 (작은 단위로)
+git add requests/adapters.py
+git commit -m "fix(adapters): preserve cookies across redirects
+
+Safari 15 changed cookie handling for cross-origin redirects.
+Update HTTPAdapter.send() to explicitly copy cookies from
+the response to the prepared request on redirect.
+
+Closes #1234"
+
+# 테스트도 별도 커밋
+git add tests/test_adapters.py
+git commit -m "test(adapters): add Safari 15 cookie redirect test"
+
+# 8. 포크에 푸시
+git push origin fix/1234-session-cookie-safari
+
+# 9. PR 생성
+gh pr create \
+  --title "fix(adapters): preserve cookies across redirects on Safari 15" \
+  --body "## Summary
+Safari 15 changed cookie handling for cross-origin redirects, causing
+session cookies to be lost after a redirect.
+
+## Changes
+- `requests/adapters.py`: Copy cookies from response to next request in redirect chain
+- `tests/test_adapters.py`: Add regression test for Safari 15 behavior
+
+## Testing
+\`\`\`bash
+pytest tests/test_adapters.py -v
+# 142 passed, 0 failed
+\`\`\`
+Manual testing on Safari 15.1 (macOS 12): cookies persisted correctly.
+
+## Related Issues
+Closes #1234
+
+## Checklist
+- [x] Tests added and passing
+- [x] No breaking changes
+- [x] Documentation updated (N/A for internal change)"
+
+# 10. 리뷰 피드백 반영
+# 리뷰어: "쿠키 병합 방식을 dict.update() 대신 CookieJar.update()로 변경"
+git add requests/adapters.py
+git commit -m "fix: use CookieJar.update() per review feedback"
+git push origin fix/1234-session-cookie-safari
+
+# 11. 머지 후 정리
+git checkout main
+git pull upstream main
+git branch -d fix/1234-session-cookie-safari
+git push origin --delete fix/1234-session-cookie-safari
+```
+
+## PR 설명 템플릿
 
 `.github/PULL_REQUEST_TEMPLATE.md`에 다음처럼 작성하면 PR을 열 때 자동으로 본문이 채워집니다.
 
 ```markdown
-## 변경 요약
-<!-- 이 PR이 무엇을 바꾸는지 1-2줄로 요약합니다 -->
+## Summary
+<!-- 이 PR이 무엇을 하는지 1-2줄로 요약합니다 -->
 
-## 관련 이슈
-<!-- Closes #이슈번호 -->
+## Problem
+<!-- 어떤 문제가 있었나요? 관련 이슈를 연결합니다 -->
+Closes #
 
-## 테스트 방법
-<!-- 어떻게 테스트했는지 설명합니다 -->
-- [ ] 단위 테스트 추가
-- [ ] 수동 테스트 완료
+## Solution
+<!-- 어떻게 해결했나요? 왜 이 접근 방식을 선택했나요? -->
 
-## 운영 체크리스트
-- [ ] 커밋 메시지가 Conventional Commits 형식을 따릅니다
-- [ ] 테스트가 모두 통과합니다
-- [ ] 문서를 업데이트했습니다 (해당되는 경우)
+## Changes
+<!-- 변경된 파일과 이유를 목록으로 적습니다 -->
+- `file.py`:
+- `tests/test_file.py`:
+
+## Testing
+<!-- 어떻게 테스트했나요? -->
+```bash
+pytest tests/ -v
 ```
 
-이 템플릿은 기여자가 빠트리는 정보 없이 PR을 작성하도록 안내합니다. 메인테이너는 템플릿이 채워지지 않은 PR에 대해 추가 질문을 던질 필요가 줄어듭니다.
+## Checklist
+- [ ] 테스트 추가 또는 기존 테스트 통과
+- [ ] 문서 업데이트 (해당되는 경우)
+- [ ] 커밋 메시지가 Conventional Commits 형식을 따름
+- [ ] CI 통과 확인
+- [ ] Breaking change 없음 (있다면 이유 설명)
+```
 
-## 이 예시에서 먼저 읽어야 할 점
+## 코드 리뷰 대응 에티켓
 
-작은 브랜치는 작은 리뷰를 만듭니다. 커밋 메시지와 풀 리퀘스트 제목은 비슷해 보여도 역할이 다릅니다. 제목은 요약이고, 본문은 맥락입니다. 관련 이슈 링크는 리뷰어가 앞선 논의를 다시 찾는 비용을 줄여 줍니다.
+리뷰를 받는 일도 협업 능력입니다.
 
-이 지점이 중요합니다. 메인테이너는 코드를 처음 보는 경우가 많습니다. 변경 내용 자체보다, 이 변경이 왜 필요한지 빠르게 이해하게 만드는 정리가 더 큰 친절이 됩니다.
+### 좋은 리뷰 대응 vs 나쁜 리뷰 대응
 
-## 자주 하는 실수 다섯 가지
+**리뷰어 코멘트**: "34번 줄의 `dict.update()` 대신 `CookieJar.update()`를 사용하면 더 안전합니다."
 
-1. `main` 브랜치에서 바로 작업합니다.
-2. 커밋 메시지가 무엇을 바꿨는지 설명하지 못합니다.
-3. 테스트 없이 풀 리퀘스트를 엽니다.
-4. 관련 이슈를 연결하지 않습니다.
-5. 리뷰 피드백을 설명 없이 무시합니다.
+```markdown
+# 나쁜 대응
+"왜요? dict.update()도 동작하는데요."
+
+# 좋은 대응
+"좋은 지적 감사합니다. CookieJar.update()를 사용하면
+thread-safety가 보장되는군요. 수정했습니다.
+
+다만 한 가지 확인할 것이 있습니다. Python 3.8에서
+CookieJar.update()의 동작이 달라지는 경우가 있는데,
+이 프로젝트가 지원하는 최소 Python 버전이 무엇인지
+확인하고 싶습니다."
+```
+
+### 반대 의견을 표현할 때
+
+```markdown
+# 상황: 리뷰어가 복잡한 캐싱 레이어 추가를 제안했을 때
+
+감사합니다. 제안하신 캐싱 접근 방식이 성능 측면에서
+더 우수하다는 점에 동의합니다.
+
+다만 이 이슈의 범위가 쿠키 버그 수정이라, 캐싱 추가는
+별도 이슈에서 더 넓은 논의가 필요할 것 같습니다.
+
+이 PR에서는 쿠키 버그만 수정하고,
+캐싱 개선을 위한 #1300 이슈를 별도로 열겠습니다.
+이렇게 진행해도 될까요?
+```
+
+## 브랜치 전략
+
+프로젝트마다 브랜치 전략이 다릅니다. 기여 전에 확인합니다.
+
+| 전략 | 특징 | 적합한 프로젝트 | 기여자 브랜치 |
+|---|---|---|---|
+| GitHub Flow | `main` + feature 브랜치 | 대부분의 오픈소스 | `fix/`, `feat/`, `docs/` |
+| Git Flow | `develop`, `release`, `hotfix` | 버전 관리 중심 대형 프로젝트 | `feature/`, `fix/` |
+| Trunk Based | `main` 직접, short-lived 브랜치 | CI/CD 고도화 팀 | 매우 짧은 브랜치 |
+
+**GitHub Flow 기여 패턴** (대부분의 오픈소스):
+
+```bash
+# main에서 브랜치 생성
+git checkout main
+git pull upstream main
+git checkout -b fix/1234-description
+
+# 작업 후 PR 생성 → 리뷰 → main에 머지
+```
+
+## Draft PR 활용법
+
+코드가 완성되지 않았지만 초기 방향에 대해 피드백을 받고 싶을 때 유용합니다.
+
+```bash
+# Draft PR 생성
+gh pr create \
+  --title "WIP: fix session cookie handling" \
+  --body "작업 진행 중입니다. 접근 방향에 대한 피드백 부탁드립니다." \
+  --draft
+
+# 완성 후 Ready for Review로 전환
+gh pr ready
+```
+
+Draft 상태에서는 리뷰어에게 알림이 가지 않습니다. "Ready for review"로 전환하면 그때부터 정식 리뷰가 시작됩니다.
+
+## 자주 하는 실수
+
+| 실수 | 구체적 상황 | 올바른 접근 |
+|---|---|---|
+| main 브랜치에서 작업 | `git checkout main` 후 직접 수정 | 항상 새 브랜치 생성: `git checkout -b fix/description` |
+| 모호한 커밋 메시지 | "fix bug", "update", "WIP" | Conventional Commits 형식 사용 |
+| 테스트 없는 PR | 기능 변경 후 테스트 미추가 | 버그 수정 PR에 반드시 회귀 테스트 포함 |
+| 이슈 연결 누락 | PR 본문에 관련 이슈 링크 없음 | `Closes #N` 형식으로 이슈 연결 |
+| 리뷰 피드백 무시 | 코멘트에 응답 없이 새 커밋만 푸시 | 각 코멘트에 응답 후 변경 내용 설명 |
 
 ## 실무에서는 이렇게 생각한다
 
 시니어 엔지니어는 풀 리퀘스트를 코드 제출이 아니라 협업 인터페이스로 봅니다. 코드가 맞아도 범위가 너무 크면 리뷰 속도가 떨어지고, 맥락이 비어 있으면 검토자가 방어적으로 변합니다. 그래서 작은 풀 리퀘스트, 분명한 설명, 빠른 피드백 반영이 중요합니다.
 
-또 리뷰는 합격 시험이 아닙니다. 좋은 리뷰 대화는 둘 중 누가 옳으냐보다, 어떤 선택이 저장소의 기존 방향과 더 잘 맞느냐를 맞춰 가는 과정입니다. 초보자일수록 방어보다 명확한 설명과 빠른 수정으로 신뢰를 쌓는 편이 유리합니다.
+또 리뷰는 합격 시험이 아닙니다. 좋은 리뷰 대화는 둘 중 누가 옳으냐보다, 어떤 선택이 저장소의 기존 방향과 더 잘 맞느냐를 맞춰 가는 과정입니다.
 
-**실무에서 PR 크기 결정하기** — PR 크기는 리뷰 속도에 직결됩니다. 일반적으로 200-300줄 이하가 적정하고, 500줄을 넘어가면 리뷰 품질이 떨어집니다. 큰 기능은 여러 개의 작은 PR로 쌍는 편이 낫습니다. 예: (1) 데이터 모델 추가 (2) 비지니스 로직 구현 (3) API 엔드포인트 (4) 테스트. 이렇게 나누면 각 PR이 명확하고, 문제 발생 시 revert도 쉬우며, 병렬 리뷰도 가능해집니다.
+**리뷰 대기 시간 활용법** — PR을 올린 뒤 리뷰를 기다리는 동안:
 
-**PR 분할 전략** — 큰 기능을 작은 PR로 나눌 때는 다음 순서를 권장합니다: (1) 데이터 모델이나 타입 정의 추가 (2) 핵심 비즈니스 로직 구현 (3) 공개 API나 엔드포인트 추가 (4) 문서와 예시 (5) 테스트 강화. 이렇게 나누면 각 PR의 목적이 명확하고, 리뷰어는 한 번에 하나의 관심사만 집중할 수 있습니다.
+```bash
+# 다른 good first issue 탐색
+gh issue list --repo psf/requests --label "good first issue"
 
-**리뷰 대기 시간 활용법** — PR을 올린 뒤 리뷰를 기다리는 동안 다음을 할 수 있습니다: (1) 관련 문서 업데이트 (2) 테스트 커버리지 확인 (3) 다른 `good-first-issue` 탐색 (4) 기존 오픈 PR에 리뷰 코멘트 달기. 이렇게 하면 기여 속도가 멈추지 않고, 커뮤니티 기여도도 높아집니다.
+# 기존 오픈 PR에 리뷰 코멘트 달기 (커뮤니티 기여)
+gh pr list --repo psf/requests --state open
 
-**Draft PR 활용법** — GitHub는 Draft PR 기능을 제공합니다. 코드가 완성되지 않았지만 초기 방향에 대해 피드백을 받고 싶을 때 유용합니다. Draft 상태에서는 리뷰어에게 알림이 가지 않고, "Ready for review"로 전환하면 그때부터 정식 리뷰가 시작됩니다. 큰 기능을 구현할 때 초기 설계 피드백을 받으려면 Draft PR을 먼저 열어 두는 것이 좋습니다.
+# 관련 문서 업데이트 확인
+gh api repos/psf/requests/contents/docs
+```
 
 ## 운영 체크리스트
 
@@ -241,41 +367,13 @@ gh pr create --title "fix: Safari 15 login" \
 - [ ] 커밋 메시지가 변경 의도를 설명합니다.
 - [ ] 테스트 결과나 검증 방법을 준비했습니다.
 - [ ] 풀 리퀘스트 설명에 관련 이슈와 맥락을 적었습니다.
+- [ ] CI가 통과했는지 확인했습니다.
 
 ## 연습 문제
 
 1. fork와 clone의 차이를 한 문장으로 적어 보세요.
 2. `Closes #N` 표현이 하는 일을 한 문장으로 적어 보세요.
 3. 작은 풀 리퀘스트가 유리한 이유를 한 문장으로 적어 보세요.
-
-## 리뷰가 빨라지는 PR 구조 템플릿
-
-PR 품질은 코드 양보다 구조에 더 크게 좌우됩니다. 메인테이너 관점에서 좋은 PR은 "왜 필요한지", "어디를 바꿨는지", "어떻게 검증했는지"가 빠르게 보이는 PR입니다.
-
-권장 본문 구조는 네 단락입니다. 변경 배경, 변경 목록, 검증 방법, 위험도/롤백입니다. 특히 롤백 문장을 포함하면 운영 리스크를 미리 줄일 수 있습니다.
-
-```markdown
-## 변경 배경
-로그인 실패 시 세션 정리 누락으로 500 오류가 발생했습니다.
-
-## 변경 내용
-- 세션 검증 분기 추가
-- 예외 처리 로깅 보강
-- 회귀 테스트 2건 추가
-
-## 검증
-- pytest 전체 통과
-- Safari/Chrome 수동 재현 테스트 완료
-
-## 롤백
-문제 발생 시 `v1.4.1` 태그로 즉시 롤백 가능합니다.
-```
-
-리뷰 체크리스트도 명시적으로 붙입니다. 정확성, 가독성, 테스트, 문서, 보안 영향 5축으로 보면 대부분의 실수를 초기에 잡습니다.
-
-Git 워크플로는 `fork -> branch -> PR -> review -> squash merge`를 기본으로 두고, 긴 브랜치 수명은 피합니다. 오래 열린 PR은 충돌과 맥락 손실을 만들기 쉽기 때문입니다.
-
-마지막으로 CI 배지와 워크플로 링크를 README에 둬서 "PR이 열리면 자동으로 무엇을 검사하는지"를 공개하세요. 이것만으로도 신규 기여자의 성공률이 크게 높아집니다.
 
 ## 정리
 
@@ -286,11 +384,11 @@ Git 워크플로는 `fork -> branch -> PR -> review -> squash merge`를 기본�
 ## 처음 질문으로 돌아가기
 
 - **메인테이너가 반기는 풀 리퀘스트는 어떤 모양일까요?**
-  - 원본 저장소에 직접 작업하지 않고, 내 작업 공간을 분리합니다. 이 단계가 있어야 실패해도 원본에 영향이 없습니다.
+  - 변경 범위가 하나의 목적으로 제한되고, 커밋 메시지가 이유를 설명하며, 테스트가 포함되어 있고, PR 본문에 관련 이슈와 검증 방법이 명시된 PR입니다. 메인테이너가 코드를 열기 전에 이미 맥락을 파악할 수 있는 PR이 가장 좋습니다.
 - **포크, 브랜치, 커밋, 풀 리퀘스트 흐름을 왜 매번 분리해야 할까요?**
-  - 이 흐름을 귀찮은 절차로 보면 매 단계가 번거롭습니다. 하지만 역할을 나눠 보면 훨씬 이해가 쉽습니다. 포크는 개인 작업 공간, 브랜치는 변경 단위, 커밋은 이력, 풀 리퀘스트는 검토 요청입니다. 섞지 않는 이유가 분명합니다.
+  - 포크는 원본 저장소를 보호하는 개인 작업 공간이고, 브랜치는 변경을 목적별로 격리하며, 커밋은 이력을 원자 단위로 남기고, PR은 그 결과를 검토 가능한 형태로 제안합니다. 이 네 단계를 섞으면 실수를 되돌리기 어렵고 리뷰가 복잡해집니다.
 - **커밋 메시지와 풀 리퀘스트 설명은 각각 어떤 역할을 할까요?**
-  - 원본 저장소에 직접 작업하지 않고, 내 작업 공간을 분리합니다. 이 단계가 있어야 실패해도 원본에 영향이 없습니다.
+  - 커밋 메시지는 개별 변경의 이유를 기록하는 영구적 이력입니다. `git log`에서 항상 보입니다. PR 설명은 이 변경들을 하나의 맥락으로 묶어 리뷰어에게 전달하는 임시 문서입니다. 커밋은 "무엇을 왜 바꿨나", PR은 "전체적으로 어떤 문제를 어떻게 해결했나"를 담당합니다.
 
 <!-- toc:end -->
 

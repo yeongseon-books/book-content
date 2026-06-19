@@ -393,7 +393,11 @@ Docker는 환경 차이를 없애는 가장 빠른 출발점입니다. 이 글�
 ### 검증과 트러블슈팅
 
 - [docker run reference](https://docs.docker.com/engine/reference/run/)
+- [docker system reference](https://docs.docker.com/engine/reference/commandline/system/)
 
+### 커뮤니티와 생태계
+
+- [Docker Community Forums](https://forums.docker.com/)
 - [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/docker-101/ko)
 
-Tags: Docker, Container, DevOps, Linux, Virtualization
+Tags: Docker, Container, DevOps, Linux, Virtualization, Containerization

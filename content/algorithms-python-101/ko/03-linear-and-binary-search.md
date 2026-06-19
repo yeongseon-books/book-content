@@ -39,11 +39,7 @@ last_reviewed: '2026-05-12'
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
-탐색은 프로그래밍에서 가장 흔한 연산입니다. 데이터가 100개일 때는 선형 탐색으로 충분합니다. 하지만 100만 개가 되면 이진 탐색은 많아야 20번 정도 비교하면 되고, 선형 탐색은 최악의 경우 100만 번 모두 확인해야 합니다.
-
 > 이진 탐색은 매 단계마다 남은 데이터의 절반을 제거해, 정렬된 데이터에서 `O(log n)`을 달성합니다.
-
-단순 조회를 넘어서, "조건을 처음 만족하는 값"이나 "마지막으로 만족하는 값"을 찾는 문제로 확장된다는 점도 코딩 테스트에서 매우 중요합니다.
 
 ## 개념 한눈에 보기
 
@@ -54,7 +50,9 @@ Linear search: [1, 3, 5, 7, 9, 11, 13] — find 9
 → 1, 3, 5, 7, 9 (5 comparisons)
 
 Binary search: [1, 3, 5, 7, 9, 11, 13] — find 9
-→ 7 (middle), 11 (right half middle), 9 (3 comparisons)
+Step 1: mid=7, 9>7 → right half
+Step 2: mid=11, 9<11 → left half
+Step 3: mid=9, found! (3 comparisons)
 ```
 
 ## 핵심 개념
@@ -68,6 +66,7 @@ Binary search: [1, 3, 5, 7, 9, 11, 13] — find 9
 | Parametric search | 정확한 값 대신 조건의 경계를 찾는 문제에 이진 탐색을 적용하는 방식입니다 |
 
 ## 적용 전후 비교
+
 정렬된 리스트에서 값을 찾는 두 가지 방법입니다.
 
 ```python
@@ -97,6 +96,7 @@ def search(data, target):
 ## 단계별 실습
 
 ### 단계 1: 선형 탐색 구현
+
 ```python
 def linear_search(data: list, target) -> int:
     """Linear search — O(n)."""
@@ -115,6 +115,7 @@ print(linear_search(data, 5))   # -1
 선형 탐색의 장점은 단순함과 범용성입니다. 데이터가 정렬되어 있지 않아도 바로 사용할 수 있지만, 큰 데이터에서는 비용이 빠르게 커집니다.
 
 ### 단계 2: 이진 탐색 구현
+
 ```python
 def binary_search(sorted_data: list[int], target: int) -> int:
     """Binary search — O(log n), requires sorted data."""
@@ -134,7 +135,7 @@ print(binary_search(data, 9))    # 4
 print(binary_search(data, 10))   # -1
 ```
 
-이진 탐색의 핵심 전제는 정렬입니다. 이 조건이 맞으면 비교 횟수를 급격히 줄일 수 있지만, 정렬되지 않은 데이터에 적용하면 결과가 틀립니다.
+이진 탐색의 핵심 전제는 정렬입니다. 정렬되지 않은 데이터에 적용하면 결과가 틀립니다.
 
 ### 단계 3: bisect 모듈 사용하기
 
@@ -165,7 +166,7 @@ print(scores)  # [70, 80, 85, 90]
 
 실무와 코딩 테스트 모두에서, 직접 이진 탐색을 매번 작성하기보다 `bisect`를 적절히 활용하는 편이 안전하고 빠른 경우가 많습니다.
 
-### 단계 4: 하한과 상한
+### 단계 4: 하한과 상한 (lower bound / upper bound)
 
 ```python
 import bisect
@@ -182,18 +183,34 @@ print(bisect.bisect_right(data, 5))  # 5
 count = bisect.bisect_right(data, 5) - bisect.bisect_left(data, 5)
 print(f"Count of 5: {count}")  # 3
 
-# First index >= 5
-lower = bisect.bisect_left(data, 5)
-print(f"First position >= 5: {lower}")  # 2
+# 직접 구현: lower bound
+def lower_bound(nums: list[int], target: int) -> int:
+    left, right = 0, len(nums)
+    while left < right:
+        mid = (left + right) // 2
+        if nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid
+    return left
 
-# First index > 5
-upper = bisect.bisect_right(data, 5)
-print(f"First position > 5: {upper}")   # 5
+# 직접 구현: upper bound
+def upper_bound(nums: list[int], target: int) -> int:
+    left, right = 0, len(nums)
+    while left < right:
+        mid = (left + right) // 2
+        if nums[mid] <= target:
+            left = mid + 1
+        else:
+            right = mid
+    return left
+
+arr = [1, 2, 2, 2, 5, 7]
+print(lower_bound(arr, 2), upper_bound(arr, 2))  # 1, 4
 ```
 
-이 차이를 이해하면 중복 구간 길이 계산, 특정 기준 이상 값의 시작점 찾기 같은 문제를 훨씬 깔끔하게 풀 수 있습니다.
-
 ### 단계 5: 성능 비교
+
 ```python
 import time
 import bisect
@@ -223,14 +240,123 @@ for n in [10_000, 100_000, 1_000_000]:
     benchmark_search(n)
 ```
 
-입력이 커질수록 선형 탐색과 이진 탐색의 차이는 눈에 띄게 벌어집니다. `bisect`가 직접 구현보다 더 빠른 이유도 함께 확인할 수 있습니다.
+## 단계별 실행 추적 — 이진 탐색
 
-- 선형 탐색은 정렬되지 않은 데이터에도 동작하지만, 이진 탐색은 정렬이 필수입니다.
-- 이진 탐색은 100만 개 데이터도 많아야 20번 정도의 비교로 처리합니다.
-- `bisect` 모듈은 C로 구현되어 있어 손으로 작성한 이진 탐색보다 더 빠른 경우가 많습니다.
-- `bisect_left`와 `bisect_right`의 차이를 이해하면 문제 변형 대응력이 크게 올라갑니다.
+`binary_search([1, 3, 5, 7, 9, 11, 13, 15], 9)` 실행을 한 단계씩 따라가 보겠습니다.
 
-## 자주 하는 실수 5가지
+```text
+입력: [1, 3, 5, 7, 9, 11, 13, 15], target=9
+인덱스:  0  1  2  3  4   5   6   7
+
+Step 1: left=0, right=7
+  mid = (0+7)//2 = 3
+  data[3] = 7
+  9 > 7 → left = mid+1 = 4
+
+Step 2: left=4, right=7
+  mid = (4+7)//2 = 5
+  data[5] = 11
+  9 < 11 → right = mid-1 = 4
+
+Step 3: left=4, right=4
+  mid = (4+4)//2 = 4
+  data[4] = 9
+  9 == 9 → return 4
+
+결과: 인덱스 4 (총 3번 비교)
+선형 탐색이라면 5번 비교 필요
+```
+
+`lower_bound([1, 2, 2, 2, 5, 7], 2)` 추적:
+
+```text
+입력: [1, 2, 2, 2, 5, 7], target=2
+범위: [left=0, right=6)
+
+Step 1: mid=3, nums[3]=2 → 2 < 2? No → right=3
+  범위: [0, 3)
+
+Step 2: mid=1, nums[1]=2 → 2 < 2? No → right=1
+  범위: [0, 1)
+
+Step 3: mid=0, nums[0]=1 → 1 < 2? Yes → left=1
+  범위: [1, 1)
+
+종료: left=1 (2가 처음 나타나는 위치)
+```
+
+## 코딩 테스트 풀이 예시
+
+**문제**: 정렬된 배열에서 특정 값 이상인 원소 개수를 `O(log n)`에 구하라.
+
+```python
+import bisect
+
+def count_greater_equal(sorted_data: list[int], threshold: int) -> int:
+    """
+    정렬된 배열에서 threshold 이상인 원소 수를 반환합니다.
+    시간 복잡도: O(log n)
+    """
+    pos = bisect.bisect_left(sorted_data, threshold)
+    return len(sorted_data) - pos
+
+
+# 테스트
+data = [1, 3, 5, 7, 9, 11, 13]
+print(count_greater_equal(data, 7))   # 4  (7, 9, 11, 13)
+print(count_greater_equal(data, 14))  # 0  (없음)
+print(count_greater_equal(data, 1))   # 7  (전부)
+```
+
+**문제**: 정수 N의 제곱근을 이진 탐색으로 구하라 (정수 부분).
+
+```python
+def integer_sqrt(n: int) -> int:
+    """
+    n의 정수 제곱근을 이진 탐색으로 구합니다.
+    시간 복잡도: O(log n)
+    """
+    if n < 0:
+        raise ValueError("음수의 제곱근은 없습니다")
+    if n == 0:
+        return 0
+
+    left, right = 1, n
+    result = 0
+
+    while left <= right:
+        mid = (left + right) // 2
+        if mid * mid <= n:
+            result = mid  # 가능한 후보 저장
+            left = mid + 1
+        else:
+            right = mid - 1
+
+    return result
+
+
+# 테스트
+print(integer_sqrt(16))   # 4
+print(integer_sqrt(17))   # 4  (floor)
+print(integer_sqrt(25))   # 5
+print(integer_sqrt(0))    # 0
+```
+
+**단계별 추적** (`integer_sqrt(17)` 입력):
+
+```text
+n=17, left=1, right=17
+
+Step 1: mid=9, 9*9=81 > 17 → right=8
+Step 2: mid=4, 4*4=16 <= 17 → result=4, left=5
+Step 3: mid=6, 6*6=36 > 17 → right=5
+Step 4: mid=5, 5*5=25 > 17 → right=4
+Step 5: left=5 > right=4 → 종료
+
+결과: 4 (√17 ≈ 4.123, floor=4)
+```
+
+## 자주 하는 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|-------------|-----------|
@@ -239,6 +365,15 @@ for n in [10_000, 100_000, 1_000_000]:
 | `while left < right`로 잘못 구현 | 마지막 원소를 놓칠 수 있습니다 | 기본형에서는 `<=`를 사용합니다 |
 | left/right 갱신 실수 | 수렴하지 않아 무한 루프가 납니다 | 항상 `mid + 1`, `mid - 1`을 의식합니다 |
 | bisect 결과를 바로 인덱스로 확정함 | 값이 없어도 삽입 위치는 반환됩니다 | 반환 위치의 실제 값을 다시 확인합니다 |
+
+## 복잡도 비교표
+
+| 접근 | 전제 | 시간 복잡도 | 용도 |
+|------|------|-------------|------|
+| 선형 탐색 | 없음 | `O(n)` | 작은 입력, 정렬 안 됨 |
+| 이진 탐색 | 정렬 필요 | `O(log n)` | 대규모 조회 |
+| 정렬 + 이진 탐색 | 초기 정렬 비용 허용 | `O(n log n) + q log n` | 다중 질의 |
+| bisect 모듈 | 정렬 필요 | `O(log n)` (C 구현) | 실무 추천 |
 
 ## 실무에서는 이렇게 연결됩니다
 
@@ -260,7 +395,7 @@ for n in [10_000, 100_000, 1_000_000]:
 - [ ] while 루프로 이진 탐색을 구현할 수 있습니다
 - [ ] `bisect_left`와 `bisect_right`의 차이를 설명할 수 있습니다
 - [ ] 이진 탐색의 전제 조건이 정렬임을 설명할 수 있습니다
-- [ ] 이진 탐색의 실무 활용 예를 말할 수 있습니다
+- [ ] lower bound / upper bound를 직접 구현할 수 있습니다
 
 ## 연습 문제
 
@@ -271,135 +406,6 @@ for n in [10_000, 100_000, 1_000_000]:
 ## 정리와 다음 글
 
 선형 탐색은 `O(n)`, 이진 탐색은 `O(log n)`입니다. 이진 탐색은 정렬이라는 전제가 필요하지만, 데이터가 커질수록 성능 차이는 매우 극적입니다. 다음 글에서는 데이터를 순서 있게 만드는 핵심 알고리즘, 정렬을 다룹니다.
-
-## 심화 실전 노트: 탐색 문제를 경계 찾기로 확장하기
-
-### 구현 앵커: lower bound / upper bound 직접 구현
-
-```python
-def lower_bound(nums: list[int], target: int) -> int:
-    left, right = 0, len(nums)
-    while left < right:
-        mid = (left + right) // 2
-        if nums[mid] < target:
-            left = mid + 1
-        else:
-            right = mid
-    return left
-
-def upper_bound(nums: list[int], target: int) -> int:
-    left, right = 0, len(nums)
-    while left < right:
-        mid = (left + right) // 2
-        if nums[mid] <= target:
-            left = mid + 1
-        else:
-            right = mid
-    return left
-
-arr = [1, 2, 2, 2, 5, 7]
-print(lower_bound(arr, 2), upper_bound(arr, 2))  # 1, 4
-```
-
-### 실행 추적: 경계가 수렴하는 과정
-
-```text
-lower_bound(arr, 2)
-[0,6) mid=3 arr[3]=2 -> right=3
-[0,3) mid=1 arr[1]=2 -> right=1
-[0,1) mid=0 arr[0]=1 -> left=1
-종료: left=1
-```
-
-이 추적을 이해하면 "값 찾기"를 넘어 "조건이 처음 참이 되는 지점" 문제를 풀 수 있습니다.
-
-### 복잡도 비교표
-
-| 접근 | 전제 | 시간 복잡도 | 용도 |
-|------|------|-------------|------|
-| 선형 탐색 | 없음 | `O(n)` | 작은 입력, 정렬 안 됨 |
-| 이진 탐색 | 정렬 필요 | `O(log n)` | 대규모 조회 |
-| 정렬 + 이진 탐색 | 초기 정렬 비용 허용 | `O(n log n) + q log n` | 다중 질의 |
-
-### 인터뷰형 문제 분해
-
-- "한 번 찾고 끝인가, 여러 번 찾는가"
-- "정렬이 이미 보장되는가"
-- "정확 일치인가, 첫 위치/마지막 위치인가"
-- "배열 크기와 질의 횟수 `q`의 상대 크기는 어떤가"
-
-### 간단 증명: 이진 탐색이 `O(log n)`인 이유
-
-매 반복에서 탐색 구간 길이는 절반 이하로 줄어듭니다. 길이 `n`이 1 이하가 될 때까지 필요한 반복 횟수 `k`는 `n / 2^k <= 1`을 만족하는 최소 정수이며, 이는 `k >= log2 n`입니다. 따라서 시간 복잡도는 `O(log n)`입니다.
-
-### 흔한 함정과 수정
-
-| 함정 | 증상 | 수정 |
-|------|------|------|
-| `while left < right` / `<=` 혼용 | 끝값 누락 | 함수 목적에 맞게 템플릿 고정 |
-| 정렬 가정 누락 | 비결정적 오답 | 입력 정렬 보장 여부를 먼저 검증 |
-| bisect 결과를 값 존재로 오해 | 없는 값을 있다고 판단 | 위치 반환 후 실제 값 재검증 |
-
-## 실전 검증 부록: 성능 측정과 반례 설계
-
-알고리즘 학습에서 구현 자체보다 오래 남는 자산은 검증 습관입니다. 아래 체크는 주제와 무관하게 거의 모든 문제에서 공통으로 적용됩니다.
-
-### 1) 마이크로 벤치마크 규칙
-
-```python
-import time
-
-def benchmark(func, *args, repeat: int = 5) -> float:
-    best = float("inf")
-    for _ in range(repeat):
-        start = time.perf_counter()
-        func(*args)
-        best = min(best, time.perf_counter() - start)
-    return best
-```
-
-- 단일 실행 시간은 노이즈가 큽니다.
-- 최소/중앙값 기준으로 비교하는 편이 안정적입니다.
-- 입력 크기를 여러 단계로 늘려 증가 추세를 기록해야 합니다.
-
-### 2) 반례 세트 템플릿
-
-```text
-A. 최소 입력: 빈 배열, 원소 1개
-B. 중복 입력: 같은 값 다수
-C. 정렬/역정렬 입력: 경계 인덱스 오류 탐지
-D. 음수/0 포함 입력: 비교식 방향 오류 탐지
-E. 해답 없음 케이스: 종료 조건 검증
-```
-
-테스트를 통과했는지보다, 어떤 종류의 실패를 막았는지 기록하는 편이 품질에 더 직접적입니다.
-
-### 3) 복잡도-메모리 트레이드오프 표
-
-| 개선 전략 | 시간 영향 | 공간 영향 | 적용 판단 |
-|-----------|-----------|-----------|-----------|
-| 캐시/메모이제이션 | 감소 | 증가 | 중복 계산이 명확할 때 |
-| 정렬 후 탐색 | 대체로 감소 | 동일/약간 증가 | 질의가 여러 번일 때 |
-| 해시 사용 | 평균 감소 | 증가 | 순서보다 조회가 중요할 때 |
-| 힙 사용 | 상위/최소 유지에 유리 | 증가 | 우선순위 선택이 핵심일 때 |
-
-### 4) 인터뷰 답변 스크립트
-
-- "먼저 입력 제약을 보고 가능한 복잡도 상한을 정하겠습니다."
-- "현재 접근의 시간/공간 복잡도를 계산해 보겠습니다."
-- "경계 입력 다섯 가지로 검증 계획을 먼저 제시하겠습니다."
-- "필요하면 정답 유지 조건을 짧게 증명하겠습니다."
-
-이 스크립트를 반복하면 설명의 밀도가 올라가고, 구현 중 길을 잃는 빈도가 줄어듭니다.
-
-## 처음 질문으로 돌아가기
-
-- **선형 탐색은 어떻게 동작하고, 한계는 무엇일까요?**
-  - 선형 탐색은 `O(n)`, 이진 탐색은 `O(log n)`입니다
-- **이진 탐색은 어떤 원리로 동작하며 어떻게 구현할까요?**
-  - 선형 탐색은 `O(n)`, 이진 탐색은 `O(log n)`입니다
-- **Python의 `bisect` 모듈은 언제 유용할까요?**
-  - > 탐색 = 데이터 집합에서 원하는 값을 찾는 과정
 
 <!-- toc:begin -->
 ## 시리즈 목차

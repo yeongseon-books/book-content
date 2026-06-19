@@ -50,138 +50,264 @@ last_reviewed: '2026-05-15'
 
 DOM에 대한 감각이 없으면 페이지가 왜 느린지 설명하기 어렵습니다. HTML, CSS, JavaScript가 모두 정상처럼 보여도 실제 병목은 layout이나 paint에서 생길 수 있기 때문입니다. 이 과정을 알지 못하면 React, Vue 같은 프레임워크도 그저 복잡한 마법처럼 보입니다.
 
-반대로 브라우저가 무엇을 파싱하고, 언제 레이아웃을 다시 계산하고, 어떤 시점에 비동기 콜백을 실행하는지 알고 있으면 프레임워크의 동작도 훨씬 명확해집니다. 성능 문제를 볼 때도 추측 대신 구체적인 단계 이름으로 대화를 시작할 수 있습니다.
+반대로 브라우저가 무엇을 파싱하고, 언제 레이아웃을 다시 계산하고, 어떤 시점에 비동기 콜백을 실행하는지 알고 있으면 프레임워크의 동작도 훨씬 명확해집니다.
 
-## 한눈에 보는 개념 지도
+## 브라우저 렌더링 파이프라인
 
-브라우저는 텍스트를 곧바로 픽셀로 그리지 않습니다. DOM과 스타일 계산, layout, paint가 순서대로 이어지고, 그 사이에 JavaScript가 DOM을 바꾸면 일부 단계가 다시 실행됩니다.
+```
+HTML 텍스트 수신
+      |
+      v  파싱 (Parse)
+DOM 트리
+      |           CSS 파싱
+      |           CSSOM 트리
+      |              |
+      v  결합 (Attach)
+Render Tree (화면에 그려질 노드만)
+      |
+      v  Layout (Reflow)
+각 노드의 크기와 위치 계산
+      |
+      v  Paint (Rasterize)
+픽셀 색칠
+      |
+      v  Composite
+GPU 레이어 합성 → 최종 화면
+```
 
-### 직접 검증해 볼 포인트
+JavaScript가 DOM을 바꾸면 이 파이프라인의 일부가 다시 실행됩니다. 어느 단계부터 다시 시작하느냐에 따라 성능 비용이 달라집니다.
 
-- DevTools Elements 탭에서 HTML이 DOM 트리로 보이는지 확인합니다.
-- Performance 탭에서 버튼 클릭 뒤 layout과 paint 이벤트가 다시 생기는지 기록합니다.
-- `setTimeout(..., 0)` 예제를 실행해 동기 코드와 비동기 콜백 순서를 비교합니다.
-
-**기대 결과:** DOM 변경이 있으면 layout 또는 paint가 다시 나타나고, `setTimeout` 콜백은 동기 로그 뒤에 실행됩니다.
-
-**실패 모드:** 반복문 안에서 DOM을 계속 바꾸면 layout 비용이 누적됩니다. 사용자 입력을 `innerHTML`에 직접 넣으면 성능보다 먼저 보안 문제가 생길 수 있습니다.
+```
+DOM 변경 종류별 비용:
+- transform/opacity 변경 → Composite만 (가장 싸다)
+- background-color 변경 → Paint + Composite
+- width/height 변경 → Layout + Paint + Composite (가장 비싸다)
+```
 
 ## 먼저 알아둘 용어
 
 - **DOM (Document Object Model)**: HTML을 객체 트리로 표현한 구조입니다.
+- **CSSOM**: CSS 규칙을 객체 트리로 표현한 구조입니다.
 - **Render tree**: DOM과 계산된 스타일을 합친 렌더링용 트리입니다.
-- **Layout**: 각 요소의 위치와 크기를 계산하는 단계입니다.
-- **Paint**: 실제 픽셀을 그리는 단계입니다.
+- **Reflow (Layout)**: 각 요소의 위치와 크기를 계산하는 단계입니다.
+- **Repaint (Paint)**: 실제 픽셀을 그리는 단계입니다.
 - **Event loop**: 비동기 작업과 콜백 실행 순서를 관리하는 큐 시스템입니다.
 
-## 전후 비교로 보는 DOM 조작 방식
-
-**Before (문자열 방식 HTML)**
-
-```js
-document.body.innerHTML += "<p>new item</p>";
-```
-
-**After (DOM API)**
-
-```js
-const p = document.createElement("p");
-p.textContent = "new item";
-document.body.appendChild(p);
-```
-
-DOM API는 문자열을 이어 붙이는 방식보다 안전하고 예측 가능하며, 기본적으로 XSS 위험도 줄여 줍니다.
-
-## DOM을 다섯 단계로 다뤄 보기
-
-### 1단계 — 트리 보기
+## DOM 트리의 구조
 
 ```html
-<!-- index.html -->
-<ul id="list">
-  <li>apple</li>
-  <li>pear</li>
-</ul>
-<script src="app.js"></script>
+<!doctype html>
+<html>
+  <body>
+    <ul id="list">
+      <li class="item">apple</li>
+      <li class="item">pear</li>
+    </ul>
+  </body>
+</html>
 ```
 
-브라우저는 이 HTML을 읽고 `ul` 아래에 두 개의 `li`가 있는 트리를 만듭니다.
+브라우저는 위 HTML을 읽고 아래와 같은 트리를 만듭니다:
 
-### 2단계 — 요소 선택하기
+```
+Document
+  └─ html
+       └─ body
+            └─ ul#list
+                 ├─ li.item  (textNode: "apple")
+                 └─ li.item  (textNode: "pear")
+```
+
+JavaScript는 이 트리를 탐색하고 수정하는 API를 제공합니다.
+
+## DOM API로 노드 다루기
+
+### 요소 선택
 
 ```js
-// app.js
+// ID로 선택 (하나)
 const list = document.getElementById("list");
-const items = list.querySelectorAll("li");
-console.log(items.length);  // 2
+
+// CSS 선택자로 선택 (하나, 첫 번째)
+const firstItem = document.querySelector(".item");
+
+// CSS 선택자로 모두 선택
+const allItems = document.querySelectorAll(".item");
+
+// 부모-자식 관계
+const parent = list.parentElement;    // body
+const children = list.children;      // HTMLCollection of li elements
+const firstChild = list.firstElementChild;
 ```
 
-JavaScript는 DOM API를 통해 트리 안의 특정 노드를 선택합니다. 이 단계가 있어야 읽기와 수정이 시작됩니다.
-
-### 3단계 — 새 요소 추가하기
+### 요소 생성과 추가
 
 ```js
+// 문자열 방식 (XSS 위험, 성능 비용 큼)
+list.innerHTML += "<li>grape</li>";  // 전체 재파싱 발생
+
+// DOM API 방식 (안전, 효율적)
 const li = document.createElement("li");
-li.textContent = "grape";
+li.textContent = "grape";        // textContent: 텍스트만 (XSS 안전)
+li.className = "item";
 list.appendChild(li);
+
+// DocumentFragment로 묶어서 한 번에 추가
+const fragment = document.createDocumentFragment();
+["mango", "banana", "kiwi"].forEach(fruit => {
+  const li = document.createElement("li");
+  li.textContent = fruit;
+  fragment.appendChild(li);
+});
+list.appendChild(fragment);  // DOM 수정 1회
 ```
 
-새 노드를 만들고 부모 노드에 붙이면 DOM이 바뀝니다. 이런 변화는 이후 layout과 paint를 다시 일으킬 수 있습니다.
-
-### 4단계 — 이벤트 등록하기
+### 속성과 스타일 수정
 
 ```js
-list.addEventListener("click", (e) => {
-  if (e.target.tagName === "LI") {
-    console.log("clicked:", e.target.textContent);
+const btn = document.querySelector("#submit-btn");
+
+// 속성
+btn.setAttribute("disabled", "");
+btn.removeAttribute("disabled");
+btn.getAttribute("data-id");  // → "42"
+
+// 클래스 (CSS와 연동)
+btn.classList.add("loading");
+btn.classList.remove("loading");
+btn.classList.toggle("active");
+btn.classList.contains("active");  // → true/false
+
+// 인라인 스타일 (최후의 수단)
+btn.style.display = "none";
+btn.style.backgroundColor = "red";
+```
+
+## 이벤트 처리
+
+### 이벤트 등록과 제거
+
+```js
+function handleClick(event) {
+  console.log("클릭됨:", event.target.textContent);
+  event.stopPropagation();  // 이벤트 버블링 중단
+  event.preventDefault();   // 기본 동작 취소
+}
+
+const btn = document.querySelector("#btn");
+btn.addEventListener("click", handleClick);
+btn.removeEventListener("click", handleClick);  // 동일한 함수 참조 필요
+```
+
+### 이벤트 위임 (Event Delegation)
+
+```js
+// 나쁜 예: 리스너 100개
+document.querySelectorAll("li").forEach(li => {
+  li.addEventListener("click", handler);  // 100개 리스너
+});
+
+// 좋은 예: 부모에 리스너 1개
+const list = document.getElementById("list");
+list.addEventListener("click", (event) => {
+  const li = event.target.closest("li");
+  if (li) {
+    console.log("클릭됨:", li.textContent);
+    li.classList.toggle("done");
   }
 });
 ```
 
-부모 요소 하나에 리스너를 달고 자식 클릭을 처리하는 방식이 이벤트 위임입니다. 요소가 많아질수록 이 방식이 더 효율적입니다.
+이벤트는 자식에서 부모로 bubble up합니다. 부모 하나에 리스너를 달고 `event.target`으로 실제 클릭된 요소를 읽으면 메모리와 등록 비용을 모두 줄일 수 있습니다.
 
-### 5단계 — 비동기 순서 비교하기
+## 이벤트 루프와 비동기 실행
+
+브라우저의 이벤트 루프는 Call Stack, Web API, Callback Queue, Microtask Queue로 구성됩니다.
 
 ```js
-console.log("1");
-setTimeout(() => console.log("2"), 0);
-console.log("3");
-// 출력: 1, 3, 2 — 이벤트 루프가 콜백을 나중에 실행합니다.
+console.log("1");                              // 동기: 즉시 실행
+
+setTimeout(() => console.log("2"), 0);        // Macro task: 나중에 실행
+
+Promise.resolve().then(() => console.log("3")); // Micro task: setTimeout보다 먼저
+
+console.log("4");                              // 동기: 즉시 실행
+
+// 출력 순서: 1 → 4 → 3 → 2
 ```
 
-`setTimeout(fn, 0)`이라고 해도 콜백이 즉시 실행되지는 않습니다. 현재 실행 중인 동기 코드가 끝난 뒤 이벤트 루프가 큐에서 콜백을 꺼냅니다.
+```
+실행 순서 규칙:
+1. 동기 코드 (Call Stack) 전부 실행
+2. Microtask Queue 전부 비움 (Promise, queueMicrotask)
+3. Macro task Queue에서 하나 꺼내 실행
+4. 다시 2번으로
+```
 
-- DOM 변경은 비용이 큰 연산입니다. layout과 paint를 다시 유발할 수 있습니다.
-- 이벤트 위임은 메모리와 시간 비용을 함께 줄여 줍니다.
-- `setTimeout(fn, 0)`은 지금 즉시가 아니라 나중 실행입니다.
+```js
+// 실제 예: fetch 이후 DOM 업데이트
+async function loadData() {
+  console.log("로딩 시작");              // 동기
 
-## 여기서 자주 헷갈립니다
+  const data = await fetch("/api/items")  // 비동기 대기
+    .then(r => r.json());
 
-1. **사용자 입력을 `innerHTML`에 넣는 경우**: XSS 위험이 커집니다.
-2. **반복문 안에서 DOM 노드를 하나씩 붙이는 경우**: layout이 반복해서 일어날 수 있습니다.
-3. **모든 `<li>`에 리스너를 따로 붙이는 경우**: 이벤트 위임의 장점을 놓칩니다.
-4. **JavaScript 실행 시점을 모르는 경우**: `defer`, `async`, inline script의 차이를 모르면 순서 버그가 생깁니다.
-5. **DOM이 항상 동기적으로 보인다고 가정하는 경우**: 비동기 콜백 순서가 예상과 다르게 느껴질 수 있습니다.
+  // await 이후는 microtask로 실행됨
+  document.getElementById("list").textContent = JSON.stringify(data);
+  console.log("화면 업데이트 완료");
+}
+
+loadData();
+console.log("loadData 호출 직후");  // loadData 내부 await 전에 실행됨
+```
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 올바른 방법 |
+|------|------|-------------|
+| 사용자 입력을 `innerHTML`에 직접 넣기 | XSS 공격 취약점 | `textContent` 사용 또는 DOMPurify로 정화 |
+| 반복문 안에서 DOM 노드 하나씩 추가 | Reflow 반복 발생, 성능 저하 | `DocumentFragment`로 묶어서 한 번에 추가 |
+| 모든 `<li>`에 리스너 따로 등록 | 메모리 낭비, 동적 요소 처리 불가 | 이벤트 위임으로 부모 하나에 등록 |
+| `<head>` 안에 `<script>` 넣기 | DOM 준비 전 실행으로 `null` 오류 | `defer` 사용 |
+| setTimeout(fn, 0)이 즉시 실행된다 생각 | 실행 순서 버그 | 이벤트 루프 이해 후 Promise 사용 |
+| `offsetWidth` 읽기 후 스타일 변경 반복 | Layout Thrashing | 읽기 묶고 쓰기 묶어 순서 분리 |
+
+## DevTools로 렌더링 분석
+
+```
+F12 → Performance 탭
+1. 녹화 시작
+2. 버튼 클릭 등 인터랙션 실행
+3. 녹화 중지
+4. Flame Chart에서 확인:
+   - Parse HTML
+   - Recalculate Style
+   - Layout
+   - Paint
+   - Composite Layers
+```
+
+Layout이 반복해서 나타나면 Reflow가 많다는 신호입니다. `transform`과 `opacity`를 써서 Composite 단계만 유발하도록 바꾸면 성능이 크게 개선됩니다.
 
 ## 운영에서는 이렇게 보입니다
 
-React와 Vue는 Virtual DOM이나 반응형 시스템을 이용해 실제 DOM 호출을 묶어서 처리합니다. 긴 리스트, 채팅 화면, 무한 스크롤처럼 화면 갱신이 많은 앱은 모두 DOM과 이벤트 루프 위에서 돌아갑니다. 페이지가 느리면 Chrome DevTools의 Performance 탭에서 layout과 paint를 flame chart로 확인하는 습관이 필요합니다.
+React와 Vue는 Virtual DOM이나 반응형 시스템을 이용해 실제 DOM 호출을 묶어서 처리합니다. 긴 리스트, 채팅 화면, 무한 스크롤처럼 화면 갱신이 많은 앱은 모두 DOM과 이벤트 루프 위에서 돌아갑니다.
 
 ## 시니어 엔지니어는 이렇게 생각합니다
 
 - DOM 변경은 가능한 한 묶어서 처리합니다.
 - 이벤트는 부모에 위임해 리스너 수를 줄입니다.
-- 최적화 전에 먼저 측정합니다.
+- 최적화 전에 먼저 Performance 탭으로 측정합니다.
 - 긴 리스트에는 virtualization을 검토합니다.
-- repaint와 reflow를 많이 일으키는 코드를 먼저 찾습니다.
+- `transform`/`opacity`로 Layout을 건드리지 않는 애니메이션을 선호합니다.
 
 ## 운영 체크리스트
 
-- [ ] 렌더링 다섯 단계를 말할 수 있습니다.
+- [ ] 렌더링 파이프라인 다섯 단계를 말할 수 있습니다.
 - [ ] DOM API로 요소를 만들고 붙일 수 있습니다.
 - [ ] 이벤트 위임을 사용할 수 있습니다.
 - [ ] 동기 코드와 비동기 콜백의 순서를 예상할 수 있습니다.
-- [ ] `innerHTML`의 위험을 알고 있습니다.
+- [ ] `innerHTML`의 XSS 위험을 알고 있습니다.
 
 ## 연습 문제
 
@@ -192,169 +318,6 @@ React와 Vue는 Virtual DOM이나 반응형 시스템을 이용해 실제 DOM �
 ## 정리와 다음 글
 
 브라우저는 DOM을 만들고, 스타일을 계산하고, 배치를 정하고, 픽셀을 그리는 기계입니다. 이 파이프라인을 이해하면 화면 성능과 프레임워크 동작이 모두 더 또렷해집니다. 다음 글에서는 클라이언트와 서버가 실제로 무엇을 주고받는지 HTTP와 API를 봅니다.
-
-## HTTP-인증-배포를 함께 검증하는 점검 루틴
-
-웹 서비스는 단일 기능이 아니라 경로 전체의 안정성으로 평가됩니다. 따라서 API 스펙, 인증 예외, 배포 헬스체크를 같은 릴리스 체크리스트로 묶는 편이 안전합니다.
-
-```text
-배포 전 점검
-1) 핵심 API 3개에 대해 상태 코드/응답 스키마 계약 테스트 실행
-2) access 만료, refresh 만료, revoke 토큰 시나리오 재현
-3) /health, /ready 엔드포인트를 배포 환경에서 실제 호출
-4) CDN/브라우저 캐시 무효화 정책 확인
-```
-
-### 장애 예방을 위한 최소 헤더 정책
-
-```http
-Cache-Control: no-store
-X-Content-Type-Options: nosniff
-X-Frame-Options: DENY
-Referrer-Policy: strict-origin-when-cross-origin
-```
-
-헤더 정책은 프론트엔드 코드 변경 없이도 보안/캐시 동작을 크게 바꿉니다. 기능 개발과 별개로 표준 헤더를 고정해 두면 릴리스 변동성이 줄어듭니다.
-
-### 배포 후 15분 관찰 항목
-
-- 5xx 비율과 p95 지연 시간의 급격한 상승 여부
-- 로그인 성공률, 토큰 재발급 성공률
-- 정적 자산 404 발생률
-
-이 루틴을 반복하면 "배포는 되었지만 정상 운영은 아닌" 상태를 초기에 감지할 수 있습니다.
-
-## 실전 앵커 모음: 렌더링을 운영 문서로 바꾸기
-
-작은 기능이라도 운영 단계까지 생각하면 문서화 기준이 달라집니다. 아래 예시는 팀이 기능 구현과 동시에 남겨 두면 바로 도움이 되는 최소 산출물입니다. 특히 요청/응답 계약, 세션/쿠키 정책, SQL 기준 쿼리, 배포 설정, 캐시 규칙을 함께 기록하면 변경 시점의 실패 반경을 크게 줄일 수 있습니다.
-
-### HTTP 요청/응답 계약 예시
-
-```http
-GET /api/v1/todos?limit=20&cursor=todo_120 HTTP/1.1
-Host: api.example.com
-Accept: application/json
-Authorization: Bearer <access_token>
-X-Request-Id: req-2026-05-21-0001
-```
-
-```http
-HTTP/1.1 200 OK
-Content-Type: application/json
-Cache-Control: private, max-age=30
-ETag: "todo-list-v42"
-
-{
-  "items": [
-    {"id": "todo_121", "text": "문서 작성", "done": false},
-    {"id": "todo_122", "text": "테스트 실행", "done": true}
-  ],
-  "next_cursor": "todo_122"
-}
-```
-
-응답 예시는 상태 코드만 맞추는 수준에서 끝내지 말고, 캐시 정책과 추적 ID를 함께 포함하는 편이 좋습니다. 특히 `X-Request-Id`를 표준화하면 장애 시점에 브라우저 로그와 서버 로그를 빠르게 결합할 수 있습니다.
-
-### REST API 설계 스케치
-
-```text
-GET    /api/v1/todos            목록 조회
-POST   /api/v1/todos            항목 생성
-PATCH  /api/v1/todos/{id}       항목 일부 수정(done 토글 등)
-DELETE /api/v1/todos/{id}       항목 삭제
-```
-
-리소스 이름은 복수형으로 고정하고, 동작은 method로 분리하는 편이 유지보수에 유리합니다. 예를 들어 `/toggleTodo`처럼 동사형 엔드포인트를 늘리기 시작하면 권한 정책과 감사 로그 규칙이 빠르게 파편화됩니다.
-
-### 세션/쿠키 정책 코드 예시
-
-```python
-from flask import Flask, session, jsonify
-
-app = Flask(__name__)
-app.secret_key = "change-me"
-app.config.update(
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SECURE=True,
-    SESSION_COOKIE_SAMESITE="Lax",
-)
-
-@app.get("/api/v1/me")
-def me():
-    user_id = session.get("user_id")
-    if not user_id:
-        return jsonify(error={"code": "UNAUTHORIZED"}), 401
-    return jsonify(user_id=user_id)
-```
-
-인증은 로그인 성공 시점보다 실패 시점 설계가 더 중요합니다. 어떤 경우에 401을 돌리고, 어떤 경우에 403을 돌릴지 미리 고정해 두어야 프론트엔드 재시도 정책과 알림 문구가 안정됩니다.
-
-### SQL 기준 쿼리와 인덱스 예시
-
-```sql
-CREATE TABLE IF NOT EXISTS todo_items (
-  id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  text TEXT NOT NULL,
-  done INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL
-);
-
-CREATE INDEX IF NOT EXISTS idx_todo_user_created
-ON todo_items(user_id, created_at DESC);
-
-SELECT id, text, done, created_at
-FROM todo_items
-WHERE user_id = ?
-ORDER BY created_at DESC
-LIMIT 20;
-```
-
-조회 패턴을 먼저 적고 그다음 인덱스를 정의하면 불필요한 인덱스 폭증을 피할 수 있습니다. 특히 쓰기 비중이 높은 서비스에서는 인덱스를 한 개 추가할 때마다 INSERT 비용이 늘어난다는 점을 함께 기록해야 합니다.
-
-### 배포 설정과 헬스 체크 예시
-
-```yaml
-services:
-  api:
-    image: ghcr.io/example/todo-api:1.0.0
-    environment:
-      - APP_ENV=production
-      - DATABASE_URL=postgresql://app:***@db:5432/todo
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-```
-
-배포 문서에는 반드시 "성공 기준"을 남겨야 합니다. 예를 들어 `/health`가 200을 반환하고, 배포 후 15분 동안 5xx 비율이 1% 미만이며, 로그인 성공률이 평시 대비 하락하지 않는지를 체크리스트로 고정하면 릴리스 판단이 사람마다 달라지지 않습니다.
-
-### 캐시 전략 표준 예시
-
-```http
-Cache-Control: public, max-age=31536000, immutable
-```
-
-정적 자산은 파일명에 해시를 넣고 장기 캐시를 적용하는 편이 안전합니다. 반대로 사용자별 데이터는 `private` 또는 `no-store` 정책을 명시해 캐시 오염을 방지해야 합니다. 이 구분을 코드 리뷰 항목으로 올려 두면 보안 이슈와 성능 이슈를 동시에 예방할 수 있습니다.
-
-### 운영 체크리스트
-
-- 요청/응답 샘플에 상태 코드, 헤더, 오류 본문 형식을 모두 기록합니다.
-- 인증 실패(401), 권한 실패(403), 입력 오류(400) 경계를 API 문서에 고정합니다.
-- 핵심 SQL 쿼리 3개를 선정해 `EXPLAIN` 결과를 릴리스마다 비교합니다.
-- 배포 후 15분 관측 지표(5xx, p95, 로그인 성공률)를 팀 표준으로 유지합니다.
-- 캐시 정책 변경 시 무효화 전략과 롤백 절차를 같은 PR에 포함합니다.
-
-## 처음 질문으로 돌아가기
-
-- **DOM은 정확히 무엇이며 어떻게 만들어질까요?**
-  - DOM에 대한 감각이 없으면 페이지가 왜 느린지 설명하기 어렵습니다
-- **브라우저 렌더링 파이프라인은 어떤 단계로 이어질까요?**
-  - 브라우저는 이 HTML을 읽고 `ul` 아래에 두 개의 `li`가 있는 트리를 만듭니다.
-- **JavaScript는 DOM을 어떻게 읽고 바꿀까요?**
-  - DOM API는 문자열을 이어 붙이는 방식보다 안전하고 예측 가능하며, 기본적으로 XSS 위험도 줄여 줍니다.
-  - 브라우저는 텍스트를 곧바로 픽셀로 그리지 않습니다. DOM과 스타일 계산, layout, paint가 순서대로 이어지고, 그 사이에 JavaScript가 DOM을 바꾸면 일부 단계가 다시 실행됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
