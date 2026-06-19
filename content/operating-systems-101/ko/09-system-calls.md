@@ -59,6 +59,18 @@ last_reviewed: '2026-05-15'
                  return value
 ```
 
+### 주요 시스템 콜 분류
+
+```text
+파일 I/O:    open, read, write, close, fsync, lseek, mmap
+프로세스:    fork, exec, wait, exit, kill, getpid
+메모리:      brk, mmap, munmap, mprotect
+네트워크:    socket, bind, listen, accept, connect, send, recv
+동기화:      futex
+이벤트:      epoll_create, epoll_ctl, epoll_wait, select, poll
+시간:        clock_gettime, nanosleep (일부는 vDSO로 처리)
+```
+
 ## 같은 코드를 다르게 읽는 법
 
 **이전 관점 — "한 번에 1바이트씩 쓴다":**
@@ -184,6 +196,7 @@ close(3)                                = 0
 - fd `3`을 받았고, 표준 입출력(0/1/2) 외 추가 디스크립터를 사용합니다.
 - EOF는 `read=0`으로 표현됩니다.
 - 음수 반환값은 에러이며 `errno`가 설명합니다.
+- 에러 예시: `openat(...) = -1 ENOENT (No such file or directory)`
 
 ### 네트워크 서버 트레이스 축약 예시
 
@@ -220,15 +233,40 @@ f.close()
 
 `write` 시스템 콜 횟수가 10,000 대 수 개로 바뀌고, `System time` 비율도 크게 낮아집니다.
 
+### vDSO: 커널 진입 없이 syscall 수행하기
+
+```bash
+# vDSO 매핑 확인
+cat /proc/self/maps | grep vdso
+# 7ffd3b3fe000-7ffd3b400000 r-xp 00000000 00:00 0    [vdso]
+```
+
+vDSO(Virtual Dynamic Shared Object)는 커널이 사용자 공간에 매핑해 주는 특별한 공유 라이브러리입니다. `clock_gettime`, `gettimeofday`, `getpid` 같은 자주 쓰는 연산이 여기서 처리되어 실제 syscall 진입 없이 실행됩니다.
+
 ### io_uring — 차세대 비동기 I/O
 
 기존 epoll/select는 준비된 fd를 알려주지만, 각 I/O는 여전히 syscall입니다. io_uring은 ring buffer로 I/O를 배치로 제출해 syscall 횟수를 수십 분의 일로 줄입니다.
 
-```python
-# liburing 파이썬 바인딩 예시 (iouringmodule)
-# 기본 개념: sqe(제출 큐 엔트리) → cqe(완료 큐 엔트리)
-# 여러 I/O를 한 번의 io_uring_enter 호출로 제출
+```text
+기존 epoll 흐름:
+epoll_wait() -> fd 준비 -> read(fd) -> write(result_fd)  (최소 3 syscall)
+
+io_uring 흐름:
+io_uring_enter() 한 번으로 여러 I/O 동시 제출/완료 처리
 ```
+
+데이터베이스, 웹 서버 등 고성능 I/O가 필요한 영역에서 빠르게 도입되고 있습니다.
+
+### 시스템 콜 비용 실측 비교표
+
+| 연산 | 대략적 비용 | 비고 |
+| --- | --- | --- |
+| `getpid` (syscall) | 100-300 ns | 가장 가벼운 syscall |
+| `clock_gettime` (vDSO) | 5-20 ns | 커널 진입 없음 |
+| `read` 4KB (캐시 히트) | 1-5 us | 페이지 캐시에서 |
+| `write` 4KB (페이지 캐시) | 1-3 us | 비동기 writeback |
+| `write` + `fsync` | 1-10 ms | 디스크 대기 |
+| 컨텍스트 스위치 | 1-10 us | 캐시 효과 미포함 |
 
 ## 처음 질문으로 돌아가기
 

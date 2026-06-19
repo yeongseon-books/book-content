@@ -261,6 +261,98 @@ loadData();
 console.log("loadData 호출 직후");  // loadData 내부 await 전에 실행됨
 ```
 
+## 성능을 높이는 DOM 조작 패턴
+
+브라우저는 DOM 변경이 발생할 때마다 Reflow(레이아웃 재계산)와 Repaint(픽셀 재그리기)를 수행합니다. 이 작업은 비쌉니다. DOM을 효율적으로 다루면 체감 속도가 크게 달라집니다.
+
+### DocumentFragment로 일괄 삽입
+
+```javascript
+// 나쁜 예: 100번 DOM 삽입 = 100번 Reflow
+const ul = document.getElementById("list");
+for (let i = 0; i < 100; i++) {
+  const li = document.createElement("li");
+  li.textContent = `항목 ${i + 1}`;
+  ul.appendChild(li);  // 루프마다 DOM 갱신
+}
+
+// 좋은 예: 메모리에서 조립 후 한 번에 삽입
+const ul2 = document.getElementById("list2");
+const fragment = document.createDocumentFragment();
+for (let i = 0; i < 100; i++) {
+  const li = document.createElement("li");
+  li.textContent = `항목 ${i + 1}`;
+  fragment.appendChild(li);  // 실제 DOM에 영향 없음
+}
+ul2.appendChild(fragment);  // 단 1번의 Reflow
+```
+
+### 강제 동기 레이아웃(Layout Thrashing) 피하기
+
+읽기와 쓰기를 교대로 하면 브라우저가 매번 레이아웃을 재계산합니다.
+
+```javascript
+// 나쁜 예: 읽기-쓰기 교대 = Layout Thrashing
+const boxes = document.querySelectorAll(".box");
+boxes.forEach(box => {
+  const width = box.offsetWidth;  // 읽기 → 레이아웃 강제
+  box.style.width = (width * 2) + "px";  // 쓰기 → 무효화
+});
+
+// 좋은 예: 읽기 모두 먼저, 쓰기 모두 나중에
+const widths = Array.from(boxes).map(box => box.offsetWidth);  // 읽기 일괄
+boxes.forEach((box, i) => {
+  box.style.width = (widths[i] * 2) + "px";  // 쓰기 일괄
+});
+```
+
+### requestAnimationFrame으로 애니메이션 처리
+
+```javascript
+// 나쁜 예: setInterval로 위치 변경 (프레임 타이밍과 불일치)
+let pos = 0;
+setInterval(() => {
+  element.style.left = (pos++) + "px";
+}, 16);
+
+// 좋은 예: rAF은 브라우저 렌더링 사이클과 동기화
+let posX = 0;
+function animate() {
+  posX += 1;
+  element.style.transform = `translateX(${posX}px)`;  // transform은 GPU 가속
+  if (posX < 300) {
+    requestAnimationFrame(animate);
+  }
+}
+requestAnimationFrame(animate);
+```
+
+`transform`과 `opacity`는 Compositor 스레드에서 처리되어 Reflow/Repaint를 건너뜁니다. 애니메이션에는 `left/top` 대신 `transform`을 사용하세요.
+
+### 교차 관찰자(IntersectionObserver)로 스크롤 이벤트 대체
+
+```javascript
+// 나쁜 예: scroll 이벤트는 초당 수백 번 발생
+window.addEventListener("scroll", () => {
+  const rect = card.getBoundingClientRect();
+  if (rect.top < window.innerHeight) {
+    card.classList.add("visible");
+  }
+});
+
+// 좋은 예: IntersectionObserver는 진입/이탈 시점에만 콜백
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("visible");
+      observer.unobserve(entry.target);  // 한 번만 실행
+    }
+  });
+}, { threshold: 0.1 });  // 10% 보이면 트리거
+
+document.querySelectorAll(".card").forEach(card => observer.observe(card));
+```
+
 ## 자주 하는 실수
 
 | 실수 | 증상 | 올바른 방법 |
