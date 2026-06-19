@@ -24,6 +24,8 @@ seo_description: 임베딩과 벡터 스토어로 Retriever를 구성해 LLM에 
 
 # LangChain 101 (3/6): Retriever — 문서 검색과 컨텍스트 주입
 
+embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
 이 글은 LangChain 101 시리즈의 세 번째 글입니다.
 
 RAG를 처음 배우면 많은 사람이 곧바로 프롬프트 문구부터 만지기 시작합니다. 하지만 실제로는 그보다 앞단에서 더 중요한 일이 있습니다. **질문에 대해 어떤 문서를 꺼내 올지 결정하는 검색 단계**입니다. 프롬프트가 아무리 좋아도, 모델 앞에 놓인 문서가 틀리거나 잡음이 많으면 답변 품질은 쉽게 흔들립니다.

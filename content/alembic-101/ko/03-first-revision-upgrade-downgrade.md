@@ -23,6 +23,8 @@ seo_description: 'revision 파일은 upgrade(): N → N+1과 downgrade(): N+1 �
 
 # Alembic 101 (3/10): 첫 revision: upgrade와 downgrade를 손으로 작성
 
+> revision 파일은 **`upgrade(): N → N+1`과 `downgrade(): N+1 → N`이라는 함수 쌍**입니다. 둘이 정확한 역연산이면 Alembic은 graph를 자유롭게 오르내릴 수 있고, 한쪽이라도 비대칭이면 사실상 단방향 commit이 됩니다.
+
 이 글은 Alembic 101 시리즈의 세 번째 글입니다. 여기서는 첫 revision 파일의 구조를 직접 읽어 보고, `upgrade()`와 `downgrade()`를 안전하게 손으로 작성하는 기준을 정리합니다.
 
 autogenerate가 편리하더라도, 한 번은 직접 써 봐야 자동 생성 결과를 비판적으로 읽을 수 있습니다. 손으로 써 본 사람만 “이건 내가 의도한 migration이 아니다”라고 바로 알아챌 수 있기 때문입니다.

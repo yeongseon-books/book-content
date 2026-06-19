@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Discrete Math 101 (4/10): 관계와 동치관계
 
+print(f"alice's friends: {[b for (a, b) in friends if a == 'alice']}")
+
 이 글은 Discrete Math 101 시리즈의 4번째 글입니다.
 
 ![Discrete Math 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/04/04-01-big-picture.ko.png)

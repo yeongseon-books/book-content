@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Data Structures 101 (10/10): 자료구조 선택 기준
 
+> 좋은 선택은 “데이터의 모양”이 아니라 “연산의 빈도와 패턴”에서 출발합니다. 핫패스에 어떤 연산이 있는지, 입력은 얼마나 큰지, 메모리 제약은 무엇인지 먼저 정리하면 후보가 빠르게 좁혀집니다.
+
 이 글은 Data Structures 101 시리즈의 마지막 글입니다.
 
 ![Data Structures 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/10/10-01-big-picture.ko.png)

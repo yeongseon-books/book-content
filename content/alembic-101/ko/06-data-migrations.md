@@ -23,6 +23,8 @@ seo_description: 데이터 마이그레이션은 "schema는 그대로 두고 row
 
 # Alembic 101 (6/10): 데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기
 
+> data migration은 **schema는 그대로 두고 row를 변환하는 revision**입니다. 이를 schema-only revision과 분리하면 (1) 거대한 트랜잭션을 작은 batch로 쪼갤 수 있고, (2) 실패 시 schema는 유지한 채 data 단계만 다시 실행할 수 있으며, (3) 리뷰어가 의도를 더 정확히 읽을 수 있습니다.
+
 이 글은 Alembic 101 시리즈의 여섯 번째 글입니다. 여기서는 data migration이 schema migration과 어떻게 다른지, 그리고 row 변환 작업을 왜 별도 revision으로 분리해야 하는지 실무 패턴 중심으로 설명합니다.
 
 데이터 마이그레이션은 주변의 schema 변경보다 더 느리고, 더 비가역적이며, 실패했을 때 복구가 더 어렵습니다. 그래서 row 변환을 revision 안에 어떻게 격리하느냐가 lock 시간과 재실행 안정성을 좌우합니다.

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # DevOps 101 (4/10): 환경 분리와 설정 관리
 
+환경별 설정 관리는 단순히 값을 저장하는 문제가 아닙니다. 보안 수준, 접근 통제, 회전 정책, 감사 로그가 모두 달라집니다. 아래 표는 대표적인 도구를 비교합니다.
+
 이 글은 DevOps 101 시리즈의 네 번째 글입니다.
 
 ![DevOps 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/04/04-01-diagram.ko.png)

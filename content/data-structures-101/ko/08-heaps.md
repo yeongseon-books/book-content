@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Data Structures 101 (8/10): 힙
 
+> 힙은 완전 이진 트리이기 때문에 빈 칸 없이 배열에 담을 수 있습니다. 그래서 부모·자식 관계를 포인터가 아니라 인덱스 계산만으로 찾을 수 있고, 메모리 효율도 좋습니다.
+
 이 글은 Data Structures 101 시리즈의 여덟 번째 글입니다.
 
 ![Data Structures 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/08/08-01-heap-array-mapping.ko.png)

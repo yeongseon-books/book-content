@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # DevOps 101 (3/10): CD와 배포 전략
 
+배포 전략은 단순히 새 코드를 올리는 방식의 차이가 아닙니다. 실패했을 때 얼마나 빠르게 되돌릴 수 있고, 영향 범위를 얼마나 작게 제한할 수 있는지를 결정하는 구조적 차이입니다.
+
 이 글은 DevOps 101 시리즈의 세 번째 글입니다.
 
 ![DevOps 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/03/03-01-diagram.ko.png)

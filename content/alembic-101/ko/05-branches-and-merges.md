@@ -23,6 +23,8 @@ seo_description: alembic revision graph는 git 브랜치와 똑같이 DAG(direct
 
 # Alembic 101 (5/10): branch와 merge: 동시에 만든 revision을 합치는 법
 
+> alembic revision graph는 git과 같은 **DAG(directed acyclic graph)**입니다. 두 사람이 같은 head에서 revision을 만들면 두 개의 새 head가 생기고, `alembic merge`는 그 둘을 부모로 가지는 새 revision을 만들어 graph를 다시 하나의 head로 되돌립니다.
+
 이 글은 Alembic 101 시리즈의 다섯 번째 글입니다. 여기서는 여러 사람이 동시에 revision을 만들 때 graph가 왜 여러 head로 갈라지는지, 그리고 `alembic merge`로 어떻게 다시 단일 head로 정리하는지 설명합니다.
 
 팀에서 동시에 PR을 열면 revision graph가 갈라지는 일은 예외가 아니라 정상 상태입니다. 이 사실을 모르고 있으면 처음 만나는 `Multiple head revisions are present` 에러가 실제보다 훨씬 더 위협적으로 느껴집니다.

@@ -23,6 +23,8 @@ last_reviewed: '2026-05-15'
 
 # Computer Networks 101 (10/10): 네트워크 문제 디버깅
 
+traceroute -n api.example.com   # or mtr -n api.example.com
+
 이 글은 Computer Networks 101 시리즈의 마지막 글입니다.
 
 ![Computer Networks 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/10/10-01-concept-at-a-glance.ko.png)

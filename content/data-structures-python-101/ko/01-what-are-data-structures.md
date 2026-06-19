@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # Data Structures with Python 101 (1/10): 자료구조란 무엇인가?
 
+프로그램은 데이터를 입력받고, 처리하고, 다시 출력합니다. 이때 데이터를 어떤 구조로 저장하느냐에 따라 같은 기능도 밀리초 안에 끝날 수 있고, 불필요하게 오래 걸릴 수도 있습니다. 자료구조는 그 차이를 만드는 가장 기본적인 레버입니다.
+
 이 글은 Data Structures with Python 101 시리즈의 첫 번째 글입니다.
 
 ![Data Structures with Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/01/01-01-big-picture.ko.png)

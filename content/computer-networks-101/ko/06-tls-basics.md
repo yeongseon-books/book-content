@@ -23,6 +23,8 @@ last_reviewed: '2026-05-15'
 
 # Computer Networks 101 (6/10): TLS 기초
 
+TLS 1.2에서는 2-RTT가 필요했지만, TLS 1.3은 키 교환과 인증서 전달을 하나의 왕복으로 합칩니다. 재접속 시에는 0-RTT도 가능합니다.
+
 이 글은 Computer Networks 101 시리즈의 6번째 글입니다.
 
 ![Computer Networks 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/06/06-01-concept-at-a-glance.ko.png)

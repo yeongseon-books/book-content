@@ -23,6 +23,8 @@ seo_description: Alembic은 DB 스키마를 위한 git입니다. 각 마이그�
 
 # Alembic 101 (1/10): 왜 Alembic인가, 그리고 init까지
 
+> Alembic은 **DB 스키마를 위한 git**입니다. 각 마이그레이션 파일은 commit이고, `alembic_version` 테이블은 현재 HEAD 포인터이며, `upgrade head`는 fast-forward이고, `downgrade -1`은 한 단계 reset에 가깝습니다.
+
 이 글은 Alembic 101 시리즈의 첫 번째 글입니다. 여기서는 raw SQL 파일만으로는 왜 스키마 변경 이력이 금방 통제 불가능해지는지, 그리고 `alembic init`이 실제로 무엇을 준비하는지 정리합니다.
 
 Alembic을 처음 접하면 명령어보다 먼저 이런 의문이 생깁니다. “SQL 파일 몇 개 잘 관리하면 되지 않을까?” 문제는 스키마 변경 이력이 revision history가 아니라 사람 기억에 기대는 순간 시작됩니다. 그때부터 배포와 롤백은 재현 가능한 절차가 아니라 추측이 됩니다.

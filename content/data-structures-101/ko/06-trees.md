@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Data Structures 101 (6/10): 트리
 
+> 트리는 연결되어 있고 사이클이 없는 그래프입니다. 그중 이진 트리는 각 노드가 자식을 최대 두 개까지만 가지는 특수한 형태이며, 알고리즘에서 가장 자주 등장합니다.
+
 이 글은 Data Structures 101 시리즈의 여섯 번째 글입니다.
 
 ![Data Structures 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/06/06-01-big-picture.ko.png)

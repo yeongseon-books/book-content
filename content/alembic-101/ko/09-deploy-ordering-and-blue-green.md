@@ -23,6 +23,8 @@ seo_description: migration은 항상 "코드보다 먼저, 그리고 코드보�
 
 # Alembic 101 (9/10): 배포 순서와 blue/green: schema와 application code의 안전한 동기화
 
+> migration은 항상 **“코드보다 먼저, 그리고 코드보다 더 넓은 호환성으로”** 배포됩니다. 컬럼을 추가할 때는 컬럼이 먼저 존재해야 하고, 컬럼을 제거할 때는 코드가 먼저 사용을 멈춰야 합니다. 이 두 방향만 기억해도 deploy 사고 대부분을 피할 수 있습니다.
+
 이 글은 Alembic 101 시리즈의 아홉 번째 글입니다. 여기서는 migration과 application code를 어떤 순서로 배포해야 안전한지, 그리고 blue/green 환경에서 schema 호환성을 어떻게 설계해야 하는지 정리합니다.
 
 많은 schema 사고는 migration 코드 자체보다 deploy ordering에서 시작됩니다. 특히 blue/green이나 rolling 환경에서는 두 버전의 앱이 같은 DB를 동시에 사용하므로, schema는 항상 그 두 버전 모두와 호환되어야 합니다.

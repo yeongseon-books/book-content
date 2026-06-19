@@ -22,6 +22,8 @@ last_reviewed: '2026-05-17'
 
 # Data Structures with Python 101 (4/10): 해시 테이블과 dict
 
+dict는 Python의 중심에 있는 자료구조입니다. JSON 파싱, 캐싱, 그룹핑, 설정 로딩, 메타데이터 관리까지 거의 모든 코드가 dict를 거칩니다. 그런데 “dict는 O(1)이다”만 외우면 실제 동작 원리를 놓치게 됩니다.
+
 이 글은 Data Structures with Python 101 시리즈의 네 번째 글입니다.
 
 ![Data Structures with Python 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/04/04-01-dict-probe-resize.ko.png)

@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Data Structures 101 (7/10): 이진 탐색 트리
 
+> BST는 정렬된 트리입니다. 각 노드는 왼쪽 서브트리 전체가 더 작고, 오른쪽 서브트리 전체가 더 크다는 불변식을 유지합니다. 그래서 매 단계에서 절반을 버리며 내려갈 수 있고, 이것이 평균 O(log n)의 근거입니다.
+
 이 글은 Data Structures 101 시리즈의 일곱 번째 글입니다.
 
 ![Data Structures 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/07/07-01-bst-balanced-vs-skewed.ko.png)

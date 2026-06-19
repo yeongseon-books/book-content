@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # DevOps 101 (9/10): 장애 대응과 on-call
 
+이 상태에서는 기술적으로 정답을 알고 있는 사람도 팀 전체를 안정시키기 어렵습니다. 기록과 커뮤니케이션, 복구가 뒤섞여 버리기 때문입니다.
+
 이 글은 DevOps 101 시리즈의 아홉 번째 글입니다.
 
 ![DevOps 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/09/09-01-diagram.ko.png)

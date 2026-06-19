@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Data Structures 101 (1/10): 자료구조란 무엇인가?
 
+> 자료구조는 논리적 형태와 물리적 메모리 배치라는 두 층으로 이해해야 합니다. ADT가 인터페이스를 정의한다면, 자료구조는 그 인터페이스를 실제로 구현하는 메모리 전략입니다.
+
 이 글은 Data Structures 101 시리즈의 첫 번째 글입니다.
 
 ![Data Structures 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/01/01-01-big-picture.ko.png)

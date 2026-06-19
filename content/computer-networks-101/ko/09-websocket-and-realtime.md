@@ -23,6 +23,8 @@ last_reviewed: '2026-05-15'
 
 # Computer Networks 101 (9/10): WebSocket과 실시간 통신
 
+핵심 전환점은 `101 Switching Protocols`입니다. 응답 전까지는 HTTP였던 연결이, 그 뒤에는 WebSocket 프레임 스트림으로 동작합니다. 같은 TCP 소켓을 재사용하므로 추가 핸드셰이크가 없습니다.
+
 이 글은 Computer Networks 101 시리즈의 9번째 글입니다.
 
 ![Computer Networks 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/09/09-01-concept-at-a-glance.ko.png)

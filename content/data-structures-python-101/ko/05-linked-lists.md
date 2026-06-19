@@ -22,6 +22,8 @@ last_reviewed: '2026-05-15'
 
 # Data Structures with Python 101 (5/10): 연결 리스트
 
+연결 리스트는 자료구조에서 가장 기본적인 빌딩 블록 중 하나입니다. 트리, 그래프, 해시 테이블의 체이닝, LRU 캐시 같은 구조를 제대로 이해하려면 결국 노드와 참조를 다루는 감각이 필요합니다. 연결 리스트는 그 감각을 가장 직접적으로 훈련시키는 구조입니다.
+
 이 글은 Data Structures with Python 101 시리즈의 다섯 번째 글입니다.
 
 ![Data Structures with Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.ko.png)

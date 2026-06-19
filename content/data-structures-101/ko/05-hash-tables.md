@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Data Structures 101 (5/10): 해시 테이블
 
+> 해시 테이블은 “key → hash value → index”라는 두 단계 변환을 거칩니다. 두 키가 같은 슬롯으로 들어오면 체이닝으로 연결하거나, open addressing으로 다음 빈 슬롯을 탐색해 충돌을 해결합니다.
+
 이 글은 Data Structures 101 시리즈의 다섯 번째 글입니다.
 
 ![Data Structures 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/05/05-01-big-picture.ko.png)

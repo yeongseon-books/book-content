@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # DevOps 101 (10/10): 운영 가능한 DevOps 흐름
 
+도구는 각각 존재하지만 연결이 없습니다. 그래서 같은 문제가 매번 다른 모습으로 다시 나타나고, 팀은 부분 최적화만 반복하게 됩니다.
+
 이 글은 DevOps 101 시리즈의 마지막 글입니다.
 
 ![DevOps 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/10/10-01-diagram.ko.png)

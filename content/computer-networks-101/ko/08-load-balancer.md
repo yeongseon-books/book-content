@@ -23,6 +23,8 @@ last_reviewed: '2026-05-15'
 
 # Computer Networks 101 (8/10): Load Balancer
 
+L4 로드밸런서는 TCP/UDP 흐름(IP + 포트)만 보고 백엔드를 고릅니다. L7 로드밸런서는 HTTP 요청(URL, 헤더, 쿠키)까지 파싱한 뒤 라우팅을 결정합니다.
+
 이 글은 Computer Networks 101 시리즈의 8번째 글입니다.
 
 ![Computer Networks 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.ko.png)

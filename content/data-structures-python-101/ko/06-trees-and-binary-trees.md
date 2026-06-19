@@ -22,6 +22,8 @@ last_reviewed: '2026-05-15'
 
 # Data Structures with Python 101 (6/10): 트리와 이진 트리
 
+트리는 컴퓨터 과학에서 가장 널리 쓰이는 구조 중 하나입니다. 파일 시스템, HTML DOM, 데이터베이스 인덱스, AST까지 계층 관계를 표현해야 하는 곳에는 거의 항상 트리가 등장합니다. 그래서 트리를 이해하는 것은 특정 알고리즘 하나를 배우는 문제가 아니라, 복잡한 시스템을 구조적으로 읽는 연습에 가깝습니다.
+
 이 글은 Data Structures with Python 101 시리즈의 여섯 번째 글입니다.
 
 ![Data Structures with Python 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.ko.png)

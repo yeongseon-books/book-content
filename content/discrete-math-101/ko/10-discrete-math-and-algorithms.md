@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Discrete Math 101 (10/10): 알고리즘과 이산수학의 연결
 
+시니어 엔지니어의 흐름은 보통 이론으로 먼저 예측하고, 그다음 계측이나 비교 출력으로 검증하는 순서입니다.
+
 이 글은 Discrete Math 101 시리즈의 마지막 글입니다.
 
 ![Discrete Math 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/10/10-01-big-picture.ko.png)

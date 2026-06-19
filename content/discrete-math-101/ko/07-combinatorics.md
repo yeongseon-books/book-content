@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Discrete Math 101 (7/10): 조합과 경우의 수
 
+shirts = ["white", "black", "gray", "navy", "beige"]
+
 이 글은 Discrete Math 101 시리즈의 7번째 글입니다.
 
 ![Discrete Math 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/07/07-01-big-picture.ko.png)

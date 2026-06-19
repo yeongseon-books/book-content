@@ -334,7 +334,7 @@ watch -n 15 "az containerapp replica list --name api --resource-group $RG -o tab
 
 ## 정리
 
-이 글에서 다룬 핵심은 세 가지입니다. 첫째 Azure Container Apps는 선언형 스케일링 신호를 바탕으로 replica 수를 어떻게 결정할, 둘째 내장 HTTP/TCP 규칙과 사용자 정의 KEDA scaler의 차이는 무엇일, 셋째 `min-replicas 0`(scale-to-zero)는 언제 안전하고, 언제 위험할입니다. 이 글이 답할 질문에서 시작해 실무 적용까지 이어지는 흐름을 따라가면 이 주제의 전체 그림이 잡힙니다.
+스케일링 — KEDA scaler와 zero-to-N의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다. 이 글에서는 이 글이 답할 질문부터 튜닝 방법 — 숫자를 어떻게 고를지까지 이 원칙을 구체적으로 살펴봤습니다. 핵심은 개념을 외우는 것이 아니라 실무에서 어떤 판단을 바꾸는지 이해하는 데 있습니다.
 
 ## 처음 질문으로 돌아가기
 

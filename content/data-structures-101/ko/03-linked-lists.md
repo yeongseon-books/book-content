@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Data Structures 101 (3/10): 연결 리스트
 
+> 단일 연결 리스트는 노드마다 `next` 포인터만 가지므로 메모리는 덜 쓰지만 역방향 이동이 어렵습니다. 이중 연결 리스트는 `prev`와 `next`를 모두 가져 양방향 순회와 양 끝 조작이 편해지는 대신, 노드당 포인터 하나를 더 부담합니다.
+
 이 글은 Data Structures 101 시리즈의 세 번째 글입니다.
 
 ![Data Structures 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/03/03-01-big-picture.ko.png)

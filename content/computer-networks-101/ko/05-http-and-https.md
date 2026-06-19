@@ -23,6 +23,8 @@ last_reviewed: '2026-05-15'
 
 # Computer Networks 101 (5/10): HTTP와 HTTPS
 
+멱등성이 중요한 이유는 네트워크 장애 시 재시도 정책 때문입니다. GET이나 PUT은 재시도해도 안전하지만, POST는 중복 생성 위험이 있어 별도 대책이 필요합니다.
+
 이 글은 Computer Networks 101 시리즈의 5번째 글입니다.
 
 ![Computer Networks 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/05/05-01-concept-at-a-glance.ko.png)

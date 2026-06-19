@@ -23,6 +23,8 @@ last_reviewed: '2026-05-15'
 
 # Computer Networks 101 (3/10): TCP와 UDP
 
+> TCP는 두 호스트 사이에 가상 회선을 만들고, 데이터가 순서대로 빠짐없이 너무 빠르지 않게 흐르도록 관리합니다. UDP는 그런 회선 없이 데이터그램을 바로 던집니다. 신뢰성이 필요하다면 애플리케이션이 그 위에 따로 얹어야 합니다.
+
 이 글은 Computer Networks 101 시리즈의 3번째 글입니다.
 
 ![Computer Networks 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.ko.png)

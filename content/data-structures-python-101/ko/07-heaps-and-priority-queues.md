@@ -22,6 +22,8 @@ title: "Data Structures with Python 101 (7/10): 힙과 우선순위 큐"
 
 # Data Structures with Python 101 (7/10): 힙과 우선순위 큐
 
+현실의 많은 문제는 단순히 데이터를 저장하는 것이 아니라, 우선순위에 따라 처리하는 것입니다. 가장 급한 작업부터 실행해야 하거나, 가장 가까운 노드를 먼저 방문해야 하거나, 가장 이른 이벤트를 먼저 소비해야 하는 상황이 계속 등장합니다. 매번 전체 정렬을 하면 O(n log n)이 들지만, 힙은 필요한 순간의 우선순위만 효율적으로 관리합니다.
+
 이 글은 Data Structures with Python 101 시리즈의 일곱 번째 글입니다.
 
 ![Data Structures with Python 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/07/07-01-big-picture.ko.png)

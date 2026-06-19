@@ -24,6 +24,8 @@ seo_description: alembic은 두 가지 모드로 실행됩니다. online은 DB�
 
 # Alembic 101 (7/10): online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기
 
+> Alembic은 두 모드로 실행됩니다. **online은 DB에 연결해 SQL을 직접 실행하고, offline은 DB 연결 없이 SQL 텍스트를 표준 출력으로 보냅니다.** offline은 dry-run, 리뷰, 스크립트화용이고, online은 실제 적용용입니다.
+
 이 글은 Alembic 101 시리즈의 일곱 번째 글입니다. 여기서는 online execution, offline SQL preview, 그리고 SQLite batch mode를 하나의 운영 흐름으로 묶어 설명합니다.
 
 production 배포 직전에는 migration이 실제로 어떤 SQL을 내보낼지 눈으로 보고 싶을 때가 많습니다. 여기에 SQLite의 제한적인 DDL 지원까지 겹치면 offline mode와 batch mode를 같이 이해해야 합니다.

@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Data Structures 101 (2/10): 배열과 동적 배열
 
+> 배열은 메모리의 연속 구간입니다. `arr[i]`는 시작 주소 + `i × 원소 크기`로 계산하므로 O(1)입니다. 동적 배열은 capacity가 부족해지면 보통 두 배 큰 블록을 새로 할당하고 기존 값을 복사합니다.
+
 이 글은 Data Structures 101 시리즈의 두 번째 글입니다.
 
 ![Data Structures 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/02/02-01-big-picture.ko.png)

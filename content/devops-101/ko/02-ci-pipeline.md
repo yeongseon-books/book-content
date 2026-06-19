@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # DevOps 101 (2/10): CI 파이프라인
 
+CI를 처음 시작할 때 가장 먼저 부딕히는 질문이 "GitHub Actions를 써야 하나, Jenkins를 써야 하나?"입니다. 아래 표는 세 가지 대표 도구를 비교하여 각 팀 환경에 적합한 선택지를 보여 줍니다.
+
 이 글은 DevOps 101 시리즈의 두 번째 글입니다.
 
 ![DevOps 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/02/02-01-diagram.ko.png)

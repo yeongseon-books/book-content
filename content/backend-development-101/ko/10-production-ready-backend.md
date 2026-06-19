@@ -630,7 +630,7 @@ app = create_app()
 
 ## 정리
 
-이 글에서 다룬 핵심은 세 가지입니다. 첫째 지금까지 배운 아홉 개 레이어를 하나의 프로젝트 구조로 어떻게 배치할, 둘째 dev, staging, prod 설정은 어떤 방식으로 나눠야 할, 셋째 observability의 세 기둥은 프로젝트 안에서 어디에 놓일입니다. "Production-ready"를 기능이 아닌 운영 성숙도로 정의하기에서 시작해 실무 적용까지 이어지는 흐름을 따라가면 이 주제의 전체 그림이 잡힙니다.
+'production-ready'는 '잘 돌아간다'가 아니라 '실패해도 살아남고, 실패한 사실이 보이고, 다시 일어설 수 있다'는 세 줄의 합입니다 — health check·observability·graceful shutdown·migration·rollback이 빠진 시스템은 production이 아니라 production 흉내입니다. 이 글에서는 "Production-ready"를 기능이 아닌 운영 성숙도로 정의하기부터 시니어가 자주 보는 실수와 판단 기준까지 이 원칙을 구체적으로 살펴봤습니다. 핵심은 개념을 외우는 것이 아니라 실무에서 어떤 판단을 바꾸는지 이해하는 데 있습니다.
 
 ## 처음 질문으로 돌아가기
 

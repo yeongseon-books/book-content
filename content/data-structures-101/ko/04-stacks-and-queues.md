@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Data Structures 101 (4/10): 스택과 큐
 
+> 스택은 “위에 넣고 위에서 꺼내는” 모델이고, 큐는 “뒤로 들어오고 앞으로 나가는” 모델입니다. 두 ADT 모두 양 끝만 만지므로, 적절한 기반 구조를 쓰면 핵심 연산을 O(1)로 유지할 수 있습니다.
+
 이 글은 Data Structures 101 시리즈의 네 번째 글입니다.
 
 ![Data Structures 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/04/04-01-big-picture.ko.png)

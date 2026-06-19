@@ -22,6 +22,8 @@ last_reviewed: '2026-05-17'
 
 # Data Structures with Python 101 (2/10): 배열과 리스트
 
+Python에서 가장 자주 만나는 자료구조는 list입니다. 그런데 자주 쓰는 만큼 내부 동작을 너무 당연하게 여기기 쉽습니다. 앞 삽입이 왜 느린지, `append()`가 왜 보통 빠른지 모르면 성능 문제를 만났을 때 원인을 구조가 아니라 코드 스타일 탓으로만 오해하기 쉽습니다.
+
 이 글은 Data Structures with Python 101 시리즈의 두 번째 글입니다.
 
 ![Data Structures with Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/02/02-01-capacity.ko.png)

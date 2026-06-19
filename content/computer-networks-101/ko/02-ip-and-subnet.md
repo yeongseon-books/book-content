@@ -23,6 +23,8 @@ last_reviewed: '2026-05-15'
 
 # Computer Networks 101 (2/10): IP와 subnet
 
+> IP 주소는 IPv4에서는 32비트, IPv6에서는 128비트 숫자입니다. subnet mask는 어디까지가 네트워크이고 어디부터가 호스트인지 알려 주는 비트 기준선입니다. CIDR(`/24`, `/16`)은 그 기준선의 길이를 비트 수로 적는 방식입니다.
+
 이 글은 Computer Networks 101 시리즈의 2번째 글입니다.
 
 ![Computer Networks 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/02/02-01-concept-at-a-glance.ko.png)

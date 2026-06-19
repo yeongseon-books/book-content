@@ -366,7 +366,7 @@ az deployment group what-if \
 
 ## 정리
 
-이 글에서 다룬 핵심은 세 가지입니다. 첫째 ACA의 세 가지 운영 단위인 Environment, Container App, Revision은 정확히 어떤 책임을 가질, 둘째 어떤 변경은 새 Revision을 만들고, 어떤 변경은 만들지 않을, 셋째 Single Revision mode와 Multiple Revision mode는 무엇이 다르고, 각각 언제 맞을입니다. 왜 이 글이 중요한가에서 시작해 실무 적용까지 이어지는 흐름을 따라가면 이 주제의 전체 그림이 잡힙니다.
+Environment, Container App, Revision — ACA in three words의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다. 이 글에서는 왜 이 글이 중요한가부터 변경 관리 규칙 — 무엇을 승인하고 무엇을 자동화할지까지 이 원칙을 구체적으로 살펴봤습니다. 핵심은 개념을 외우는 것이 아니라 실무에서 어떤 판단을 바꾸는지 이해하는 데 있습니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # DevOps 101 (6/10): 컨테이너와 빌드
 
+호스트에 직접 설치하는 방식은 서버마다 상태가 조금씩 달라지기 쉽습니다. 운영자는 버전을 맞추느라 고생하고, 장애가 나면 "어느 서버에 무엇이 설치됐는지"부터 다시 조사해야 합니다.
+
 이 글은 DevOps 101 시리즈의 여섯 번째 글입니다.
 
 ![DevOps 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/06/06-01-diagram.ko.png)

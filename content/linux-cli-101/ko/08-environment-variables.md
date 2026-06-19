@@ -23,6 +23,8 @@ seo_description: 환경변수와 PATH가 명령 실행과 설정 전달에 쓰�
 
 # Linux CLI 101 (8/10): 환경변수와 PATH
 
+> 환경변수는 프로세스에 붙은 이름표이고, PATH는 Shell이 명령어를 찾아다니는 지도입니다.
+
 이 글은 Linux CLI 101 시리즈의 8번째 글입니다.
 
 `python`을 입력하면 Shell이 Python 실행 파일을 찾아서 실행합니다. 어떻게 찾을까요? 모든 디렉터리를 뒤지는 것이 아니라, PATH에 등록된 디렉터리만 순서대로 확인합니다. PATH에 없으면 "command not found"입니다.

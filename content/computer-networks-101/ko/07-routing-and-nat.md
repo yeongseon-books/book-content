@@ -23,6 +23,8 @@ last_reviewed: '2026-05-15'
 
 # Computer Networks 101 (7/10): 라우팅과 NAT
 
+패킷은 호스트 A에서 출발할 때 사설 IP를 달고 있습니다. 첫 번째 라우터(default gateway)가 NAT를 수행해 공인 IP로 바꾸고, 이후 라우터들은 공인 IP 기준으로 다음 홉을 결정합니다. 응답이 돌아올 때는 NAT 테이블을 역으로 참조해 원래 사설 IP로 되돌립니다.
+
 이 글은 Computer Networks 101 시리즈의 7번째 글입니다.
 
 ![Computer Networks 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.ko.png)

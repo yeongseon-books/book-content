@@ -24,6 +24,8 @@ seo_description: autogenerate는 현재 DB(ground truth)와 target_metadata(desi
 
 # Alembic 101 (4/10): autogenerate: 잡는 것과 못 잡는 것의 경계
 
+> Autogenerate는 **현재 DB(ground truth)와 `target_metadata`(desired state)의 diff를 만들고, 그 차이를 `op` 호출로 직렬화하는 도구**입니다. diff 알고리즘이 볼 수 없는 것, 즉 데이터 의미 수준의 의도, 식별자 rename, DB 전용 객체는 자동으로 감지할 수 없습니다.
+
 이 글은 Alembic 101 시리즈의 네 번째 글입니다. 여기서는 `alembic revision --autogenerate`가 내부에서 무엇을 비교하는지, 그리고 어디까지는 자동화가 안전하고 어디부터는 사람이 직접 개입해야 하는지 구분합니다.
 
 autogenerate는 매우 강력하지만, 의도까지 읽어 주는 도구는 아닙니다. 특히 rename처럼 의미를 해석해야 하는 변경은 사람이 마지막 책임을 져야 합니다.

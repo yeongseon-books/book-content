@@ -23,6 +23,8 @@ last_reviewed: '2026-05-15'
 
 # Computer Networks 101 (4/10): DNS
 
+> 클라이언트는 운영 체제의 stub resolver에 물어보고, stub resolver는 보통 ISP나 회사의 recursive resolver에 질의를 넘깁니다. recursive resolver는 루트 서버, TLD 서버, authoritative 서버를 순서대로 따라가며 답을 찾고, 그 결과를 TTL 동안 캐시합니다.
+
 이 글은 Computer Networks 101 시리즈의 4번째 글입니다.
 
 ![Computer Networks 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/04/04-01-concept-at-a-glance.ko.png)

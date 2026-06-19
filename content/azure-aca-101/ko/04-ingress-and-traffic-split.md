@@ -359,7 +359,7 @@ az containerapp ingress traffic show --name myapi --resource-group $RG -o json
 
 ## 정리
 
-이 글에서 다룬 핵심은 세 가지입니다. 첫째 ACA의 관리형 Ingress는 무엇을 책임지고(TLS, external/internal 노출, Revision 라우팅), 무엇은 책임지지 않을, 둘째 `external`, `internal`, `disabled` ingress mode의 차이는 정확히 무엇일, 셋째 Single mode와 Multiple mode는 트래픽 분배 동작을 어떻게 바꿀입니다. 왜 이 글이 중요한가에서 시작해 실무 적용까지 이어지는 흐름을 따라가면 이 주제의 전체 그림이 잡힙니다.
+Ingress와 트래픽 분할 — revision 기반 배포 전략의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다. 이 글에서는 왜 이 글이 중요한가부터 고급 배포 전략 — 기능 플래그와 트래픽 분할 결합까지 이 원칙을 구체적으로 살펴봤습니다. 핵심은 개념을 외우는 것이 아니라 실무에서 어떤 판단을 바꾸는지 이해하는 데 있습니다.
 
 ## 처음 질문으로 돌아가기
 

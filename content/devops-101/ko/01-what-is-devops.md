@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # DevOps 101 (1/10): DevOps란 무엇인가?
 
+DevOps를 처음 이해하려 할 때 가장 혼란스러운 부분은 이것이 기술이 아니라 문화 전환이라는 사실입니다. 아래 표는 전통 운영과 DevOps가 같은 문제를 어떻게 다르게 풀어내는지 정리한 것입니다.
+
 이 글은 DevOps 101 시리즈의 첫 번째 글입니다.
 
 ![DevOps 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/01/01-01-diagram.ko.png)

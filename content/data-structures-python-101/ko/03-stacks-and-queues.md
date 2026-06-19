@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # Data Structures with Python 101 (3/10): 스택과 큐
 
+스택과 큐는 가장 기본적인 추상 자료형입니다. 함수 호출 스택, 브라우저 뒤로 가기, 작업 큐, BFS 탐색처럼 운영 코드와 알고리즘 코드의 양쪽에서 모두 반복해서 등장합니다. 이 둘을 정확히 이해하면 더 복잡한 흐름 제어 구조를 훨씬 쉽게 읽을 수 있습니다.
+
 이 글은 Data Structures with Python 101 시리즈의 세 번째 글입니다.
 
 ![Data Structures with Python 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/03/03-01-big-picture.ko.png)

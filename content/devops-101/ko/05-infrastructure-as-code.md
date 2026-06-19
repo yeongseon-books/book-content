@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # DevOps 101 (5/10): Infrastructure as Code
 
+IaC 도구를 선택할 때 가장 혼란스러운 부분은 "Terraform을 쓰면 되나?"라는 질문입니다. 아래 표는 네 가지 대표 도구를 비교해 각 팀이 자신의 환경에 맞는 선택을 할 수 있게 합니다.
+
 이 글은 DevOps 101 시리즈의 다섯 번째 글입니다.
 
 ![DevOps 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/05/05-01-diagram.ko.png)

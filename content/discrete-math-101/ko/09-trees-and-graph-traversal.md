@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Discrete Math 101 (9/10): 트리와 그래프 탐색
 
+tree_edges = [(1, 2), (1, 3), (2, 4), (2, 5), (3, 6)]
+
 이 글은 Discrete Math 101 시리즈의 9번째 글입니다.
 
 ![Discrete Math 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/09/09-01-big-picture.ko.png)

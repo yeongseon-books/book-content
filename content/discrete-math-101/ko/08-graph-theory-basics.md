@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Discrete Math 101 (8/10): 그래프 이론 기초
 
+그래프를 한 번 추상화해 두면 이후 알고리즘은 대부분 같은 인터페이스 위에서 작동합니다. 이 표현의 안정성이 실무에서는 매우 중요합니다.
+
 이 글은 Discrete Math 101 시리즈의 8번째 글입니다.
 
 ![Discrete Math 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/08/08-01-graph-representations.ko.png)

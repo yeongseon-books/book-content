@@ -23,6 +23,8 @@ seo_description: Alembic의 부트 스크립트인 env.py 설정법과 target_me
 
 # Alembic 101 (2/10): env.py와 target_metadata: 모델과 마이그레이션 연결
 
+> `env.py`는 Alembic이 **모든 명령마다 실행하는 부트 스크립트**입니다. 각 실행(`upgrade`, `revision --autogenerate` 등)에서 Alembic은 (1) `alembic.ini`를 읽고, (2) `env.py`를 실행해 connection과 metadata를 얻고, (3) `versions/` 아래의 revision을 적용합니다.
+
 이 글은 Alembic 101 시리즈의 두 번째 글입니다. 여기서는 `env.py`가 Alembic 실행 흐름에서 정확히 어떤 위치를 차지하는지, 그리고 `target_metadata`가 autogenerate의 근거로서 무엇을 제공해야 하는지 실무 관점에서 정리합니다.
 
 1편에서 `alembic init`까지 마쳤더라도 그 상태의 Alembic은 여러분 모델을 모릅니다. 이 연결을 `env.py`에서 제대로 하지 못하면 `alembic revision --autogenerate`는 즉시 신뢰를 잃습니다.

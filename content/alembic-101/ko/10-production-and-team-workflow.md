@@ -24,6 +24,8 @@ seo_description: migration은 "가장 비가역적인 코드 변경"입니다. �
 
 # Alembic 101 (10/10): Production과 team workflow: PR, CI, 모니터링, 그리고 incident response
 
+> migration은 **“가장 비가역적인 코드 변경”**입니다. 일반 코드는 버튼 한 번으로 revert할 수 있어도, schema 변경은 데이터를 끌고 가기 때문에 훨씬 되돌리기 어렵습니다. 그래서 PR 단계에서부터 일반 코드보다 더 엄격하게 다뤄야 합니다.
+
 이 글은 Alembic 101 시리즈의 마지막 글입니다. 여기서는 앞선 아홉 편의 내용을 production 운영 모델로 묶어서, PR 규칙, CI 체크, 모니터링, incident response까지 하나의 workflow로 정리합니다.
 
 production에서 migration은 일반 application code보다 훨씬 비가역적입니다. 그래서 Alembic 안전성은 개인 습관이 아니라 팀 workflow, PR 규칙, 검증 루틴 안에 들어가 있어야 합니다.

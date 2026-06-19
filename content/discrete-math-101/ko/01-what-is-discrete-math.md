@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Discrete Math 101 (1/10): 이산수학이란 무엇인가?
 
+continuous_sample = [i * 0.0001 for i in range(10001)]  # an approximation
+
 이 글은 Discrete Math 101 시리즈의 1번째 글입니다.
 
 ![Discrete Math 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/01/01-01-big-picture.ko.png)

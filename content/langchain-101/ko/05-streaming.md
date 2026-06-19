@@ -24,6 +24,8 @@ seo_description: LangChain의 stream과 astream으로 LLM 출력을 토큰 단�
 
 # LangChain 101 (5/6): Streaming — 실시간 출력 처리
 
+from langchain_core.output_parsers import StrOutputParser
+
 이 글은 LangChain 101 시리즈의 다섯 번째 글입니다.
 
 LLM 응답은 종종 몇 초씩 걸립니다. 총 처리 시간은 같더라도, 사용자가 아무 것도 보지 못한 채 기다리는 경험은 훨씬 더 느리게 느껴집니다. 그래서 스트리밍은 성능 최적화라기보다 먼저 **체감 지연을 줄이는 전달 방식**으로 이해하는 편이 정확합니다.

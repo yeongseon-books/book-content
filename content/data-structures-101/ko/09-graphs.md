@@ -23,6 +23,8 @@ title: "Data Structures 101 (9/10): 그래프"
 
 # Data Structures 101 (9/10): 그래프
 
+> 그래프 `G = (V, E)`는 정점 집합 V와 간선 집합 E로 정의합니다. 간선에 방향이 있으면 방향 그래프, 가중치가 있으면 가중치 그래프입니다. 인접 리스트는 메모리 효율이 좋고, 인접 행렬은 두 정점 사이 간선 존재 여부를 O(1)에 확인할 수 있습니다.
+
 이 글은 Data Structures 101 시리즈의 아홉 번째 글입니다.
 
 ![Data Structures 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/09/09-01-graph-representations.ko.png)

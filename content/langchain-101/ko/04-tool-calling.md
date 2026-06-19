@@ -24,6 +24,8 @@ seo_description: LangChain Tool Calling으로 LLM이 함수를 호출하고 결�
 
 # LangChain 101 (4/6): Tool Calling — 외부 도구 연결하기
 
+llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"])
+
 이 글은 LangChain 101 시리즈의 네 번째 글입니다.
 
 LLM은 텍스트를 잘 만듭니다. 하지만 계산, 현재 시각 조회, 데이터베이스 질의, 외부 API 호출은 텍스트 생성만으로 끝나지 않습니다. 그래서 실제 애플리케이션에서는 모델이 모든 일을 "알아서" 하는 것이 아니라, **무엇을 물어봐야 할지 판단하는 역할**을 맡고, 실제 실행은 애플리케이션의 함수나 도구가 담당하게 됩니다.

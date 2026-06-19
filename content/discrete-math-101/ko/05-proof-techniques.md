@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Discrete Math 101 (5/10): 증명 방법
 
+Correctness: gcd(a, b) = gcd(b, a mod b) (mathematical theorem)
+
 이 글은 Discrete Math 101 시리즈의 5번째 글입니다.
 
 ![Discrete Math 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/05/05-01-big-picture.ko.png)

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-17'
 
 # Data Structures with Python 101 (9/10): set과 집합 연산
 
+중복 제거, 존재 여부 확인, 컬렉션 비교는 권한 관리, 태그 시스템, 데이터 정제, 처리 완료 추적처럼 실무의 거의 모든 영역에 등장합니다. list로도 구현할 수 있지만, 데이터가 커질수록 비용 차이가 급격히 벌어집니다.
+
 이 글은 Data Structures with Python 101 시리즈의 아홉 번째 글입니다.
 
 ![Data Structures with Python 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/09/09-01-set.ko.png)

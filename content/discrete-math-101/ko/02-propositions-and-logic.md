@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Discrete Math 101 (2/10): 명제와 논리
 
+명제는 참이나 거짓이 분명해야 합니다. 질문, 명령, 감탄처럼 진리값이 정해지지 않는 문장은 명제가 아닙니다. 이 구분이 흐려지면 이후의 모든 논리식도 애매해집니다.
+
 이 글은 Discrete Math 101 시리즈의 2번째 글입니다.
 
 ![Discrete Math 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/02/02-01-big-picture.ko.png)

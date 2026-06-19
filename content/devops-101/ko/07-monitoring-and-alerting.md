@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # DevOps 101 (7/10): 모니터링과 알림
 
+이 상태에서는 문제를 발견하는 주체가 팀이 아니라 고객이 됩니다. 그리고 장애가 나도 현재 상태만 볼 수 있을 뿐, 10분 전부터 어떤 추세가 쌓였는지는 알기 어렵습니다.
+
 이 글은 DevOps 101 시리즈의 일곱 번째 글입니다.
 
 ![DevOps 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/07/07-01-diagram.ko.png)

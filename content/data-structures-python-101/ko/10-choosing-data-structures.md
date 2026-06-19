@@ -22,6 +22,8 @@ last_reviewed: '2026-05-15'
 
 # Data Structures with Python 101 (10/10): 자료구조 선택 기준
 
+개별 자료구조의 특성을 아는 것과, 상황에 맞는 구조를 고르는 것은 전혀 다른 능력입니다. 잘못된 자료구조를 선택하면 코드가 불필요하게 복잡해지고, 성능도 예측하기 어려워집니다. 반대로 올바른 구조를 고르면 코드와 성능이 동시에 단순해집니다.
+
 이 글은 Data Structures with Python 101 시리즈의 마지막 글입니다.
 
 ![Data Structures with Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.ko.png)

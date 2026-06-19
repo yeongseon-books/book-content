@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # DevOps 101 (8/10): 로그 수집과 분석
 
+이 방식은 서버가 하나일 때만 겨우 버팁니다. 서비스가 분산되면 어떤 요청이 어느 서버를 지났는지 금방 놓치게 됩니다.
+
 이 글은 DevOps 101 시리즈의 여덟 번째 글입니다.
 
 ![DevOps 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/08/08-01-diagram.ko.png)

@@ -23,6 +23,8 @@ last_reviewed: '2026-05-12'
 
 # Discrete Math 101 (3/10): 집합과 함수
 
+마지막 식은 포함-배제 원리의 가장 단순한 형태입니다. 조합론 장으로 넘어가면 이 아이디어가 훨씬 큰 계산으로 확장됩니다.
+
 이 글은 Discrete Math 101 시리즈의 3번째 글입니다.
 
 ![Discrete Math 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/03/03-01-big-picture.ko.png)

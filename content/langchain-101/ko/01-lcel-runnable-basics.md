@@ -24,6 +24,8 @@ seo_description: LCEL과 Runnable 인터페이스로 LLM 파이프라인을 한 
 
 # LangChain 101 (1/6): LangChain 소개 — LCEL과 Runnable 기본
 
+from langchain_core.output_parsers import StrOutputParser
+
 이 글은 LangChain 101 시리즈의 첫 번째 글입니다.
 
 LangChain을 처음 보면 용어가 먼저 몰려옵니다. LCEL, Runnable, Chain, Pipe 같은 단어가 연달아 나오는데, 정작 손에 잡히는 것은 "프롬프트 만들고 모델 호출하고 결과 파싱하는 코드"입니다. 그래서 입문 단계에서는 개념을 외우기보다, **반복되는 글루 코드를 LangChain이 어떤 공통 계약으로 정리했는지**부터 보는 편이 훨씬 빠릅니다.

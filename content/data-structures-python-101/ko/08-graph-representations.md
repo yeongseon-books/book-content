@@ -22,6 +22,8 @@ last_reviewed: '2026-05-15'
 
 # Data Structures with Python 101 (8/10): 그래프 표현
 
+현실 세계의 대부분의 복잡한 관계는 그래프로 모델링할 수 있습니다. 친구 관계, 웹 링크, 도로망, 패키지 의존성, CI/CD 작업 흐름 모두 그래프 문제입니다. 그래서 그래프를 표현하고 순회하는 능력은 특정 문제 하나를 푸는 기술이 아니라, 관계형 시스템을 해석하는 기본 역량입니다.
+
 이 글은 Data Structures with Python 101 시리즈의 여덟 번째 글입니다.
 
 ![Data Structures with Python 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.ko.png)
