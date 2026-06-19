@@ -24,590 +24,358 @@ seo_description: 온라인 서점 주문 시스템 예제로 OOP 설계와 리�
 
 개념을 따로 배울 때는 캡슐화, 상속, 다형성, 합성, SOLID가 각각 이해되는 듯 보입니다. 그런데 실제 기능 하나를 설계하려고 하면 갑자기 어려워집니다. 어디서 클래스를 나누고, 어떤 규칙은 지금 적용하고 어떤 규칙은 나중으로 미뤄야 할지 판단이 필요해지기 때문입니다.
 
-그래서 실전 예제가 중요합니다. 좋은 설계는 처음부터 완벽한 다이어그램을 그려서 나오기보다, 동작하는 모델을 만들고 변경 가능성이 큰 지점에 유연성을 추가하면서 점점 다듬어집니다. 이 글에서는 그 흐름을 주문 시스템 예제로 따라가 보겠습니다.
+이 글은 온라인 서점 주문 시스템을 절차지향 코드에서 출발하여 OOP로 점진적으로 발전시키는 과정을 보여줍니다. 완벽한 설계를 목표로 하는 것이 아니라, 변경이 생길 때마다 설계를 어떻게 조정하는지에 집중합니다.
 
 이 글은 OOP 101 시리즈의 9번째 글입니다.
 
-![Object-Oriented Programming 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/09/09-01-concept-overview.ko.png)
+![Object-Oriented Programming 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/09/09-01-big-picture.ko.png)
 *Object-Oriented Programming 101 9장 흐름 개요*
 
 ## 이 글에서 다룰 문제
 
-- 요구사항에서 어떤 클래스를 도출하고, 어떤 책임을 어디에 둘지 어떻게 판단할까요?
-- 값 객체, 엔티티, 서비스 클래스는 어떤 식으로 역할을 나누면 좋을까요?
-- 할인 정책, 결제 수단, 저장소처럼 바뀌기 쉬운 요소는 어떻게 분리해야 할까요?
+- 절차지향 코드에서 OOP로 전환할 때 첫 번째 경계를 어디에 그어야 할까요?
+- Value Object, Entity, Service는 어떤 기준으로 구분하나요?
+- 요구사항이 바뀔 때 설계를 어떻게 조정하나요?
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
-## 핵심 개념 잡기
+## 이 글에서 배울 것
 
-> 온라인 서점 주문 시스템 구조
-
-```text
-OrderService
-├── Cart          -> cart management
-├── Discount      -> discount policy (strategy pattern)
-├── PaymentGateway -> payment processing (DIP)
-└── OrderRepository -> order persistence (DIP)
-```
+- 절차지향에서 OOP로 전환하는 리팩터링 과정을 따라갑니다
+- Value Object, Entity, Service의 역할을 구분합니다
+- 도메인 규칙을 올바른 계층에 배치하는 기준을 익힙니다
+- 할인 정책 확장을 OCP 방식으로 처리합니다
+- 테스트 가능한 설계를 위한 DIP 적용 방법을 배웁니다
 
 ## 핵심 개념
 
-| 용어 | 설명 |
+| 패턴 | 역할 |
 |------|------|
-| 도메인 모델 | 비즈니스 개념을 클래스로 표현한 것입니다 |
-| 서비스 클래스 | 도메인 객체 간의 협력을 조율하는 클래스입니다 |
-| 값 객체(value object) | 동등성으로 비교되는 불변 객체입니다 |
-| 엔티티(entity) | 고유 식별자로 구분되는 객체입니다 |
-| 리팩터링 | 동작을 유지하면서 코드 구조를 개선하는 것입니다 |
+| Value Object | 동일성이 값에 있고, 불변입니다. (예: Money, Email) |
+| Entity | 동일성이 식별자에 있고, 상태가 변합니다. (예: Order, User) |
+| Service | 도메인 규칙을 조합하는 역할로, 자체 상태가 없습니다. |
+| Repository | 영속성 저장/조회를 담당합니다. |
+| Policy / Strategy | 교체 가능한 비즈니스 규칙 단위입니다. |
 
 ## 전후 비교
 
-주문 처리 로직을 비교합니다.
+절차지향 주문 처리를 OOP로 전환합니다.
 
 ```python
-# before: procedural — 모든 로직이 한 함수에 몰림
-def process_order(items, payment_type, discount_code):
-    total = sum(item["price"] * item["qty"] for item in items)
-    if discount_code == "SAVE10":
+# before: 절차지향 — 데이터와 로직이 딕셔너리와 함수로 분산
+def create_order(book_id: str, qty: int, price: int, coupon: str | None) -> dict:
+    total = price * qty
+    if coupon == "SAVE10":
         total = int(total * 0.9)
-    if payment_type == "card":
-        print(f"Card payment: ${total}")
-    elif payment_type == "bank":
-        print(f"Bank transfer: ${total}")
-    print(f"Order saved: ${total}, {len(items)} items")
+    if total <= 0:
+        raise ValueError("Invalid total")
+    return {"book_id": book_id, "qty": qty, "total": total, "status": "pending"}
+
+def confirm_order(order: dict) -> None:
+    if order["status"] != "pending":
+        raise ValueError("Only pending orders can be confirmed")
+    order["status"] = "confirmed"
+    print(f"Order confirmed: {order['total']}")
 ```
 
 ```python
-# after: OOP — 책임이 분리됨
-class Order:
-    def __init__(self, items: list["OrderItem"]) -> None:
-        self.items = items
-
-    @property
-    def subtotal(self) -> int:
-        return sum(item.total for item in self.items)
-
-class OrderItem:
-    def __init__(self, name: str, price: int, quantity: int) -> None:
-        self.name = name
-        self.price = price
-        self.quantity = quantity
-
-    @property
-    def total(self) -> int:
-        return self.price * self.quantity
-```
-
-## 단계별 실습
-
-### 1단계: 도메인 모델 정의
-
-```python
-from dataclasses import dataclass
+# after: OOP — 도메인 규칙이 각 객체에 모임
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Protocol
 
 @dataclass(frozen=True)
 class Money:
-    """Value object — represents monetary amounts"""
+    """Value Object: 금액 표현"""
     amount: int
+    currency: str = "KRW"
 
-    def __add__(self, other: "Money") -> "Money":
-        return Money(self.amount + other.amount)
+    def __post_init__(self) -> None:
+        if self.amount < 0:
+            raise ValueError(f"Money cannot be negative: {self.amount}")
 
-    def __mul__(self, factor: int) -> "Money":
-        return Money(self.amount * factor)
+    def add(self, other: "Money") -> "Money":
+        if self.currency != other.currency:
+            raise ValueError("Currency mismatch")
+        return Money(self.amount + other.amount, self.currency)
 
-    def apply_discount(self, percent: int) -> "Money":
-        return Money(self.amount - (self.amount * percent // 100))
+    def __repr__(self) -> str:
+        return f"{self.amount:,} {self.currency}"
+
+class OrderStatus(str, Enum):
+    PENDING = "pending"
+    CONFIRMED = "confirmed"
+    SHIPPED = "shipped"
+    CANCELLED = "cancelled"
 
 @dataclass
-class Book:
-    """Entity — identified by unique ID"""
+class OrderItem:
     book_id: str
-    title: str
-    price: Money
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Book):
-            return NotImplemented
-        return self.book_id == other.book_id
-
-book = Book("B001", "Python Basics", Money(25000))
-print(book.price.amount)  # 25000
-print((book.price * 3).amount)  # 75000
-```
-
-### 2단계: 장바구니 클래스
-
-```python
-@dataclass
-class CartItem:
-    book: Book
     quantity: int
+    unit_price: Money
 
-    @property
-    def total(self) -> Money:
-        return self.book.price * self.quantity
-
-class Cart:
-    def __init__(self) -> None:
-        self._items: dict[str, CartItem] = {}
-
-    def add(self, book: Book, quantity: int = 1) -> None:
-        if book.book_id in self._items:
-            existing = self._items[book.book_id]
-            self._items[book.book_id] = CartItem(book, existing.quantity + quantity)
-        else:
-            self._items[book.book_id] = CartItem(book, quantity)
-
-    def remove(self, book_id: str) -> None:
-        self._items.pop(book_id, None)
-
-    @property
-    def items(self) -> list[CartItem]:
-        return list(self._items.values())
-
-    @property
     def subtotal(self) -> Money:
-        total = Money(0)
-        for item in self._items.values():
-            total = total + item.total
-        return total
-
-    @property
-    def item_count(self) -> int:
-        return sum(item.quantity for item in self._items.values())
-
-cart = Cart()
-cart.add(Book("B001", "Python Basics", Money(25000)), 2)
-cart.add(Book("B002", "Django in Practice", Money(35000)))
-print(f"Subtotal: ${cart.subtotal.amount}, {cart.item_count} books")
-# Subtotal: $85000, 3 books
+        return Money(self.unit_price.amount * self.quantity)
 ```
 
-### 3단계: 할인 정책 — 전략 패턴
+## 단계별 실습: 온라인 서점 주문 시스템
+
+### 1단계: Value Object — Money와 Email
 
 ```python
+from dataclasses import dataclass
+import re
+
+@dataclass(frozen=True)
+class Money:
+    amount: int
+    currency: str = "KRW"
+
+    def __post_init__(self) -> None:
+        if self.amount < 0:
+            raise ValueError(f"Money cannot be negative: {self.amount}")
+
+    def add(self, other: "Money") -> "Money":
+        if self.currency != other.currency:
+            raise ValueError("Currency mismatch")
+        return Money(self.amount + other.amount, self.currency)
+
+    def apply_discount(self, rate: float) -> "Money":
+        if not 0 <= rate <= 1:
+            raise ValueError("Rate must be 0.0 to 1.0")
+        return Money(int(self.amount * (1 - rate)), self.currency)
+
+    def __repr__(self) -> str:
+        return f"{self.amount:,} {self.currency}"
+
+@dataclass(frozen=True)
+class Email:
+    value: str
+
+    def __post_init__(self) -> None:
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", self.value):
+            raise ValueError(f"Invalid email: {self.value}")
+
+m1 = Money(10000)
+m2 = Money(5000)
+print(m1.add(m2))                # 15,000 KRW
+print(m1.apply_discount(0.2))   # 8,000 KRW
+
+email = Email("alice@example.com")
+# Email("not-an-email")  # ValueError
+```
+
+Value Object는 `frozen=True`로 불변성을 보장합니다. 두 Money가 같은 금액과 통화를 가지면 동일합니다.
+
+### 2단계: Entity — Order
+
+```python
+from dataclasses import dataclass, field
+from enum import Enum
 from typing import Protocol
+import uuid
+
+class OrderStatus(str, Enum):
+    PENDING = "pending"
+    CONFIRMED = "confirmed"
+    SHIPPED = "shipped"
+    CANCELLED = "cancelled"
+
+@dataclass
+class OrderItem:
+    book_id: str
+    quantity: int
+    unit_price: Money
+
+    def subtotal(self) -> Money:
+        return Money(self.unit_price.amount * self.quantity)
 
 class DiscountPolicy(Protocol):
-    def calculate(self, subtotal: Money) -> Money: ...
+    def apply(self, amount: Money) -> Money: ...
 
 class NoDiscount:
-    def calculate(self, subtotal: Money) -> Money:
-        return subtotal
+    def apply(self, amount: Money) -> Money:
+        return amount
 
 class PercentDiscount:
-    def __init__(self, percent: int) -> None:
-        self._percent = percent
+    def __init__(self, rate: float) -> None:
+        self.rate = rate
 
-    def calculate(self, subtotal: Money) -> Money:
-        return subtotal.apply_discount(self._percent)
+    def apply(self, amount: Money) -> Money:
+        return amount.apply_discount(self.rate)
 
-class BulkDiscount:
-    """10% off for orders over $50,000"""
-    def calculate(self, subtotal: Money) -> Money:
-        if subtotal.amount >= 50000:
-            return subtotal.apply_discount(10)
-        return subtotal
+@dataclass
+class Order:
+    """Entity: 식별자(id)로 동일성 판단"""
+    customer_email: Email
+    items: list[OrderItem] = field(default_factory=list)
+    status: OrderStatus = OrderStatus.PENDING
+    id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
+    _discount: DiscountPolicy = field(default_factory=NoDiscount, repr=False)
 
-print(NoDiscount().calculate(Money(85000)).amount)       # 85000
-print(PercentDiscount(20).calculate(Money(85000)).amount) # 68000
-print(BulkDiscount().calculate(Money(85000)).amount)      # 76500
+    def add_item(self, item: OrderItem) -> None:
+        if self.status != OrderStatus.PENDING:
+            raise ValueError("Cannot modify non-pending order")
+        self.items.append(item)
+
+    def apply_discount(self, policy: DiscountPolicy) -> None:
+        if self.status != OrderStatus.PENDING:
+            raise ValueError("Discount can only be applied to pending orders")
+        self._discount = policy
+
+    def subtotal(self) -> Money:
+        return Money(sum(item.subtotal().amount for item in self.items))
+
+    def total(self) -> Money:
+        return self._discount.apply(self.subtotal())
+
+    def confirm(self) -> None:
+        if self.status != OrderStatus.PENDING:
+            raise ValueError(f"Cannot confirm order in {self.status} status")
+        if not self.items:
+            raise ValueError("Cannot confirm empty order")
+        self.status = OrderStatus.CONFIRMED
+
+    def cancel(self) -> None:
+        if self.status == OrderStatus.SHIPPED:
+            raise ValueError("Cannot cancel shipped order")
+        self.status = OrderStatus.CANCELLED
 ```
 
-### 4단계: 결제 게이트웨이 — DIP
+### 3단계: Repository 인터페이스와 구현
 
 ```python
 from typing import Protocol
 
-class PaymentGateway(Protocol):
-    def charge(self, amount: Money) -> bool: ...
-
-class CardPayment:
-    def charge(self, amount: Money) -> bool:
-        print(f"Card payment: ${amount.amount}")
-        return True
-
-class BankTransfer:
-    def charge(self, amount: Money) -> bool:
-        print(f"Bank transfer: ${amount.amount}")
-        return True
-
 class OrderRepository(Protocol):
-    def save(self, order_data: dict) -> str: ...
+    def save(self, order: Order) -> None: ...
+    def find(self, order_id: str) -> Order | None: ...
+    def find_by_customer(self, email: Email) -> list[Order]: ...
 
-class InMemoryOrderRepo:
+class InMemoryOrderRepository:
     def __init__(self) -> None:
-        self._orders: dict[str, dict] = {}
-        self._counter = 0
+        self._store: dict[str, Order] = {}
 
-    def save(self, order_data: dict) -> str:
-        self._counter += 1
-        order_id = f"ORD-{self._counter:04d}"
-        self._orders[order_id] = order_data
-        print(f"Order saved: {order_id}")
-        return order_id
+    def save(self, order: Order) -> None:
+        self._store[order.id] = order
+
+    def find(self, order_id: str) -> Order | None:
+        return self._store.get(order_id)
+
+    def find_by_customer(self, email: Email) -> list[Order]:
+        return [
+            o for o in self._store.values()
+            if o.customer_email == email
+        ]
 ```
 
-### 5단계: 주문 서비스 — 전체 조립
+### 4단계: Service — OrderService
 
 ```python
 class OrderService:
-    def __init__(
+    def __init__(self, repository: OrderRepository) -> None:
+        self._repo = repository
+
+    def create_order(self, customer_email: str) -> Order:
+        email = Email(customer_email)
+        order = Order(customer_email=email)
+        self._repo.save(order)
+        return order
+
+    def add_book(
         self,
-        discount: DiscountPolicy,
-        payment: PaymentGateway,
-        repo: OrderRepository,
+        order_id: str,
+        book_id: str,
+        quantity: int,
+        unit_price: int,
     ) -> None:
-        self._discount = discount
-        self._payment = payment
-        self._repo = repo
+        order = self._find_or_raise(order_id)
+        item = OrderItem(book_id, quantity, Money(unit_price))
+        order.add_item(item)
+        self._repo.save(order)
 
-    def checkout(self, cart: Cart) -> str | None:
-        if cart.item_count == 0:
-            print("Cart is empty")
-            return None
+    def apply_coupon(self, order_id: str, discount_rate: float) -> None:
+        order = self._find_or_raise(order_id)
+        order.apply_discount(PercentDiscount(discount_rate))
+        self._repo.save(order)
 
-        subtotal = cart.subtotal
-        final = self._discount.calculate(subtotal)
+    def confirm(self, order_id: str) -> Money:
+        order = self._find_or_raise(order_id)
+        order.confirm()
+        self._repo.save(order)
+        return order.total()
 
-        success = self._payment.charge(final)
-        if not success:
-            print("Payment failed")
-            return None
-
-        order_data = {
-            "items": [(i.book.title, i.quantity) for i in cart.items],
-            "subtotal": subtotal.amount,
-            "total": final.amount,
-        }
-        return self._repo.save(order_data)
-
-# 조립 및 실행
-cart = Cart()
-cart.add(Book("B001", "Python Basics", Money(25000)), 2)
-cart.add(Book("B002", "Django in Practice", Money(35000)))
-
-service = OrderService(
-    discount=BulkDiscount(),
-    payment=CardPayment(),
-    repo=InMemoryOrderRepo(),
-)
-
-order_id = service.checkout(cart)
-# Card payment: $76500
-# 주문 저장 완료: ORD-0001
-print(f"Order complete: {order_id}")  # Order complete: ORD-0001
+    def _find_or_raise(self, order_id: str) -> Order:
+        order = self._repo.find(order_id)
+        if order is None:
+            raise ValueError(f"Order not found: {order_id}")
+        return order
 ```
 
-## 이 코드에서 주목할 점
+### 5단계: 전체 조립과 실행
 
-- `Money`는 값 객체로 금액 연산을 안전하게 캡슐화합니다
-- `Cart`는 내부 딕셔너리를 숨기고 메서드로만 접근하게 합니다(캡슐화)
-- `DiscountPolicy`는 전략 패턴으로 할인 정책을 런타임에 교체합니다(OCP)
-- `OrderService`는 모든 의존성을 Protocol로 받아 교체와 테스트가 쉽습니다(DIP)
+```python
+# 조립
+repo = InMemoryOrderRepository()
+service = OrderService(repo)
 
-## 자주 하는 실수 5가지
+# 시나리오: 책 2권 주문, 10% 할인 쿠폰 적용
+order = service.create_order("alice@example.com")
+service.add_book(order.id, "BOOK-001", quantity=2, unit_price=18000)
+service.add_book(order.id, "BOOK-002", quantity=1, unit_price=25000)
+service.apply_coupon(order.id, discount_rate=0.10)
+
+print(f"Subtotal: {order.subtotal()}")  # 61,000 KRW
+total = service.confirm(order.id)
+print(f"Total after discount: {total}")  # 54,900 KRW
+print(f"Status: {order.status}")         # OrderStatus.CONFIRMED
+
+# 같은 고객의 주문 조회
+customer_orders = repo.find_by_customer(Email("alice@example.com"))
+print(f"Order count: {len(customer_orders)}")  # 1
+```
+
+## 자주 하는 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| 도메인 로직을 서비스에 넣음 | 모델이 빈껍데기(빈혈 도메인 모델)가 됩니다 | 비즈니스 로직은 도메인 모델에 넣습니다 |
-| 모든 것을 한 번에 설계 | 과도한 추상화로 시작합니다 | 간단하게 시작하고 필요할 때 리팩터링합니다 |
-| 값 객체를 가변으로 만듦 | 공유 참조 시 예기치 않은 변경입니다 | `frozen=True` 또는 읽기 전용으로 만듭니다 |
-| 순환 의존성 | A가 B를, B가 A를 참조합니다 | 인터페이스를 분리하여 의존 방향을 통일합니다 |
-| 테스트 없이 리팩터링 | 동작이 바뀌어도 알 수 없습니다 | 리팩터링 전 테스트를 작성합니다 |
+| 모든 클래스를 Service로 만듦 | 도메인 규칙이 서비스에 흩어집니다 | 규칙은 Entity/Value Object 내부에 둡니다 |
+| Value Object에 식별자(id) 추가 | Value Object의 동일성 의미가 깨집니다 | 식별자가 필요하면 Entity로 설계합니다 |
+| Repository에 비즈니스 규칙 포함 | 저장 계층이 도메인 변경에 영향받습니다 | Repository는 저장/조회만 담당합니다 |
+| 상태 전이를 외부에서 직접 변경 | `order.status = "confirmed"` 처럼 우회 | 상태 변경은 반드시 메서드를 통해 합니다 |
+| `dataclass`에서 가변 기본값 | 모든 인스턴스가 같은 리스트를 공유합니다 | `field(default_factory=list)`를 사용합니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- 이커머스 플랫폼에서 장바구니, 결제, 할인을 분리 설계합니다
-- 도메인 주도 설계(DDD)에서 엔티티와 값 객체 패턴을 활용합니다
-- 결제 게이트웨이 교체(PG사 변경)를 Protocol로 대응합니다
-- 마이크로서비스에서 각 서비스의 도메인 모델을 독립적으로 설계합니다
-- A/B 테스트에서 할인 정책을 전략 패턴으로 교체합니다
+이 설계 패턴은 Django의 모델-뷰 분리, FastAPI의 Pydantic 모델, DDD(Domain-Driven Design)의 Aggregate 패턴으로 이어집니다.
+
+`Money`처럼 도메인 값을 별도 타입으로 만들면 `int`를 잘못 전달하는 실수를 타입 검사기가 잡아줍니다. `order.status = "shipped"`처럼 잘못된 문자열 직접 할당을 막고 `order.ship()` 메서드만 허용하면 상태 전이 규칙이 항상 지켜집니다.
 
 ## 현업 개발자는 이렇게 생각합니다
 
-좋은 설계의 핵심은 "변경이 예상되는 곳에 유연성을 두는 것"입니다. 할인 정책이 자주 바뀔 것이라면 전략 패턴으로, 결제 수단이 추가될 것이라면 DIP로 대비합니다.
+설계는 한 번에 완성하지 않습니다. 처음에는 절차지향 코드로 빠르게 동작시키고, 같은 데이터를 여러 함수가 공유하거나, 규칙이 여러 곳에 중복될 때 객체 경계를 그어갑니다.
 
-처음부터 모든 것을 완벽하게 설계하려 하지 마세요. 동작하는 간단한 코드를 먼저 작성하고, 중복이나 결합도가 문제가 될 때 원칙을 적용하여 리팩터링하는 것이 실무적 접근입니다.
-
-## 실전에서 먼저 깨지는 지점
-
-| 먼저 흔들리는 지점 | 전형적인 증상 | 대응 포인트 |
-|--------------------|--------------|-------------|
-| 결제 게이트웨이 | 승인 실패와 저장 실패가 뒤섞여 재시도 기준이 모호합니다 | 결제 성공/실패를 도메인 이벤트처럼 분리하고 저장은 그 뒤에 수행합니다 |
-| 할인 정책 | 주문 금액 계산 로직이 서비스 메서드 안 분기문으로 커집니다 | 정책 객체를 유지하고, 조합 규칙만 별도 팩토리나 룰 엔진으로 올립니다 |
-| 저장소 | 테스트는 빠른데 실제 DB 붙이면 트랜잭션 경계가 달라집니다 | 저장소 인터페이스를 유지한 채 커밋 시점과 예외 번역 규칙을 명시합니다 |
-| 장바구니 모델 | 수량 변경, 재고 확인, 쿠폰 적용 책임이 한 클래스에 몰립니다 | 상태 변경 메서드와 검증 메서드를 분리하고, 재고 확인은 별도 협력 객체로 둡니다 |
-
-## 안전하게 리팩터링하는 순서
-
-1. 먼저 현재 절차지향 흐름을 테스트로 고정합니다.
-2. 그다음 계산 로직처럼 순수한 부분부터 값 객체(`Money`)로 옮깁니다.
-3. 외부 I/O가 섞인 결제와 저장은 마지막에 Protocol 경계 뒤로 밀어냅니다.
-4. 마지막으로 조립 코드에서 어떤 구현을 넣을지 결정하게 만들어, 도메인 모델이 프레임워크나 인프라를 직접 모르도록 유지합니다.
+"어떤 규칙이 바뀔 때 어떤 코드를 수정해야 하는가"를 기준으로 경계를 그으면, 변경 범위가 예측 가능해집니다.
 
 ## 운영 체크리스트
 
-- [ ] 요구사항에서 클래스를 도출할 수 있다
-- [ ] 값 객체와 엔티티를 구분하여 설계할 수 있다
-- [ ] 합성과 DIP로 클래스 간 결합도를 낮출 수 있다
-- [ ] 전략 패턴으로 교체 가능한 정책을 설계할 수 있다
-- [ ] 절차지향 코드를 객체지향으로 리팩터링할 수 있다
+- [ ] Value Object와 Entity의 차이를 설명할 수 있다
+- [ ] 도메인 규칙을 적절한 클래스에 배치할 수 있다
+- [ ] Repository 인터페이스를 Protocol로 정의할 수 있다
+- [ ] 상태 전이를 메서드로만 처리할 수 있다
+- [ ] 할인 정책을 OCP 방식으로 확장할 수 있다
 
-## 정리 및 다음 글 안내
+## 연습 문제
 
-실전 설계에서는 단일 원칙이 아니라 여러 OOP 원칙이 함께 적용됩니다. 간단하게 시작하고, 변경이 필요할 때 점진적으로 개선하는 것이 현실적인 접근입니다. 다음 글에서는 객체지향을 언제 사용하지 말아야 하는지 알아봅니다.
+1. `Book` 클래스를 Value Object로 설계하세요. ISBN, 제목, 저자, 정가를 포함하고, ISBN 형식 검증을 추가합니다.
+2. `Cart` Entity를 설계하세요. 항목 추가/제거, 수량 변경, 총 금액 계산 기능을 포함합니다. 항목이 비어 있을 때 결제 시도 시 예외를 발생시킵니다.
+3. `VolumeDiscount` 정책을 추가하세요. 총 금액이 50,000원 이상이면 5%, 100,000원 이상이면 10% 할인합니다. 기존 코드를 수정하지 않고 추가합니다.
 
-## 설계 예제를 UML 텍스트로 먼저 고정하기
+## 정리 및 다음 단계
 
-코드를 쓰기 전에 협력 구조를 텍스트 UML로 먼저 고정하면, 리팩터링 중에도 책임 경계가 흔들리지 않습니다.
+OOP 설계는 도메인 규칙을 적절한 객체에 배치하고, 변경이 일어날 때 수정 범위를 좁히는 것입니다. Value Object, Entity, Service, Repository의 역할을 구분하면 코드 구조가 도메인 언어를 그대로 반영합니다.
 
-```text
-[TicketController]
-    |
-    v
-[TicketService]
-  + create_ticket()
-  + close_ticket()
-    |
-    +--> [TicketRepository]
-    +--> [AssignmentPolicy]
-    +--> [NotificationPort]
-
-[Ticket]
-  - id
-  - status
-  - assignee
-  + assign_to()
-  + close()
-```
-
-## 적용 전후: 서비스 메서드 단일 거대 함수 분해
-
-```python
-# before
-
-def create_ticket(payload: dict, db, slack_client):
-    # 파싱, 검증, 담당자 선정, 저장, 알림 전송이 모두 혼재
-    ...
-```
-
-```python
-# after
-from dataclasses import dataclass
-
-@dataclass
-class Ticket:
-    id: str
-    title: str
-    status: str = 'open'
-    assignee: str | None = None
-
-    def assign_to(self, engineer: str) -> None:
-        if self.status != 'open':
-            raise ValueError('only open ticket can be assigned')
-        self.assignee = engineer
-
-    def close(self) -> None:
-        if self.status == 'closed':
-            raise ValueError('already closed')
-        self.status = 'closed'
-
-class RoundRobinAssignmentPolicy:
-    def __init__(self, members: list[str]) -> None:
-        self.members = members
-        self._index = 0
-
-    def pick(self) -> str:
-        engineer = self.members[self._index % len(self.members)]
-        self._index += 1
-        return engineer
-```
-
-## 위반과 교정
-
-| 위반 | 운영 문제 | 교정 |
-|---|---|---|
-| 컨트롤러가 도메인 상태 전이를 직접 수정 | API별 규칙 불일치 | 도메인 메서드로 상태 전이 통일 |
-| 정책이 서비스에 하드코딩 | 실험/교체 난이도 상승 | 정책 객체 주입 |
-| 알림 실패가 트랜잭션과 결합 | 핵심 기능까지 롤백 | outbox/비동기 알림으로 분리 |
-
-## 비교표: 리팩터링 전후
-
-| 항목 | 리팩터링 전 | 리팩터링 후 |
-|---|---|---|
-| 코드 탐색 | 한 함수 내부 추적 | 객체 경계별 탐색 |
-| 테스트 | 통합 테스트 의존 | 도메인 단위 테스트 가능 |
-| 변경 대응 | 수정 충돌 빈번 | 영향 범위 축소 |
-
-## 실전 시나리오: 요구사항 변경을 견디는 구조로 바꾸기
-
-현업에서는 기능 추가보다 규칙 변경이 더 자주 발생합니다. 따라서 클래스 구조를 평가할 때는 "지금 동작하는가"보다 "다음 변경을 어디까지 건드려야 하는가"를 기준으로 보는 편이 안전합니다.
-
-```python
-from dataclasses import dataclass
-from typing import Protocol
-
-@dataclass
-class LineItem:
-    name: str
-    quantity: int
-    unit_price: int
-
-    def subtotal(self) -> int:
-        return self.quantity * self.unit_price
-
-class DiscountPolicy(Protocol):
-    def apply(self, amount: int) -> int:
-        ...
-
-class NoDiscount:
-    def apply(self, amount: int) -> int:
-        return amount
-
-class PercentDiscount:
-    def __init__(self, percent: int) -> None:
-        if not 0 <= percent <= 100:
-            raise ValueError('percent must be 0..100')
-        self.percent = percent
-
-    def apply(self, amount: int) -> int:
-        return int(amount * (100 - self.percent) / 100)
-
-class Invoice:
-    def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
-        self.items = items
-        self.policy = policy
-
-    def total(self) -> int:
-        base = sum(i.subtotal() for i in self.items)
-        return self.policy.apply(base)
-```
-
-이 코드는 할인 규칙이 바뀌어도 `Invoice.total()`을 수정할 필요가 없습니다. 확장은 구현 클래스 추가로 닫히고, 핵심 흐름은 안정적으로 유지됩니다.
-
-## UML 스타일로 보는 협력 관계
-
-```text
-[Invoice]
-  - items: list[LineItem]
-  - policy: DiscountPolicy
-  + total()
-
-[LineItem]
-  + subtotal()
-
-[DiscountPolicy] <<interface>>
-  + apply(amount)
-      ^
-      +-- [NoDiscount]
-      +-- [PercentDiscount]
-```
-
-협력 구조를 이렇게 텍스트로 적어 두면 코드 리뷰에서 "어디가 정책 축이고 어디가 도메인 축인가"를 빠르게 맞출 수 있습니다.
-
-## 안티패턴과 교정 절차
-
-| 안티패턴 | 발견 신호 | 교정 순서 |
-|---|---|---|
-| 거대 클래스(God Object) | 메서드가 20개 이상, 변경 이력이 분산됨 | 책임 축 분해 → 협력 인터페이스 도출 |
-| 데이터만 가진 빈 클래스 | 메서드 없이 getter/setter만 존재 | 규칙 메서드 이동 또는 dataclass로 단순화 |
-| 상속 트리 우회 분기 | 하위 클래스 타입 체크 분기 존재 | 다형성 계약 재정의 |
-| 인프라 타입 누수 | 도메인 계층이 SDK 응답 객체 의존 | DTO 변환 계층 추가 |
-
-## 전후 비교: 테스트 유지비
-
-| 항목 | 리팩터링 전 | 리팩터링 후 |
-|---|---|---|
-| 테스트 준비 | 전역 상태 초기화 필요 | 객체 단위 상태 생성 |
-| 실패 원인 추적 | 함수 체인 전체 역추적 | 클래스 메서드 단위 추적 |
-| 회귀 범위 | 넓고 불명확 | 좁고 예측 가능 |
-
-## 팀 적용 체크리스트
-
-- 도메인 용어와 클래스 이름이 일치하는지 확인합니다.
-- 인스턴스 생성 시점에 불변식이 완성되는지 확인합니다.
-- 정책 변경이 기존 코드 수정이 아닌 구현 추가로 가능한지 점검합니다.
-- 코드 리뷰에서 UML 텍스트 10줄로 협력 구조를 먼저 합의합니다.
-- 테스트 이름이 메서드명보다 비즈니스 규칙을 설명하는지 확인합니다.
-
-## 미니 케이스 스터디: 규칙 추가 한 번으로 검증하기
-
-아래 예시는 정책 확장을 기존 코드 수정 없이 추가하는 최소 단위입니다.
-
-```python
-class WeekendPolicy:
-    def apply(self, amount: int, is_weekend: bool) -> int:
-        if is_weekend:
-            return int(amount * 0.95)
-        return amount
-
-def estimate(amount: int, is_weekend: bool) -> int:
-    policy = WeekendPolicy()
-    return policy.apply(amount, is_weekend)
-```
-
-핵심은 새로운 정책이 호출 경로를 깨지 않고 들어온다는 사실입니다. 변경 이력이 정책 클래스에만 남도록 경계를 유지하면 회귀 위험이 줄어듭니다.
-
-| 확인 질문 | Pass 기준 |
-|---|---|
-| 새 정책 추가 시 기존 함수 수정이 필요한가 | 아니오 |
-| 예외 정책이 기존 계약과 같은가 | 예 |
-| 테스트가 정책별로 분리되어 있는가 | 예 |
-
-## 리팩터링 회고: 변경 비용을 수치로 보는 방법
-
-- 수정 파일 수가 기능 하나당 5개를 넘으면 경계 재설계를 검토합니다.
-- 타입 분기 if/elif가 3개 이상 누적되면 다형성 또는 전략 객체로 이동합니다.
-- 회귀 테스트 작성 시간이 구현 시간보다 길어지면 책임 배치를 재검토합니다.
-
-```python
-def complexity_signal(changed_files: int, branch_count: int) -> str:
-    if changed_files >= 5 or branch_count >= 3:
-        return 'refactor-needed'
-    return 'acceptable'
-```
-
-위 방식은 엄밀한 메트릭은 아니지만, 팀이 감각이 아니라 기준으로 논의하게 만드는 데 유용합니다.
-
-## 검증 노트: 객체 설계 품질을 점검하는 질문
-
-아래 질문은 구현 이후 리뷰에서 반복적으로 사용하는 기준입니다.
-
-- 이 메서드가 실패할 때 예외 타입과 메시지가 호출자 계약과 일치하는가.
-- 같은 규칙이 다른 클래스나 함수에 중복되어 있지 않은가.
-- 상태 변경이 메서드 한 경로로만 이루어지는가.
-- 외부 의존성 없이 단위 테스트가 가능한가.
-
-```python
-def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
-    if duplicate_rules > 0:
-        return '중복 규칙 제거 필요'
-    if mutable_paths > 1:
-        return '상태 변경 경로 통합 필요'
-    return '구조 안정'
-```
-
-이런 체크를 글 단위 예제에도 적용하면, 객체지향을 문법이 아니라 유지보수 전략으로 이해하는 데 도움이 됩니다.
-
-## 한 줄 정리 확장
-
-객체지향 품질은 클래스 개수가 아니라 변경 영향 범위를 얼마나 줄였는지로 판단합니다.
-
-## 보강 메모
-
-설계 선택은 정답 찾기가 아니라 변경 비용을 낮추는 의사결정입니다. 같은 기능이라도 경계를 먼저 정의하면 리뷰와 테스트가 단순해집니다.
-
-## 처음 질문으로 돌아가기
-
-- **요구사항에서 어떤 클래스를 도출하고, 어떤 책임을 어디에 둘지 어떻게 판단할까요?**
-  - 요구사항에서 어떤 클래스를 도출하고, 어떤 책임을 어디에 둘지 어떻게 판단할까요에 대해 본문에서 실무 예시와 함께 답합니다.
-- **값 객체, 엔티티, 서비스 클래스는 어떤 식으로 역할을 나누면 좋을까요?**
-  - 아래 질문은 구현 이후 리뷰에서 반복적으로 사용하는 기준입니다
-- **할인 정책, 결제 수단, 저장소처럼 바뀌기 쉬운 요소는 어떻게 분리해야 할까요?**
-  - 좋은 설계의 핵심은 "변경이 예상되는 곳에 유연성을 두는 것"입니다
+다음 글에서는 객체지향을 피해야 할 때를 다룹니다. 함수, `dataclass`, 함수형 접근이 더 나은 상황을 실제 코드로 비교합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -627,10 +395,10 @@ def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
 
 ## 참고 자료
 
-- [Python 공식 문서 — dataclasses](https://docs.python.org/3/library/dataclasses.html)
-- [Python 공식 문서 — typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
+- [Python dataclasses 공식 문서](https://docs.python.org/3/library/dataclasses.html)
+- [typing.Protocol 공식 문서](https://docs.python.org/3/library/typing.html#typing.Protocol)
 - [Refactoring — Martin Fowler](https://refactoring.com/)
-- [Domain-Driven Design — Eric Evans](https://www.oreilly.com/library/view/domain-driven-design/0321125215/)
+- [Domain-Driven Design — Eric Evans](https://www.oreilly.com/library/view/domain-driven-design-tackling/0321125215/)
 
 - [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/oop-101/ko)
 Tags: Python, OOP, 설계 예제, 리팩터링, 클래스 설계

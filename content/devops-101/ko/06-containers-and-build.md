@@ -14,400 +14,268 @@ tags:
   - DevOps
   - Docker
   - Container
+  - Security
   - Build
-  - Image
-seo_description: 재현 가능하고 가벼운 컨테이너 이미지를 만드는 Docker 빌드 원칙을 설명합니다.
+seo_description: 재현 가능한 컨테이너 빌드, 멀티 스테이지 Dockerfile, 이미지 보안 스캔 전략을 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 
 # DevOps 101 (6/10): 컨테이너와 빌드
 
-호스트에 직접 설치하는 방식은 서버마다 상태가 조금씩 달라지기 쉽습니다. 운영자는 버전을 맞추느라 고생하고, 장애가 나면 "어느 서버에 무엇이 설치됐는지"부터 다시 조사해야 합니다.
+컨테이너는 "내 컴퓨터에서는 됩니다" 문제를 해결하는 가장 현실적인 방법입니다. 하지만 단순히 Dockerfile을 만드는 것으로는 충분하지 않습니다. 이미지 크기, 빌드 시간, 보안, 레이어 캐시 활용이 모두 운영 품질에 직접 영향을 줍니다.
 
 이 글은 DevOps 101 시리즈의 여섯 번째 글입니다.
 
 ![DevOps 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/06/06-01-diagram.ko.png)
 *DevOps 101 6장 흐름 개요*
-> 컨테이너와 빌드 자동화의 핵심은 개발 환경의 '내 컴퓨터에서는 되는데'를 없애는 것입니다.
+> 좋은 컨테이너 이미지는 작고, 재현 가능하며, 취약점이 최소화된 이미지입니다.
 
 ## 이 글에서 다룰 문제
 
-- 컨테이너는 VM과 무엇이 다르고 왜 배포 재현성에 유리할까요?
-- Dockerfile에서 꼭 이해해야 할 기본 명령은 무엇일까요?
-- multi-stage build는 이미지 크기와 보안에 어떤 차이를 만들까요?
-- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
-- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
+- 멀티 스테이지 빌드는 왜 필수인가요?
+- 이미지 레이어 캐시를 어떻게 활용해야 빌드가 빨라질까요?
+- 컨테이너 이미지 보안 스캔은 어떻게 파이프라인에 통합할까요?
+- 루트가 아닌 사용자로 실행해야 하는 이유는 무엇일까요?
 
-같은 빌드 산출물이 모든 환경에서 같은 방식으로 동작해야 배포가 예측 가능해집니다. 컨테이너는 운영체제 라이브러리와 의존성, 애플리케이션 코드를 함께 묶어서 이 문제를 해결합니다.
+## 멀티 스테이지 Dockerfile
 
-실무에서 컨테이너의 가치는 단순히 배포가 편해진다는 데 있지 않습니다. 환경 차이 때문에 생기던 "내 로컬에서는 되는데 서버에서는 안 된다"라는 종류의 문제를 구조적으로 줄여 준다는 점이 더 중요합니다.
-
-> 컨테이너는 Build once, run anywhere를 애플리케이션 레벨에서 실현합니다.
-
-코드가 이미지가 되고, 이미지는 레지스트리에 올라가고, 운영 환경은 그 이미지를 가져다 실행합니다. 이 흐름이 명확할수록 배포는 더 단순해지고 롤백도 쉬워집니다.
-
-- **Image**: 변경 불가능한 실행 패키지입니다.
-- **Container**: 이미지를 실제로 실행한 인스턴스입니다.
-- **Dockerfile**: 이미지를 만들기 위한 선언형 빌드 레시피입니다.
-- **Layer**: Dockerfile 명령마다 쌓이는 읽기 전용 계층입니다.
-- **Registry**: 이미지를 저장하고 배포하는 저장소입니다.
-
-이 용어를 구분하면 컨테이너 운영에서 자주 나오는 질문도 훨씬 쉽게 풀립니다. 예를 들어 문제를 고칠 때 컨테이너 안에서 직접 수정하는 것이 아니라 새 이미지를 다시 만드는 이유도 여기서 설명됩니다.
-
-## 전환 전후
-
-**Before (호스트 의존)**
-
-```bash
-# Install directly on the server
-apt install python3.12 postgresql-client
-pip install -r requirements.txt
-# On another server, *versions differ*
-```
-
-호스트에 직접 설치하는 방식은 서버마다 상태가 조금씩 달라지기 쉽습니다. 운영자는 버전을 맞추느라 고생하고, 장애가 나면 "어느 서버에 무엇이 설치됐는지"부터 다시 조사해야 합니다.
-
-**After (Dockerfile)**
+단일 스테이지 이미지는 빌드 도구, 테스트 의존성, 소스 코드가 모두 포함되어 이미지가 비대해집니다. 멀티 스테이지 빌드로 최종 실행 이미지만 최소화합니다.
 
 ```dockerfile
-FROM python:3.12-slim
-WORKDIR /app
+# Dockerfile
+# ── 스테이지 1: 의존성 빌드 ────────────────────────────────────
+FROM python:3.12-slim AS builder
+
+WORKDIR /build
+
+# 의존성 파일만 먼저 복사 (레이어 캐시 최적화)
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]
+
+# 의존성을 /install에 설치 (최종 이미지에 복사할 위치)
+RUN pip install \
+    --no-cache-dir \
+    --prefix=/install \
+    -r requirements.txt
+
+# ── 스테이지 2: 최종 실행 이미지 ─────────────────────────────────
+FROM python:3.12-slim AS runtime
+
+# 보안: 루트 사용자 대신 전용 사용자 생성
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+WORKDIR /app
+
+# 빌더에서 의존성만 복사
+COPY --from=builder /install /usr/local
+
+# 소스 코드 복사
+COPY --chown=appuser:appuser src/ ./src/
+
+# 비루트 사용자로 전환
+USER appuser
+
+# 컨테이너 헬스 체크
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+
+EXPOSE 8000
+
+CMD ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-Dockerfile이 있으면 실행 환경이 코드와 함께 버전 관리됩니다. 그 순간부터 환경 차이는 개인의 기억이 아니라 저장소 안의 변경 이력으로 다룰 수 있습니다.
+## 이미지 크기 비교
 
-## 실전으로 보는 도커파일 다섯 단계
+| 빌드 방식 | 이미지 크기 | 빌드 시간 |
+|----------|-----------|---------|
+| python:3.12 (풀 이미지) | ~1.1GB | 느림 |
+| python:3.12-slim 단일 스테이지 | ~400MB | 보통 |
+| 멀티 스테이지 (slim 기반) | ~150MB | 첫 빌드 느림, 이후 캐시 빠름 |
+| python:3.12-alpine 기반 | ~80MB | 빌드 복잡 (musl libc 이슈) |
 
-### 1단계 - 기본 빌드
+Alpine 기반은 작지만 musl libc 호환성 문제로 NumPy, scipy 같은 과학 라이브러리에서 문제가 생깁니다. `-slim` 기반이 대부분의 Python 서비스에 적합합니다.
 
-먼저 이미지를 만들고 실제로 실행해 보아야 합니다. 컨테이너 학습의 출발점은 개념보다 빌드와 실행을 한 번 연결해 보는 경험입니다.
+## 레이어 캐시 최적화
 
-```bash
-docker build -t myapp:1.0 .
-docker run -p 8000:8000 myapp:1.0
-```
-
-### 2단계 - layer cache 최적화
-
-의존성 파일은 자주 안 바뀌고 애플리케이션 코드는 자주 바뀝니다. 이 차이를 Dockerfile 순서에 반영해야 빌드 속도가 빨라집니다.
+Docker는 Dockerfile의 각 명령을 레이어로 캐시합니다. 변경이 없는 레이어는 재사용합니다. 자주 변경되는 파일을 나중에 복사하면 캐시 히트율이 높아집니다.
 
 ```dockerfile
-COPY requirements.txt .          # rare changes -> cache reuse
+# 나쁜 예: 소스 코드 복사 후 의존성 설치 (소스 변경마다 pip install 재실행)
+COPY . .
 RUN pip install -r requirements.txt
-COPY . .                          # only the code changes often
-```
 
-### 3단계 - multi-stage로 이미지 줄이기
-
-빌드에 필요한 도구와 실행에 필요한 도구는 다릅니다. 이 둘을 분리하면 최종 이미지를 훨씬 작고 안전하게 만들 수 있습니다.
-
-```dockerfile
-FROM python:3.12 AS builder
+# 좋은 예: 의존성 먼저 설치, 소스 나중에
 COPY requirements.txt .
-RUN pip install --user -r requirements.txt
-
-FROM python:3.12-slim
-COPY --from=builder /root/.local /root/.local
-COPY . /app
-WORKDIR /app
-CMD ["python", "main.py"]
+RUN pip install -r requirements.txt
+COPY src/ ./src/
 ```
 
-### 4단계 - non-root user
-
-운영 컨테이너는 기본적으로 루트가 아니어야 합니다. 보안은 별도 옵션이 아니라 기본 실행 계정에서부터 시작합니다.
+BuildKit의 캐시 마운트를 활용하면 pip 캐시를 빌드 간 재사용합니다.
 
 ```dockerfile
-RUN useradd --create-home appuser
-USER appuser
+# BuildKit 캐시 마운트 - pip 캐시를 빌드 간 재사용
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install \
+    --no-cache-dir \
+    --prefix=/install \
+    -r requirements.txt
 ```
 
-### 5단계 - healthcheck
+## CI에서 이미지 빌드와 푸시
 
-실행만 된다고 끝이 아닙니다. 컨테이너가 실제로 정상 응답하는지 런타임이 알 수 있어야 운영 자동화가 가능합니다.
+```yaml
+# .github/workflows/docker-build.yml
+name: Docker Build
 
-```dockerfile
-HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: AWS 인증 (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-northeast-2
+
+      - name: ECR 로그인
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Docker Buildx 설정
+        uses: docker/setup-buildx-action@v3
+
+      - name: 이미지 빌드 및 푸시
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ${{ steps.ecr-login.outputs.registry }}/order-service:${{ github.sha }}
+            ${{ steps.ecr-login.outputs.registry }}/order-service:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Trivy 이미지 스캔
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.ecr-login.outputs.registry }}/order-service:${{ github.sha }}
+          format: sarif
+          output: trivy-image-results.sarif
+          severity: HIGH,CRITICAL
+          exit-code: 1
+
+      - name: 스캔 결과 업로드
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-image-results.sarif
 ```
 
-- 변경 빈도가 낮은 명령을 위에 두어야 캐시를 최대한 재사용할 수 있습니다.
-- slim이나 distroless 이미지는 공격 표면을 줄여 줍니다.
-- non-root는 권장사항이 아니라 기본값처럼 다뤄야 합니다.
+## 이미지 취약점 대응 런북
 
-Dockerfile 한 줄 순서가 빌드 시간과 보안 수준을 동시에 바꿀 수 있습니다. 그래서 컨테이너 빌드는 단순 포장 작업이 아니라 운영 품질을 결정하는 설계 작업에 가깝습니다.
+**HIGH/CRITICAL 취약점 발견 시 대응 절차**
 
-## 컨테이너 빌드 최적화
-
-빌드 시간은 개발자 경험과 배포 속도를 동시에 결정합니다. 아래 표는 자주 사용하는 세 가지 최적화 기법과 효과를 정리한 것입니다.
-
-| 기법 | 효과 | 예시 |
-| --- | --- | --- |
-| 멀티스테이지 빌드 | 최종 이미지 크기 50-70% 감소 | builder stage 분리 |
-| layer cache 활용 | 변경 없는 빌드 시간 90% 단축 | requirements.txt 먼저 COPY |
-| 경량 베이스 이미지 | 공격 표면 축소, 빌드 시간 10-30% 개선 | python:3.12-slim, distroless |
-
-cache 최적화는 빈번한 재빌드에서 가장 큰 차이를 만듭니다. 의존성이 바뀌지 않았다면 재설치를 건너뛰는 것만으로 CI 대기 시간을 크게 줄일 수 있습니다.
-
-## 파이썬 FastAPI 멀티스테이지 도커파일 예시
-
-실무에서 바로 쓸 수 있는 FastAPI 앱의 멀티스테이지 Dockerfile 구성입니다. 빌드 단계와 실행 단계를 나눠 최종 이미지를 가볍게 유지합니다.
-
-```dockerfile
-# Stage 1: Build dependencies
-FROM python:3.12 AS builder
-WORKDIR /build
-
-# Install dependencies to user directory
-COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
-
-# Stage 2: Runtime
-FROM python:3.12-slim
-WORKDIR /app
-
-# Create non-root user
-RUN useradd --create-home --uid 1001 appuser
-
-# Copy dependencies from builder
-COPY --from=builder /root/.local /opt/runtime/.local
-ENV PATH=/opt/runtime/.local/bin:$PATH
-
-# Copy application code
-COPY --chown=appuser:appuser . /app
-
-# Switch to non-root user
-USER appuser
-
-# Health check
-HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
-
-EXPOSE 8000
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-이 구조는 builder 단계에서 컴파일과 의존성 설치를 모두 끝낸 뒤, 실행 단계에서는 필요한 파일만 복사해 최종 이미지 크기를 최소화합니다. 추가로 non-root 사용자 전환과 health check까지 포함해 프로덕션 수준의 안정성을 갖춥니다.
-
-## 컨테이너 보안 스캔
-
-이미지를 빌드했다면 보안 취약점 스캔을 실행해야 합니다. CI 단계에서 자동 검증하는 것이 가장 효과적입니다.
-
-### Trivy를 사용한 취약점 스캔
-
+1. 취약점 상세 확인:
 ```bash
-# Install Trivy
-curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+# 로컬 스캔
+trivy image --severity HIGH,CRITICAL \
+  --format table \
+  registry.example.com/order-service:latest
 
-# Scan image
-trivy image --severity HIGH,CRITICAL myapp:1.0
-
-# Fail CI if vulnerabilities found
-trivy image --exit-code 1 --severity CRITICAL myapp:1.0
+# 수정 가능한 취약점만 표시
+trivy image --severity HIGH,CRITICAL \
+  --ignore-unfixed \
+  registry.example.com/order-service:latest
 ```
 
-스캔은 빌드 직후에 실행하고, CRITICAL 취약점이 있으면 파이프라인을 멈춰야 합니다. 이 단계는 선택이 아니라 배포 전 필수 검증입니다.
+2. 원인 파악:
+   - 애플리케이션 의존성 취약점 → `pip-audit`으로 확인 후 업그레이드
+   - 베이스 이미지 취약점 → `FROM python:3.12-slim` 최신 태그로 갱신
 
-### 스캔 결과 읽기
+3. 수정 및 재빌드:
+```bash
+# 취약 패키지 업그레이드
+pip install --upgrade <패키지명>
+pip freeze > requirements.txt
 
-Trivy는 CVE 번호, 심각도, 영향받는 패키지, 고정 버전을 함께 보여줍니다. HIGH 이상 취약점은 즉시 대응해야 하고, MEDIUM은 우선순위를 정해 점진적으로 고쳐야 합니다.
+# 이미지 재빌드
+docker build --no-cache -t order-service:patched .
 
-```text
-Total: 3 (HIGH: 1, CRITICAL: 2)
-
-Package: openssl
-Vulnerability: CVE-2024-1234
-Severity: CRITICAL
-Fixed Version: 3.0.13
+# 패치 확인
+trivy image --severity HIGH,CRITICAL order-service:patched
 ```
 
-취약점 스캔은 이미지를 빌드한 순간의 상태만 알려 줍니다. 따라서 프로덕션에 배포된 이미지도 주기적으로 재스캔해 새로 발견된 CVE에 대응해야 합니다.
+4. 즉각 패치 불가 시:
+   - `.trivyignore` 파일에 CVE ID와 이유 및 해결 예정일 기록
+   - 이슈 트래커에 취약점 추적 티켓 생성
 
-## 자주 하는 실수 5가지
-
-1. **`latest` 태그를 쓰는 실수**입니다. 재현성이 사라지므로 항상 버전을 고정해야 합니다.
-2. **`COPY . .`를 처음에 두는 실수**입니다. 캐시가 쉽게 깨져 빌드 시간이 계속 길어집니다.
-3. **시크릿을 이미지 안에 굽는 실수**입니다. `docker history`만으로도 흔적이 드러날 수 있습니다.
-4. **루트 계정으로 실행하는 실수**입니다. 컨테이너 탈출 시 피해 범위가 커집니다.
-5. **이미지를 과도하게 크게 만드는 실수**입니다. push, pull, 콜드 스타트 모두 느려집니다.
-
-## 실무에서는 이렇게 이어집니다
-
-성숙한 팀은 distroless, SBOM 생성, 이미지 서명, 취약점 스캔을 CI 파이프라인에 붙입니다. 이미지 빌드는 이제 단순 배포 준비가 아니라 소프트웨어 공급망 보안의 일부입니다.
-
-작은 팀도 최소한 이미지 크기 관리, non-root 실행, 취약점 스캔 세 가지는 초기에 습관으로 들이는 편이 좋습니다.
-
-## 시니어 엔지니어는 이렇게 봅니다
-
-- 이미지는 변경 불가능해야 합니다. 수정이 필요하면 새 이미지를 만듭니다.
-- 작은 이미지가 더 안전하고 운영 비용도 낮습니다.
-- .dockerignore는 .gitignore만큼 중요합니다.
-- 빌드 속도는 개발 속도와 직결됩니다.
-- 이미지 서명은 공급망 보호의 핵심 장치입니다.
-
-## 운영 체크리스트
-
-- [ ] Dockerfile이 non-root 계정으로 끝납니다.
-- [ ] multi-stage로 최종 이미지 크기를 줄였습니다.
-- [ ] .dockerignore가 .git, tests, docs를 제외합니다.
-- [ ] CI에 취약점 스캔이 포함됩니다.
-
-## 연습 문제
-
-1. 현재 앱의 최종 이미지 크기를 200MB 이하로 줄여 보세요.
-2. multi-stage 적용 전후의 빌드 시간을 비교해 보세요.
-3. Trivy로 HIGH/CRITICAL 취약점을 점검해 보세요.
-
-## 정리 및 다음 단계
-
-컨테이너는 실행 환경을 얼려서 전달하는 방식입니다. 다음 글에서는 이렇게 배포된 서비스를 운영 중에 어떻게 관찰할지 모니터링과 알림을 다룹니다.
-
-## 컨테이너 빌드를 운영 품질 관점으로 확장하기
-
-컨테이너는 포장 기술이지만, 빌드 방식은 보안과 성능을 동시에 결정합니다. 이미지 크기, 레이어 구성, 베이스 이미지, 서명과 스캔 정책이 모두 운영 리스크에 직접 연결됩니다.
-
-### 오케스트레이션 비교 관점
-
-| 항목 | Docker Compose | Kubernetes |
-| --- | --- | --- |
-| 목표 | 로컬/소규모 멀티컨테이너 실행 | 대규모 운영 오케스트레이션 |
-| 복구 | 수동 또는 단순 재시작 | 자동 스케줄링/자가 복구 |
-| 확장 | 제한적 | HPA/클러스터 오토스케일 |
-| 네트워크 | 단순 서비스 디스커버리 | Service/Ingress 정책 기반 |
-| 운영 난이도 | 낮음 | 높음 |
-
-### 멀티스테이지 Dockerfile 예시
-
-```dockerfile
-FROM python:3.12 AS builder
-WORKDIR /build
-COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
-
-FROM python:3.12-slim
-WORKDIR /app
-COPY --from=builder /root/.local /root/.local
-COPY . .
-ENV PATH="/root/.local/bin:${PATH}"
-RUN useradd --create-home appuser
-USER appuser
-EXPOSE 8000
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-### Docker Compose 배포 검증용 스택
+## Kubernetes 컨테이너 보안 설정
 
 ```yaml
-version: "3.9"
-services:
-  api:
-    image: ghcr.io/example/api:1.2.0
-    ports:
-      - "8000:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 10s
-      timeout: 2s
-      retries: 3
-  redis:
-    image: redis:7
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+spec:
+  template:
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+
+      containers:
+        - name: order-service
+          image: registry.example.com/order-service:latest
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+
+      volumes:
+        - name: tmp
+          emptyDir: {}
 ```
 
-### 이미지 품질 체크 표
+## 자주 하는 실수
 
-| 항목 | 권장 기준 |
-| --- | --- |
-| 태그 | `latest` 금지, semver 또는 sha 태그 |
-| 크기 | 불필요한 빌드 도구 제거 |
-| 계정 | non-root 실행 |
-| 취약점 | HIGH/CRITICAL 차단 |
-| SBOM | 생성 및 저장 |
-
-### 보안 스캔 자동화 예시
-
-```yaml
-- name: Trivy image scan
-  uses: aquasecurity/trivy-action@0.24.0
-  with:
-    image-ref: ghcr.io/example/api:${{ github.sha }}
-    severity: HIGH,CRITICAL
-    exit-code: "1"
-```
-
-### 운영 연결 포인트
-
-1. 빌드 산출물 이미지는 불변(immutable)으로 다룹니다.
-2. 장애 대응 시 컨테이너 내부 수정보다 새 이미지 배포를 원칙으로 합니다.
-3. 이미지 서명과 검증 정책을 도입해 공급망 위협을 줄입니다.
-4. 빌드 시간, 이미지 크기, 취약점 수를 릴리스 지표로 관리합니다.
-
-컨테이너 빌드가 안정되면 배포 논의가 기술 세부 대신 운영 정책 중심으로 전환됩니다. 이것이 DevOps 성숙의 중요한 신호입니다.
-
-```text
-## 0-5분
-1. SEV 판정 (SEV1/SEV2)
-2. incident 채널 개설
-3. 최근 배포 커밋 확인
-
-## 5-10분
-1. canary/최근 릴리스 롤백 시도
-2. 에러율, p95, DB 연결수 확인
-3. 고객 영향 범위 요약 공지
-
-## 10-20분
-1. 임시 완화 조치 적용
-2. 영구 수정 owner 지정
-3. postmortem 일정 예약
-```
-
-운영에서는 "잘 아는 사람"보다 "같은 순서를 따르는 팀"이 더 빠르게 복구합니다. 그래서 runbook은 설명 문서가 아니라 실행 문서여야 하며, 경보에서 한 번에 열 수 있어야 합니다.
-
-### 운영 메모
-
-운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
-
-### 운영 메모
-
-운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
-
-### 운영 메모
-
-운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
-
-### 운영 메모
-
-운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
-
-### 운영 메모
-
-운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
-
-### 운영 메모
-
-운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
-
-### 운영 메모
-
-운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
-
-### 운영 메모
-
-운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
-
-### 운영 메모
-
-운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
-
-## 처음 질문으로 돌아가기
-
-- **컨테이너는 VM과 무엇이 다르고 왜 배포 재현성에 유리할까요?**
-  - 빌드 시간은 개발자 경험과 배포 속도를 동시에 결정합니다. 아래 표는 자주 사용하는 세 가지 최적화 기법과 효과를 정리한 것입니다.
-- **Dockerfile에서 꼭 이해해야 할 기본 명령은 무엇일까요?**
-  - 성숙한 팀은 distroless, SBOM 생성, 이미지 서명, 취약점 스캔을 CI 파이프라인에 붙입니다
-- **multi-stage build는 이미지 크기와 보안에 어떤 차이를 만들까요?**
-  - 먼저 이미지를 만들고 실제로 실행해 보아야 합니다
+| 실수 유형 | 증상 | 올바른 접근 |
+|-----------|------|------------|
+| 단일 스테이지 빌드 | 이미지에 빌드 도구, 테스트 파일 포함 | 멀티 스테이지로 빌드 환경과 실행 환경 분리 |
+| root 사용자로 실행 | 컨테이너 탈출 시 호스트 권한 획득 가능 | 비루트 사용자 생성 후 USER 지정 |
+| `COPY . .`를 의존성 설치 전에 위치 | 소스 변경마다 pip install 재실행 | 의존성 파일 먼저 복사, 소스 나중에 |
+| 이미지 보안 스캔 없음 | 알려진 CVE가 프로덕션에 배포됨 | Trivy를 CI 필수 단계로 포함 |
+| :latest 태그만 사용 | 이전 버전으로 롤백 불가 | SHA 또는 버전 태그 병행 사용 |
+| 읽기 전용 파일시스템 미설정 | 컨테이너 내부 파일 변조 가능 | `readOnlyRootFilesystem: true` 설정 |
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -427,11 +295,7 @@ services:
 
 ## 참고 자료
 
-- [Docker docs](https://docs.docker.com/)
-- [Distroless images](https://github.com/GoogleContainerTools/distroless)
-- [Trivy](https://trivy.dev/)
-- [Sigstore Cosign](https://docs.sigstore.dev/cosign/overview/)
-
+- [Docker 멀티 스테이지 빌드](https://docs.docker.com/build/building/multi-stage/)
+- [Trivy 문서](https://trivy.dev/)
+- [Kubernetes Security Context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
 - [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/devops-101/ko)
-
-Tags: DevOps, Docker, Container, Build, Image

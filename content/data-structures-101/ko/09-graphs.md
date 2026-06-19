@@ -44,10 +44,6 @@ title: "Data Structures 101 (9/10): 그래프"
 
 ## 핵심 한눈에 보기
 
-> 그래프 `G = (V, E)`는 정점 집합 V와 간선 집합 E로 정의합니다. 간선에 방향이 있으면 방향 그래프, 가중치가 있으면 가중치 그래프입니다. 인접 리스트는 메모리 효율이 좋고, 인접 행렬은 두 정점 사이 간선 존재 여부를 O(1)에 확인할 수 있습니다.
-
-### 그래프 표현 방식
-
 | 용어 | 의미 |
 | --- | --- |
 | 정점 | 그래프의 노드 |
@@ -58,14 +54,14 @@ title: "Data Structures 101 (9/10): 그래프"
 
 ## 전후 비교
 
-**Before — ad-hoc dict-of-dict representation:**
+**Before — 일관성 없는 dict-of-dict 표현:**
 
 ```text
 graph = {"A": {"B": 1}, "B": {"A": 1, "C": 2}, ...}
-# It works, but with no consistent interface every algorithm becomes awkward
+# 동작은 하지만 인터페이스가 없어 알고리즘마다 다르게 접근해야 함
 ```
 
-**After — an explicit Graph class:**
+**After — 명시적 Graph 클래스:**
 
 ```python
 class Graph:
@@ -113,9 +109,6 @@ for u, v in [
     ("cache", "warehouse-db"),
 ]:
     service_graph.add_edge(u, v)
-
-for node in service_graph:
-    print(node, service_graph.neighbors(node))
 ```
 
 dict와 list를 조합한 가장 표준적인 표현입니다. 메모리 사용량은 O(V + E)라서 서비스 의존성처럼 희소한 실무 그래프에 특히 잘 맞습니다.
@@ -138,12 +131,13 @@ class MatrixGraph:
         return self.matrix[u][v] != 0
 
 matrix_graph = MatrixGraph(4, directed=True)
-matrix_graph.add_edge(0, 1); matrix_graph.add_edge(0, 2); matrix_graph.add_edge(1, 3); matrix_graph.add_edge(2, 3)
+matrix_graph.add_edge(0, 1); matrix_graph.add_edge(0, 2)
+matrix_graph.add_edge(1, 3); matrix_graph.add_edge(2, 3)
 print(matrix_graph.has_edge(0, 1))   # True
 print(matrix_graph.has_edge(1, 0))   # False
 ```
 
-행렬은 O(V^2) 메모리를 쓰지만 “간선이 있는가?”를 O(1)에 답합니다. 정점 수가 작고 그래프가 조밀할 때 유리합니다.
+행렬은 O(V^2) 메모리를 쓰지만 "간선이 있는가?"를 O(1)에 답합니다. 정점 수가 작고 그래프가 조밀할 때 유리합니다.
 
 ### 3단계: 너비 우선 탐색 - 최단 경로
 
@@ -171,22 +165,11 @@ def bfs_path(g, start, target):
 
 path = bfs_path(service_graph, "api-gateway", "warehouse-db")
 print(path)
-print(f"hop count: {len(path) - 1}")
-
-expected = [
-    "api-gateway",
-    "catalog-service",
-    "inventory-service",
-    "warehouse-db",
-]
-print(f"path matches expectation: {path == expected}")
-
 # ['api-gateway', 'catalog-service', 'inventory-service', 'warehouse-db']
-# hop count: 3
-# 경로가 기대값과 일치: True
+print(f"hop count: {len(path) - 1}")   # 3
 ```
 
-BFS는 가까운 정점을 먼저 방문하므로 비가중치 그래프에서 자연스럽게 최단 경로를 구합니다. 여기서 경로나 hop 수가 다르게 나오면 queue 순서를 깨뜨렸거나, `visited` 표시 시점이 늦었거나, 간선 방향을 잘못 넣었을 가능성이 큽니다.
+BFS는 가까운 정점을 먼저 방문하므로 비가중치 그래프에서 자연스럽게 최단 경로를 구합니다.
 
 ### 4단계: 깊이 우선 탐색 - 재귀 기반 순회
 
@@ -204,7 +187,8 @@ def dfs(g, start, visited=None, order=None):
     return order
 
 print(dfs(service_graph, "api-gateway"))
-# ['api-gateway', 'auth-service', 'user-db', 'catalog-service', 'inventory-service', 'warehouse-db', 'cache']
+# ['api-gateway', 'auth-service', 'user-db', 'catalog-service',
+#  'inventory-service', 'warehouse-db', 'cache']
 ```
 
 DFS는 한 갈래를 끝까지 파고들었다가 되돌아옵니다. 사이클 검출, 위상 정렬, 연결 요소 탐색의 기본 도구입니다.
@@ -234,19 +218,16 @@ for u, v in [
     ("web", "auth"),
     ("auth", "payments"),
     ("payments", "ledger"),
-    ("ledger", "web"),
+    ("ledger", "web"),   # 순환 의존성!
 ]:
     dependency_graph.add_edge(u, v)
 
 cycle_found = has_cycle_directed(dependency_graph)
-print(cycle_found)
-print(f"topological traversal possible: {not cycle_found}")
-
-# True
-# 위상 순회 가능 여부: False
+print(cycle_found)                                   # True
+print(f"topological traversal possible: {not cycle_found}")  # False
 ```
 
-이 검증은 DFS가 실무에서 어떻게 쓰이는지 직접 보여 줍니다. 역방향 간선이 생기면 의존성 그래프를 위상 정렬할 수 없습니다. 여기서 `cycle_found`가 `False`로 나오면 방향 그래프를 무방향처럼 다뤘거나, 재귀 스택 추적을 빼먹었을 가능성이 큽니다.
+역방향 간선이 생기면 의존성 그래프를 위상 정렬할 수 없습니다. `active` 집합이 현재 재귀 스택을 추적하는 핵심입니다.
 
 ## 이 코드에서 주목할 점
 
@@ -255,12 +236,109 @@ print(f"topological traversal possible: {not cycle_found}")
 - 방향 그래프의 사이클 검출은 현재 재귀 스택을 함께 추적해야 정확합니다.
 - 그래프는 트리의 일반화이자 관계 모델링의 기본 어휘입니다.
 
-## 자주 하는 실수 5가지
+## 인접 리스트 vs 인접 행렬 비교
+
+| 항목 | 인접 리스트 | 인접 행렬 |
+| --- | --- | --- |
+| 메모리 | O(V + E) | O(V²) |
+| 간선 존재 확인 | O(차수) | O(1) |
+| 이웃 노드 순회 | O(차수) | O(V) |
+| 희소 그래프 | 효율적 | 메모리 낭비 |
+| 조밀 그래프 | 오버헤드 있음 | 효율적 |
+| 가중치 표현 | (노드, 가중치) 튜플 | 행렬 값 |
+| 적합한 상황 | 소셜 네트워크, 의존성 | 플로이드-워셜, 작은 조밀 그래프 |
+
+## 디버깅 시나리오
+
+### 시나리오 1: visited 표시 타이밍이 늦어서 노드를 중복 방문
+
+**증상:** BFS가 같은 노드를 여러 번 방문하거나, 예상보다 많은 경로를 탐색합니다.
+
+```python
+# 버그: dequeue 후에 visited 표시
+def bfs_buggy(g, start):
+    queue = deque([start])
+    visited = set()
+    order = []
+    while queue:
+        u = queue.popleft()
+        if u in visited:   # 이미 처리된 노드 체크
+            continue
+        visited.add(u)     # 너무 늦음: enqueue 시점이 아닌 dequeue 시점에 표시
+        order.append(u)
+        for v, _ in g.neighbors(u):
+            queue.append(v)
+    return order
+```
+
+**해결:** enqueue 시점에 바로 visited 표시합니다.
+
+```python
+def bfs_correct(g, start):
+    visited = {start}          # enqueue 시점에 표시
+    queue = deque([start])
+    order = []
+    while queue:
+        u = queue.popleft()
+        order.append(u)
+        for v, _ in g.neighbors(u):
+            if v not in visited:
+                visited.add(v)    # 큐에 넣으면서 바로 표시
+                queue.append(v)
+    return order
+```
+
+### 시나리오 2: 무방향 그래프에서 방향 오류
+
+**증상:** 무방향 그래프인데 한쪽 방향으로만 이동 가능합니다.
+
+```python
+# 버그: directed=True인데 무방향으로 쓰려 함
+wrong_graph = Graph(directed=True)
+wrong_graph.add_edge("A", "B")
+print(list(wrong_graph.neighbors("B")))  # [] — B에서 A로 못 감
+
+# 해결
+undirected = Graph(directed=False)
+undirected.add_edge("A", "B")
+print(list(undirected.neighbors("B")))   # [('A', 1)] — 양방향
+```
+
+**원인:** `add_edge`가 반대 방향도 추가하지 않았습니다. `directed=False`를 명시하거나, 반대 간선을 수동으로 추가합니다.
+
+### 시나리오 3: 큰 그래프에서 재귀 DFS가 RecursionError
+
+**증상:** 노드가 수만 개인 그래프에서 DFS를 재귀로 실행하면 `RecursionError`가 납니다.
+
+```python
+import sys
+# sys.setrecursionlimit(100000)  # 임시방편 — 메모리 위험
+
+# 근본 해결: 명시적 스택을 사용한 반복 DFS
+def dfs_iterative(g, start):
+    visited = set()
+    stack = [start]
+    order = []
+    while stack:
+        u = stack.pop()
+        if u in visited:
+            continue
+        visited.add(u)
+        order.append(u)
+        for v, _ in reversed(list(g.neighbors(u))):
+            if v not in visited:
+                stack.append(v)
+    return order
+```
+
+**원인:** 파이썬의 기본 재귀 한도는 1000입니다. 깊이가 깊은 그래프는 반복 방식을 써야 합니다.
+
+## 자주 하는 실수
 
 | 실수 | 문제 | 해결 |
 | --- | --- | --- |
 | 방향 여부를 코드에 드러내지 않음 | 알고리즘 결과가 틀어짐 | directed/undirected를 명시합니다 |
-| visited 집합을 빼먹음 | 무한 순회 발생 | enqueue/push 시점에 바로 표시합니다 |
+| visited 집합을 빠뜨림 | 무한 순회 발생 | enqueue/push 시점에 바로 표시합니다 |
 | 가중치를 무시하고 BFS를 사용함 | 잘못된 최단 경로가 나옴 | 가중치가 있으면 다익스트라를 고려합니다 |
 | 큰 V에서 인접 행렬을 고름 | 메모리가 폭발함 | 희소 그래프에는 인접 리스트를 씁니다 |
 | 깊은 그래프에 재귀 DFS만 사용함 | `RecursionError` 가능 | 명시적 스택으로 전환합니다 |
@@ -275,7 +353,7 @@ print(f"topological traversal possible: {not cycle_found}")
 
 ## 시니어 엔지니어는 이렇게 생각합니다
 
-시니어 엔지니어는 먼저 “이게 그래프 문제인가?”를 묻습니다. 정점, 간선, 관계라는 언어로 다시 표현할 수 있으면 BFS, DFS, 다익스트라, 위상 정렬 같은 검증된 해법을 곧바로 떠올릴 수 있기 때문입니다.
+시니어 엔지니어는 먼저 "이게 그래프 문제인가?"를 묻습니다. 정점, 간선, 관계라는 언어로 다시 표현할 수 있으면 BFS, DFS, 다익스트라, 위상 정렬 같은 검증된 해법을 곧바로 떠올릴 수 있기 때문입니다.
 
 또한 NetworkX, igraph, Neo4j 같은 도구를 알고 적절할 때 사용합니다. 하지만 기본 알고리즘은 몸에 익혀 두어야, 라이브러리가 내부에서 무엇을 하는지 이해하고 성능·제약을 예측할 수 있습니다.
 
@@ -301,174 +379,14 @@ print(f"topological traversal possible: {not cycle_found}")
 
 다음 글에서는 시리즈를 마무리하며, 지금까지 본 자료구조들을 어떤 상황에서 어떻게 선택할지 실전 관점으로 정리합니다.
 
-## 구현 관점 보강: 복잡도와 선택 기준
-
-자료구조를 비교할 때는 평균 시간 복잡도만으로 결론을 내리면 정확도가 떨어집니다. 실제 시스템에서는 데이터 분포, 갱신 비율, 메모리 제약, 동시성 요구가 동시에 작동하기 때문입니다. 따라서 아래 표처럼 연산별 상한과 운영 조건을 함께 보는 기준이 필요합니다.
-
-| 구조 | 조회 | 삽입 | 삭제 | 메모리 특성 | 적합한 상황 |
-| --- | --- | --- | --- | --- | --- |
-| 배열/동적 배열 | O(1) 인덱스, O(n) 탐색 | 끝 O(1) amortized, 중간 O(n) | 중간 O(n) | 연속 메모리, 캐시 효율 우수 | 읽기 중심, 랜덤 액세스 필요 |
-| 연결 리스트 | O(n) | 노드 위치 확보 시 O(1) | 노드 위치 확보 시 O(1) | 포인터 오버헤드 큼 | 중간 삽입/삭제 빈번 |
-| 해시 테이블 | 평균 O(1), 최악 O(n) | 평균 O(1) | 평균 O(1) | 버킷/재해시 비용 존재 | 키 기반 빠른 조회 |
-| 균형 트리 | O(log n) | O(log n) | O(log n) | 포인터 구조, 정렬 유지 | 범위 질의, 순서 보존 |
-
-구현 단계에서는 연산 정의를 코드 시그니처로 먼저 고정하는 방식이 안전합니다. 예를 들어 `insert`, `remove`, `contains`, `iterate`의 사전/사후 조건을 먼저 문서화하고, 그 뒤에 내부 저장 구조를 바꾸면 테스트 재사용성이 크게 올라갑니다. 같은 인터페이스에 배열 기반 구현과 링크 기반 구현을 각각 붙여 벤치마크하면, 개념 설명에서 보던 복잡도 표가 실제 지연 시간으로 어떻게 드러나는지 확인할 수 있습니다.
-
-또한 사용 사례 비교는 데이터 흐름 단위로 해야 합니다. 예를 들어 이벤트 로그 파이프라인에서는 "대량 append + 배치 스캔" 패턴이 많아 동적 배열이 유리하지만, 작업 스케줄러에서는 "우선순위 갱신 + 최소값 추출"이 반복되어 힙이 더 적합합니다. 반대로 온라인 추천 시스템의 피처 저장소는 키 조회 비율이 매우 높아 해시 기반 구조가 기본 선택이 됩니다.
-
-실습 팁으로는 동일한 입력 집합에 대해 최소 두 가지 구조를 구현하고, 다음 항목을 비교 기록하는 방식이 좋습니다: (1) 연산당 평균 지연 시간, (2) p95 지연 시간, (3) 메모리 사용량, (4) 구현 복잡도. 이 네 가지를 같이 보면 단순 Big-O 표기법이 놓치는 현실 제약까지 반영한 결정을 내릴 수 있습니다.
-
-실무 적용 관점에서는 입력 데이터의 크기뿐 아니라 업데이트 패턴, 동시 접근, 메모리 상한을 함께 고려해 구조를 선택해야 안정적인 성능이 나옵니다.
-
-## 실전 앵커: 구현과 복잡도 검증
-
-개념을 정확히 이해하려면 설명 문장만 보는 것으로는 부족합니다. 손으로 구현하고, 연산 단위를 측정하고, 메모리 배치를 눈으로 그려 보는 과정이 함께 있어야 합니다. 아래 앵커는 이 시리즈 전체에서 공통으로 재사용할 수 있는 검증 틀입니다.
-
-### 파이썬 미니 구현 묶음
-
-```python
-from collections import deque
-
-# 1) 리스트: 끝 append/pop은 빠르고, 앞쪽 연산은 느립니다.
-arr = []
-arr.append(10)
-arr.append(20)
-arr.pop()
-
-# 2) 스택: list로 LIFO 구현
-stack = []
-stack.append('A')
-stack.append('B')
-stack.pop()
-
-# 3) 큐: deque로 FIFO 구현
-queue = deque()
-queue.append('job-1')
-queue.append('job-2')
-queue.popleft()
-
-# 4) 트리 노드
-class Node:
-    def __init__(self, key, left=None, right=None):
-        self.key = key
-        self.left = left
-        self.right = right
-
-# 5) 그래프 인접 리스트와 너비 우선 탐색
-graph = {
-    'A': ['B', 'C'],
-    'B': ['D'],
-    'C': ['D'],
-    'D': []
-}
-
-def bfs(start):
-    seen = {start}
-    q = deque([start])
-    order = []
-    while q:
-        cur = q.popleft()
-        order.append(cur)
-        for nxt in graph[cur]:
-            if nxt not in seen:
-                seen.add(nxt)
-                q.append(nxt)
-    return order
-```
-
-### 연산 복잡도 비교표
-
-| 구조 | 핵심 연산 | 평균 시간 | 최악 시간 | 메모리 관찰 포인트 |
-| --- | --- | --- | --- | --- |
-| 동적 배열 | 인덱스 조회 | O(1) | O(1) | 연속 메모리, 캐시 친화적 |
-| 동적 배열 | 중간 삽입/삭제 | O(n) | O(n) | 이동 비용이 성능 병목 |
-| 스택 | push/pop | O(1) | O(1) | 한쪽 끝 연산으로 단순 |
-| 큐(덱) | enqueue/dequeue | O(1) | O(1) | 양 끝 연산이 안정적 |
-| 트리(균형) | 탐색/삽입/삭제 | O(log n) | O(log n) | 높이 유지가 관건 |
-| 그래프 | 순회(BFS/DFS) | O(V+E) | O(V+E) | 정점/간선 수에 비례 |
-
-### 메모리 배치 그림
-
-```text
-동적 배열
-[0][1][2][3][4]  (연속 주소)
-  |  |  |  |
-  +-- 인덱스로 즉시 접근
-
-연결 리스트
-[값|다음] -> [값|다음] -> [값|다음]
-   ^ 포인터를 따라 이동
-
-트리
-        [8]
-       /   \
-     [3]   [10]
-     / \
-   [1] [6]
-
-그래프(인접 리스트)
-A: B, C
-B: D
-C: D
-D: (없음)
-```
-
-### 문제 연결 지도
-
-| 유형 | 대표 문제 | 이 글의 관점으로 보는 핵심 |
-| --- | --- | --- |
-| 배열/투포인터 | LeetCode 1, 88, 283 | 인덱스 이동과 덮어쓰기 비용 관리 |
-| 스택 | LeetCode 20, 155, 739 | 상태를 되돌릴 때 LIFO가 자연스러운가 |
-| 큐/BFS | LeetCode 102, 994, 542 | 레벨 단위 확산과 최단 거리 |
-| 트리 | LeetCode 104, 226, 236 | 재귀와 반복 중 호출 깊이 제어 |
-| 그래프 | LeetCode 200, 207, 417 | 방문 집합 설계와 순회 순서 |
-
-실무에서 성능 이슈가 발생하면, 먼저 연산을 위 표의 행으로 대응시켜 병목을 분류한 뒤 구현을 교체하는 순서로 접근하는 편이 안전합니다.
-
-### 운영에서 다시 확인할 기준
-
-그래프 문제에서는 모델링이 절반입니다. 정점을 무엇으로 볼지, 간선 방향을 어떻게 정의할지에 따라 같은 데이터도 전혀 다른 문제로 바뀝니다. 구현 전에 노드, 간선, 가중치, 방문 조건을 문장으로 먼저 고정하면 코드 품질이 훨씬 안정됩니다.
-
-검증 단계에서는 동일 입력 집합으로 최소 두 구현을 비교하고, 평균 지연 시간과 상위 백분위 지연 시간을 함께 기록해야 합니다. 또한 메모리 사용량과 코드 복잡도를 같이 보아야 실제 유지보수 비용까지 반영한 결정을 내릴 수 있습니다.
-
-### 운영에서 다시 확인할 기준
-
-그래프 문제에서는 모델링이 절반입니다. 정점을 무엇으로 볼지, 간선 방향을 어떻게 정의할지에 따라 같은 데이터도 전혀 다른 문제로 바뀝니다. 구현 전에 노드, 간선, 가중치, 방문 조건을 문장으로 먼저 고정하면 코드 품질이 훨씬 안정됩니다.
-
-검증 단계에서는 동일 입력 집합으로 최소 두 구현을 비교하고, 평균 지연 시간과 상위 백분위 지연 시간을 함께 기록해야 합니다. 또한 메모리 사용량과 코드 복잡도를 같이 보아야 실제 유지보수 비용까지 반영한 결정을 내릴 수 있습니다.
-
-### 운영에서 다시 확인할 기준
-
-그래프 문제에서는 모델링이 절반입니다. 정점을 무엇으로 볼지, 간선 방향을 어떻게 정의할지에 따라 같은 데이터도 전혀 다른 문제로 바뀝니다. 구현 전에 노드, 간선, 가중치, 방문 조건을 문장으로 먼저 고정하면 코드 품질이 훨씬 안정됩니다.
-
-검증 단계에서는 동일 입력 집합으로 최소 두 구현을 비교하고, 평균 지연 시간과 상위 백분위 지연 시간을 함께 기록해야 합니다. 또한 메모리 사용량과 코드 복잡도를 같이 보아야 실제 유지보수 비용까지 반영한 결정을 내릴 수 있습니다.
-
-### 운영에서 다시 확인할 기준
-
-그래프 문제에서는 모델링이 절반입니다. 정점을 무엇으로 볼지, 간선 방향을 어떻게 정의할지에 따라 같은 데이터도 전혀 다른 문제로 바뀝니다. 구현 전에 노드, 간선, 가중치, 방문 조건을 문장으로 먼저 고정하면 코드 품질이 훨씬 안정됩니다.
-
-검증 단계에서는 동일 입력 집합으로 최소 두 구현을 비교하고, 평균 지연 시간과 상위 백분위 지연 시간을 함께 기록해야 합니다. 또한 메모리 사용량과 코드 복잡도를 같이 보아야 실제 유지보수 비용까지 반영한 결정을 내릴 수 있습니다.
-
-### 운영에서 다시 확인할 기준
-
-그래프 문제에서는 모델링이 절반입니다. 정점을 무엇으로 볼지, 간선 방향을 어떻게 정의할지에 따라 같은 데이터도 전혀 다른 문제로 바뀝니다. 구현 전에 노드, 간선, 가중치, 방문 조건을 문장으로 먼저 고정하면 코드 품질이 훨씬 안정됩니다.
-
-검증 단계에서는 동일 입력 집합으로 최소 두 구현을 비교하고, 평균 지연 시간과 상위 백분위 지연 시간을 함께 기록해야 합니다. 또한 메모리 사용량과 코드 복잡도를 같이 보아야 실제 유지보수 비용까지 반영한 결정을 내릴 수 있습니다.
-
-### 운영에서 다시 확인할 기준
-
-그래프 문제에서는 모델링이 절반입니다. 정점을 무엇으로 볼지, 간선 방향을 어떻게 정의할지에 따라 같은 데이터도 전혀 다른 문제로 바뀝니다. 구현 전에 노드, 간선, 가중치, 방문 조건을 문장으로 먼저 고정하면 코드 품질이 훨씬 안정됩니다.
-
-검증 단계에서는 동일 입력 집합으로 최소 두 구현을 비교하고, 평균 지연 시간과 상위 백분위 지연 시간을 함께 기록해야 합니다. 또한 메모리 사용량과 코드 복잡도를 같이 보아야 실제 유지보수 비용까지 반영한 결정을 내릴 수 있습니다.
-
 ## 처음 질문으로 돌아가기
 
 - **정점, 간선, 차수, 경로 같은 그래프 용어를 어떻게 정확히 쓸까요?**
-  - dict와 list를 조합한 가장 표준적인 표현입니다
+  - 정점은 노드, 간선은 두 노드를 잇는 연결, 차수는 한 정점의 간선 수, 경로는 간선으로 이어진 정점들의 순서입니다. 방향이 있으면 진입/진출 차수로 구분합니다.
 - **인접 리스트와 인접 행렬은 어떤 트레이드오프를 가질까요?**
-  - 그래프는 정점과 간선으로 임의의 관계를 표현하는 가장 일반적이고 강력한 모델입니다
+  - 인접 리스트는 O(V+E) 메모리로 희소 그래프에 효율적이고, 인접 행렬은 O(V²) 메모리를 쓰지만 간선 존재 여부를 O(1)에 확인합니다.
 - **방향 그래프와 무방향 그래프, 가중치 그래프와 비가중치 그래프는 무엇이 다를까요?**
-  - 그래프는 정점과 간선으로 임의의 관계를 표현하는 가장 일반적이고 강력한 모델입니다
+  - 방향 그래프는 간선에 방향이 있어 A→B와 B→A가 독립적이고, 무방향은 양방향입니다. 가중치는 간선에 비용·거리·용량을 부여하며, 최단 경로 알고리즘 선택에 영향을 줍니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -83,6 +83,7 @@ API를 오래 운영한 팀이라면 언젠가 같은 장면을 봅니다. 평�
 ```python
 import time
 
+
 class TokenBucket:
     def __init__(self, capacity: int, refill_rate_per_second: float) -> None:
         self.capacity = capacity
@@ -124,6 +125,7 @@ else:
 def estimate_token_cost(prompt_tokens: int, reserved_completion_tokens: int) -> int:
     return prompt_tokens + reserved_completion_tokens
 
+
 bucket = TokenBucket(capacity=40_000, refill_rate_per_second=20_000 / 60)
 cost = estimate_token_cost(prompt_tokens=1200, reserved_completion_tokens=800)
 
@@ -137,11 +139,12 @@ else:
 
 ### 슬라이딩 윈도우는 어디에 잘 맞는가
 
-슬라이딩 윈도우는 최근 시간 창 안에 몇 개의 요청이 있었는지 직접 셉니다. “최근 60초 동안 최대 100개” 같은 정책을 구현하기에 직관적입니다. burst 완화는 토큰 버킷보다 덜 부드럽지만, 운영자에게 설명하기는 더 쉽습니다.
+슬라이딩 윈도우는 최근 시간 창 안에 몇 개의 요청이 있었는지 직접 셉니다. "최근 60초 동안 최대 100개" 같은 정책을 구현하기에 직관적입니다. burst 완화는 토큰 버킷보다 덜 부드럽지만, 운영자에게 설명하기는 더 쉽습니다.
 
 ```python
 import time
 from collections import deque
+
 
 class SlidingWindowLimiter:
     def __init__(self, max_requests: int, window_seconds: int) -> None:
@@ -178,6 +181,7 @@ import time
 
 from groq import Groq
 
+
 class TokenBucket:
     def __init__(self, capacity: int, refill_rate_per_second: float) -> None:
         self.capacity = capacity
@@ -202,8 +206,10 @@ class TokenBucket:
                 return
             time.sleep(0.1)
 
+
 bucket = TokenBucket(capacity=10, refill_rate_per_second=5)
 client = Groq(api_key=os.environ["GROQ_API_KEY"])
+
 
 def limited_completion(prompt: str) -> str:
     bucket.wait_for_token()
@@ -213,6 +219,7 @@ def limited_completion(prompt: str) -> str:
         temperature=0,
     )
     return completion.choices[0].message.content
+
 
 print(limited_completion("Explain the difference between a list and a tuple in Python."))
 ```
@@ -236,6 +243,7 @@ import time
 
 from groq import APIStatusError, Groq
 
+
 class TokenBucket:
     def __init__(self, capacity: int, refill_rate_per_second: float) -> None:
         self.capacity = capacity
@@ -257,8 +265,10 @@ class TokenBucket:
                 return
             time.sleep(0.1)
 
+
 bucket = TokenBucket(capacity=10, refill_rate_per_second=5)
 client = Groq(api_key=os.environ["GROQ_API_KEY"], max_retries=0)
+
 
 def retry_after_seconds(exc: APIStatusError) -> float | None:
     value = exc.response.headers.get("retry-after")
@@ -268,6 +278,7 @@ def retry_after_seconds(exc: APIStatusError) -> float | None:
         return float(value)
     except ValueError:
         return None
+
 
 def limited_completion_with_429(prompt: str) -> str:
     for attempt in range(3):
@@ -298,19 +309,21 @@ def limited_completion_with_429(prompt: str) -> str:
 
 *제한기 선택 기준이 갈리는 비교 구조*
 
-토큰 버킷은 짧은 burst를 허용하고 평균 속도를 부드럽게 제어하고 싶을 때 잘 맞습니다. 사용자 행동에 따라 순간 피크가 있는 트래픽이 대표적입니다. 슬라이딩 윈도우는 “최근 60초에 몇 개”처럼 창 기반 정책을 그대로 반영하고 싶을 때 더 직관적입니다.
+토큰 버킷은 짧은 burst를 허용하고 평균 속도를 부드럽게 제어하고 싶을 때 잘 맞습니다. 사용자 행동에 따라 순간 피크가 있는 트래픽이 대표적입니다. 슬라이딩 윈도우는 "최근 60초에 몇 개"처럼 창 기반 정책을 그대로 반영하고 싶을 때 더 직관적입니다.
 
 많은 시스템에서는 토큰 버킷으로 시작해도 충분합니다. 이후 공급자 정책이 창 기반 설명과 더 잘 맞으면 슬라이딩 윈도우로 옮기거나 둘을 함께 조합할 수 있습니다. 중요한 것은 어떤 모델을 고르느냐보다, 애플리케이션이 먼저 허용 여부를 결정한다는 원칙입니다.
 
 ### 비용 추적 미들웨어를 같이 붙여야 하는 이유
 
-rate limit은 요청 수만 제한한다고 끝나지 않습니다. LLM 경로에서는 요청 수보다 토큰 비용이 더 빨리 병목이 되기도 합니다. 그래서 제한기와 같은 위치에 비용 추적 미들웨어를 두면, “왜 제한이 걸렸는지”를 요청 수와 비용 두 축으로 동시에 설명할 수 있습니다.
+rate limit은 요청 수만 제한한다고 끝나지 않습니다. LLM 경로에서는 요청 수보다 토큰 비용이 더 빨리 병목이 되기도 합니다. 그래서 제한기와 같은 위치에 비용 추적 미들웨어를 두면, "왜 제한이 걸렸는지"를 요청 수와 비용 두 축으로 동시에 설명할 수 있습니다.
 
 ```python
 import time
+
 from fastapi import FastAPI, Request
 
 app = FastAPI()
+
 
 @app.middleware("http")
 async def cost_tracking_middleware(request: Request, call_next):
@@ -349,6 +362,7 @@ import redis
 
 r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
+
 def allow_with_redis_window(key: str, max_requests: int, window_seconds: int) -> bool:
     now = int(time.time())
     bucket = now // window_seconds
@@ -360,6 +374,7 @@ def allow_with_redis_window(key: str, max_requests: int, window_seconds: int) ->
         current_count, _ = pipe.execute()
 
     return int(current_count) <= max_requests
+
 
 print(allow_with_redis_window("llm-chat", max_requests=100, window_seconds=60))
 ```
@@ -375,6 +390,7 @@ from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
 
+
 def build_rate_limit_error(retry_after_seconds: float) -> dict:
     return {
         "error": {
@@ -383,6 +399,7 @@ def build_rate_limit_error(retry_after_seconds: float) -> dict:
             "retry_after_seconds": retry_after_seconds,
         }
     }
+
 
 @app.get("/api/chat")
 def chat_example():
@@ -395,13 +412,15 @@ def chat_example():
 
 이렇게 표준화하면 클라이언트는 `code`와 `retry_after_seconds`만 보고 재시도 UI를 통일할 수 있습니다. 운영 로그도 같은 코드값으로 집계할 수 있어, 공급자 429와 애플리케이션 선제 거절을 분리해 분석하기 쉬워집니다.
 
-## 흔히 헷갈리는 지점
+## 자주 하는 실수
 
-- 재시도와 백오프만 있으면 rate limit 관리가 된다고 생각하기 쉽지만, 두 장치는 사후 대응입니다.
-- 모든 요청 비용을 동일하게 보면 TPM 제약이 큰 환경에서 제어가 어긋날 수 있습니다.
-- 로컬 제한기가 있어도 여러 프로세스·여러 서버 환경에서는 상태 공유 문제가 남습니다.
-- `Retry-After`가 있으면 자체 백오프보다 우선하는 편이 보통 더 정확합니다.
-- 토큰 버킷과 슬라이딩 윈도우 중 무엇이 더 우월한지가 아니라, 트래픽 패턴과 정책 표현에 무엇이 더 맞는지가 중요합니다.
+| 실수 | 이유 | 올바른 접근 |
+|------|------|------------|
+| 재시도와 백오프만으로 rate limit 문제를 해결하려 함 | 두 장치는 이미 429가 온 뒤에야 반응하는 사후 대응 | 공급자 호출 앞에 로컬 제한기(토큰 버킷 또는 슬라이딩 윈도우)를 배치해 사전에 흐름 제어 |
+| 모든 요청 비용을 동일하게 1로 계산 | LLM 경로에서는 프롬프트 길이 차이로 TPM 소비가 수십 배 달라짐 | `estimate_token_cost()`처럼 프롬프트 토큰과 예상 완성 토큰을 합산해 비용으로 사용 |
+| 단일 프로세스 제한기를 다중 워커 환경에서 그대로 사용 | 각 프로세스가 따로 카운트를 세므로 전체 한도를 보장할 수 없음 | Redis 기반 공유 카운터로 전환해 서비스 전체 요청 수를 단일 원천에서 관리 |
+| `Retry-After` 헤더를 무시하고 자체 백오프만 적용 | 공급자가 명시한 대기 시간보다 짧게 재시도하면 429가 반복됨 | 헤더가 있으면 그 값을 우선 사용하고, 없을 때만 지수 백오프와 지터 적용 |
+| 거절 응답 형식을 경로마다 다르게 반환 | 클라이언트가 공급자 429와 애플리케이션 선제 거절을 구분하지 못함 | `build_rate_limit_error()`처럼 표준 오류 payload를 정의하고 모든 거절에 동일하게 적용 |
 
 ## 운영 체크리스트
 
@@ -410,6 +429,7 @@ def chat_example():
 - [ ] burst 중심이면 토큰 버킷, 창 기반 정책이면 슬라이딩 윈도우를 우선 검토했다
 - [ ] 429 응답에서 `Retry-After`를 우선 처리하고 재허가 후 재시도하게 만들었다
 - [ ] 다중 워커·다중 서버 환경으로 갈 때 공유 상태 설계가 필요함을 문서화했다
+- [ ] 표준 rate limit 오류 응답 payload를 정의해 모든 거절 경로에 통일했다
 
 ## 정리
 
@@ -422,12 +442,13 @@ def chat_example():
 ## 처음 질문으로 돌아가기
 
 - **rate limit 대응은 429 뒤에 처리하는 일일까요, 429 전에 흐름을 조절하는 일일까요?**
-  - 재시도와 백오프만으로는 rate limit 문제를 풀 수 없습니다
+  - 재시도와 백오프는 429가 이미 발생한 뒤에야 반응합니다. 애플리케이션이 공급자 앞에 로컬 제한기를 두면 공급자 한도에 도달하기 전에 흐름을 먼저 조절할 수 있습니다. 이 두 층은 대체 관계가 아니라 보완 관계입니다. 선제 제어(proactive)가 먼저 흐름을 다듬고, 사후 복구(reactive)가 그래도 발생하는 429를 처리합니다.
+
 - **토큰 버킷과 슬라이딩 윈도우는 각각 어떤 트래픽에 맞을까요?**
-  - 재시도와 백오프만으로는 rate limit 문제를 풀 수 없습니다
+  - 토큰 버킷은 짧은 burst를 허용하고 장기 평균을 부드럽게 제한하고 싶을 때 적합합니다. 사용자 행동이 순간적으로 몰리는 user-facing 경로에 잘 맞습니다. 슬라이딩 윈도우는 "최근 60초에 최대 100개"처럼 창 기반 정책을 그대로 반영하고 싶을 때 더 직관적입니다. 공급자 한도가 분당 요청 수로 명시되어 있으면 슬라이딩 윈도우가 정책 표현이 더 자연스럽습니다.
+
 - **provider 429를 받은 뒤에도 애플리케이션은 무엇을 해야 할까요?**
-  - 재시도와 백오프만으로는 rate limit 문제를 풀 수 없습니다
-  - 재시도와 백오프만으로는 rate limit 문제를 풀 수 없습니다. 그 방식은 이미 공급자 한도를 넘어선 뒤에야 반응합니다. 반면 로컬 제한기는 초과 가능성을 공급자 앞에서 흡수합니다. 즉, 429를 외부의 놀라운 예외가 아니라 내부 정책의 일부로 바꿔 줍니다.
+  - 먼저 `Retry-After` 헤더가 있으면 그 값을 대기 시간으로 우선 사용합니다. 없으면 지수 백오프와 지터를 적용합니다. 재시도 전에는 로컬 제한기에서 다시 허가를 받아야 합니다. 공급자 429를 단순히 재시도하는 것이 아니라, 로컬 흐름 제어를 통과한 뒤에 다시 시도하는 순서가 중요합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
