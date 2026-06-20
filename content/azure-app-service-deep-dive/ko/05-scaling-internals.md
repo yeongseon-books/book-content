@@ -78,6 +78,13 @@ Learn 문서가 설명하듯 scale-up은 더 큰 CPU, memory, features를 가진
 
 이 구분은 느림의 원인을 읽을 때 특히 중요합니다. 메모리 부족과 동시성 병목은 둘 다 "느리다"로 보일 수 있지만, 전자는 scale-up이 더 맞고 후자는 scale-out이 더 맞을 수 있습니다. 같은 증상처럼 보여도 대응 축이 다릅니다.
 
+| 증상 | 원인 진단 | 권장 대응 |
+|------|-----------|-----------|
+| OOM 오류, 메모리 사용률 지속 상승 | 인스턴스 체급 부족 | Scale-Up (더 큰 SKU) |
+| 요청 큐 증가, CPU 부족 | 처리량 한계 | Scale-Out (인스턴스 추가) |
+| 특정 시간대 반복 부하 | 예측 가능한 패턴 | 스케줄 기반 Pre-Scaling |
+| 간헐적 지연 스파이크 | Cold start / warmup 지연 | Always-On 또는 Warm-Up 설정 |
+
 ### autoscale rule은 app이 아니라 plan에 붙습니다
 
 이 부분은 현업에서 반복해서 헷갈립니다. 포털에서는 앱 중심으로 들어가 autoscale을 설정하는 것처럼 보일 수 있지만, 실제 대상 리소스는 App Service Plan입니다. 즉 scale event는 "내 앱만의 일"이 아니라 plan-level capacity 변화입니다.
@@ -161,7 +168,9 @@ az monitor metrics list \
 autoscale이 왜 그렇게 반응했는지를 설명하려면 규칙 정의를 사람이 읽는 문장으로 변환해야 합니다. 아래 명령은 autoscale profile을 JSON으로 꺼내 threshold, window, cooldown을 바로 확인하게 해 줍니다.
 
 ```bash
-az monitor autoscale show -g my-rg -n my-app-autoscale   --query "profiles[].{name:name,capacity:capacity,rules:rules[].{metric:metricTrigger.metricName,op:metricTrigger.operator,th:metricTrigger.threshold,window:metricTrigger.timeWindow,grain:metricTrigger.timeGrain,stat:metricTrigger.statistic,dir:scaleAction.direction,type:scaleAction.type,value:scaleAction.value,cooldown:scaleAction.cooldown}}"   -o json
+az monitor autoscale show -g my-rg -n my-app-autoscale \
+  --query "profiles[].{name:name,capacity:capacity,rules:rules[].{metric:metricTrigger.metricName,op:metricTrigger.operator,th:metricTrigger.threshold,window:metricTrigger.timeWindow,grain:metricTrigger.timeGrain,stat:metricTrigger.statistic,dir:scaleAction.direction,type:scaleAction.type,value:scaleAction.value,cooldown:scaleAction.cooldown}}" \
+  -o json
 ```
 
 이 출력은 scale controller의 의사결정 경계를 거의 그대로 보여 줍니다. 예를 들어 `CpuPercentage > 70 for PT10M` 같은 rule은 "10분 관찰 창이 채워져야 확장이 가능"하다는 뜻이고, `cooldown PT5M`은 확장 직후 재평가가 지연될 수 있음을 의미합니다. 즉 확장 체감 지연은 비정상이 아니라 설계 결과일 수 있습니다.
@@ -173,12 +182,18 @@ az monitor autoscale show -g my-rg -n my-app-autoscale   --query "profiles[].{na
 ```bash
 PLAN_ID=$(az appservice plan show -n my-plan -g my-rg --query id -o tsv)
 
-az monitor metrics list   --resource "$PLAN_ID"   --metric "CpuPercentage,HttpQueueLength,Requests"   --interval PT1M -o table
+az monitor metrics list \
+  --resource "$PLAN_ID" \
+  --metric "CpuPercentage,HttpQueueLength,Requests" \
+  --interval PT1M -o table
 
-az monitor activity-log list   --resource-id "$PLAN_ID"   --offset 2h   --status Succeeded -o table
+az monitor activity-log list \
+  --resource-id "$PLAN_ID" \
+  --offset 2h \
+  --status Succeeded -o table
 ```
 
-**Expected output:** metrics 급등 시점과 scale action initiated/completed 이벤트를 비교하면 제어 루프 지연을 정량화할 수 있습니다. 이 데이터를 런북에 남기면 "autoscale이 안 됐다"는 모호한 보고를 "규칙 평가 창과 cooldown으로 인해 6분 지연"처럼 설명 가능한 상태로 바꿀 수 있습니다.
+metrics 급등 시점과 scale action initiated/completed 이벤트를 비교하면 제어 루프 지연을 정량화할 수 있습니다. 이 데이터를 런북에 남기면 "autoscale이 안 됐다"는 모호한 보고를 "규칙 평가 창과 cooldown으로 인해 6분 지연"처럼 설명 가능한 상태로 바꿀 수 있습니다.
 
 ### Scale-out 실험 시나리오: 규칙 검증과 결과 측정
 
@@ -186,23 +201,39 @@ az monitor activity-log list   --resource-id "$PLAN_ID"   --offset 2h   --status
 
 ```bash
 # 현재 인스턴스 수 확인
-az appservice plan show -n my-plan -g my-rg --query "{workers:numberOfWorkers,sku:sku.name}" -o json
+az appservice plan show -n my-plan -g my-rg \
+  --query "{workers:numberOfWorkers,sku:sku.name}" -o json
 
 # 실험 중 1분 간격 상태 스냅샷
 for i in $(seq 1 20); do
   date -u +"%Y-%m-%dT%H:%M:%SZ"
-  az appservice plan show -n my-plan -g my-rg --query numberOfWorkers -o tsv
+  az appservice plan show -n my-plan -g my-rg \
+    --query numberOfWorkers -o tsv
   sleep 60
 done
 ```
 
 이 스냅샷을 요청량 그래프와 겹치면 제어 루프 지연을 팀 공통 언어로 설명할 수 있습니다. "느낌상 늦다"가 아니라 "규칙 창 10분 + cooldown 5분 + readiness 2분"처럼 근거 있는 운영 보고가 가능해집니다.
 
-### 스케일 정책 리뷰 주기
+### 스케일 정책 리뷰 주기와 캠페인성 트래픽 대응
 
 autoscale 규칙은 한 번 만들고 끝나지 않습니다. 트래픽 계절성, 배치 작업 시간대, 신규 기능 출시 후 부하 곡선을 반영해 월 단위로 임계치와 cooldown을 재검토해야 과소확장과 과잉확장을 동시에 줄일 수 있습니다.
 
 특히 캠페인성 트래픽이 있는 서비스는 이벤트 전 사전 확장값을 별도 프로필로 두고, 이벤트 종료 후 자동 복귀 시점까지 함께 정의해야 운영 편차를 줄일 수 있습니다.
+
+```bash
+# 사전 확장: 이벤트 전날 수동 scale-out
+az appservice plan update -n my-plan -g my-rg --number-of-workers 10
+
+# 이벤트 후 자동화를 위한 스케줄 프로필 추가
+az monitor autoscale profile create \
+  -g my-rg -n my-app-autoscale \
+  --name "campaign-profile" \
+  --start "2026-12-23T09:00" \
+  --end "2026-12-26T23:00" \
+  --timezone "Korea Standard Time" \
+  --min-count 8 --count 10 --max-count 20
+```
 
 ## 흔히 헷갈리는 지점
 
@@ -219,6 +250,7 @@ autoscale 규칙은 한 번 만들고 끝나지 않습니다. 트래픽 계절�
 - [ ] scale event 알림과 instance-count 그래프를 운영 대시보드에 올렸습니다.
 - [ ] scale-in 시 graceful drain을 위한 종료 처리와 런북을 점검했습니다.
 - [ ] scale-up runbook과 scale-out runbook을 서로 다른 절차로 분리했습니다.
+- [ ] autoscale 규칙을 월 단위로 재검토하는 일정을 정했습니다.
 
 ## 정리
 
@@ -231,12 +263,11 @@ autoscale 규칙은 한 번 만들고 끝나지 않습니다. 트래픽 계절�
 ## 처음 질문으로 돌아가기
 
 - **scale-up과 scale-out은 App Service에서 실제로 무엇을 바꿀까요?**
-  - 스케일링을 한 줄 버튼으로 이해하면 사용자 체감 지연을 설명할 수 없게 됩니다
+  - scale-up은 worker 한 대의 CPU/메모리 체급을 키우는 일이고, scale-out은 앱이 사용할 수 있는 worker 수를 늘리는 일입니다. 같은 "느리다"는 증상도 원인이 다르면 대응 축이 달라집니다.
 - **autoscale rule은 앱이 아니라 왜 App Service Plan에 붙는다고 봐야 할까요?**
-  - 이 주제를 이해할 때 가장 중요한 문장은 이것입니다
+  - autoscale은 App Service Plan의 desired instance count를 조정합니다. 앱이 아니라 plan 단위이므로, 같은 plan의 다른 앱도 scale 결과를 공유합니다. noisy-neighbour 현상은 이 구조를 모르면 진단하기 어렵습니다.
 - **Azure Monitor autoscale은 어떤 cadence와 observation window로 규칙을 평가할까요?**
-  - 스케일링을 한 줄 버튼으로 이해하면 사용자 체감 지연을 설명할 수 없게 됩니다
-  - 스케일링을 한 줄 버튼으로 이해하면 사용자 체감 지연을 설명할 수 없게 됩니다. CPU가 높아졌는데 왜 바로 capacity가 늘지 않았는지, metrics는 이미 올라갔는데 왜 요청 큐가 여전히 길었는지, 인스턴스 수가 늘었는데 왜 첫 요청 지연은 남았는지를 설명하려면 scale-out을 제어 루프로 읽어야 합니다.
+  - 약 30~60초마다 규칙을 평가하며, 각 규칙은 `timeWindow`로 정해진 관찰 창이 채워져야 action을 내립니다. action 이후에는 `cooldown` 동안 같은 방향의 재평가가 지연됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

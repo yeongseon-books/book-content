@@ -104,19 +104,86 @@ print("R^2:", r2_score(yt, yp))
 - PR-AUC는 불균형 데이터에서 더 유용한 경우가 많습니다.
 - RMSE와 MAE는 이상치 민감도가 다릅니다.
 
+## 분류 지표 선택 가이드
+
+어떤 지표를 써야 할지 혼란스러울 때 사용할 수 있는 판단 기준입니다.
+
+| 상황 | 추천 지표 | 이유 |
+|---|---|---|
+| 클래스 균형, 단순 성능 비교 | Accuracy | 해석이 쉽고 직관적 |
+| 양성을 놓치면 치명적 (예: 암 진단) | Recall (재현율) | 거짓 음성 최소화 |
+| 오탐이 비용이 큰 경우 (예: 스팸) | Precision (정밀도) | 거짓 양성 최소화 |
+| 불균형 데이터, 전반적 균형 | F1 Score | Precision과 Recall의 조화평균 |
+| 임계값 무관 순위 성능 | ROC-AUC | 전체 임계값 범위를 요약 |
+| 심한 불균형, 양성이 희귀 | PR-AUC | 희귀 양성 탐지 성능에 집중 |
+
+## 혼동 행렬 읽는 법
+
+혼동 행렬의 네 칸이 실제로 무엇을 뜻하는지 코드로 확인합니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+sc = StandardScaler().fit(Xtr)
+Xtr_s, Xte_s = sc.transform(Xtr), sc.transform(Xte)
+m = LogisticRegression(max_iter=1000).fit(Xtr_s, ytr)
+pred = m.predict(Xte_s)
+
+cm = confusion_matrix(yte, pred)
+tn, fp, fn, tp = cm.ravel()
+print(f"TN={tn}  FP={fp}")
+print(f"FN={fn}  TP={tp}")
+print(f"Precision = TP/(TP+FP) = {tp/(tp+fp):.4f}")
+print(f"Recall    = TP/(TP+FN) = {tp/(tp+fn):.4f}")
+print(f"Accuracy  = (TP+TN)/total = {(tp+tn)/(tp+tn+fp+fn):.4f}")
+```
+
+- **TN (진짜 음성)**: 음성이라 예측했고 실제로도 음성
+- **FP (거짓 양성)**: 양성이라 예측했지만 실제는 음성 (1종 오류)
+- **FN (거짓 음성)**: 음성이라 예측했지만 실제는 양성 (2종 오류)
+- **TP (진짜 양성)**: 양성이라 예측했고 실제로도 양성
+
+## 회귀 지표 비교
+
+```python
+import numpy as np
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+# 이상치가 있는 경우
+y_true = np.array([3.0, 5.0, 2.5, 7.0, 4.0])
+y_pred = np.array([2.8, 5.4, 2.1, 7.2, 3.9])
+y_pred_outlier = np.array([2.8, 5.4, 2.1, 15.0, 3.9])  # 이상치 하나
+
+for label, yp in [("정상 예측", y_pred), ("이상치 포함", y_pred_outlier)]:
+    mae = mean_absolute_error(y_true, yp)
+    rmse = mean_squared_error(y_true, yp) ** 0.5
+    r2 = r2_score(y_true, yp)
+    print(f"{label}: MAE={mae:.3f}, RMSE={rmse:.3f}, R²={r2:.3f}")
+```
+
+RMSE는 이상치에 매우 민감합니다. 이상치를 크게 페널티 주고 싶다면 RMSE를, 이상치 영향을 줄이려면 MAE를 씁니다. R²는 설명력 비율이므로 모델 품질을 요약할 때 씁니다.
+
 ## 실패 신호를 먼저 이렇게 읽습니다
 
 - 어떤 지표를 써야 할지 합의가 안 되면, 모델 이야기를 잠시 멈추고 **거짓 양성**과 **거짓 음성**의 비용부터 정리해야 합니다.
 - 클래스 불균형이 심한데 ROC-AUC만 보고 있으면, PR 곡선과 임계값 민감도를 같이 봐야 합니다.
 - 한 지표는 좋은데 다른 지표가 나쁘다면 모순이 아니라, **어떤 실패를 더 싫어하는지** 다시 분명히 하라는 신호입니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수
 
-1. **불균형 데이터에서 Accuracy만 보고합니다.**
-2. **클래스 불균형이 심한데 ROC-AUC만 믿습니다.**
-3. **F1을 최적화하면서 임계값 조정을 무시합니다.**
-4. **회귀에서 MAE 또는 RMSE 중 하나만 보고합니다.**
-5. **같은 테스트 세트로 반복 평가하며 정보를 누수시킵니다.**
+| 실수 | 증상 | 해결 방법 |
+|---|---|---|
+| 불균형 데이터에서 Accuracy만 보고 | 소수 클래스 성능 숨겨짐 | F1, Recall, PR-AUC 추가 |
+| ROC-AUC만 믿는 불균형 상황 | 희귀 양성 탐지 과대평가 | PR-AUC 병행 |
+| F1 최적화하면서 임계값 무시 | 비즈니스 비용 반영 안 됨 | PR 곡선에서 임계값 선택 |
+| 회귀에서 MAE 또는 RMSE만 보고 | 이상치 민감도 놓침 | 둘 다 보고 차이 해석 |
+| 같은 테스트 세트 반복 평가 | 지표 누수 | 테스트는 최종에 딱 한 번 |
 
 ## 실무에서는 이렇게 나타납니다
 
@@ -137,11 +204,84 @@ A/B 테스트, 모델 게이트, MLOps 모니터링은 모두 지표 정의 위�
 - [ ] 회귀에서는 MAE와 RMSE를 함께 보고합니다.
 - [ ] 테스트 세트는 마지막에 한 번만 봅니다.
 
+## 불균형 데이터 평가의 함정 직접 확인하기
+
+불균형 데이터에서 Accuracy가 얼마나 오해를 부르는지 실험합니다.
+
+```python
+import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.dummy import DummyClassifier
+from sklearn.metrics import (
+    accuracy_score, f1_score, roc_auc_score,
+    average_precision_score, classification_report
+)
+
+# 95:5 불균형 데이터
+X, y = make_classification(
+    n_samples=2000, n_features=10,
+    weights=[0.95, 0.05], random_state=42
+)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+# 항상 다수 클래스를 예측하는 더미 분류기
+dummy = DummyClassifier(strategy="most_frequent").fit(Xtr, ytr)
+dummy_pred = dummy.predict(Xte)
+print("=== 더미 분류기 (항상 음성 예측) ===")
+print(f"Accuracy: {accuracy_score(yte, dummy_pred):.4f}  ← 높아 보이지만 의미 없음")
+print(f"F1      : {f1_score(yte, dummy_pred, zero_division=0):.4f}")
+
+# 실제 로지스틱 회귀
+m = LogisticRegression(class_weight="balanced", max_iter=1000).fit(Xtr, ytr)
+pred = m.predict(Xte)
+prob = m.predict_proba(Xte)[:, 1]
+print("\n=== 로지스틱 회귀 (class_weight=balanced) ===")
+print(f"Accuracy: {accuracy_score(yte, pred):.4f}")
+print(f"F1      : {f1_score(yte, pred):.4f}")
+print(f"ROC-AUC : {roc_auc_score(yte, prob):.4f}")
+print(f"PR-AUC  : {average_precision_score(yte, prob):.4f}")
+print(classification_report(yte, pred, target_names=["음성", "양성"]))
+```
+
+더미 분류기가 95% 정확도를 보이지만 F1은 0입니다. Accuracy 하나만 보면 더미 모델과 실제 모델을 구분하지 못합니다.
+
+## 회귀 지표 선택 시나리오별 가이드
+
+```python
+import numpy as np
+from sklearn.metrics import (
+    mean_absolute_error, mean_squared_error,
+    r2_score, mean_absolute_percentage_error
+)
+
+# 이상치 하나가 있는 예측값
+y_true = np.array([10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0])
+y_pred_good = np.array([10.5, 20.3, 29.8, 40.2, 50.1, 59.9, 70.2, 79.8])
+y_pred_outlier = np.array([10.5, 20.3, 29.8, 40.2, 50.1, 59.9, 70.2, 120.0])  # 마지막 값 이상치
+
+print(f"{'지표':>6} {'좋은 예측':>12} {'이상치 포함':>12} {'차이':>10}")
+for label, fn in [("MAE", mean_absolute_error),
+                   ("RMSE", lambda a, b: mean_squared_error(a, b)**0.5),
+                   ("R²", r2_score)]:
+    good = fn(y_true, y_pred_good)
+    out = fn(y_true, y_pred_outlier)
+    print(f"{label:>6} {good:>12.4f} {out:>12.4f} {out-good:>10.4f}")
+
+print("\n결론: RMSE는 이상치에 매우 민감, MAE는 더 강건합니다.")
+print("이상치를 강하게 페널티 주려면 RMSE, 강건하게 보려면 MAE를 씁니다.")
+```
+
+이상치 하나가 RMSE를 크게 올리지만 MAE는 상대적으로 영향이 적습니다. 도메인에서 큰 오차가 특히 문제가 되는 경우에는 RMSE를 선택하고, 이상치 영향을 줄이려면 MAE를 씁니다.
+
 ## 연습 문제
 
 1. 불균형 데이터에서 Accuracy와 F1을 비교해 보세요.
 2. ROC 곡선과 PR 곡선을 나란히 그려 보세요.
 3. MAE와 RMSE가 크게 다르게 나오는 데이터셋을 만들어 보세요.
+4. 혼동 행렬에서 FP와 FN의 비용이 2:1일 때 최적 임계값을 탐색해 보세요.
+5. `classification_report`의 각 수치(precision, recall, f1-score, support)를 직접 계산해서 검증해 보세요.
 
 ## 정리
 
@@ -150,8 +290,8 @@ A/B 테스트, 모델 게이트, MLOps 모니터링은 모두 지표 정의 위�
 ## 처음 질문으로 돌아가기
 
 - **분류에서는 어떤 지표를 언제 써야 할까요?**
-  - - 어떤 지표를 써야 할지 합의가 안 되면, 모델 이야기를 잠시 멈추고 **거짓 양성**과 **거짓 음성**의 비용부터 정리해야 합니다
+  - 거짓 음성이 비싼 경우(암 진단, 사기 탐지)에는 Recall, 거짓 양성이 비싼 경우(스팸 필터)에는 Precision, 전반적 균형이 필요하면 F1, 임계값 무관 성능 비교에는 AUC를 씁니다.
 - **회귀에서는 MAE, MSE, RMSE, R-squared를 어떻게 나눠 읽을까요?**
-  - - AUC는 특정 임계값 하나에 묶이지 않습니다
+  - MAE는 이상치에 강하고, RMSE는 큰 오차에 민감합니다. R²는 설명력 비율이므로 모델 품질을 요약할 때 씁니다. 셋을 함께 보고합니다.
 - **혼동 행렬은 어떤 구조를 보여 줄까요?**
-  - - AUC는 특정 임계값 하나에 묶이지 않습니다
+  - TP, FP, FN, TN 네 칸으로 구성됩니다. 어떤 종류의 오류가 얼마나 발생했는지 구체적으로 보여 주므로, 정확도 하나보다 훨씬 많은 정보를 담습니다.

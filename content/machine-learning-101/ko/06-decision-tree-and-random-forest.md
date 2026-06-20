@@ -97,19 +97,83 @@ print("top:", order)
 - `n_estimators`가 많을수록 더 안정적이지만, 증가 효과는 점점 줄어듭니다.
 - `feature_importances_`는 상관된 피처들 사이에 기여도를 나눠 가집니다.
 
+## 트리 계열 모델 비교
+
+표 데이터에서 자주 쓰는 트리 계열 모델을 한눈에 비교합니다.
+
+| 모델 | 특징 | 과적합 위험 | 속도 | 언제 쓸까 |
+|---|---|---|---|---|
+| DecisionTree | 한 그루, 해석 쉬움 | 높음 | 빠름 | 규칙 시각화, 탐색 |
+| RandomForest | 병렬 배깅 앙상블 | 낮음 | 중간 | 안정적 베이스라인 |
+| GradientBoosting | 순차적 앙상블 | 중간 | 느림 | 높은 정확도 목표 |
+| ExtraTrees | 극단적 무작위 분할 | 낮음 | 빠름 | 속도 우선, RF 대안 |
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, ExtraTreesClassifier
+from sklearn.metrics import f1_score
+
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+models = {
+    "DecisionTree(d=5)": DecisionTreeClassifier(max_depth=5, random_state=42),
+    "RandomForest(200)": RandomForestClassifier(n_estimators=200, random_state=42),
+    "GradientBoosting": GradientBoostingClassifier(n_estimators=100, random_state=42),
+    "ExtraTrees(200)": ExtraTreesClassifier(n_estimators=200, random_state=42),
+}
+
+print(f"{'모델':>22} {'Train Acc':>10} {'Test Acc':>9} {'F1':>7}")
+for name, m in models.items():
+    m.fit(Xtr, ytr)
+    tr = m.score(Xtr, ytr)
+    te = m.score(Xte, yte)
+    f1 = f1_score(yte, m.predict(Xte))
+    print(f"{name:>22} {tr:>10.4f} {te:>9.4f} {f1:>7.4f}")
+```
+
+단일 트리는 훈련 정확도가 앙상블보다 높게 나오지만 테스트에서는 역전되는 경우가 많습니다. 이것이 과적합의 신호입니다.
+
+## max_depth와 과적합의 관계
+
+트리 깊이를 바꿔 가며 훈련과 테스트 점수의 간격을 관찰합니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+print(f"{'depth':>7} {'train':>8} {'test':>8} {'gap':>7}")
+for d in [1, 2, 3, 4, 5, 7, 10, None]:
+    m = DecisionTreeClassifier(max_depth=d, random_state=42).fit(Xtr, ytr)
+    tr = m.score(Xtr, ytr)
+    te = m.score(Xte, yte)
+    label = str(d) if d else "None"
+    print(f"{label:>7} {tr:>8.4f} {te:>8.4f} {tr-te:>7.4f}")
+```
+
+깊이가 깊어질수록 훈련 점수는 올라가지만 테스트 점수는 어느 지점에서 다시 내려오기 시작합니다. 이 지점이 최적 깊이의 힌트입니다.
+
 ## 실패 신호를 먼저 이렇게 읽습니다
 
 - 훈련 점수는 완벽한데 테스트 점수가 떨어지면, 더 복잡한 모델보다 먼저 **깊이 제한**을 걸어야 합니다.
 - 중요도 결과가 도메인 상식과 어긋나면 상관 피처와 **permutation importance**를 같이 봐야 합니다.
 - 포레스트가 겨우 조금만 더 좋다면, 마지막 몇 점보다 **해석 가능성**이 더 중요한지 함께 판단해야 합니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수
 
-1. **깊이 제한 없이 하나의 깊은 트리만 사용합니다.**
-2. **feature importance를 인과 해석으로 읽습니다.**
-3. **트리에는 필요하지 않은 표준화를 습관적으로 합니다.**
-4. **훈련 정확도 100%를 믿고 안심합니다.**
-5. **그래디언트 부스팅 트리와의 비교를 건너뜁니다.**
+| 실수 | 증상 | 해결 방법 |
+|---|---|---|
+| 깊이 제한 없는 단일 트리 | 훈련 100%, 테스트 폭락 | max_depth 명시 |
+| feature_importance 인과 해석 | 잘못된 의사결정 | permutation importance 병행 |
+| 트리에 불필요한 표준화 | 결과 변화 없음 | 트리는 스케일 무관 |
+| 훈련 100% 신뢰 | 과적합 판단 못함 | train/test 점수 함께 추적 |
+| GBDT와 비교 생략 | 더 좋은 모델 기회 놓침 | GradientBoosting 항상 비교 |
 
 ## 실무에서는 이렇게 나타납니다
 
@@ -130,11 +194,72 @@ print("top:", order)
 - [ ] feature importance의 한계를 알고 있습니다.
 - [ ] GBDT 모델과 비교합니다.
 
+## Permutation Importance로 더 신뢰할 수 있는 피처 중요도 얻기
+
+기본 `feature_importances_`는 상관 피처 사이에서 왜곡될 수 있습니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.inspection import permutation_importance
+import numpy as np
+
+X, y = load_breast_cancer(return_X_y=True)
+feature_names = load_breast_cancer().feature_names
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+rf = RandomForestClassifier(n_estimators=200, random_state=42).fit(Xtr, ytr)
+
+# 기본 feature importance (Gini 기반)
+gini_imp = rf.feature_importances_
+top5_gini = np.argsort(gini_imp)[::-1][:5]
+print("기본 importance 상위 5:")
+for i in top5_gini:
+    print(f"  {feature_names[i]:35s}: {gini_imp[i]:.4f}")
+
+# Permutation importance (테스트 세트 기반)
+perm_imp = permutation_importance(rf, Xte, yte, n_repeats=10, random_state=42)
+top5_perm = np.argsort(perm_imp.importances_mean)[::-1][:5]
+print("\nPermutation importance 상위 5 (테스트 세트):")
+for i in top5_perm:
+    print(f"  {feature_names[i]:35s}: {perm_imp.importances_mean[i]:.4f} ± {perm_imp.importances_std[i]:.4f}")
+```
+
+Permutation importance는 피처를 무작위로 섞었을 때 성능 하락 폭을 측정합니다. 상관 피처가 있어도 더 안정적인 순위를 줍니다.
+
+## n_estimators와 성능-속도 트레이드오프
+
+트리 수가 늘수록 성능이 오르지만 증가 속도는 점점 느려집니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import f1_score
+import time
+
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+print(f"{'n_estimators':>14} {'test_acc':>10} {'f1':>8} {'time(s)':>9}")
+for n in [10, 25, 50, 100, 200, 500]:
+    start = time.time()
+    rf = RandomForestClassifier(n_estimators=n, random_state=42, n_jobs=-1).fit(Xtr, ytr)
+    elapsed = time.time() - start
+    acc = rf.score(Xte, yte)
+    f1 = f1_score(yte, rf.predict(Xte))
+    print(f"{n:>14} {acc:>10.4f} {f1:>8.4f} {elapsed:>9.3f}")
+```
+
+일반적으로 100~200 트리에서 성능이 안정됩니다. 그 이상은 학습 시간만 늘고 성능 향상은 미미합니다.
+
 ## 연습 문제
 
 1. `max_depth`를 1부터 20까지 바꿔 가며 테스트 점수를 그려 보세요.
 2. 랜덤 포레스트와 그래디언트 부스팅을 비교해 보세요.
 3. 기본 importance와 permutation importance를 비교해 보세요.
+4. `n_estimators`를 10, 50, 100, 200으로 늘려 가며 성능 변화와 학습 시간을 측정해 보세요.
+5. 결정 트리를 시각화해서 어떤 피처와 임계값으로 분류가 이루어지는지 확인해 보세요.
 
 ## 정리
 
@@ -143,8 +268,8 @@ print("top:", order)
 ## 처음 질문으로 돌아가기
 
 - **결정 트리는 피처 공간을 어떤 기준으로 나눌까요?**
-  - - `max_depth`는 과적합을 막는 가장 중요한 손잡이입니다
+  - 각 분할에서 Gini 불순도 또는 entropy를 가장 많이 줄이는 피처와 임계값을 찾습니다. 분할 후 두 그룹이 최대한 순수해지도록 만드는 것이 목표입니다.
 - **Gini와 entropy는 무엇을 측정할까요?**
-  - - `max_depth`는 과적합을 막는 가장 중요한 손잡이입니다
+  - 둘 다 노드의 불순도를 측정합니다. Gini는 계산이 빠르고 entropy는 정보이론 기반입니다. 대부분의 상황에서 결과 차이는 크지 않습니다.
 - **단일 트리는 왜 쉽게 과적합될까요?**
-  - - `max_depth`는 과적합을 막는 가장 중요한 손잡이입니다
+  - 깊이 제한 없이 성장하면 훈련 데이터의 노이즈까지 외웁니다. `max_depth`, `min_samples_leaf` 같은 파라미터로 성장을 제한해야 합니다.

@@ -100,19 +100,89 @@ for a in np.logspace(-3, 2, 6):
 - Ridge는 모든 계수를 부드럽게 줄입니다.
 - `alpha`는 감으로 찍는 값이 아니라 교차검증으로 정해야 합니다.
 
+## 정규화 방법 비교
+
+| 방법 | 페널티 항 | 계수 특성 | 피처 선택 | 언제 쓸까 |
+|---|---|---|---|---|
+| LinearRegression | 없음 | 제한 없음 | 없음 | 피처 수가 적고 다중공선성 없을 때 |
+| Ridge (L2) | sum(w²) | 전체적으로 줄어듦 | 없음 | 다중공선성 있을 때 |
+| Lasso (L1) | sum(\|w\|) | 일부가 정확히 0 | 자동 | 피처 선택이 필요할 때 |
+| ElasticNet | L1+L2 혼합 | 일부 0, 나머지 줄어듦 | 부분적 | 상관 피처가 많을 때 |
+
+```python
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
+import numpy as np
+
+X, y = fetch_california_housing(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42)
+sc = StandardScaler().fit(Xtr)
+Xtr_s, Xte_s = sc.transform(Xtr), sc.transform(Xte)
+
+models = {
+    "LinearRegression": LinearRegression(),
+    "Ridge(alpha=1)": Ridge(alpha=1.0),
+    "Lasso(alpha=0.01)": Lasso(alpha=0.01),
+    "ElasticNet(l1=0.5)": ElasticNet(alpha=0.01, l1_ratio=0.5),
+}
+
+print(f"{'모델':>22} {'Train R²':>10} {'Test R²':>9} {'Non-zero 계수':>14}")
+for name, m in models.items():
+    m.fit(Xtr_s, ytr)
+    coef = getattr(m, "coef_", np.array([]))
+    nz = (coef != 0).sum() if len(coef) > 0 else "-"
+    print(f"{name:>22} {m.score(Xtr_s, ytr):>10.4f} {m.score(Xte_s, yte):>9.4f} {str(nz):>14}")
+```
+
+## 학습 곡선으로 진단하기
+
+학습 곡선은 훈련 데이터 크기를 늘려 가면서 훈련 점수와 검증 점수를 추적합니다.
+
+```python
+import numpy as np
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split, learning_curve
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import Ridge
+
+X, y = fetch_california_housing(return_X_y=True)
+pipeline = make_pipeline(StandardScaler(), Ridge(alpha=1.0))
+
+train_sizes, train_scores, val_scores = learning_curve(
+    pipeline, X, y,
+    train_sizes=np.linspace(0.1, 1.0, 10),
+    cv=5, scoring="r2", n_jobs=-1
+)
+
+print(f"{'Train size':>12} {'Train R²':>10} {'Val R²':>9}")
+for ts, tr, vl in zip(train_sizes,
+                       train_scores.mean(axis=1),
+                       val_scores.mean(axis=1)):
+    print(f"{ts:>12} {tr:>10.4f} {vl:>9.4f}")
+```
+
+- 훈련 점수와 검증 점수가 모두 낮으면: **과소적합** → 모델 용량을 늘립니다.
+- 훈련 점수만 높고 검증이 낮으면: **과적합** → 정규화를 강화하거나 데이터를 늘립니다.
+- 두 점수 모두 높고 수렴하면: **적절한 적합** → 배포 가능한 상태입니다.
+
 ## 실패 신호를 먼저 이렇게 읽습니다
 
 - 모델 용량이 커질수록 train-test 간격이 벌어지면, 구조 변경 전에 **정규화**와 **데이터 양**을 먼저 점검해야 합니다.
 - Lasso가 실행할 때마다 다른 피처를 고르면, 상관 피처가 많은지 보고 ElasticNet이나 Ridge도 함께 비교해야 합니다.
 - train과 test가 둘 다 낮으면 과적합이 아니라 **과소적합**이나 **피처 설계 부족**일 수 있습니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수
 
-1. **스케일링 없이 L1이나 L2를 적용합니다.**
-2. **`alpha`를 한 번만 시도하고 끝냅니다.**
-3. **훈련 점수만 보고 과적합을 판단합니다.**
-4. **상관 피처가 많을 때 Lasso의 불안정성을 무시합니다.**
-5. **ElasticNet의 존재를 잊습니다.**
+| 실수 | 결과 | 올바른 방법 |
+|---|---|---|
+| 스케일링 없이 L1/L2 적용 | 페널티가 피처 단위에 의존 | StandardScaler 후 적용 |
+| alpha를 한 번만 시도 | 최적 alpha 놓침 | logspace로 범위 탐색 |
+| 훈련 점수만 보고 과적합 판단 | 오진 가능 | 학습 곡선 + 테스트 점수 |
+| 상관 피처에서 Lasso 불안정 무시 | 피처 선택 불안정 | ElasticNet 또는 Ridge 병행 |
+| ElasticNet 존재를 잊음 | L1/L2 중 하나만 선택 | 세 가지 모두 비교 |
 
 ## 실무에서는 이렇게 나타납니다
 
@@ -133,11 +203,79 @@ for a in np.logspace(-3, 2, 6):
 - [ ] `alpha`를 교차검증으로 정합니다.
 - [ ] Lasso가 선택한 피처를 확인합니다.
 
+## 다항 피처로 과적합 직접 재현하기
+
+과적합이 어떻게 발생하는지 단계별로 재현하는 실험입니다.
+
+```python
+import numpy as np
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.pipeline import make_pipeline
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score
+
+# 간단한 비선형 데이터 생성
+np.random.seed(42)
+n = 100
+X = np.sort(np.random.uniform(-3, 3, n)).reshape(-1, 1)
+y = np.sin(X.ravel()) + np.random.randn(n) * 0.3
+
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=42)
+
+print(f"{'degree':>7} {'train R²':>10} {'test R²':>9} {'판단':>8}")
+for deg in [1, 2, 3, 5, 8, 12]:
+    m = make_pipeline(PolynomialFeatures(deg), LinearRegression()).fit(Xtr, ytr)
+    tr = r2_score(ytr, m.predict(Xtr))
+    te = r2_score(yte, m.predict(Xte))
+    verdict = "좋음" if abs(tr - te) < 0.05 else ("과적합" if tr > te + 0.05 else "과소적합")
+    print(f"{deg:>7} {tr:>10.4f} {te:>9.4f} {verdict:>8}")
+
+# Ridge 정규화로 고차 다항식 제어
+print("\nRidge로 degree=12 제어:")
+for alpha in [0.0001, 0.001, 0.01, 0.1, 1.0]:
+    m = make_pipeline(PolynomialFeatures(12), Ridge(alpha=alpha)).fit(Xtr, ytr)
+    tr = r2_score(ytr, m.predict(Xtr))
+    te = r2_score(yte, m.predict(Xte))
+    print(f"  alpha={alpha:.4f}: train={tr:.4f}, test={te:.4f}")
+```
+
+차수가 낮으면 과소적합, 너무 높으면 과적합이 됩니다. Ridge 정규화는 고차 다항식의 계수를 줄여서 과적합을 막습니다.
+
+## 편향-분산 트레이드오프의 실험적 시각화
+
+모델 복잡도와 편향-분산의 관계를 데이터로 확인합니다.
+
+```python
+import numpy as np
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import cross_val_score
+from sklearn.datasets import make_regression
+
+X, y = make_regression(n_samples=300, n_features=5, noise=20, random_state=42)
+
+print(f"{'max_depth':>10} {'bias(train err)':>17} {'variance(cv std)':>17} {'판단':>10}")
+for depth in [1, 2, 3, 4, 5, 7, 10, None]:
+    m = DecisionTreeRegressor(max_depth=depth, random_state=42)
+    cv = cross_val_score(m, X, y, cv=5, scoring="neg_mean_squared_error")
+    m.fit(X, y)
+    train_mse = -cross_val_score(m, X, y, cv=5, scoring="neg_mean_squared_error").mean()
+    cv_mean = -cv.mean()
+    cv_std = cv.std()
+    label = str(depth) if depth else "None"
+    verdict = "고편향" if train_mse > 500 else ("고분산" if cv_std > 100 else "균형")
+    print(f"{label:>10} {cv_mean:>17.1f} {cv_std:>17.1f} {verdict:>10}")
+```
+
+얕은 트리는 편향(오차)이 크고 분산(불안정)이 작습니다. 깊은 트리는 편향이 작지만 분산이 커집니다. 정규화는 이 사이의 균형점을 찾는 작업입니다.
+
 ## 연습 문제
 
 1. `PolynomialFeatures(degree=10)`와 Ridge를 써서 과적합을 재현해 보세요.
 2. `RidgeCV`와 수동으로 고른 `alpha`를 비교해 보세요.
 3. Lasso가 0으로 줄인 피처 목록을 적어 보세요.
+4. `learning_curve`를 그려서 현재 모델이 과적합인지 과소적합인지 진단해 보세요.
+5. ElasticNet의 `l1_ratio`를 0.1, 0.5, 0.9로 바꿔 가며 선택되는 피처 수를 비교해 보세요.
 
 ## 정리
 
@@ -146,8 +284,8 @@ for a in np.logspace(-3, 2, 6):
 ## 처음 질문으로 돌아가기
 
 - **과적합과 과소적합은 어떤 신호로 구분할까요?**
-  - - Lasso는 계수를 0으로 만들어 피처 선택 효과까지 냅니다
+  - 훈련 점수가 높고 테스트 점수가 낮으면 과적합, 둘 다 낮으면 과소적합입니다. 학습 곡선을 그리면 두 상황을 명확히 구분할 수 있습니다.
 - **편향-분산 트레이드오프는 무엇을 뜻할까요?**
-  - - Lasso는 계수를 0으로 만들어 피처 선택 효과까지 냅니다
+  - 단순한 모델은 편향이 높고 분산이 낮으며, 복잡한 모델은 편향이 낮고 분산이 높습니다. 정규화는 복잡한 모델의 분산을 줄여 균형을 찾게 해 줍니다.
 - **Ridge, Lasso, ElasticNet은 어떻게 다를까요?**
-  - - Lasso는 계수를 0으로 만들어 피처 선택 효과까지 냅니다
+  - Ridge는 모든 계수를 줄이고, Lasso는 일부를 0으로 만들어 피처 선택까지 합니다. ElasticNet은 두 방법을 혼합해 상관 피처가 많은 상황에서 더 안정적입니다.

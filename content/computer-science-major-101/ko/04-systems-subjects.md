@@ -198,6 +198,42 @@ else:
 
 여기까지 오면 시스템 과목이 추상적 암기 과목이 아니라 "문제를 좁히는 기술"로 바뀝니다.
 
+## 시스템 관점 측정 실습
+
+측정 없이 최적화하면 감으로 하는 일이 됩니다. 아래 코드는 연산 방식이 다를 때 실제 시간 차이를 직접 확인하는 가장 간단한 실험입니다.
+
+```python
+import time
+import os
+import resource
+
+def measure(label: str, fn):
+    """함수 실행 시간과 메모리를 측정합니다."""
+    rss_before = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    t = time.perf_counter()
+    result = fn()
+    elapsed = time.perf_counter() - t
+    rss_after = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    print(f"{label}: {elapsed*1000:.2f}ms, rss_delta={rss_after - rss_before}KB")
+    return result
+
+# 캐시 친화적 탐색 vs 비친화적 탐색
+n = 1000
+
+# 행우선 순회 (cache-friendly)
+matrix = [[i * n + j for j in range(n)] for i in range(n)]
+measure("row-major",   lambda: sum(matrix[i][j] for i in range(n) for j in range(n)))
+
+# 열우선 순회 (cache-unfriendly)
+measure("col-major",   lambda: sum(matrix[j][i] for i in range(n) for j in range(n)))
+
+# 리스트 컴프리헨션 vs 제너레이터
+measure("list-comp",   lambda: sum([x*x for x in range(1_000_000)]))
+measure("generator",   lambda: sum(x*x for x in range(1_000_000)))
+```
+
+이 실험의 결과를 직접 기록해 두면 "캐시 친화적 코드"와 "메모리 효율"이 추상적인 개념이 아닌 측정 가능한 수치로 바뀝니다.
+
 ## 시스템 과목을 팀 프로젝트에 연결하기
 
 시스템 과목은 시험 과목으로 끝내면 효용이 급격히 줄어듭니다. 운영 로그와 측정 결과를 읽는 연습으로 연결해야 실제 역량이 됩니다.
@@ -211,6 +247,21 @@ else:
 | 처리량 갑자기 저하 | GC 멈춤, 스케줄러 경합 | GC 로그, run queue | GC 튜닝 또는 스레드 수 조정 |
 
 학기 프로젝트에서 위 표를 장애 회고 템플릿으로 사용하면 시스템 과목 지식이 문서화 자산으로 전환됩니다.
+
+## 시스템 과목 연계 도구 맵
+
+시스템 지식을 실습으로 전환할 때 어떤 도구를 쓰면 좋을지 정리합니다.
+
+| 개념 | Linux 도구 | Python 도구 | 학습 포인트 |
+| --- | --- | --- | --- |
+| 프로세스 상태 | `ps`, `top`, `htop` | `os.getpid()`, `psutil` | 프로세스 생명주기 |
+| 메모리 사용 | `free`, `vmstat`, `/proc/$PID/status` | `resource`, `tracemalloc` | RSS vs VSZ, 누수 탐지 |
+| 파일 디스크립터 | `lsof`, `ulimit -n` | `os.open()`, `f.fileno()` | 자원 고갈 시뮬레이션 |
+| CPU 분석 | `perf`, `strace` | `cProfile`, `time.perf_counter` | CPU-bound 함수 찾기 |
+| 디스크 I/O | `iostat`, `iotop` | `io.open()` + `seek()` | I/O-bound 특성 확인 |
+| 네트워크 | `ss`, `netstat`, `tcpdump` | `socket`, `http.client` | 연결 한도와 타임아웃 |
+
+이 표를 학기 초 스터디 그룹에서 공유하면, 실습마다 어느 도구를 써야 하는지 기준이 생깁니다.
 
 ## 자주 하는 실수 5가지
 

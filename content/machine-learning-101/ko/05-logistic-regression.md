@@ -158,19 +158,90 @@ for t in [0.3, 0.5, 0.7]:
 - 임계값은 정밀도-재현율 절충을 조절하는 손잡이입니다.
 - `StandardScaler`는 최적화가 수렴하는 데 도움을 줍니다.
 
+## 분류 모델 비교: 로지스틱 회귀 vs 다른 분류기
+
+같은 데이터에서 로지스틱 회귀와 다른 분류기를 나란히 비교해 봅니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import f1_score, roc_auc_score
+
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+sc = StandardScaler().fit(Xtr)
+Xtr_s, Xte_s = sc.transform(Xtr), sc.transform(Xte)
+
+models = {
+    "LogisticRegression": LogisticRegression(max_iter=1000),
+    "DecisionTree(d=4)": DecisionTreeClassifier(max_depth=4, random_state=42),
+    "RandomForest": RandomForestClassifier(n_estimators=100, random_state=42),
+}
+
+print(f"{'모델':>22} {'Accuracy':>10} {'F1':>8} {'AUC':>8}")
+for name, m in models.items():
+    m.fit(Xtr_s, ytr)
+    pred = m.predict(Xte_s)
+    prob = m.predict_proba(Xte_s)[:, 1]
+    acc = m.score(Xte_s, yte)
+    f1 = f1_score(yte, pred)
+    auc = roc_auc_score(yte, prob)
+    print(f"{name:>22} {acc:>10.4f} {f1:>8.4f} {auc:>8.4f}")
+```
+
+로지스틱 회귀는 단순하지만 선형 경계를 가진 데이터에서는 복잡한 모델과 거의 동등합니다. 결과가 비슷하다면 해석 가능한 모델이 우선입니다.
+
+## 임계값과 정밀도-재현율 트레이드오프
+
+임계값을 바꾸면 정밀도와 재현율이 반대 방향으로 움직입니다. 이 관계를 이해해야 비즈니스 목적에 맞는 임계값을 정할 수 있습니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import precision_score, recall_score, f1_score
+
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+sc = StandardScaler().fit(Xtr)
+Xtr_s, Xte_s = sc.transform(Xtr), sc.transform(Xte)
+model = LogisticRegression(max_iter=1000).fit(Xtr_s, ytr)
+prob = model.predict_proba(Xte_s)[:, 1]
+
+print(f"{'임계값':>8} {'정밀도':>8} {'재현율':>8} {'F1':>8}")
+for t in [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]:
+    pred = (prob >= t).astype(int)
+    p = precision_score(yte, pred, zero_division=0)
+    r = recall_score(yte, pred, zero_division=0)
+    f = f1_score(yte, pred, zero_division=0)
+    print(f"{t:>8.1f} {p:>8.4f} {r:>8.4f} {f:>8.4f}")
+```
+
+- 임계값을 낮추면 재현율이 올라가고 정밀도가 내려갑니다.
+- 암 진단처럼 놓치면 위험한 경우에는 재현율을 높입니다.
+- 스팸 필터처럼 오탐이 불편한 경우에는 정밀도를 높입니다.
+- F1은 두 지표의 조화평균으로 중간 지점을 찾을 때 기준이 됩니다.
+
 ## 실패 신호를 먼저 이렇게 읽습니다
 
 - 정확도는 높은데 중요한 양성을 놓친다면, 모델보다 먼저 **재현율**과 **임계값**을 봐야 합니다.
 - 확률이 지나치게 자신 있어 보이면 `predict_proba`를 곧바로 믿기보다 **보정(calibration)** 여부를 확인해야 합니다.
 - 계수가 불안정하게 흔들리면 solver보다 먼저 **스케일링**과 **클래스 불균형**을 점검하는 편이 낫습니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수
 
-1. **원시 확률이 이미 보정되어 있다고 가정합니다.**
-2. **항상 0.5를 임계값으로 사용합니다.**
-3. **불균형 데이터에서 정확도만 보고합니다.**
-4. **피처 스케일링을 빼먹습니다.**
-5. **다중 클래스에서 명시적 multinomial 설정 없이 기본값만 믿습니다.**
+| 실수 | 증상 | 교정 방법 |
+|---|---|---|
+| 확률이 이미 보정됐다고 가정 | 확률이 실제 비율과 다름 | calibration_curve로 확인 |
+| 0.5 임계값 고정 | 비즈니스 비용 무시 | PR 곡선에서 임계값 탐색 |
+| 불균형 데이터에서 정확도만 보고 | 소수 클래스 성능 숨겨짐 | F1, AUC, recall 함께 보고 |
+| 피처 스케일링 생략 | 수렴 실패 또는 불안정 | StandardScaler 분할 후 적용 |
+| 다중 클래스 설정 누락 | 기본값이 예상과 다를 수 있음 | `multi_class` 파라미터 명시 |
 
 ## 실무에서는 이렇게 나타납니다
 
@@ -191,11 +262,127 @@ for t in [0.3, 0.5, 0.7]:
 - [ ] 비용 기준으로 임계값을 정합니다.
 - [ ] 항상 피처를 스케일링합니다.
 
+## ROC 곡선과 PR 곡선으로 모델 성능 요약
+
+임계값에 독립적인 성능 지표가 필요할 때 AUC를 씁니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    roc_auc_score, average_precision_score,
+    roc_curve, precision_recall_curve
+)
+import numpy as np
+
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+sc = StandardScaler().fit(Xtr)
+Xtr_s, Xte_s = sc.transform(Xtr), sc.transform(Xte)
+model = LogisticRegression(max_iter=1000).fit(Xtr_s, ytr)
+prob = model.predict_proba(Xte_s)[:, 1]
+
+# AUC 지표
+roc_auc = roc_auc_score(yte, prob)
+pr_auc = average_precision_score(yte, prob)
+print(f"ROC-AUC: {roc_auc:.4f}")
+print(f"PR-AUC : {pr_auc:.4f}")
+
+# ROC 곡선 포인트 샘플
+fpr, tpr, thresholds = roc_curve(yte, prob)
+print(f"\nROC 곡선 주요 포인트 (FPR, TPR, threshold):")
+indices = [0, len(fpr)//4, len(fpr)//2, 3*len(fpr)//4, -1]
+for i in indices:
+    print(f"  FPR={fpr[i]:.3f}, TPR={tpr[i]:.3f}, t={thresholds[min(i, len(thresholds)-1)]:.3f}")
+```
+
+ROC-AUC는 임계값 전반에서 모델의 순위 품질을 요약합니다. 불균형이 심하면 PR-AUC가 더 정보량이 많습니다.
+
+## 다중 클래스 로지스틱 회귀
+
+이진 분류에서 다중 분류로 확장하는 방법입니다.
+
+```python
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+
+X, y = load_iris(return_X_y=True)
+feature_names = load_iris().feature_names
+target_names = load_iris().target_names
+
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+sc = StandardScaler().fit(Xtr)
+Xtr_s, Xte_s = sc.transform(Xtr), sc.transform(Xte)
+
+# multi_class='multinomial'은 소프트맥스를 씁니다
+model = LogisticRegression(max_iter=1000, multi_class="multinomial", solver="lbfgs")
+model.fit(Xtr_s, ytr)
+
+print(classification_report(yte, model.predict(Xte_s), target_names=target_names))
+
+# 각 클래스별 확률 확인
+proba = model.predict_proba(Xte_s)[:3]
+print("\n첫 3개 샘플의 클래스별 확률:")
+for i, row in enumerate(proba):
+    probs = {n: f"{p:.3f}" for n, p in zip(target_names, row)}
+    print(f"  샘플 {i}: {probs}")
+```
+
+다중 클래스에서 `multi_class="multinomial"`은 모든 클래스를 동시에 고려합니다. `"ovr"`(One-vs-Rest)과 비교해서 데이터에 맞는 설정을 찾습니다.
+
+## 클래스 불균형 처리 전략 비교
+
+불균형 데이터에서 로지스틱 회귀의 성능을 개선하는 여러 전략을 비교합니다.
+
+```python
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score, roc_auc_score, average_precision_score
+import numpy as np
+
+# 90:10 불균형 데이터
+X, y = make_classification(
+    n_samples=2000, n_features=15,
+    weights=[0.90, 0.10], random_state=42
+)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+sc = StandardScaler().fit(Xtr)
+Xtr_s, Xte_s = sc.transform(Xtr), sc.transform(Xte)
+
+strategies = {
+    "기본 (C=1.0)": LogisticRegression(C=1.0, max_iter=1000),
+    "class_weight=balanced": LogisticRegression(class_weight="balanced", max_iter=1000),
+    "C=0.1 (정규화 강화)": LogisticRegression(C=0.1, max_iter=1000),
+    "balanced + C=0.1": LogisticRegression(class_weight="balanced", C=0.1, max_iter=1000),
+}
+
+print(f"{'전략':>25} {'F1':>8} {'ROC-AUC':>9} {'PR-AUC':>8}")
+for name, m in strategies.items():
+    m.fit(Xtr_s, ytr)
+    pred = m.predict(Xte_s)
+    prob = m.predict_proba(Xte_s)[:, 1]
+    f1 = f1_score(yte, pred, zero_division=0)
+    auc = roc_auc_score(yte, prob)
+    pr = average_precision_score(yte, prob)
+    print(f"{name:>25} {f1:>8.4f} {auc:>9.4f} {pr:>8.4f}")
+```
+
+`class_weight="balanced"`는 소수 클래스에 더 큰 가중치를 줍니다. 불균형이 심할수록 F1과 PR-AUC가 더 의미 있는 지표입니다.
+
 ## 연습 문제
 
 1. 임계값을 0.1부터 0.9까지 바꿔 가며 정밀도와 재현율을 그려 보세요.
 2. `class_weight="balanced"`를 적용했을 때 결과를 비교해 보세요.
 3. 다중 클래스 데이터셋에 `multi_class="multinomial"`을 적용해 보세요.
+4. 로지스틱 회귀와 랜덤 포레스트의 AUC를 비교하고 어떤 상황에서 로지스틱 회귀가 더 나은지 분석해 보세요.
+5. `C` 파라미터(정규화 강도 역수)를 0.001부터 100까지 바꿔 가며 검증 점수를 관찰해 보세요.
 
 ## 정리
 
@@ -204,13 +391,8 @@ for t in [0.3, 0.5, 0.7]:
 ## 처음 질문으로 돌아가기
 
 - **0 또는 1을 예측하는데 왜 이름은 회귀일까요?**
-  - 로지스틱 회귀의 핵심은 **시그모이드 함수**입니다
+  - 내부적으로 선형 점수를 계산하기 때문에 회귀라는 이름이 붙었습니다. 최종 분류 결정은 그 점수를 확률로 변환한 뒤 임계값을 적용해 나옵니다.
 - **시그모이드는 선형 점수를 어떻게 확률로 바꿀까요?**
-  - 이름이 혼란스러운 이유는 로지스틱 회귀가 확률을 출력하기 때문입니다
+  - 어떤 실수 입력도 (0, 1) 구간으로 압축합니다. 입력이 크면 1에 가까워지고, 작으면 0에 가까워지는 S자 곡선입니다.
 - **왜 0.5 임계값을 항상 정답처럼 쓰면 안 될까요?**
-  - 로지스틱 회귀의 핵심은 **시그모이드 함수**입니다
-from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import...
-- **실습: 5단계로 보는 분류의 핵심 원리를 한 문장으로 설명하면 무엇일까요?**
-  
+  - 비즈니스 비용이 거짓 양성과 거짓 음성 사이에서 비대칭일 때는 임계값을 조정해야 합니다. 암 진단이라면 0.3이, 스팸 필터라면 0.7이 더 적절할 수 있습니다.

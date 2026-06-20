@@ -44,17 +44,17 @@ Azure Functions를 운영하다 보면 가장 먼저 부딪히는 질문은 의�
 
 ## 왜 이 글이 중요한가
 
-운영에서 자주 보는 증상은 “앱이 안 뜬다”라는 한 문장으로 들어오지만, 실제 원인은 제각각입니다. `host.json` 옵션이 잘못 들어가 부팅이 깨질 수도 있고, 함수 메타데이터 인덱싱이 끝나지 않았을 수도 있고, 그 다음 단계인 리스너 시작에서 시간이 걸릴 수도 있습니다. 부팅 경계를 모르면 서로 다른 장애 모드를 하나로 뭉뚱그리게 됩니다.
+운영에서 자주 보는 증상은 "앱이 안 뜬다"라는 한 문장으로 들어오지만, 실제 원인은 제각각입니다. `host.json` 옵션이 잘못 들어가 부팅이 깨질 수도 있고, 함수 메타데이터 인덱싱이 끝나지 않았을 수도 있고, 그 다음 단계인 리스너 시작에서 시간이 걸릴 수도 있습니다. 부팅 경계를 모르면 서로 다른 장애 모드를 하나로 뭉뚱그리게 됩니다.
 
 또 하나 중요한 점은 Azure Functions의 언어 실행 모델이 호스트와 워커로 분리되어 있다는 사실입니다. 이 시리즈는 gRPC 채널, 워커 프로세스, 스케일링, 콜드 스타트까지 모두 다루지만, 그 모든 설명은 `ScriptHost`가 언제 준비 완료 상태가 되는지 이해한 뒤에야 의미를 갖습니다. 첫 단추가 틀리면 이후 개념도 계속 비껴갑니다.
 
-무엇보다 이 글은 운영자가 로그를 읽는 순서를 바꿔 줍니다. “왜 함수가 실행되지 않았지?”가 아니라 “호스트가 부팅을 끝냈는지, 함수 목록을 만들었는지, 리스너 시작 직전까지 도달했는지”를 먼저 묻게 만듭니다. 이 차이가 있어야 재시작 로그와 시작 실패 로그를 같은 의미로 오해하지 않게 됩니다.
+무엇보다 이 글은 운영자가 로그를 읽는 순서를 바꿔 줍니다. "왜 함수가 실행되지 않았지?"가 아니라 "호스트가 부팅을 끝냈는지, 함수 목록을 만들었는지, 리스너 시작 직전까지 도달했는지"를 먼저 묻게 만듭니다. 이 차이가 있어야 재시작 로그와 시작 실패 로그를 같은 의미로 오해하지 않게 됩니다.
 
 ## 핵심 관점
 
 Azure Functions 호스트 부팅은 거대한 블랙박스처럼 보이지만, 실제로는 역할이 분명한 두 층으로 나뉩니다. 바깥쪽에는 ASP.NET Core 호스팅 모델 위에 올라간 `WebJobsScriptHostService`가 있고, 안쪽에는 실제 함수 앱 준비를 수행하는 `ScriptHost`가 있습니다. 바깥 껍질은 생명주기를 관리하고, 안쪽 커널은 설정 로드·메타데이터 인덱싱·리스너 시작 직전 상태까지를 책임집니다.
 
-이 구분이 중요한 이유는 회복 전략이 바로 여기서 나오기 때문입니다. 호스트가 죽더라도 외피가 살아 있으면 새 `ScriptHost`를 만들어 다시 붙일 수 있습니다. 즉, “호스트가 재시작됐다”는 운영 현상을 볼 때 실제로 교체된 것이 무엇인지 구분할 수 있어야 합니다.
+이 구분이 중요한 이유는 회복 전략이 바로 여기서 나오기 때문입니다. 호스트가 죽더라도 외피가 살아 있으면 새 `ScriptHost`를 만들어 다시 붙일 수 있습니다. 즉, "호스트가 재시작됐다"는 운영 현상을 볼 때 실제로 교체된 것이 무엇인지 구분할 수 있어야 합니다.
 
 > 이 글에서 호스트 부팅이란 ASP.NET Core 프로세스 전체가 아니라, `WebJobsScriptHostService`가 `ScriptHost`를 구성하고 `InitializeAsync`를 끝내서 리스너 시작 직전까지 올려놓는 경계입니다.
 
@@ -120,7 +120,7 @@ ASP.NET Core 호스트가 올라오면 Functions 쪽 진짜 주인공은 `IHoste
 
 *호스트 상태 점검과 재시작 판단 흐름*
 
-따라서 별도 “헬스 모니터 서비스”를 상상할 필요는 없습니다. 이 저장소 안에서 보이는 구현은 타이머 루프와 성능 판단 조합입니다. 부팅 예외, 지나치게 긴 부팅 시간, 메모리·CPU 임계치 초과 같은 현상이 결국 여기서 재시작 판단으로 이어집니다.
+따라서 별도 "헬스 모니터 서비스"를 상상할 필요는 없습니다. 이 저장소 안에서 보이는 구현은 타이머 루프와 성능 판단 조합입니다. 부팅 예외, 지나치게 긴 부팅 시간, 메모리·CPU 임계치 초과 같은 현상이 결국 여기서 재시작 판단으로 이어집니다.
 
 ### 소스 코드 경로를 파일 단위로 고정해 두면 재현 속도가 빨라집니다
 
@@ -213,6 +213,47 @@ az functionapp log tail -n my-func -g my-rg
 
 이 출력에서 `FUNCTIONS_EXTENSION_VERSION`, 워커 관련 설정, `WEBSITE_` 계열 값과 시작 로그를 함께 보면, 호스트 부팅 문제인지 워커 연결 이후 문제인지 빠르게 범위를 좁힐 수 있습니다.
 
+### Application Insights 쿼리로 부팅 단계 로그를 추출하기
+
+라이브 로그 외에 Application Insights에 쌓인 로그를 단계별로 분석할 수 있습니다.
+
+```kusto
+traces
+| where timestamp > ago(2h)
+| where message contains "ScriptHost" or message contains "FunctionMetadata" or message contains "listener"
+| project timestamp, message, severityLevel, cloud_RoleInstance
+| order by timestamp asc
+```
+
+부팅 타임라인을 재구성하려면 `cloud_RoleInstance`로 인스턴스를 고정한 뒤, `timestamp` 순으로 읽습니다. 같은 인스턴스에서 `IndexFunctionMetadata` 시작과 완료 사이 간격이 비정상적으로 길다면 함수 수 증가나 파일 시스템 성능 문제를 의심합니다.
+
+```kusto
+exceptions
+| where timestamp > ago(2h)
+| where outerMessage contains "Script host initialization failed"
+| project timestamp, outerMessage, details, cloud_RoleInstance
+| order by timestamp desc
+```
+
+초기화 실패는 예외 테이블에서 더 잘 보입니다. `outerMessage`와 `details`를 같이 보면 설정 오류인지 메타데이터 파싱 오류인지 줄어듭니다.
+
+### `host.json` 변경 검증 절차
+
+`host.json`을 변경하기 전과 후에 실제 런타임 옵션이 제대로 반영됐는지 확인하는 절차가 있어야 합니다. Azure Functions에서 현재 적용된 호스트 설정을 확인하는 방법은 두 가지입니다.
+
+```bash
+# Kudu를 통한 직접 파일 확인
+curl -u "username:password" \
+  https://my-func.scm.azurewebsites.net/api/vfs/site/wwwroot/host.json
+
+# 앱 설정 전체를 덤프해 host.json과 충돌 여부 확인
+az functionapp config appsettings list -n my-func -g my-rg -o json | \
+  python3 -c "import json,sys; [print(x['name'],'=',x['value']) for x in json.load(sys.stdin)]" | \
+  sort
+```
+
+설정 변경 리뷰는 파일 diff와 앱 설정 diff를 동시에 봐야 합니다. 어느 한쪽만 보면 최종 런타임 값을 오판할 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - **`WebJobsScriptHostService`가 곧 실행 호스트는 아닙니다.** 이것은 수명주기 관리자이고, 실제 함수 앱 호스트는 내부의 `ScriptHost`입니다.
@@ -220,6 +261,7 @@ az functionapp log tail -n my-func -g my-rg
 - **함수 메타데이터 인덱싱은 선택적 부가 단계가 아닙니다.** 워커 로드와 트리거 리스너 활성화의 전제가 되는 카탈로그 생성 단계입니다.
 - **호스트 시작과 리스너 시작은 같은 순간이 아닙니다.** `InitializeAsync`가 끝난 뒤에야 `JobHost.StartAsync()`가 이어집니다.
 - **재시작 로그가 보인다고 해서 항상 앱 코드 문제는 아닙니다.** 타이머 기반 헬스 모니터와 성능 판단이 호스트 교체를 일으킬 수도 있습니다.
+- **`host.json` 변경이 반영 안 된다고 느껴질 때는 앱 설정 override를 먼저 확인해야 합니다.** 같은 `IConfiguration` 트리에서 앱 설정이 파일 설정보다 우선합니다.
 
 ## 운영 체크리스트
 
@@ -228,10 +270,12 @@ az functionapp log tail -n my-func -g my-rg
 - [ ] 호스트 시작 실패와 반복 재시작에 대한 알림 규칙을 만들었습니다.
 - [ ] Host와 Worker가 별도 프로세스라는 실행 모델을 팀 운영 문서에 반영했습니다.
 - [ ] 시작 로그를 볼 때 부팅 단계와 리스너 활성화 단계를 분리해서 읽도록 RUNBOOK을 정리했습니다.
+- [ ] `host.json`과 앱 설정 override를 함께 검토하는 변경 리뷰 절차를 만들었습니다.
+- [ ] Application Insights에서 부팅 단계별 로그를 추출하는 KQL 쿼리를 런북에 포함했습니다.
 
 ## 정리
 
-이번 글의 핵심은 호스트 부팅을 하나의 덩어리로 보지 않는 것입니다. ASP.NET Core 위에서 `WebJobsScriptHostService`가 수명주기를 잡고, 그 안에서 `ScriptHost`가 설정 로드와 함수 메타데이터 인덱싱을 수행한 뒤, 그 다음에야 리스너 시작 단계로 넘어갑니다. 이 순서를 알면 “함수가 왜 아직 실행되지 않는가”라는 질문이 훨씬 구체적인 단계 질문으로 바뀝니다.
+이번 글의 핵심은 호스트 부팅을 하나의 덩어리로 보지 않는 것입니다. ASP.NET Core 위에서 `WebJobsScriptHostService`가 수명주기를 잡고, 그 안에서 `ScriptHost`가 설정 로드와 함수 메타데이터 인덱싱을 수행한 뒤, 그 다음에야 리스너 시작 단계로 넘어갑니다. 이 순서를 알면 "함수가 왜 아직 실행되지 않는가"라는 질문이 훨씬 구체적인 단계 질문으로 바뀝니다.
 
 또한 `host.json`과 환경변수가 같은 구성 트리 안에서 런타임 옵션으로 합쳐진다는 점도 중요합니다. 운영자는 설정 파일과 앱 설정을 따로 보지 말고, 하나의 호스트 구성 표면으로 봐야 합니다. 이 관점을 잡아 두면 워커 수, 타임아웃, 동시성 설정이 왜 부팅 초기에 이미 결정되는지 이해하기 쉬워집니다.
 
@@ -240,12 +284,11 @@ az functionapp log tail -n my-func -g my-rg
 ## 처음 질문으로 돌아가기
 
 - **Functions Host는 정확히 어떤 프로세스이며, 어떤 순서로 부팅될까요?**
-  - 운영에서 자주 보는 증상은 “앱이 안 뜬다”라는 한 문장으로 들어오지만, 실제 원인은 제각각입니다
+  - `WebJobsScriptHostService`가 `ScriptHost`를 만들고 `InitializeAsync`를 거쳐 리스너를 시작합니다. 네 단계(진입, 초기화, 설정 로딩, 메타데이터 인덱싱)로 나눠 보면 각 단계별 장애 원인이 선명해집니다.
 - **`host.json`은 단순 설정 파일일까요, 아니면 런타임 동작을 바꾸는 실제 구성 입력일까요?**
-  - - **`WebJobsScriptHostService`가 곧 실행 호스트는 아닙니다.
+  - 런타임 옵션의 실제 입력입니다. `HostJsonFileConfigurationSource`가 파일을 `IConfiguration` 트리에 올리고, 앱 설정이 같은 트리에서 더 높은 우선순위로 덮어쓸 수 있습니다. 따라서 변경 리뷰는 파일과 앱 설정 양쪽을 함께 봐야 합니다.
 - **호스트 시작 실패는 어디에 기록되고, 첫 번째 진단 지점은 어디일까요?**
-  - 운영에서 자주 보는 증상은 “앱이 안 뜬다”라는 한 문장으로 들어오지만, 실제 원인은 제각각입니다
-  - 운영에서 자주 보는 증상은 “앱이 안 뜬다”라는 한 문장으로 들어오지만, 실제 원인은 제각각입니다.
+  - Application Insights `exceptions` 테이블에 `Script host initialization failed` 메시지로 기록됩니다. 첫 번째 진단 지점은 `WebJobsScriptHostService` 시작 예외이며, 그 다음은 `FunctionMetadataManager` 인덱싱 로그 순으로 범위를 좁힙니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

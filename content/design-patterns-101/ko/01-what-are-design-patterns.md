@@ -158,6 +158,153 @@ def charge(kind: str, amount: int) -> None:
 
 이걸 구분하는 게 왜 중요할까요? 모든 좋은 코딩 습관을 "패턴"이라고 부르기 시작하면, 정작 패턴이라는 단어가 가진 합의 속도라는 가치가 흐려지기 때문입니다. 패턴은 언어와 무관하게 같은 문제-해법 구조를 가리킬 때 쓰는 단어로 남겨 두는 편이 깨끗합니다.
 
+## 패턴 선택 흐름: 문제 → 범주 → 후보
+
+실무에서 패턴을 고를 때는 이름부터 떠올리는 것보다 문제부터 분류하는 흐름이 더 안전합니다.
+
+```text
+문제 신호 분류
+├── 객체 생성 방식이 복잡하거나 결정권이 불명확할 때
+│   └── Creational 범주 탐색
+│       ├── 복잡한 객체 조립 순서 → Builder
+│       ├── 어떤 클래스 인스턴스를 만들지 외부가 결정 → Factory Method
+│       └── 전역 단일 인스턴스 필요 → Singleton (Python에서는 모듈 변수 우선 검토)
+│
+├── 인터페이스 불일치 / 기존 코드 재사용 어려울 때
+│   └── Structural 범주 탐색
+│       ├── 외부 인터페이스를 내부에 맞게 감쌀 때 → Adapter
+│       ├── 기능을 동적으로 덧붙일 때 → Decorator
+│       └── 복잡한 서브시스템 단순화 → Facade
+│
+└── 알고리즘·행동 교환 / 객체 간 소통 방식 조정
+    └── Behavioral 범주 탐색
+        ├── 행동을 런타임에 교환 → Strategy
+        ├── 이벤트 발행·구독 구조 → Observer
+        └── 실행을 객체로 캡슐화 → Command
+```
+
+이 흐름을 따르면 패턴 이름을 몰라도 "이 문제가 어느 방향인지"는 빠르게 판단할 수 있습니다. 이름은 그 다음에 찾아도 늦지 않습니다.
+
+## 패턴별 도입 신호와 경고 신호
+
+각 범주별로 패턴을 도입해야 한다는 신호와, 오히려 도입하지 말아야 한다는 경고 신호를 표로 정리합니다.
+
+| 패턴 | 도입 신호 | 경고 신호 (이럴 땐 쓰지 마세요) |
+| --- | --- | --- |
+| Strategy | 같은 작업의 구현이 2가지 이상이고 런타임 교환 필요 | 구현이 하나뿐이거나 변경 가능성이 낮은 경우 |
+| Adapter | 외부 라이브러리/API 인터페이스가 우리 코드와 맞지 않음 | 외부 인터페이스가 이미 원하는 형태인 경우 |
+| Observer | 한 이벤트를 여러 구독자가 독립적으로 처리해야 할 때 | 구독자가 하나뿐이고 늘어날 가능성이 없을 때 |
+| Factory Method | 어떤 클래스를 생성할지 서브클래스나 외부가 결정해야 할 때 | 생성 로직이 단순하고 클래스가 하나뿐일 때 |
+| Builder | 옵션이 많고 조합 방식이 다양한 복잡 객체 생성 | 생성자 인자가 2-3개 이하의 단순 객체 |
+| Decorator | 객체에 책임을 동적으로 추가해야 할 때 | 기능이 정적이고 컴파일 타임에 결정되는 경우 |
+| Singleton | 전역 단일 인스턴스가 진정 필요한 경우 (설정, 연결 풀) | 테스트 격리가 중요하거나 인스턴스 개수가 바뀔 수 있을 때 |
+
+경고 신호를 무시하고 패턴을 도입하면 코드가 오히려 더 읽기 어려워집니다. "이 코드에 패턴이 없으니 나쁜 코드"라는 생각은 잘못된 전제입니다.
+
+## Observer 패턴: 구독-발행 구조의 최소 구현
+
+Strategy 다음으로 실무에서 자주 마주치는 패턴이 Observer입니다. 이벤트 발행자(Subject)와 여러 구독자(Observer)를 분리하는 구조입니다.
+
+```python
+from __future__ import annotations
+from typing import Protocol
+
+
+class Observer(Protocol):
+    def on_event(self, event: dict) -> None: ...
+
+
+class EventBus:
+    def __init__(self) -> None:
+        self._subscribers: list[Observer] = []
+
+    def subscribe(self, observer: Observer) -> None:
+        self._subscribers.append(observer)
+
+    def publish(self, event: dict) -> None:
+        for sub in self._subscribers:
+            sub.on_event(event)
+
+
+# 사용 예시
+class EmailNotifier:
+    def on_event(self, event: dict) -> None:
+        print(f"[Email] 이벤트 수신: {event['type']}")
+
+
+class AuditLogger:
+    def on_event(self, event: dict) -> None:
+        print(f"[Audit] {event['type']} 기록됨")
+
+
+bus = EventBus()
+bus.subscribe(EmailNotifier())
+bus.subscribe(AuditLogger())
+
+bus.publish({"type": "order_placed", "order_id": 42})
+# [Email] 이벤트 수신: order_placed
+# [Audit] order_placed 기록됨
+```
+
+이 구조에서 발행자는 구독자가 몇 명인지, 어떤 동작을 하는지 전혀 모릅니다. 새 구독자를 추가할 때 발행자 코드를 건드릴 필요가 없습니다. 이 점이 Observer의 핵심 가치입니다.
+
+## Adapter 패턴: 인터페이스 불일치 해소
+
+외부 라이브러리를 바꾸거나, 내부 코드를 외부 인터페이스에서 격리해야 할 때 Adapter를 씁니다.
+
+```python
+from typing import Protocol
+
+
+# 우리 도메인이 기대하는 인터페이스
+class Notifier(Protocol):
+    def send(self, recipient: str, message: str) -> bool: ...
+
+
+# 외부 라이브러리 — 인터페이스가 우리와 다름
+class SlackClient:
+    def post_message(self, channel: str, text: str, icon: str = ":robot_face:") -> dict:
+        print(f"Slack -> #{channel}: {text}")
+        return {"ok": True}
+
+
+# Adapter: 외부 인터페이스를 내부 인터페이스로 변환
+class SlackNotifierAdapter:
+    def __init__(self, client: SlackClient, default_channel: str) -> None:
+        self._client = client
+        self._channel = default_channel
+
+    def send(self, recipient: str, message: str) -> bool:
+        result = self._client.post_message(
+            channel=self._channel,
+            text=f"@{recipient}: {message}",
+        )
+        return result.get("ok", False)
+
+
+# 도메인 코드는 Notifier 인터페이스만 알고 있음
+def notify_team(notifier: Notifier, members: list[str], msg: str) -> None:
+    for member in members:
+        notifier.send(member, msg)
+
+
+slack = SlackClient()
+adapter = SlackNotifierAdapter(slack, default_channel="alerts")
+notify_team(adapter, ["alice", "bob"], "배포 완료")
+```
+
+나중에 Slack을 Teams로 교체할 때, `notify_team`은 건드리지 않아도 됩니다. 새 `TeamsNotifierAdapter`만 만들면 됩니다.
+
+## 흔히 헷갈리는 지점
+
+| 혼동 | 올바른 이해 |
+| --- | --- |
+| 패턴 = 클래스 다이어그램 | 패턴은 문제-해법 쌍입니다. 다이어그램은 구현 예시에 불과합니다 |
+| 패턴 = 고급 코드 | 단순한 if/elif가 더 나을 때도 많습니다. 복잡성을 추가하는 모든 패턴에는 근거가 필요합니다 |
+| Strategy = 인터페이스 강제 | Python에서 Protocol을 쓰면 명시적 상속 없이도 덕 타이핑으로 구현 가능합니다 |
+| Singleton = 전역변수 | Singleton은 인스턴스 생성 제어에 관한 패턴입니다. 전역 접근은 부수 효과입니다 |
+| Observer = 이벤트 드리븐 시스템 전체 | Observer는 단일 이벤트 채널 패턴입니다. 전체 이벤트 아키텍처와 혼동하지 않아야 합니다 |
+
 ## 1장에서 가져갈 한 가지
 
 이 장에서 단 하나만 가져가야 한다면 이겁니다. **패턴 이름을 외우기 전에, 그 패턴이 어떤 문제를 풀고 어떤 비용을 부르는지 먼저 한 문장으로 말할 수 있어야 합니다.** 이게 되면 23개를 다 외우지 않아도 실무에서 필요한 5-7개만으로 충분히 강력해집니다. 이게 안 되면 23개를 다 외워도 적용하는 순간마다 팀에 부담이 됩니다.
@@ -169,6 +316,8 @@ def charge(kind: str, amount: int) -> None:
 - [ ] 디자인 패턴을 한 문장으로 정의할 수 있습니다.
 - [ ] 생성·구조·행위 세 범주의 역할을 구분할 수 있습니다.
 - [ ] 패턴 남용이 왜 위험한지 설명할 수 있습니다.
+- [ ] 문제 신호 → 패턴 범주 → 패턴 후보 흐름으로 선택할 수 있습니다.
+- [ ] Strategy, Adapter, Observer의 도입 신호를 말할 수 있습니다.
 
 ## 정리
 
@@ -179,9 +328,9 @@ def charge(kind: str, amount: int) -> None:
 - **디자인 패턴은 결국 무엇을 가리키는 말일까요?**
   - 디자인 패턴은 "이 코드를 이렇게 짜라"는 답안이 아닙니다. 더 정확히 말하면 **이런 종류의 문제가 반복해서 나타날 때, 사람들이 비슷한 모양으로 풀어 온 해법에 붙인 이름**입니다. 패턴의 본체는 코드가 아니라 문제-해법 쌍입니다.
 - **패턴 이름을 외우는 것과 패턴을 이해하는 것은 어떻게 다를까요?**
-  - 디자인 패턴은 "이 코드를 이렇게 짜라"는 답안이 아닙니다. 더 정확히 말하면 **이런 종류의 문제가 반복해서 나타날 때, 사람들이 비슷한 모양으로 풀어 온 해법에 붙인 이름**입니다. 패턴의 본체는 코드가 아니라 문제-해법 쌍입니다.
+  - 이름을 외우면 용어를 쓸 수 있지만, 언제 왜 써야 하는지 설명하지 못합니다. 패턴을 이해한다는 것은 "이 문제 신호를 보면 이 패턴이 후보로 떠오르고, 이런 비용이 따르므로 이럴 때만 도입한다"는 판단 흐름을 갖추는 것입니다.
 - **같은 문제에 패턴을 쓰는 팀과 안 쓰는 팀의 차이는 어디에서 생길까요?**
-  - 디자인 패턴은 "이 코드를 이렇게 짜라"는 답안이 아닙니다. 더 정확히 말하면 **이런 종류의 문제가 반복해서 나타날 때, 사람들이 비슷한 모양으로 풀어 온 해법에 붙인 이름**입니다. 패턴의 본체는 코드가 아니라 문제-해법 쌍입니다.
+  - 패턴 이름이 공통 어휘가 되면 코드 리뷰·설계 토론에서 합의 속도가 달라집니다. "Strategy로 빼자"는 한 마디가 두 단락짜리 설명을 대체합니다. 이 어휘가 없으면 같은 문제를 매번 처음부터 설명해야 하고, 그 과정에서 오해와 재작업이 생깁니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
