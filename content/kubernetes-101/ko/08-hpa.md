@@ -49,6 +49,16 @@ last_reviewed: '2026-05-15'
 
 HPA는 이 문제를 메트릭 기반 자동화로 줄입니다. 다만 자동화라고 해서 무조건 똑똑한 것은 아닙니다. 기준 지표가 부정확하면 엉뚱한 결정을 내릴 수 있고, 파드를 늘려도 노드가 부족하면 실제 스케일은 진행되지 않습니다. 그래서 HPA는 메트릭과 클러스터 용량을 함께 봐야 합니다.
 
+## HPA vs 수동 스케일링 비교
+
+| 항목 | 수동 스케일링 | HPA |
+|---|---|---|
+| 대응 속도 | 사람이 확인 후 수동 변경 (늦음) | 메트릭 초과 즉시 자동 조절 |
+| 비용 효율 | 피크 대비 과잉 프로비저닝 | 부하에 따라 최적 파드 수 유지 |
+| 운영 부담 | 24시간 모니터링 필요 | 기준값 설정 후 자동화 |
+| 정확성 | 경험 기반 판단 | 메트릭 기반 정확한 계산 |
+| 위험 | 대응 누락 시 서비스 장애 | 기준값 오설정 시 과잉/과소 스케일 |
+
 ## 한눈에 보는 구조
 
 HPA는 파드를 직접 만들고 지우기보다 Deployment의 원하는 개수를 조정합니다. 즉, 자동 스케일링의 판단 계층이라고 보는 편이 더 정확합니다. 뒤의 실제 파드 생성과 유지 작업은 여전히 Deployment가 맡습니다.
@@ -59,18 +69,78 @@ HPA는 파드를 직접 만들고 지우기보다 Deployment의 원하는 개수
 - 커스텀 메트릭: 큐 길이, 요청 수 같은 외부 지표입니다.
 - VPA: 파드 수가 아니라 파드 하나의 자원 요청값을 조절하는 도구입니다.
 
-## 도입 전과 후
+## HPA YAML 완전 이해
 
-HPA가 없으면 피크 시간에는 503이 늘어나고, 한가한 시간에는 파드가 과하게 떠 있을 수 있습니다. 운영자는 트래픽 패턴을 보고 수동으로 replicas를 바꿔야 합니다.
+### 기본 CPU 기반 HPA (autoscaling/v2)
 
-HPA를 두면 현재 부하에 맞춰 파드 수를 자동으로 조절할 수 있습니다. 물론 자동화의 핵심은 기능 자체보다 기준값과 한계값을 어떻게 잡느냐에 있습니다. 최소 개수, 최대 개수, 메트릭 품질이 함께 맞아야 기대한 효과가 납니다.
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web
+  minReplicas: 2          # 최소 파드 수 (고가용성 기준)
+  maxReplicas: 10         # 최대 파드 수 (비용·용량 상한)
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 60   # requests 대비 60% 초과 시 스케일 아웃
+```
 
-## 단계별로 CPU 기반 HPA 구성하기
+이 설정은 평균 CPU 사용률이 requests 대비 60% 수준을 유지하도록 파드 수를 조절합니다. `minReplicas: 2`는 가용성의 시작점이고, `maxReplicas: 10`은 비용과 용량의 상한선입니다.
 
-### 1단계 — Deployment에 자원 요청 설정
+### CPU + 메모리 복합 기준 HPA
 
-```python
-"""
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:                        # 스케일링 동작 제어
+    scaleDown:
+      stabilizationWindowSeconds: 300   # 스케일 인 전 안정화 대기 (5분)
+      policies:
+      - type: Percent
+        value: 25                        # 한 번에 최대 25%씩만 줄임
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 60    # 스케일 아웃 전 안정화 대기 (1분)
+      policies:
+      - type: Pods
+        value: 4                         # 한 번에 최대 4개씩 추가
+        periodSeconds: 60
+```
+
+### Deployment에 resource requests 설정 (HPA 필수 요건)
+
+```yaml
 spec:
   template:
     spec:
@@ -78,72 +148,76 @@ spec:
       - name: app
         image: myorg/app:1.0
         resources:
-          requests: {cpu: 200m, memory: 256Mi}
-"""
+          requests:             # HPA가 사용률 계산에 사용하는 기준값
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 512Mi
 ```
 
 HPA가 CPU 사용률을 계산하려면 기준점이 필요합니다. 그 기준이 바로 requests입니다. requests가 없으면 사용률 비율을 계산할 수 없어서 자동화가 기대한 대로 움직이지 않습니다.
 
-### 2단계 — HPA 매니페스트 작성
+## 단계별로 CPU 기반 HPA 구성하기
 
-```python
-"""
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata: {name: web}
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: web
-  minReplicas: 2
-  maxReplicas: 10
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target: {type: Utilization, averageUtilization: 60}
-"""
+### 1단계 — metrics-server 설치 확인
+
+```bash
+# metrics-server 파드 확인
+kubectl get pods -n kube-system | grep metrics-server
+
+# 메트릭 수집 동작 확인
+kubectl top nodes
+kubectl top pods
 ```
 
-이 설정은 평균 CPU 사용률이 requests 대비 60% 수준을 유지하도록 파드 수를 조절합니다. `minReplicas: 2`는 가용성의 시작점이고, `maxReplicas: 10`은 비용과 용량의 상한선입니다.
+`top` 명령이 동작해야 HPA가 읽을 메트릭이 존재한다는 뜻입니다. 이 명령이 실패하면 HPA YAML보다 metrics-server부터 확인해야 합니다.
 
-### 3단계 — 적용
+### 2단계 — Deployment 적용
 
-```python
-import subprocess
-
-def apply(path):
-    subprocess.run(["kubectl", "apply", "-f", path], check=True)
+```bash
+kubectl apply -f deployment.yaml   # resources.requests 포함된 Deployment
 ```
 
-리소스를 적용했다고 끝난 것은 아닙니다. HPA는 메트릭이 실제로 들어오는지 확인해야 비로소 의미가 있습니다. 객체가 있어도 메트릭이 없으면 자동화는 멈춰 있습니다.
+### 3단계 — HPA 적용
+
+```bash
+kubectl apply -f hpa.yaml
+kubectl get hpa web
+```
+
+출력 예시:
+```
+NAME   REFERENCE         TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+web    Deployment/web    15%/60%   2         10        2          1m
+```
+
+`TARGETS`에서 현재 CPU 사용률(15%)과 목표(60%)를 볼 수 있습니다. 사용률이 60% 이상이 되면 스케일 아웃이 시작됩니다.
 
 ### 4단계 — 부하 만들기
 
-```python
-def load(target):
-    subprocess.run([
-        "kubectl", "run", "load", "--rm", "-i", "--restart=Never",
-        "--image=busybox", "--", "sh", "-c",
-        f"while true; do wget -q -O- {target}; done",
-    ], check=False)
+```bash
+# 부하 발생 (별도 터미널에서 실행)
+kubectl run load --rm -i --restart=Never --image=busybox -- \
+  sh -c "while true; do wget -q -O- http://web.default.svc.cluster.local; done"
 ```
 
-테스트 부하를 만들어 보면 HPA가 실제로 스케일 아웃하는지 확인할 수 있습니다. 기준값을 검증하지 않고 운영에 바로 넣으면 너무 늦거나 너무 민감한 자동화가 오래 남기 쉽습니다.
+### 5단계 — HPA 상태 실시간 모니터링
 
-### 5단계 — HPA 상태 확인
+```bash
+# 실시간 변화 관찰
+kubectl get hpa web -w
 
-```python
-def hpa_status(name):
-    res = subprocess.run(
-        ["kubectl", "get", "hpa", name, "-o", "wide"],
-        capture_output=True, text=True, check=True,
-    )
-    return res.stdout
+# HPA 상세 이벤트 확인
+kubectl describe hpa web
 ```
 
-현재 메트릭, 목표값, 최소·최대 replicas, 실제 replicas를 함께 봐야 합니다. HPA는 숫자를 자동으로 바꾸는 기능이므로 상태 조회가 곧 디버깅의 출발점입니다.
+출력 예시 (스케일 아웃 발생 시):
+```
+Events:
+  Normal  SuccessfulRescale  2m    horizontal-pod-autoscaler  New size: 4; reason: cpu resource utilization (percentage of request) above target
+  Normal  SuccessfulRescale  5m    horizontal-pod-autoscaler  New size: 6; reason: cpu resource utilization (percentage of request) above target
+```
 
 ## 검증 흐름
 
@@ -161,19 +235,57 @@ kubectl describe hpa web
 - HPA는 늘리려 하는데 Pod가 안 뜨면 노드 용량 부족이나 Cluster Autoscaler 부재가 더 큰 원인입니다.
 - scale in/out이 계속 흔들리면 target 값보다 requests 크기와 부하 패턴을 먼저 다시 봅니다.
 
-- requests가 없으면 HPA는 계산 기준을 잃습니다.
-- `averageUtilization`은 절대값이 아니라 requests 대비 비율입니다.
-- `minReplicas >= 2`는 고가용성의 시작점입니다.
+## 트러블슈팅 시나리오
 
-이 세 가지를 놓치면 HPA를 켰는데도 왜 반응하지 않는지, 혹은 왜 과하게 반응하는지 이해하기 어렵습니다. 자동화는 숫자를 어떻게 읽는지부터 봐야 합니다.
+### 시나리오 1: HPA TARGETS가 `<unknown>`
 
-## 자주 하는 실수 다섯 가지
+```bash
+# HPA 상태 확인
+kubectl describe hpa web
 
-1. requests를 설정하지 않아 메트릭 계산이 꼬입니다.
-2. `maxReplicas`를 너무 낮게 잡아 피크 트래픽을 못 받습니다.
-3. 기본 메트릭 검증도 없이 커스텀 지표부터 붙입니다.
-4. 노드 한계를 보지 않아 HPA가 늘리려 해도 파드가 뜨지 않습니다.
-5. 플래핑을 방치해 비용과 안정성을 함께 잃습니다.
+# 흔한 원인 1: metrics-server 미설치
+kubectl get pods -n kube-system | grep metrics
+
+# 흔한 원인 2: Deployment에 requests 미설정
+kubectl get deployment web -o jsonpath='{.spec.template.spec.containers[0].resources}'
+
+# 흔한 원인 3: 파드가 아직 시작 중
+kubectl get pods -l app=web
+```
+
+### 시나리오 2: 스케일 아웃이 안 됨
+
+```bash
+# HPA 이벤트 확인
+kubectl describe hpa web | grep -A 20 Events
+
+# 파드 Pending 여부 확인 (노드 용량 부족 시)
+kubectl get pods -l app=web
+
+# Cluster Autoscaler 동작 확인
+kubectl get events --field-selector reason=TriggeredScaleUp
+```
+
+### 시나리오 3: 플래핑 (스케일 인/아웃이 반복됨)
+
+```bash
+# behavior.scaleDown.stabilizationWindowSeconds 늘리기
+kubectl patch hpa web -p '{"spec":{"behavior":{"scaleDown":{"stabilizationWindowSeconds":300}}}}'
+
+# 원인: CPU 사용률이 목표값 근처에서 계속 오르내림
+# 해결: stabilizationWindowSeconds를 늘려 안정화 기간 확보
+# 또는: averageUtilization 값을 더 여유 있게 조정
+```
+
+## 자주 하는 실수
+
+| 실수 | 문제 | 올바른 방법 |
+|---|---|---|
+| requests 미설정 | HPA TARGETS가 `<unknown>` | Deployment에 requests 반드시 설정 |
+| maxReplicas를 너무 낮게 설정 | 피크 트래픽 시 스케일 아웃 한계 도달 | 예상 최대 부하의 여유 있는 상한 설정 |
+| 기본 메트릭 없이 커스텀 지표 사용 | 디버깅 어려움 | CPU/메모리 기반으로 먼저 검증 |
+| 노드 한계 미고려 | 파드 늘려도 Pending만 증가 | Cluster Autoscaler 함께 설정 |
+| 플래핑 방치 | 잦은 스케일 이벤트로 비용·안정성 손실 | stabilizationWindowSeconds 조정 |
 
 ## 실무에서는 이렇게 봅니다
 
@@ -181,18 +293,111 @@ kubectl describe hpa web
 
 시니어 엔지니어는 커스텀 메트릭을 처음부터 욕심내지 않습니다. CPU와 메모리처럼 이해하기 쉬운 기준으로 먼저 안정성을 확인한 뒤, 큐 길이와 요청 수 같은 서비스별 지표로 넓혀 가는 흐름이 더 안전합니다.
 
+```bash
+# 실무에서 HPA 운영 시 자주 쓰는 명령 모음
+kubectl get hpa -A                                  # 전체 HPA 목록
+kubectl describe hpa web                            # 이벤트 포함 상세
+kubectl top pods -l app=web                         # 파드별 자원 사용량
+kubectl get hpa web -o yaml                         # 전체 스펙 확인
+kubectl get events --field-selector reason=SuccessfulRescale  # 스케일 이벤트
+```
+
+### KEDA를 이용한 커스텀 메트릭 스케일링
+
+```yaml
+# KEDA ScaledObject 예시 (SQS 큐 길이 기반)
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: worker
+spec:
+  scaleTargetRef:
+    name: worker
+  minReplicaCount: 0       # 유휴 시 파드 0개도 가능
+  maxReplicaCount: 50
+  triggers:
+  - type: aws-sqs-queue
+    metadata:
+      queueURL: https://sqs.ap-northeast-2.amazonaws.com/...
+      queueLength: "10"    # 큐 메시지 10개당 파드 1개
+      awsRegion: ap-northeast-2
+```
+
 ## 운영 체크리스트
 
 - [ ] requests를 설정했는가
 - [ ] `minReplicas`를 2 이상으로 둘지 검토했는가
 - [ ] Cluster Autoscaler와의 조합을 검토했는가
 - [ ] 플래핑 여부를 모니터링하고 있는가
+- [ ] metrics-server가 정상 동작하는가
+- [ ] `maxReplicas`가 예상 최대 부하를 감당할 수 있는가
 
 ## 연습 문제
 
 1. requests가 없으면 HPA가 왜 실패하는지 한 줄로 설명해 보세요.
 2. VPA와 HPA의 차이를 한 줄로 정리해 보세요.
 3. Cluster Autoscaler의 역할을 한 줄로 적어 보세요.
+4. HPA `behavior.scaleDown.stabilizationWindowSeconds`를 늘리면 어떤 효과가 있나요?
+5. HPA TARGETS가 `<unknown>`으로 표시될 때 가장 먼저 확인할 것은 무엇인가요?
+
+## HPA 스케일링 알고리즘 이해
+
+HPA가 replica 수를 어떻게 계산하는지 알면 예상치 못한 동작을 미리 막을 수 있습니다.
+
+```
+계산 공식:
+원하는 replica = ceil(현재 replica × (현재 메트릭 / 목표 메트릭))
+
+예시:
+- 현재 replica: 4
+- 현재 CPU 사용률: 90%
+- 목표 CPU 사용률: 60%
+- 계산: ceil(4 × (90/60)) = ceil(6) = 6
+→ 4개 → 6개로 스케일 아웃
+```
+
+```bash
+# HPA 계산에 사용되는 현재 메트릭 확인
+kubectl get hpa web -o yaml | grep -A 10 currentMetrics
+
+# 메트릭 서버에서 직접 확인
+kubectl top pods -l app=web
+
+# 스케일링 이벤트 히스토리 확인
+kubectl describe hpa web | grep -A 20 "Conditions:"
+```
+
+## VPA (Vertical Pod Autoscaler)와의 조합
+
+HPA가 파드 수를 조절한다면, VPA는 파드 하나의 resource requests 값을 조절합니다.
+
+| 항목 | HPA | VPA |
+|---|---|---|
+| 조절 대상 | 파드 수 (replicas) | requests/limits 값 |
+| 주 메트릭 | CPU, 메모리 사용률 | 실제 리소스 사용 패턴 |
+| 적용 방식 | 즉시 적용 | 파드 재시작 필요 (기본) |
+| 적합 워크로드 | Stateless, 트래픽 변동 큰 경우 | 요청 예측 어려운 Stateful |
+| 함께 사용 | 같은 Deployment에 동시 사용 주의 | 충돌 가능, 공식 권장 안 함 |
+
+```yaml
+# VPA 예시 (추천 모드: 재시작 없이 권장값만 제공)
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: web-vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web
+  updatePolicy:
+    updateMode: "Off"    # Off: 권장값만 표시, Auto: 자동 적용
+```
+
+```bash
+# VPA 권장값 확인
+kubectl describe vpa web-vpa | grep -A 10 Recommendation
+```
 
 ## 마무리와 다음 글
 
@@ -207,13 +412,11 @@ HPA는 'CPU 높으면 파드 늘리는 기능'이 아니라 '메트릭을 입력
 ## 처음 질문으로 돌아가기
 
 - **트래픽이 바뀔 때마다 사람이 직접 파드 수를 조절하면 왜 느리고 비싸질까요?**
-  - HPA는 파드를 직접 만들고 지우기보다 Deployment의 원하는 개수를 조정합니다
+  - 사람이 모니터링하고 판단하고 변경하는 과정에는 반드시 지연이 있습니다. HPA는 메트릭을 실시간으로 보고 즉시 Deployment의 replica 수를 바꿉니다.
 - **HPA는 어떤 지표를 보고 스케일 아웃과 스케일 인을 결정할까요?**
-  - HPA는 파드를 직접 만들고 지우기보다 Deployment의 원하는 개수를 조정합니다
+  - 기본적으로 CPU/메모리 사용률(requests 대비 비율)을 봅니다. KEDA 같은 도구를 더하면 큐 길이, 요청 수, 커스텀 메트릭도 사용할 수 있습니다.
 - **resource requests가 없으면 왜 제대로 동작하지 않을까요?**
-  - HPA는 파드를 직접 만들고 지우기보다 Deployment의 원하는 개수를 조정합니다
-  - HPA는 파드를 직접 만들고 지우기보다 Deployment의 원하는 개수를 조정합니다. 즉, 자동 스케일링의 판단 계층이라고 보는 편이 더 정확합니다. 뒤의 실제 파드 생성과 유지 작업은 여전히 Deployment가 맡습니다.
-  - HPA가 없으면 피크 시간에는 503이 늘어나고, 한가한 시간에는 파드가 과하게 떠 있을 수 있습니다
+  - `averageUtilization`은 절대값이 아니라 requests 대비 비율입니다. requests가 없으면 분모가 없어 비율 계산 자체가 불가능합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

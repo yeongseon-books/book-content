@@ -267,6 +267,33 @@ kubectl top nodes                             # 노드 자원 사용량
 kubectl get events --sort-by=.lastTimestamp  # 최근 이벤트 시간순
 ```
 
+## Kubernetes를 도입하기 전 검토할 질문들
+
+Kubernetes는 강력하지만 모든 팀에게 적합하지는 않습니다. 도입 전에 아래 질문에 답해 보는 것이 중요합니다.
+
+**조직 관점:**
+- 컨테이너 배포를 자동화해야 할 서비스가 몇 개인가?
+- YAML 관리와 클러스터 운영을 담당할 엔지니어가 있는가?
+- 관리형 Kubernetes(EKS, GKE, AKS)를 쓸 것인가, 직접 구축할 것인가?
+
+**기술 관점:**
+- 애플리케이션이 12 Factor App 원칙을 따르는가?
+- stateless와 stateful 워크로드를 구분해서 설계했는가?
+- 로그, 메트릭, 트레이싱 관측성 스택을 준비했는가?
+- CI/CD 파이프라인을 Kubernetes 배포 흐름과 연결할 준비가 됐는가?
+- 네트워크 보안 정책(NetworkPolicy)을 적용할 계획이 있는가?
+
+```bash
+# 관리형 Kubernetes 비교 (비용 아닌 기능 관점)
+# EKS (AWS): Fargate 지원, AWS 서비스 통합 우수
+# GKE (GCP): 오토파일럿 모드, 업그레이드 자동화 우수
+# AKS (Azure): Azure AD 통합, Windows 노드 지원
+# OpenShift: 기업용 보안 기능, 자체 CI/CD 포함
+
+# 어떤 것을 선택하든 먼저 비용 계산
+# 최소 구성: 컨트롤 플레인 + 워커 노드 3개 (고가용성)
+```
+
 ## 운영 체크리스트
 
 - [ ] 적용 전 현재 컨텍스트를 확인했는가
@@ -283,6 +310,59 @@ kubectl get events --sort-by=.lastTimestamp  # 최근 이벤트 시간순
 3. Kubernetes 도입을 미루는 편이 나은 상황을 하나 떠올려 보세요.
 4. `kubectl get nodes`가 timeout 날 때 가장 먼저 확인할 것은 무엇인가요?
 5. kube-system 네임스페이스에 어떤 파드가 있어야 하는지 나열해 보세요.
+
+## 컨트롤러 루프 깊이 이해하기
+
+Kubernetes의 모든 자동화는 컨트롤러 루프(Reconciliation Loop)를 기반으로 합니다. 이 패턴을 이해하면 왜 Kubernetes가 이렇게 동작하는지 훨씬 명확해집니다.
+
+```
+컨트롤러 루프 흐름:
+
+1. 현재 상태(Current State) 읽기
+   etcd에서 실제 클러스터 상태를 가져옴
+
+2. 원하는 상태(Desired State) 읽기
+   사용자가 선언한 YAML의 목표 상태
+
+3. 비교(Diff)
+   현재 ≠ 원하는 상태?
+
+4. 조정(Reconcile)
+   차이가 있으면 현재 → 원하는 상태로 맞춤
+
+5. 반복
+   이 루프를 계속 실행
+```
+
+이 루프가 있기 때문에 노드가 죽어서 파드가 사라져도, 재시작해서 컨테이너가 교체돼도, 사람이 실수로 파드를 지워도 Kubernetes는 다시 원하는 상태로 맞추려 합니다.
+
+```bash
+# 컨트롤러 루프 동작을 직접 관찰하는 방법
+# 파드를 강제로 지워 보고 Deployment가 다시 만드는 과정 확인
+kubectl delete pod -l app=web  # 파드 삭제
+
+# 즉시 파드 목록 확인 - 새 파드가 생성 중임을 볼 수 있음
+kubectl get pods -l app=web -w
+```
+
+## Kubernetes를 쓰기 시작하는 시점
+
+Kubernetes가 강력하다고 해서 항상 정답은 아닙니다. 도입 시점을 판단하는 기준이 있어야 합니다.
+
+| 상황 | 권장 도구 |
+|---|---|
+| 컨테이너 1-5개, 단일 서버 | Docker Compose |
+| 컨테이너 수십 개, 팀 규모 | Kubernetes 검토 시작 |
+| 멀티 환경, 자동 스케일링 필요 | Kubernetes 도입 |
+| 서버리스, 이벤트 드리븐 | Cloud Functions / Knative |
+
+```bash
+# 클러스터 전체 자원 사용량 확인
+kubectl describe nodes | grep -A 5 "Allocated resources"
+
+# 네임스페이스별 리소스 사용량
+kubectl top pods -A --sort-by=cpu
+```
 
 ## 마무리와 다음 글
 

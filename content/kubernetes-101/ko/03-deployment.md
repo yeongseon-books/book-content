@@ -61,77 +61,138 @@ Deployment는 직접 파드 수를 세는 대신 ReplicaSet을 통해 파드를 
 
 ## 도입 전과 후
 
-Deployment가 없으면 파드 하나가 죽었을 때 서비스가 바로 흔들릴 수 있습니다. 새 버전 배포도 기존 파드를 지우고 새 파드를 띄우는 식으로 거칠게 끝나기 쉽습니다.
+| 항목 | Pod 직접 관리 | Deployment 사용 |
+|---|---|---|
+| 파드 장애 복구 | 수동 재생성 필요 | 컨트롤러가 자동 교체 |
+| 버전 업데이트 | 기존 삭제 후 신규 생성 (중단 발생) | 롤링 업데이트로 무중단 교체 |
+| 롤백 | 이전 YAML을 다시 적용해야 함 | `kubectl rollout undo` 한 줄 |
+| 스케일 조절 | 수동 파드 추가/삭제 | `kubectl scale` 또는 HPA 연동 |
+| 배포 이력 | 없음 | revision 이력 자동 보관 |
 
-Deployment를 사용하면 죽은 파드는 다시 만들어지고, 이미지 변경은 배포 전략에 따라 서서히 적용되며, 이전 버전 이력도 남습니다. Kubernetes 운영이 훨씬 예측 가능해지는 이유가 바로 여기에 있습니다.
+## Deployment YAML 완전 이해
 
-## 단계별로 무중단 배포 흐름 보기
+### 기본 Deployment
 
-### 1단계 — Deployment 매니페스트 작성
-
-```python
-"""
+```yaml
 apiVersion: apps/v1
 kind: Deployment
-metadata: {name: web}
+metadata:
+  name: web
+  labels:
+    app: web
 spec:
   replicas: 3
-  selector: {matchLabels: {app: web}}
+  selector:
+    matchLabels:
+      app: web           # 이 라벨과 일치하는 파드를 관리
   template:
-    metadata: {labels: {app: web}}
+    metadata:
+      labels:
+        app: web         # selector와 반드시 일치해야 함
     spec:
       containers:
       - name: app
         image: nginx:1.25
-"""
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
 ```
 
 이 예제에서 가장 먼저 볼 값은 `replicas: 3`입니다. 이는 단순한 숫자가 아니라 서비스가 감당해야 할 최소 실행 개수에 대한 선언입니다. 하나가 죽어도 세 개를 유지하려는 의도가 여기에 담깁니다.
 
-### 2단계 — 적용
+### 롤링 업데이트 전략 명시
 
-```python
-import subprocess
+```yaml
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1   # 동시에 중단 허용 파드 수 (또는 25%)
+      maxSurge: 1         # 기존 replicas를 초과해 추가 생성 허용 수 (또는 25%)
+  selector:
+    matchLabels:
+      app: web
+  template:
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.25
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+```
 
-def apply(path):
-    subprocess.run(["kubectl", "apply", "-f", path], check=True)
+`maxUnavailable`과 `maxSurge`를 명시하면 배포 속도와 안정성을 균형 있게 조절할 수 있습니다. readinessProbe가 없으면 새 파드가 실제로 준비되기 전에 트래픽이 흘러 오류가 발생합니다.
+
+## 단계별로 무중단 배포 흐름 보기
+
+### 1단계 — 적용
+
+```bash
+kubectl apply -f deployment.yaml
 ```
 
 적용 이후부터는 Deployment와 ReplicaSet이 현재 상태를 원하는 상태에 맞추기 시작합니다. 사용자가 일일이 파드를 세거나 다시 만들지 않아도 되는 이유가 바로 여기에 있습니다.
 
-### 3단계 — 이미지 업데이트
+### 2단계 — 이미지 업데이트
 
-```python
-def set_image(dep, container, image):
-    subprocess.run([
-        "kubectl", "set", "image",
-        f"deployment/{dep}", f"{container}={image}",
-    ], check=True)
+```bash
+# 이미지 태그 변경으로 롤링 업데이트 시작
+kubectl set image deployment/web app=nginx:1.26
+
+# 또는 YAML 수정 후 재적용
+# image: nginx:1.26 으로 변경 후
+kubectl apply -f deployment.yaml
 ```
 
 이미지 태그만 바꿔도 Deployment는 이를 새 버전 배포로 해석합니다. 기존 파드를 한 번에 모두 없애는 대신, 전략에 따라 새 파드를 띄우고 준비 상태를 확인하면서 교체합니다.
 
-### 4단계 — rollout 상태 확인
+### 3단계 — rollout 상태 확인
 
-```python
-def rollout_status(dep):
-    res = subprocess.run(
-        ["kubectl", "rollout", "status", f"deployment/{dep}"],
-        capture_output=True, text=True, check=True,
-    )
-    return res.stdout
+```bash
+# 배포 완료까지 대기
+kubectl rollout status deployment/web
+
+# 출력 예시
+# Waiting for deployment "web" rollout to finish: 1 out of 3 new replicas have been updated...
+# Waiting for deployment "web" rollout to finish: 2 out of 3 new replicas have been updated...
+# deployment "web" successfully rolled out
 ```
 
 배포는 명령이 끝났다고 끝나는 일이 아닙니다. 새 파드가 실제로 준비 완료 상태가 되어 트래픽을 받을 수 있는지 확인해야 비로소 배포가 끝났다고 볼 수 있습니다.
 
+### 4단계 — 배포 이력 확인
+
+```bash
+kubectl rollout history deployment/web
+
+# 출력 예시
+# REVISION  CHANGE-CAUSE
+# 1         <none>
+# 2         <none>
+
+# 특정 revision 상세 보기
+kubectl rollout history deployment/web --revision=2
+```
+
 ### 5단계 — 롤백
 
-```python
-def rollback(dep):
-    subprocess.run(
-        ["kubectl", "rollout", "undo", f"deployment/{dep}"],
-        check=True,
-    )
+```bash
+# 직전 버전으로 롤백
+kubectl rollout undo deployment/web
+
+# 특정 revision으로 롤백
+kubectl rollout undo deployment/web --to-revision=1
 ```
 
 롤백은 마지막 안전장치입니다. 자동화가 잘 되어 있어도, 실제로 이전 ReplicaSet으로 되돌리는 흐름을 알고 있어야 야간 장애 대응 속도가 달라집니다.
@@ -152,19 +213,63 @@ kubectl rollout history deployment/web
 - rollout이 멈추면 이미지 문제보다 readiness probe 실패를 먼저 확인하는 편이 실무에서 더 자주 맞습니다.
 - revision 이력이 없거나 너무 짧으면 rollback 자체보다 배포 기록 정책부터 손봐야 합니다.
 
-- `selector`와 `labels`는 정확히 일치해야 합니다.
-- 이미지 변경은 작아 보여도 실제로는 배포 이벤트입니다.
-- `undo`는 직전 ReplicaSet 기준으로 돌아갑니다.
+## 트러블슈팅 시나리오
 
-이 세 가지를 놓치면 Deployment는 "파드를 많이 띄우는 YAML" 정도로만 보입니다. 하지만 실제로는 배포 이력과 복구 흐름까지 포함한 운영 객체입니다.
+### 시나리오 1: 롤아웃이 멈춘 경우
 
-## 자주 하는 실수 다섯 가지
+```bash
+# 현재 상태 확인
+kubectl rollout status deployment/web
+# Waiting for deployment "web" rollout to finish...
 
-1. Pod를 직접 만들고 재시작과 복구를 Kubernetes가 알아서 해 줄 거라고 기대합니다.
-2. `replicas: 1`로 두고도 고가용성을 기대합니다.
-3. RollingUpdate 관련 옵션을 대충 넘겨 한 번에 너무 많이 교체합니다.
-4. readiness 없이 배포해서 절반만 살아 있는 상태로 rollout을 끝냅니다.
-5. 롤백이 있다고 믿지만 실제 절차를 한 번도 연습하지 않습니다.
+# 파드 상태 확인
+kubectl get pods -l app=web
+
+# 특정 파드 상세 확인
+kubectl describe pod <pod-name>
+
+# 원인 분석 포인트
+# 1. readiness probe 실패 -> 새 파드가 Ready 상태 안 됨
+# 2. 이미지 Pull 실패 -> ImagePullBackOff
+# 3. 자원 부족 -> Pending 상태 지속
+# 4. 컨테이너 크래시 -> CrashLoopBackOff
+```
+
+### 시나리오 2: selector 불일치
+
+```bash
+# ReplicaSet이 파드를 관리 못하는 경우
+kubectl get rs
+# NAME         DESIRED   CURRENT   READY   AGE
+# web-abc123   3         0         0       1m  <- 파드 0개
+
+# 원인: spec.selector.matchLabels와 spec.template.metadata.labels 불일치
+# 해결: 두 값을 정확히 일치시킨 후 재적용
+```
+
+### 시나리오 3: 롤백 후에도 문제 지속
+
+```bash
+# 현재 이미지 확인
+kubectl get deployment web -o jsonpath='{.spec.template.spec.containers[0].image}'
+
+# 모든 revision 이미지 확인
+kubectl rollout history deployment/web --revision=1
+kubectl rollout history deployment/web --revision=2
+
+# 이력 정책 확인 (보관할 revision 수)
+kubectl get deployment web -o jsonpath='{.spec.revisionHistoryLimit}'
+```
+
+## 자주 하는 실수
+
+| 실수 | 문제 | 올바른 방법 |
+|---|---|---|
+| Pod 직접 생성 후 복구 기대 | 죽으면 그대로 사라짐 | Deployment로 상위 컨트롤러에 위임 |
+| `replicas: 1` 설정 | 단일 파드 장애 시 서비스 중단 | 최소 2개 이상 설정 |
+| maxUnavailable을 너무 크게 설정 | 배포 중 과도한 서비스 용량 감소 | 서비스 특성에 맞게 조정 |
+| readiness probe 없이 배포 | 준비 안 된 파드에 트래픽 유입 | httpGet 또는 exec probe 필수 설정 |
+| 롤백 절차 미연습 | 장애 시 실수 가능성 증가 | 정기적으로 롤백 절차 검증 |
 
 ## 실무에서는 이렇게 봅니다
 
@@ -172,18 +277,126 @@ kubectl rollout history deployment/web
 
 시니어 엔지니어는 Deployment를 볼 때 두 가지를 특히 봅니다. 첫째, 대부분의 stateless 워크로드에서 Deployment는 기본값입니다. 둘째, 무중단 배포의 본질은 Deployment라는 이름이 아니라 readiness와 배포 전략을 얼마나 제대로 잡았는가에 달려 있습니다.
 
+```bash
+# 실무에서 Deployment 운영 시 자주 쓰는 명령 모음
+kubectl get deployment web -o yaml              # 현재 전체 스펙 확인
+kubectl describe deployment web                 # 이벤트 포함 상세 확인
+kubectl get rs -l app=web                       # ReplicaSet 이력 확인
+kubectl rollout history deployment/web          # 배포 이력
+kubectl scale deployment web --replicas=5       # 즉시 스케일 조절
+kubectl rollout pause deployment/web            # 배포 일시 중지
+kubectl rollout resume deployment/web           # 배포 재개
+```
+
+## Readiness와 Liveness Probe 설정
+
+Probe는 무중단 배포의 실제 핵심입니다. 올바르게 설정해야 롤링 업데이트가 안전하게 동작합니다.
+
+```yaml
+spec:
+  containers:
+  - name: app
+    image: myorg/app:1.0
+    readinessProbe:              # 파드가 트래픽을 받을 준비가 됐는지 확인
+      httpGet:
+        path: /health/ready
+        port: 8080
+      initialDelaySeconds: 10   # 컨테이너 시작 후 첫 확인까지 대기
+      periodSeconds: 5          # 확인 간격
+      failureThreshold: 3       # 3번 실패 시 Ready 상태 해제 (트래픽 제외)
+    livenessProbe:               # 파드가 살아있는지 확인 (죽었으면 재시작)
+      httpGet:
+        path: /health/live
+        port: 8080
+      initialDelaySeconds: 30   # readiness보다 늦게 시작
+      periodSeconds: 10
+      failureThreshold: 5       # 5번 실패 시 컨테이너 재시작
+    startupProbe:                # 느린 시작 앱을 위한 시작 완료 확인
+      httpGet:
+        path: /health/startup
+        port: 8080
+      failureThreshold: 30      # 30번 × 10초 = 최대 5분 대기
+      periodSeconds: 10
+```
+
+| Probe 종류 | 실패 시 동작 | 주 용도 |
+|---|---|---|
+| readinessProbe | 트래픽에서 제외 (재시작 안 함) | 준비 완료 전 트래픽 차단 |
+| livenessProbe | 컨테이너 재시작 | 데드락, 무한루프 감지 |
+| startupProbe | 일정 시간 내 준비 안 되면 재시작 | 느린 초기화 앱 보호 |
+
+```bash
+# Probe 동작 상태 확인
+kubectl describe pod <pod-name> | grep -A 10 "Readiness\|Liveness\|Startup"
+
+# Probe 실패로 인한 재시작 횟수 확인
+kubectl get pod <pod-name> -o jsonpath='{.status.containerStatuses[0].restartCount}'
+```
+
 ## 운영 체크리스트
 
 - [ ] `replicas`를 2 이상으로 둘지 검토했는가
 - [ ] Readiness probe를 정의했는가
 - [ ] RollingUpdate 옵션을 명시했는가
 - [ ] 롤백 절차를 문서화했는가
+- [ ] `revisionHistoryLimit`을 적절히 설정했는가
+- [ ] selector와 template labels가 정확히 일치하는가
 
 ## 연습 문제
 
 1. Deployment와 ReplicaSet의 차이를 한 줄로 설명해 보세요.
 2. readiness가 무중단 배포의 핵심인 이유를 한 줄로 적어 보세요.
 3. 롤백이 느리거나 어려워지는 상황을 하나 떠올려 보세요.
+4. `maxUnavailable: 0`으로 설정하면 어떤 효과가 있나요?
+5. Deployment와 StatefulSet은 어떤 상황에서 나눠 쓰나요?
+
+## Deployment와 유사한 워크로드 컨트롤러 비교
+
+Deployment가 기본값이지만, 워크로드 특성에 따라 다른 컨트롤러를 선택해야 합니다.
+
+| 컨트롤러 | 사용 시나리오 | 특징 |
+|---|---|---|
+| Deployment | Stateless 애플리케이션 | 가장 일반적, 롤링 업데이트/롤백 |
+| StatefulSet | 데이터베이스, 메시지 큐 | 파드마다 고정 이름, 안정적 스토리지 |
+| DaemonSet | 모든 노드에 배치 | 로그 수집기, 모니터링 에이전트 |
+| Job | 일회성 작업 | 배치 처리, 마이그레이션 |
+| CronJob | 주기적 작업 | 정기 백업, 리포트 생성 |
+
+```bash
+# StatefulSet과 Deployment 파드 이름 비교
+kubectl get pods -l app=web           # web-abc123-xyz (Deployment: 랜덤)
+kubectl get pods -l app=db            # db-0, db-1, db-2 (StatefulSet: 고정)
+
+# DaemonSet 파드 확인 (모든 노드에 하나씩)
+kubectl get pods -n kube-system -o wide | grep node-exporter
+```
+
+## Deployment 배포 전략 선택
+
+```yaml
+# 전략 1: RollingUpdate (기본, 무중단 배포)
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
+
+# 전략 2: Recreate (전체 교체, 중단 발생)
+# 데이터베이스 스키마 변경처럼 구버전과 병행 실행 불가 시 사용
+strategy:
+  type: Recreate
+```
+
+```bash
+# 배포 진행 중 일시 중지 (카나리 배포 시뮬레이션)
+kubectl rollout pause deployment/web
+
+# 일부 파드가 새 버전으로 교체된 상태 확인
+kubectl get pods -l app=web -o custom-columns=NAME:.metadata.name,IMAGE:.spec.containers[0].image
+
+# 검증 후 재개
+kubectl rollout resume deployment/web
+```
 
 ## 마무리와 다음 글
 
@@ -198,13 +411,11 @@ Deployment는 '파드를 N개 띄우는 설정'이 아니라 '원하는 개수�
 ## 처음 질문으로 돌아가기
 
 - **Deployment와 ReplicaSet은 어떤 관계일까요?**
-  - Deployment는 직접 파드 수를 세는 대신 ReplicaSet을 통해 파드를 관리합니다
+  - Deployment가 상위 객체이고 ReplicaSet을 통해 파드 수를 관리합니다. 이미지가 바뀌면 새 ReplicaSet이 생기고, 이전 ReplicaSet은 점진적으로 줄어듭니다.
 - **`replicas`는 단순 숫자 이상의 어떤 의미를 가질까요?**
-  - 이 예제에서 가장 먼저 볼 값은 `replicas: 3`입니다
+  - 서비스가 유지해야 할 최소 실행 개수 선언입니다. 이 수보다 적으면 컨트롤러가 자동으로 파드를 보충합니다.
 - **이미지 변경이 왜 무중단 배포 흐름으로 이어질까요?**
-  - 이 예제에서 가장 먼저 볼 값은 `replicas: 3`입니다
-  - Deployment는 직접 파드 수를 세는 대신 ReplicaSet을 통해 파드를 관리합니다. 그래서 이미지가 바뀌면 새 ReplicaSet이 생기고, 이전 ReplicaSet은 점진적으로 줄어듭니다.
-  - Deployment가 없으면 파드 하나가 죽었을 때 서비스가 바로 흔들릴 수 있습니다
+  - 새 이미지로 새 ReplicaSet이 생기고, readiness probe를 통과한 파드가 생길 때마다 기존 파드를 하나씩 줄이는 방식으로 교체가 진행됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

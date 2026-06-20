@@ -49,9 +49,33 @@ Kubernetes를 실제로 쓰기 시작하면 YAML이 빠르게 늘어납니다. �
 
 Helm은 같은 구조를 반복 사용할 때 차이는 값으로만 드러나게 만듭니다. 입문 단계에서는 편한 템플릿 도구처럼 보일 수 있지만, 실무에서는 배포 단위를 어떻게 표준화할지와 직접 연결됩니다.
 
-## 한눈에 보는 구조
+## YAML 복사 vs Helm 비교
 
-Helm은 값을 받아 템플릿을 렌더링하고, 그 결과를 Kubernetes API에 적용합니다. 그래서 Helm을 이해할 때는 결과 YAML과 입력 값, 그리고 공통 템플릿의 책임을 분리해서 보는 편이 좋습니다.
+| 항목 | 환경별 YAML 복사 | Helm 차트 사용 |
+|---|---|---|
+| 공통 구조 변경 | 모든 환경 파일 개별 수정 | 차트 템플릿 한 번 수정 |
+| 환경별 차이 | 파일 비교가 어렵 | values.yaml로 명시적 표현 |
+| 배포 이력 | 없음 | revision 자동 관리 |
+| 롤백 | 이전 YAML 재적용 (복잡) | `helm rollback` 한 줄 |
+| 패키지 공유 | 불가 | Helm 저장소로 배포 가능 |
+
+## Helm 핵심 개념
+
+### 차트 구조
+
+```
+my-app/
+├── Chart.yaml          # 차트 메타데이터 (이름, 버전, 설명)
+├── values.yaml         # 기본값
+├── charts/             # 의존성 차트 (하위 차트)
+└── templates/          # Go 템플릿 파일
+    ├── deployment.yaml
+    ├── service.yaml
+    ├── ingress.yaml
+    ├── configmap.yaml
+    ├── _helpers.tpl    # 공통 헬퍼 함수
+    └── NOTES.txt       # 설치 후 출력 메시지
+```
 
 - 차트: Helm의 패키지 단위입니다.
 - `values.yaml`: 기본값을 담는 파일입니다.
@@ -59,76 +83,192 @@ Helm은 값을 받아 템플릿을 렌더링하고, 그 결과를 Kubernetes API
 - 저장소: 차트를 배포하고 받는 유통 채널입니다.
 - 의존성: 하위 차트를 포함하는 관계입니다.
 
-## 도입 전과 후
+## 차트 파일 작성 예시
 
-Helm이 없으면 개발, 스테이징, 운영별 YAML 사본이 따로 생기기 쉽습니다. 처음에는 단순하지만, 시간이 지나면 공통 구조와 환경 차이가 뒤섞입니다.
+### Chart.yaml
 
-Helm을 도입하면 공통 구조는 차트에 두고, 환경별 차이는 values로만 관리할 수 있습니다. 배포 반복성이 좋아지고, 어떤 값이 어디서 달라지는지도 훨씬 선명해집니다.
+```yaml
+apiVersion: v2
+name: my-app
+description: A Helm chart for my application
+type: application
+version: 1.2.0          # 차트 버전 (Semantic Versioning)
+appVersion: "2.5.0"     # 애플리케이션 버전
+dependencies:
+- name: postgresql
+  version: "12.1.0"
+  repository: https://charts.bitnami.com/bitnami
+  condition: postgresql.enabled
+```
+
+### values.yaml (기본값)
+
+```yaml
+replicaCount: 2
+image:
+  repository: myorg/app
+  tag: "1.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: nginx
+  host: example.com
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 60
+
+postgresql:
+  enabled: false         # 기본적으로 PostgreSQL 비활성화
+```
+
+### templates/deployment.yaml
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "my-app.fullname" . }}
+  labels:
+    {{- include "my-app.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "my-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "my-app.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.port }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+```
+
+여기에는 환경에 따라 달라질 수 있는 값이 `{{ .Values.* }}`로 표현됩니다. 반대로 배포 구조 자체는 차트 템플릿에 남겨 두는 편이 좋습니다.
 
 ## 단계별로 작은 차트 만들어 보기
 
 ### 1단계 — 차트 생성
 
-```python
-import subprocess
+```bash
+helm create my-app
 
-def create(name):
-    subprocess.run(["helm", "create", name], check=True)
+# 생성된 구조 확인
+ls my-app/
+# Chart.yaml  charts/  templates/  values.yaml
 ```
 
-Helm은 기본 차트 구조를 빠르게 만들어 줍니다. 물론 생성 직후 템플릿이 그대로 운영 품질이라는 뜻은 아니고, 공통 구조를 어떤 기준으로 다듬을지가 더 중요합니다.
+Helm은 기본 차트 구조를 빠르게 만들어 줍니다. 생성 직후 템플릿이 그대로 운영 품질이라는 뜻은 아니고, 공통 구조를 어떤 기준으로 다듬을지가 더 중요합니다.
 
-### 2단계 — `values.yaml` 작성
+### 2단계 — 환경별 values 파일 작성
 
-```python
-"""
-replicaCount: 2
+```bash
+# 개발 환경 values
+cat > values-dev.yaml << 'EOF'
+replicaCount: 1
 image:
-  repository: myorg/app
-  tag: "1.0"
-service:
-  type: ClusterIP
-  port: 80
-"""
+  tag: "latest"
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+EOF
+
+# 운영 환경 values
+cat > values-prod.yaml << 'EOF'
+replicaCount: 3
+image:
+  tag: "2.5.0"
+ingress:
+  enabled: true
+  host: app.example.com
+autoscaling:
+  enabled: true
+  maxReplicas: 20
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+EOF
 ```
 
-여기에는 환경에 따라 달라질 수 있는 값이 들어갑니다. 반대로 배포 구조 자체는 차트 템플릿에 남겨 두는 편이 좋습니다.
+### 3단계 — 렌더 결과 미리 보기
 
-### 3단계 — 설치
+```bash
+# 적용 전 YAML 출력으로 확인
+helm template my-app ./my-app -f values-prod.yaml
 
-```python
-def install(release, chart, values):
-    subprocess.run(
-        ["helm", "install", release, chart, "-f", values],
-        check=True,
-    )
+# 문법 검사
+helm lint ./my-app
+```
+
+`helm template`으로 렌더 결과를 미리 보는 것은 적용 전 필수 단계입니다. 클러스터에 반영하기 전에 어떤 YAML이 생성될지 확인할 수 있습니다.
+
+### 4단계 — 설치
+
+```bash
+# 개발 환경에 설치
+helm install my-app-dev ./my-app -f values-dev.yaml -n dev --create-namespace
+
+# 운영 환경에 설치
+helm install my-app-prod ./my-app -f values-prod.yaml -n prod --create-namespace
+
+# 설치된 릴리스 확인
+helm list -A
 ```
 
 릴리스는 같은 차트를 실제로 설치한 인스턴스입니다. 이 개념을 이해해야 Helm이 템플릿 저장소가 아니라 배포 단위라는 사실이 보입니다.
 
-### 4단계 — 업그레이드
+### 5단계 — 업그레이드
 
-```python
-def upgrade(release, chart, values):
-    subprocess.run(
-        ["helm", "upgrade", release, chart, "-f", values, "--atomic"],
-        check=True,
-    )
+```bash
+# 이미지 태그 변경 후 업그레이드
+helm upgrade my-app-prod ./my-app -f values-prod.yaml \
+  --set image.tag=2.6.0 \
+  --atomic \          # 실패 시 자동 롤백
+  --timeout 5m \      # 타임아웃 설정
+  -n prod
+
+# 업그레이드 후 이력 확인
+helm history my-app-prod -n prod
 ```
 
-`--atomic`은 실패 시 자동 롤백을 함께 수행합니다. 야간 배포에서 특히 의미가 큰 옵션입니다. 업그레이드가 끝나지 않았는데도 릴리스 상태를 정상처럼 남겨 두는 일을 줄여 줍니다.
+`--atomic`은 실패 시 자동 롤백을 함께 수행합니다. 야간 배포에서 특히 의미가 큰 옵션입니다.
 
-### 5단계 — 롤백
+### 6단계 — 롤백
 
-```python
-def rollback(release, revision):
-    subprocess.run(
-        ["helm", "rollback", release, str(revision)],
-        check=True,
-    )
+```bash
+# 이력 확인
+helm history my-app-prod -n prod
+# REVISION  UPDATED                   STATUS     CHART         DESCRIPTION
+# 1         2026-06-01 10:00:00       superseded  my-app-1.2.0  Install complete
+# 2         2026-06-10 14:00:00       deployed    my-app-1.2.0  Upgrade complete
+
+# 이전 revision으로 롤백
+helm rollback my-app-prod 1 -n prod
 ```
-
-롤백은 Helm을 쓸 때도 여전히 중요합니다. 템플릿과 값이 분리돼 있어도, 실제 운영에서는 이전 정상 상태로 돌아가는 절차를 알고 있어야 복구 속도가 달라집니다.
 
 ## 검증 흐름
 
@@ -146,19 +286,59 @@ helm history web
 - lint가 통과해도 Secret을 평문 values로 넣었다면 운영 품질 문제는 여전히 남아 있습니다.
 - rollback이 안 되면 Helm 자체보다 release history가 남도록 설치·업그레이드 절차를 점검해야 합니다.
 
-- `--atomic`은 실패 시 자동 롤백을 수행합니다.
-- `helm template`으로 렌더 결과를 적용 전에 볼 수 있습니다.
-- 환경별 차이는 values에 두고 차트는 공유해야 합니다.
+## 트러블슈팅 시나리오
 
-이 세 가지를 같이 잡아 두면 Helm을 단순 생성기처럼 쓰지 않게 됩니다. Helm의 가치는 템플릿 재사용과 배포 복구 흐름을 함께 묶는 데 있습니다.
+### 시나리오 1: 업그레이드 실패 후 롤백
 
-## 자주 하는 실수 다섯 가지
+```bash
+# 업그레이드 실패 시 (--atomic 없는 경우)
+helm status my-app-prod -n prod
+# STATUS: failed
 
-1. values와 차트 책임을 같은 파일에 섞습니다.
-2. Secret 값을 values에 평문으로 넣습니다.
-3. 버전 고정 없이 `latest`에 기대어 배포합니다.
-4. 롤백 절차를 모른 채 업그레이드만 반복합니다.
-5. 의존성 갱신을 잊습니다.
+# 수동 롤백
+helm rollback my-app-prod -n prod
+
+# --atomic 사용 시 자동으로 이전 버전으로 복구됨
+helm upgrade my-app-prod ./my-app -f values-prod.yaml --atomic -n prod
+```
+
+### 시나리오 2: values와 템플릿 불일치
+
+```bash
+# 렌더 결과 직접 확인
+helm template my-app ./my-app -f values-prod.yaml --debug
+
+# 특정 값이 어떻게 처리되는지 확인
+helm get values my-app-prod -n prod          # 현재 릴리스에 적용된 values
+helm get manifest my-app-prod -n prod        # 현재 릴리스의 실제 YAML
+```
+
+### 시나리오 3: Secret 평문 노출
+
+```bash
+# values에 민감한 값이 있는지 확인
+helm get values my-app-prod -n prod | grep -i password
+
+# 해결 방안 1: External Secrets Operator 연동
+# 해결 방안 2: Sealed Secrets로 암호화
+# 해결 방안 3: Helm Secrets 플러그인 사용
+
+# Helm Secrets 플러그인 설치
+helm plugin install https://github.com/jkroepke/helm-secrets
+
+# 암호화된 values 파일로 업그레이드
+helm secrets upgrade my-app-prod ./my-app -f secrets.yaml.enc -n prod
+```
+
+## 자주 하는 실수
+
+| 실수 | 문제 | 올바른 방법 |
+|---|---|---|
+| values와 차트 책임 혼용 | 재사용 어려움, 드리프트 발생 | 구조는 차트, 환경 차이는 values에만 |
+| Secret 값을 values에 평문 저장 | 비밀 정보 Git 노출 | External Secrets, Sealed Secrets, Helm Secrets 사용 |
+| `latest` 태그 사용 | 재현 불가, 무엇이 배포됐는지 불명확 | 정확한 버전 태그 고정 |
+| rollback 절차 미숙지 | 장애 시 복구 지연 | `helm history`와 `helm rollback` 정기 연습 |
+| 의존성 갱신 누락 | 오래된 하위 차트 사용 | `helm dependency update` 실행 |
 
 ## 실무에서는 이렇게 봅니다
 
@@ -166,18 +346,59 @@ helm history web
 
 시니어 엔지니어는 Helm을 쓸 때 values에 무엇을 넣지 않을지도 같이 정합니다. 민감한 값은 외부 비밀 관리 시스템으로 넘기고, 차트에는 구조만 남겨 두는 편이 장기적으로 훨씬 안정적입니다.
 
+```bash
+# 실무에서 Helm 운영 시 자주 쓰는 명령 모음
+helm list -A                                         # 전체 릴리스 목록
+helm status <release> -n <namespace>                 # 릴리스 상태
+helm get values <release> -n <namespace>             # 현재 values
+helm get manifest <release> -n <namespace>           # 현재 적용된 YAML
+helm history <release> -n <namespace>                # 배포 이력
+helm diff upgrade <release> ./chart -f values.yaml   # 변경 사항 미리 보기 (플러그인)
+```
+
+### ArgoCD와 Helm 연동
+
+```yaml
+# ArgoCD Application 예시
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/myorg/helm-charts
+    targetRevision: HEAD
+    path: my-app
+    helm:
+      valueFiles:
+      - values-prod.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+```
+
 ## 운영 체크리스트
 
 - [ ] 차트와 values 책임을 분리했는가
 - [ ] 버전을 고정했는가
 - [ ] `--atomic` 사용 여부를 검토했는가
 - [ ] Secret 처리를 외부화했는가
+- [ ] `helm lint`를 CI에 포함했는가
+- [ ] 롤백 절차를 팀이 알고 있는가
 
 ## 연습 문제
 
 1. `helm template`의 목적을 한 줄로 설명해 보세요.
 2. values와 차트의 책임 차이를 한 줄로 적어 보세요.
 3. `--atomic`이 왜 더 안전한지 한 줄로 정리해 보세요.
+4. 같은 차트를 개발/운영 환경에 각각 설치할 때 어떻게 구분하나요?
+5. `helm lint`가 통과했는데도 운영에서 문제가 생길 수 있는 경우를 하나 떠올려 보세요.
 
 ## 마무리와 다음 글
 
@@ -192,13 +413,11 @@ Helm은 단순한 패키지 매니저가 아니라 '공통 템플릿과 환경�
 ## 처음 질문으로 돌아가기
 
 - **환경마다 YAML을 복사하는 방식은 왜 드리프트를 만들까요?**
-  - Helm은 값을 받아 템플릿을 렌더링하고, 그 결과를 Kubernetes API에 적용합니다
+  - 공통 구조 변경이 모든 사본에 반영되지 않으면 환경마다 차이가 쌓입니다. 어떤 차이가 의도된 것인지 알 수 없게 되는 상태가 드리프트입니다.
 - **Chart와 `values.yaml`은 어떤 책임을 나눌까요?**
-  - Helm은 값을 받아 템플릿을 렌더링하고, 그 결과를 Kubernetes API에 적용합니다
+  - 차트는 "어떻게 배포하는가"라는 공통 구조를 담고, values는 "이 환경에서 어떤 값을 쓰는가"라는 차이를 담습니다.
 - **`install`, `upgrade`, `rollback`은 어떤 흐름으로 이어질까요?**
-  - Helm은 값을 받아 템플릿을 렌더링하고, 그 결과를 Kubernetes API에 적용합니다
-  - Helm은 값을 받아 템플릿을 렌더링하고, 그 결과를 Kubernetes API에 적용합니다. 그래서 Helm을 이해할 때는 결과 YAML과 입력 값, 그리고 공통 템플릿의 책임을 분리해서 보는 편이 좋습니다.
-  - Helm이 없으면 개발, 스테이징, 운영별 YAML 사본이 따로 생기기 쉽습니다
+  - install로 첫 릴리스를 만들고, upgrade로 revision을 쌓으며, 문제가 생기면 rollback으로 이전 revision으로 돌아갑니다. 이 이력이 Helm의 핵심 가치입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
