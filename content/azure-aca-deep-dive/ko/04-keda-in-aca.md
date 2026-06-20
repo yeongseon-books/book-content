@@ -22,7 +22,7 @@ seo_description: ACA의 Scale Rule이 KEDA형 제어 루프로 어떻게 번역�
 
 Azure Container Apps의 스케일링 표면은 놀랄 만큼 짧습니다. `minReplicas`, `maxReplicas`, 그리고 HTTP·TCP·custom rule 몇 개만 설정하면 플랫폼이 나머지를 처리합니다. 사용 경험은 단순하지만, 실제 질문은 그다음부터 시작합니다. 이 설정이 어떻게 실제 replica 수로 바뀌는가입니다.
 
-Microsoft 문서가 ACA scaling을 KEDA-powered라고 명시하는 이유도 여기에 있습니다. 사용자가 직접 `ScaledObject`나 HPA를 만들지는 않지만, 하위 제어 루프를 설명할 때는 KEDA가 가장 정확한 기준점이 되기 때문입니다. 제품 표면만 보고 있으면 스케일링이 “그냥 자동으로 되는 일”처럼 보이지만, 운영은 그렇게 단순하지 않습니다.
+Microsoft 문서가 ACA scaling을 KEDA-powered라고 명시하는 이유도 여기에 있습니다. 사용자가 직접 `ScaledObject`나 HPA를 만들지는 않지만, 하위 제어 루프를 설명할 때는 KEDA가 가장 정확한 기준점이 되기 때문입니다. 제품 표면만 보고 있으면 스케일링이 "그냥 자동으로 되는 일"처럼 보이지만, 운영은 그렇게 단순하지 않습니다.
 
 이 글은 Azure Container Apps Deep Dive 시리즈의 네 번째 글입니다. 여기서는 ACA의 scale rule이 보이지 않는 KEDA형 control loop로 어떻게 읽히는지, 그리고 왜 scale과 traffic을 서로 다른 mental bucket에 넣어야 하는지 설명하겠습니다.
 
@@ -46,7 +46,7 @@ Microsoft 문서가 ACA scaling을 KEDA-powered라고 명시하는 이유도 여
 
 ACA 운영에서 트래픽 분할과 스케일링은 자주 같은 이야기처럼 섞입니다. 둘 다 Revision 주변에서 일어나기 때문입니다. 하지만 실제로는 완전히 다른 제어 루프입니다. 트래픽은 Ingress가 어디로 보낼지를 결정하고, 스케일은 선택된 Revision 뒤에 몇 개 replica를 둘지를 결정합니다. 이 둘을 섞는 순간 rollout과 capacity planning이 동시에 흐려집니다.
 
-또한 scale rule은 성능 조절 기능이면서 비용 제어 기능입니다. `minReplicas`, `maxReplicas`, polling interval, cooldown, concurrency threshold를 어떻게 잡느냐에 따라 첫 요청 지연, burst 대응, downstream 부하, 운영 비용이 함께 달라집니다. 즉 스케일링은 “자동”이 아니라 “제약을 둔 자동”이어야 합니다.
+또한 scale rule은 성능 조절 기능이면서 비용 제어 기능입니다. `minReplicas`, `maxReplicas`, polling interval, cooldown, concurrency threshold를 어떻게 잡느냐에 따라 첫 요청 지연, burst 대응, downstream 부하, 운영 비용이 함께 달라집니다. 즉 스케일링은 "자동"이 아니라 "제약을 둔 자동"이어야 합니다.
 
 마지막으로 KEDA 모델을 이해하면 ACA의 닫힌 구현을 과장하지 않아도 됩니다. Microsoft가 공개한 제품 사실은 그대로 두고, 보이지 않는 하위 제어 루프는 pinned upstream KEDA 동작으로 제한적으로 설명할 수 있기 때문입니다. 이것이 가장 정확하고 실무적인 접근입니다.
 
@@ -66,7 +66,7 @@ ACA의 스케일링을 한 문장으로 요약하면 이렇습니다. **scale ru
 
 ACA에서 사용자가 작성하는 rule은 runtime scaler object가 아닙니다. 플랫폼이 그 rule을 KEDA가 reconcile할 수 있는 형태의 숨은 구성으로 바꿔야 합니다. 보이지 않는다는 사실이 중요하지 않다는 뜻은 아닙니다. 오히려 보이지 않기 때문에 더 잘 이해해야 합니다.
 
-직접 object를 보지는 못해도, 관찰되는 스케일 결과는 이 번역의 downstream입니다. 따라서 scale 이슈를 이해할 때는 rule 문법보다 “이 rule이 어떤 제어 루프를 만들었을까”를 먼저 생각해야 합니다.
+직접 object를 보지는 못해도, 관찰되는 스케일 결과는 이 번역의 downstream입니다. 따라서 scale 이슈를 이해할 때는 rule 문법보다 "이 rule이 어떤 제어 루프를 만들었을까"를 먼저 생각해야 합니다.
 
 ### KEDA가 기준점인 이유는 계약이 명확하기 때문입니다
 
@@ -116,7 +116,7 @@ ACA가 `minReplicas: 0`을 허용한다는 사실은 중요한 의미를 가집�
 
 ### custom rule은 가장 KEDA다운 부분입니다
 
-custom rule은 KEDA scaler와의 대응이 가장 선명한 영역입니다. ACA 문서도 KEDA scaler metadata와 authentication 개념을 ACA field로 옮기는 방법을 설명합니다. 사실상 “여기는 KEDA식으로 생각하라”는 힌트에 가깝습니다.
+custom rule은 KEDA scaler와의 대응이 가장 선명한 영역입니다. ACA 문서도 KEDA scaler metadata와 authentication 개념을 ACA field로 옮기는 방법을 설명합니다. 사실상 "여기는 KEDA식으로 생각하라"는 힌트에 가깝습니다.
 
 ![Custom rule to replica control loop](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/04/04-06-the-control-loop-how-a-custom-rule-becom.ko.png)
 
@@ -156,7 +156,7 @@ Upstream KEDA는 HPA가 external metric 질의에 답을 받을 수 있도록 me
 
 *HPA queries and metrics adapter path*
 
-그래서 metric이 사라지거나 activation이 기대와 다르게 느릴 때는 제품 표면만 보지 말고, “metric answer path에서 어떤 신호가 비었는가”라는 질문도 함께 해야 합니다.
+그래서 metric이 사라지거나 activation이 기대와 다르게 느릴 때는 제품 표면만 보지 말고, "metric answer path에서 어떤 신호가 비었는가"라는 질문도 함께 해야 합니다.
 
 ### 기본 polling·cooldown 값이 운영 체감을 만듭니다
 
@@ -188,11 +188,11 @@ scale이 runtime behavior라는 점을 생각하면, revision template에 붙는
 
 scale rule을 추가하는 일은 처리량을 늘리는 일처럼 보이지만, 동시에 downstream pressure를 증폭시키는 일입니다. queue scaler, HTTP concurrency scaler, 외부 metric scaler가 같은 Revision을 깨울 수 있다면, 앱 뒤의 DB connection pool, rate-limited API, 메시지 브로커가 버틸 수 있는지까지 함께 계산해야 합니다.
 
-이 점이 중요한 이유는 ACA가 “잘” 확장될수록 뒤 시스템에는 더 빨리 부담을 줄 수 있기 때문입니다. KEDA형 autoscaling loop는 애플리케이션 앞단의 demand를 읽는 데는 능숙하지만, downstream이 같은 속도로 커진다고 가정하지는 않습니다. 따라서 max replica와 concurrency threshold는 성능 knob이면서 동시에 보호 장치입니다.
+이 점이 중요한 이유는 ACA가 "잘" 확장될수록 뒤 시스템에는 더 빨리 부담을 줄 수 있기 때문입니다. KEDA형 autoscaling loop는 애플리케이션 앞단의 demand를 읽는 데는 능숙하지만, downstream이 같은 속도로 커진다고 가정하지는 않습니다. 따라서 max replica와 concurrency threshold는 성능 knob이면서 동시에 보호 장치입니다.
 
 ### scale 변화가 즉시 연속적이지 않은 이유
 
-운영에서 자주 듣는 질문이 있습니다. “왜 요청이 늘었는데 바로바로 replica가 늘지 않죠?” 이때는 제품이 둔한 것이 아니라, control loop가 polling과 cooldown을 가진다는 사실을 먼저 떠올리는 편이 맞습니다. event-driven autoscaling은 본질적으로 measurement window, threshold, polling cadence 위에서 움직입니다.
+운영에서 자주 듣는 질문이 있습니다. "왜 요청이 늘었는데 바로바로 replica가 늘지 않죠?" 이때는 제품이 둔한 것이 아니라, control loop가 polling과 cooldown을 가진다는 사실을 먼저 떠올리는 편이 맞습니다. event-driven autoscaling은 본질적으로 measurement window, threshold, polling cadence 위에서 움직입니다.
 
 즉 scale change는 매 밀리초마다 끊김 없이 따라붙는 연속 함수가 아닙니다. 이 특성을 이해하고 나면 burst 대응 전략도 현실적으로 바뀝니다. 아주 짧고 급한 스파이크는 warm baseline이나 higher min replica가 더 맞을 수 있고, 길고 명확한 이벤트 증가는 aggressive scaler가 더 맞을 수 있습니다.
 
@@ -200,7 +200,7 @@ scale rule을 추가하는 일은 처리량을 늘리는 일처럼 보이지만,
 
 ACA에서 보이지 않는 object를 직접 볼 수는 없지만, 관찰 포인트는 분명히 잡을 수 있습니다. 첫째, trigger input이 실제로 들어오고 있는가를 봐야 합니다. 둘째, activation 이후 replica count가 기대 방향으로 움직이는가를 봐야 합니다. 셋째, 움직인 replica가 downstream 오류율과 latency에 어떤 영향을 주는지 봐야 합니다.
 
-이 세 단계를 나누면 scale 문제를 훨씬 덜 추상적으로 다룰 수 있습니다. “스케일이 이상하다”는 막연한 말 대신, 입력 신호 문제인지, control loop 반응 문제인지, downstream 용량 문제인지를 각각 따로 검토할 수 있기 때문입니다.
+이 세 단계를 나누면 scale 문제를 훨씬 덜 추상적으로 다룰 수 있습니다. "스케일이 이상하다"는 막연한 말 대신, 입력 신호 문제인지, control loop 반응 문제인지, downstream 용량 문제인지를 각각 따로 검토할 수 있기 때문입니다.
 
 ### 운영자가 바로 적용해 볼 명령
 
@@ -234,6 +234,21 @@ az containerapp revision list -n my-app -g my-rg -o table
 
 이 검증이 중요한 이유는 스케일링을 앱 전역 설정으로 착각하지 않기 위해서입니다. 같은 앱 URL을 쓰더라도, 실제 replica 제어는 언제나 특정 Revision template 뒤에서 일어납니다.
 
+## 스케일 문제 진단 테이블
+
+운영 중에 scale이 기대와 다르게 동작할 때 아래 표로 증상을 빠르게 분류할 수 있습니다.
+
+| 증상 | 의심 원인 | 확인 방법 |
+|---|---|---|
+| scale-out이 전혀 안 됨 | rule 설정 오류, auth 미설정 | `az containerapp show --query "properties.template.scale"` |
+| scale-out이 기대보다 느림 | polling interval이 김, 측정 창 미충족 | Log Analytics에서 `ReplicaCount` 시계열 확인 |
+| 0에서 첫 요청이 매우 느림 | scale-to-zero 후 cold activation | `minReplicas: 1`로 변경하거나 warmup 경로 최적화 |
+| scale-in이 너무 빠름 | cooldown 값이 작음 | custom rule의 `cooldownPeriod` 값 조정 |
+| 여러 rule 중 하나만 동작함 | 다른 rule의 trigger signal 부재 | 각 rule 별 source(큐 길이, concurrency) 직접 확인 |
+| max replica 도달 후 오류 급증 | downstream 용량 초과 | DB connection count, rate limit 헤더 확인 |
+
+scale 문제는 대부분 세 번의 질문으로 좁힐 수 있습니다. 첫째, trigger signal이 들어오고 있는가. 둘째, control loop가 signal을 받아서 replica 결정을 내렸는가. 셋째, replica가 늘었는데도 문제가 지속되는가입니다. 이 세 질문을 순서대로 확인하면 "스케일이 안 된다"는 모호한 문장을 구체적인 계층 문제로 바꿀 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - **scale rule은 scaler object 자체가 아닙니다.** 제품 설정이며, 플랫폼이 하위 루프로 번역합니다.
@@ -249,6 +264,8 @@ az containerapp revision list -n my-app -g my-rg -o table
 - [ ] max replicas가 downstream(DB 연결 수, API quota)를 깨지 않는지 확인했습니다.
 - [ ] 여러 scaler를 겹칠 때 우선순위와 aggregation 방식을 문서화했습니다.
 - [ ] KEDA형 metric 변화와 실제 replica 수가 일치하는지 모니터링 체계를 만들었습니다.
+- [ ] scale rule 변경이 새 Revision을 만든다는 점을 배포 파이프라인에 반영했습니다.
+- [ ] 스케일 이슈 진단 시 trigger signal → control loop 반응 → downstream 용량 순서로 점검하는 런북을 팀과 공유했습니다.
 
 ## 정리
 
@@ -261,12 +278,13 @@ ACA의 스케일링은 단순한 제품 편의 기능이 아닙니다. 사용자
 ## 처음 질문으로 돌아가기
 
 - **ACA의 scale rule은 KEDA에서 어떤 형태의 제어 루프로 읽는 편이 가장 정확할까요?**
-  - ACA 운영에서 트래픽 분할과 스케일링은 자주 같은 이야기처럼 섞입니다
+  - scale rule은 scaler object 자체가 아닙니다. 사용자가 작성하는 것은 제품 설정이고, 플랫폼이 그 설정을 KEDA형 control loop로 번역합니다. 관찰되는 replica 수 변화는 이 번역의 downstream입니다. 따라서 "scale rule = scaler"가 아니라 "scale rule → KEDA형 루프 번역 → HPA류 결정 → replica 수"로 읽는 편이 가장 정확합니다.
+
 - **왜 scale rule은 app-scope가 아니라 revision-scope에 속할까요?**
-  - ACA 운영에서 트래픽 분할과 스케일링은 자주 같은 이야기처럼 섞입니다
+  - scale은 runtime behavior이기 때문입니다. canary Revision은 stable Revision과 다른 concurrency threshold나 max replica를 필요로 할 수 있고, 새 버전은 요청 처리 효율이 달라서 같은 임계값이 맞지 않을 수 있습니다. scale rule을 revision template에 붙임으로써 rollout 실험과 scaling 실험을 함께 하면서도 서로 섞지 않을 수 있습니다.
+
 - **`minReplicas: 0`이 가능하다는 사실은 스케일 모델을 어떻게 바꿀까요?**
-  - ACA 운영에서 트래픽 분할과 스케일링은 자주 같은 이야기처럼 섞입니다
-  - ACA 운영에서 트래픽 분할과 스케일링은 자주 같은 이야기처럼 섞입니다. 둘 다 Revision 주변에서 일어나기 때문입니다.
+  - `minReplicas: 0`은 스케일링을 단순한 비율 조정에서 event-driven activation 모델로 확장합니다. 0에서 1로 올라가는 첫 단계는 이미 떠 있는 replica의 scale-out과 체감이 다르고, 마지막 1에서 0으로 내려가는 단계는 cooldown 설정에 따라 비용과 응답 지연 양쪽에 직접 영향을 줍니다. 따라서 `minReplicas: 0`을 허용할 때는 SLA와 cold activation 비용을 함께 고려해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

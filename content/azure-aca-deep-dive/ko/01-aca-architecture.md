@@ -22,13 +22,13 @@ seo_description: ACA를 숨은 Kubernetes 위의 제품 계층으로 읽고 Envi
 
 Azure Container Apps를 처음 보면 설명이 꽤 단순합니다. 컨테이너 이미지를 올리고, Ingress를 켜고, 필요하면 Dapr와 스케일 규칙을 붙이면 플랫폼 운영은 Microsoft가 맡는다는 이야기입니다. 제품 소개로는 충분하지만, 운영자가 알아야 할 내부 경계까지 보여 주지는 않습니다.
 
-그래서 입문 직후에 흔한 오해가 생깁니다. ACA를 “AKS에서 Kubernetes를 숨긴 버전” 정도로 보거나, 반대로 “컨테이너만 올리면 되는 완전히 새로운 런타임”으로 이해하는 경우입니다. 둘 다 절반만 맞습니다. ACA는 Kubernetes를 지운 서비스가 아니라, Kubernetes 위에 관리형 제품 표면을 올린 서비스입니다.
+그래서 입문 직후에 흔한 오해가 생깁니다. ACA를 "AKS에서 Kubernetes를 숨긴 버전" 정도로 보거나, 반대로 "컨테이너만 올리면 되는 완전히 새로운 런타임"으로 이해하는 경우입니다. 둘 다 절반만 맞습니다. ACA는 Kubernetes를 지운 서비스가 아니라, Kubernetes 위에 관리형 제품 표면을 올린 서비스입니다.
 
 이 글은 Azure Container Apps Deep Dive 시리즈의 첫 번째 글입니다. 여기서는 Azure Container Apps를 하나의 박스로 보지 않고, Environment·Revision·KEDA·Dapr·Envoy가 각각 어느 층에서 어떤 역할을 맡는지 전체 지도로 정리하겠습니다.
 
 이 관점을 먼저 잡아 두면 뒤의 다섯 편이 기능 설명으로 흩어지지 않습니다. Environment는 왜 격리 경계인지, Revision은 왜 배포 이력이 아니라 런타임 단위인지, 트래픽 분할과 스케일링은 왜 서로 다른 제어 루프인지 같은 질문이 한 그림 안에서 연결되기 때문입니다.
 
-이제 ACA를 “숨겨진 Kubernetes 위의 관리형 제품 표면”이라는 시각으로 읽어 보겠습니다.
+이제 ACA를 "숨겨진 Kubernetes 위의 관리형 제품 표면"이라는 시각으로 읽어 보겠습니다.
 
 ![Azure Container Apps Deep Dive 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.ko.png)
 *Azure Container Apps Deep Dive 1장 흐름 개요*
@@ -70,7 +70,7 @@ ACA의 전체 구조를 한 번에 보면 시리즈가 훨씬 읽기 쉬워집�
 
 ### Kubernetes가 안 보인다고 없는 것은 아닙니다
 
-ACA를 볼 때 가장 먼저 교정해야 할 오해는 “클러스터를 안 보여 주니 Kubernetes는 중요하지 않다”는 생각입니다. 중요한 것은 그대로 있지만, Microsoft가 운영 책임과 인터페이스를 대신 가져갔을 뿐입니다.
+ACA를 볼 때 가장 먼저 교정해야 할 오해는 "클러스터를 안 보여 주니 Kubernetes는 중요하지 않다"는 생각입니다. 중요한 것은 그대로 있지만, Microsoft가 운영 책임과 인터페이스를 대신 가져갔을 뿐입니다.
 
 이 차이는 AKS와 비교하면 더 선명합니다. ACA에서는 클러스터 API endpoint를 직접 운영하지 않고, 노드에 직접 접근하지 않으며, 기저 control plane에 `kubectl`을 쓰지 않고, 임의의 클러스터 전역 add-on을 설치하지도 않습니다. 대신 여전히 Pod 같은 런타임 단위, Service 같은 내부 홉, Revision 불변성, KEDA 기반 스케일링, Dapr 사이드카, Envoy 기반 라우팅 같은 Kubernetes 인접 개념을 상대하게 됩니다.
 
@@ -100,7 +100,7 @@ Environment는 상위 폴더 같은 리소스가 아닙니다. 같은 Environmen
 
 ### Container App보다 Revision이 런타임에 더 가깝습니다
 
-사용자는 “앱을 업데이트했다”고 느끼지만, 런타임은 그보다 더 세분화되어 있습니다. ACA는 앱 전역 설정과 Revision 템플릿성 설정을 분리하고, 이미지·컨테이너 템플릿·스케일 규칙처럼 Revision 범위 설정이 바뀌면 새 Revision을 만듭니다. 그리고 그 Revision은 불변입니다.
+사용자는 "앱을 업데이트했다"고 느끼지만, 런타임은 그보다 더 세분화되어 있습니다. ACA는 앱 전역 설정과 Revision 템플릿성 설정을 분리하고, 이미지·컨테이너 템플릿·스케일 규칙처럼 Revision 범위 설정이 바뀌면 새 Revision을 만듭니다. 그리고 그 Revision은 불변입니다.
 
 ![App·Revision·Replica로 이어지는 런타임 구조](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-04-what-a-container-app-becomes-at-runtime.ko.png)
 
@@ -164,7 +164,7 @@ ACA와 AKS의 차이를 짧게 말하면 제어권입니다. AKS에서는 클러
 
 이 차이는 단순한 편의성 비교가 아닙니다. 트러블슈팅의 진입점, 변경 승인 방식, 관측 포인트, 운영 문서의 구성까지 바꿉니다. AKS에서는 native Kubernetes object를 직접 열어 보는 흐름이 자연스럽지만, ACA에서는 product feature, revision 상태, ingress 동작, sidecar 로그, scale 결과를 통해 아래층 상태를 추론하는 흐름이 더 자연스럽습니다.
 
-즉 ACA가 모호한 서비스라는 뜻이 아닙니다. **진실에 접근하는 창문이 다르다**는 뜻입니다. 이 차이를 받아들여야 “왜 kubectl이 안 되지?”라는 불만에서 멈추지 않고, 대신 어떤 제품 표면이 lower-layer state를 가장 잘 드러내는지 찾게 됩니다.
+즉 ACA가 모호한 서비스라는 뜻이 아닙니다. **진실에 접근하는 창문이 다르다**는 뜻입니다. 이 차이를 받아들여야 "왜 kubectl이 안 되지?"라는 불만에서 멈추지 않고, 대신 어떤 제품 표면이 lower-layer state를 가장 잘 드러내는지 찾게 됩니다.
 
 ### 공개 사실과 제한적 추론을 분리하는 습관이 필요합니다
 
@@ -182,11 +182,11 @@ ACA 심화 글을 읽거나 쓸 때 가장 중요한 태도 중 하나는 증거
 
 1편의 역할은 기능을 많이 설명하는 데 있지 않습니다. 오히려 뒤의 글들이 어디에 걸리는지 먼저 좌표를 찍는 데 있습니다. 2편의 Environment는 격리 경계를 다루고, 3편의 Revision은 immutable rollout target을, 4편의 KEDA는 replica control loop를, 5편의 Dapr는 sidecar runtime을, 6편의 Envoy는 request path를 담당합니다.
 
-이렇게 보면 “ACA는 기능이 많다”는 인상보다 “ACA는 여러 제어 루프와 런타임 계층을 제품 표면으로 정리한 서비스”라는 인상이 남습니다. 저는 후자가 훨씬 운영에 도움이 된다고 생각합니다.
+이렇게 보면 "ACA는 기능이 많다"는 인상보다 "ACA는 여러 제어 루프와 런타임 계층을 제품 표면으로 정리한 서비스"라는 인상이 남습니다. 저는 후자가 훨씬 운영에 도움이 된다고 생각합니다.
 
 ### 운영 질문을 이 지도 위에 올리면 답이 빨라집니다
 
-실제 현업 질문을 이 아키텍처 지도 위에 올려 보면 구조가 더 또렷해집니다. “새 Revision이 생겼는데 왜 메인 URL에서 안 보이지?”라는 질문은 Revision과 Ingress 사이의 문제입니다. “Dapr API는 응답하는데 backing store는 왜 실패하지?”라는 질문은 sidecar와 component scope, 외부 경로 문제입니다. “scale rule은 있는데 왜 replica가 0이지?”라는 질문은 KEDA activation과 metric 입력 문제입니다.
+실제 현업 질문을 이 아키텍처 지도 위에 올려 보면 구조가 더 또렷해집니다. "새 Revision이 생겼는데 왜 메인 URL에서 안 보이지?"라는 질문은 Revision과 Ingress 사이의 문제입니다. "Dapr API는 응답하는데 backing store는 왜 실패하지?"라는 질문은 sidecar와 component scope, 외부 경로 문제입니다. "scale rule은 있는데 왜 replica가 0이지?"라는 질문은 KEDA activation과 metric 입력 문제입니다.
 
 즉 운영 질문을 서비스 이름 기준이 아니라 계층 기준으로 재분류해야 합니다. ACA 문제 해결 속도는 이 재분류를 얼마나 빨리 하느냐에 크게 좌우됩니다. 저는 이 감각이 생기면 포털 메뉴를 외우는 것보다 훨씬 빠르게 원인 후보를 줄일 수 있다고 봅니다.
 
@@ -206,7 +206,7 @@ az containerapp env workload-profile list \
   -o table
 ```
 
-이 명령은 “내가 지금 어느 Environment 위에서 어떤 경계를 공유하고 있는가”를 빠르게 확인할 때 유용합니다. 특히 이후 글의 네트워크, Dapr, scale 관련 논의를 실제 환경과 연결하는 첫 점검으로 좋습니다.
+이 명령은 "내가 지금 어느 Environment 위에서 어떤 경계를 공유하고 있는가"를 빠르게 확인할 때 유용합니다. 특히 이후 글의 네트워크, Dapr, scale 관련 논의를 실제 환경과 연결하는 첫 점검으로 좋습니다.
 
 여기서 한 단계 더 나가면 아키텍처 지도를 실제 리소스와 바로 연결할 수 있습니다.
 
@@ -224,6 +224,20 @@ az containerapp show \
 
 이 두 명령을 묶어 보면, 1편에서 설명한 큰 그림이 포털 설명이 아니라 실제 리소스 관계라는 점이 더 분명해집니다. Environment는 바깥 경계이고, Revision은 런타임 단위이며, Ingress는 그 위에 얹힌 노출 표면입니다.
 
+### 계층별 장애 유형과 1차 점검 대상
+
+아키텍처 계층을 이해했다면 장애 발생 시 어느 계층에서 확인해야 하는지 표로 정리해둘 수 있습니다.
+
+| 관찰 증상 | 추정 계층 | 1차 점검 대상 |
+|---|---|---|
+| 새 Revision 생성 후 트래픽 미반영 | Control plane / Ingress | Revision 활성 상태, traffic weight 설정 |
+| Dapr API 200인데 state store 실패 | Dapr sidecar / Component scope | Component 등록 여부, Dapr app ID scope 설정 |
+| scale rule 있는데 replica=0 유지 | KEDA / Scale activation | metric 입력 정상 여부, activation threshold |
+| 같은 Environment 내 앱 간 통신 실패 | Network / DNS | internal ingress 설정, DNS suffix 일치 여부 |
+| 배포 후 응답 지연 급증 | Revision 시작 / Probe | readiness probe 설정, 컨테이너 startup 비용 |
+
+이 표를 런북에 포함해두면 온콜 엔지니어가 처음 보는 증상에서도 1~2분 안에 첫 번째 점검 대상을 결정할 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - **ACA는 Kubernetes를 안 쓰는 서비스가 아닙니다.** Kubernetes를 관리형 제품 표면 뒤로 감춘 서비스입니다.
@@ -231,6 +245,7 @@ az containerapp show \
 - **Revision은 배포 로그가 아닙니다.** 트래픽과 스케일 정책이 붙는 불변 런타임 스냅샷입니다.
 - **KEDA를 직접 못 본다고 스케일 엔진이 사라지는 것은 아닙니다.** 오히려 보이지 않기 때문에 KEDA 모델을 이해해야 합니다.
 - **Envoy cluster를 Kubernetes cluster로 읽으면 안 됩니다.** 여기서는 upstream destination을 뜻합니다.
+- **kubectl이 없다고 디버깅이 불가능한 것은 아닙니다.** 제품 표면이 하위 상태를 간접적으로 드러내는 창문입니다.
 
 ## 운영 체크리스트
 
@@ -239,6 +254,7 @@ az containerapp show \
 - [ ] Revision 범위 변경과 앱 범위 변경을 코드 리뷰 기준에 분리해 두었습니다.
 - [ ] KEDA, Dapr, Envoy 관련 설명에서 공개 사실과 upstream 추론을 문서상으로 구분했습니다.
 - [ ] Control plane 장애와 data plane 장애를 다른 점검 순서로 대응하도록 운영 문서를 정리했습니다.
+- [ ] 계층별 장애 유형과 1차 점검 대상을 런북에 포함했습니다.
 
 ## 정리
 
@@ -251,12 +267,11 @@ az containerapp show \
 ## 처음 질문으로 돌아가기
 
 - **ACA는 정확히 어떤 추상화 위에 어떤 추상화를 올린 서비스일까요?**
-  - ACA를 이해할 때 가장 유용한 문장은 이것입니다
+  - Microsoft 관리 Kubernetes 위에 Environment·Revision·Ingress·Autoscaling·Dapr라는 제품 기능을 올린 관리형 표면입니다. 기반 Kubernetes substrate는 공개되지 않아 직접 접근하지 못하지만, 제품 동작을 이해하는 데 KEDA·Dapr·Envoy 모델이 유용한 기준점이 됩니다.
 - **AKS와 비교할 때 Microsoft가 대신 떠안는 운영 책임과 사용자가 여전히 이해해야 할 책임은 무엇일까요?**
-  - ACA의 전체 구조를 한 번에 보면 시리즈가 훨씬 읽기 쉬워집니다
+  - Microsoft가 대신 가져가는 것: 클러스터 업그레이드, 노드 관리, control plane 가용성, 클러스터 전역 add-on 관리입니다. 사용자가 여전히 이해해야 할 것: Environment 경계 설계, Revision 불변성, KEDA scale activation 논리, Dapr component scope, Envoy 기반 트래픽 라우팅입니다.
 - **Environment는 단순한 상위 리소스가 아니라 왜 실제 격리 경계라고 봐야 할까요?**
-  - - **ACA는 Kubernetes를 안 쓰는 서비스가 아닙니다.
-  - ACA를 제품 표면만 보고 쓰면 초기 경험은 편합니다. 하지만 실제 운영에서 부딪히는 문제는 대부분 추상화 아래층에서 발생합니다.
+  - 네트워크 perimeter, Log Analytics destination, Dapr component registry가 Environment에서 동시에 묶이기 때문입니다. 이 세 가지 경계가 한 단위로 움직이는 것이 "단순한 상위 리소스"와 "실제 격리 경계"를 가르는 차이입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

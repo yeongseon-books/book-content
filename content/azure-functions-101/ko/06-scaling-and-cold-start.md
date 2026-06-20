@@ -19,21 +19,21 @@ tags:
 - Serverless
 - Cloud
 last_reviewed: '2026-05-15'
-seo_description: 서버리스 설명에는 늘 “자동으로 스케일링된다”는 문장이 붙습니다. 맞는 말이지만, 운영에서는 그 한 줄만으로 충분하지
+seo_description: 서버리스 설명에는 늘 "자동으로 스케일링된다"는 문장이 붙습니다. 맞는 말이지만, 운영에서는 그 한 줄만으로 충분하지
   않습니다.
 ---
 
 # Azure Functions 101 (6/7): 스케일링과 콜드 스타트 — 서버리스가 빨라지는 순간과 느려지는 순간
 
-서버리스 설명에는 늘 “자동으로 스케일링된다”는 문장이 붙습니다. 틀린 말은 아닙니다. 하지만 운영에서는 이 한 문장으로는 거의 아무것도 설명되지 않습니다. 어떤 신호를 보고 인스턴스를 늘리는지, 한 인스턴스가 동시에 몇 개의 호출을 흡수하는지, idle 상태에서 다시 깨어나는 첫 요청은 왜 느릴 수 있는지를 같이 봐야 비로소 현실의 성능과 비용이 읽힙니다.
+서버리스 설명에는 늘 "자동으로 스케일링된다"는 문장이 붙습니다. 틀린 말은 아닙니다. 하지만 운영에서는 이 한 문장으로는 거의 아무것도 설명되지 않습니다. 어떤 신호를 보고 인스턴스를 늘리는지, 한 인스턴스가 동시에 몇 개의 호출을 흡수하는지, idle 상태에서 다시 깨어나는 첫 요청은 왜 느릴 수 있는지를 같이 봐야 비로소 현실의 성능과 비용이 읽힙니다.
 
-특히 Azure Functions에서는 앞 글의 플랜 선택과 이 주제가 강하게 연결됩니다. Consumption, Flex Consumption, Premium, Dedicated는 모두 “자동 확장”이라는 표현 아래 묶이지만, 실제로는 warm capacity를 어떻게 유지하는지, scale to zero가 가능한지, concurrency를 어디까지 제어할 수 있는지가 다릅니다. 즉 같은 트래픽 스파이크라도 플랜별 체감은 꽤 다를 수 있습니다.
+특히 Azure Functions에서는 앞 글의 플랜 선택과 이 주제가 강하게 연결됩니다. Consumption, Flex Consumption, Premium, Dedicated는 모두 "자동 확장"이라는 표현 아래 묶이지만, 실제로는 warm capacity를 어떻게 유지하는지, scale to zero가 가능한지, concurrency를 어디까지 제어할 수 있는지가 다릅니다. 즉 같은 트래픽 스파이크라도 플랜별 체감은 꽤 다를 수 있습니다.
 
 이 글은 Azure Functions 101 시리즈의 여섯 번째 글입니다. 여기서는 스케일링과 콜드 스타트를 **운영 현상**으로 읽는 기준을 정리합니다. 인스턴스 수와 인스턴스 내부 동시성, cold start가 구성되는 단계, downstream 병목, 비용과 스케일 한도의 관계를 함께 보겠습니다.
 
 이번 장의 목표는 콜드 스타트를 무조건 없애는 비법을 찾는 것이 아닙니다. 더 현실적인 목표는 **어디서 시간이 쓰이는지, 어떤 레버를 먼저 움직여야 하는지, 어떤 비용을 감수해야 하는지**를 판단할 수 있게 만드는 것입니다.
 
-이제 “자동으로 늘어난다”는 말 속에 숨어 있는 두 축과, 첫 요청이 느려지는 실제 이유를 차례로 풀어보겠습니다.
+이제 "자동으로 늘어난다"는 말 속에 숨어 있는 두 축과, 첫 요청이 느려지는 실제 이유를 차례로 풀어보겠습니다.
 
 ![Azure Functions 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/06/06-01-scaling-has-two-axes-instance-count-and.ko.png)
 *Azure Functions 101 6장 흐름 개요*
@@ -49,7 +49,7 @@ seo_description: 서버리스 설명에는 늘 “자동으로 스케일링된�
 
 ## 왜 이 글이 중요한가
 
-스케일링과 콜드 스타트는 Azure Functions에서 가장 많이 회자되지만, 동시에 가장 자주 단순화되는 주제입니다. 많은 팀이 “첫 요청이 느리다 = 플랜이 나쁘다”로 곧장 결론을 내립니다. 하지만 실제로는 새 인스턴스 준비, Host 부팅, Worker 시작, import와 초기화, 첫 요청 자체의 무거움이 모두 섞여 있습니다. 원인을 쪼개 보지 않으면 해결책도 자주 틀립니다.
+스케일링과 콜드 스타트는 Azure Functions에서 가장 많이 회자되지만, 동시에 가장 자주 단순화되는 주제입니다. 많은 팀이 "첫 요청이 느리다 = 플랜이 나쁘다"로 곧장 결론을 내립니다. 하지만 실제로는 새 인스턴스 준비, Host 부팅, Worker 시작, import와 초기화, 첫 요청 자체의 무거움이 모두 섞여 있습니다. 원인을 쪼개 보지 않으면 해결책도 자주 틀립니다.
 
 또한 자동 스케일은 신뢰성과 비용을 동시에 흔듭니다. 인스턴스 수가 늘어나면 처리량은 좋아질 수 있지만, 동시에 DB 연결 수와 외부 API 호출 수도 폭증할 수 있습니다. 반대로 concurrency를 너무 보수적으로 잡으면 인스턴스가 지나치게 빨리 늘어 비용이 튀고, 너무 공격적으로 잡으면 한 인스턴스가 과부하되어 지연이 치솟을 수 있습니다. 즉 스케일링은 성능 기능이면서 비용 제어 기능이기도 합니다.
 
@@ -59,11 +59,11 @@ seo_description: 서버리스 설명에는 늘 “자동으로 스케일링된�
 
 Azure Functions의 스케일링은 한 단어가 아닙니다. **수평 스케일링(scale out)** 과 **인스턴스 내부 동시성(in-instance concurrency)** 이라는 두 축을 함께 봐야 합니다. 인스턴스 수가 늘어나는 것만이 스케일이 아니고, 한 인스턴스가 동시에 몇 개 호출을 처리하도록 설정되어 있는지도 같은 정도로 중요합니다.
 
-예를 들어 같은 HTTP 부하라도 어떤 경우에는 인스턴스를 빨리 늘리는 편이 낫고, 어떤 경우에는 인스턴스당 동시성을 먼저 높여도 충분합니다. Python처럼 런타임 특성이 뚜렷한 언어에서는 thread pool, async 처리 방식, HTTP concurrency 설정이 scale out보다 먼저 병목을 만들기도 합니다. 결국 “몇 대가 있나”와 “한 대가 얼마나 세게 일하나”를 동시에 봐야 합니다.
+예를 들어 같은 HTTP 부하라도 어떤 경우에는 인스턴스를 빨리 늘리는 편이 낫고, 어떤 경우에는 인스턴스당 동시성을 먼저 높여도 충분합니다. Python처럼 런타임 특성이 뚜렷한 언어에서는 thread pool, async 처리 방식, HTTP concurrency 설정이 scale out보다 먼저 병목을 만들기도 합니다. 결국 "몇 대가 있나"와 "한 대가 얼마나 세게 일하나"를 동시에 봐야 합니다.
 
 이 관점은 콜드 스타트 해석에도 그대로 이어집니다. 인스턴스 수를 0까지 줄이는 플랜에서는 다음 호출이 새 인스턴스를 깨워야 할 수 있고, warm capacity가 있는 플랜은 그 경로를 줄일 수 있습니다. 따라서 스케일링과 콜드 스타트는 별개가 아니라, **같은 실행 수명주기를 다른 각도에서 보는 주제**라고 이해하는 편이 가장 실용적입니다.
 
-> Azure Functions의 스케일링을 제대로 이해하려면 “얼마나 많이 늘어나는가”보다 먼저 “언제 새 인스턴스가 필요해지고, 그 전에 한 인스턴스를 어디까지 쓰는가”를 봐야 합니다.
+> Azure Functions의 스케일링을 제대로 이해하려면 "얼마나 많이 늘어나는가"보다 먼저 "언제 새 인스턴스가 필요해지고, 그 전에 한 인스턴스를 어디까지 쓰는가"를 봐야 합니다.
 
 ## 핵심 개념
 
@@ -98,9 +98,9 @@ Flex가 특별한 이유는 target-based scaling 개념 자체보다, **per-func
 - **Premium**: warm 인스턴스를 유지하므로 첫 요청 지연을 더 강하게 누를 수 있습니다.
 - **Dedicated**: scale to zero는 없지만, 갑작스러운 부하 대응은 autoscale 규칙 품질에 달려 있습니다.
 
-여기서 자주 나오는 오해는 “Flex면 항상 따뜻하다”는 생각입니다. 아닙니다. **Always Ready가 0이면 Flex도 0으로 내려갈 수 있고, 다음 호출은 cold start를 겪을 수 있습니다.**
+여기서 자주 나오는 오해는 "Flex면 항상 따뜻하다"는 생각입니다. 아닙니다. **Always Ready가 0이면 Flex도 0으로 내려갈 수 있고, 다음 호출은 cold start를 겪을 수 있습니다.**
 
-반대로 Premium도 “무조건 cold start가 없다”로 단정하면 안 됩니다. warm baseline이 있더라도 모든 상황에서 완전히 같은 지연 특성을 보장하는 것은 아닙니다. 중요한 것은 플랜 이름이 아니라, 실제로 얼마의 warm capacity를 유지하고 어떤 스파이크를 상정하느냐입니다.
+반대로 Premium도 "무조건 cold start가 없다"로 단정하면 안 됩니다. warm baseline이 있더라도 모든 상황에서 완전히 같은 지연 특성을 보장하는 것은 아닙니다. 중요한 것은 플랜 이름이 아니라, 실제로 얼마의 warm capacity를 유지하고 어떤 스파이크를 상정하느냐입니다.
 
 ### 콜드 스타트는 하나의 시간이 아니라 여러 단계의 합입니다
 
@@ -130,7 +130,7 @@ Flex가 특별한 이유는 target-based scaling 개념 자체보다, **per-func
 
 Azure Functions가 콜드 스타트를 전부 애플리케이션에게 떠넘기는 것은 아닙니다. 플랫폼은 placeholder 모델과 warm capacity 개념을 통해 **인스턴스와 Host 준비 비용 일부를 앞당겨** 놓으려 합니다. Premium의 prewarmed/Always Ready 인스턴스, Flex의 always-ready 인스턴스 수 설정이 바로 그 레버입니다.
 
-하지만 경계도 분명합니다. 플랫폼이 줄여 줄 수 있는 것은 “실행 환경이 존재하고 Host가 기본적으로 준비될 때까지”에 가깝습니다. 여러분의 import 비용, 느린 초기화 코드, 첫 요청에서 열리는 DB 연결, 외부 서비스 응답 지연은 여전히 애플리케이션 책임입니다.
+하지만 경계도 분명합니다. 플랫폼이 줄여 줄 수 있는 것은 "실행 환경이 존재하고 Host가 기본적으로 준비될 때까지"에 가깝습니다. 여러분의 import 비용, 느린 초기화 코드, 첫 요청에서 열리는 DB 연결, 외부 서비스 응답 지연은 여전히 애플리케이션 책임입니다.
 
 ### cold start가 아플 때 무엇부터 바꿀까요
 
@@ -213,6 +213,66 @@ DB 커넥션 풀, 외부 API rate limit, Redis 연결 수는 Functions 인스턴
 
 특히 재시도 폭주나 비정상 트래픽이 발생하는 상황에서는 이 안전장치의 가치가 더 커집니다. 최대 scale-out과 concurrency를 아예 열어 두면 플랫폼은 성실하게 확장하지만, 비즈니스 관점에서는 그 성실함이 곧 비용 사고가 될 수도 있습니다.
 
+### cold start 진단에 바로 쓸 수 있는 KQL 쿼리
+
+Application Insights에서 cold start를 진단할 때 유용한 쿼리를 미리 준비해두면 사고 대응이 빨라집니다.
+
+```kusto
+// cold start 의심 요청 탐색: 응답 시간이 비정상적으로 긴 초기 호출
+requests
+| where timestamp > ago(1h)
+| where duration > 5000
+| extend coldStart = iif(duration > 5000 and success == true, "suspected", "normal")
+| summarize count(), avg(duration), percentile(duration, 95) by coldStart, bin(timestamp, 5m)
+| order by timestamp desc
+
+// 인스턴스별 P95 지연 비교 (특정 인스턴스만 느린 경우 cold start 후보)
+requests
+| where timestamp > ago(30m)
+| summarize p95=percentile(duration, 95), count() by cloud_RoleInstance
+| order by p95 desc
+```
+
+인스턴스별 P95 지연 차이가 크면 일부 인스턴스만 cold start 상태임을 의미합니다. 이 경우 Always Ready 설정이나 warmup trigger 적용을 검토할 수 있습니다.
+
+### 플랜별 비용-성능 trade-off 표
+
+플랜 변경을 검토할 때 아래 표를 기준으로 논의를 시작하면 의사결정이 빨라집니다.
+
+| 비교 항목 | Consumption | Flex Consumption | Premium | Dedicated |
+|---|---|---|---|---|
+| 콜드 스타트 위험 | 높음 (scale to zero) | 설정 의존 | 낮음 (warm 유지) | 없음 |
+| 비용 구조 | 사용량 비례 | 사용량 + Always Ready | 기본 warm 비용 포함 | Plan 고정 비용 |
+| 동시성 제어 | 제한적 | HTTP concurrency 설정 | Worker 수로 제어 | 직접 설정 |
+| 최대 인스턴스 | 제한 있음 | 함수별 독립 설정 | 설정 가능 | Plan SKU 의존 |
+| 적합한 워크로드 | 간헐적 배치, 저빈도 | HTTP burst + 큐 혼합 | 지연 민감 API | 예측 가능 트래픽 |
+
+이 표는 정답을 제공하지 않습니다. 팀의 지연 허용 기준, 트래픽 패턴, 예산을 함께 대입해야 합니다.
+
+### 스케일링 지표 모니터링 설정
+
+아래 Azure Monitor 명령으로 현재 인스턴스 수와 실행 수를 시간별로 추적할 수 있습니다.
+
+```bash
+FUNC_ID=$(az functionapp show -n my-func -g my-rg --query id -o tsv)
+
+# 인스턴스 수 추이
+az monitor metrics list \
+  --resource "$FUNC_ID" \
+  --metric "InstanceCount" \
+  --interval PT5M \
+  -o table
+
+# 함수 실행 수와 실패율
+az monitor metrics list \
+  --resource "$FUNC_ID" \
+  --metric "FunctionExecutionCount,FunctionExecutionUnits" \
+  --interval PT5M \
+  -o table
+```
+
+인스턴스 수가 급등한 시점과 P95 지연이 높아진 시점이 겹친다면 cold start가 원인일 가능성이 높습니다. 반대로 인스턴스 수는 안정적인데 지연이 높다면 downstream 병목이나 코드 문제를 먼저 보는 것이 맞습니다.
+
 ## 흔히 헷갈리는 지점
 
 - **스케일링은 인스턴스 수만의 문제가 아닙니다.** 인스턴스 내부 동시성도 같은 만큼 중요합니다.
@@ -220,8 +280,9 @@ DB 커넥션 풀, 외부 API rate limit, Redis 연결 수는 Functions 인스턴
 - **cold start는 하나의 원인이 아니라 여러 단계 시간의 합입니다.** 플랜만 바꾼다고 모두 해결되지는 않습니다.
 - **Functions가 scale out되면 downstream도 자동으로 버텨 줄 것이라고 기대하면 안 됩니다.**
 - **비용 제어와 성능 제어는 같은 스케일 설정 안에서 동시에 일어납니다.**
+- **Warmup trigger와 Always Ready는 같은 기능이 아닙니다.** 전자는 새 인스턴스 부팅 시 훅, 후자는 warm 인스턴스를 항상 유지하는 설정입니다.
 
-이 오해들이 자주 반복되는 이유는 스케일링이 겉으로는 “잘 동작하고 있다”처럼 보이기 쉽기 때문입니다. 인스턴스 수가 늘면 문제를 해결한 것처럼 느껴지지만, 실제로는 latency가 개선되지 않거나 downstream 실패율이 동시에 튈 수 있습니다. 스케일은 결과가 아니라 과정이므로, 항상 뒤 시스템과 비용까지 같이 읽어야 합니다.
+이 오해들이 자주 반복되는 이유는 스케일링이 겉으로는 "잘 동작하고 있다"처럼 보이기 쉽기 때문입니다. 인스턴스 수가 늘면 문제를 해결한 것처럼 느껴지지만, 실제로는 latency가 개선되지 않거나 downstream 실패율이 동시에 튈 수 있습니다. 스케일은 결과가 아니라 과정이므로, 항상 뒤 시스템과 비용까지 같이 읽어야 합니다.
 
 또한 cold start를 무조건 제거 대상으로만 보는 것도 조심해야 합니다. 어떤 워크로드는 약간의 첫 요청 지연보다 비용 절감이 훨씬 중요할 수 있습니다. 중요한 것은 모든 지연을 없애는 것이 아니라, 비즈니스가 감당할 수 없는 지연과 감당 가능한 지연을 구분해 적절한 비용으로 제어하는 것입니다.
 
@@ -232,6 +293,8 @@ DB 커넥션 풀, 외부 API rate limit, Redis 연결 수는 Functions 인스턴
 - [ ] Always Ready 사용 여부와 비용 trade-off를 명시적으로 결정했습니다.
 - [ ] DB 커넥션 풀, 외부 API 한도, Redis 연결 수를 최대 인스턴스 수와 함께 계산했습니다.
 - [ ] burst 트래픽에 대한 상한(max scale-out, batch, concurrency)을 설정했습니다.
+- [ ] cold start 진단용 KQL 쿼리를 Application Insights 런북에 포함했습니다.
+- [ ] Warmup trigger 사용 여부와 예열 로직을 팀 운영 문서에 기록했습니다.
 
 ## 정리
 
@@ -241,17 +304,16 @@ DB 커넥션 풀, 외부 API rate limit, Redis 연결 수는 Functions 인스턴
 
 다음 글에서는 이 동작을 실제로 관측하는 방법으로 넘어갑니다. **Application Insights, Live Metrics, KQL, InstanceCount, 알람**을 통해 지금 몇 개 인스턴스가 도는지, 실패율과 지연이 어디서 올라가는지, 비용 신호가 어떻게 보이는지 정리하겠습니다.
 
-결국 스케일링과 cold start를 잘 다루는 팀은 “왜 느린가”를 단일 원인으로 보지 않습니다. 인스턴스 준비, runtime 시작, 코드 초기화, downstream 병목, 비용 상한까지 같은 그림 안에서 읽습니다. 그 시야가 다음 장의 모니터링과 운영 기준으로 자연스럽게 이어집니다.
+결국 스케일링과 cold start를 잘 다루는 팀은 "왜 느린가"를 단일 원인으로 보지 않습니다. 인스턴스 준비, runtime 시작, 코드 초기화, downstream 병목, 비용 상한까지 같은 그림 안에서 읽습니다. 그 시야가 다음 장의 모니터링과 운영 기준으로 자연스럽게 이어집니다.
 
 ## 처음 질문으로 돌아가기
 
 - **Functions scale controller는 어떤 신호를 보고 인스턴스를 추가할까요?**
-  - - **수평 스케일링(scale out)** — 앱에 몇 개 인스턴스를 둘 것인가 - **인스턴스 내부 동시성(in-instance concurrency)** — 인스턴스 하나가 동시에 몇 개 호출을 처리할 것인가 플랜별 차이는 이 두 축을 누가, 어떤 방식으로 제어하는지에서 갈립니다
+  - 트리거별로 다릅니다. 큐 트리거는 큐 깊이, HTTP 트리거는 동시 요청 수, Storage 트리거는 blob 수/처리 속도가 신호입니다. 이 신호가 임계치를 넘으면 새 인스턴스가 추가되지만, 한 인스턴스가 동시에 처리할 수 있는 호출 수(동시성)도 같이 제어해야 scale-out 빈도를 최적화할 수 있습니다.
 - **콜드 스타트는 정확히 어느 단계에서 발생하고, 무엇을 측정해야 볼 수 있을까요?**
-  - 스케일링과 콜드 스타트는 Azure Functions에서 가장 많이 회자되지만, 동시에 가장 자주 단순화되는 주제입니다
+  - 새 인스턴스 할당 → Host 초기화 → Worker 시작 → 의존성 import → 첫 호출 처리 순으로 발생합니다. Application Insights에서 P95 지연이 P50 대비 크게 높고, 해당 시점에 InstanceCount가 증가했다면 cold start를 의심합니다.
 - **Premium의 Always Ready나 Flex의 always-ready 인스턴스는 콜드 스타트를 어디까지 줄여 줄까요?**
-  - 스케일링과 콜드 스타트는 Azure Functions에서 가장 많이 회자되지만, 동시에 가장 자주 단순화되는 주제입니다
-  - 스케일링과 콜드 스타트는 Azure Functions에서 가장 많이 회자되지만, 동시에 가장 자주 단순화되는 주제입니다.
+  - 플랫폼이 새 실행 환경 준비와 Host 초기화 비용을 앞당겨 놓습니다. 그러나 애플리케이션의 import 비용, 의존성 초기화, 첫 DB 연결은 여전히 애플리케이션 책임입니다. 즉 플랫폼 쪽 지연(1~2단계)은 크게 줄어들지만, 애플리케이션 쪽 지연(3~5단계)은 코드 최적화로 별도 줄여야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

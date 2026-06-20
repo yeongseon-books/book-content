@@ -160,25 +160,24 @@ az webapp show -n my-app -g my-rg \
 
 아키텍처를 외우는 가장 빠른 방법은 요청 평면과 실행 평면, 격리 평면을 동시에 그려 보는 것입니다. Front-End는 host, TLS, affinity라는 라우팅 판단을 수행하고, Worker는 실제 사용자 코드를 실행하며, Sandbox는 그 코드가 접근할 수 있는 OS 기능 경계를 제한합니다. 이 세 레이어를 한 도표에 올려 두면 502, 503, startup 지연, 라이브러리 호환성 문제를 같은 범주로 섞지 않게 됩니다.
 
-```mermaid
-flowchart LR
-    C["Client"] --> FE["Front-End
-Host/TLS/ARR"]
-    FE --> W1["Worker A"]
-    FE --> W2["Worker B"]
-    subgraph W1S["Worker A 실행 경계"]
-      A1["App Process"]
-      A2["Sandbox Policy"]
-      A1 --> A2
-    end
-    subgraph W2S["Worker B 실행 경계"]
-      B1["App Process"]
-      B2["Sandbox Policy"]
-      B1 --> B2
-    end
-    W1 --> SH["Shared /home/site/wwwroot"]
-    W2 --> SH
-    K["Kudu SCM"] --> SH
+```
+[Client]
+   |
+   v
+[Front-End: Host/TLS/ARR]
+   |              |
+   v              v
+[Worker A]    [Worker B]
+  |- App Process     |- App Process
+  |- Sandbox Policy  |- Sandbox Policy
+   |              |
+   +------+-------+
+          |
+          v
+   [Shared /home/site/wwwroot]
+          ^
+          |
+   [Kudu SCM]
 ```
 
 이 그림의 실전 포인트는 단순합니다. Front-End 로그는 "어디로 보냈는가"를 설명하고, Worker 로그는 "무엇을 실행했는가"를 설명하며, Sandbox 관련 실패는 "무엇을 실행하지 못했는가"를 설명합니다. 장애 분석 중에 이 세 질문을 분리하면 원인 후보가 급격히 줄어듭니다.
@@ -192,8 +191,8 @@ Host/TLS/ARR"]
 curl -I -s https://my-app.azurewebsites.net
 
 # 같은 요청에 대해 DNS와 TLS 핸드셰이크 시간 분해
-curl -o /dev/null -s -w "dns=%{time_namelookup} tls=%{time_appconnect} ttfb=%{time_starttransfer} total=%{time_total}
-"   https://my-app.azurewebsites.net/diag/worker
+curl -o /dev/null -s -w "dns=%{time_namelookup} tls=%{time_appconnect} ttfb=%{time_starttransfer} total=%{time_total}\n" \
+  https://my-app.azurewebsites.net/diag/worker
 
 # 다회 호출로 worker 분산 감지
 for i in $(seq 1 10); do
@@ -211,16 +210,34 @@ done
 ```bash
 # 요청 시간 분해
 for i in $(seq 1 25); do
-  curl -o /dev/null -s -w "code=%{http_code} dns=%{time_namelookup} connect=%{time_connect} tls=%{time_appconnect} ttfb=%{time_starttransfer} total=%{time_total}
-"     https://my-app.azurewebsites.net/api/ping
+  curl -o /dev/null -s -w "code=%{http_code} dns=%{time_namelookup} connect=%{time_connect} tls=%{time_appconnect} ttfb=%{time_starttransfer} total=%{time_total}\n" \
+    https://my-app.azurewebsites.net/api/ping
 done
 
 # plan 리소스 지표
 PLAN_ID=$(az appservice plan show -n my-plan -g my-rg --query id -o tsv)
-az monitor metrics list --resource "$PLAN_ID" --metric "CpuPercentage,MemoryPercentage,HttpQueueLength" --interval PT1M -o table
+az monitor metrics list \
+  --resource "$PLAN_ID" \
+  --metric "CpuPercentage,MemoryPercentage,HttpQueueLength" \
+  --interval PT1M \
+  -o table
 ```
 
 DNS/TLS 구간이 길면 네트워크 경계 이슈를 먼저 보고, TTFB만 길면 worker 또는 앱 실행 구간을 우선 점검합니다. 이 식으로 계층별 해석을 고정하면 운영 대화가 훨씬 짧아집니다.
+
+### 아키텍처 계층별 장애 유형과 진단 순서
+
+각 계층에서 발생하는 장애 유형을 미리 분류해두면 온콜 대응 속도가 크게 향상됩니다.
+
+| 관찰 증상 | 추정 계층 | 1차 확인 방법 |
+|---|---|---|
+| 특정 사용자만 지속 실패 | Front-End / ARR affinity | ARR affinity 헤더 확인, worker 식별자 비교 |
+| 배포 성공 후 앱 미응답 | Kudu vs 런타임 분리 | `WEBSITE_RUN_FROM_PACKAGE` 동기화 상태, startup 로그 |
+| 502/503 간헐 발생 | Worker 가용성 | worker 재시작 로그, health check 결과 |
+| scale-out 후 일부 요청 느림 | 새 Worker cold start | warm-up request 설정, startup probe |
+| 파일 변경이 일부 인스턴스에만 반영 | Shared storage 지연 | `WEBSITES_ENABLE_APP_SERVICE_STORAGE` 설정 확인 |
+
+이 표를 런북에 포함해두면 "플랫폼 문제"라는 단어 대신 계층 기준의 구체적인 언어로 대화할 수 있습니다.
 
 ### 운영 문서에 남겨야 할 최소 관찰값
 
@@ -235,6 +252,7 @@ DNS/TLS 구간이 길면 네트워크 경계 이슈를 먼저 보고, TTFB만 �
 - **`/home/site/wwwroot`는 항상 로컬 디스크 복사본이 아닙니다.** 기본 모델에서는 shared content path이고, Linux custom container에서는 storage 설정에 따라 의미가 달라질 수 있습니다.
 - **Kudu는 런타임 그 자체가 아닙니다.** SCM buddy site로서 배포와 진단을 담당하며, Kudu success와 runtime success는 서로 다른 판정입니다.
 - **Functions를 이해했다고 App Service substrate를 자동으로 이해한 것은 아닙니다.** Functions host는 worker 위에 올라가는 런타임일 뿐, Front-End·storage·Kudu 구조를 대신 설명하지는 않습니다.
+- **Front-End 로그와 Worker 로그는 다른 계층입니다.** "플랫폼 문제"라고 통합하기 전에 어느 계층 로그를 먼저 볼지 정해야 합니다.
 
 ## 운영 체크리스트
 
@@ -243,6 +261,8 @@ DNS/TLS 구간이 길면 네트워크 경계 이슈를 먼저 보고, TTFB만 �
 - [ ] 같은 plan에 여러 앱을 올릴 때 noisy-neighbour 시나리오를 검토했습니다.
 - [ ] shared `/home` 경로와 local state의 차이를 팀 운영 문서에 반영했습니다.
 - [ ] Kudu 성공과 런타임 성공을 분리해서 보는 로그 확인 절차를 정했습니다.
+- [ ] 계층별 장애 유형과 1차 진단 순서를 런북에 포함했습니다.
+- [ ] worker 분산 감지용 다회 호출 스크립트를 사고 대응 도구함에 준비했습니다.
 
 ## 정리
 
@@ -255,12 +275,11 @@ DNS/TLS 구간이 길면 네트워크 경계 이슈를 먼저 보고, TTFB만 �
 ## 처음 질문으로 돌아가기
 
 - **App Service의 "플랫폼"은 실제로 어떤 박스들로 나눠서 이해해야 할까요?**
-  - App Service를 잘못 이해하면 거의 모든 운영 증상이 "플랫폼 문제"라는 한 단어로 뭉개집니다
+  - Front-End(요청 진입, TLS, ARR 라우팅), Worker(사용자 코드 실행, Sandbox 격리), Shared Storage(`/home/site/wwwroot`, 재시작 후에도 유지), Kudu(SCM buddy site, 배포·진단) 네 박스로 나눠 이해하면 됩니다. 이 분리가 있어야 증상이 어느 경계에 속하는지 빠르게 좁힐 수 있습니다.
 - **App Service Plan은 단순한 과금 단위가 아니라 어떤 격리와 용량의 의미를 가질까요?**
-  - - **App Service Plan은 단순한 과금 바구니가 아닙니다.
+  - worker capacity를 확정하는 단위입니다. 같은 plan에 여러 앱이 있으면 그 capacity를 공유하며, noisy-neighbour 영향을 받을 수 있습니다. SKU는 단순히 가격이 아니라 CPU/메모리 크기, scale-out 한도, 같은 plan에 올릴 수 있는 앱 수 한계를 동시에 결정합니다.
 - **Front-End, Worker, shared storage는 각자 어떤 책임을 맡고 어디서 서로 연결될까요?**
-  - App Service를 잘못 이해하면 거의 모든 운영 증상이 "플랫폼 문제"라는 한 단어로 뭉개집니다
-  - App Service를 잘못 이해하면 거의 모든 운영 증상이 "플랫폼 문제"라는 한 단어로 뭉개집니다.
+  - Front-End는 요청을 어느 app/slot에 보낼지 결정하고 ARR로 worker를 선택합니다. Worker는 선택된 실행 단위로 사용자 코드를 실행합니다. Shared storage는 여러 worker가 같은 `/home/site/wwwroot`를 보는 파일 기준점이며, Kudu가 이 경로에 배포 artifact를 배치합니다. 연결점은 shared storage로, 배포 경로와 런타임 경로가 여기서 만납니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

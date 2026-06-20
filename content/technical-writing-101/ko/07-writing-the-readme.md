@@ -221,6 +221,20 @@ MIT
 | FAQ | 자주 묻는 질문 | 3-5개 | 선택 |
 | Troubleshooting | 흔한 오류 해결 | 3-5개 | 선택 |
 
+## 프로젝트 유형별 README 구성 차이
+
+프로젝트 유형에 따라 어떤 섹션을 강조해야 하는지가 달라집니다.
+
+| 프로젝트 유형 | 강조할 섹션 | 생략 가능한 섹션 | 추가 권장 섹션 |
+| --- | --- | --- | --- |
+| CLI 도구 | Quick Start, 사용 예시 | Demo 스크린샷 | Configuration 옵션 |
+| 웹 API | Demo (API 예시), Endpoints | Features | API Reference |
+| 라이브러리/패키지 | Installation, Usage 예시 | Why | API Reference, Changelog |
+| 오픈소스 | Contributing, License | — | Code of Conduct, Roadmap |
+| 개인 포트폴리오 | Why, Demo | License | Architecture, Decision Log |
+
+CLI 도구는 화면 스크린샷보다 실제 명령과 출력이 더 설득력 있습니다. 웹 API는 curl 예시와 응답 JSON이 가장 먼저 와야 합니다.
+
 ## 배지와 상태 표시
 
 README 상단에 배지를 달면 프로젝트 상태를 한눈에 전달할 수 있습니다.
@@ -237,6 +251,19 @@ README 상단에 배지를 달면 프로젝트 상태를 한눈에 전달할 수
 2. 3-5개 이하로 제한합니다
 3. 중요도 순으로 배치합니다: CI 상태 → 라이선스 → 버전
 
+## Quick Start 명령 수와 완주율 관계
+
+Quick Start의 명령 수가 늘어날수록 독자가 중간에 이탈할 가능성이 높아집니다.
+
+| 명령 수 | 예상 완주율 | 권장 여부 | 초과 시 대응 |
+| --- | --- | --- | --- |
+| 1-3개 | 90% 이상 | 이상적 | — |
+| 4-5개 | 70-80% | 허용 | 각 명령에 한 줄 설명 추가 |
+| 6-7개 | 50-60% | 주의 | 일부를 `make setup` 스크립트로 묶기 |
+| 8개 이상 | 40% 미만 | 지양 | 별도 Setup 가이드로 분리 |
+
+복잡한 설정이 필수라면 `make setup` 같은 자동화 스크립트를 만들어 Quick Start는 3개 이내로 유지하는 것이 좋습니다.
+
 ## 흔한 README 실수와 해결
 
 | 실수 | 왜 문제인가 | 바로 고치는 방법 |
@@ -247,6 +274,16 @@ README 상단에 배지를 달면 프로젝트 상태를 한눈에 전달할 수
 | 라이선스가 없습니다 | 상업적 사용 여부 등 법적 판단을 할 수 없습니다 | `## License` 섹션을 문서 하단에 추가합니다 |
 | 스크린샷이 없습니다 | 독자가 결과를 상상해야 합니다 | CLI는 터미널 출력, 웹앱은 UI 스크린샷 한 장을 추가합니다 |
 | 버전 정보가 없습니다 | 시간이 지나면 명령이 달라져 독자가 혼란을 겪습니다 | requirements.txt에 버전을 고정하고 README에 Python 버전을 명시합니다 |
+
+## README 첫 문장 개선 연습
+
+첫 문장은 README에서 가장 중요한 문장입니다. 독자가 계속 읽을지 여기서 결정합니다.
+
+| 나쁜 예 | 좋은 예 | 개선 포인트 |
+| --- | --- | --- |
+| "This is my project." | "A CLI tool that converts Markdown files to PDF, optimized for technical documents." | 무엇을, 어떤 특성으로 설명 |
+| "I made this for learning." | "Built to solve the problem of manual environment variable setup across dev/staging/prod." | 문제 중심으로 설명 |
+| "A useful tool." | "A Python library for parsing and validating OpenAPI 3.1 schemas, with zero external dependencies." | 기술 스택과 제약 명시 |
 
 ## 운영 체크리스트
 
