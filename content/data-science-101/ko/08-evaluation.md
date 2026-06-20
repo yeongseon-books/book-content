@@ -64,6 +64,40 @@ last_reviewed: '2026-05-15'
 
 **After**: recall을 주요 지표로 두고, F1과 비용 기반 지표를 보조 지표로 둡니다. 그제야 문제와 지표가 맞기 시작합니다.
 
+## accuracy가 속이는 방식 — 구체 예시
+
+정확도가 오해를 만드는 가장 전형적인 사례를 숫자로 살펴봅니다.
+
+```python
+# 실제 데이터 분포
+total_samples = 10_000
+fraud_samples = 100      # 1% 사기 거래
+normal_samples = 9_900   # 99% 정상 거래
+
+# 아무것도 하지 않는 모델: 모든 거래를 정상으로 예측
+accuracy_naive = normal_samples / total_samples
+print(f"정확도: {accuracy_naive:.2%}")  # 99.00%
+
+# 하지만 recall은?
+recall_naive = 0 / fraud_samples
+print(f"재현율: {recall_naive:.2%}")    # 0.00%
+```
+
+이 모델은 아무것도 감지하지 못하면서도 정확도가 99%입니다. 이 한 가지 예시만으로도 "정확도 = 좋은 모델"이라는 등식이 얼마나 위험한지 알 수 있습니다.
+
+### 어떤 지표를 선택해야 하는가
+
+지표 선택은 문제의 비용 구조에서 출발합니다.
+
+| 비용 구조 | 우선 지표 | 보조 지표 | 예시 도메인 |
+| --- | --- | --- | --- |
+| FN 비용 >> FP 비용 | Recall | F1 | 의료 진단, 사기 탐지, 장애 탐지 |
+| FP 비용 >> FN 비용 | Precision | F1 | 스팸 필터, 법적 리스크 시스템 |
+| FN ≈ FP 비용 | F1 | ROC AUC | 이탈 예측, 리텐션 모델 |
+| 모델 비교 단계 | ROC AUC | — | 여러 알고리즘 비교 |
+| 이상치에 강한 회귀 | MAE | R² | 가격 예측, 수요 예측 |
+| 큰 오차에 페널티 | RMSE | R² | 에너지 최적화, 물류 |
+
 ## 실습: 5단계 평가
 
 ### 1단계 — confusion matrix 보기
@@ -76,6 +110,20 @@ print(cm)
 
 분류 평가는 confusion matrix에서 시작합니다. precision, recall, F1도 결국 이 표에서 나옵니다. 어떤 오류가 얼마나 많이 발생했는지 직접 보는 습관이 중요합니다.
 
+confusion matrix를 시각화하면 숫자가 더 직관적으로 읽힙니다.
+
+```python
+import matplotlib.pyplot as plt
+from sklearn.metrics import ConfusionMatrixDisplay
+
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["정상", "사기"])
+disp.plot(cmap="Blues")
+plt.title("혼동 행렬")
+plt.tight_layout()
+plt.savefig("confusion_matrix.png", dpi=150)
+plt.show()
+```
+
 ### 2단계 — precision, recall, F1 계산
 
 ```python
@@ -87,6 +135,27 @@ print(f1_score(y_test, y_pred))
 
 precision은 잘못 알람을 울리는 비용과 연결되고, recall은 놓치는 비용과 연결됩니다. F1은 둘 사이 균형을 보고 싶을 때 유용합니다.
 
+`classification_report`를 사용하면 클래스별로 한 번에 볼 수 있습니다.
+
+```python
+from sklearn.metrics import classification_report
+
+report = classification_report(y_test, y_pred, target_names=["정상", "사기"], digits=4)
+print(report)
+
+# 예시 출력:
+#               precision    recall  f1-score   support
+#
+#           정상     0.9980    0.9910    0.9945      9900
+#           사기     0.4750    0.8100    0.5994       100
+#
+#     accuracy                         0.9900     10000
+#    macro avg     0.7365    0.9005    0.7970     10000
+# weighted avg     0.9948    0.9900    0.9920     10000
+```
+
+이 리포트에서 "사기" 클래스의 recall이 0.81인 반면 precision이 0.475임을 확인할 수 있습니다. 비용 구조에 따라 이 균형점을 달리 설정해야 합니다.
+
 ### 3단계 — ROC AUC 보기
 
 ```python
@@ -96,6 +165,27 @@ print(roc_auc_score(y_test, proba))
 ```
 
 ROC AUC는 특정 임계값 하나에 덜 묶여 있다는 장점이 있습니다. 그래서 분류기의 전반적인 구분 능력을 볼 때 자주 사용합니다.
+
+ROC 곡선을 직접 그려 보면 임계값 선택의 trade-off를 시각적으로 확인할 수 있습니다.
+
+```python
+from sklearn.metrics import roc_curve
+import numpy as np
+
+fpr, tpr, thresholds = roc_curve(y_test, proba)
+auc_score = roc_auc_score(y_test, proba)
+
+plt.figure(figsize=(7, 5))
+plt.plot(fpr, tpr, label=f"ROC AUC = {auc_score:.4f}")
+plt.plot([0, 1], [0, 1], linestyle="--", color="gray", label="무작위 분류기")
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate (Recall)")
+plt.title("ROC 곡선")
+plt.legend()
+plt.tight_layout()
+plt.savefig("roc_curve.png", dpi=150)
+plt.show()
+```
 
 ### 4단계 — 회귀 지표 보기
 
@@ -110,6 +200,33 @@ print("R^2 :", r2_score(y_test, y_pred))
 
 회귀에서는 오차를 어떻게 벌주고 싶은지에 따라 지표를 다르게 봅니다. RMSE는 큰 오차에 더 민감하고, MAE는 더 직관적인 평균 절대 오차를 보여 줍니다.
 
+#### 회귀 지표 세부 비교
+
+```python
+import numpy as np
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
+
+y_true = np.array([100, 200, 300, 400, 500])
+y_pred = np.array([110, 195, 285, 420, 490])
+
+mae  = mean_absolute_error(y_true, y_pred)
+rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+r2   = r2_score(y_true, y_pred)
+mape = mean_absolute_percentage_error(y_true, y_pred) * 100
+
+print(f"MAE  = {mae:.2f}")    # 평균 절대 오차
+print(f"RMSE = {rmse:.2f}")   # 큰 오차에 민감
+print(f"R²   = {r2:.4f}")     # 분산 설명 비율
+print(f"MAPE = {mape:.2f}%")  # 상대 오차 (퍼센트)
+```
+
+| 지표 | 의미 | 강점 | 약점 | 선택 기준 |
+| --- | --- | --- | --- | --- |
+| MAE | 평균 절대 오차 | 직관적, 이상치 강건 | 큰 오차 패널티 없음 | 이상치 많은 데이터 |
+| RMSE | 제곱 평균 제곱근 | 큰 오차 강조 | 이상치에 민감 | 큰 오차가 치명적인 경우 |
+| R² | 분산 설명 비율 | 0-1 범위 직관적 | 절대 오차 크기 숨김 | 모델 비교 지표로 사용 |
+| MAPE | 평균 절대 백분율 오차 | 스케일 무관 비교 | y=0 근처에서 불안정 | 단위 다른 데이터셋 비교 |
+
 ### 5단계 — 비즈니스 비용 직접 계산
 
 ```python
@@ -119,6 +236,30 @@ print("expected cost:", cost)
 ```
 
 실무에서는 이 단계가 특히 중요합니다. false negative가 false positive보다 훨씬 비싼 문제라면 그 비용을 직접 숫자로 계산해 지표로 삼아야 합니다. 그래야 모델 점수와 실제 의사결정이 같은 방향을 봅니다.
+
+비용 행렬을 여러 임계값에 걸쳐 계산하면 최적 임계값을 찾을 수 있습니다.
+
+```python
+thresholds = np.linspace(0.1, 0.9, 17)
+records = []
+
+for t in thresholds:
+    pred_t = (proba >= t).astype(int)
+    cm_t = confusion_matrix(y_test, pred_t)
+    if cm_t.shape == (2, 2):
+        TN, FP, FN, TP = cm_t.ravel()
+        cost_t = 5 * FN + 1 * FP
+        recall_t = TP / (TP + FN) if (TP + FN) > 0 else 0
+        prec_t = TP / (TP + FP) if (TP + FP) > 0 else 0
+        records.append((round(t, 2), cost_t, round(recall_t, 4), round(prec_t, 4)))
+
+import pandas as pd
+df_thresh = pd.DataFrame(records, columns=["threshold", "cost", "recall", "precision"])
+print(df_thresh)
+# cost가 최소인 임계값이 비즈니스 최적 임계값
+best = df_thresh.loc[df_thresh["cost"].idxmin()]
+print("최적 임계값:", best["threshold"])
+```
 
 **Expected output:** confusion matrix와 함께 precision, recall, F1, ROC AUC, 비용 기반 점수를 같은 평가 표에 적습니다.
 
@@ -134,9 +275,54 @@ print("expected cost:", cost)
 4. **테스트셋에서 임계값을 조정하는 실수**: 평가 데이터에 맞춰 버리는 데이터 누수입니다.
 5. **비즈니스 비용을 무시하는 실수**: 점수는 좋아 보여도 현업 만족도는 낮아질 수 있습니다.
 
+### 실수 사례: 테스트셋 데이터 누수
+
+```python
+# 잘못된 방법: 테스트셋으로 임계값 최적화
+proba_test = model.predict_proba(X_test)[:, 1]
+best_threshold_test = find_best_threshold(proba_test, y_test)  # 데이터 누수!
+
+# 올바른 방법: 검증셋으로 임계값 최적화, 테스트셋으로 최종 평가만
+proba_valid = model.predict_proba(X_valid)[:, 1]
+best_threshold = find_best_threshold(proba_valid, y_valid)  # 검증셋 사용
+
+# 테스트셋은 한 번만 사용
+proba_test = model.predict_proba(X_test)[:, 1]
+final_pred = (proba_test >= best_threshold).astype(int)
+print("최종 테스트 recall:", recall_score(y_test, final_pred))
+```
+
+테스트셋을 임계값 조정에 사용하면 그 모델은 테스트셋에 과적합된 것입니다. 이렇게 하면 실제 배포 성능이 테스트 성능보다 크게 낮아질 수 있습니다.
+
 ## 실무에서는 이렇게 나타납니다
 
 실무 팀은 하나의 주 지표와 여러 가드레일 지표를 함께 둡니다. 예를 들어 recall을 최우선으로 보되, precision이 0.7 아래로 내려가면 배포하지 않는 식입니다. 이렇게 해야 한쪽 지표만 좋아지고 다른 쪽이 무너지는 상황을 막을 수 있습니다.
+
+### 실무 평가 리포트 구조
+
+실무에서는 평가 결과를 아래 구조로 기록합니다.
+
+```text
+모델 평가 리포트 — [날짜]
+
+데이터
+  - 버전: churn_v2026_05
+  - 기간: 2026-04-01 ~ 2026-04-30
+  - 샘플 수: train 80,000 / valid 10,000 / test 10,000
+  - 클래스 비율: 이탈 7.2% / 유지 92.8%
+
+지표 요약
+  - 주 지표: Recall @ threshold=0.35 → 0.7800
+  - 가드레일: Precision >= 0.65 → 0.6920 (통과)
+  - 보조: ROC AUC → 0.8732
+  - 비용 함수: 5*FN + 1*FP → 245 (이전 모델 대비 -12%)
+
+배포 판단
+  - 조건 충족 여부: 통과
+  - 다음 검토 시점: 2026-06-15 (배포 후 2주)
+```
+
+이 구조를 팀 내 공통 템플릿으로 두면 모델 비교와 의사결정 속도가 크게 올라갑니다.
 
 ## 시니어는 이렇게 생각합니다
 
@@ -152,12 +338,16 @@ print("expected cost:", cost)
 - [ ] ROC AUC가 어떤 의미인지 알고 있습니다.
 - [ ] MAE, RMSE, R²의 차이를 알고 있습니다.
 - [ ] 비용 행렬을 직접 만들 수 있습니다.
+- [ ] 임계값을 검증셋에서 조정하고 테스트셋을 마지막에만 사용합니다.
+- [ ] 평가 결과를 리포트 형식으로 문서화할 수 있습니다.
 
 ## 연습 문제
 
 1. 불균형 데이터에서 accuracy와 recall이 충돌하는 사례를 만들어 보세요.
 2. ROC 곡선을 그리고 임계값에 따라 trade-off가 어떻게 달라지는지 관찰해 보세요.
 3. 비용 기반 지표를 정의하고, 가장 좋은 임계값을 골라 보세요.
+4. 같은 데이터에서 MAE와 RMSE 값이 크게 차이날 경우 어떤 의미인지 설명해 보세요.
+5. "주 지표 1개 + 가드레일 지표 2개" 조합을 여러분이 풀고 싶은 문제에 맞게 설계해 보세요.
 
 ## 정리 및 다음 글
 
