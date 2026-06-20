@@ -27,7 +27,7 @@ last_reviewed: '2026-05-15'
 
 이 글은 Software Design 101 시리즈의 2번째 글입니다.
 
-여기서는 관심사 분리를 “파일을 많이 쪼개는 일”이 아니라, 다른 이유로 바뀌는 책임을 다른 경계로 나누는 설계 원칙으로 설명합니다. 결합도와 응집도가 왜 함께 나오는지, 횡단 관심사는 어디에 두어야 하는지, 분리와 통합 사이의 균형은 어떻게 잡아야 하는지도 차례로 보겠습니다.
+여기서는 관심사 분리를 "파일을 많이 쪼개는 일"이 아니라, 다른 이유로 바뀌는 책임을 다른 경계로 나누는 설계 원칙으로 설명합니다. 결합도와 응집도가 왜 함께 나오는지, 횡단 관심사는 어디에 두어야 하는지, 분리와 통합 사이의 균형은 어떻게 잡아야 하는지도 차례로 보겠습니다.
 
 ![Software Design 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/02/02-01-concept-at-a-glance.ko.png)
 *Software Design 101 2장 흐름 개요*
@@ -50,6 +50,18 @@ last_reviewed: '2026-05-15'
 
 UI, 도메인, 인프라는 바뀌는 속도도 이유도 다릅니다. 이 셋을 같은 상자에 넣으면 작은 변경도 넓게 번집니다. 분리를 잘하면 세 관심사가 서로 다른 속도로 움직일 수 있습니다.
 
+```text
+변경 이유별 분리 구조
+
+[UI 계층]          ← 디자인 변경, 채널 추가
+     |
+[도메인 계층]      ← 비즈니스 규칙 변경
+     |
+[인프라 계층]      ← DB 교체, 외부 API 교체
+
+각 계층은 독립적으로 변경될 수 있어야 합니다.
+```
+
 ## 기본 용어
 
 - <strong>관심사</strong>: 시스템이 신경 써야 하는 하나의 주제입니다.
@@ -60,15 +72,38 @@ UI, 도메인, 인프라는 바뀌는 속도도 이유도 다릅니다. 이 셋�
 
 ## 변경 전과 변경 후
 
-**변경 전**
+**변경 전 — 모든 관심사가 한 함수에**
 
 ```python
 def process_order(req):
-    # 입력 파싱 + 검증 + 가격 계산 + DB 저장 + 이메일 + 응답
-    ...
+    # 관심사 1: 입력 파싱
+    data = json.loads(req.body)
+    user_id = data["user_id"]
+    items = data["items"]
+
+    # 관심사 2: 입력 검증
+    if not items:
+        return {"error": "items required"}, 400
+
+    # 관심사 3: 가격 계산 (도메인)
+    total = sum(item["price"] * item["qty"] for item in items)
+    if user_id.startswith("vip"):
+        total *= 0.9
+
+    # 관심사 4: DB 저장 (인프라)
+    import psycopg2
+    conn = psycopg2.connect(...)
+    conn.execute("INSERT INTO orders VALUES (%s, %s)", (user_id, total))
+
+    # 관심사 5: 이메일 발송 (외부 통신)
+    import smtplib
+    smtplib.SMTP("smtp.example.com").sendmail(...)
+
+    # 관심사 6: 응답 직렬화
+    return json.dumps({"order_id": "...", "total": total})
 ```
 
-**변경 후**
+**변경 후 — 각 관심사가 독립된 함수로**
 
 ```python
 def process_order(req):
@@ -77,6 +112,26 @@ def process_order(req):
     saved = save_order(order)      # 인프라
     notify(saved)                  # 통신
     return to_response(saved)      # 출력
+
+# 각 함수는 하나의 관심사만 담당
+def parse(req) -> OrderCommand:
+    data = json.loads(req.body)
+    return OrderCommand(user_id=data["user_id"], items=data["items"])
+
+def build_order(cmd: OrderCommand) -> Order:
+    total = sum(i.price * i.qty for i in cmd.items)
+    if cmd.user_id.startswith("vip"):
+        total *= 0.9
+    return Order(user_id=cmd.user_id, total=total)
+
+def save_order(order: Order) -> SavedOrder:
+    return repo.save(order)
+
+def notify(saved: SavedOrder) -> None:
+    mailer.send(saved.user_id, f"주문 완료: {saved.total}원")
+
+def to_response(saved: SavedOrder) -> dict:
+    return {"order_id": saved.id, "total": saved.total}
 ```
 
 아래 구조에서는 각 줄이 하나의 관심사를 맡습니다. 함수 전체를 읽는 사람도 흐름을 한 번에 파악할 수 있고, 저장 방식을 바꾸더라도 도메인 로직을 크게 흔들지 않아도 됩니다.
@@ -128,6 +183,11 @@ def with_logging(fn):
         # 로깅
         return fn(*a, **k)
     return w
+
+# 도메인 코드에 로깅을 직접 넣지 않고
+# 데코레이터로 감쌉니다.
+@with_logging
+def build_order(cmd): ...
 ```
 
 로깅, 인증, 추적 같은 횡단 관심사는 데코레이터나 미들웨어로 모으는 편이 낫습니다. 도메인 코드 안에 흩어 두면 핵심 규칙을 읽기가 빠르게 어려워집니다.
@@ -143,6 +203,24 @@ def app(req):
 
 분리가 끝이 아닙니다. 분리된 관심사가 만나는 지점이 적고 명확해야 합니다. 이음새가 많아지면 통합 비용이 커지고, 구조가 다시 흐려집니다.
 
+## 응집도와 결합도 시각화
+
+```text
+높은 응집도 + 낮은 결합도 (목표)
+┌──────────┐    ┌──────────┐    ┌──────────┐
+│  도메인  │───▶│ 저장소   │    │  알림    │
+│  (규칙)  │    │ (인터페이스)│    │  (이메일)│
+└──────────┘    └──────────┘    └──────────┘
+  - 도메인은 저장소 인터페이스만 알고, 구현은 모름
+  - 알림은 별도 트리거로 실행 (이벤트 or 서비스)
+
+낮은 응집도 + 높은 결합도 (회피)
+┌─────────────────────────────────────┐
+│ process_order: 파싱+검증+계산+저장+알림+직렬화 │
+└─────────────────────────────────────┘
+  - 하나가 바뀌면 전체 영향
+```
+
 ## 빠르게 검증해 보기
 
 주문 처리 함수 하나를 골라 아래처럼 책임을 색칠해 보면 관심사가 실제로 얼마나 섞였는지 금방 드러납니다.
@@ -157,7 +235,7 @@ to_response()        -> 출력
 
 **Expected output:** 같은 함수 안에 입력·도메인·인프라·출력이 모두 들어 있으면 분리 후보가 뚜렷하게 보입니다.
 
-가능하면 색칠한 결과를 기준으로 “이 단계는 왜 바뀌는가?”를 한 줄씩 적어 보세요. 변경 이유가 다르면 경계 후보도 다릅니다.
+가능하면 색칠한 결과를 기준으로 "이 단계는 왜 바뀌는가?"를 한 줄씩 적어 보세요. 변경 이유가 다르면 경계 후보도 다릅니다.
 
 ## 실패 신호와 먼저 볼 것
 
@@ -169,6 +247,16 @@ to_response()        -> 출력
 
 관심사 분리는 파일 수를 늘리는 일이 아니라, 다른 이유로 바뀌는 코드를 다른 경계에 두는 일입니다.
 
+## 자주 하는 실수
+
+| 실수 | 왜 문제인가 | 올바른 접근 |
+| --- | --- | --- |
+| 폴더만 나누고 함수 내부는 그대로 | 이름은 분리됐지만 책임은 섞임 | 변경 이유 기준으로 실제 코드를 나눔 |
+| 너무 잘게 쪼개기 | 왕복 모듈이 많아져 통합 비용 증가 | 같이 바뀌는 것은 같이 있어야 함 |
+| 횡단 관심사를 도메인 안에 삽입 | 핵심 규칙이 로깅·인증으로 뒤덮임 | 데코레이터, 미들웨어, AOP로 분리 |
+| 서비스 계층에 모든 것을 모음 | 서비스가 다시 신 객체가 됨 | 서비스도 단일 유스케이스 단위로 분리 |
+| 분리 후 이음새를 방치 | 통합 지점이 흩어져 흐름 파악 어려움 | 분리된 관심사가 만나는 곳을 명확히 정의 |
+
 ## 이 코드에서 먼저 볼 점
 
 - 모듈마다 변경 이유를 하나로 모으려는 방향이 보입니다.
@@ -177,7 +265,7 @@ to_response()        -> 출력
 
 ## 어디서 많이 헷갈릴까
 
-관심사 분리를 “폴더만 나누는 일”로 이해하면 효과가 거의 없습니다. presentation, service, repository 같은 이름을 붙여도 실제 함수 안에서 여전히 모든 책임을 다루고 있다면 구조만 복잡해졌을 뿐입니다.
+관심사 분리를 "폴더만 나누는 일"로 이해하면 효과가 거의 없습니다. presentation, service, repository 같은 이름을 붙여도 실제 함수 안에서 여전히 모든 책임을 다루고 있다면 구조만 복잡해졌을 뿐입니다.
 
 반대로 너무 잘게 자르는 것도 문제입니다. 함수 하나마다 파일 하나를 만들고, 모듈 하나마다 인터페이스 하나를 둔다고 해서 자동으로 좋은 설계가 되지는 않습니다. 분리는 통합 비용과 함께 봐야 합니다. 같은 변경을 처리하려고 모듈 여덟 개를 왕복해야 한다면 그 또한 나쁜 신호입니다.
 
@@ -185,7 +273,29 @@ to_response()        -> 출력
 
 강한 팀은 관심사 분리를 규칙으로만 두지 않고 코드 수준에서 강제합니다. 예를 들어 도메인 패키지 안에서 외부 라이브러리 import를 막는 린트를 두면, 분리가 문서가 아니라 실행되는 제약이 됩니다.
 
-코드 리뷰에서도 질문은 비슷합니다. “이 함수는 왜 바뀌는가?”, “이 로깅이 정말 도메인 안으로 들어가야 하는가?”, “입력 파싱을 분리하면 테스트가 쉬워지지 않는가?” 이런 질문이 반복되면 설계 감각도 함께 올라갑니다.
+코드 리뷰에서도 질문은 비슷합니다. "이 함수는 왜 바뀌는가?", "이 로깅이 정말 도메인 안으로 들어가야 하는가?", "입력 파싱을 분리하면 테스트가 쉬워지지 않는가?" 이런 질문이 반복되면 설계 감각도 함께 올라갑니다.
+
+```python
+# 린트 규칙 예시 (flake8-import-order 또는 커스텀 훅)
+# domain/ 패키지에서 아래 패키지는 import 불가
+FORBIDDEN_IN_DOMAIN = [
+    "psycopg2", "sqlalchemy", "redis",
+    "requests", "httpx", "boto3",
+    "smtplib", "twilio",
+]
+```
+
+## 관심사 분리 수준별 적용
+
+관심사 분리는 한 가지 방식으로만 하는 것이 아닙니다. 함수 수준, 모듈 수준, 서비스 수준으로 나눠 생각할 수 있습니다.
+
+| 수준 | 분리 단위 | 경계 표현 방식 | 적용 시점 |
+| --- | --- | --- | --- |
+| 함수 수준 | 단일 책임 함수 | 함수 분리 | 항상 |
+| 모듈 수준 | 패키지/클래스 | `__init__.py`, 인터페이스 | 팀이 2명 이상 |
+| 서비스 수준 | 마이크로서비스 | API 경계, 메시지 큐 | 팀이 5명 이상, 독립 배포 필요 시 |
+
+작은 팀에서 서비스 수준 분리를 강제하면 통신 비용이 코드 복잡도보다 훨씬 커집니다. 분리 수준은 팀 크기와 변경 주기에 맞춰 선택해야 합니다.
 
 ## 운영 체크리스트
 
@@ -201,6 +311,87 @@ to_response()        -> 출력
 2. 함수 하나를 입력, 처리, 출력 단계로 분리해 보세요.
 3. 도메인 코드에 있는 외부 import를 찾아 어댑터 쪽으로 옮겨 보세요.
 
+## 팀 규모에 따른 관심사 분리 전략
+
+팀이 작을 때는 분리를 최소화하고, 팀이 커질수록 경계를 더 명확히 세우는 방향으로 조정하는 것이 현실적입니다.
+
+```text
+1인 팀 또는 소규모 (1~3명)
+  - 관심사 분리보다 빠른 배포가 우선
+  - 도메인과 인프라를 분리하는 정도로 충분
+  - 과도한 추상화는 오히려 속도를 낮춤
+
+중간 팀 (4~10명)
+  - 각 팀원이 독립적으로 작업하는 영역이 생김
+  - 관심사 경계가 팀 경계와 맞물리기 시작
+  - 모듈 간 인터페이스를 명확히 정의할 필요가 생김
+
+대규모 팀 (10명 이상)
+  - 관심사 분리가 팀 자율성을 보장하는 구조적 기반
+  - 횡단 관심사(인증, 로깅, 모니터링)를 플랫폼 팀이 담당
+  - 서비스 경계 = 팀 경계로 수렴 (콘웨이 법칙)
+```
+
+콘웨이 법칙에 따르면 시스템 구조는 팀 커뮤니케이션 구조를 따라가는 경향이 있습니다. 반대로 좋은 모듈 경계를 먼저 설계하면 팀 분업 구조도 자연스럽게 따라옵니다.
+
+## 관심사 분리 적용 전후 비교: 주문 처리
+
+실제 주문 시스템에서 관심사 분리를 적용하기 전후 코드를 나란히 봅니다.
+
+```python
+# 분리 전: 모든 것이 한 함수에
+def handle_order(request):
+    # 1. 파싱
+    data = json.loads(request.body)
+    # 2. 검증 (비즈니스 규칙)
+    if data["quantity"] <= 0:
+        return error(400, "수량 오류")
+    # 3. 재고 확인 (외부 시스템)
+    stock = inventory_service.check(data["item_id"])
+    if stock < data["quantity"]:
+        return error(409, "재고 부족")
+    # 4. 가격 계산 (비즈니스 규칙)
+    price = data["quantity"] * catalog.get_price(data["item_id"])
+    if data.get("coupon"):
+        price *= 0.9
+    # 5. 저장 (인프라)
+    order_id = db.insert("orders", {...})
+    # 6. 알림 (외부 시스템)
+    notify_service.send(data["user_id"], f"주문 완료: {order_id}")
+    # 7. 응답 직렬화
+    return json.dumps({"order_id": order_id, "total": price})
+
+# 분리 후: 각 관심사가 독립된 함수에
+class OrderCommand:
+    item_id: str
+    quantity: int
+    user_id: str
+    coupon: str | None
+
+class OrderResult:
+    order_id: str
+    total: int
+
+def parse_order(request) -> OrderCommand: ...           # 입력
+def validate_order(cmd: OrderCommand) -> None: ...      # 도메인 규칙
+def check_stock(cmd: OrderCommand) -> None: ...         # 외부 시스템
+def calculate_price(cmd: OrderCommand) -> int: ...      # 도메인 규칙
+def save_order(cmd: OrderCommand, price: int) -> str: ... # 인프라
+def notify_user(user_id: str, order_id: str) -> None: ... # 외부 통신
+def to_response(result: OrderResult) -> str: ...        # 출력
+
+def handle_order(request):
+    cmd = parse_order(request)
+    validate_order(cmd)
+    check_stock(cmd)
+    price = calculate_price(cmd)
+    order_id = save_order(cmd, price)
+    notify_user(cmd.user_id, order_id)
+    return to_response(OrderResult(order_id=order_id, total=price))
+```
+
+분리 후에는 각 단계가 독립적으로 테스트 가능하고, 재고 확인 로직이 바뀌어도 가격 계산 코드를 건드릴 필요가 없습니다.
+
 ## 현업 적용 관점에서 다시 정리
 
 관심사 분리는 함수를 여러 개 만드는 작업이 아니라 변경 이유를 분리하는 작업입니다. 책임을 분리하면 배포 리스크와 회귀 테스트 범위가 함께 줄어듭니다.
@@ -212,8 +403,8 @@ to_response()        -> 출력
 ## 처음 질문으로 돌아가기
 
 - **관심사란 정확히 무엇일까요?**
-  - UI, 도메인, 인프라는 바뀌는 속도도 이유도 다릅니다
+  - 시스템이 신경 써야 하는 하나의 주제이며, 독립적으로 바뀔 수 있는 책임 단위입니다. UI, 도메인, 인프라는 바뀌는 속도도 이유도 다르기 때문에 서로 다른 관심사입니다.
 - **한 모듈이 너무 많은 일을 하는지 어떻게 알아낼 수 있을까요?**
-  - UI, 도메인, 인프라는 바뀌는 속도도 이유도 다릅니다
+  - "이 모듈은 왜 바뀌는가?" 질문에 답이 여러 개 나오면 책임이 너무 많습니다. 변경 이유가 둘 이상이면 분리 후보입니다.
 - **결합도와 응집도는 관심사 분리와 어떤 관계가 있을까요?**
-  - 모듈이 왜 바뀌는지 적어 보면 책임 후보가 바로 드러납니다
+  - 모듈이 왜 바뀌는지 적어 보면 책임 후보가 바로 드러납니다. 같이 바뀌는 것을 모으면 응집도가 높아지고, 다른 이유로 바뀌는 것을 나누면 결합도가 낮아집니다.

@@ -50,6 +50,28 @@ UI, 비즈니스 규칙, 인프라는 바뀌는 이유도 속도도 다릅니다
 
 계층 구조에서 먼저 기억할 점은 도메인이 가장 안정적인 중심이라는 사실입니다. 바깥 채널과 저장소는 도메인을 향해 붙지만, 도메인은 바깥 세부를 모르는 편이 좋습니다.
 
+```text
+계층 아키텍처 의존성 방향
+
+┌─────────────────────────────────┐
+│  Presentation (HTTP, CLI, UI)   │  ← 자주 바뀜
+└──────────────┬──────────────────┘
+               │ 의존
+┌──────────────▼──────────────────┐
+│  Application (유스케이스 조율)   │
+└──────────────┬──────────────────┘
+               │ 의존
+┌──────────────▼──────────────────┐
+│  Domain (업무 규칙, 엔티티)      │  ← 안정적
+└──────────────┬──────────────────┘
+               │ 인터페이스 정의 (포트)
+┌──────────────▼──────────────────┐
+│  Infrastructure (DB, 파일, SaaS)│  ← 자주 바뀜
+└─────────────────────────────────┘
+
+화살표 방향: 바깥 → 안쪽 (안쪽은 바깥을 모름)
+```
+
 ## 기본 용어
 
 - <strong>표현 계층</strong>: HTTP, CLI, UI처럼 바깥과 만나는 접점입니다.
@@ -60,30 +82,67 @@ UI, 비즈니스 규칙, 인프라는 바뀌는 이유도 속도도 다릅니다
 
 ## 변경 전과 변경 후
 
-**변경 전**
+**변경 전 — 한 함수가 HTTP, business, DB를 모두 처리함**
 
 ```python
-# 한 함수가 HTTP, business, DB를 모두 처리함
 @app.route("/charge")
 def charge():
     body = request.json
-    if body["amount"] <= 0: return "bad", 400
-    db.execute("UPDATE wallet ...")
-    return "ok"
+    # HTTP 파싱 + 검증 + 도메인 규칙 + DB 저장 + 응답
+    if not body.get("user_id"):
+        return "user_id required", 400
+    if body["amount"] <= 0:
+        return "invalid amount", 400
+    conn = psycopg2.connect(...)
+    balance = conn.fetchone("SELECT balance FROM wallet WHERE user_id = %s",
+                             (body["user_id"],))[0]
+    if balance < body["amount"]:
+        return "insufficient funds", 422
+    conn.execute("UPDATE wallet SET balance = balance - %s WHERE user_id = %s",
+                 (body["amount"], body["user_id"]))
+    return json.dumps({"status": "ok"}), 200
 ```
 
-**변경 후**
+**변경 후 — 각 계층이 자기 책임만 맡음**
 
 ```python
-# presentation
+# presentation/wallet_views.py
 @app.route("/charge")
 def charge_view():
-    return charge_use_case(request.json)
+    try:
+        cmd = ChargeCommand.from_json(request.json)  # 입력 파싱만
+        result = charge_use_case.run(cmd)            # 위임
+        return jsonify(result.to_dict()), 200
+    except ValidationError as e:
+        return jsonify({"error": str(e)}), 400
+    except InsufficientFundsError as e:
+        return jsonify({"error": str(e)}), 422
 
-# application
-def charge_use_case(payload):
-    cmd = ChargeCommand.from_payload(payload)
-    return charge_service.run(cmd)
+# application/charge_use_case.py
+@dataclass
+class ChargeResult:
+    transaction_id: str
+    remaining_balance: int
+
+def run(cmd: ChargeCommand) -> ChargeResult:
+    wallet = wallet_repo.get(cmd.user_id)   # 조율만
+    wallet.debit(cmd.amount)                # 도메인 규칙 위임
+    saved = wallet_repo.save(wallet)        # 저장 위임
+    return ChargeResult(transaction_id=saved.tx_id,
+                        remaining_balance=wallet.balance)
+
+# domain/wallet.py
+@dataclass
+class Wallet:
+    user_id: str
+    balance: int
+
+    def debit(self, amount: int) -> None:
+        if amount <= 0:
+            raise ValidationError("금액은 0보다 커야 합니다")
+        if self.balance < amount:
+            raise InsufficientFundsError(f"잔액 부족: {self.balance} < {amount}")
+        self.balance -= amount  # 도메인 규칙만 담당
 ```
 
 두 번째 구조에서는 표현 계층이 얇고, 업무 흐름은 애플리케이션 계층으로 이동합니다. 각 계층이 자기 책임만 맡으므로 수정 범위도 더 예측하기 쉬워집니다.
@@ -110,7 +169,7 @@ def charge(repo, user_id, amount):
     w = repo.get(user_id); w.debit(amount); repo.save(w)
 ```
 
-유스케이스는 “무엇을 하는가”의 흐름을 담당합니다. 도메인 객체를 조합해 작업을 완료하지만, 표현 세부나 저장 구현은 직접 품지 않습니다.
+유스케이스는 "무엇을 하는가"의 흐름을 담당합니다. 도메인 객체를 조합해 작업을 완료하지만, 표현 세부나 저장 구현은 직접 품지 않습니다.
 
 ### 3단계 — 표현 계층을 얇게 유지한다
 
@@ -138,11 +197,25 @@ class SqlWalletRepo:
 
 ```python
 # 5_acl.py
-def to_domain_user(external_json):
-    return User(id=external_json["uid"], name=external_json["nm"])
+def to_domain_user(external_json: dict) -> User:
+    # 외부 API는 "uid", "nm" 같은 축약 필드를 쓸 수 있음
+    return User(
+        id=external_json["uid"],
+        name=external_json["nm"],
+        email=external_json.get("email_addr", ""),
+    )
 ```
 
 외부 API 응답을 도메인 모델로 바로 쓰기 시작하면 외부 스키마가 도메인 내부 어휘를 오염시킵니다. 번역 계층을 두면 외부 변경 충격을 그 지점에서 흡수할 수 있습니다.
+
+## 각 계층의 책임 요약
+
+| 계층 | 책임 | 허용된 의존성 | 변경 이유 |
+| --- | --- | --- | --- |
+| Presentation | HTTP 입출력, CLI, UI | Application | API 형식 변경, UI 변경 |
+| Application | 유스케이스 조율, 트랜잭션 경계 | Domain, Port | 업무 흐름 변경 |
+| Domain | 업무 규칙, 엔티티, 도메인 정책 | 없음 (독립) | 비즈니스 정책 변경 |
+| Infrastructure | DB, 파일, 외부 SaaS 구현 | Domain (포트 구현) | 기술 변경, 벤더 교체 |
 
 ## 빠르게 검증해 보기
 
@@ -169,6 +242,16 @@ infra lines: ORM call, SQL, SDK
 
 계층의 목적은 파일 구조를 예쁘게 만드는 것이 아니라, 바깥 변화가 안쪽 규칙을 직접 흔들지 못하게 막는 데 있습니다.
 
+## 자주 하는 실수
+
+| 실수 | 왜 문제인가 | 올바른 접근 |
+| --- | --- | --- |
+| 계층 이름만 붙이고 실제 분리 없음 | service 파일에 HTTP·DB가 모두 있으면 계층이 아님 | 의존성 방향을 코드 수준에서 강제 |
+| 도메인 모델에 ORM 데코레이터 추가 | 도메인이 인프라를 직접 알게 됨 | 도메인 모델과 ORM 모델을 별도로 유지 |
+| 서비스가 트랜잭션도, 검증도, HTTP도 처리 | 서비스가 다시 신 객체가 됨 | 유스케이스 단위로 서비스를 분리 |
+| 외부 API JSON을 도메인에 직접 사용 | 외부 스키마 변경이 도메인 안까지 영향 | ACL(부패 방지 계층)로 번역 |
+| 작은 프로젝트에 4계층 강제 | 구조 overhead가 생산성보다 큼 | 계층 수를 시스템 크기에 맞게 조정 |
+
 ## 이 코드에서 먼저 볼 점
 
 - 의존성은 도메인을 향하도록 정리됩니다.
@@ -187,6 +270,25 @@ infra lines: ORM call, SQL, SDK
 
 도메인 모델에 ORM 데코레이터가 잔뜩 붙기 시작하거나, 라우터가 업무 규칙을 대부분 품고 있으면 경계가 무너지고 있다는 신호로 봐도 됩니다. 계층 구조는 이런 누수를 빨리 발견하게 해 줍니다.
 
+```python
+# 계층 경계를 lint로 강제하는 예시 (import-linter 설정)
+# .importlinter
+[importlinter]
+root_package = myapp
+
+[importlinter:contract:domain-independence]
+name = Domain must not import infrastructure
+type = forbidden
+source_modules =
+    myapp.domain
+forbidden_modules =
+    myapp.infra
+    psycopg2
+    sqlalchemy
+    redis
+    requests
+```
+
 ## 운영 체크리스트
 
 - [ ] 도메인이 인프라 라이브러리를 직접 import하지 않는가?
@@ -201,6 +303,110 @@ infra lines: ORM call, SQL, SDK
 2. ORM 모델과 도메인 모델을 분리해 보세요.
 3. 외부 SaaS 응답 하나에 ACL을 적용해 보세요.
 
+## 계층 아키텍처 전체 예시: 지갑 충전
+
+네 계층이 실제로 어떻게 협력하는지 지갑 충전 기능으로 확인합니다.
+
+```python
+# ── domain/wallet.py (도메인 계층) ───────────────────
+from dataclasses import dataclass
+
+@dataclass
+class Wallet:
+    user_id: str
+    balance: int
+
+    def deposit(self, amount: int) -> None:
+        if amount <= 0:
+            raise ValueError("충전 금액은 0보다 커야 합니다")
+        self.balance += amount  # 순수 도메인 규칙
+
+# ── application/deposit_use_case.py (애플리케이션 계층) ──
+from domain.wallet import Wallet
+from typing import Protocol
+
+class WalletRepo(Protocol):  # 포트 — 도메인 쪽에 정의
+    def get(self, user_id: str) -> Wallet: ...
+    def save(self, wallet: Wallet) -> None: ...
+
+def deposit(repo: WalletRepo, user_id: str, amount: int) -> int:
+    """유스케이스 조율 — HTTP도 DB도 직접 모름"""
+    wallet = repo.get(user_id)
+    wallet.deposit(amount)          # 도메인 규칙 위임
+    repo.save(wallet)               # 저장 위임
+    return wallet.balance
+
+# ── infra/sql_wallet_repo.py (인프라 계층) ──────────────
+class SqlWalletRepo:
+    """어댑터: WalletRepo 포트 구현"""
+    def get(self, user_id: str) -> Wallet:
+        row = self._db.fetchone(
+            "SELECT user_id, balance FROM wallets WHERE user_id = %s",
+            (user_id,)
+        )
+        return Wallet(user_id=row[0], balance=row[1])
+
+    def save(self, wallet: Wallet) -> None:
+        self._db.execute(
+            "UPDATE wallets SET balance = %s WHERE user_id = %s",
+            (wallet.balance, wallet.user_id)
+        )
+
+# ── presentation/wallet_view.py (표현 계층) ─────────────
+from flask import request, jsonify
+
+@app.route("/wallet/deposit", methods=["POST"])
+def deposit_view():
+    try:
+        body = request.get_json()
+        new_balance = deposit(
+            repo=sql_wallet_repo,           # 구현 주입
+            user_id=body["user_id"],
+            amount=body["amount"],
+        )
+        return jsonify({"balance": new_balance}), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+```
+
+이 구조에서 Flask를 FastAPI로 바꿔도 도메인·애플리케이션 계층은 건드리지 않습니다. PostgreSQL을 MySQL로 바꿔도 `SqlWalletRepo`만 수정하면 됩니다.
+
+## 계층 경계를 위반하는 흔한 패턴
+
+의도치 않게 계층 경계를 무너뜨리는 코드는 대부분 다음 세 가지 형태로 나타납니다.
+
+```python
+# 위반 1: 도메인 모델에 ORM 데코레이터
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import declarative_base
+
+Base = declarative_base()
+
+class Wallet(Base):  # 도메인 + ORM이 섞임
+    __tablename__ = "wallets"
+    user_id = Column(String, primary_key=True)
+    balance = Column(Integer)
+
+    def deposit(self, amount: int) -> None:  # 도메인 규칙이 ORM 클래스 안에
+        self.balance += amount
+
+# 위반 2: 라우터 안에 업무 규칙
+@app.route("/deposit")
+def deposit():
+    body = request.json
+    if body["amount"] <= 0:       # 도메인 규칙이 라우터 안에
+        return "금액 오류", 400
+    db.execute("UPDATE wallets SET balance = balance + %s ...", ...)
+    return "ok", 200
+
+# 위반 3: 서비스가 HTTP 객체를 직접 받음
+def deposit_service(request):   # HTTP 요청 객체가 서비스 안으로
+    amount = request.json["amount"]  # 서비스가 HTTP에 의존
+    ...
+```
+
+이 세 가지 패턴 중 하나라도 보이면 계층 경계를 다시 점검할 타이밍입니다.
+
 ## 현업 적용 관점에서 다시 정리
 
 계층 아키텍처의 핵심은 호출 순서가 아니라 책임 분리입니다. 프레젠테이션·애플리케이션·도메인·인프라가 각자 다른 변경 리듬을 갖도록 만드는 것이 목적입니다.
@@ -212,8 +418,8 @@ infra lines: ORM call, SQL, SDK
 ## 처음 질문으로 돌아가기
 
 - **계층을 왜 나누고, 무엇을 기준으로 나눌까요?**
-  - 가장 먼저 분리할 것은 업무 규칙입니다
+  - 변경의 이유와 속도가 다른 코드를 같은 곳에 두면 하나의 변경이 모든 것을 흔듭니다. 가장 먼저 분리할 것은 업무 규칙입니다. 도메인이 가장 안정적이고 바깥 채널·저장소가 더 자주 바뀝니다.
 - **각 계층은 어떤 책임을 가져야 할까요?**
-  - 계층 구조에서 먼저 기억할 점은 도메인이 가장 안정적인 중심이라는 사실입니다
+  - Presentation은 입출력, Application은 유스케이스 흐름 조율, Domain은 업무 규칙, Infrastructure는 DB·외부 SaaS 구현입니다. 계층 구조에서 먼저 기억할 점은 도메인이 가장 안정적인 중심이라는 사실입니다.
 - **의존성은 어떤 방향으로만 흘러야 할까요?**
-  - 계층 구조에서 먼저 기억할 점은 도메인이 가장 안정적인 중심이라는 사실입니다
+  - 바깥 계층이 안쪽 계층을 알아야 하고, 안쪽 계층은 바깥 계층을 몰라야 합니다. 도메인이 인프라를 모를 때 기술 교체가 도메인을 건드리지 않을 수 있습니다.

@@ -27,7 +27,7 @@ last_reviewed: '2026-05-15'
 
 이 글은 Software Design 101 시리즈의 4번째 글입니다.
 
-여기서는 의존성이 결합도와 어떻게 이어지는지, 안정적인 모듈과 변동이 큰 모듈은 어떻게 구분하는지, DIP와 포트·어댑터 패턴이 왜 실무에서 자주 쓰이는지 정리합니다. 설계에서 “방향”이 왜 자유를 사는 문제인지도 함께 보겠습니다.
+여기서는 의존성이 결합도와 어떻게 이어지는지, 안정적인 모듈과 변동이 큰 모듈은 어떻게 구분하는지, DIP와 포트·어댑터 패턴이 왜 실무에서 자주 쓰이는지 정리합니다. 설계에서 "방향"이 왜 자유를 사는 문제인지도 함께 보겠습니다.
 
 ![Software Design 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.ko.png)
 *Software Design 101 4장 흐름 개요*
@@ -50,6 +50,23 @@ last_reviewed: '2026-05-15'
 
 핵심 아이디어는 간단합니다. 세부 구현이 코어를 향하게 하고, 코어는 자신이 필요한 모양만 추상으로 선언합니다. 그러면 구현 교체가 코어를 직접 흔들지 않습니다.
 
+```text
+잘못된 방향 (도메인 → 인프라)
+┌──────────────┐         ┌───────────────┐
+│   Domain     │────────▶│ psycopg2 (DB) │
+│  (규칙)      │         │ (자주 바뀜)   │
+└──────────────┘         └───────────────┘
+  DB 드라이버를 바꾸면 도메인도 수정 필요
+
+올바른 방향 (인프라 → 도메인)
+┌──────────────┐         ┌───────────────┐
+│   Domain     │◀────────│  SqlRepo      │
+│  WalletRepo  │         │  (구현체)     │
+│  (추상)      │         └───────────────┘
+└──────────────┘
+  구현을 바꿔도 도메인은 그대로
+```
+
 ## 기본 용어
 
 - <strong>의존성</strong>: A가 B를 import하거나 호출하면 A는 B에 의존합니다.
@@ -60,26 +77,50 @@ last_reviewed: '2026-05-15'
 
 ## 변경 전과 변경 후
 
-**변경 전**
+**변경 전 — 도메인이 DB를 직접 알고 있음**
 
 ```python
-# domain이 DB를 직접 알고 있음
-import psycopg2
+# domain/wallet.py - 잘못된 예
+import psycopg2  # 도메인이 인프라 라이브러리를 직접 import
 
-def charge(user_id, amount):
-    conn = psycopg2.connect(...)
-    conn.execute("UPDATE wallet SET ...")
+def charge(user_id: str, amount: int) -> None:
+    conn = psycopg2.connect(dsn="postgresql://...")
+    conn.execute("UPDATE wallet SET balance = balance - %s WHERE user_id = %s",
+                 (amount, user_id))
+    conn.commit()
+
+# 문제:
+# - DB를 바꾸면 도메인 함수를 수정해야 함
+# - DB 없이는 테스트 불가능
+# - 도메인 규칙과 저장 방식이 얽혀 있음
 ```
 
-**변경 후**
+**변경 후 — 도메인은 추상만 알고 있음**
 
 ```python
-# domain은 abstraction만 알고 있음
-class WalletRepo:
-    def debit(self, user_id, amount): ...
+# domain/wallet.py - 올바른 예
+from typing import Protocol
 
-def charge(repo: WalletRepo, user_id, amount):
+class WalletRepo(Protocol):
+    """포트: 도메인이 필요한 모양을 직접 선언"""
+    def debit(self, user_id: str, amount: int) -> None: ...
+    def get_balance(self, user_id: str) -> int: ...
+
+def charge(repo: WalletRepo, user_id: str, amount: int) -> None:
+    balance = repo.get_balance(user_id)
+    if balance < amount:
+        raise InsufficientFundsError(f"잔액 부족: {balance} < {amount}")
     repo.debit(user_id, amount)
+
+# infra/wallet_repo.py - 어댑터
+import psycopg2
+
+class PostgresWalletRepo:
+    """어댑터: WalletRepo 인터페이스를 구현"""
+    def debit(self, user_id: str, amount: int) -> None:
+        self._conn.execute("UPDATE wallet SET balance = balance - %s ...", ...)
+    def get_balance(self, user_id: str) -> int:
+        return self._conn.fetchone("SELECT balance FROM wallet WHERE ...")[0]
 ```
 
 이 구조에서는 데이터베이스 구현이 바뀌어도 도메인 함수 `charge`는 거의 손대지 않아도 됩니다. 변경의 충격이 어댑터 쪽에 머물 가능성이 커집니다.
@@ -135,17 +176,44 @@ def main():
 
 ```python
 # 5_fake.py
-class FakeRepo:
-    def __init__(self): self.calls = []
-    def debit(self, u, a): self.calls.append((u, a))
+class FakeWalletRepo:
+    def __init__(self):
+        self._balances: dict[str, int] = {}
+        self._debits: list[tuple[str, int]] = []
 
-def test_charge():
-    repo = FakeRepo()
-    charge(repo, "u-1", 500)
-    assert repo.calls == [("u-1", 500)]
+    def get_balance(self, user_id: str) -> int:
+        return self._balances.get(user_id, 10_000)
+
+    def debit(self, user_id: str, amount: int) -> None:
+        self._debits.append((user_id, amount))
+
+def test_charge_reduces_balance():
+    repo = FakeWalletRepo()
+    repo._balances["u-1"] = 5000
+    charge(repo, "u-1", 1000)
+    assert repo._debits == [("u-1", 1000)]
+
+def test_charge_raises_when_insufficient():
+    repo = FakeWalletRepo()
+    repo._balances["u-1"] = 500
+    with pytest.raises(InsufficientFundsError):
+        charge(repo, "u-1", 1000)
 ```
 
 가짜 어댑터로 도메인을 검증할 수 있다면 방향이 잘 잡혔을 가능성이 높습니다. 이 단계에서 DB 연결이 필요하다면 코어와 세부가 너무 가깝게 붙어 있는 편입니다.
+
+## 안정성 분류
+
+```text
+높은 안정성 (변경 적음)          낮은 안정성 (변경 많음)
+─────────────────────────────────────────────────────
+도메인 규칙                       DB 드라이버
+인터페이스/프로토콜               외부 API 클라이언트
+유틸리티 (타입, 에러)             3rd-party SDK
+핵심 비즈니스 정책                웹 프레임워크 세부
+
+화살표는 안정적인 쪽을 향해야 합니다.
+```
 
 ## 빠르게 검증해 보기
 
@@ -171,6 +239,16 @@ infra  -> domain          # 기대하는 방향
 
 의존성 방향을 바로잡는 목적은 추상화를 늘리는 것이 아니라, 코어를 세부 구현 변경에서 보호하는 데 있습니다.
 
+## 자주 하는 실수
+
+| 실수 | 왜 문제인가 | 올바른 접근 |
+| --- | --- | --- |
+| 인터페이스를 인프라 폴더에 둠 | 도메인이 인프라를 향해 의존하게 됨 | 포트(인터페이스)는 도메인 쪽에 정의 |
+| 모든 함수에 포트를 만듦 | 과도한 추상화로 구조가 무거워짐 | 실제로 바뀔 가능성이 있는 경계에만 적용 |
+| 도메인 안에서 `new PostgresRepo()` 직접 생성 | 구현 선택이 도메인 안으로 새어 들어옴 | composition root에서만 조립 |
+| 테스트에서 실제 DB를 씀 | DB 없이는 테스트 불가, 속도도 느림 | FakeRepo로 도메인 규칙만 빠르게 검증 |
+| 포트에 DB 용어를 담음 | 추상이 구현 세부를 드러냄 | 도메인 언어로 인터페이스 이름 정의 |
+
 ## 이 코드에서 먼저 볼 점
 
 - 도메인 코드가 외부 라이브러리로부터 비교적 자유롭습니다.
@@ -188,6 +266,150 @@ infra  -> domain          # 기대하는 방향
 결제 게이트웨이, 알림 채널, 외부 SaaS 연동은 의존성 방향이 특히 중요합니다. 벤더를 교체하거나 테스트에서 가짜 구현을 써야 할 때, 도메인이 구체 구현을 모르고 있으면 변경은 훨씬 조용하게 끝납니다.
 
 코드 리뷰에서도 경고 신호는 분명합니다. 도메인이 ORM 모델을 import하는가, `new PostgresRepo()` 같은 구체 생성이 업무 로직 안에 들어왔는가, 포트 수가 실제 필요보다 과도한가를 먼저 봅니다.
+
+## 포트-어댑터 패턴 전체 예시
+
+의존성 방향을 실제로 적용한 결제 모듈 예시입니다.
+
+```python
+# ── domain/payment.py (코어) ──────────────────────
+from typing import Protocol
+from dataclasses import dataclass
+
+@dataclass
+class PaymentRequest:
+    user_id: str
+    amount: int
+    currency: str = "KRW"
+
+@dataclass
+class Receipt:
+    transaction_id: str
+    amount: int
+
+class PaymentGateway(Protocol):
+    """포트: 도메인이 필요한 모양을 직접 선언합니다"""
+    def charge(self, req: PaymentRequest) -> Receipt: ...
+
+class PaymentRepo(Protocol):
+    """포트: 저장 계약을 도메인이 선언합니다"""
+    def save(self, receipt: Receipt) -> None: ...
+
+def process_payment(
+    gateway: PaymentGateway,
+    repo: PaymentRepo,
+    req: PaymentRequest,
+) -> Receipt:
+    """도메인 유스케이스 — 외부 라이브러리를 전혀 모름"""
+    if req.amount <= 0:
+        raise ValueError("결제 금액은 0보다 커야 합니다")
+    receipt = gateway.charge(req)
+    repo.save(receipt)
+    return receipt
+
+
+# ── infra/stripe_gateway.py (어댑터 1) ──────────────
+import stripe
+
+class StripeGateway:
+    """어댑터: PaymentGateway 프로토콜을 구현"""
+    def charge(self, req: PaymentRequest) -> Receipt:
+        result = stripe.Charge.create(
+            amount=req.amount,
+            currency=req.currency.lower(),
+        )
+        return Receipt(transaction_id=result.id, amount=req.amount)
+
+
+# ── infra/sql_payment_repo.py (어댑터 2) ────────────
+class SqlPaymentRepo:
+    """어댑터: PaymentRepo 프로토콜을 구현"""
+    def save(self, receipt: Receipt) -> None:
+        self._db.execute(
+            "INSERT INTO receipts (tx_id, amount) VALUES (%s, %s)",
+            (receipt.transaction_id, receipt.amount),
+        )
+
+
+# ── main.py (조립 지점) ──────────────────────────────
+def main():
+    gateway = StripeGateway()     # 구현 선택은 여기서만
+    repo = SqlPaymentRepo()       # 구현 선택은 여기서만
+    req = PaymentRequest(user_id="u-1", amount=10_000)
+    receipt = process_payment(gateway, repo, req)
+    print(f"결제 완료: {receipt.transaction_id}")
+
+
+# ── tests/test_payment.py (가짜 어댑터 테스트) ────────
+class FakeGateway:
+    def charge(self, req: PaymentRequest) -> Receipt:
+        return Receipt(transaction_id="fake-tx-001", amount=req.amount)
+
+class FakeRepo:
+    def __init__(self): self.saved: list[Receipt] = []
+    def save(self, receipt: Receipt) -> None:
+        self.saved.append(receipt)
+
+def test_process_payment_saves_receipt():
+    gateway = FakeGateway()
+    repo = FakeRepo()
+    req = PaymentRequest(user_id="u-1", amount=5_000)
+    receipt = process_payment(gateway, repo, req)
+    assert receipt.transaction_id == "fake-tx-001"
+    assert len(repo.saved) == 1
+
+def test_process_payment_rejects_zero_amount():
+    import pytest
+    with pytest.raises(ValueError):
+        process_payment(FakeGateway(), FakeRepo(),
+                        PaymentRequest(user_id="u-1", amount=0))
+```
+
+이 구조에서 Stripe를 Toss로 교체하려면 `StripeGateway` 대신 `TossGateway`를 만들고 `main.py`의 조립 줄 하나만 바꾸면 됩니다. 도메인 코드는 전혀 수정하지 않아도 됩니다.
+
+## 의존성 방향 진단: import 분석 스크립트
+
+팀 코드에서 의존성 방향 위반을 자동으로 감지하는 간단한 방법입니다.
+
+```python
+# check_deps.py — 도메인 패키지의 금지된 import를 검사
+import ast
+import sys
+from pathlib import Path
+
+FORBIDDEN_IN_DOMAIN = {
+    "psycopg2", "sqlalchemy", "redis",
+    "requests", "httpx", "aiohttp",
+    "boto3", "stripe", "twilio",
+}
+
+def check_domain_imports(domain_dir: str) -> list[str]:
+    violations = []
+    for py_file in Path(domain_dir).rglob("*.py"):
+        tree = ast.parse(py_file.read_text())
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                module = (
+                    node.module if isinstance(node, ast.ImportFrom)
+                    else node.names[0].name
+                )
+                if module and module.split(".")[0] in FORBIDDEN_IN_DOMAIN:
+                    violations.append(
+                        f"{py_file}:{node.lineno}: forbidden import '{module}'"
+                    )
+    return violations
+
+if __name__ == "__main__":
+    violations = check_domain_imports("src/domain")
+    if violations:
+        print("의존성 방향 위반:")
+        for v in violations:
+            print(f"  {v}")
+        sys.exit(1)
+    print("의존성 방향 검사 통과")
+```
+
+이 스크립트를 CI 파이프라인에 추가하면 도메인 패키지에 인프라 라이브러리가 들어오는 순간 빌드가 실패합니다. 규칙이 문서가 아니라 코드로 강제됩니다.
 
 ## 운영 체크리스트
 
@@ -214,8 +436,8 @@ infra  -> domain          # 기대하는 방향
 ## 처음 질문으로 돌아가기
 
 - **의존성 방향은 왜 변경 비용을 크게 좌우할까요?**
-  - 이 구조에서는 데이터베이스 구현이 바뀌어도 도메인 함수 `charge`는 거의 손대지 않아도 됩니다
+  - 화살표가 불안정한 세부를 향하면 세부가 바뀔 때마다 핵심 코드도 함께 흔들립니다. 데이터베이스 구현이 바뀌어도 도메인 함수는 손대지 않으려면 방향이 반대여야 합니다.
 - **안정적인 모듈과 변동이 큰 모듈은 어떻게 구분할까요?**
-  - - <strong>의존성</strong>: A가 B를 import하거나 호출하면 A는 B에 의존합니다
+  - 도메인 규칙은 비교적 오래 유지되고, DB 드라이버·외부 SDK·웹 프레임워크는 자주 바뀝니다. 화살표는 안정적인 쪽을 향해야 합니다.
 - **도메인이 세부 구현을 모르게 만드는 방법은 무엇일까요?**
-  - 결제 게이트웨이, 알림 채널, 외부 SaaS 연동은 의존성 방향이 특히 중요합니다
+  - 도메인 쪽에 프로토콜(포트)을 선언하고, 세부 구현은 그 프로토콜을 따르는 어댑터로 작성합니다. 가짜 어댑터로 도메인 테스트를 먼저 검증하면 방향이 올바른지 확인할 수 있습니다.

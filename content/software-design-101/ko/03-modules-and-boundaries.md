@@ -42,13 +42,29 @@ last_reviewed: '2026-05-15'
 - 이 설계 원칙을 무시하면 코드베이스가 어떻게 변질될까요?
 - 팀 규모가 커질 때 이 원칙의 중요성은 어떻게 달라질까요?
 
-모듈 경계는 변경을 가두는 벽입니다. 벽이 약하면 내부 수정이 외부 호출자까지 흔들고, 벽이 강하면 같은 수정도 모듈 안에서 끝납니다. 설계를 잘했다는 말은 종종 “이 변경이 여기서 멈춘다”는 말과 같습니다.
+모듈 경계는 변경을 가두는 벽입니다. 벽이 약하면 내부 수정이 외부 호출자까지 흔들고, 벽이 강하면 같은 수정도 모듈 안에서 끝납니다. 설계를 잘했다는 말은 종종 "이 변경이 여기서 멈춘다"는 말과 같습니다.
 
 실무에서 진짜 차이는 API의 표면적에서 드러납니다. 함수 열 개를 공개하는 모듈은 호출자에게 그 열 개의 관계를 모두 이해하라고 요구합니다. 반대로 공개 진입점 하나가 내부 복잡도를 흡수하면 호출자는 적게 알고도 많은 일을 할 수 있습니다.
 
 ## 전체 그림
 
 좋은 모듈은 표면이 작고 내부가 깊습니다. 외부에는 간단한 약속만 보이지만, 내부에서는 의미 있는 일을 많이 처리합니다.
+
+```text
+얕은 모듈 (피해야 할 구조)
+┌─────────────────────────────────┐
+│  open_file  read_chunk  close_file  │  ← 내부 절차 전부 노출
+└─────────────────────────────────┘
+         호출자가 순서를 알아야 함
+
+깊은 모듈 (목표 구조)
+┌───────────────────┐
+│    read_file      │  ← 진입점 하나
+├───────────────────┤
+│  _open  _read  _close  │  ← 내부 구현 숨김
+└───────────────────┘
+         호출자는 경로만 넘기면 됨
+```
 
 ## 기본 용어
 
@@ -60,20 +76,40 @@ last_reviewed: '2026-05-15'
 
 ## 변경 전과 변경 후
 
-**변경 전**
+**변경 전 — 얕은 모듈: 내부 절차가 함수 단위로 그대로 드러납니다**
 
 ```python
-# 얕은 모듈: 내부 절차가 함수 단위로 그대로 드러납니다.
+# 호출자가 반드시 알아야 하는 것들
 def open_file(p): ...
 def read_chunk(f, n): ...
 def close_file(f): ...
+
+# 호출 코드 - 순서를 외워야 함
+f = open_file("/data/users.csv")
+try:
+    while True:
+        chunk = read_chunk(f, 4096)
+        if not chunk:
+            break
+        process(chunk)
+finally:
+    close_file(f)
 ```
 
-**변경 후**
+**변경 후 — 깊은 모듈: 작은 표면이 전체 책임을 맡습니다**
 
 ```python
-# 깊은 모듈: 작은 표면이 전체 책임을 맡습니다.
-def read_file(path) -> bytes: ...
+# 호출자는 경로만 넘기면 됨
+def read_file(path: str) -> bytes:
+    f = _open(path)
+    try:
+        return _read_all(f)
+    finally:
+        _close(f)
+
+# 호출 코드 - 한 줄로 끝남
+data = read_file("/data/users.csv")
+process(data)
 ```
 
 호출자는 파일을 열고 읽고 닫는 순서를 몰라도 됩니다. 내부 구현을 바꿔도 외부 계약은 그대로 유지할 수 있습니다.
@@ -110,6 +146,17 @@ def read_file(path):
 class CacheBackend:  # outside knows only the interface
     def get(self, k): ...
     def set(self, k, v): ...
+
+# 구현은 내부에서 결정
+class _RedisCacheBackend(CacheBackend):
+    def get(self, k):
+        return self._client.get(k)
+    def set(self, k, v):
+        self._client.set(k, v)
+
+# 공개 팩토리 — 구현 선택을 내부로 숨김
+def make_cache() -> CacheBackend:
+    return _RedisCacheBackend()
 ```
 
 Redis를 쓸지, 메모리 캐시를 쓸지 같은 선택은 외부가 알 필요가 없습니다. 이런 결정이 밖으로 새면 모듈은 진화할 자유를 잃습니다.
@@ -119,7 +166,20 @@ Redis를 쓸지, 메모리 캐시를 쓸지 같은 선택은 외부가 알 필�
 ```python
 # 4_dto.py
 # 내부 모델을 직접 노출하지 말고 DTO를 사용하세요.
-def public_user(u): return {"id": u.id, "name": u.name}
+@dataclass
+class UserInternal:
+    id: str
+    name: str
+    password_hash: str   # 외부에 노출하면 안 됨
+    _audit_log: list     # 내부 전용
+
+@dataclass
+class UserPublic:
+    id: str
+    name: str
+
+def public_user(u: UserInternal) -> UserPublic:
+    return UserPublic(id=u.id, name=u.name)
 ```
 
 내부 모델을 그대로 반환하면 외부 코드가 내부 구조에 결합됩니다. DTO를 두면 내부 변경이 외부 계약으로 새는 일을 줄일 수 있습니다.
@@ -130,9 +190,30 @@ def public_user(u): return {"id": u.id, "name": u.name}
 # 5_one_way.py
 # Domain은 infra를 알면 안 됩니다.
 # Infra가 domain을 import합니다.
+
+# domain/order.py
+class Order:
+    def calculate_total(self) -> int: ...  # IO 없음
+
+# infra/order_repo.py
+from domain.order import Order  # 인프라가 도메인을 알음
+
+class SqlOrderRepo:
+    def save(self, order: Order) -> None:
+        self._db.execute(...)
 ```
 
 경계는 의존성 방향으로 강화됩니다. 도메인이 인프라를 모를수록 내부 규칙을 더 오래 안정적으로 유지할 수 있습니다.
+
+## 깊은 모듈 vs 얕은 모듈 비교
+
+| 특성 | 얕은 모듈 | 깊은 모듈 |
+| --- | --- | --- |
+| 공개 API 크기 | 크다 (내부 절차 전부 노출) | 작다 (진입점만 공개) |
+| 호출자 부담 | 내부 순서와 관계를 알아야 함 | 의도만 전달하면 됨 |
+| 내부 변경 영향 | 호출자까지 영향 | 모듈 안에서 끝남 |
+| 추상화 이익 | 낮음 | 높음 |
+| 예시 | open, read_chunk, close | read_file |
 
 ## 빠르게 검증해 보기
 
@@ -159,7 +240,17 @@ __all__ = [
 | 외부 코드가 내부 dict 구조를 직접 안다 | DTO 없이 내부 모델을 그대로 노출했는지 확인합니다 |
 | 함수는 많은데 추상화 이익이 작다 | 얕은 모듈만 늘어난 것은 아닌지 점검합니다 |
 
-좋은 경계는 외부 호출자에게 “적게 알고도 많이 하게” 만들어 줍니다.
+좋은 경계는 외부 호출자에게 "적게 알고도 많이 하게" 만들어 줍니다.
+
+## 자주 하는 실수
+
+| 실수 | 왜 문제인가 | 올바른 접근 |
+| --- | --- | --- |
+| 내부 모델을 직접 반환 | 내부 필드 하나를 바꾸면 외부가 전부 영향받음 | DTO를 만들어 계약을 분리 |
+| 모든 함수를 public으로 | 호출자가 어떤 것을 써야 할지 모름 | 진짜 외부 진입점만 `__all__`에 등록 |
+| 캐시 구현체를 직접 노출 | Redis에서 Memcached로 바꾸면 호출자 전체 수정 | 인터페이스를 두고 구현은 내부에서 선택 |
+| 파일 열기/닫기를 별도 함수로 공개 | 호출자가 순서를 알고 자원 해제를 책임져야 함 | 컨텍스트 매니저나 단일 함수로 감싸기 |
+| 모듈 간 직접 dict 전달 | 스키마 변경 시 양쪽 모두 수정 필요 | dataclass나 TypedDict로 계약을 명시 |
 
 ## 이 코드에서 먼저 볼 점
 
@@ -177,7 +268,47 @@ __all__ = [
 
 좋은 라이브러리는 대개 표면이 작고 내부가 깊습니다. `requests`처럼 사용자는 몇 개 함수만 알아도 되지만, 내부에서는 세션 관리, 직렬화, 오류 처리, 재시도 같은 복잡도를 흡수합니다. 이런 성격이 바로 깊은 모듈의 힘입니다.
 
-팀 코드에서도 같은 질문을 던질 수 있습니다. “정말 외부에 이 함수가 필요할까?”, “이 DTO 없이 내부 모델을 그대로 넘겨도 괜찮을까?”, “변하기 쉬운 선택이 밖으로 새어 있지 않은가?” 이런 질문이 경계를 단단하게 만듭니다.
+팀 코드에서도 같은 질문을 던질 수 있습니다. "정말 외부에 이 함수가 필요할까?", "이 DTO 없이 내부 모델을 그대로 넘겨도 괜찮을까?", "변하기 쉬운 선택이 밖으로 새어 있지 않은가?" 이런 질문이 경계를 단단하게 만듭니다.
+
+```python
+# 실무 패턴: 팩토리 함수로 내부 구현 선택을 숨김
+class NotificationService:
+    """외부에 공개되는 표면 (단 하나의 메서드)"""
+    def send(self, user_id: str, message: str) -> None: ...
+
+def make_notification_service(config: Config) -> NotificationService:
+    """내부 구현 선택 — 외부는 신경 쓰지 않아도 됨"""
+    if config.channel == "email":
+        return _EmailNotificationService(config.smtp)
+    elif config.channel == "sms":
+        return _SmsNotificationService(config.twilio)
+    else:
+        return _PushNotificationService(config.fcm)
+```
+
+## 경계 설계가 팀 생산성에 미치는 영향
+
+모듈 경계는 단순히 코드 구조 문제가 아닙니다. 팀 병렬 작업 가능성과 직결됩니다.
+
+```text
+경계가 약한 경우 (결합도 높음)
+──────────────────────────────
+개발자 A: 결제 로직 수정
+   └→ 개발자 B의 주문 코드가 영향받음
+   └→ 개발자 C의 정산 코드도 영향받음
+   → 세 명이 같은 PR을 검토해야 함
+   → 병렬 작업 불가, 리뷰 지연
+
+경계가 강한 경우 (결합도 낮음)
+──────────────────────────────
+개발자 A: 결제 모듈 내부 수정
+   └→ PaymentGateway 인터페이스는 그대로
+   └→ 주문, 정산은 인터페이스만 봄
+   → 개발자 A만 PR 검토하면 됨
+   → 병렬 작업 가능, 빠른 출시
+```
+
+이것이 "경계가 팀 생산성을 결정한다"는 말의 실제 의미입니다. 좋은 경계는 팀원들이 서로 기다리지 않고 독립적으로 일할 수 있게 만듭니다.
 
 ## 운영 체크리스트
 
@@ -193,6 +324,81 @@ __all__ = [
 2. 외부에 노출된 내부 자료구조 하나를 DTO로 감싸 보세요.
 3. 모듈 안에서 변동성이 큰 결정을 하나 찾아 내부로 숨겨 보세요.
 
+## 모듈 경계 설계 예시: 사용자 모듈
+
+사용자 관련 기능을 모듈로 설계할 때 좋은 경계가 어떻게 생기는지 구체적으로 보겠습니다.
+
+```python
+# ── users/__init__.py ────────────────────────────
+# 외부에 공개하는 표면 (최소화)
+from .service import UserService
+from .models import UserPublic
+
+__all__ = ["UserService", "UserPublic"]
+# _UserInternal, _UserRepo, _PasswordHasher 등은 공개하지 않음
+
+
+# ── users/models.py ──────────────────────────────
+from dataclasses import dataclass
+
+@dataclass
+class _UserInternal:
+    """내부 모델 — 외부에 직접 노출하지 않음"""
+    id: str
+    email: str
+    password_hash: str    # 절대 외부 노출 금지
+    created_at: str
+    _login_attempts: int  # 내부 전용
+
+@dataclass
+class UserPublic:
+    """공개 DTO — 외부 계약"""
+    id: str
+    email: str
+    # password_hash는 포함하지 않음
+
+
+# ── users/service.py ─────────────────────────────
+class UserService:
+    """공개 진입점 — 표면이 작고 내부가 깊음"""
+
+    def get(self, user_id: str) -> UserPublic:
+        internal = self._repo.find(user_id)     # 내부 모델 조회
+        return self._to_public(internal)        # DTO로 변환해 반환
+
+    def signup(self, email: str, password: str) -> UserPublic:
+        hashed = self._hasher.hash(password)    # 내부 처리
+        internal = self._repo.create(email, hashed)
+        return self._to_public(internal)
+
+    def _to_public(self, u: _UserInternal) -> UserPublic:
+        return UserPublic(id=u.id, email=u.email)
+
+    # 공개하지 않는 내부 메서드들
+    def _validate_email(self, email: str) -> None: ...
+    def _check_duplicate(self, email: str) -> None: ...
+```
+
+이 구조에서 외부 코드는 `UserService`와 `UserPublic`만 알면 됩니다. 비밀번호 해싱 방식, 저장소 구현, 이메일 중복 검사 로직은 모두 내부에 숨겨져 있어 나중에 마음대로 바꿀 수 있습니다.
+
+## 경계 품질을 측정하는 세 가지 지표
+
+모듈 경계가 좋은지 나쁜지를 감으로만 판단하기보다, 아래 세 가지 수치로 빠르게 점검할 수 있습니다.
+
+```text
+1. 공개 API 크기 (작을수록 좋음)
+   측정: __all__에 등록된 심볼 수
+   기준: 3개 이하면 표면이 작음, 10개 이상이면 검토 필요
+
+2. 내부 복잡도 비율 (높을수록 깊은 모듈)
+   측정: 내부 함수 수 / 공개 함수 수
+   기준: 3 이상이면 내부가 충분히 깊음
+
+3. 외부 데이터 누수 여부 (없을수록 좋음)
+   측정: 내부 모델이 그대로 반환되는 곳 수
+   기준: 0이면 DTO가 잘 적용됨
+```
+
 ## 현업 적용 관점에서 다시 정리
 
 모듈 경계는 폴더 이름으로 생기지 않습니다. 외부에 노출하는 표면적, 내부 모델 은닉, 의존성 단방향성까지 맞춰야 경계가 실제 동작합니다.
@@ -204,8 +410,8 @@ __all__ = [
 ## 처음 질문으로 돌아가기
 
 - **좋은 모듈 경계는 어떤 조건을 갖춰야 할까요?**
-  - 공개 심볼 수는 곧 외부가 알아야 할 약속의 수입니다
+  - 공개 표면이 작고, 내부 구현이 풍부하며, 데이터를 DTO로 보호하고, 의존성이 한 방향으로 흐릅니다. 공개 심볼 수는 곧 외부가 알아야 할 약속의 수입니다.
 - **깊은 모듈과 얕은 모듈은 무엇이 다를까요?**
-  - 좋은 모듈은 표면이 작고 내부가 깊습니다
+  - 깊은 모듈은 진입점 하나로 많은 일을 처리하고, 얕은 모듈은 내부 절차를 전부 공개해 호출자가 순서를 알아야 합니다. 좋은 모듈은 표면이 작고 내부가 깊습니다.
 - **공개 API는 어디까지 드러내야 할까요?**
-  - 좋은 모듈은 표면이 작고 내부가 깊습니다
+  - 호출자가 정말 필요로 하는 것만 공개합니다. "이 함수가 없으면 호출자가 목적을 달성할 수 없는가?"라고 물어봐서 아니라면 내부로 숨깁니다.
