@@ -28,15 +28,7 @@ ChatGPT의 이미지 생성 기능은 이런 순간에 쓸 수 있는 도구입�
 
 ---
 
-```mermaid
-flowchart LR
-    A["프롬프트 작성"] --> B["AI 모델 해석"]
-    B --> C["이미지 생성"]
-    C --> D["결과 확인"]
-    D -->|"만족"| E["완성"]
-    D -->|"수정 필요"| A
-```
-
+![AI 이미지 생성 101 (1/10): 첫 이미지 생성하기](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/01/01-01-ai-image-generation-101-1-10-creating-yo.ko.png)
 *프롬프트 작성부터 결과 확인까지의 이미지 생성 흐름*
 
 ## 먼저 던지는 질문

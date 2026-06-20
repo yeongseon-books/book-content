@@ -28,21 +28,7 @@ This is post 9 in the AI Image Generation 101 series.
 
 ---
 
-```mermaid
-flowchart TD
-    A["Anchor Scene"] --> B["Season Change"]
-    A --> C["Style Transfer"]
-    A --> D["Element Swap"]
-    A --> E["Mood Shift"]
-    B --> F["Winter to Spring"]
-    B --> G["Winter to Summer Night"]
-    B --> H["Winter to Autumn Rain"]
-    C --> I["Photo to Watercolor"]
-    C --> J["Photo to Anime"]
-    D --> K["Armchair to Hammock"]
-    E --> L["Cozy to Horror"]
-```
-
+![AI Image Generation 101 (9/10): Working with Reference Images](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/09/09-01-ai-image-generation-101-9-10-working-wit.en.png)
 *Four variation axes from one anchor scene*
 
 ## Questions to Keep in Mind

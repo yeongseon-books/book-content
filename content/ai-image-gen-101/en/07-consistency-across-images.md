@@ -28,16 +28,7 @@ This is post 7 in the AI Image Generation 101 series.
 
 ---
 
-```mermaid
-flowchart LR
-    A["Character Sheet"] --> B["Scene 1: Cafe"]
-    A --> C["Scene 2: Rainy Street"]
-    A --> D["Scene 3: Library"]
-    A --> E["Scene 4: Park"]
-    F["Vague Description"] --> G["Scene 1: Cafe"]
-    F --> H["Scene 2: Rainy Street"]
-```
-
+![AI Image Generation 101 (7/10): Maintaining Consistency](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/07/07-01-ai-image-generation-101-7-10-maintaining.en.png)
 *Same character sheet across 4 scenes vs vague description across 2 scenes*
 
 ## Questions to Keep in Mind

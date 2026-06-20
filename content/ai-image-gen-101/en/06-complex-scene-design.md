@@ -28,16 +28,7 @@ This is post 6 in the AI Image Generation 101 series.
 
 ---
 
-```mermaid
-flowchart LR
-    A["Complexity Levels"] --> B["1 Person"]
-    B --> C["2 People + Interaction"]
-    C --> D["Multi-person"]
-    D --> E["Layer Arrangement"]
-    E --> F["Spatial Division"]
-    F --> G["Action + Interaction"]
-```
-
+![AI Image Generation 101 (6/10): Designing Complex Scenes](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/06/06-01-ai-image-generation-101-6-10-designing-c.en.png)
 *Stepwise approach to complex scenes*
 
 ## Questions to Keep in Mind

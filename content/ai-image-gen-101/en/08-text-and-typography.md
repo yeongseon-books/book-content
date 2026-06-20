@@ -28,17 +28,7 @@ This is post 8 in the AI Image Generation 101 series.
 
 ---
 
-```mermaid
-flowchart LR
-    A["Text Types"] --> B["Environment Text"]
-    A --> C["Design Text"]
-    B --> D["Neon Signs"]
-    B --> E["Chalkboards/Signs"]
-    C --> F["Posters/Banners"]
-    C --> G["Logos"]
-    C --> H["Book Covers"]
-```
-
+![AI Image Generation 101 (8/10): Text and Typography](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/08/08-01-ai-image-generation-101-8-10-text-and-ty.en.png)
 *Two categories of in-image text: environment text and design text*
 
 ## Questions to Keep in Mind

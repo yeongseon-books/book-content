@@ -28,20 +28,7 @@ seo_description: "같은 카페 장면을 8가지 조명으로 생성하며 골�
 
 ---
 
-```mermaid
-flowchart LR
-    A["같은 장면"] --> B["자연광"]
-    A --> C["인공광/특수 조명"]
-    B --> D["골든아워"]
-    B --> E["블루아워"]
-    B --> F["한낮 직사광"]
-    B --> G["흐린 날"]
-    C --> H["네온"]
-    C --> I["캔들라이트"]
-    C --> J["역광 실루엣"]
-    C --> K["스튜디오 림라이트"]
-```
-
+![AI 이미지 생성 101 (5/10): 색감과 조명](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/05/05-01-ai-image-generation-101-5-10-color-and-l.ko.png)
 *조명의 두 갈래: 자연광과 인공광*
 
 ## 먼저 던지는 질문

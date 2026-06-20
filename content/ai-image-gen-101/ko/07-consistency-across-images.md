@@ -28,16 +28,7 @@ seo_description: "같은 캐릭터를 여러 장면에서 일관되게 생성하
 
 ---
 
-```mermaid
-flowchart LR
-    A["캐릭터 정의서"] --> B["장면 1: 카페"]
-    A --> C["장면 2: 비 오는 거리"]
-    A --> D["장면 3: 도서관"]
-    A --> E["장면 4: 공원"]
-    F["모호한 설명"] --> G["장면 1: 카페"]
-    F --> H["장면 2: 비 오는 거리"]
-```
-
+![AI 이미지 생성 101 (7/10): 일관성 유지하기](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/07/07-01-ai-image-generation-101-7-10-maintaining.ko.png)
 *같은 캐릭터 정의서 → 다른 장면 vs 모호한 설명 → 다른 장면*
 
 ## 먼저 던지는 질문

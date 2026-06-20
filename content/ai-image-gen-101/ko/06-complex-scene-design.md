@@ -28,16 +28,7 @@ seo_description: "여러 인물과 요소를 한 화면에 배치하는 복잡�
 
 ---
 
-```mermaid
-flowchart LR
-    A["복잡도 단계"] --> B["1인"]
-    B --> C["2인 상호작용"]
-    C --> D["다인 장면"]
-    D --> E["레이어 배치"]
-    E --> F["공간 분할"]
-    F --> G["동작 + 상호작용"]
-```
-
+![AI 이미지 생성 101 (6/10): 복잡한 장면 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/06/06-01-ai-image-generation-101-6-10-designing-c.ko.png)
 *복잡한 장면의 단계별 접근*
 
 ## 먼저 던지는 질문

@@ -28,18 +28,7 @@ seo_description: "같은 장면을 8가지 스타일로 생성하며 각 스타�
 
 ---
 
-```mermaid
-flowchart LR
-    A["같은 장면"] --> B["사진"]
-    A --> C["수채화"]
-    A --> D["유화"]
-    A --> E["픽셀아트"]
-    A --> F["애니메이션"]
-    A --> G["3D 렌더"]
-    A --> H["플랫 벡터"]
-    A --> I["연필 스케치"]
-```
-
+![AI 이미지 생성 101 (3/10): 스타일 마스터하기](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/03-01-ai-image-generation-101-3-10-mastering-s.ko.png)
 *같은 장면을 8가지 스타일로 변환하는 것이 오늘의 실험*
 
 ## 먼저 던지는 질문

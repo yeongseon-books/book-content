@@ -28,20 +28,7 @@ seo_description: "같은 장면을 거리와 각도로 완전히 다른 이미�
 
 ---
 
-```mermaid
-flowchart TD
-    A["같은 장면"] --> B["촬영 거리"]
-    A --> C["카메라 각도"]
-    B --> D["익스트림 클로즈업"]
-    B --> E["클로즈업"]
-    B --> F["미디엄 샷"]
-    B --> G["와이드 샷"]
-    C --> H["버드아이 뷰"]
-    C --> I["로우 앵글"]
-    C --> J["더치 앵글"]
-    C --> K["아이소메트릭"]
-```
-
+![AI 이미지 생성 101 (4/10): 구도와 시점](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/04/04-01-ai-image-generation-101-4-10-composition.ko.png)
 *구도를 결정하는 두 축: 촬영 거리와 카메라 각도*
 
 ## 먼저 던지는 질문

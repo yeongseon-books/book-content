@@ -28,15 +28,7 @@ This is post 2 in the AI Image Generation 101 series. Here, we'll learn the spec
 
 ---
 
-```mermaid
-flowchart LR
-    A["Subject"] --> B["Style"]
-    B --> C["Setting"]
-    C --> D["Lighting"]
-    D --> E["Composition"]
-    E --> F["Complete Prompt"]
-```
-
+![AI Image Generation 101 (2/10): The Structure of a Good Prompt](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/02-01-ai-image-generation-101-2-10-the-structu.en.png)
 *The layering structure of prompt elements*
 
 ## Questions to Keep in Mind

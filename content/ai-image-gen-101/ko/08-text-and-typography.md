@@ -28,17 +28,7 @@ AI 이미지 생성에서 가장 오래된 약점 중 하나가 **텍스트**입
 
 ---
 
-```mermaid
-flowchart LR
-    A["텍스트 유형"] --> B["환경 속 텍스트"]
-    A --> C["디자인 텍스트"]
-    B --> D["네온 사인"]
-    B --> E["칠판/간판"]
-    C --> F["포스터/배너"]
-    C --> G["로고"]
-    C --> H["북커버"]
-```
-
+![AI 이미지 생성 101 (8/10): 텍스트와 타이포그래피](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/08/08-01-ai-image-generation-101-8-10-text-and-ty.ko.png)
 *이미지 속 텍스트의 두 갈래: 환경 속 텍스트와 디자인 텍스트*
 
 ## 먼저 던지는 질문

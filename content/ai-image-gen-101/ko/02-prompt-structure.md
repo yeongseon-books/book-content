@@ -28,15 +28,7 @@ seo_description: "이미지 생성 프롬프트의 5가지 구성 요소와 조�
 
 ---
 
-```mermaid
-flowchart LR
-    A["주제"] --> B["스타일"]
-    B --> C["배경"]
-    C --> D["조명"]
-    D --> E["구도"]
-    E --> F["완성된 프롬프트"]
-```
-
+![AI 이미지 생성 101 (2/10): 좋은 프롬프트의 구조](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/02-01-ai-image-generation-101-2-10-the-structu.ko.png)
 *프롬프트 구성 요소의 레이어링 구조*
 
 ## 먼저 던지는 질문

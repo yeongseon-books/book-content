@@ -28,20 +28,7 @@ This is post 5 in the AI Image Generation 101 series.
 
 ---
 
-```mermaid
-flowchart LR
-    A["Same Scene"] --> B["Natural Light"]
-    A --> C["Artificial/Special Light"]
-    B --> D["Golden Hour"]
-    B --> E["Blue Hour"]
-    B --> F["Harsh Noon"]
-    B --> G["Overcast"]
-    C --> H["Neon"]
-    C --> I["Candlelight"]
-    C --> J["Backlit Silhouette"]
-    C --> K["Studio Rim Light"]
-```
-
+![AI Image Generation 101 (5/10): Color and Lighting](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/05/05-01-ai-image-generation-101-5-10-color-and-l.en.png)
 *Two branches of lighting: natural and artificial*
 
 ## Questions to Keep in Mind

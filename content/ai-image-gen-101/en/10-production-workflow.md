@@ -28,15 +28,7 @@ This is the final post in the AI Image Generation 101 series.
 
 ---
 
-```mermaid
-flowchart LR
-    A["Define Purpose"] --> B["Select Prompt Formula"]
-    B --> C["Generate + Evaluate"]
-    C --> D["Post-process"]
-    D --> E["Publish"]
-    C -->|"Not satisfied"| B
-```
-
+![AI Image Generation 101 (10/10): Production Workflows](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/10/10-01-ai-image-generation-101-10-10-production.en.png)
 *Production image creation workflow*
 
 ## Questions to Keep in Mind

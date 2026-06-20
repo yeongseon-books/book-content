@@ -28,15 +28,7 @@ seo_description: "시리즈에서 배운 모든 기법을 합쳐 블로그 썸�
 
 ---
 
-```mermaid
-flowchart LR
-    A["용도 결정"] --> B["프롬프트 공식 선택"]
-    B --> C["생성 + 평가"]
-    C --> D["후처리"]
-    D --> E["발행"]
-    C -->|"불만족"| B
-```
-
+![AI 이미지 생성 101 (10/10): 실전 워크플로우](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/10/10-01-ai-image-generation-101-10-10-production.ko.png)
 *실전 이미지 제작 워크플로우*
 
 ## 먼저 던지는 질문

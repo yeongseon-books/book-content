@@ -28,20 +28,7 @@ This is post 4 in the AI Image Generation 101 series.
 
 ---
 
-```mermaid
-flowchart TD
-    A["Same Scene"] --> B["Camera Distance"]
-    A --> C["Camera Angle"]
-    B --> D["Extreme Close-up"]
-    B --> E["Close-up"]
-    B --> F["Medium Shot"]
-    B --> G["Wide Shot"]
-    C --> H["Bird's Eye"]
-    C --> I["Low Angle"]
-    C --> J["Dutch Angle"]
-    C --> K["Isometric"]
-```
-
+![AI Image Generation 101 (4/10): Composition and Perspective](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/04/04-01-ai-image-generation-101-4-10-composition.en.png)
 *Two axes of composition: camera distance and camera angle*
 
 ## Questions to Keep in Mind

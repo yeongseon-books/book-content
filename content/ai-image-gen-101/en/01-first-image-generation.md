@@ -28,15 +28,7 @@ This is the first post in the AI Image Generation 101 series. Here, we'll create
 
 ---
 
-```mermaid
-flowchart LR
-    A["Write Prompt"] --> B["AI Interprets"]
-    B --> C["Generate Image"]
-    C --> D["Check Result"]
-    D -->|"Satisfied"| E["Done"]
-    D -->|"Needs Revision"| A
-```
-
+![AI Image Generation 101 (1/10): Creating Your First Image](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/01/01-01-ai-image-generation-101-1-10-creating-yo.en.png)
 *The image generation flow from prompt to final result*
 
 ## Questions to Keep in Mind

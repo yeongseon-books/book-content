@@ -28,18 +28,7 @@ This is post 3 in the AI Image Generation 101 series.
 
 ---
 
-```mermaid
-flowchart LR
-    A["Same Scene"] --> B["Photorealistic"]
-    A --> C["Watercolor"]
-    A --> D["Oil Painting"]
-    A --> E["Pixel Art"]
-    A --> F["Anime"]
-    A --> G["3D Render"]
-    A --> H["Flat Vector"]
-    A --> I["Pencil Sketch"]
-```
-
+![AI Image Generation 101 (3/10): Mastering Styles](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/03-01-ai-image-generation-101-3-10-mastering-s.en.png)
 *One scene transformed into 8 styles — today's experiment*
 
 ## Questions to Keep in Mind

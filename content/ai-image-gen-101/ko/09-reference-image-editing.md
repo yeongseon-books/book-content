@@ -28,21 +28,7 @@ seo_description: "하나의 장면을 기준으로 계절, 스타일, 분위기,
 
 ---
 
-```mermaid
-flowchart TD
-    A["기준 장면"] --> B["계절 변경"]
-    A --> C["스타일 변환"]
-    A --> D["요소 교체"]
-    A --> E["분위기 전환"]
-    B --> F["겨울 → 봄"]
-    B --> G["겨울 → 여름 밤"]
-    B --> H["겨울 → 가을 비"]
-    C --> I["사진 → 수채화"]
-    C --> J["사진 → 애니메이션"]
-    D --> K["의자 → 해먹"]
-    E --> L["아늑함 → 공포"]
-```
-
+![AI 이미지 생성 101 (9/10): 레퍼런스 이미지 활용](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/09/09-01-ai-image-generation-101-9-10-working-wit.ko.png)
 *하나의 기준 장면에서 4가지 변형 축*
 
 ## 먼저 던지는 질문

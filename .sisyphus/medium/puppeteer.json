@@ -1,4 +1,4 @@
 {
-  "executablePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "executablePath": "/home/yeongseon/.cache/ms-playwright/chromium-1217/chrome-linux64/chrome",
   "args": ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
 }
