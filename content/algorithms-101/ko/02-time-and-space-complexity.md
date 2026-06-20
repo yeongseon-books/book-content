@@ -241,6 +241,56 @@ for n in sizes:
 | O(2^n) | 지수 | 엄청남 | 불가 | 부분집합 열거, 백트래킹 |
 | O(n!) | 팩토리얼 | 불가 | 불가 | TSP 완전 탐색 |
 
+## 심화: 재귀 복잡도와 Master Theorem
+
+재귀 알고리즘의 복잡도는 루프로 직접 읽기 어렵습니다. 점화식으로 표현한 뒤 Master theorem을 적용합니다.
+
+```text
+T(n) = a · T(n/b) + f(n)
+
+a  = 부분 문제 수
+b  = 입력 분할 비율 (n/b 크기의 부분 문제)
+f(n) = 분할/결합 비용
+
+n^log_b(a) 와 f(n) 을 비교:
+
+케이스 1: f(n) = O(n^(log_b(a) - ε))  →  T(n) = Θ(n^log_b(a))
+케이스 2: f(n) = Θ(n^log_b(a))        →  T(n) = Θ(n^log_b(a) · log n)
+케이스 3: f(n) = Ω(n^(log_b(a) + ε))  →  T(n) = Θ(f(n))
+```
+
+**실전 예시 4개:**
+
+```python
+# 예시 1: mergesort  T(n) = 2T(n/2) + O(n)
+# a=2, b=2, f(n)=n, n^log_2(2)=n → 케이스 2 → O(n log n)
+
+# 예시 2: binary search  T(n) = T(n/2) + O(1)
+# a=1, b=2, f(n)=1, n^log_2(1)=1 → 케이스 2 → O(log n)
+
+# 예시 3: naive matrix multiply  T(n) = 8T(n/2) + O(n^2)
+# a=8, b=2, n^log_2(8)=n^3, f(n)=n^2 → 케이스 1 → O(n^3)
+
+# 예시 4: Strassen  T(n) = 7T(n/2) + O(n^2)
+# a=7, b=2, n^log_2(7)≈n^2.807, f(n)=n^2 → 케이스 1 → O(n^2.807)
+
+def analyze_recurrence(a, b, f_power):
+    """점화식 T(n) = a·T(n/b) + n^f_power 의 케이스를 판별합니다."""
+    import math
+    critical = math.log(a, b)
+    if f_power < critical - 1e-9:
+        return f"케이스 1: T(n) = Θ(n^{critical:.3f})"
+    elif abs(f_power - critical) < 1e-9:
+        return f"케이스 2: T(n) = Θ(n^{critical:.3f} · log n)"
+    else:
+        return f"케이스 3: T(n) = Θ(n^{f_power})"
+
+print(analyze_recurrence(2, 2, 1))   # mergesort  → 케이스 2
+print(analyze_recurrence(1, 2, 0))   # binsearch  → 케이스 2
+print(analyze_recurrence(8, 2, 2))   # naive matmul → 케이스 1
+print(analyze_recurrence(7, 2, 2))   # Strassen   → 케이스 1
+```
+
 ## 이 글에서 먼저 가져갈 점
 
 - Big-O는 상수를 숨기지만, 작은 n에서는 상수도 중요합니다.

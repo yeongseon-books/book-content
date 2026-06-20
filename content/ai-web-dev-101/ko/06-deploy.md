@@ -31,8 +31,6 @@ seo_description: 로컬에서 만든 AI 웹 앱을 Vercel과 Azure App Service�
 
 이 글은 AI 웹 개발 입문 시리즈의 6번째 글입니다.
 
-여기서는 로컬에서 만든 AI 웹 앱을 실제 서비스 환경에 배포하고 운영할 때의 기본 흐름을 정리합니다.
-
 ![AI Web Development 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/local-to-live-deployment.ko.png)
 *AI Web Development 101 6장 흐름 개요*
 
@@ -59,7 +57,7 @@ seo_description: 로컬에서 만든 AI 웹 앱을 Vercel과 Azure App Service�
 
 ## 어떤 플랫폼을 고를까
 
-입문 단계에서 자주 만나는 선택지는 Vercel과 Azure App Service입니다. 어느 쪽이 절대적으로 낫다기보다, 앱의 성격에 따라 맞는 쪽이 다릅니다.
+입문 단계에서 자주 만나는 선택지는 Vercel과 Azure App Service입니다.
 
 | 구분 | Vercel (버셀) | Azure App Service (애저) |
 | :--- | :--- | :--- |
@@ -68,19 +66,17 @@ seo_description: 로컬에서 만든 AI 웹 앱을 Vercel과 Azure App Service�
 | 추천 대상 | Next.js, React 앱 배포 | Python Flask/FastAPI 백엔드 앱 |
 | 비용 | 개인 프로젝트 무료 플랜 강력 | 일정 수준까지 무료지만 유료 전환 가능성 |
 
-간단히 정리하면 이렇습니다.
-
 - Vercel: Next.js나 React로 만든 화면 중심 앱에 잘 맞습니다.
 - Azure App Service: Python Flask/FastAPI 백엔드처럼 서버 런타임 제어가 더 필요한 경우에 잘 맞습니다.
-- 둘을 함께 쓰는 조합도 자연스럽습니다. 예를 들어 프론트엔드는 Vercel, Python API는 Azure에 둘 수 있습니다.
+- 둘을 함께 쓰는 조합도 자연스럽습니다. 프론트엔드는 Vercel, Python API는 Azure에 둘 수 있습니다.
 
-![*Vercel과 Azure의 배포 구조 비교*](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/vercel-azure-hosting-overview.ko.png)
+![Vercel과 Azure의 배포 구조 비교](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/vercel-azure-hosting-overview.ko.png)
 
 *Vercel과 Azure의 배포 구조 비교*
 
 ## Vercel에 배포하기
 
-Vercel은 GitHub 저장소를 연결하는 것만으로 배포 흐름을 거의 완성할 수 있습니다. Next.js 챗봇처럼 프론트엔드 중심 AI 앱을 올릴 때 특히 편합니다.
+Vercel은 GitHub 저장소를 연결하는 것만으로 배포 흐름을 거의 완성할 수 있습니다.
 
 ### 1단계: GitHub에 코드 올리기
 
@@ -103,19 +99,15 @@ git push origin main
 - Key: `OPENAI_API_KEY`
 - Value: OpenAI 대시보드에서 발급한 실제 키 값
 
-이렇게 해야 배포된 서버가 내 OpenAI 계정으로 요청을 보낼 수 있습니다.
-
 ### 4단계: 배포 후 확인
 
 Deploy를 누르면 빌드 로그가 흐릅니다. 여기서 빨간 에러가 뜬다면 대개 의존성 누락, 환경 변수 누락, 타입 오류 중 하나입니다. 배포가 끝나면 `[프로젝트명].vercel.app` 형태의 주소가 생기고, 이 URL로 바로 동작 여부를 확인할 수 있습니다.
 
-![*배포된 앱으로 사용자 요청이 들어오는 운영 경로*](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/production-request-path.ko.png)
+![배포된 앱으로 사용자 요청이 들어오는 운영 경로](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/production-request-path.ko.png)
 
 *배포된 앱으로 사용자 요청이 들어오는 운영 경로*
 
 ### 운영 중 환경 변수 바꾸기
-
-API 키를 교체하거나 설정을 수정했다면 아래 순서를 기억해 두는 편이 좋습니다.
 
 1. **Settings > Environment Variables**에서 값을 수정합니다.
 2. **Deployments** 탭에서 최신 항목을 다시 배포합니다.
@@ -124,7 +116,7 @@ API 키를 교체하거나 설정을 수정했다면 아래 순서를 기억해 
 
 ## Azure App Service에 Python 앱 배포하기
 
-Python Flask나 FastAPI 앱이라면 Azure App Service가 좋은 선택입니다. 다만 Vercel보다 자동 추론이 적기 때문에, 시작 명령과 앱 설정을 더 명시적으로 잡아 줄 필요가 있습니다.
+Python Flask나 FastAPI 앱이라면 Azure App Service가 좋은 선택입니다.
 
 ### 1단계: Azure CLI 준비
 
@@ -137,10 +129,6 @@ az account list --output table
 ```
 
 ### 2단계: 기본 배포 실행
-
-`az webapp up`은 초반 실습에서 가장 빠른 출발점입니다. 리소스 그룹, App Service Plan, 웹앱 생성과 코드 업로드를 한 번에 처리해 줍니다.
-
-FastAPI를 올릴 때는 배포 성공과 앱 실행 성공을 구분해서 봐야 합니다. 파일은 올라갔지만 어떤 ASGI 서버로 `main:app`을 띄울지 모르면 기본 플레이스홀더 페이지가 보일 수 있습니다.
 
 먼저 루트에 최소한 아래와 같은 `requirements.txt`가 있어야 합니다.
 
@@ -160,8 +148,6 @@ az webapp up --sku F1 --name my-ai-chatbot-app --location koreacentral
 - `--name`: 전 세계에서 고유해야 하는 앱 이름입니다.
 - `--location koreacentral`: 배포 리전을 한국으로 지정합니다.
 
-배포가 끝나면 출력 JSON에 Resource Group 이름이 보이는데, 이 값은 이후 설정 명령에서 계속 필요하니 메모해 두는 편이 좋습니다.
-
 ### 3단계: 시작 명령 명시하기
 
 FastAPI는 시작 명령을 직접 지정해 주는 편이 안전합니다.
@@ -173,14 +159,11 @@ az webapp config set \
   --startup-file "gunicorn -w 2 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 main:app"
 ```
 
-이 설정이 없으면 App Service가 내 앱을 어떤 방식으로 띄워야 하는지 몰라 정상 기동에 실패할 수 있습니다. 즉, 배포는 끝났는데 실행은 안 되는 상태가 생길 수 있습니다.
+이 설정이 없으면 App Service가 내 앱을 어떤 방식으로 띄워야 하는지 몰라 정상 기동에 실패할 수 있습니다.
 
 ### 4단계: API 키 주입하기
 
-서버도 로컬처럼 환경 변수로 비밀 값을 받아야 합니다. 셸 히스토리에 실제 비밀 문자열을 남기지 않으려면 먼저 로컬 셸 환경 변수에 키를 잡아 둔 뒤, 그 값을 전달하는 편이 좋습니다.
-
 ```bash
-# 메모해둔 리소스 그룹 이름을 --resource-group 뒤에 넣으세요.
 az webapp config appsettings set \
   --name my-ai-chatbot-app \
   --resource-group [메모한-리소스-그룹-이름] \
@@ -188,8 +171,6 @@ az webapp config appsettings set \
 ```
 
 ### 5단계: 로그로 실제 상태 확인하기
-
-배포 후 `Application Error`가 보이면 추측보다 로그가 먼저입니다.
 
 ```bash
 # 실시간 로그 스트리밍 시작
@@ -213,164 +194,37 @@ node_modules/
 .DS_Store
 ```
 
-저장소에는 `.env.example`만 두고 필요한 변수 이름만 공유하면 됩니다. 실제 비밀 값은 각 개발자 로컬 환경과 배포 플랫폼에만 남아야 합니다.
+저장소에는 `.env.example`만 두고 필요한 변수 이름만 공유하면 됩니다.
 
-![*환경 변수 관리와 하드코딩 노출의 차이*](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/secret-key-boundary.ko.png)
+![환경 변수 관리와 하드코딩 노출의 차이](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/secret-key-boundary.ko.png)
 
 *환경 변수 관리와 하드코딩 노출의 차이*
 
 ## 비용과 모니터링 기본선
 
-AI 앱은 배포가 무료여도 모델 호출 비용은 계속 발생할 수 있습니다. 그래서 운영의 핵심은 “의외의 지출과 조용한 오류를 빨리 잡는 것”입니다.
+AI 앱은 배포가 무료여도 모델 호출 비용은 계속 발생할 수 있습니다. 그래서 운영의 핵심은 "의외의 지출과 조용한 오류를 빨리 잡는 것"입니다.
 
-### OpenAI 사용량 제한
+**OpenAI 사용량 제한**
 
-[OpenAI Dashboard](https://platform.openai.com/usage)에서 월간 예산 한도를 설정해 두는 편이 안전합니다. 실험용 프로젝트라면 낮은 금액으로 먼저 묶어 두는 것이 좋습니다.
+[OpenAI Dashboard](https://platform.openai.com/usage)에서 월간 예산 한도를 설정해 두는 편이 안전합니다.
 
-### Azure 비용 알람
+**Azure 비용 알람**
 
 Azure를 쓴다면 Cost Management에서 Budget Alert를 설정해 두세요. 무료 범위 초과나 예산 80% 도달 시 알림을 받으면 비용 사고를 줄일 수 있습니다.
 
-### 배포 직후 확인할 신호
+**배포 직후 확인할 신호**
 
 - 첫 접속 속도: cold start가 체감상 어느 정도인지 확인합니다.
 - HTTP 500 추적: Vercel Runtime Logs나 Azure Log Stream에서 원인을 바로 확인합니다.
 - 사용자 질문 패턴: 실제 사용자가 어떤 프롬프트를 넣는지 관찰하면 다음 개선 방향이 보입니다.
 
-![*예산 제한과 오류 확인으로 이어지는 운영 점검 흐름*](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/cost-guardrails-flow.ko.png)
+![예산 제한과 오류 확인으로 이어지는 운영 점검 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/cost-guardrails-flow.ko.png)
 
 *예산 제한과 오류 확인으로 이어지는 운영 점검 흐름*
 
-## 운영 체크리스트
+## 배포 파이프라인 자동화
 
-- [ ] 의존성 파일과 시작 명령을 배포 환경 기준으로 점검했다.
-- [ ] API 키를 플랫폼 환경 변수로만 주입한다.
-- [ ] 배포 직후 로그 확인 경로를 알고 있다.
-- [ ] OpenAI와 클라우드 예산 알림을 설정했다.
-
-## 배포 직후 24시간 운영 점검 시나리오
-
-초기 배포에서 가장 자주 놓치는 것은 "성공 화면"만 확인하고 실제 사용 흐름을 끝까지 검증하지 않는 점입니다. 배포 직후 24시간은 기능 검증보다 운영 신호 점검에 집중하는 편이 안전합니다.
-
-### 1) 사용자 경로 기준 점검
-
-- 첫 요청, 두 번째 요청, 긴 요청처럼 서로 다른 길이의 프롬프트를 보내 응답 시간 분포를 확인합니다.
-- 정상 질문, 엣지 질문, 실패 유도 질문을 분리해 HTTP 상태 코드와 오류 메시지 일관성을 확인합니다.
-- 프론트엔드와 백엔드가 분리된 구조라면 CORS, 타임아웃, 재시도 정책이 실제로 동작하는지 확인합니다.
-
-### 2) 로그 품질 점검
-
-- 요청 ID가 프론트엔드 로그와 백엔드 로그를 관통하는지 확인합니다.
-- 모델 호출 실패 시, 사용자에게는 안전한 메시지를 주고 내부 로그에는 원인 코드를 남기는지 확인합니다.
-- 키 누락, 권한 오류, 한도 초과 같은 운영성 오류를 재현해 알림 경로까지 검증합니다.
-
-### 3) 비용 안전장치 점검
-
-- 일일 요청 수가 늘어날 때 토큰 사용량이 어떤 기울기로 증가하는지 추정합니다.
-- 모델별 단가가 다른 경우 라우팅 규칙이 의도대로 적용되는지 샘플 로그로 확인합니다.
-- 예산 임계값 알림이 실제 연락 채널(이메일, 메신저)로 도달하는지 모의 테스트합니다.
-
-이 점검은 개발 속도를 늦추는 절차가 아니라, 이후 장애 대응 시간을 줄이는 사전 투자입니다. 특히 AI 앱은 코드 버그보다 데이터·모델·비용 요인이 함께 엮여 장애를 만들기 때문에, 초반에 운영 관측선을 분명히 잡아 두는 습관이 중요합니다.
-
-또 하나의 실무 팁은 "배포 확인 담당"을 명시하는 것입니다. 배포 버튼을 누른 사람과 검증 책임자가 같아도 괜찮지만, 체크 항목을 역할로 나눠 두면 누락이 줄어듭니다. 예를 들어 한 명은 사용자 시나리오 테스트를, 다른 한 명은 로그/비용/알림을 확인하도록 분리하면 배포 직후 리스크를 더 빠르게 줄일 수 있습니다.
-
-## 배포 전 체크리스트를 코드와 함께 고정하기
-
-배포를 안정적으로 반복하려면 개인 기억 대신 체크리스트를 저장소에 남겨야 합니다. 특히 AI 앱은 일반 웹앱보다 환경 변수 의존도가 높아서, 값 하나가 빠져도 사용자에게는 "응답 없음"으로만 보일 수 있습니다.
-
-```bash
-# 배포 전 공통 점검
-python3 -m pytest tests
-npm run lint
-npm run build
-python3 scripts/check_env_required.py --env-file .env.production.example
-```
-
-검증 스크립트가 배포 파이프라인에 연결되어 있지 않다면, 결국 수동 확인으로 되돌아가고 장애 확률이 올라갑니다.
-
-## Vercel 프런트엔드 배포 구성
-
-Next.js 기반 챗봇 프런트엔드는 Vercel에 먼저 올리는 편이 진입장벽이 낮습니다. 다만 프런트와 백엔드 URL 계약을 명확히 해야 환경별 혼선을 막을 수 있습니다.
-
-```json
-{
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "framework": "nextjs",
-  "env": {
-    "NEXT_PUBLIC_API_BASE_URL": "https://api.example.com",
-    "AI_MODEL": "gpt-4o-mini"
-  }
-}
-```
-
-환경 변수 이름은 코드의 상수 이름과 반드시 일치시켜야 합니다. 이름이 조금만 달라도 런타임에서 조용히 실패하는 경우가 많습니다.
-
-## Azure App Service 백엔드 배포 예시
-
-Python API 서버를 Azure App Service에 배포할 때는 시작 명령과 헬스 체크 경로를 먼저 고정하는 것이 좋습니다.
-
-```yaml
-# startup command example
-gunicorn app.main:app -k uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000 --timeout 120
-```
-
-```bash
-az webapp config appsettings set \
-  --resource-group rg-ai-web-dev \
-  --name ai-web-dev-api \
-  --settings OPENAI_API_KEY="***" AI_MODEL="gpt-4o-mini" LOG_LEVEL="INFO"
-```
-
-헬스 체크 경로(`/healthz`)는 모델 호출을 포함하지 않고, 프로세스와 의존성 연결 상태만 빠르게 확인하도록 설계해야 합니다.
-
-## 운영 설정: 타임아웃, 재시도, 회로 차단
-
-AI API는 네트워크와 공급자 상태에 영향을 받으므로, 배포 환경에서 반드시 시간 제한과 재시도 정책을 명시해야 합니다.
-
-```python
-CALL_TIMEOUT_SEC = 20
-MAX_RETRY = 2
-RETRY_BACKOFF_SEC = [0.5, 1.0]
-```
-
-또한 일정 비율 이상 실패가 누적되면 회로 차단기 패턴으로 일시적으로 호출을 중단하고, 사용자에게 장애 공지를 반환하는 방식이 실무에서 자주 사용됩니다.
-
-## 배포 후 검증 시나리오
-
-배포 성공 메시지만 보고 끝내면 거의 반드시 문제를 놓칩니다. 최소한 아래 시나리오를 자동화해야 합니다.
-
-1. 정상 질의: 응답 코드 200, JSON 스키마 통과
-2. 잘못된 입력: 4xx와 오류 메시지 규약 확인
-3. 모델 장애 모의: 5xx 대응 메시지 확인
-4. 시간 초과 모의: 재시도 횟수와 최종 오류 확인
-5. 토큰 과다 입력: 길이 제한 동작 확인
-
-## 평가 지표 대시보드 기본 항목
-
-배포 이후 첫 주에는 대시보드를 단순하게 유지하는 편이 좋습니다.
-
-- 요청 수, 오류율, p95 지연 시간
-- 평균 prompt_tokens, completion_tokens
-- 사용자 피드백(도움됨/도움안됨)
-- 경로별 비용 추정치
-- 배포 버전별 성능 비교
-
-이 다섯 항목만으로도 "성능 저하", "비용 급증", "특정 버전 회귀"를 초기에 발견할 수 있습니다.
-
-## 보안 기본선: 키 관리와 접근 제어
-
-배포 단계에서 가장 위험한 실수는 API 키를 코드 저장소나 클라이언트 번들에 노출하는 일입니다. 운영 키는 반드시 플랫폼 시크릿 저장소에 넣고, 권한 범위를 최소화해야 합니다.
-
-- 운영 키와 개발 키를 분리합니다.
-- 키 회전 주기를 월 단위로 정합니다.
-- 이상 트래픽이 감지되면 즉시 폐기할 수 있는 절차를 문서화합니다.
-
-또한 관리자 페이지나 내부 진단 API에는 IP 제한 또는 인증 게이트를 두어야 불필요한 노출을 줄일 수 있습니다.
-
-## 실제 운영 배포 파이프라인 예시
-
-배포는 수동 클릭보다 선언형 파이프라인이 안정적입니다. 아래와 같은 단계로 구성하면 실패 지점을 명확히 분리할 수 있습니다.
+배포는 수동 클릭보다 선언형 파이프라인이 안정적입니다.
 
 ```yaml
 name: deploy-ai-web-app
@@ -397,6 +251,26 @@ jobs:
 
 검증과 배포 단계를 분리하면 문제 발생 시 원인을 빠르게 특정할 수 있습니다.
 
+## 운영 설정: 타임아웃, 재시도, 헬스 체크
+
+AI API는 네트워크와 공급자 상태에 영향을 받으므로, 배포 환경에서 반드시 시간 제한과 재시도 정책을 명시해야 합니다.
+
+```python
+CALL_TIMEOUT_SEC = 20
+MAX_RETRY = 2
+RETRY_BACKOFF_SEC = [0.5, 1.0]
+```
+
+헬스 체크 경로(`/healthz`)는 모델 호출을 포함하지 않고, 프로세스와 의존성 연결 상태만 빠르게 확인하도록 설계해야 합니다.
+
+```bash
+# 배포 후 10분 안에 실행하는 점검
+curl -fsS https://api.example.com/healthz
+curl -fsS https://api.example.com/api/ask \
+  -H 'content-type: application/json' \
+  -d '{"question":"상태 점검","user_id":"monitor"}'
+```
+
 ## 롤백 기준을 미리 문서화하기
 
 롤백은 실패했을 때 즉흥적으로 결정하면 늦습니다. 다음 기준을 사전에 합의해 두는 편이 좋습니다.
@@ -407,40 +281,25 @@ jobs:
 
 기준이 명시되어 있으면 담당자가 교대해도 같은 판단을 재현할 수 있습니다.
 
-## 운영 점검 자동화 명령 예시
+## 자주 하는 실수
 
-배포 후 10분 안에 실행하는 점검 명령을 스크립트로 고정해 두면 야간 장애 대응이 훨씬 쉬워집니다.
+| 실수 | 증상 | 올바른 접근 |
+| --- | --- | --- |
+| API 키를 코드 저장소에 커밋 | 키 유출 → 무단 과금 및 보안 사고 | `.gitignore`에 `.env` 등록, 플랫폼 시크릿 관리 사용 |
+| 시작 명령 미지정 (FastAPI) | 배포 성공했지만 앱 기동 실패 | `--startup-file` 에 gunicorn+uvicorn 명령 명시 |
+| 환경 변수 수정 후 재배포 생략 | 이전 값으로 서비스 계속 운영 | 환경 변수 변경 후 반드시 재배포 트리거 |
+| 로그 확인 없이 "배포 성공"으로 마무리 | 런타임 오류를 사용자가 먼저 발견 | 배포 직후 로그 스트림으로 에러 확인 |
+| 비용 알람 미설정 | 토큰 폭증 시 월말에 과금 확인 | OpenAI 월 한도 + Azure Budget Alert 동시 설정 |
+| 개발/운영 환경 모델 이름 불일치 | 디버깅 비용 증가, 품질 편차 | 환경별 모델 이름을 동일 환경 변수로 통일 |
 
-```bash
-curl -fsS https://api.example.com/healthz
-curl -fsS https://api.example.com/api/ask -H 'content-type: application/json' -d '{"question":"상태 점검","user_id":"monitor"}'
-```
+## 운영 체크리스트
 
-이 명령의 목적은 기능 완전 검증이 아니라 "지금 즉시 서비스 가능한 상태인지"를 빠르게 확인하는 것입니다.
-
-## 비용 상한 가드
-
-AI 앱은 정상 동작 중에도 비용이 급증할 수 있으므로 일일 상한과 경보 임계치를 설정해야 합니다.
-
-- 일일 비용 상한 100달러
-- 1시간 이동 평균이 기준 대비 2배 상승하면 경보
-- 특정 엔드포인트에서 토큰 급증 시 자동 샘플링 로그 활성화
-
-이 가드가 있어야 품질 이슈가 비용 사고로 번지는 것을 막을 수 있습니다.
-
-### 실무 메모
-
-이 절에서 다룬 원칙은 기능이 늘어날수록 더 중요해집니다. 특히 팀원이 늘어나면 개인 감각보다 문서화된 규칙이 더 큰 품질 차이를 만듭니다. 따라서 예제 코드를 복사해 쓰는 것에서 멈추지 말고, 현재 팀의 장애 패턴과 운영 제약에 맞춰 규칙을 재정의하는 작업이 필요합니다. 작은 체크리스트 하나가 장기적으로는 가장 큰 비용 절감으로 돌아옵니다.
-
-### 실무 메모
-
-이 절에서 다룬 원칙은 기능이 늘어날수록 더 중요해집니다. 특히 팀원이 늘어나면 개인 감각보다 문서화된 규칙이 더 큰 품질 차이를 만듭니다. 따라서 예제 코드를 복사해 쓰는 것에서 멈추지 말고, 현재 팀의 장애 패턴과 운영 제약에 맞춰 규칙을 재정의하는 작업이 필요합니다. 작은 체크리스트 하나가 장기적으로는 가장 큰 비용 절감으로 돌아옵니다.
-
-### 배포 후 24시간 관찰
-
-첫 24시간에는 기능 추가보다 관찰을 우선합니다. 오류율, 지연 시간, 토큰 사용량이 안정 구간에 들어오는지 확인한 뒤 다음 릴리스를 계획하는 편이 장기적으로 안전합니다.
-
-추가로, 운영팀과 개발팀이 같은 체크리스트를 공유하도록 문서 위치를 고정해 두는 것이 좋습니다. 이렇게 해야 담당자가 바뀌어도 동일한 기준으로 대응할 수 있습니다.
+- [ ] 의존성 파일과 시작 명령을 배포 환경 기준으로 점검했다.
+- [ ] API 키를 플랫폼 환경 변수로만 주입한다.
+- [ ] 배포 직후 로그 확인 경로를 알고 있다.
+- [ ] OpenAI와 클라우드 예산 알림을 설정했다.
+- [ ] 헬스 체크 엔드포인트가 모델 호출 없이 동작 상태를 반환한다.
+- [ ] 롤백 기준을 문서화했다.
 
 ## 정리
 
@@ -456,11 +315,11 @@ AI 앱은 정상 동작 중에도 비용이 급증할 수 있으므로 일일 �
 ## 처음 질문으로 돌아가기
 
 - **배포는 단순 업로드가 아니라 무엇을 준비하는 과정일까요?**
-  - 내 컴퓨터에서는 `python app.py`나 `npm run dev`만으로 쉽게 실행되던 코드가, 서버에서는 그대로 되지 않는 경우가 많습니다.
+  - 의존성 정리, 환경 변수 분리, 진입점 명시, 포트 설정이라는 네 가지를 서버가 이해할 수 있게 준비하는 과정입니다.
 - **Next.js 앱과 Python 백엔드는 어떤 플랫폼에 먼저 올리는 편이 좋을까요?**
-  - 입문 단계에서 자주 만나는 선택지는 Vercel과 Azure App Service입니다. 어느 쪽이 절대적으로 낫다기보다, 앱의 성격에 따라 맞는 쪽이 다릅니다.
+  - Next.js는 Vercel, Python FastAPI는 Azure App Service가 각각 진입 장벽이 낮습니다.
 - **Vercel에서는 무엇을 가장 먼저 확인해야 할까요?**
-  - 내 컴퓨터에서는 `python app.py`나 `npm run dev`만으로 쉽게 실행되던 코드가, 서버에서는 그대로 되지 않는 경우가 많습니다
+  - 환경 변수(`OPENAI_API_KEY`)가 올바르게 주입됐는지와 빌드 로그에 에러가 없는지를 먼저 확인해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

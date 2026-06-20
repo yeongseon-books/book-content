@@ -22,568 +22,353 @@ seo_description: 객체지향이 과한 상황과 함수, dataclass, 함수형 �
 
 # Object-Oriented Programming 101 (10/10): 객체지향을 언제 피해야 할까?
 
-가장 어려운 객체지향 결정은 종종 "어떤 클래스를 더 만들까?"가 아니라 "이걸 정말 클래스여야 하나?"입니다. 이 글은 OOP 101 시리즈의 마지막 글입니다.
+가장 어려운 객체지향 결정은 종종 "어떤 클래스를 더 만들까?"가 아니라 "이걸 정말 클래스여야 하나?"입니다. 클래스가 있으면 더 전문적으로 보이는 것 같고, 함수로만 구성하면 구조가 없는 것처럼 느껴질 수 있습니다. 하지만 현업에서는 불필요한 클래스가 유지보수를 어렵게 만드는 경우가 적지 않습니다.
 
-Python이 함수, 모듈, `dataclass`, `NamedTuple`, `TypedDict`, 콜러블을 함께 주는 이유가 있습니다. 이번 글에서는 클래스가 과하게 많은 리포트 미니 앱을 단계적으로 단순화하고, 다시 클래스를 도입해야 하는 임계점까지 분명하게 잡아 보겠습니다.
+Python은 클래스와 함수를 모두 일급 시민으로 대우합니다. 어떤 로직에 클래스가 필요한지, 어떤 로직은 함수, `dataclass`, 함수형 접근이 더 나은지 판단하는 능력이 OOP 학습의 마지막 단계입니다.
 
-![Object-Oriented Programming 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/10/10-01-concept-overview.ko.png)
+이 글은 OOP 101 시리즈의 마지막 글입니다.
+
+![Object-Oriented Programming 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/10/10-01-big-picture.ko.png)
 *Object-Oriented Programming 101 10장 흐름 개요*
-
-> OOP는 도구이지 종교가 아닙니다 — 짧은 스크립트, 순수 데이터 변환, 동시성 중심 코드에서는 클래스 계층이 오히려 사고를 가립니다. '언제 안 써야 하는가'를 모르고 'OOP가 좋다'고 외우면, 모든 못이 망치로 보이기 시작합니다.
 
 ## 이 글에서 다룰 문제
 
-- 어떤 신호가 보이면 클래스 기반 설계가 대부분 의식적인 장식에 가깝다고 판단할 수 있을까요?
-- 어떤 종류의 클래스가 함수, `dataclass`, `NamedTuple`, `TypedDict`로 더 잘 바뀔까요?
-- 전략 클래스 전체 대신 콜백 하나면 충분한 순간은 언제일까요?
+- OOP가 과잉 설계가 되는 신호는 무엇인가요?
+- 순수 함수와 함수형 스타일이 클래스보다 나은 상황은 언제인가요?
+- `dataclass`와 `TypedDict`는 어떤 상황에서 클래스를 대체할 수 있나요?
 - 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
 - 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
 
-## 핵심 개념 잡기
+## 이 글에서 배울 것
 
-실무적인 질문은 단순합니다. 이 동작이 정말 상태와 수명주기 조정을 필요로 하는가, 아니면 대부분 데이터 변환 파이프라인인가? 후자라면 클래스는 종종 추가 무게일 뿐입니다.
+- OOP 과잉 설계의 신호를 인식합니다
+- 순수 함수와 파이프라인으로 데이터 처리를 단순화합니다
+- `dataclass`와 `TypedDict`의 올바른 사용 상황을 구분합니다
+- callable 객체와 함수의 트레이드오프를 이해합니다
+- 클래스 도입 타이밍 판단 기준을 갖춥니다
 
 ## 핵심 개념
 
-| 용어 | 설명 |
-|------|------|
-| 다중 패러다임 | Python은 절차, 객체지향, 함수형 스타일을 함께 지원합니다 |
-| 빈혈 클래스 | 데이터 보관이나 단일 메서드 래핑에 가까운 얇은 클래스입니다 |
-| `dataclass` | 데이터 중심 구조를 간결하게 표현하는 기능입니다 |
-| 고차 함수 | 다른 함수를 인자로 받거나 반환하는 함수입니다 |
-| 재도입 임계점 | 상태, 검증, 수명주기 조정이 강해져 다시 클래스가 유리해지는 시점입니다 |
+| 접근 방식 | 적합한 상황 |
+|----------|------------|
+| 순수 함수 | 상태가 없고, 입력만으로 출력이 결정될 때 |
+| `dataclass` | 데이터 컨테이너가 필요하고, 복잡한 메서드가 없을 때 |
+| `TypedDict` | 딕셔너리 구조를 타입으로 문서화할 때 |
+| callable 클래스 | 설정 상태가 필요한 함수가 필요할 때 |
+| 일반 클래스(OOP) | 상태와 행위가 함께 변경되고, 수명주기가 명확할 때 |
 
 ## 전후 비교
 
-이번 글의 핵심은 "클래스는 나쁘다"가 아니라 "설계 의도를 지키는 가장 가벼운 도구를 먼저 쓰자"입니다.
+캠페인 보고서 처리를 비교합니다.
 
 ```python
-# before: 상태 없는 헬퍼와 단순 데이터도 모두 클래스로 감쌉니다
-class TitleCleaner:
-    def clean(self, title: str) -> str:
-        return title.strip().title()
+# before: 불필요한 클래스 — 상태 없이 메서드만 있음
+class CampaignReportProcessor:
+    def load(self, path: str) -> list[dict]:
+        return []  # 파일 로드 시뮬레이션
 
-class ScoreFilter:
-    def keep(self, score: int, minimum: int) -> bool:
-        return score >= minimum
+    def filter_active(self, records: list[dict]) -> list[dict]:
+        return [r for r in records if r.get("active")]
+
+    def calculate_ctr(self, records: list[dict]) -> list[dict]:
+        return [{**r, "ctr": r["clicks"] / r["impressions"]} for r in records if r["impressions"] > 0]
+
+    def sort_by_ctr(self, records: list[dict]) -> list[dict]:
+        return sorted(records, key=lambda r: r["ctr"], reverse=True)
+
+    def process(self, path: str) -> list[dict]:
+        records = self.load(path)
+        records = self.filter_active(records)
+        records = self.calculate_ctr(records)
+        return self.sort_by_ctr(records)
 ```
 
 ```python
-# after: 함수와 데이터 구조가 같은 워크플로를 더 직접적으로 표현합니다
-def clean_title(title: str) -> str:
-    return title.strip().title()
+# after: 순수 함수 파이프라인 — 테스트와 조합이 쉬움
+def filter_active(records: list[dict]) -> list[dict]:
+    return [r for r in records if r.get("active")]
 
-def keep_score(score: int, minimum: int) -> bool:
-    return score >= minimum
-```
-
-## 하나의 워크플로로 보는 클래스 줄이기
-
-### 출발점: 너무 많은 작은 클래스
-
-주간 캠페인 리포트를 만드는 팀이 모든 단계를 각각 클래스로 감쌌다고 가정해 보겠습니다.
-
-```python
-class TitleCleaner:
-    def clean(self, title: str) -> str:
-        return title.strip().title()
-
-class ScoreFilter:
-    def keep(self, score: int, minimum: int) -> bool:
-        return score >= minimum
-
-class CurrencyFormatter:
-    def format(self, value: int) -> str:
-        return f"${value:,.0f}"
-
-class ReportRow:
-    def __init__(self, title: str, score: int, spend: int) -> None:
-        self.title = title
-        self.score = score
-        self.spend = spend
-
-class ReportConfig:
-    def __init__(self, minimum_score: int, currency: str) -> None:
-        self.minimum_score = minimum_score
-        self.currency = currency
-```
-
-각 클래스는 이해 가능하지만, 전체 설계는 문제에 비해 무겁습니다.
-
-### 1단계: 상태 없는 헬퍼 클래스를 함수로 바꿉니다
-
-인스턴스 상태도 없고 수명주기도 없는 코드는 모듈 함수가 더 분명한 경우가 많습니다.
-
-```python
-def clean_title(title: str) -> str:
-    return title.strip().title()
-
-def keep_score(score: int, minimum: int) -> bool:
-    return score >= minimum
-
-def format_currency(value: int) -> str:
-    return f"${value:,.0f}"
-```
-
-#### 실행
-
-```python
-print(clean_title("  spring launch "))
-print(keep_score(82, 80))
-print(format_currency(12500))
-```
-
-예상 출력:
-
-```text
-Spring Launch
-True
-$12,500
-```
-
-#### 점검
-
-바뀐 것: 인스턴스 생성이 사라졌습니다. 그대로인 것: 각 변환은 여전히 이름이 분명하고 역할이 하나입니다.
-
-### 2단계: 데이터 보관용 boilerplate를 `dataclass`와 `TypedDict`로 바꿉니다
-
-원래 `ReportRow`, `ReportConfig`는 대부분 필드 저장만 하고 있었습니다. 이때는 가벼운 데이터 구조가 더 적합합니다.
-
-```python
-from dataclasses import dataclass
-from typing import TypedDict
-
-@dataclass(frozen=True)
-class ReportRow:
-    title: str
-    score: int
-    spend: int
-
-class ReportConfig(TypedDict):
-    minimum_score: int
-    channel: str
-
-config: ReportConfig = {"minimum_score": 80, "channel": "email"}
-row = ReportRow(title="Spring Launch", score=82, spend=12500)
-
-print(row)
-print(config["channel"])
-```
-
-예상 출력:
-
-```text
-ReportRow(title='Spring Launch', score=82, spend=12500)
-email
-```
-
-#### 점검
-
-바뀐 것: 생성자와 표현용 boilerplate가 사라졌습니다. 그대로인 것: 워크플로는 여전히 이름 있는 행 타입과 명시적 설정 키를 가집니다.
-
-#### 실패 경로
-
-`config["chnanel"]`처럼 dict 키를 잘못 쓰면 런타임에 늦게 실패합니다. 얕고 단순한 설정에서는 감수할 수 있지만, 나중에 더 풍부한 객체가 필요해지는 첫 신호이기도 합니다.
-
-### 3단계: 사소한 전략 클래스를 콜러블로 바꿉니다
-
-많은 전략 클래스는 사실상 이름 붙은 포매팅 함수 하나에 가깝습니다.
-
-```python
-from collections.abc import Callable
-
-def format_currency(value: int) -> str:
-    return f"${value:,.0f}"
-
-def format_points(value: int) -> str:
-    return f"{value} pts"
-
-def render_value(value: int, formatter: Callable[[int], str]) -> str:
-    return formatter(value)
-
-print(render_value(12500, format_currency))
-print(render_value(82, format_points))
-```
-
-예상 출력:
-
-```text
-$12,500
-82 pts
-```
-
-#### 점검
-
-바뀐 것: 전략 추상이 호출자가 실제로 필요한 것, 즉 콜러블 하나로 줄었습니다. 그대로인 것: 포매팅 교체는 여전히 자연스럽습니다.
-
-#### 실패 경로
-
-각 포매터가 나중에 공통 설정, 캐시, 보조 메서드를 필요로 하기 시작하면 콜백만으로는 관련 동작이 흩어집니다. 그 순간이 클래스를 다시 고려할 한 기준입니다.
-
-### 4단계: 리포트를 함수 파이프라인으로 조립합니다
-
-이제 미니 앱은 작은 껍데기 클래스 모음 대신 읽기 쉬운 파이프라인이 될 수 있습니다.
-
-```python
-from dataclasses import dataclass
-from collections.abc import Callable
-from typing import TypedDict
-
-@dataclass(frozen=True)
-class ReportRow:
-    title: str
-    score: int
-    spend: int
-
-class ReportConfig(TypedDict):
-    minimum_score: int
-    channel: str
-
-def clean_title(title: str) -> str:
-    return title.strip().title()
-
-def format_currency(value: int) -> str:
-    return f"${value:,.0f}"
-
-def normalize_rows(rows: list[dict]) -> list[ReportRow]:
+def calculate_ctr(records: list[dict]) -> list[dict]:
     return [
-        ReportRow(
-            title=clean_title(row["title"]),
-            score=row["score"],
-            spend=row["spend"],
-        )
-        for row in rows
+        {**r, "ctr": r["clicks"] / r["impressions"]}
+        for r in records
+        if r["impressions"] > 0
     ]
 
-def filter_rows(rows: list[ReportRow], minimum_score: int) -> list[ReportRow]:
-    return [row for row in rows if row.score >= minimum_score]
+def sort_by_ctr(records: list[dict]) -> list[dict]:
+    return sorted(records, key=lambda r: r["ctr"], reverse=True)
 
-def sort_rows(rows: list[ReportRow]) -> list[ReportRow]:
-    return sorted(rows, key=lambda row: row.score, reverse=True)
-
-def render_report(rows: list[ReportRow], money: Callable[[int], str]) -> list[str]:
-    return [f"{row.title} | score={row.score} | spend={money(row.spend)}" for row in rows]
-
-def build_report(raw_rows: list[dict], config: ReportConfig, money: Callable[[int], str]) -> list[str]:
-    rows = normalize_rows(raw_rows)
-    rows = filter_rows(rows, config["minimum_score"])
-    rows = sort_rows(rows)
-    return render_report(rows, money)
-
-raw_rows = [
-    {"title": "  spring launch ", "score": 82, "spend": 12500},
-    {"title": "retargeting", "score": 76, "spend": 4000},
-    {"title": "summer promo", "score": 91, "spend": 18000},
-]
-config: ReportConfig = {"minimum_score": 80, "channel": "email"}
-
-for line in build_report(raw_rows, config, format_currency):
-    print(line)
+def process_campaign_report(records: list[dict]) -> list[dict]:
+    return sort_by_ctr(calculate_ctr(filter_active(records)))
 ```
 
-#### 실행
+순수 함수 버전은 각 단계를 독립적으로 테스트할 수 있고, 파이프라인을 조합하거나 순서를 바꾸기도 쉽습니다.
 
-```bash
-python report_pipeline.py
-```
+## 단계별 실습
 
-예상 출력:
-
-```text
-Summer Promo | score=91 | spend=$18,000
-Spring Launch | score=82 | spend=$12,500
-```
-
-#### 점검
-
-다음 세 가지를 확인합니다.
-
-1. 정규화, 필터링, 정렬, 렌더링이 각각 독립 함수로 테스트되기 쉬운가
-2. 데이터 보관 구조가 가볍지만 충분히 명시적인가
-3. 리포트 파이프라인이 인스턴스 조정 노이즈 없이 위에서 아래로 읽히는가
-
-#### 실패 경로: 함수만으로 두었더니 느슨해지는 순간
-
-함수 파이프라인은 규칙과 공유 상태가 함께 움직이기 시작할 때부터 흔들립니다. 예를 들면 다음과 같습니다.
+### 1단계: OOP 과잉 신호 인식
 
 ```python
-config = {"minimum_score": 80, "chnanel": "email"}  # dict 키 오타가 숨어 있습니다
+# OOP 과잉 신호 1: 상태 없이 메서드만 있는 클래스
+class StringUtils:
+    @staticmethod
+    def to_upper(s: str) -> str:
+        return s.upper()
+
+    @staticmethod
+    def truncate(s: str, max_len: int) -> str:
+        return s[:max_len]
+
+# 더 나은 방법: 모듈 수준 함수
+def to_upper(s: str) -> str:
+    return s.upper()
+
+def truncate(s: str, max_len: int) -> str:
+    return s[:max_len]
+
+# OOP 과잉 신호 2: 인스턴스화하자마자 바로 메서드 하나만 호출
+class TaxCalculator:
+    def calculate(self, amount: int, rate: float) -> int:
+        return int(amount * rate)
+
+result = TaxCalculator().calculate(10000, 0.1)  # 인스턴스 생성 후 바로 버림
+
+# 더 나은 방법: 함수
+def calculate_tax(amount: int, rate: float) -> int:
+    return int(amount * rate)
+
+result = calculate_tax(10000, 0.1)
 ```
 
-또는 각 포매터가 통화 기호 설정, 로케일 반올림 규칙, 환율 캐시 조회를 함께 필요로 한다고 해 보겠습니다. 그 시점에는 맨몸의 콜러블이 더 이상 가장 분명한 추상이 아닐 수 있습니다.
+### 2단계: dataclass로 데이터 컨테이너 표현
 
-## 다시 클래스를 도입할지 판단하는 기준
+```python
+from dataclasses import dataclass, field
+from datetime import datetime
 
-다음 항목 중 두 개 이상이 동시에 보이면 클래스 쪽으로 되돌아갈 이유가 생깁니다.
+@dataclass
+class CampaignReport:
+    """순수 데이터 컨테이너 — 메서드 최소화"""
+    campaign_id: str
+    name: str
+    impressions: int
+    clicks: int
+    spend: int
+    active: bool = True
+    created_at: datetime = field(default_factory=datetime.now)
 
-| 신호 | 왜 클래스가 도움이 되기 시작하는가 |
-|------|----------------------------------|
-| 같은 필드 묶음이 여러 함수 사이를 반복해서 같이 이동 | 더 풍부한 도메인 객체가 불변식과 동작을 한곳에 묶을 수 있습니다 |
-| 검증 규칙과 상태 전이가 함께 반복 | 메서드와 캡슐화된 상태가 더 추론하기 쉬워집니다 |
-| 포매터나 전략이 설정, 캐시 같은 지속 상태를 가짐 | 매번 인자를 늘리는 것보다 상태 객체가 분명해집니다 |
-| 파이프라인이 재시도, 훅, 공유 협력 객체를 요구 | 조정자 객체가 횡단 관심사를 맡기 쉬워집니다 |
+    @property
+    def ctr(self) -> float:
+        """계산 속성만 허용 — 비즈니스 로직은 외부 함수에"""
+        if self.impressions == 0:
+            return 0.0
+        return self.clicks / self.impressions
 
-목표는 "순수 함수형"을 지키는 것이 아닙니다. 더 무거운 구조가 자기 값을 벌어들일 때까지 미루는 것입니다.
+    @property
+    def cpc(self) -> float:
+        """비용 per 클릭"""
+        if self.clicks == 0:
+            return 0.0
+        return self.spend / self.clicks
 
-## 이 워크플로에서 주목할 점
+# 분리된 처리 함수
+def filter_profitable(reports: list[CampaignReport], max_cpc: float) -> list[CampaignReport]:
+    return [r for r in reports if r.active and r.cpc <= max_cpc]
 
-- 상태 없는 변환 로직은 메서드 하나짜리 클래스보다 함수가 더 읽기 쉬운 경우가 많습니다.
-- `dataclass`와 `TypedDict`는 이름 있는 구조를 유지하면서도 객체 ceremony를 줄여 줍니다.
-- 단순한 교체 가능 동작은 콜러블 하나로 충분한 경우가 많습니다.
-- 함수 파이프라인은 상태, 불변식, 수명주기 조정이 반복되기 전까지 강력합니다.
+def summarize(reports: list[CampaignReport]) -> dict:
+    total_spend = sum(r.spend for r in reports)
+    total_clicks = sum(r.clicks for r in reports)
+    return {
+        "campaign_count": len(reports),
+        "total_spend": total_spend,
+        "total_clicks": total_clicks,
+        "avg_cpc": total_spend / total_clicks if total_clicks else 0,
+    }
 
-## 자주 하는 실수 5가지
+reports = [
+    CampaignReport("C1", "Summer Sale", 100000, 3000, 150000),
+    CampaignReport("C2", "Spring Ad", 50000, 500, 80000),
+]
+profitable = filter_profitable(reports, max_cpc=60)
+print(summarize(profitable))
+```
 
-| 실수 | 왜 아픈가 | 더 나은 선택 |
-|------|----------|--------------|
-| 모든 헬퍼를 클래스화 | 단순한 파이프라인이 객체 노이즈에 가려집니다 | 모듈 함수로 시작합니다 |
-| 평범한 데이터에 수제 클래스를 사용 | boilerplate가 가치보다 빨리 늘어납니다 | `dataclass`, `NamedTuple`, `TypedDict`를 봅니다 |
-| 함수 하나 감싼 전략 클래스를 유지 | 상태 없는 간접 계층만 남습니다 | 콜러블을 전달합니다 |
-| 함수 중심 설계를 이념처럼 밀어붙임 | 상태와 검증이 흩어집니다 | 불변식이 반복되면 클래스를 재도입합니다 |
-| dict 기반 설정을 너무 오래 방치 | 오타와 기본값 누락이 늦게 드러납니다 | 설정 복잡도가 커지면 더 풍부한 객체로 올립니다 |
+### 3단계: TypedDict로 딕셔너리 구조화
+
+```python
+from typing import TypedDict, NotRequired
+
+class UserRecord(TypedDict):
+    id: str
+    name: str
+    email: str
+    role: str
+    age: NotRequired[int]  # 선택 필드
+
+def create_user_record(id: str, name: str, email: str) -> UserRecord:
+    return {"id": id, "name": name, "email": email, "role": "viewer"}
+
+def promote_user(user: UserRecord, new_role: str) -> UserRecord:
+    return {**user, "role": new_role}
+
+user = create_user_record("u1", "Alice", "alice@example.com")
+admin = promote_user(user, "admin")
+print(admin)  # {'id': 'u1', 'name': 'Alice', 'email': 'alice@example.com', 'role': 'admin'}
+```
+
+`TypedDict`는 딕셔너리 구조를 타입으로 문서화하지만 메서드를 추가할 수 없습니다. API 응답 파싱이나 JSON 처리처럼 데이터를 그대로 전달할 때 적합합니다.
+
+### 4단계: callable 객체 — 상태 있는 함수
+
+```python
+from typing import Callable
+
+class RateLimiter:
+    """상태(호출 횟수)가 필요한 함수 — callable 클래스 적합"""
+    def __init__(self, max_calls: int) -> None:
+        self.max_calls = max_calls
+        self._calls = 0
+
+    def __call__(self, func: Callable) -> Callable:
+        def wrapper(*args, **kwargs):
+            if self._calls >= self.max_calls:
+                raise RuntimeError("Rate limit exceeded")
+            self._calls += 1
+            return func(*args, **kwargs)
+        return wrapper
+
+class ExponentialBackoff:
+    """재시도 간격을 누적하는 callable"""
+    def __init__(self, base: float = 1.0, factor: float = 2.0) -> None:
+        self.base = base
+        self.factor = factor
+        self._attempt = 0
+
+    def __call__(self) -> float:
+        delay = self.base * (self.factor ** self._attempt)
+        self._attempt += 1
+        return delay
+
+backoff = ExponentialBackoff(base=0.5)
+for _ in range(4):
+    print(f"Wait: {backoff():.1f}s")  # 0.5, 1.0, 2.0, 4.0
+```
+
+callable 클래스는 함수처럼 호출하지만 내부 상태를 유지합니다. 상태 없이 같은 기능만 제공한다면 일반 함수가 더 단순합니다.
+
+### 5단계: functools로 함수형 파이프라인
+
+```python
+from functools import reduce
+from typing import Callable
+
+Pipeline = Callable[[list], list]
+
+def compose(*funcs: Pipeline) -> Pipeline:
+    """여러 변환 함수를 하나의 파이프라인으로 조합"""
+    def pipeline(data: list) -> list:
+        return reduce(lambda acc, f: f(acc), funcs, data)
+    return pipeline
+
+# 각 단계를 독립된 순수 함수로 정의
+def remove_nulls(records: list) -> list:
+    return [r for r in records if r is not None]
+
+def normalize_emails(records: list[dict]) -> list[dict]:
+    return [{**r, "email": r["email"].lower().strip()} for r in records if "email" in r]
+
+def add_rank(records: list[dict]) -> list[dict]:
+    return [{**r, "rank": i + 1} for i, r in enumerate(records)]
+
+# 파이프라인 조합
+process = compose(remove_nulls, normalize_emails, add_rank)
+
+data = [
+    {"name": "Alice", "email": "ALICE@EXAMPLE.COM"},
+    None,
+    {"name": "Bob", "email": "  BOB@EXAMPLE.COM  "},
+]
+result = process(data)
+for r in result:
+    print(r)
+```
+
+## 자주 하는 실수
+
+| 실수 | 왜 문제인가 | 해결 방법 |
+|------|------------|----------|
+| 유틸리티 함수를 클래스로 감쌈 | 불필요한 인스턴스화가 필요합니다 | 모듈 수준 함수로 충분합니다 |
+| 데이터만 있는 클래스에 메서드를 억지로 추가 | 응집도가 낮아집니다 | `dataclass`나 `TypedDict`를 사용합니다 |
+| 상태 없는 로직에 클래스를 도입 | 테스트가 복잡해집니다 | 순수 함수가 더 간단합니다 |
+| `TypedDict`에 메서드 추가 시도 | `TypedDict`는 딕셔너리 타입 힌트만 제공합니다 | 메서드가 필요하면 `dataclass`로 전환합니다 |
+| 함수형과 OOP를 무조건 분리 | 두 방식은 보완 관계입니다 | 상태 관리는 OOP, 데이터 변환은 함수형을 조합합니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- CLI 유틸리티는 함수 중심 모듈이 가장 잘 맞는 경우가 많습니다.
-- 데이터 정리와 변환 코드는 파이프라인 형태가 자연스럽습니다.
-- `dataclass`는 내부 DTO나 불변 페이로드에 특히 적합합니다.
-- 반대로 상태가 있는 API 클라이언트나 캐시 서비스는 클래스를 다시 정당화합니다.
-
-## 현업 개발자는 이렇게 생각합니다
-
-현업 개발자는 클래스가 나빠서 클래스를 피하지 않습니다. 상태와 계층 구조의 무게가 실제로는 데이터 변환 문제에 불필요하게 올라타고 있기 때문에 피합니다. 좋은 질문은 "가장 싸면서도 워크플로를 보호하는 추상이 무엇인가?"입니다.
-
-그래서 많은 Python 코드베이스는 함수로 시작하고, 상태·불변식·조정 책임이 쌓이는 지점만 클래스로 올립니다. 절제가 설계 능력의 일부입니다.
-
-## 운영 체크리스트
-
-- [ ] 상태 없는 헬퍼 함수를 얇게 감싼 클래스를 식별할 수 있다
-- [ ] boilerplate 데이터 보관 클래스를 `dataclass`나 `TypedDict`로 바꿀 수 있다
-- [ ] 사소한 전략 클래스 대신 콜러블을 사용할 수 있다
-- [ ] 변환 중심 코드를 읽기 쉬운 함수 파이프라인으로 만들 수 있다
-- [ ] 상태와 불변식이 커질 때 클래스를 다시 도입해야 하는 이유를 설명할 수 있다
-
-## 정리 및 다음 글 안내
-
-객체지향을 피해야 하는 순간은 클래스가 보호보다 의식을 더 많이 늘릴 때입니다. 이번 리포트 워크플로에서는 상태 없는 헬퍼를 함수로, 데이터 보관용 클래스를 가벼운 구조로, 사소한 전략을 콜러블로 바꾸면서 전체를 직접적인 파이프라인으로 만들었습니다. 동시에 상태와 불변식이 함께 움직이기 시작하면 다시 클래스로 올라가야 하는 기준도 얻었습니다.
-
-## 객체지향을 피해야 하는 신호를 구조로 정리
-
-객체지향을 피해야 하는 상황은 반객체지향이 아니라, 문제 형태와 해법이 맞지 않는 경우입니다.
-
-```text
-입력 변환 파이프라인
-[read_csv] -> [normalize_row] -> [filter_invalid] -> [aggregate] -> [write_report]
-
-도메인 상태 모델
-[Account]
-  + open()
-  + suspend()
-  + close()
-```
-
-첫 번째 형태는 함수 조합이 자연스럽고, 두 번째 형태는 상태 모델 객체가 자연스럽습니다.
-
-## 적용 전후: 과도한 클래스화에서 함수 중심으로
-
-```python
-# before
-class CsvReader:
-    def run(self, path: str) -> list[dict]:
-        ...
-
-class RowNormalizer:
-    def run(self, rows: list[dict]) -> list[dict]:
-        ...
-
-class InvalidFilter:
-    def run(self, rows: list[dict]) -> list[dict]:
-        ...
-```
-
-```python
-# after
-from collections.abc import Iterable
-
-def read_csv(path: str) -> list[dict]:
-    ...
-
-def normalize_row(row: dict) -> dict:
-    ...
-
-def filter_invalid(rows: Iterable[dict]) -> list[dict]:
-    return [r for r in rows if r.get('price', 0) > 0]
-
-def pipeline(path: str) -> list[dict]:
-    rows = read_csv(path)
-    normalized = [normalize_row(r) for r in rows]
-    return filter_invalid(normalized)
-```
-
-## 원칙 위반 관점
-
-| 위반 | 증상 | 수정 |
-|---|---|---|
-| 클래스가 데이터 없이 정적 메서드만 가짐 | 사실상 네임스페이스 포장 | 함수 모듈로 단순화 |
-| 생성자 의존성만 8개 이상 | 조립 비용 과다 | use case 분리 또는 함수 파이프라인 |
-| 작은 변환 로직도 객체 1개씩 생성 | 인지 부하 증가 | 순수 함수로 전환 |
-
-## 비교표: 함수형 접근과 객체지향 접근
-
-| 질문 | 함수형 접근 유리 | 객체지향 접근 유리 |
-|---|---|---|
-| 상태 전이가 핵심인가 | 아니오 | 예 |
-| 입력→출력 변환이 반복되는가 | 예 | 아니오 |
-| 규칙이 객체 생명주기에 묶이는가 | 아니오 | 예 |
-| 테스트를 데이터 중심으로 작성하는가 | 예 | 상황별 |
-
-## 혼합 전략
-
-실무에서는 둘 중 하나만 고집하지 않습니다. 도메인 상태는 객체로 모델링하고, 데이터 변환은 순수 함수로 처리하는 혼합 전략이 유지보수 비용을 가장 낮추는 경우가 많습니다.
-
-## 실전 시나리오: 요구사항 변경을 견디는 구조로 바꾸기
-
-현업에서는 기능 추가보다 규칙 변경이 더 자주 발생합니다. 따라서 클래스 구조를 평가할 때는 "지금 동작하는가"보다 "다음 변경을 어디까지 건드려야 하는가"를 기준으로 보는 편이 안전합니다.
+데이터 처리 파이프라인에서는 함수형 접근이 더 자연스럽습니다.
 
 ```python
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Callable
 
 @dataclass
-class LineItem:
-    name: str
-    quantity: int
-    unit_price: int
+class SalesRecord:
+    region: str
+    product: str
+    amount: int
+    is_refund: bool = False
 
-    def subtotal(self) -> int:
-        return self.quantity * self.unit_price
+# 각 변환을 순수 함수로 정의
+def exclude_refunds(records: list[SalesRecord]) -> list[SalesRecord]:
+    return [r for r in records if not r.is_refund]
 
-class DiscountPolicy(Protocol):
-    def apply(self, amount: int) -> int:
-        ...
+def group_by_region(records: list[SalesRecord]) -> dict[str, int]:
+    result: dict[str, int] = {}
+    for r in records:
+        result[r.region] = result.get(r.region, 0) + r.amount
+    return result
 
-class NoDiscount:
-    def apply(self, amount: int) -> int:
-        return amount
+def top_regions(grouped: dict[str, int], n: int = 3) -> list[tuple[str, int]]:
+    return sorted(grouped.items(), key=lambda x: x[1], reverse=True)[:n]
 
-class PercentDiscount:
-    def __init__(self, percent: int) -> None:
-        if not 0 <= percent <= 100:
-            raise ValueError('percent must be 0..100')
-        self.percent = percent
+# 데이터는 dataclass, 처리는 함수형
+records = [
+    SalesRecord("Seoul", "Book A", 50000),
+    SalesRecord("Seoul", "Book B", 30000),
+    SalesRecord("Busan", "Book A", 70000),
+    SalesRecord("Seoul", "Book C", 20000, is_refund=True),
+]
 
-    def apply(self, amount: int) -> int:
-        return int(amount * (100 - self.percent) / 100)
-
-class Invoice:
-    def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
-        self.items = items
-        self.policy = policy
-
-    def total(self) -> int:
-        base = sum(i.subtotal() for i in self.items)
-        return self.policy.apply(base)
+valid = exclude_refunds(records)
+grouped = group_by_region(valid)
+print(top_regions(grouped))  # [('Busan', 70000), ('Seoul', 80000)]
 ```
 
-이 코드는 할인 규칙이 바뀌어도 `Invoice.total()`을 수정할 필요가 없습니다. 확장은 구현 클래스 추가로 닫히고, 핵심 흐름은 안정적으로 유지됩니다.
+## 현업 개발자는 이렇게 생각합니다
 
-## UML 스타일로 보는 협력 관계
+OOP의 목적은 클래스를 많이 만드는 게 아니라, 변경 비용을 낮추는 것입니다. 상태와 행위가 함께 변경되는 경우에는 클래스가 강력합니다. 하지만 데이터를 읽어서 변환하고 반환하는 파이프라인에서는 순수 함수가 더 단순하고 테스트하기 쉽습니다.
 
-```text
-[Invoice]
-  - items: list[LineItem]
-  - policy: DiscountPolicy
-  + total()
+"클래스를 써야 하나?"를 자문할 때 가장 좋은 기준은 다음입니다. 이 코드에 수명주기가 있는가? 생성과 소멸 사이에 상태가 유의미하게 변화하는가? 그렇다면 클래스입니다. 입력을 받아 출력을 반환하는 변환이라면 함수로 충분합니다.
 
-[LineItem]
-  + subtotal()
+## 운영 체크리스트
 
-[DiscountPolicy] <<interface>>
-  + apply(amount)
-      ^
-      +-- [NoDiscount]
-      +-- [PercentDiscount]
-```
+- [ ] OOP 과잉 설계의 신호를 인식할 수 있다
+- [ ] 순수 함수로 데이터 처리 파이프라인을 구성할 수 있다
+- [ ] `dataclass`와 `TypedDict`를 상황에 맞게 선택할 수 있다
+- [ ] callable 클래스를 적절하게 활용할 수 있다
+- [ ] OOP와 함수형을 상황에 맞게 조합할 수 있다
 
-협력 구조를 이렇게 텍스트로 적어 두면 코드 리뷰에서 "어디가 정책 축이고 어디가 도메인 축인가"를 빠르게 맞출 수 있습니다.
+## 연습 문제
 
-## 안티패턴과 교정 절차
+1. 파일 처리 유틸리티가 모두 정적 메서드만 있는 클래스로 구현되어 있습니다. 모듈 수준 함수로 리팩터링하고, 차이를 설명하세요.
+2. 사용자 데이터 변환 파이프라인을 `compose` 함수로 구성하세요. 빈 이름 제거, 이메일 소문자화, 나이 검증 세 단계를 순수 함수로 만들고 조합합니다.
+3. `EventCounter` callable 클래스를 만드세요. `max_per_window`와 `window_seconds` 설정으로 시간 창 안의 이벤트 수를 제한합니다.
 
-| 안티패턴 | 발견 신호 | 교정 순서 |
-|---|---|---|
-| 거대 클래스(God Object) | 메서드가 20개 이상, 변경 이력이 분산됨 | 책임 축 분해 → 협력 인터페이스 도출 |
-| 데이터만 가진 빈 클래스 | 메서드 없이 getter/setter만 존재 | 규칙 메서드 이동 또는 dataclass로 단순화 |
-| 상속 트리 우회 분기 | 하위 클래스 타입 체크 분기 존재 | 다형성 계약 재정의 |
-| 인프라 타입 누수 | 도메인 계층이 SDK 응답 객체 의존 | DTO 변환 계층 추가 |
+## 정리 및 다음 단계
 
-## 전후 비교: 테스트 유지비
+OOP는 도구입니다. 상태와 행위가 함께 변경되는 곳에서 클래스가 빛을 발합니다. 데이터 변환, 유틸리티 함수, 단순 컨테이너에서는 함수형 접근과 `dataclass`가 더 단순하고 테스트하기 쉽습니다.
 
-| 항목 | 리팩터링 전 | 리팩터링 후 |
-|---|---|---|
-| 테스트 준비 | 전역 상태 초기화 필요 | 객체 단위 상태 생성 |
-| 실패 원인 추적 | 함수 체인 전체 역추적 | 클래스 메서드 단위 추적 |
-| 회귀 범위 | 넓고 불명확 | 좁고 예측 가능 |
-
-## 팀 적용 체크리스트
-
-- 도메인 용어와 클래스 이름이 일치하는지 확인합니다.
-- 인스턴스 생성 시점에 불변식이 완성되는지 확인합니다.
-- 정책 변경이 기존 코드 수정이 아닌 구현 추가로 가능한지 점검합니다.
-- 코드 리뷰에서 UML 텍스트 10줄로 협력 구조를 먼저 합의합니다.
-- 테스트 이름이 메서드명보다 비즈니스 규칙을 설명하는지 확인합니다.
-
-## 미니 케이스 스터디: 규칙 추가 한 번으로 검증하기
-
-아래 예시는 정책 확장을 기존 코드 수정 없이 추가하는 최소 단위입니다.
-
-```python
-class WeekendPolicy:
-    def apply(self, amount: int, is_weekend: bool) -> int:
-        if is_weekend:
-            return int(amount * 0.95)
-        return amount
-
-def estimate(amount: int, is_weekend: bool) -> int:
-    policy = WeekendPolicy()
-    return policy.apply(amount, is_weekend)
-```
-
-핵심은 새로운 정책이 호출 경로를 깨지 않고 들어온다는 사실입니다. 변경 이력이 정책 클래스에만 남도록 경계를 유지하면 회귀 위험이 줄어듭니다.
-
-| 확인 질문 | Pass 기준 |
-|---|---|
-| 새 정책 추가 시 기존 함수 수정이 필요한가 | 아니오 |
-| 예외 정책이 기존 계약과 같은가 | 예 |
-| 테스트가 정책별로 분리되어 있는가 | 예 |
-
-## 검증 노트: 객체 설계 품질을 점검하는 질문
-
-아래 질문은 구현 이후 리뷰에서 반복적으로 사용하는 기준입니다.
-
-- 이 메서드가 실패할 때 예외 타입과 메시지가 호출자 계약과 일치하는가.
-- 같은 규칙이 다른 클래스나 함수에 중복되어 있지 않은가.
-- 상태 변경이 메서드 한 경로로만 이루어지는가.
-- 외부 의존성 없이 단위 테스트가 가능한가.
-
-```python
-def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
-    if duplicate_rules > 0:
-        return '중복 규칙 제거 필요'
-    if mutable_paths > 1:
-        return '상태 변경 경로 통합 필요'
-    return '구조 안정'
-```
-
-이런 체크를 글 단위 예제에도 적용하면, 객체지향을 문법이 아니라 유지보수 전략으로 이해하는 데 도움이 됩니다.
-
-## 처음 질문으로 돌아가기
-
-- **어떤 신호가 보이면 클래스 기반 설계가 대부분 의식적인 장식에 가깝다고 판단할 수 있을까요?**
-  - 주간 캠페인 리포트를 만드는 팀이 모든 단계를 각각 클래스로 감쌌다고 가정해 보겠습니다.
-- **어떤 종류의 클래스가 함수, `dataclass`, `NamedTuple`, `TypedDict`로 더 잘 바뀔까요?**
-  - 현업 개발자는 클래스가 나빠서 클래스를 피하지 않습니다
-- **전략 클래스 전체 대신 콜백 하나면 충분한 순간은 언제일까요?**
-  - 주간 캠페인 리포트를 만드는 팀이 모든 단계를 각각 클래스로 감쌌다고 가정해 보겠습니다.
+이 시리즈를 통해 배운 OOP 원칙들은 클래스를 쓸 때 더 잘 쓰기 위한 기초입니다. 다음 단계로는 Python의 함수형 프로그래밍 패턴, 디자인 패턴, 또는 Domain-Driven Design을 공부하면 이 기초가 더 풍부해집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -597,16 +382,16 @@ def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
 - [Object-Oriented Programming 101 (7/10): 합성과 상속](./07-composition-vs-inheritance.md)
 - [Object-Oriented Programming 101 (8/10): SOLID 원칙 기초](./08-solid-principles.md)
 - [Object-Oriented Programming 101 (9/10): 객체지향 설계 예제](./09-oop-design-example.md)
-- **객체지향을 언제 피해야 할까? (현재 글)**
+- **Object-Oriented Programming 101 (10/10): 객체지향을 언제 피해야 할까? (현재 글)**
 
 <!-- toc:end -->
 
 ## 참고 자료
 
-- [Python 공식 문서 — dataclasses](https://docs.python.org/3/library/dataclasses.html)
-- [Python 공식 문서 — typing.NamedTuple / TypedDict / Callable](https://docs.python.org/3/library/typing.html)
-- [Python 공식 문서 — functools](https://docs.python.org/3/library/functools.html)
-- [Stop Writing Classes — PyCon Talk by Jack Diederich](https://www.youtube.com/watch?v=o9pEzgHorH0)
+- [Python dataclasses 공식 문서](https://docs.python.org/3/library/dataclasses.html)
+- [Python typing 공식 문서](https://docs.python.org/3/library/typing.html)
+- [Python functools 공식 문서](https://docs.python.org/3/library/functools.html)
+- [PyCon 2012 — Stop Writing Classes (Jack Diederich)](https://www.youtube.com/watch?v=o9pEzgHorH0)
 
 - [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/oop-101/ko)
 Tags: Python, OOP, 함수형 프로그래밍, dataclass, 설계 판단

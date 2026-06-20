@@ -3,470 +3,571 @@ title: "AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하
 series: ai-evaluation-101
 episode: 4
 language: ko
-status: published
-published_to:
-  tistory:
-    url: "https://yeongseonchoe.tistory.com/119"
-    published_at: '2026-05-18'
+status: publish-ready
 targets:
-  tistory: true
-  medium: false
-  mkdocs: true
-  ebook: true
+  - tistory
+  - github
 tags:
-- AI Evaluation
-- LLM-as-Judge
-- Bias
-- Cohen Kappa
-last_reviewed: '2026-05-12'
-seo_description: 사람이 모든 응답을 평가할 수 없을 때, 강력한 LLM에게 채점을 맡기는 방법이 LLM-as-judge입니다.
+  - LLM평가
+  - LLM-as-Judge
+  - AI품질관리
+  - 프롬프트엔지니어링
+  - MLOps
+seo_description: "LLM-as-Judge 패턴의 3가지 방식(pointwise, pairwise, reference-based)과 위치·길이·자기선호 편향을 실전 코드로 완전 정복합니다."
+last_reviewed: '2026-06-20'
 ---
 
 # AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기
 
-자유 형식 답변을 평가하려고 하면 곧 한계가 드러납니다. BLEU와 ROUGE로는 의미가 맞는 답을 지나치게 깎고, 사람에게 전부 채점시키기에는 비용과 시간이 감당되지 않습니다. 이 사이를 메우는 대표적인 방법이 LLM-as-Judge입니다.
+> **시리즈 안내:** 이 글은 *AI Evaluation 101* 시리즈의 네 번째 글입니다. 앞선 글에서 결정론적 메트릭(Exact Match, ROUGE)을 다뤘습니다. 이번에는 사람이 작성한 정답이 없어도 품질을 측정할 수 있는 **LLM-as-Judge** 패턴을 다룹니다.
 
-이 글은 AI Evaluation 101 시리즈의 4번째 글입니다.
+![LLM-as-Judge 개념도](../images/04-llm-as-judge.png)
+*그림: 채점자 LLM이 생성 모델의 출력을 평가하는 구조. 좌측이 피평가 모델, 우측이 Judge 모델.*
 
-하지만 여기서 가장 흔한 오해는 강한 모델에게 점수만 시키면 곧바로 신뢰할 수 있다고 믿는 것입니다. 실제로는 judge 프롬프트, 위치 편향, 길이 편향, 자기 모델 선호 편향을 어떻게 통제하느냐가 결과를 크게 바꿉니다.
+사람이 매번 응답을 검토하면 정밀하지만 비용과 시간이 너무 많이 듭니다. 정해진 정답(reference)이 없는 창작, 요약, 상담 응답을 ROUGE나 Exact Match로 측정하면 실제 품질과 상관관계가 낮습니다. **LLM-as-Judge**는 GPT-4나 Claude 같은 강력한 모델을 채점자로 사용해 이 공백을 메웁니다. 단, 채점자 모델도 편향을 갖고 있으므로 그 편향을 이해하고 설계해야 합니다.
 
-현업에서 저는 LLM judge를 붙인 뒤 오히려 더 자신 있게 잘못된 결론을 내리는 팀도 봤습니다. 사람 기준선 없이 judge 점수만 높다고 배포를 밀어붙였기 때문입니다. 반대로 프롬프트를 몇 차례 다듬고 사람과의 일치도를 재보는 팀은 놀랄 만큼 빠르게 품질 판단 속도를 끌어올립니다.
-
-여기서는 judge 프롬프트를 어떻게 쓰고, 어떤 편향을 통제하고, 사람 채점과 어느 정도 일치해야 실무에서 믿고 쓸 수 있는지 정리하겠습니다.
-
-![LLM-as-Judge - 모델로 모델을 평가하기](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.ko.png)
-*LLM-as-Judge - 모델로 모델을 평가하기*
-> LLM judge는 강력하지만, 기준선과 편향 통제 없이 쓰면 평가 자동화가 아니라 자동화된 착각이 됩니다.
+---
 
 ## 이 글에서 다룰 문제
 
-- LLM-as-Judge는 언제 사람이 매번 평가하기 어려운 품질 판단을 도와줄까요?
-- judge prompt와 rubric이 없으면 자동 채점기는 어떤 편향에 흔들릴까요?
-- 사람 기준선과 agreement를 어떻게 붙여야 judge 결과를 믿을 수 있을까요?
-- 이 개념을 실무에서 잘못 적용하면 어떤 문제가 생길까요?
-- 이 주제에서 초보자가 가장 자주 놓치는 포인트는 무엇일까요?
+1. LLM-as-Judge는 언제 쓰고 언제 피해야 하는가?
+2. Pointwise, Pairwise, Reference-based 방식의 차이는 무엇인가?
+3. 위치 편향·길이 편향·자기선호 편향을 어떻게 측정하고 완화하는가?
+4. Judge 프롬프트를 어떻게 설계해야 안정적인 점수가 나오는가?
+5. Human Agreement Rate로 Judge 신뢰도를 어떻게 검증하는가?
 
-## 왜 이 글이 중요한가
+---
 
-LLM judge를 제대로 설계하면 수천 건 규모의 자유 형식 응답도 실무 속도로 채점할 수 있습니다. 특히 모델 비교나 프롬프트 A/B 실험처럼 상대 평가가 필요한 상황에서는 사람보다 훨씬 빠른 피드백 루프를 만들 수 있습니다.
+## 핵심 개념 한 줄 정리
 
-반면 설계를 잘못하면 편향이 그대로 자동화됩니다. 첫 번째 답을 더 자주 고르는 judge, 긴 답을 더 좋게 보는 judge, 자기 계열 모델을 편애하는 judge는 팀을 조용히 오판으로 이끕니다.
+| 개념 | 설명 |
+|------|------|
+| **Pointwise** | 응답 하나를 절대 기준으로 1-5점 채점 |
+| **Pairwise** | 두 응답을 나란히 놓고 승패 비교 |
+| **Reference-based** | 정답 예시와 비교해 유사도·정확도 채점 |
+| **위치 편향** | Judge가 프롬프트에서 먼저 나온 응답에 유리하게 채점하는 현상 |
+| **길이 편향** | 더 긴 응답을 더 좋은 응답으로 착각하는 현상 |
+| **자기선호 편향** | 같은 회사 모델의 출력을 높이 평가하는 현상 |
+| **Human Agreement Rate** | Judge 점수와 사람 레이블의 일치율 (목표 ≥ 85%) |
 
-그래서 이 글의 핵심은 'judge를 쓸까 말까'가 아니라 'judge를 운영 가능한 평가자로 만들려면 무엇을 검증해야 하나'입니다. 사람 기준선과 편향 통제 없이 judge를 쓰는 것은 자동화가 아니라 자동 착시에 가깝습니다.
+---
 
-## 핵심 관점
+## Judge 방식 비교
 
-이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다. LLM judge를 제대로 설계하면 수천 건 규모의 자유 형식 응답도 실무 속도로 채점할 수 있습니다. 특히 모델 비교나 프롬프트 A/B 실험처럼 상대 평가가 필요한 상황에서는 사람보다 훨씬 빠른 피드백 루프를 만들 수 있습니다.
+| 구분 | Pointwise | Pairwise | Reference-based |
+|------|-----------|----------|-----------------|
+| **정답 필요?** | 불필요 | 불필요 | 필요 |
+| **속도** | 빠름 | 느림 (2배 호출) | 빠름 |
+| **편향 위험** | 기준 모호성 | 위치 편향 강함 | 정답 품질에 의존 |
+| **적합 용도** | 절대 품질 트래킹 | 모델 A vs B 비교 | QA, 사실 확인 |
+| **점수 안정성** | 중간 | 낮음 (순서 swap 필요) | 높음 |
 
-> LLM judge는 사람을 완전히 대체하지 않습니다. 다만 사람이 다 볼 수 없는 규모에서, 명확한 프롬프트와 사람 기준선이 있을 때 일관된 1차 판정자로 매우 강력하게 작동합니다.
+---
 
-이 관점을 먼저 잡아 두면 뒤에 나오는 코드와 지표를 기능 설명이 아니라 운영 설계 관점에서 읽을 수 있습니다. 결국 중요한 것은 수치 이름보다, 그 수치가 어떤 의사결정을 가능하게 하느냐입니다.
+## 1. Pointwise Judge — 절대 채점
 
-## 핵심 개념
+### 프롬프트 설계
 
-LLM-as-Judge - 모델로 모델을 평가하기
-
-### LLM-as-judge가 필요한 이유
-
-![LLM-as-judge가 필요한 이유](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-02-why-llm-as-judge.ko.png)
-
-*LLM-as-judge가 필요한 이유*
-
-Ep3에서 다룬 결정적 지표(BLEU, ROUGE, Exact Match)는 정답이 짧고 명확할 때만 잘 작동합니다. 하지만 실제 LLM 응답은 다음과 같은 경우가 많습니다.
-
-- 정답이 여러 개인 자유 형식 답변 (예: "이 코드를 설명해 줘")
-- 톤, 명확성, 유용성 같은 주관적 품질
-- 사람이 직접 채점하기에는 너무 많은 데이터 (수천~수만 건)
-
-이때 강력한 LLM(GPT-4, Claude Opus 등)에게 채점을 맡기는 방식이 LLM-as-judge입니다. 사람보다 빠르고, 결정적 지표보다 유연합니다.
-
-| 평가 방식 | 속도 | 비용 | 자유 형식 처리 | 일관성 |
-|----------|------|-----|--------------|--------|
-| Human | 느림 | 매우 비쌈 | 우수 | 평가자별 편차 |
-| Deterministic | 매우 빠름 | 거의 무료 | 약함 | 100% 재현 가능 |
-| LLM-as-judge | 빠름 | 중간 | 우수 | 70~90% (prompt 의존) |
-
-### Judge prompt 설계 — 3가지 패턴
-
-![Judge prompt 설계 - 3가지 패턴](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-03-judge-prompt-design-three-patterns.ko.png)
-
-*Judge prompt 설계 - 3가지 패턴*
-
-### 패턴 1: Single scoring (1~5점 척도)
-
-가장 단순한 방식입니다. judge에게 응답 하나를 보여주고 점수를 매기게 합니다.
+Judge 프롬프트의 핵심은 **채점 기준을 숫자 앵커로 명확히 고정**하는 것입니다. "좋은 응답"처럼 모호한 기준을 쓰면 Judge 자체가 할루시네이션합니다.
 
 ```python
-# eval/judge_single.py
+POINTWISE_JUDGE_PROMPT = """\
+당신은 AI 응답 품질을 평가하는 전문 채점자입니다.
+
+## 평가 기준
+아래 루브릭에 따라 1-5점 정수로 채점하세요.
+
+5점: 질문에 완전히 답변하며 사실이 정확하고 간결함
+4점: 질문에 대부분 답변하나 사소한 불완전함이 있음
+3점: 질문에 부분적으로 답변하거나 관련 없는 내용이 포함됨
+2점: 질문에 거의 답변하지 못하거나 오류가 있음
+1점: 질문과 무관하거나 명백히 잘못된 정보를 제공함
+
+## 입력
+질문: {question}
+응답: {answer}
+
+## 출력 형식 (JSON만 출력, 다른 텍스트 금지)
+{{
+  "score": <1-5 정수>,
+  "reason": "<30자 이내 채점 근거>"
+}}
+"""
+```
+
+### 구현: 안정적인 JSON 파싱
+
+```python
+import json
+import re
+from dataclasses import dataclass
 from openai import OpenAI
 
 client = OpenAI()
 
-JUDGE_PROMPT = """You are a strict evaluator. Read the question and answer below and grade on a 1-5 scale.
+@dataclass
+class JudgeResult:
+    score: int
+    reason: str
+    raw_response: str
 
-Question: {question}
-Answer: {answer}
+def pointwise_judge(
+    question: str,
+    answer: str,
+    model: str = "gpt-4o",
+    temperature: float = 0.0,
+) -> JudgeResult:
+    """Pointwise LLM-as-Judge 채점."""
+    prompt = POINTWISE_JUDGE_PROMPT.format(
+        question=question,
+        answer=answer,
+    )
 
-Rubric:
-- 5: Accurate, complete, clear
-- 4: Accurate but missing minor details or slightly ambiguous
-- 3: Partially accurate
-- 2: Mostly inaccurate
-- 1: Completely wrong or off-topic
-
-Write a one-sentence reasoning first, then output only 'Score: N' on the last line.
-"""
-
-def judge_single(question: str, answer: str) -> tuple[int, str]:
     response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[{"role": "user", "content": JUDGE_PROMPT.format(
-            question=question, answer=answer
-        )}],
-        temperature=0,  # reproducibility
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=temperature,  # 재현성을 위해 0으로 고정
+        response_format={"type": "json_object"},  # JSON 모드 강제
     )
-    text = response.choices[0].message.content
-    last_line = text.strip().split("\n")[-1]
-    score = int(last_line.replace("Score:", "").strip())
-    return score, text
 
-if __name__ == "__main__":
-    score, reasoning = judge_single(
-        "What is the difference between list and tuple in Python?",
-        "Lists are mutable and tuples are immutable."
-    )
-    print(f"Score: {score}\nReasoning: {reasoning}")
+    raw = response.choices[0].message.content
+    try:
+        data = json.loads(raw)
+        score = int(data["score"])
+        if not 1 <= score <= 5:
+            raise ValueError(f"점수 범위 초과: {score}")
+        return JudgeResult(score=score, reason=data["reason"], raw_response=raw)
+    except (json.JSONDecodeError, KeyError, ValueError) as e:
+        # 파싱 실패 시 정규식으로 점수 추출
+        match = re.search(r'"score"\s*:\s*(\d)', raw)
+        if match:
+            return JudgeResult(
+                score=int(match.group(1)),
+                reason="파싱 폴백",
+                raw_response=raw,
+            )
+        raise RuntimeError(f"Judge 응답 파싱 실패: {e}\n원문: {raw}")
+
+
+# 사용 예시
+result = pointwise_judge(
+    question="파이썬에서 리스트와 튜플의 차이는?",
+    answer="리스트는 변경 가능하고 튜플은 변경 불가능합니다.",
+)
+print(f"점수: {result.score}/5 — {result.reason}")
+# 출력: 점수: 3/5 — 기본 차이는 맞지만 사용 시나리오 누락
 ```
 
-장점: 단순합니다. 한 응답씩 독립 평가가 가능합니다.
-단점: 점수 인플레이션이 발생합니다. judge가 대부분 4~5점을 줍니다.
+---
 
-### 패턴 2: Pairwise comparison (둘 중 하나)
+## 2. Pairwise Judge — 승패 비교
 
-두 응답을 동시에 보여주고 더 나은 쪽을 고르게 합니다. 모델 A vs 모델 B 비교에 적합합니다.
+Pairwise는 "A가 더 좋다 / B가 더 좋다 / 동등하다" 세 가지로 판정합니다. **위치 편향**이 강하게 나타나므로 반드시 순서를 바꾸어 두 번 호출한 뒤 결과를 집계해야 합니다.
 
 ```python
-# eval/judge_pairwise.py
-PAIRWISE_PROMPT = """Pick the better answer to the question.
+from enum import Enum
+from typing import Optional
 
-Question: {question}
-Answer A: {answer_a}
-Answer B: {answer_b}
+class PairwiseVerdict(str, Enum):
+    A_WINS = "A"
+    B_WINS = "B"
+    TIE = "TIE"
 
-Respond with one of: 'A', 'B', 'Tie'.
-Write a one-sentence reasoning first, then output only 'Verdict: X' on the last line.
+PAIRWISE_PROMPT = """\
+두 AI 응답 중 어느 것이 더 나은지 판정하세요.
+
+질문: {question}
+
+[응답 A]
+{answer_a}
+
+[응답 B]
+{answer_b}
+
+판정 기준: 정확성 > 완전성 > 간결성
+
+JSON으로만 출력:
+{{"winner": "A" | "B" | "TIE", "reason": "<30자 이내>"}}
 """
 
-def judge_pairwise(question: str, answer_a: str, answer_b: str) -> str:
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[{"role": "user", "content": PAIRWISE_PROMPT.format(
-            question=question, answer_a=answer_a, answer_b=answer_b
-        )}],
-        temperature=0,
-    )
-    text = response.choices[0].message.content
-    last_line = text.strip().split("\n")[-1]
-    return last_line.replace("Verdict:", "").strip()
-```
+def pairwise_judge(
+    question: str,
+    answer_a: str,
+    answer_b: str,
+    model: str = "gpt-4o",
+) -> dict:
+    """위치 편향 제거를 위해 순서를 바꿔 두 번 호출."""
 
-장점: 점수 인플레이션이 없습니다. 사람의 직관과 잘 맞습니다.
-단점: 절대 품질을 알 수 없습니다 (둘 다 나빠도 하나는 뽑힘).
+    def _call(q, a, b) -> PairwiseVerdict:
+        prompt = PAIRWISE_PROMPT.format(question=q, answer_a=a, answer_b=b)
+        resp = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.0,
+            response_format={"type": "json_object"},
+        )
+        data = json.loads(resp.choices[0].message.content)
+        return PairwiseVerdict(data["winner"])
 
-### 패턴 3: Reference-based (정답 비교)
+    # 정방향: A=answer_a, B=answer_b
+    verdict_fwd = _call(question, answer_a, answer_b)
+    # 역방향: A=answer_b, B=answer_a (레이블 반전 필요)
+    verdict_rev_raw = _call(question, answer_b, answer_a)
+    verdict_rev = {
+        PairwiseVerdict.A_WINS: PairwiseVerdict.B_WINS,
+        PairwiseVerdict.B_WINS: PairwiseVerdict.A_WINS,
+        PairwiseVerdict.TIE: PairwiseVerdict.TIE,
+    }[verdict_rev_raw]
 
-정답이 있을 때, 응답이 정답과 의미적으로 일치하는지 묻습니다.
+    # 두 결과가 일치하면 확정, 불일치하면 TIE 처리
+    if verdict_fwd == verdict_rev:
+        final = verdict_fwd
+        consistent = True
+    else:
+        final = PairwiseVerdict.TIE
+        consistent = False
 
-```python
-# eval/judge_reference.py
-REFERENCE_PROMPT = """Decide whether the answer is semantically equivalent to the reference.
-
-Question: {question}
-Reference: {reference}
-Answer: {answer}
-
-If the answer covers all the key points of the reference, output 'PASS'. Otherwise 'FAIL'.
-Write a one-sentence reasoning, then output only 'Result: PASS' or 'Result: FAIL' on the last line.
-"""
-```
-
-장점: 정답이 있는 QA 데이터셋에 적합합니다. BLEU/ROUGE보다 의미 비교가 잘 됩니다.
-단점: 정답을 미리 만들어야 합니다.
-
-### Bias 3가지와 통제 방법
-
-![Bias 3가지와 통제 방법](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-04-three-biases-and-how-to-control-them.ko.png)
-
-*Bias 3가지와 통제 방법*
-
-LLM judge는 사람과 다른 방식으로 편향됩니다. 다음 3가지 bias를 알아야 합니다.
-
-### Bias 1: Position bias (위치 편향)
-
-Pairwise 평가에서 judge는 **첫 번째 답변을 더 자주 선택**하는 경향이 있습니다 (GPT-4 기준 약 60% A 선택). 통제 방법은 **순서를 바꿔서 두 번 평가**하는 것입니다.
-
-```python
-# eval/debias_position.py
-def judge_pairwise_debiased(question: str, ans_a: str, ans_b: str) -> str:
-    v1 = judge_pairwise(question, ans_a, ans_b)  # A=ans_a, B=ans_b
-    v2 = judge_pairwise(question, ans_b, ans_a)  # A=ans_b, B=ans_a (swapped)
-
-    # v2에서는 "A"가 실제로 ans_b를 의미하므로 뒤집어서 비교
-    flip = {"A": "B", "B": "A", "Tie": "Tie"}
-    v2_normalized = flip[v2]
-
-    if v1 == v2_normalized:
-        return v1  # consistent
-    return "Tie"  # if order changes the verdict, call it a tie
-```
-
-### Bias 2: Length bias (길이 편향)
-
-긴 답변이 짧고 정확한 답변보다 높게 평가되는 경향이 있습니다. 통제 방법:
-
-- Judge prompt에 명시: "답변 길이는 채점에 영향을 주지 않습니다. 핵심 정보의 정확성만 평가하세요."
-- 길이를 정규화한 추가 metric을 함께 봄 (예: score / log(length))
-
-### Bias 3: Self-preference bias (자기 선호 편향)
-
-GPT-4가 GPT-4 응답을 채점하면, 다른 모델 응답보다 자기 모델 응답을 더 선호합니다. 통제 방법:
-
-- Generator 모델과 judge 모델을 다르게 선택 (예: Claude로 생성, GPT-4로 평가)
-- 가능하면 두 judge로 cross-validation
-
-### 사람과의 일치도 측정 — Cohen's kappa
-
-![사람과의 일치도 측정 - Cohen's kappa](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-05-measuring-agreement-with-humans-cohen-s.ko.png)
-
-*사람과의 일치도 측정 - Cohen's kappa*
-
-Judge가 실제로 믿을 만한지 어떻게 압니까? **사람이 채점한 50~100건과 judge 점수를 비교**해서 일치도를 측정합니다. 단순 정확도(percentage agreement)는 우연히 맞는 경우를 보정하지 못하므로, **Cohen's kappa**를 사용합니다.
-
-```python
-# eval/agreement.py
-from sklearn.metrics import cohen_kappa_score
-
-# 인간 평가자가 50개 샘플을 1-5 척도로 평가
-human_scores  = [5, 4, 3, 5, 2, 4, 5, 3, 4, 5, ...]  # len=50
-judge_scores  = [5, 4, 4, 5, 2, 3, 5, 3, 4, 4, ...]  # len=50
-
-# Cohen's kappa: -1~1 (1=완벽 일치, 0=우연 수준, <0=무작위보다 나쁨)
-kappa = cohen_kappa_score(human_scores, judge_scores, weights="quadratic")
-print(f"Cohen's kappa: {kappa:.3f}")
-
-# 해석 기준 (Landis & Koch, 1977):
-# 0.0-0.2: slight
-# 0.2-0.4: fair
-# 0.4-0.6: moderate
-# 0.6-0.8: substantial
-# 0.8-1.0: almost perfect
-```
-
-**경험적 기준**: kappa 0.6 이상이면 production에서 judge를 신뢰할 수 있습니다. 0.4 미만이면 prompt를 다시 설계해야 합니다.
-
-### 비용 — judge는 공짜가 아닙니다
-
-GPT-4o 기준 judge call 한 번에 약 $0.01~0.03 듭니다. 1만 건 평가 시 $100~300입니다. 비용 관리 전략:
-
-- **CI에서는 샘플링**: 매 PR마다 전체 1만 건이 아닌 100건만 평가
-- **Tier 분리**: 빠른 deterministic metrics → 의심스러운 샘플만 LLM judge로 재평가
-- **Cheaper judge**: 단순 PASS/FAIL은 GPT-4o-mini로 충분 (10x 저렴)
-
-### Judge 프롬프트 템플릿 버전 관리
-
-LLM-as-judge의 재현성을 높이려면 프롬프트를 코드처럼 버전 관리해야 합니다. 특히 rubric 변경, 출력 스키마 변경, 금지 규칙 변경은 결과 분포에 직접 영향을 줍니다.
-
-```yaml
-# eval/judge_prompts/v3.yaml
-name: support-judge-v3
-version: 3
-task: pairwise
-dimensions:
-  - correctness
-  - completeness
-  - policy_compliance
-output_schema:
-  winner: ["A", "B", "Tie"]
-  confidence: float
-  rationale: string
-rules:
-  - "답변 길이는 평가 기준에서 제외합니다."
-  - "정책 위반이 있으면 다른 장점이 있어도 감점합니다."
-```
-
-```python
-import yaml
-
-def load_judge_prompt(path: str) -> dict:
-    with open(path) as f:
-        return yaml.safe_load(f)
-
-prompt_cfg = load_judge_prompt("eval/judge_prompts/v3.yaml")
-assert prompt_cfg["version"] == 3
-```
-
-프롬프트 버전을 명시하면 "모델이 바뀌어서 점수가 흔들렸는지, judge 기준이 바뀌어서 흔들렸는지"를 분리할 수 있습니다.
-
-### 편향 감사 리포트 자동 생성
-
-편향 통제를 수동 체크리스트로만 두면 곧 빠집니다. 아래처럼 주기적으로 position/length/self-preference 신호를 보고서로 출력해 두는 편이 안전합니다.
-
-```python
-from statistics import mean
-
-def bias_audit(verdict_rows: list[dict]) -> dict:
-    # verdict_rows fields:
-    # first_position_wins(bool), long_answer_wins(bool), same_family_preferred(bool)
     return {
-        "position_bias_rate": mean(int(r["first_position_wins"]) for r in verdict_rows),
-        "length_bias_rate": mean(int(r["long_answer_wins"]) for r in verdict_rows),
-        "self_preference_rate": mean(int(r["same_family_preferred"]) for r in verdict_rows),
+        "verdict": final.value,
+        "consistent": consistent,
+        "forward": verdict_fwd.value,
+        "reversed": verdict_rev.value,
     }
 
-report = bias_audit(audit_rows)
-print(report)
+
+# 사용 예시
+result = pairwise_judge(
+    question="머신러닝에서 과적합이란?",
+    answer_a="훈련 데이터에 너무 맞춰져 새 데이터에서 성능이 낮아지는 현상입니다.",
+    answer_b="과적합은 모델 복잡도가 높을 때 발생하며 드롭아웃, 정규화로 방지합니다.",
+)
+print(result)
+# {'verdict': 'B', 'consistent': True, 'forward': 'B', 'reversed': 'B'}
 ```
 
-```text
-운영 기준 예시
-- position_bias_rate > 0.58: swap 평가 강제 및 prompt 재작성
-- length_bias_rate > 0.65: "길이 무관" 규칙 강화
-- self_preference_rate > 0.60: judge 모델 family 교체 검토
-```
+---
 
-### Judge 캘리브레이션 세션 운영법
+## 3. Reference-based Judge — 정답 비교
 
-사람 채점자와 judge가 반복해서 어긋나는 차원은 캘리브레이션 세션으로 기준을 맞춰야 합니다. 이 작업을 빼면 kappa가 장기간 개선되지 않습니다.
-
-```text
-캘리브레이션 60분 템플릿
-1) 불일치 상위 20건 선별
-2) 사람 채점 근거와 judge 근거 나란히 비교
-3) anchor 문장 수정
-4) 금지/우선 규칙 재명시
-5) 동일 20건 재평가 후 kappa 재측정
-```
-
-### LLM-as-judge 출력 스키마 안정화
-
-프롬프트를 잘 써도 구조화 출력이 흔들리면 파이프라인이 자주 깨집니다. 스키마 검증 단계를 추가하면 실패를 조기 차단할 수 있습니다.
+정답 예시(reference)가 있을 때 Judge에게 정답과 비교해 채점하도록 지시합니다. QA 시스템에서 가장 신뢰도 높은 방식입니다.
 
 ```python
-REQUIRED_KEYS = {"winner", "confidence", "reason"}
+REFERENCE_JUDGE_PROMPT = """\
+정답 예시와 비교해 AI 응답의 품질을 채점하세요.
 
-def validate_judge_output(payload: dict) -> bool:
-    if set(payload.keys()) & REQUIRED_KEYS != REQUIRED_KEYS:
-        return False
-    if payload["winner"] not in {"A", "B", "Tie"}:
-        return False
-    if not (0.0 <= float(payload["confidence"]) <= 1.0):
-        return False
-    if len(str(payload["reason"]).strip()) == 0:
-        return False
-    return True
+질문: {question}
+정답 예시: {reference}
+AI 응답: {answer}
+
+채점 기준:
+- 사실 일치도 (0-5): 정답의 핵심 사실을 얼마나 포함하는가
+- 추가 오류 (0-5): 정답에 없는 잘못된 정보가 있는가 (없으면 5점)
+
+JSON으로만 출력:
+{{"factual_match": <0-5>, "no_hallucination": <0-5>, "reason": "<30자>"}}
+"""
+
+def reference_judge(
+    question: str,
+    reference: str,
+    answer: str,
+    model: str = "gpt-4o",
+) -> dict:
+    prompt = REFERENCE_JUDGE_PROMPT.format(
+        question=question,
+        reference=reference,
+        answer=answer,
+    )
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.0,
+        response_format={"type": "json_object"},
+    )
+    data = json.loads(resp.choices[0].message.content)
+    composite = (data["factual_match"] * 0.6 + data["no_hallucination"] * 0.4)
+    data["composite_score"] = round(composite, 2)
+    return data
 ```
 
-이 검증을 넣으면 모델 출력 포맷이 바뀌었을 때 조용한 오작동 대신 즉시 실패로 드러납니다.
+---
 
-또한 스키마 실패율을 별도 메트릭으로 관리하면 judge 파이프라인의 안정성을 장기적으로 추적할 수 있습니다.
+## 4. 편향 측정 및 완화
 
-스키마 실패는 단순 파싱 오류가 아니라 평가 신뢰도 저하 신호이므로, 발생 즉시 원인 모델/프롬프트 버전을 기록해 두는 편이 좋습니다.
+### 위치 편향 측정
 
-작아 보여도 이 기록이 쌓이면 judge 안정화 속도가 크게 빨라집니다.
+```python
+import pandas as pd
 
-누적 기록은 재발 방지에 특히 유효합니다.
+def measure_position_bias(
+    eval_cases: list[dict],
+    model: str = "gpt-4o",
+) -> float:
+    """
+    위치 편향 계수 반환 (0에 가까울수록 편향 없음).
+    eval_cases: [{"question": ..., "answer_a": ..., "answer_b": ...}, ...]
+    """
+    first_wins = 0
+    total = len(eval_cases)
 
-- 세 가지 judge 프롬프트 패턴을 나란히 보시면 어떤 평가 문제를 어떤 인터페이스로 바꿔야 하는지 감이 잡힙니다.
-- `judge_pairwise_debiased` 예제는 위치 편향을 코드로 제어하는 가장 실용적인 방식입니다. 순서를 바꿔 두 번 평가하는 규칙은 이후 A/B 테스트에서도 그대로 이어집니다.
-- Cohen's kappa 예제는 judge를 감으로 믿지 말고 사람과의 합의도로 검증해야 한다는 점을 가장 분명하게 보여 줍니다.
+    for case in eval_cases:
+        fwd = _single_pairwise(case["question"], case["answer_a"], case["answer_b"], model)
+        rev = _single_pairwise(case["question"], case["answer_b"], case["answer_a"], model)
+        # 정방향에서 A가 이기고 역방향에서도 A(=원래 B)가 이기면 위치 편향
+        if fwd == "A" and rev == "A":
+            first_wins += 1
 
-이 세 지점을 먼저 읽고 나면 세부 구현과 지표 해석이 훨씬 빨라집니다. 코드가 길어 보여도 운영 질문은 대개 여기로 다시 돌아옵니다.
+    bias_rate = first_wins / total
+    print(f"위치 편향 비율: {bias_rate:.1%} (기준: < 20%)")
+    return bias_rate
 
-## 어디서 자주 헷갈릴까요?
+def _single_pairwise(question, a, b, model) -> str:
+    prompt = PAIRWISE_PROMPT.format(question=question, answer_a=a, answer_b=b)
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.0,
+        response_format={"type": "json_object"},
+    )
+    return json.loads(resp.choices[0].message.content)["winner"]
+```
 
-### Mistake 1: judge prompt를 한 번 쓰고 끝
+### 길이 편향 측정
 
-Judge prompt는 평가 데이터셋만큼 중요한 자산입니다. 첫 prompt는 거의 항상 부족합니다. **사람 평가자 50건과의 kappa를 측정하면서 prompt를 3~5회 반복 개선**해야 합니다.
+```python
+def measure_length_bias(
+    eval_cases: list[dict],
+    model: str = "gpt-4o",
+) -> float:
+    """
+    Judge가 더 긴 응답을 얼마나 선호하는지 측정.
+    반환값: 긴 응답 선호율 (기준: < 60%)
+    """
+    longer_wins = 0
+    total = len(eval_cases)
 
-### Mistake 2: Position bias를 무시
+    for case in eval_cases:
+        a, b = case["answer_a"], case["answer_b"]
+        result = pairwise_judge(case["question"], a, b, model)
+        winner = result["verdict"]
 
-Pairwise 평가에서 순서를 바꿔보지 않으면 결과의 절반이 위치 편향에서 옵니다. **반드시 양방향으로 평가**하세요.
+        a_longer = len(a) > len(b)
+        if (winner == "A" and a_longer) or (winner == "B" and not a_longer):
+            longer_wins += 1
 
-### Mistake 3: 같은 모델로 생성하고 평가
+    bias_rate = longer_wins / total
+    print(f"길이 편향 비율: {bias_rate:.1%} (기준: < 60%)")
+    return bias_rate
+```
 
-GPT-4로 응답을 생성하고 GPT-4로 채점하면 점수가 부풀려집니다. **다른 family의 모델로 평가**하거나 사람 평가와 cross-check 하세요.
+### 완화 전략 정리
 
-### Mistake 4: temperature를 0으로 설정하지 않음
+```python
+# 전략 1: 길이 제한 지시문 추가
+LENGTH_PENALTY_INSTRUCTION = """
+평가 시 응답 길이는 무시하세요. 짧지만 정확한 응답이 길지만 부정확한 응답보다 낫습니다.
+"""
 
-Judge call에서 temperature가 0이 아니면, 같은 응답을 두 번 채점할 때 점수가 다릅니다. **재현성을 위해 항상 temperature=0**.
+# 전략 2: Chain-of-Thought 채점 (이유 먼저 작성 후 점수)
+COT_JUDGE_SUFFIX = """
+먼저 각 기준에 대한 분석을 작성한 다음, 최종 점수를 JSON으로 출력하세요.
+분석: <여기에 분석 작성>
+JSON: {"score": ..., "reason": ...}
+"""
 
-### Mistake 5: 사람 평가 baseline 없이 judge만 신뢰
+# 전략 3: 앙상블 (여러 Judge 모델 평균)
+def ensemble_judge(question: str, answer: str, judges: list[str]) -> float:
+    scores = []
+    for judge_model in judges:
+        result = pointwise_judge(question, answer, model=judge_model)
+        scores.append(result.score)
+    return sum(scores) / len(scores)
 
-Judge가 90점을 줬다고 좋은 응답이 아닙니다. **production 출시 전 반드시 50~100건을 사람이 직접 채점**하고 judge와의 kappa를 측정하세요.
+# 사용 예시
+avg_score = ensemble_judge(
+    question="HTTP와 HTTPS의 차이는?",
+    answer="HTTPS는 SSL/TLS로 암호화된 HTTP입니다.",
+    judges=["gpt-4o", "gpt-4o-mini"],
+)
+print(f"앙상블 점수: {avg_score:.1f}/5")
+```
 
-현업에서 제가 가장 자주 보는 문제는 결과 숫자만 보고 원인 분해를 건너뛰는 습관입니다. 평가가 개선을 돕지 못하고 보고서용 숫자로만 남는 순간, 팀은 다시 감각에 의존하게 됩니다.
+---
 
-## 첫 번째 운영 체크리스트
+## 5. Human Agreement Rate — Judge 신뢰도 검증
 
-- [ ] judge 프롬프트를 운영 자산으로 보고 버전 관리하는가
-- [ ] pairwise 비교에서 답 순서를 항상 교차시키는가
-- [ ] temperature=0을 기본값으로 고정했는가
-- [ ] 사람이 직접 채점한 50~100건 기준선이 있는가
-- [ ] judge 비용을 샘플링과 계층화로 통제하는가
+Judge를 실제 배포 전에 반드시 사람 레이블과 비교해야 합니다. 목표는 **85% 이상 일치**입니다.
 
-## 실무에서는 이렇게 생각한다
+```python
+from sklearn.metrics import cohen_kappa_score
+import numpy as np
 
-실무에서는 judge 자체보다 judge를 둘러싼 검증 절차가 더 중요합니다. 좋은 팀은 judge 점수를 기능 지표로 쓰기 전에, 사람과 어느 정도 합의하는지부터 확인합니다.
+def compute_human_agreement(
+    human_scores: list[int],
+    judge_scores: list[int],
+    tolerance: int = 1,
+) -> dict:
+    """
+    human_scores: 사람 채점자 점수 리스트
+    judge_scores: LLM Judge 점수 리스트
+    tolerance: 허용 오차 (기본 1점 이내이면 일치로 간주)
+    """
+    assert len(human_scores) == len(judge_scores)
 
-또한 judge와 generator를 같은 계열로 두는 문제를 가볍게 보지 않습니다. 같은 모델 가족이 자기 스타일을 선호하는 경향은 생각보다 눈에 띄게 결과를 흔듭니다.
+    exact_matches = sum(h == j for h, j in zip(human_scores, judge_scores))
+    tolerance_matches = sum(
+        abs(h - j) <= tolerance for h, j in zip(human_scores, judge_scores)
+    )
+    n = len(human_scores)
 
-다음 글의 rubric 기반 채점은 여기서 한 단계 더 나갑니다. 점수 하나로 끝내지 않고 정확성, 완전성, 명확성처럼 차원별 판단을 분리해야 실제 개선 포인트가 보이기 시작합니다.
+    # Cohen's Kappa: 우연 일치를 보정한 일치도
+    kappa = cohen_kappa_score(human_scores, judge_scores)
 
-## 정리: LLM judge는 강력하지만, 사람 기준선과 편향 통제가 붙을 때만 믿을 수 있습니다
+    return {
+        "exact_agreement": exact_matches / n,
+        "tolerance_agreement": tolerance_matches / n,
+        "cohen_kappa": round(kappa, 3),
+        "sample_size": n,
+        "pass": tolerance_matches / n >= 0.85,
+    }
 
-- LLM-as-judge는 자유 형식 응답 평가에 강력합니다. 단, judge prompt 품질이 결과를 좌우합니다.
-- 3가지 패턴: single scoring(단순), pairwise(점수 인플레이션 없음), reference-based(정답 비교).
-- 3가지 bias: position(순서 swap), length(prompt 명시), self-preference(다른 모델 사용)을 통제하세요.
-- Cohen's kappa로 사람과의 일치도를 측정합니다. **0.6 이상이 production 신뢰 기준**입니다.
-- Temperature=0, 비용 관리(샘플링/tier 분리), 사람 평가 baseline은 필수입니다.
 
-이제 단일 점수의 한계를 넘어 차원별 채점으로 가 보겠습니다. 다음 글에서는 rubric을 설계해 무엇이 실제로 망가졌는지를 더 또렷하게 드러내는 방법을 다룹니다.
+# 사용 예시 (50개 케이스 검증)
+human = [4, 3, 5, 2, 4, 3, 5, 5, 2, 3]  # 실제 사람 점수
+judge = [4, 3, 5, 3, 4, 3, 4, 5, 2, 3]  # LLM Judge 점수
+
+result = compute_human_agreement(human, judge)
+print(result)
+# {
+#   'exact_agreement': 0.8,
+#   'tolerance_agreement': 0.9,
+#   'cohen_kappa': 0.743,
+#   'sample_size': 10,
+#   'pass': True
+# }
+
+if not result["pass"]:
+    print("경고: Judge 신뢰도 부족. 프롬프트 재설계 필요.")
+```
+
+---
+
+## 6. 실전 Judge 파이프라인
+
+```python
+import asyncio
+from dataclasses import dataclass, field
+
+@dataclass
+class EvalCase:
+    question: str
+    answer: str
+    reference: str | None = None
+    judge_score: int | None = None
+    judge_reason: str | None = None
+
+async def run_judge_pipeline(
+    cases: list[EvalCase],
+    judge_model: str = "gpt-4o",
+    concurrency: int = 5,
+) -> list[EvalCase]:
+    """비동기 Judge 파이프라인 (동시 5개 호출)."""
+    sem = asyncio.Semaphore(concurrency)
+
+    async def _judge_one(case: EvalCase) -> EvalCase:
+        async with sem:
+            result = pointwise_judge(case.question, case.answer, model=judge_model)
+            case.judge_score = result.score
+            case.judge_reason = result.reason
+            return case
+
+    return await asyncio.gather(*[_judge_one(c) for c in cases])
+
+
+async def main():
+    cases = [
+        EvalCase(question="파이썬 GIL이란?", answer="글로벌 인터프리터 락으로 멀티스레딩을 제한합니다."),
+        EvalCase(question="REST API란?", answer="HTTP 기반 무상태 인터페이스 설계 원칙입니다."),
+        EvalCase(question="SQL JOIN 종류는?", answer="INNER, LEFT, RIGHT, FULL OUTER JOIN이 있습니다."),
+    ]
+
+    results = await run_judge_pipeline(cases)
+
+    for r in results:
+        print(f"[{r.judge_score}/5] {r.question[:20]}... — {r.judge_reason}")
+        # [4/5] 파이썬 GIL이란?... — 핵심 정의 맞으나 예시 부재
+        # [5/5] REST API란?... — 정확하고 간결함
+        # [5/5] SQL JOIN 종류는?... — 모든 종류 포함
+
+asyncio.run(main())
+```
+
+---
 
 ## 운영 체크리스트
 
-- [ ] judge 패턴을 평가 목적에 맞게 single, pairwise, reference-based로 나누기
-- [ ] 위치 편향 통제를 pairwise 코드에 기본 내장하기
-- [ ] 사람 채점과의 kappa를 정기적으로 다시 측정하기
-- [ ] judge 비용이 serving 비용을 잠식하지 않도록 샘플링하기
-- [ ] judge 점수만으로 배포 결정을 내리지 않기
+- [ ] Judge 프롬프트에 숫자 앵커(각 점수별 설명) 포함
+- [ ] Temperature = 0.0으로 고정해 재현성 확보
+- [ ] JSON 모드 강제 (`response_format={"type": "json_object"}`)
+- [ ] Pairwise 사용 시 순서 swap 두 번 호출
+- [ ] 위치 편향 비율 < 20% 검증
+- [ ] 길이 편향 비율 < 60% 검증
+- [ ] Human Agreement Rate ≥ 85% 달성 후 배포
+- [ ] 앙상블 Judge (2개 이상 모델) 고비용 케이스에 적용
+- [ ] Judge 호출 비용 모니터링 (token/case × 케이스 수)
+
+---
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 해결책 |
+|------|------|--------|
+| Judge 프롬프트에 앵커 없음 | 같은 응답에 매번 다른 점수 | 각 점수별 구체적 기준 문장 추가 |
+| Temperature > 0 사용 | 점수 분산이 커서 신뢰 불가 | `temperature=0.0` 고정 |
+| Pairwise를 한 방향만 호출 | 위치 편향 결과를 신뢰함 | 순서 swap 두 번 호출 필수 |
+| JSON 파싱 에러 무시 | 잘못된 점수가 DB에 저장됨 | 파싱 실패 시 예외 처리 + 재시도 |
+| Human Agreement 검증 생략 | 엉터리 Judge를 배포에 사용 | 최소 50개 케이스로 반드시 검증 |
+| 자기 회사 모델을 Judge로 사용 | 자기선호 편향으로 점수 과장 | 서로 다른 벤더 모델 사용 권장 |
+| Judge 비용 예측 없이 배포 | 월 수십만 원 청구 폭탄 | 케이스 수 × 토큰 × 단가 사전 계산 |
+
+---
 
 ## 처음 질문으로 돌아가기
 
-- **LLM-as-Judge는 언제 사람이 매번 평가하기 어려운 품질 판단을 도와줄까요?**
-  - LLM-as-Judge - 모델로 모델을 평가하기 Ep3에서 다룬 결정적 지표(BLEU, ROUGE, Exact Match)는 정답이 짧고 명확할 때만 잘 작동합니다
-- **judge prompt와 rubric이 없으면 자동 채점기는 어떤 편향에 흔들릴까요?**
-  - 이제 단일 점수의 한계를 넘어 차원별 채점으로 가 보겠습니다. 다음 글에서는 rubric을 설계해 무엇이 실제로 망가졌는지를 더 또렷하게 드러내는 방법을 다룹니다.
-- **사람 기준선과 agreement를 어떻게 붙여야 judge 결과를 믿을 수 있을까요?**
-  - 이제 단일 점수의 한계를 넘어 차원별 채점으로 가 보겠습니다. 다음 글에서는 rubric을 설계해 무엇이 실제로 망가졌는지를 더 또렷하게 드러내는 방법을 다룹니다.
-  - LLM judge를 제대로 설계하면 수천 건 규모의 자유 형식 응답도 실무 속도로 채점할 수 있습니다. 특히 모델 비교나 프롬프트 A/B 실험처럼 상대 평가가 필요한 상황에서는 사람보다 훨씬 빠른 피드백 루프를 만들 수 있습니다.
+**Q1. LLM-as-Judge는 언제 쓰고 언제 피해야 하는가?**
+정답이 하나로 정해지지 않는 생성 작업(창작, 요약, 상담)에는 LLM-as-Judge가 효과적입니다. 반면 사실 확인처럼 정답이 명확할 때는 Exact Match나 Reference-based 방식이 더 저렴하고 신뢰도가 높습니다.
 
+**Q2. Pointwise, Pairwise, Reference-based 방식의 차이는?**
+Pointwise는 절대 품질을 빠르게 추적할 때, Pairwise는 두 모델을 직접 비교할 때, Reference-based는 정답 데이터셋이 있는 QA 시스템에 씁니다. 비용 대비 효과는 Pointwise > Reference-based > Pairwise 순입니다.
+
+**Q3. 편향을 어떻게 측정하고 완화하는가?**
+위치 편향은 순서 swap 두 번 호출로 측정하고, 불일치 시 TIE 처리합니다. 길이 편향은 Judge 프롬프트에 "길이 무시" 지시를 추가합니다. 자기선호 편향은 서로 다른 벤더 모델 앙상블로 완화합니다.
+
+**Q4. Judge 프롬프트는 어떻게 설계해야 하는가?**
+각 점수(1-5)에 구체적 기준 문장을 달고, JSON 출력 모드를 강제하며, Temperature를 0으로 고정합니다. "좋다/나쁘다"처럼 모호한 기준 대신 "질문에 완전히 답변하며 사실이 정확하다"처럼 행동 기반으로 서술합니다.
+
+**Q5. Human Agreement Rate로 어떻게 신뢰도를 검증하는가?**
+최소 50개 케이스를 사람이 먼저 채점한 뒤 Judge 결과와 비교합니다. 1점 오차 허용 일치율 ≥ 85%가 배포 기준이며, Cohen's Kappa ≥ 0.6이면 중간 수준의 일치도로 수용 가능합니다.
+
+---
+
+<!-- toc:begin -->
+## 목차
+1. [Judge 방식 비교](#judge-방식-비교)
+2. [Pointwise Judge](#1-pointwise-judge--절대-채점)
+3. [Pairwise Judge](#2-pairwise-judge--승패-비교)
+4. [Reference-based Judge](#3-reference-based-judge--정답-비교)
+5. [편향 측정 및 완화](#4-편향-측정-및-완화)
+6. [Human Agreement Rate](#5-human-agreement-rate--judge-신뢰도-검증)
+7. [실전 Judge 파이프라인](#6-실전-judge-파이프라인)
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 
-### 공식 문서
-
-- [Zheng et al. (2023). Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena (NeurIPS)](https://arxiv.org/abs/2306.05685)
-- [Anthropic — Evaluating Claude (judge prompting guide)](https://docs.anthropic.com/en/docs/build-with-claude/develop-tests)
-- [OpenAI Evals — model-graded evaluations](https://github.com/openai/evals/blob/main/docs/eval-templates.md)
-- [scikit-learn — Cohen's kappa score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.cohen_kappa_score.html)
-
-### 관련 시리즈
-
-- [이전 글 — 결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- [다음 글 — Rubric 기반 채점 설계](./05-rubric-based-scoring.md)
-- [시리즈 현재 위치 다시 보기](./04-llm-as-judge.md)
-
-- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-evaluation-101/ko/04-llm-as-judge)
-
-Tags: AI Evaluation, LLM-as-Judge, Bias, Cohen Kappa
+- Zheng et al. (2023). *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena*. arXiv:2306.05685
+- Pangakis et al. (2023). *Automated Annotation with Generative AI Requires Validation*. arXiv:2306.00176
+- OpenAI. *GPT-4 System Card* — 자기선호 편향 관련 섹션
+- LangChain Docs. [LLM-as-Judge Evaluators](https://docs.langchain.com/docs/guides/evaluation/string/criteria_eval_chain)
+- LMSYS Chatbot Arena. [Bradley-Terry 모델 기반 Elo 랭킹](https://chat.lmsys.org/)

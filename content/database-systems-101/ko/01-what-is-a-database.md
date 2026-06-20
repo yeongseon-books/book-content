@@ -265,6 +265,42 @@ COMMIT;
 -- COMMIT이 반환된 순간 WAL에 기록되어 내구성 보장
 ```
 
+## DBMS 유형별 강점 비교
+
+모든 문제에 같은 DBMS를 쓸 필요는 없습니다. 각 유형의 강점을 파악하면 선택 기준이 명확해집니다.
+
+```sql
+-- 관계형 DBMS: 복잡한 JOIN과 트랜잭션 (PostgreSQL, MySQL)
+SELECT o.id, u.email, sum(oi.price * oi.qty) AS total
+FROM orders o
+JOIN users u ON u.id = o.user_id
+JOIN order_items oi ON oi.order_id = o.id
+WHERE o.status = 'PAID'
+GROUP BY o.id, u.email;
+```
+
+```python
+# 문서형 DB: 스키마 없는 유연한 구조 (MongoDB 유사 패턴)
+# 모든 속성이 다른 제품 목록을 하나의 컬렉션에 저장
+products = [
+    {"type": "book", "title": "DDIA", "pages": 600, "isbn": "..."},
+    {"type": "shirt", "size": "M", "color": "blue", "material": "cotton"},
+]
+```
+
+```python
+# 키-값 저장: 세션, 캐시 (Redis 유사 패턴)
+# SET session:user42 '{"cart": [1, 2, 3]}' EX 3600
+# GET session:user42
+```
+
+| 유형 | 강점 | 약점 | 대표 예 |
+|------|------|------|---------|
+| 관계형 | JOIN, 트랜잭션, 무결성 | 수평 확장 어려움 | PostgreSQL, MySQL |
+| 문서형 | 유연한 스키마, 중첩 구조 | 복잡한 JOIN 불편 | MongoDB, Firestore |
+| 키-값 | 초고속 단일 키 조회 | 범위 조회 제한 | Redis, DynamoDB |
+| 컬럼형 | 대규모 집계, 분석 | 단일 행 쓰기 느림 | BigQuery, ClickHouse |
+
 ## EXPLAIN으로 질의 처리 내부 들여다보기
 
 ```sql
@@ -287,6 +323,26 @@ CREATE INDEX idx_users_email ON users(email);
 ```
 
 이 한 줄 출력만으로도 세 가지를 판단할 수 있습니다. 첫째, 인덱스를 타는지, 둘째, 예상 행 수와 실제 행 수가 크게 어긋나는지, 셋째, 계획 수립 시간 대비 실행 시간이 비정상적으로 큰지입니다.
+
+## 마이그레이션을 코드처럼 다루기
+
+스키마 변경을 애드혹으로 하면 환경 간 불일치가 쌓입니다. 마이그레이션 파일을 코드 저장소와 함께 관리하는 것이 기본입니다.
+
+```sql
+-- migrations/0001_create_products.sql
+CREATE TABLE products (
+    id         BIGSERIAL PRIMARY KEY,
+    name       TEXT NOT NULL,
+    price      NUMERIC(10,2) NOT NULL CHECK (price >= 0),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- migrations/0002_add_sku_to_products.sql
+ALTER TABLE products ADD COLUMN sku TEXT UNIQUE;
+CREATE INDEX idx_products_sku ON products(sku);
+```
+
+각 마이그레이션은 번호 순서로 실행되어야 하고, 어떤 환경에서도 같은 결과를 낳아야 합니다. Flyway, Liquibase, Alembic 같은 도구가 이 실행 순서를 추적하는 테이블을 자동으로 관리합니다.
 
 ## 자주 하는 실수
 

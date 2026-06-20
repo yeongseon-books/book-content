@@ -241,6 +241,74 @@ assert search_rotated([4, 5, 6, 7, 0, 1, 2], 0) == 4
 assert search_rotated([4, 5, 6, 7, 0, 1, 2], 3) == -1
 ```
 
+## 심화: 이진 탐색 버그 패턴과 방어법
+
+이진 탐색은 구현이 쉬워 보이지만 실제로 버그가 많습니다. 대표적인 버그 4가지와 방어법을 정리합니다.
+
+```python
+# 버그 1: lo <= hi 대신 lo < hi 사용 → 요소 하나를 놓침
+def buggy_search_1(arr, target):
+    lo, hi = 0, len(arr) - 1
+    while lo < hi:    # 버그: lo == hi 일 때 검사 안 함
+        mid = (lo + hi) // 2
+        if arr[mid] == target:
+            return mid
+        if arr[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1  # arr[lo]가 target일 수도 있는데 놓침
+
+# 버그 2: hi = mid 대신 hi = mid - 1 → 무한 루프 (lower_bound 패턴에서)
+def buggy_lower_bound(arr, target):
+    lo, hi = 0, len(arr)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if arr[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1  # 버그: hi = mid 여야 함
+    return lo
+
+# 버그 3: mid 계산 시 오버플로우 (Python은 안전하지만 C/Java는 위험)
+def safe_mid(lo, hi):
+    return lo + (hi - lo) // 2   # 안전
+    # return (lo + hi) // 2      # C에서는 위험
+
+# 버그 4: 빈 배열 처리 누락
+def robust_binary_search(arr, target):
+    if not arr:    # 명시적 방어
+        return -1
+    lo, hi = 0, len(arr) - 1
+    while lo <= hi:
+        mid = lo + (hi - lo) // 2
+        if arr[mid] == target:
+            return mid
+        if arr[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1
+
+# 검증으로 버그 포착
+assert robust_binary_search([], 5) == -1
+assert robust_binary_search([5], 5) == 0
+assert robust_binary_search([1, 3, 5, 7], 5) == 2
+assert robust_binary_search([1, 3, 5, 7], 6) == -1
+```
+
+**이진 탐색 변형 선택 가이드:**
+
+```text
+"값이 존재하는지"           → bisect_left + 일치 확인
+"첫 번째 등장 위치"         → lower_bound (bisect_left)
+"마지막 등장 위치"          → upper_bound - 1 (bisect_right - 1)
+"삽입 위치 (중복 앞)"       → bisect_left
+"삽입 위치 (중복 뒤)"       → bisect_right
+"범위 내 개수"              → bisect_right(target) - bisect_left(target)
+"최솟값 such that f(x)≥k" → parametric search
+```
+
 ## 탐색 알고리즘 Big-O 비교
 
 | 알고리즘 | 시간 복잡도 | 공간 복잡도 | 전제 조건 | 적합한 상황 |
