@@ -253,6 +253,133 @@ for n in [10, 25, 50, 100, 200, 500]:
 
 일반적으로 100~200 트리에서 성능이 안정됩니다. 그 이상은 학습 시간만 늘고 성능 향상은 미미합니다.
 
+## 앙상블 방법론 비교: Bagging vs Boosting
+
+랜덤 포레스트(Bagging)와 그래디언트 부스팅(Boosting)의 핵심 차이를 코드로 확인합니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import (
+    RandomForestClassifier, GradientBoostingClassifier,
+    BaggingClassifier, AdaBoostClassifier
+)
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import roc_auc_score
+import numpy as np
+
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+models = {
+    "단일 트리(d=5)": DecisionTreeClassifier(max_depth=5, random_state=42),
+    "Bagging(트리 100)": BaggingClassifier(
+        estimator=DecisionTreeClassifier(max_depth=5),
+        n_estimators=100, random_state=42
+    ),
+    "RandomForest(100)": RandomForestClassifier(n_estimators=100, random_state=42),
+    "AdaBoost(100)": AdaBoostClassifier(n_estimators=100, random_state=42, algorithm="SAMME"),
+    "GradientBoosting": GradientBoostingClassifier(n_estimators=100, random_state=42),
+}
+
+print(f"{'모델':>22} {'Train':>8} {'Test':>7} {'AUC':>7} {'CV Mean':>9}")
+for name, m in models.items():
+    m.fit(Xtr, ytr)
+    prob = m.predict_proba(Xte)[:, 1]
+    cv = cross_val_score(m, X, y, cv=5, scoring="roc_auc")
+    print(f"{name:>22} {m.score(Xtr, ytr):>8.4f} {m.score(Xte, yte):>7.4f} "
+          f"{roc_auc_score(yte, prob):>7.4f} {cv.mean():>9.4f}")
+```
+
+Bagging은 독립적인 모델을 병렬로 학습하고 평균냅니다. Boosting은 이전 모델의 오류에 집중해서 순차적으로 학습합니다. 일반적으로 Boosting이 더 강력하지만 과적합에 더 주의해야 합니다.
+
+## 결정 트리 시각화와 규칙 해석
+
+트리를 시각화해서 모델이 실제로 어떤 규칙을 배웠는지 확인합니다.
+
+```python
+from sklearn.datasets import load_iris
+from sklearn.tree import DecisionTreeClassifier, export_text
+from sklearn.model_selection import train_test_split
+
+X, y = load_iris(return_X_y=True)
+feature_names = load_iris().feature_names
+target_names = load_iris().target_names
+
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+tree = DecisionTreeClassifier(max_depth=3, random_state=42).fit(Xtr, ytr)
+
+# 텍스트로 트리 규칙 출력
+print("=== 결정 트리 규칙 (depth=3) ===")
+rules = export_text(tree, feature_names=list(feature_names))
+print(rules)
+
+print(f"\n훈련 정확도: {tree.score(Xtr, ytr):.4f}")
+print(f"테스트 정확도: {tree.score(Xte, yte):.4f}")
+print(f"트리 깊이: {tree.get_depth()}")
+print(f"리프 노드 수: {tree.get_n_leaves()}")
+
+# 피처 중요도
+print("\n피처 중요도:")
+for name, imp in sorted(zip(feature_names, tree.feature_importances_),
+                          key=lambda x: x[1], reverse=True):
+    bar = "█" * int(imp * 30)
+    print(f"  {name:35s}: {imp:.4f} {bar}")
+```
+
+`export_text`로 출력된 규칙은 이해관계자에게 "왜 이렇게 분류했는가"를 설명할 때 직접 사용할 수 있습니다. 깊이가 3 이하인 트리는 사람이 완전히 이해할 수 있습니다.
+
+## 하이퍼파라미터 튜닝: GridSearchCV로 최적 트리 찾기
+
+결정 트리와 랜덤 포레스트의 주요 하이퍼파라미터를 교차검증으로 탐색합니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
+import numpy as np
+
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+# 결정 트리 그리드 탐색
+tree_params = {
+    "max_depth": [2, 3, 4, 5, 7, 10],
+    "min_samples_split": [2, 5, 10],
+    "criterion": ["gini", "entropy"],
+}
+gs_tree = GridSearchCV(
+    DecisionTreeClassifier(random_state=42),
+    tree_params, cv=5, scoring="roc_auc", n_jobs=-1
+)
+gs_tree.fit(Xtr, ytr)
+best_tree_prob = gs_tree.predict_proba(Xte)[:, 1]
+print(f"DecisionTree 최적 파라미터: {gs_tree.best_params_}")
+print(f"DecisionTree CV AUC: {gs_tree.best_score_:.4f}")
+print(f"DecisionTree Test AUC: {roc_auc_score(yte, best_tree_prob):.4f}")
+
+# 랜덤 포레스트 그리드 탐색 (더 좁은 범위)
+rf_params = {
+    "n_estimators": [50, 100, 200],
+    "max_depth": [None, 5, 10],
+    "max_features": ["sqrt", "log2"],
+}
+gs_rf = GridSearchCV(
+    RandomForestClassifier(random_state=42),
+    rf_params, cv=5, scoring="roc_auc", n_jobs=-1
+)
+gs_rf.fit(Xtr, ytr)
+best_rf_prob = gs_rf.predict_proba(Xte)[:, 1]
+print(f"\nRandomForest 최적 파라미터: {gs_rf.best_params_}")
+print(f"RandomForest CV AUC: {gs_rf.best_score_:.4f}")
+print(f"RandomForest Test AUC: {roc_auc_score(yte, best_rf_prob):.4f}")
+```
+
+그리드 탐색은 지정한 모든 조합을 시험합니다. 파라미터 공간이 크면 `RandomizedSearchCV`로 무작위 샘플링해서 시간을 절약합니다.
+
 ## 연습 문제
 
 1. `max_depth`를 1부터 20까지 바꿔 가며 테스트 점수를 그려 보세요.

@@ -346,6 +346,52 @@ print("  두 숫자는 직접 비교할 수 없습니다 - 목적이 다릅니�
 
 ARI(Adjusted Rand Index)는 군집 품질을 정답 레이블과 비교하는 지표지만, 실제 운영에서는 레이블이 없으므로 탐색 단계에서만 씁니다.
 
+## 피처 엔지니어링과 패러다임 선택의 관계
+
+같은 원시 데이터에서도 어떻게 피처를 만드느냐에 따라 적합한 패러다임이 달라집니다.
+
+```python
+import numpy as np
+from sklearn.datasets import make_blobs
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.cluster import KMeans
+from sklearn.metrics import accuracy_score, silhouette_score
+
+# 원형 클러스터 데이터 생성
+np.random.seed(42)
+X, y = make_blobs(n_samples=300, centers=3, cluster_std=1.5, random_state=42)
+sc = StandardScaler()
+X_scaled = sc.fit_transform(X)
+
+print("=== 패러다임별 성능 비교 (원본 피처) ===")
+
+# 지도학습: 분류
+Xtr, Xte, ytr, yte = train_test_split(X_scaled, y, test_size=0.2, stratify=y, random_state=42)
+clf = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
+print(f"분류 정확도 (원본): {accuracy_score(yte, clf.predict(Xte)):.4f}")
+
+# 비지도학습: 군집
+km = KMeans(n_clusters=3, n_init=10, random_state=42).fit(X_scaled)
+print(f"군집 Silhouette (원본): {silhouette_score(X_scaled, km.labels_):.4f}")
+
+# 다항 피처 추가 후 비교
+poly = PolynomialFeatures(degree=2, include_bias=False)
+X_poly = poly.fit_transform(X_scaled)
+Xtr_p, Xte_p = train_test_split(X_poly, test_size=0.2, random_state=42)[0:2]
+ytr_p, yte_p = train_test_split(y, test_size=0.2, random_state=42)[0:2]
+
+print("\n=== 다항 피처 추가 후 ===")
+clf_p = LogisticRegression(max_iter=2000).fit(Xtr_p, ytr_p)
+print(f"분류 정확도 (다항): {accuracy_score(yte_p, clf_p.predict(Xte_p)):.4f}")
+km_p = KMeans(n_clusters=3, n_init=10, random_state=42).fit(X_poly)
+print(f"군집 Silhouette (다항): {silhouette_score(X_poly, km_p.labels_):.4f}")
+print(f"원본 피처 수: {X_scaled.shape[1]} → 다항 피처 수: {X_poly.shape[1]}")
+```
+
+피처 엔지니어링은 지도학습과 비지도학습 모두에 영향을 줍니다. 하지만 비지도학습에서는 더 조심해야 합니다 - 피처가 늘면 거리 측정이 더 어려워지기 때문입니다.
+
 ## 연습 문제
 
 1. KMeans로 `iris`를 군집화한 뒤 실제 `y`와 교차표를 만들어 보세요.

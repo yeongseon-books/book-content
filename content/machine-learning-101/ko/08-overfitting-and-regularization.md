@@ -269,6 +269,122 @@ for depth in [1, 2, 3, 4, 5, 7, 10, None]:
 
 얕은 트리는 편향(오차)이 크고 분산(불안정)이 작습니다. 깊은 트리는 편향이 작지만 분산이 커집니다. 정규화는 이 사이의 균형점을 찾는 작업입니다.
 
+## GridSearchCV로 정규화 강도 자동 최적화
+
+교차검증으로 최적 alpha를 찾는 체계적인 방법입니다.
+
+```python
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Ridge, Lasso, ElasticNet
+from sklearn.pipeline import make_pipeline
+import numpy as np
+
+X, y = fetch_california_housing(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Ridge GridSearch
+ridge_pipe = make_pipeline(StandardScaler(), Ridge())
+param_grid = {"ridge__alpha": np.logspace(-3, 3, 13)}
+gs = GridSearchCV(ridge_pipe, param_grid, cv=5, scoring="r2", n_jobs=-1)
+gs.fit(Xtr, ytr)
+
+print(f"Ridge 최적 alpha: {gs.best_params_['ridge__alpha']:.4g}")
+print(f"CV R² (최적):    {gs.best_score_:.4f}")
+print(f"Test R² (최적):  {gs.score(Xte, yte):.4f}")
+
+# 상위 3개 alpha 비교
+results = gs.cv_results_
+top3 = np.argsort(results["mean_test_score"])[::-1][:3]
+print("\n상위 3개 alpha:")
+for i in top3:
+    alpha = results["params"][i]["ridge__alpha"]
+    score = results["mean_test_score"][i]
+    print(f"  alpha={alpha:.4g}: CV R²={score:.4f}")
+```
+
+`GridSearchCV`는 지정한 파라미터 조합을 교차검증으로 평가합니다. `make_pipeline`으로 스케일러를 포함해야 각 fold에서 누수 없이 학습됩니다.
+
+## ElasticNet: L1과 L2의 균형점 찾기
+
+상관 피처가 많을 때 Lasso의 불안정성을 ElasticNet으로 해결합니다.
+
+```python
+import numpy as np
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Lasso, ElasticNet, ElasticNetCV
+from sklearn.pipeline import make_pipeline
+
+# 상관 피처가 많은 데이터 생성
+X, y, true_coef = make_regression(
+    n_samples=500, n_features=20, n_informative=10,
+    noise=15, random_state=42, coef=True
+)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42)
+
+sc = StandardScaler().fit(Xtr)
+Xtr_s, Xte_s = sc.transform(Xtr), sc.transform(Xte)
+
+# l1_ratio 비교
+print(f"{'l1_ratio':>10} {'의미':>15} {'Test R²':>9} {'0인 계수':>9}")
+for l1_ratio in [0.0, 0.1, 0.3, 0.5, 0.7, 0.9, 1.0]:
+    if l1_ratio == 0.0:
+        label = "Ridge (L2만)"
+    elif l1_ratio == 1.0:
+        label = "Lasso (L1만)"
+    else:
+        label = f"ElasticNet"
+    m = ElasticNet(alpha=0.1, l1_ratio=l1_ratio, max_iter=5000).fit(Xtr_s, ytr)
+    r2 = m.score(Xte_s, yte)
+    nz = (m.coef_ == 0).sum()
+    print(f"{l1_ratio:>10.1f} {label:>15} {r2:>9.4f} {nz:>9}")
+
+# ElasticNetCV로 자동 선택
+encv = ElasticNetCV(cv=5, max_iter=5000).fit(Xtr_s, ytr)
+print(f"\nElasticNetCV 최적: alpha={encv.alpha_:.4g}, l1_ratio={encv.l1_ratio_:.2f}")
+print(f"Test R²: {encv.score(Xte_s, yte):.4f}")
+```
+
+`l1_ratio=0`이면 Ridge(L2만), `l1_ratio=1`이면 Lasso(L1만), 중간값이면 ElasticNet입니다. 상관 피처가 많을 때는 중간 값이 더 안정적입니다.
+
+## 드롭아웃 대신 교차검증: 모델 복잡도 선택 전략
+
+신경망의 드롭아웃과 달리 sklearn 모델은 교차검증으로 최적 복잡도를 탐색합니다. 정규화 강도와 모델 구조를 동시에 비교하는 패턴입니다.
+
+```python
+import numpy as np
+from sklearn.datasets import make_regression
+from sklearn.linear_model import Ridge, Lasso
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import cross_val_score
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+X, y = make_regression(n_samples=300, n_features=20, noise=15, random_state=42)
+
+candidates = {
+    "Ridge(alpha=0.1)": Pipeline([("sc", StandardScaler()),
+                                   ("m", Ridge(alpha=0.1))]),
+    "Ridge(alpha=10)":  Pipeline([("sc", StandardScaler()),
+                                   ("m", Ridge(alpha=10))]),
+    "Lasso(alpha=0.1)": Pipeline([("sc", StandardScaler()),
+                                   ("m", Lasso(alpha=0.1))]),
+    "DecisionTree(d=3)": DecisionTreeRegressor(max_depth=3, random_state=0),
+    "DecisionTree(d=8)": DecisionTreeRegressor(max_depth=8, random_state=0),
+}
+
+print(f"{'모델':<22} {'CV R² mean':>10} {'CV R² std':>10}")
+print("-" * 44)
+for name, model in candidates.items():
+    scores = cross_val_score(model, X, y, cv=5, scoring="r2")
+    print(f"{name:<22} {scores.mean():>10.4f} {scores.std():>10.4f}")
+```
+
+std가 작고 mean이 높은 모델이 실전 데이터에서도 안정적입니다. 같은 mean이라면 std가 낮은 쪽을 선택하세요.
+
 ## 연습 문제
 
 1. `PolynomialFeatures(degree=10)`와 Ridge를 써서 과적합을 재현해 보세요.

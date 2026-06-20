@@ -275,6 +275,131 @@ print("이상치를 강하게 페널티 주려면 RMSE, 강건하게 보려면 M
 
 이상치 하나가 RMSE를 크게 올리지만 MAE는 상대적으로 영향이 적습니다. 도메인에서 큰 오차가 특히 문제가 되는 경우에는 RMSE를 선택하고, 이상치 영향을 줄이려면 MAE를 씁니다.
 
+## 여러 모델을 같은 기준으로 비교하는 평가 보고서
+
+실무에서 모델 선택 시 여러 지표를 한 표로 정리합니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.metrics import (
+    accuracy_score, f1_score, roc_auc_score, average_precision_score
+)
+import numpy as np
+
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+sc = StandardScaler().fit(Xtr)
+Xtr_s, Xte_s = sc.transform(Xtr), sc.transform(Xte)
+
+models = {
+    "LogisticReg": (make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000)), True),
+    "DecisionTree": (DecisionTreeClassifier(max_depth=5, random_state=42), False),
+    "RandomForest": (RandomForestClassifier(n_estimators=100, random_state=42), False),
+    "GradBoost": (GradientBoostingClassifier(n_estimators=100, random_state=42), False),
+}
+
+print(f"{'모델':>14} {'Acc':>7} {'F1':>7} {'ROC':>7} {'PR':>7} {'CV Acc':>8}")
+for name, (m, use_raw) in models.items():
+    Xtr_fit = Xtr if use_raw else Xtr_s
+    Xte_fit = Xte if use_raw else Xte_s
+
+    if use_raw:
+        m.fit(Xtr, ytr)
+    else:
+        m.fit(Xtr_s, ytr)
+
+    pred = m.predict(Xte_fit)
+    prob = m.predict_proba(Xte_fit)[:, 1]
+    cv = cross_val_score(m, X if use_raw else sc.transform(X), y, cv=5, scoring="accuracy")
+
+    acc = accuracy_score(yte, pred)
+    f1 = f1_score(yte, pred)
+    roc = roc_auc_score(yte, prob)
+    pr = average_precision_score(yte, prob)
+    print(f"{name:>14} {acc:>7.4f} {f1:>7.4f} {roc:>7.4f} {pr:>7.4f} {cv.mean():>8.4f}")
+```
+
+단일 지표로 모델을 선택하면 잘못된 결론에 도달할 수 있습니다. Accuracy, F1, ROC-AUC, PR-AUC, CV 점수를 함께 보고 비즈니스 요구사항에 맞는 모델을 선택합니다.
+
+## 임계값 최적화: 비즈니스 비용 함수 기반 선택
+
+비즈니스 비용을 정의하고 그에 맞는 최적 임계값을 찾습니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
+import numpy as np
+
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+sc = StandardScaler().fit(Xtr)
+m = LogisticRegression(max_iter=1000).fit(sc.transform(Xtr), ytr)
+prob = m.predict_proba(sc.transform(Xte))[:, 1]
+
+# 시나리오 1: 거짓 음성(암 놓침)이 거짓 양성(불필요한 추가검사)보다 10배 비쌈
+cost_fn = 10  # 거짓 음성 비용
+cost_fp = 1   # 거짓 양성 비용
+
+print(f"{'임계값':>8} {'FP':>5} {'FN':>5} {'총비용':>9} {'정확도':>8}")
+best_t, best_cost = 0.5, float("inf")
+for t in np.arange(0.1, 0.91, 0.05):
+    pred = (prob >= t).astype(int)
+    tn, fp, fn, tp = confusion_matrix(yte, pred).ravel()
+    cost = cost_fn * fn + cost_fp * fp
+    acc = (tn + tp) / len(yte)
+    if cost < best_cost:
+        best_cost, best_t = cost, t
+    print(f"{t:>8.2f} {fp:>5} {fn:>5} {cost:>9} {acc:>8.4f}")
+
+print(f"\n최적 임계값 (비용 최소화): {best_t:.2f} (총비용: {best_cost})")
+```
+
+비용 함수를 정의하면 정밀도와 재현율의 절충을 숫자로 비교할 수 있습니다. 임계값 0.5가 항상 최선이 아닌 이유가 이 표에서 명확하게 드러납니다.
+
+## 교차검증 기반 평가: 단일 홀드아웃을 넘어서
+
+단일 train/test 분할은 운에 따라 결과가 달라질 수 있습니다. 교차검증으로 지표의 신뢰 구간을 추정하는 패턴입니다.
+
+```python
+import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_validate, StratifiedKFold
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+X, y = make_classification(n_samples=500, n_features=20,
+                            weights=[0.8, 0.2], random_state=42)
+
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+scoring = ["accuracy", "f1", "roc_auc"]
+
+models = {
+    "LogisticRegression": Pipeline([("sc", StandardScaler()),
+                                    ("m", LogisticRegression(max_iter=1000))]),
+    "RandomForest":       RandomForestClassifier(n_estimators=100, random_state=0),
+}
+
+for name, model in models.items():
+    res = cross_validate(model, X, y, cv=cv, scoring=scoring)
+    print(f"\n{name}")
+    for metric in scoring:
+        vals = res[f"test_{metric}"]
+        print(f"  {metric:<12} {vals.mean():.4f} ± {vals.std():.4f}")
+```
+
+`mean ± std` 형식으로 보고하면 단일 수치보다 훨씬 신뢰할 수 있는 평가가 됩니다. std가 0.05 이상이면 데이터가 너무 적거나 모델이 불안정한 신호입니다.
+
 ## 연습 문제
 
 1. 불균형 데이터에서 Accuracy와 F1을 비교해 보세요.

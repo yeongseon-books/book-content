@@ -261,6 +261,137 @@ print(f"\n군집 크기: {np.bincount(km.labels_)}")
 
 군집별로 피처 평균을 보면 "대형 꽃 그룹", "소형 꽃 그룹" 같은 비즈니스 언어로 설명할 수 있습니다. 숫자를 해석 가능한 언어로 변환하는 것이 군집화 결과를 활용하는 핵심 단계입니다.
 
+## 계층적 군집화(Agglomerative Clustering)
+
+KMeans와 DBSCAN 외에 계층 구조를 탐색하는 방법입니다.
+
+```python
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import AgglomerativeClustering, KMeans
+from sklearn.metrics import silhouette_score, adjusted_rand_score
+import numpy as np
+
+X, y = load_iris(return_X_y=True)
+sc = StandardScaler()
+X_scaled = sc.fit_transform(X)
+
+print(f"{'방법':>25} {'K':>4} {'Silhouette':>12} {'ARI':>7}")
+
+# KMeans 비교 기준
+km = KMeans(n_clusters=3, n_init=10, random_state=42).fit(X_scaled)
+print(f"{'KMeans':>25} {'3':>4} {silhouette_score(X_scaled, km.labels_):>12.4f} {adjusted_rand_score(y, km.labels_):>7.4f}")
+
+# 계층적 군집화 - 다양한 연결 방식
+for linkage in ["ward", "complete", "average", "single"]:
+    for k in [2, 3, 4]:
+        ac = AgglomerativeClustering(n_clusters=k, linkage=linkage).fit(X_scaled)
+        sil = silhouette_score(X_scaled, ac.labels_)
+        ari = adjusted_rand_score(y, ac.labels_)
+        if k == 3:  # K=3만 출력
+            print(f"{'Agglo-'+linkage:>25} {k:>4} {sil:>12.4f} {ari:>7.4f}")
+```
+
+`ward` 연결 방식은 병합 시 분산 증가를 최소화해서 일반적으로 가장 균형 잡힌 군집을 만듭니다. `single`은 가장 가까운 포인트 기준이라 노이즈에 취약합니다.
+
+## 군집화 실전 적용: 고객 세그먼트 분석 패턴
+
+실무에서 군집화 결과를 비즈니스 인사이트로 전환하는 방법입니다.
+
+```python
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.decomposition import PCA
+
+# 고객 데이터 시뮬레이션 (구매 횟수, 평균 금액, 최근 구매일)
+np.random.seed(42)
+n = 500
+purchase_freq = np.concatenate([
+    np.random.poisson(2, 150),    # 저빈도 고객
+    np.random.poisson(8, 200),    # 중빈도 고객
+    np.random.poisson(20, 150),   # 고빈도 고객
+])
+avg_amount = np.concatenate([
+    np.random.normal(15, 3, 150),
+    np.random.normal(45, 8, 200),
+    np.random.normal(120, 20, 150),
+])
+recency = np.concatenate([
+    np.random.uniform(60, 180, 150),
+    np.random.uniform(10, 60, 200),
+    np.random.uniform(1, 30, 150),
+])
+
+X_cust = np.column_stack([purchase_freq, avg_amount, recency])
+feature_names = ["구매빈도", "평균금액", "최근구매일"]
+
+sc = StandardScaler()
+X_scaled = sc.fit_transform(X_cust)
+
+# 최적 K 탐색
+print(f"{'K':>4} {'Silhouette':>12} {'Inertia':>12}")
+best_k, best_sil = 2, -1
+for k in range(2, 8):
+    km = KMeans(n_clusters=k, n_init=10, random_state=42).fit(X_scaled)
+    sil = silhouette_score(X_scaled, km.labels_)
+    if sil > best_sil:
+        best_k, best_sil = k, sil
+    print(f"{k:>4} {sil:>12.4f} {km.inertia_:>12.1f}")
+
+# 최적 K로 세그먼트 프로파일 생성
+print(f"\n최적 K={best_k}로 세그먼트 프로파일:")
+km_best = KMeans(n_clusters=best_k, n_init=10, random_state=42).fit(X_scaled)
+print(f"{'세그먼트':>8} {'크기':>6}", end="")
+for fn in feature_names:
+    print(f"  {fn:>8}", end="")
+print()
+for seg in range(best_k):
+    mask = km_best.labels_ == seg
+    print(f"{'세그'+str(seg):>8} {mask.sum():>6}", end="")
+    for j in range(3):
+        print(f"  {X_cust[mask, j].mean():>8.1f}", end="")
+    print()
+```
+
+군집별 피처 평균을 원본 스케일로 출력하면 "고빈도 고가 고객", "저빈도 저가 고객" 같은 비즈니스 언어로 세그먼트를 설명할 수 있습니다.
+
+## 군집화 결과 안정성 검증: 반복 실험 패턴
+
+KMeans는 초기 중심점을 무작위로 설정하기 때문에 실행마다 결과가 달라질 수 있습니다. 여러 시드로 반복 실험해 안정성을 확인하는 패턴입니다.
+
+```python
+import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.datasets import make_blobs
+from sklearn.metrics import silhouette_score, adjusted_rand_score
+
+X, y_true = make_blobs(n_samples=300, centers=4, random_state=0)
+
+# 서로 다른 random_state로 여러 번 실행
+results = []
+for seed in range(10):
+    km = KMeans(n_clusters=4, random_state=seed, n_init=10)
+    labels = km.fit_predict(X)
+    sil = silhouette_score(X, labels)
+    ari = adjusted_rand_score(y_true, labels)
+    results.append({"seed": seed, "silhouette": sil, "ari": ari,
+                    "inertia": km.inertia_})
+
+# 결과 요약
+sils = [r["silhouette"] for r in results]
+aris = [r["ari"] for r in results]
+print(f"Silhouette  mean={np.mean(sils):.4f}  std={np.std(sils):.4f}")
+print(f"ARI         mean={np.mean(aris):.4f}  std={np.std(aris):.4f}")
+
+# std가 크면 초기값 민감 → n_init 늘리거나 k-means++ 확인
+best = max(results, key=lambda r: r["silhouette"])
+print(f"\n최적 seed={best['seed']}  silhouette={best['silhouette']:.4f}")
+```
+
+표준편차가 0.01 이하면 결과가 안정적입니다. `n_init` 기본값은 10이지만 데이터가 불균형하면 30 이상으로 늘리는 것이 좋습니다.
+
 ## 연습 문제
 
 1. `K`를 2부터 7까지 바꿔 가며 Silhouette 점수를 비교해 보세요.

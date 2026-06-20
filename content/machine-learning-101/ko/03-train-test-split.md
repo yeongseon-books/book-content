@@ -345,6 +345,48 @@ print(f"차이: {scores_kf.mean() - scores_gkf.mean():.4f}")
 
 의료 데이터(환자 ID), 추천 시스템(사용자 ID), 음성 인식(화자 ID)처럼 그룹이 있는 데이터는 반드시 `GroupKFold` 또는 `LeaveOneGroupOut`을 씁니다.
 
+## 교차검증 방식 비교: KFold vs StratifiedKFold vs GroupKFold
+
+세 가지 교차검증 방식의 차이를 실제 분할 결과로 비교합니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import (
+    KFold, StratifiedKFold, cross_val_score
+)
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+import numpy as np
+
+X, y = load_breast_cancer(return_X_y=True)
+pipe = make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000))
+
+# 클래스 비율 확인
+print(f"전체 클래스 비율: {np.bincount(y) / len(y)}")
+
+cv_methods = {
+    "KFold(shuffle=True)": KFold(n_splits=5, shuffle=True, random_state=42),
+    "StratifiedKFold": StratifiedKFold(n_splits=5, shuffle=True, random_state=42),
+}
+
+print(f"\n{'방식':>22} {'CV Mean':>9} {'CV Std':>8} {'각 fold 점수'}")
+for name, cv in cv_methods.items():
+    scores = cross_val_score(pipe, X, y, cv=cv, scoring="accuracy")
+    fold_str = " ".join(f"{s:.4f}" for s in scores)
+    print(f"{name:>22} {scores.mean():>9.4f} {scores.std():>8.4f}  {fold_str}")
+
+# 각 fold의 클래스 비율 확인
+print("\nStratifiedKFold에서 각 fold의 클래스 1 비율:")
+skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+for fold, (tr_idx, te_idx) in enumerate(skf.split(X, y), 1):
+    tr_ratio = y[tr_idx].mean()
+    te_ratio = y[te_idx].mean()
+    print(f"  fold {fold}: train={tr_ratio:.4f}, test={te_ratio:.4f}")
+```
+
+`StratifiedKFold`는 각 fold에서 클래스 비율을 원본과 동일하게 유지합니다. 불균형 데이터에서는 항상 `StratifiedKFold`를 씁니다.
+
 ## 연습 문제
 
 1. `test_size`를 0.1부터 0.3까지 바꿔 가며 테스트 점수를 관찰해 보세요.

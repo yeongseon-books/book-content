@@ -358,6 +358,45 @@ print(f"\n절대 잔차 > 1.0인 샘플 비율: {large_err:.2%}")
 
 잔차의 평균이 0에 가깝고, 분포가 대칭적이며, 패턴이 없으면 모델이 데이터의 선형 관계를 잘 포착한 것입니다.
 
+## 다중공선성 진단: VIF와 계수 안정성 확인
+
+다중공선성이 있으면 계수 해석이 왜곡됩니다.
+
+```python
+import numpy as np
+from sklearn.datasets import fetch_california_housing
+from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+X, y = fetch_california_housing(return_X_y=True)
+feature_names = fetch_california_housing().feature_names
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42)
+sc = StandardScaler().fit(Xtr)
+Xtr_s, Xte_s = sc.transform(Xtr), sc.transform(Xte)
+
+# 여러 랜덤 시드로 계수 안정성 확인 (부트스트랩 방식)
+lin_coefs = []
+ridge_coefs = []
+for seed in range(20):
+    idx = np.random.RandomState(seed).choice(len(Xtr_s), len(Xtr_s), replace=True)
+    lin = LinearRegression().fit(Xtr_s[idx], ytr[idx])
+    rdg = Ridge(alpha=1.0).fit(Xtr_s[idx], ytr[idx])
+    lin_coefs.append(lin.coef_)
+    ridge_coefs.append(rdg.coef_)
+
+lin_coefs = np.array(lin_coefs)
+ridge_coefs = np.array(ridge_coefs)
+
+print(f"{'피처':>20} {'OLS 계수 표준편차':>18} {'Ridge 계수 표준편차':>20}")
+for j, name in enumerate(feature_names):
+    print(f"{name:>20} {lin_coefs[:, j].std():>18.4f} {ridge_coefs[:, j].std():>20.4f}")
+
+print("\nRidge 계수가 더 안정적이면 다중공선성이 있다는 신호입니다.")
+```
+
+부트스트랩으로 계수를 여러 번 추정해 표준편차가 크면 다중공선성이 존재합니다. Ridge는 이런 상황에서 계수를 더 안정적으로 만듭니다.
+
 ## 연습 문제
 
 1. `PolynomialFeatures(degree=2)`를 추가하고 R-squared 변화를 관찰해 보세요.

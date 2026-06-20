@@ -384,6 +384,42 @@ print("모델 클래스:", type(loaded_model).__name__)
 
 모델을 파일로 저장하고 불러오는 것이 배포의 첫 단계입니다. `joblib`은 numpy 배열을 포함한 scikit-learn 모델을 효율적으로 직렬화합니다.
 
+## 다양한 데이터셋으로 ML 연습하기
+
+scikit-learn에 내장된 데이터셋으로 각기 다른 유형의 문제를 연습합니다.
+
+```python
+from sklearn import datasets
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import LogisticRegression, LinearRegression
+import numpy as np
+
+# 사용 가능한 내장 데이터셋 목록
+toy_datasets = {
+    "iris (분류, 3클래스)": (datasets.load_iris, "clf"),
+    "breast_cancer (이진분류)": (datasets.load_breast_cancer, "clf"),
+    "digits (다중분류)": (datasets.load_digits, "clf"),
+    "california (회귀)": (datasets.fetch_california_housing, "reg"),
+}
+
+print(f"{'데이터셋':>28} {'샘플':>7} {'피처':>6} {'CV 점수':>9}")
+for name, (loader, task) in toy_datasets.items():
+    data = loader(return_X_y=True)
+    X, y = data
+    if task == "clf":
+        pipe = make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000))
+        scoring = "accuracy"
+    else:
+        pipe = make_pipeline(StandardScaler(), LinearRegression())
+        scoring = "r2"
+    cv = cross_val_score(pipe, X, y, cv=5, scoring=scoring)
+    print(f"{name:>28} {X.shape[0]:>7} {X.shape[1]:>6} {cv.mean():>9.4f}")
+```
+
+각 데이터셋으로 연습하면서 문제 유형(분류/회귀), 피처 수, 샘플 수에 따라 적합한 모델과 지표가 달라짐을 체감합니다.
+
 ## 연습 문제
 
 1. `iris`가 아닌 **자신의 데이터셋**으로 `fit / predict`를 실행해 보세요.

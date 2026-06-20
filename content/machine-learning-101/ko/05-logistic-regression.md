@@ -376,6 +376,43 @@ for name, m in strategies.items():
 
 `class_weight="balanced"`는 소수 클래스에 더 큰 가중치를 줍니다. 불균형이 심할수록 F1과 PR-AUC가 더 의미 있는 지표입니다.
 
+## 로지스틱 회귀 계수 해석: 오즈비(Odds Ratio)
+
+로지스틱 회귀 계수를 오즈비로 변환하면 실질적인 의미를 해석할 수 있습니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+import numpy as np
+
+X, y = load_breast_cancer(return_X_y=True)
+feature_names = load_breast_cancer().feature_names
+
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+sc = StandardScaler().fit(Xtr)
+Xtr_s, Xte_s = sc.transform(Xtr), sc.transform(Xte)
+m = LogisticRegression(max_iter=1000).fit(Xtr_s, ytr)
+
+print(f"{'피처':>35} {'계수':>8} {'오즈비':>8} {'해석'}")
+coef_sorted = sorted(zip(feature_names, m.coef_[0]), key=lambda x: abs(x[1]), reverse=True)
+for name, coef in coef_sorted[:8]:
+    odds_ratio = np.exp(coef)
+    if odds_ratio > 1.5:
+        interp = "양성 위험 증가"
+    elif odds_ratio < 0.67:
+        interp = "양성 위험 감소"
+    else:
+        interp = "영향 적음"
+    print(f"{name:>35} {coef:>8.4f} {odds_ratio:>8.4f}  {interp}")
+
+print(f"\n정확도: {m.score(Xte_s, yte):.4f}")
+print("주의: 계수는 표준화된 피처 기준입니다. 원본 단위로 해석하려면 sc.scale_로 보정하세요.")
+```
+
+계수가 양수이면 해당 피처가 클수록 양성(악성) 확률이 올라가고, 음수이면 내려갑니다. 오즈비가 1보다 크면 위험 증가, 1보다 작으면 위험 감소입니다.
+
 ## 연습 문제
 
 1. 임계값을 0.1부터 0.9까지 바꿔 가며 정밀도와 재현율을 그려 보세요.

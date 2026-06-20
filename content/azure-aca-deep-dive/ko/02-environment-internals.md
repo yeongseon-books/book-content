@@ -28,7 +28,7 @@ Microsoft Learn이 Environment를 설명할 때 반복하는 문장이 있습니
 
 이 경계를 먼저 이해해야 뒤의 Revision, KEDA, Dapr, Envoy 글도 제자리를 찾습니다. Revision은 Environment 바깥으로 나가지 못하고, Dapr component는 Environment 범위에서 로드되며, Ingress와 관측 역시 결국 같은 바깥 경계 안에서 작동하기 때문입니다.
 
-이제 Environment를 “상위 폴더”가 아니라 “플랫폼 경계”로 보겠습니다.
+이제 Environment를 "상위 폴더"가 아니라 "플랫폼 경계"로 보겠습니다.
 
 ![Azure Container Apps Deep Dive 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/02/02-01-the-environment-is-the-platform-s-isolat.ko.png)
 *Azure Container Apps Deep Dive 2장 흐름 개요*
@@ -48,7 +48,7 @@ Environment를 잘못 이해하면 ACA의 여러 기능을 제각각 따로 보�
 
 특히 팀 경계와 신뢰 경계가 다른 워크로드를 한 Environment에 섞어 넣으면 나중에 제일 먼저 문제가 됩니다. 같은 로그 대상, 같은 Dapr component 카탈로그, 같은 네트워크 평면을 공유하는 것이 의도였는지 아닌지를 뒤늦게 묻게 되기 때문입니다. 많은 경우 이는 기능 문제가 아니라 경계 모델의 문제입니다.
 
-또한 Environment는 이후 모든 런타임 이야기의 전제입니다. Revision도, Scale도, Dapr sidecar도 결국 이 경계 안에서만 의미를 갖습니다. 그래서 2편은 단지 “환경 리소스 소개”가 아니라 시리즈 전체의 운영 경계를 정하는 글입니다.
+또한 Environment는 이후 모든 런타임 이야기의 전제입니다. Revision도, Scale도, Dapr sidecar도 결국 이 경계 안에서만 의미를 갖습니다. 그래서 2편은 단지 "환경 리소스 소개"가 아니라 시리즈 전체의 운영 경계를 정하는 글입니다.
 
 ## 핵심 관점
 
@@ -56,7 +56,7 @@ Environment를 볼 때 가장 먼저 머리에 남겨야 할 문장은 이것입
 
 이 관점이 실용적인 이유는, 앱 단위에서 할 수 있는 선택과 Environment 단위에서 이미 결정된 선택을 분리해 주기 때문입니다. 예를 들어 앱마다 ingress를 켜거나 끌 수는 있지만, 그것이 놓이는 네트워크 perimeter는 Environment에 속합니다. 앱마다 Dapr enablement는 다를 수 있지만, component registry의 경계는 Environment에 속합니다.
 
-즉 Environment는 “무엇을 공유할 것인가”를 정하는 바깥 계약입니다. 그 안에서 개별 앱과 Revision이 자기 런타임 행동을 가집니다. 이 순서를 거꾸로 이해하면 설계가 자꾸 엇나갑니다.
+즉 Environment는 "무엇을 공유할 것인가"를 정하는 바깥 계약입니다. 그 안에서 개별 앱과 Revision이 자기 런타임 행동을 가집니다. 이 순서를 거꾸로 이해하면 설계가 자꾸 엇나갑니다.
 
 > ACA에서 Environment는 배포 편의용 컨테이너가 아니라, 네트워크와 관측과 Dapr 정책이 동시에 걸리는 플랫폼의 바깥 경계입니다.
 
@@ -76,7 +76,7 @@ Revision은 런타임 스냅샷이지 네트워크 섬이 아닙니다. ACA에�
 
 *Per-app ingress choices inside one environment*
 
-앱마다 ingress on/off, external/internal 선택은 다를 수 있습니다. 하지만 그 선택이 놓이는 네트워크 perimeter는 여전히 하나의 Environment입니다. 그래서 동일 Environment를 “서로 절대 만나면 안 되는 내부 mesh”에 쓰려는 시도는 설계 단계에서 다시 봐야 합니다.
+앱마다 ingress on/off, external/internal 선택은 다를 수 있습니다. 하지만 그 선택이 놓이는 네트워크 perimeter는 여전히 하나의 Environment입니다. 그래서 동일 Environment를 "서로 절대 만나면 안 되는 내부 mesh"에 쓰려는 시도는 설계 단계에서 다시 봐야 합니다.
 
 ### External ingress와 internal ingress도 같은 Environment 표면 위에 있습니다
 
@@ -86,7 +86,7 @@ Revision은 런타임 스냅샷이지 네트워크 섬이 아닙니다. ACA에�
 
 *External and internal ingress within one environment*
 
-하지만 이 편의는 동시에 제약입니다. 같은 Environment 안에 넣는 순간 네트워크 경계의 가장 중요한 단위는 개별 앱보다 Environment가 됩니다. 즉 “앱 하나만 내부 전용이면 충분한가”가 아니라 “이 앱들이 같은 Environment에 있어도 되는가”를 먼저 물어야 합니다.
+하지만 이 편의는 동시에 제약입니다. 같은 Environment 안에 넣는 순간 네트워크 경계의 가장 중요한 단위는 개별 앱보다 Environment가 됩니다. 즉 "앱 하나만 내부 전용이면 충분한가"가 아니라 "이 앱들이 같은 Environment에 있어도 되는가"를 먼저 물어야 합니다.
 
 ### DNS 맥락도 Environment가 결정합니다
 
@@ -106,7 +106,7 @@ Environment 문서는 `appLogsConfiguration`이 Environment-level property라고
 
 ### 같은 workspace를 쓴다고 모든 신호가 같은 것은 아닙니다
 
-여기서 흔한 과잉 보정이 나옵니다. Environment가 workspace를 공유하니 모든 신호도 Environment 수준이라고 생각하는 것입니다. 그렇지 않습니다. Environment는 “어디로 보낼지”를 정하고, App·Revision·Dapr sidecar·Ingress 경로는 “무엇을 보낼지”를 결정합니다.
+여기서 흔한 과잉 보정이 나옵니다. Environment가 workspace를 공유하니 모든 신호도 Environment 수준이라고 생각하는 것입니다. 그렇지 않습니다. Environment는 "어디로 보낼지"를 정하고, App·Revision·Dapr sidecar·Ingress 경로는 "무엇을 보낼지"를 결정합니다.
 
 ![Shared workspace and per-runtime signal sources](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/02/02-05-shared-logs-do-not-mean-all-signals-are.ko.png)
 
@@ -184,7 +184,7 @@ Environment 이해가 중요한 또 다른 이유는 뒤의 모든 동작이 이
 
 ### production과 non-production을 나눌 때도 가장 먼저 보는 경계
 
-팀들이 흔히 하는 질문 중 하나는 “dev와 prod를 같은 Environment에 둘 수 있나”입니다. 기술적으로 가능한 조합을 묻는 것보다, 같은 네트워크·로그·Dapr 경계에 묶이는 것이 괜찮은지를 먼저 물어야 합니다. 대부분의 프로덕션 환경에서는 운영 책임, 접근 제어, 장애 반경, 비용 추적이 다르기 때문에 분리된 Environment가 더 자연스럽습니다.
+팀들이 흔히 하는 질문 중 하나는 "dev와 prod를 같은 Environment에 둘 수 있나"입니다. 기술적으로 가능한 조합을 묻는 것보다, 같은 네트워크·로그·Dapr 경계에 묶이는 것이 괜찮은지를 먼저 물어야 합니다. 대부분의 프로덕션 환경에서는 운영 책임, 접근 제어, 장애 반경, 비용 추적이 다르기 때문에 분리된 Environment가 더 자연스럽습니다.
 
 반대로 매우 작은 실험 환경이나 교육용 워크로드라면 하나의 Environment가 운영 단순성을 줄 수 있습니다. 핵심은 가능 여부가 아니라 경계 의도가 분명한가입니다. Environment는 나중에 수정하기 쉬운 cosmetic choice가 아니라, 초기 설계의 기본 선입니다.
 
@@ -193,6 +193,21 @@ Environment 이해가 중요한 또 다른 이유는 뒤의 모든 동작이 이
 같은 workspace에 로그가 쌓인다는 것은 기술적 편의 이상을 의미합니다. 누가 어떤 로그를 볼 수 있는지, 어떤 retention 정책을 적용하는지, 비용을 어느 팀에 귀속할지까지 함께 연결되기 때문입니다. 그래서 observability boundary를 소홀히 보면, 나중에 보안과 운영 소유권 이슈가 한꺼번에 드러납니다.
 
 저는 Environment를 정할 때 네트워크와 Dapr만큼이나 observability ownership을 같이 봐야 한다고 생각합니다. 같은 workspace를 공유해도 되는 팀과 워크로드인지 먼저 답하지 못한다면, Environment 경계도 다시 검토하는 편이 안전합니다.
+
+### Environment 설계 결정 매트릭스
+
+Environment를 몇 개로 나눌지 결정할 때는 아래 표를 기준으로 삼을 수 있습니다.
+
+| 결정 축 | 단일 Environment 유리 | 복수 Environment 유리 |
+|---|---|---|
+| 네트워크 격리 요구 | 내부 서비스끼리 자유롭게 통신 가능 | 팀/서비스별 네트워크 분리 필요 |
+| 로그 접근 제어 | 전체 팀이 같은 workspace 접근 | 팀별 별도 workspace, 접근 제어 분리 |
+| Dapr component 공유 | 공통 메시지 버스, 공유 state store | 서비스별 독립 component 정책 |
+| 장애 반경 | 단일 장애가 모든 앱에 영향 허용 | 장애 반경을 환경 단위로 제한 |
+| 비용 추적 | 전체 비용을 하나로 관리 | 팀별 비용 분리 필요 |
+| 배포 주기 | 모든 앱 동시 배포 가능 | 앱별 독립 배포 주기 필요 |
+
+이 표에서 "복수 Environment 유리" 열에 체크가 2개 이상이라면 분리를 진지하게 고려해야 합니다.
 
 ### 운영자가 먼저 확인할 정보
 
@@ -221,7 +236,24 @@ az containerapp list -g my-rg \
 - `external` 값이 달라도 네트워크 바깥 경계가 자동으로 분리되는 것은 아닙니다.
 - 같은 Environment인데 분리 의도가 강한 앱이 섞여 있다면, ingress 설정이 아니라 Environment 설계를 다시 봐야 합니다.
 
-이 표 한 장만 봐도 “앱마다 설정이 다르다”와 “플랫폼 경계가 다르다”를 구분할 수 있습니다. Environment를 폴더가 아니라 실제 경계로 읽어야 하는 이유가 여기에 있습니다.
+이 표 한 장만 봐도 "앱마다 설정이 다르다"와 "플랫폼 경계가 다르다"를 구분할 수 있습니다. Environment를 폴더가 아니라 실제 경계로 읽어야 하는 이유가 여기에 있습니다.
+
+### Dapr component 등록과 scope 확인 명령
+
+Dapr component가 예상대로 로드되는지 확인하려면 아래 명령으로 Environment에 등록된 component 목록과 scope를 검토합니다.
+
+```bash
+# Environment에 등록된 Dapr component 전체 목록
+az containerapp env dapr-component list -n my-env -g my-rg -o table
+
+# 특정 component의 scope 설정 확인
+az containerapp env dapr-component show \
+  -n my-env -g my-rg \
+  --dapr-component-name my-statestore \
+  --query "properties.scopes"
+```
+
+scope가 빈 배열이면 해당 Environment의 모든 Dapr-enabled 앱에 로드됩니다. 특정 Dapr app ID만 지정하고 싶다면 `scopes` 배열에 app ID 문자열을 넣어야 합니다. Container App 이름과 Dapr app ID가 다를 수 있으므로, 앱 배포 시 `dapr.appId`를 명시적으로 설정하고 이를 component scope와 맞춰야 합니다.
 
 ## 흔히 헷갈리는 지점
 
@@ -230,6 +262,7 @@ az containerapp list -g my-rg \
 - **같은 workspace를 쓴다고 모든 로그 해석이 Environment 수준인 것은 아닙니다.** 신호 생산자는 App·Revision·sidecar입니다.
 - **Dapr component scope는 Container App 이름이 아니라 Dapr app ID에 대응합니다.** 이 매핑을 틀리면 로딩이 어긋납니다.
 - **Environment 통합은 편의 기능이 아니라 신뢰 경계 선택입니다.** 나중에 분리하기 어렵기 때문에 처음 설계가 중요합니다.
+- **outbound IP와 static IP도 Environment 수준 속성입니다.** 방화벽과 allowlist는 앱 단위가 아니라 Environment 단위로 관리해야 합니다.
 
 ## 운영 체크리스트
 
@@ -238,6 +271,8 @@ az containerapp list -g my-rg \
 - [ ] Log Analytics workspace 변경이 RPO/RTO에 주는 영향을 검토했습니다.
 - [ ] workload profile별 비용과 격리 trade-off를 표로 정리했습니다.
 - [ ] internal/external ingress 결정이 DNS 전략과 일관되는지 확인했습니다.
+- [ ] Dapr component scope와 Dapr app ID 매핑을 팀 문서에 명시했습니다.
+- [ ] dev/prod 분리 기준을 Environment 경계 관점에서 문서화했습니다.
 
 ## 정리
 
@@ -250,12 +285,11 @@ Environment는 ACA에서 가장 과소평가되기 쉬운 리소스이지만, �
 ## 처음 질문으로 돌아가기
 
 - **Environment는 왜 단순한 부모 리소스가 아니라 실제 격리 경계일까요?**
-  - Environment를 볼 때 가장 먼저 머리에 남겨야 할 문장은 이것입니다
+  - 네트워크 perimeter, Log Analytics destination, Dapr component registry가 모두 Environment에서 결정되기 때문입니다. 앱 단위 설정은 이 경계 안에서만 동작합니다. 경계를 잘못 그으면 앱 설정만으로는 되돌리기 어렵습니다.
 - **네트워크 범위는 Revision이나 App이 아니라 왜 Environment에서 시작될까요?**
-  - Environment를 잘못 이해하면 ACA의 여러 기능을 제각각 따로 보게 됩니다
+  - Revision은 런타임 스냅샷이고, App은 Revision의 관리 단위입니다. 네트워크 perimeter는 이 둘보다 바깥에 있습니다. managed VNet 또는 사용자 제공 VNet의 연결이 Environment 생성 시점에 확정되기 때문에, 네트워크 경계는 배포 단위보다 먼저 결정됩니다.
 - **Log Analytics workspace를 Environment 수준에서 공유한다는 말은 운영상 무엇을 뜻할까요?**
-  - Environment를 잘못 이해하면 ACA의 여러 기능을 제각각 따로 보게 됩니다
-  - Environment를 잘못 이해하면 ACA의 여러 기능을 제각각 따로 보게 됩니다. Ingress는 네트워크 기능, Dapr는 미들웨어 기능, 로그는 관측 기능, Revision은 배포 기능처럼 흩어져 보입니다.
+  - 같은 Environment 안의 앱 로그, Dapr sidecar 로그, Ingress 로그가 한 workspace에 모입니다. cross-app troubleshooting이 쉬워지는 반면, retention 정책, 접근 제어, 비용 귀속도 Environment 단위로 관리해야 합니다. 팀별로 분리가 필요하다면 workspace가 아니라 Environment를 먼저 분리해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
