@@ -1,10 +1,10 @@
 ---
 series: statistics-101
 episode: 1
-title: What Is Statistics?
+title: "Statistics 101 (1/10): What Is Statistics?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,25 +20,24 @@ seo_description: An introduction to descriptive and inferential statistics and t
 last_reviewed: '2026-05-04'
 ---
 
-# What Is Statistics?
+# Statistics 101 (1/10): What Is Statistics?
 
-> Statistics 101 series (1/10)
+As data accumulates, so do numbers. But more numbers do not automatically produce better judgment. Monthly revenue is up, conversion changed, survey satisfaction looks high—those statements all contain numbers, but they do not say whether the conclusion is stable enough to trust.
 
-<!-- a-grade-intro:begin -->
+Statistics is the tool that closes that gap. It is not just a way to format numbers neatly. It is a way to move from observation to a decision while keeping uncertainty visible.
 
-**Core question**: What does statistics actually study, and why do we need it? How do we turn a collection of formulas into a *language for decisions*?
+This is the first post in the Statistics 101 series. Here we will split statistics into its two major branches—descriptive and inferential statistics—and build the basic flow that connects data to a decision.
 
-> *Statistics is the shared language of uncertainty.*
 
-<!-- a-grade-intro:end -->
+![statistics 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/01/01-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 1 flow overview*
+> Statistics is the bridge between data and decisions — making decisions that are *less uncertain*.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *two pillars* of statistics — descriptive and inferential
-- The *data → decision* thinking flow
-- The *four questions* statistics answers
-- A 5-step statistical thinking exercise
-- Five common mistakes
+- What does statistics actually study?
+- How are descriptive statistics and inferential statistics different?
+- How does statistics connect numbers to decision-making?
 
 ## Why It Matters
 
@@ -47,14 +46,7 @@ As data piles up, the question *“is this really true?”* shows up more and mo
 > *Good statistical thinking produces decisions, not numbers.*
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Data["Data"] --> Desc["Descriptive"]
-    Desc --> Infer["Inferential"]
-    Infer --> Decide["Decision"]
-```
-
+Data is messy. Numbers alone do not tell us whether a change is real or just noise. Statistics layers **thinking** on top of **numbers**, turning observations into *judgments we can defend*.
 ## Key Terms
 
 - **Descriptive Statistics**: statistics that *summarize* data (mean, variance, etc.).
@@ -85,11 +77,15 @@ df = pd.read_csv("clicks.csv")
 print(df.shape, df.columns.tolist())
 ```
 
+**Expected output:** something like `(2000, ['group', 'ctr'])`, which confirms the row count and the columns you expect to analyze.
+
 ### Step 3 — Summarize (descriptive)
 
 ```python
 print(df.groupby("group")["ctr"].agg(["mean", "std", "count"]))
 ```
+
+**Expected output:** a small table with one row per group and columns for mean CTR, standard deviation, and sample count.
 
 ### Step 4 — Infer
 
@@ -98,6 +94,8 @@ from scipy.stats import ttest_ind
 a, b = df.loc[df.group == "control", "ctr"], df.loc[df.group == "test", "ctr"]
 print(ttest_ind(a, b, equal_var=False))
 ```
+
+**Expected output:** a `TtestResult(statistic=..., pvalue=...)` object. The p-value is the first signal for whether the observed gap is plausibly just noise.
 
 ### Step 5 — Decide
 
@@ -148,7 +146,18 @@ A/B testing, revenue forecasting, anomaly detection, quality control — *every 
 
 Statistics is the tool that moves *uncertainty* into *decisions*. The next episode dives into the most basic summary tools — *mean, median, and variance*.
 
+## Answering the Opening Questions
+
+- **What does statistics actually study?**
+  - The article treats What Is Statistics? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How are descriptive statistics and inferential statistics different?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How does statistics connect numbers to decision-making?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Statistics? (current)**
 - Mean, Median, and Variance (upcoming)
 - Distributions (upcoming)
@@ -159,6 +168,7 @@ Statistics is the tool that moves *uncertainty* into *decisions*. The next episo
 - Correlation and Regression (upcoming)
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

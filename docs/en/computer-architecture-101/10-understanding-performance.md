@@ -1,10 +1,10 @@
 ---
 series: computer-architecture-101
 episode: 10
-title: Understanding Performance
+title: "Computer Architecture 101 (10/10): Understanding Performance"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: A thinking model for performance analysis — throughput vs lat
 last_reviewed: '2026-05-04'
 ---
 
-# Understanding Performance
+# Computer Architecture 101 (10/10): Understanding Performance
 
 > Computer Architecture 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: What does "slow" actually mean? Where, by how much, and how does anyone justify saying a system "needs optimization"?
 
 > Performance problems almost always begin with a guess — "I think the DB is slow," "I think Python is slow." But a senior engineer never changes a line without a measurement. This final article gathers everything we have built up — CPU, memory, cache, I/O, parallelism — into a thinking tool for understanding performance.
 
-<!-- a-grade-intro:end -->
+This is the final post in the Computer Architecture 101 series.
+
+
+![computer architecture 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/10/10-01-big-picture.en.png)
+*computer architecture 101 chapter 10 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Understanding Performance?
+- Which signal should the example or diagram make visible for Understanding Performance?
+- What failure should be prevented first when Understanding Performance reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 Performance is a feature of every system. A faster page keeps more users, an efficient deployment runs on fewer servers, lower latency yields a better user experience. But the word "optimization" gets paired with assumption and aimed at the wrong place. Knuth's "premature optimization is the root of all evil" gets quoted often; what he meant was "do not optimize without measurement."
 
 > An unmeasured optimization is not optimization. It is faith.
-
-## Concept at a Glance
 
 > Performance has two axes — latency (how long one task takes) and throughput (how many tasks per unit of time). They often trade off. To find bottlenecks, the USE method examines utilization, saturation, and errors of each resource (CPU, memory, disk, network). Profiling comes in two flavors — statistical sampling and precise instrumentation — each with its own tradeoffs.
 
@@ -274,17 +280,29 @@ Performance starts with measurement. Distinguish latency from throughput, watch 
 
 This concludes the Computer Architecture 101 series. The next series builds on it: how the operating system layers its abstractions on top of this hardware. Once you know the architecture, every system call and scheduling choice in an OS looks different.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Understanding Performance?**
+  - The article treats Understanding Performance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Understanding Performance?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Understanding Performance reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Architecture?](./01-what-is-computer-architecture.md)
-- [Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
-- [CPU and Instructions](./03-cpu-and-instructions.md)
-- [Registers and the ALU](./04-registers-and-alu.md)
-- [Memory Organization](./05-memory-organization.md)
-- [Cache and Locality](./06-cache-and-locality.md)
-- [Pipelining](./07-pipelining.md)
-- [I/O and Devices](./08-io-and-devices.md)
-- [Parallelism and Multicore](./09-parallelism-and-multicore.md)
+## In this series
+
+- [Computer Architecture 101 (1/10): What Is Computer Architecture?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU and Instructions](./03-cpu-and-instructions.md)
+- [Computer Architecture 101 (4/10): Registers and the ALU](./04-registers-and-alu.md)
+- [Computer Architecture 101 (5/10): Memory Organization](./05-memory-organization.md)
+- [Computer Architecture 101 (6/10): Cache and Locality](./06-cache-and-locality.md)
+- [Computer Architecture 101 (7/10): Pipelining](./07-pipelining.md)
+- [Computer Architecture 101 (8/10): I/O and Devices](./08-io-and-devices.md)
+- [Computer Architecture 101 (9/10): Parallelism and Multicore](./09-parallelism-and-multicore.md)
 - **Understanding Performance (current)**
+
 <!-- toc:end -->
 
 ## References

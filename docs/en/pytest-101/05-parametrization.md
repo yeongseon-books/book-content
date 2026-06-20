@@ -1,10 +1,10 @@
 ---
 series: pytest-101
 episode: 5
-title: Parametrization
+title: "pytest 101 (5/10): Parametrization"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,21 +16,29 @@ tags:
   - parametrize
   - Test Cases
   - Data-Driven Testing
-seo_description: Write data-driven tests with pytest parametrize.
+seo_description: Learn to use @pytest.mark.parametrize for data-driven tests. Master syntax, multi-parameter usage, custom test IDs, and Cartesian products.
 last_reviewed: '2026-05-04'
 ---
 
-# Parametrization
+# pytest 101 (5/10): Parametrization
+
+This is post 5 in the pytest 101 series.
 
 > pytest 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: When testing the same logic with different inputs, do you have to copy the function?
 
 > `@pytest.mark.parametrize` lets a single test function verify multiple input-output combinations. This article covers basic syntax, multi-parameter usage, and ID customization.
 
-<!-- a-grade-intro:end -->
+
+![pytest 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/05/05-01-big-picture.en.png)
+*pytest 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Parametrization?
+- Which signal should the example or diagram make visible for Parametrization?
+- What failure should be prevented first when Parametrization reaches a real system?
 
 ## What You Will Learn
 
@@ -51,7 +59,7 @@ Boundary values, empty inputs, and special characters need comprehensive coverag
 
 > parametrize = one test function + multiple data sets → N independent tests
 
-```
+```text
 @pytest.mark.parametrize("input,expected", [
     ("hello", 5),      ← test 1
     ("", 0),            ← test 2
@@ -257,17 +265,29 @@ In practice, when a bug report arrives, the failing input gets added to a parame
 
 Parametrize is the core tool for data-driven testing. A single test function covers diverse inputs, eliminating code duplication. Next, we'll learn mock and monkeypatch for replacing external dependencies.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Parametrization?**
+  - The article treats Parametrization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Parametrization?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Parametrization reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Write Tests?](./01-why-write-tests.md)
-- [Writing Your First pytest Test](./02-first-pytest-test.md)
-- [Assert and Exception Testing](./03-assert-and-exceptions.md)
-- [Understanding Fixtures](./04-fixtures.md)
+## In this series
+
+- [pytest 101 (1/10): Why Write Tests?](./01-why-write-tests.md)
+- [pytest 101 (2/10): Writing Your First pytest Test](./02-first-pytest-test.md)
+- [pytest 101 (3/10): Assert and Exception Testing](./03-assert-and-exceptions.md)
+- [pytest 101 (4/10): Understanding Fixtures](./04-fixtures.md)
 - **Parametrization (current)**
 - Mock and Monkeypatch (upcoming)
 - Testing Files, Environment Variables, and Time (upcoming)
 - Coverage and Test Quality (upcoming)
 - Test Automation with GitHub Actions (upcoming)
 - Writing Testable Code (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,10 +1,10 @@
 ---
 series: software-engineering-101
 episode: 10
-title: What Makes Good Software
+title: "Software Engineering 101 (10/10): What Makes Good Software"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,26 @@ tags:
   - Simplicity
   - Engineering
 seo_description: Quality attributes, SOLID, simplicity, sustainability, and the external signals senior engineers actually look at.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Makes Good Software
+# Software Engineering 101 (10/10): What Makes Good Software
 
-> Software Engineering 101 series (10/10)
+A working feature and good software are not the same thing. Shipping the feature is only the opening move. The harder question is whether the system still behaves well when requirements change, teammates rotate, traffic grows, and incidents force trade-offs under pressure.
 
-<!-- a-grade-intro:begin -->
+Teams often judge quality first by style or abstraction. Those signals matter, but the stronger truth usually appears outside the code: lead time, recovery speed, onboarding friction, user trust, and the ease of safe change. Quality lives at the intersection of internal structure and external behavior.
 
-**Core question**: Are "good code" and "good software" the same thing?
+This is the final post in the Software Engineering 101 series. In this chapter, we tie the series together by looking at quality attributes, practical readings of SOLID, and the operational signals senior engineers use when they say a system is healthy.
 
-> Code is a means. Software is a system people live with for years.
 
-<!-- a-grade-intro:end -->
+![software engineering 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/10/10-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 10 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Makes Good Software?
+- Which signal should the example or diagram make visible for What Makes Good Software?
+- What failure should be prevented first when What Makes Good Software reaches a real system?
 
 ## What You Will Learn
 
@@ -46,17 +52,6 @@ last_reviewed: '2026-05-04'
 A working feature is the start, not the end. Good software endures over time and grows the people who work on it.
 
 > What is simple lasts.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    F["Functional"] --> R["Reliable"]
-    R --> M["Maintainable"]
-    M --> P["Performant"]
-    P --> S["Secure"]
-    S --> U["Usable"]
-```
 
 Quality is not one axis but a balance across many.
 
@@ -139,6 +134,28 @@ Track time from code to deploy.
 
 External signals tell more truth than internal code metrics.
 
+## A quality-signal check
+
+The fastest way to make quality actionable is to convert it from taste into signals. Pick one weak quality attribute in your current system and pair it with one internal metric and one external outcome.
+
+### Verification steps
+
+1. Choose the weakest current axis such as reliability or maintainability.
+2. Name one internal signal and one external signal that expose that weakness.
+3. Define a baseline and one quarter-scale improvement target.
+
+**Expected output:**
+
+- Quality discussions shift from preference to evidence.
+- Complexity, lead time, MTTR, and onboarding speed start to connect to each other.
+- SOLID principles become tools for reducing change cost instead of slogans.
+
+### Failure modes to watch
+
+- The team measures feature output only.
+- Internal code style stands in for user and operational reality.
+- Metrics exist, but no review cadence turns them into decisions.
+
 ## What to Notice in This Code
 
 - One class, one reason to change.
@@ -184,17 +201,29 @@ Strong teams track DORA's four metrics (deploy frequency, lead time, change fail
 
 Good software is simple, measurable, and grows the people who maintain it. This series ends here, but the principles from these ten essays deepen further in the next series — Clean Code, Design Patterns, API Design, and beyond.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Makes Good Software?**
+  - The article treats What Makes Good Software as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Makes Good Software?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Makes Good Software reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Software Engineering?](./01-what-is-software-engineering.md)
-- [Understanding Requirements](./02-understanding-requirements.md)
-- [Design vs Implementation](./03-design-vs-implementation.md)
-- [Code Review](./04-code-review.md)
-- [Testing Strategy](./05-testing-strategy.md)
-- [Version Control and Release](./06-version-control-and-release.md)
-- [Documentation](./07-documentation.md)
-- [Collaboration Process](./08-collaboration-process.md)
-- [Maintenance and Tech Debt](./09-maintenance-and-tech-debt.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): Understanding Requirements](./02-understanding-requirements.md)
+- [Software Engineering 101 (3/10): Design vs Implementation](./03-design-vs-implementation.md)
+- [Software Engineering 101 (4/10): Code Review](./04-code-review.md)
+- [Software Engineering 101 (5/10): Testing Strategy](./05-testing-strategy.md)
+- [Software Engineering 101 (6/10): Version Control and Release](./06-version-control-and-release.md)
+- [Software Engineering 101 (7/10): Documentation](./07-documentation.md)
+- [Software Engineering 101 (8/10): Collaboration Process](./08-collaboration-process.md)
+- [Software Engineering 101 (9/10): Maintenance and Tech Debt](./09-maintenance-and-tech-debt.md)
 - **What Makes Good Software (current)**
+
 <!-- toc:end -->
 
 ## References

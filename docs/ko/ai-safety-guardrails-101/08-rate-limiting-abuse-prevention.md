@@ -1,12 +1,12 @@
 ---
-title: Rate Limiting과 남용 방지
+title: "AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지"
 series: ai-safety-guardrails-101
 episode: 8
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,37 +14,56 @@ tags:
 - Rate Limiting
 - Abuse Prevention
 - Anomaly Detection
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: 전통적인 API 남용은 "초당 요청 수" 위주였습니다. LLM API는 두 가지 차원이 추가됩니다.
 ---
 
-# Rate Limiting과 남용 방지
+# AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지
 
-> AI Safety & Guardrails 101 시리즈 (8/10)
+전통적인 API 보호는 초당 요청 수를 세는 것으로 상당 부분 해결됐습니다. 하지만 LLM API는 그렇지 않습니다. 한 요청이 100토큰일 수도 있고 100,000토큰일 수도 있으며, 스트리밍 응답은 출력 비용을 끝없이 늘릴 수 있습니다. 그래서 남용 방지도 다차원으로 설계해야 합니다.
 
----
+실무에서는 이 차이가 곧 비용 사고로 이어집니다. RPS는 낮아도 긴 컨텍스트와 장문 출력만으로 비용이 폭증할 수 있고, 사용자당 한도만 두면 IP를 돌리거나 조직 단위 키를 바꿔 우회할 수 있습니다. 결국 요청 수, 입력 토큰, 출력 토큰, 비용을 함께 봐야 합니다.
 
-## Section 1
+이 글은 LLM rate limiting을 트래픽 제어가 아니라 비용·남용·가용성 통제 문제로 다룹니다. token bucket, output budget, anomaly detection, 단계적 escalation이 왜 함께 있어야 하는지 설명합니다.
 
-## LLM API에서 rate limiting이 다른 이유
+이 글에서는 quota 차원, bucket 알고리즘, output cap, 비용 제한, 이상 징후 탐지, 단계적 대응을 정리합니다.
 
-전통적인 API 남용은 "초당 요청 수" 위주였습니다. LLM API는 두 가지 차원이 추가됩니다.
+![Rate limiting과 abuse 방지 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/08/08-01-big-picture.ko.png)
+*Rate limiting과 abuse 방지 흐름*
+> LLM rate limiting의 단위는 요청 한 번이 아니라 토큰, 비용, 도구 호출처럼 실제로 고갈되는 자원입니다.
 
-- **토큰 비용**: 한 요청이 100 토큰일 수도, 100,000 토큰일 수도 있습니다. RPS 제한만으로는 비용 폭주를 막지 못합니다.
-- **출력 토큰 비용**: streaming으로 무한히 출력을 받아내는 공격이 가능합니다. 입력만 측정하면 놓칩니다.
+## 먼저 던지는 질문
 
-따라서 LLM 시스템의 rate limit은 (RPS, input tokens/min, output tokens/min, $/min) 네 가지 차원을 모두 추적해야 합니다.
+- LLM rate limiting은 왜 요청 수보다 리소스 소비를 기준으로 봐야 할까요?
+- 토큰, 비용, 사용자·키 단위 한도는 각각 어떤 abuse를 막을까요?
+- 한도 초과 시 차단과 완화 응답은 어떻게 나눠야 할까요?
 
-## Token Bucket과 Sliding Window
+## 왜 이 글이 중요한가
 
-기본 알고리즘 두 가지를 비교합니다.
+다차원 rate limiting을 잘 설계하면 비용 폭주와 서비스 남용을 같은 구조 안에서 통제할 수 있습니다. 사용자 경험을 과도하게 해치지 않으면서도, 비정상적인 burst와 자동화 공격을 조기에 감지할 수 있습니다.
 
-| 알고리즘 | 장점 | 약점 |
-| --- | --- | --- |
-| Token bucket | burst 허용, 구현 단순 | 장시간 평균은 정확하나 짧은 burst가 모이면 비용 폭주 |
-| Sliding window | 평균 정확, 분석 용이 | Redis 키 비용이 큼, burst에 인색 |
+반대로 RPS만 제한하면 대형 입력과 긴 출력으로도 충분히 비용이 폭증합니다. 출력 토큰을 끝에서만 계산하면 무한 스트리밍 공격을 막지 못하고, 사용자 기준 한도만 두면 조직 단위 spend나 IP 회전 공격을 놓치게 됩니다.
 
-LLM에는 token bucket을 quota dimension으로 두고, sliding window를 burst 감지용으로 병행하는 hybrid가 일반적입니다.
+따라서 LLM rate limiting은 네트워크 보호가 아니라 경제적 안전장치이기도 합니다. 토큰과 달러를 함께 통제해야 실제로 안전합니다.
+
+## 핵심 관점
+
+LLM 시스템에서 중요한 것은 “몇 번 호출했는가”보다 “얼마나 많은 리소스를 썼는가”입니다. 토큰 수, 응답 길이, 모델 단가, 스트리밍 지속 시간이 각각 비용과 장애에 직접 연결됩니다. 이 때문에 rate limit도 요청 횟수가 아니라 자원 예산의 형태를 가져야 합니다.
+
+운영 설계는 보통 hybrid입니다. quota 차원에는 token bucket을 쓰고, 비정상 burst 감시에는 sliding window나 이상 탐지를 붙입니다. 여기에 사용자, IP, API 키라는 세 경계를 겹쳐 공격 우회를 어렵게 만듭니다.
+
+> LLM rate limiting의 본질은 초당 요청 제한이 아닙니다. 토큰과 비용이 예산 밖으로 새지 않게 만드는 리소스 회계 시스템입니다.
+
+## 핵심 개념
+
+### LLM 한도는 네 가지 차원을 동시에 봐야 합니다
+
+- **Token cost**: a single request can be 100 tokens or 100,000 tokens. RPS alone cannot prevent cost runaway.
+- **Output token cost**: streaming makes infinite-output attacks possible. Measuring only input misses them.
+
+따라서 최소한 RPS, input tokens per minute, output tokens per minute, dollars per minute를 함께 관리해야 합니다.
+
+### token bucket은 quota 관리의 기본입니다
 
 ```python
 import time
@@ -69,11 +88,9 @@ def token_bucket(key: str, capacity: int, refill_per_sec: float, cost: int) -> b
     return True
 ```
 
-`cost`는 RPS의 경우 1, 토큰의 경우 실제 input/output 토큰 수입니다.
+`cost`를 1로 두면 RPS, 입력 토큰 수로 두면 TPM, 비용 단위로 두면 spend limiter가 됩니다. 같은 메커니즘을 여러 자원에 재사용할 수 있다는 점이 장점입니다.
 
-## Per-User, Per-IP, Per-Key Limits
-
-세 가지 경계를 모두 둡니다.
+### 사용자·IP·키를 함께 제한해야 우회가 어려워집니다
 
 ```python
 def allow_request(user_id: str, ip: str, api_key: str, input_tokens: int) -> tuple[bool, str]:
@@ -88,18 +105,16 @@ def allow_request(user_id: str, ip: str, api_key: str, input_tokens: int) -> tup
     return True, ""
 ```
 
-User 한도는 가장 좁고, IP 한도는 한 사용자가 IP를 돌려가며 우회하지 못하게 합니다. API key 한도는 조직 단위 비용 cap입니다.
+사용자 한도는 개인 남용을 막고, IP 한도는 세션 회전을 막고, 키 한도는 조직 단위 비용 상한을 만듭니다. 세 경계가 겹쳐야 우회 비용이 커집니다.
 
-## 출력 토큰 cap
-
-응답 streaming 중에도 토큰을 차감해야 합니다. 응답이 끝나는 시점에만 차감하면 무한 출력 공격을 막지 못합니다.
+### 출력 토큰은 스트리밍 중에 과금해야 합니다
 
 ```python
 def stream_with_budget(prompt: str, user_id: str, max_output: int):
     bucket_key = f"u:{user_id}:out"
     spent = 0
     for chunk in llm.stream(prompt, max_tokens=max_output):
-        token_count = len(chunk.split())  # 실제는 tokenizer 사용
+        token_count = len(chunk.split())  # use a real tokenizer in production
         if not token_bucket(bucket_key, capacity=200_000, refill_per_sec=200_000/60, cost=token_count):
             yield "[output quota exceeded]"
             return
@@ -107,11 +122,9 @@ def stream_with_budget(prompt: str, user_id: str, max_output: int):
         yield chunk
 ```
 
-`max_tokens` 파라미터를 항상 명시하고, application 단에서도 추가 cap을 둡니다. 모델이 무시하거나 streaming proxy가 다를 수 있습니다.
+`max_tokens`만 믿으면 부족합니다. 애플리케이션 레이어에서 별도 cap을 두고 스트리밍 도중 예산을 차감해야 무한 출력 공격을 막을 수 있습니다.
 
-## 비용 예산 limiter
-
-토큰 단위가 아닌 달러 단위로도 cap을 둡니다. 모델별 단가를 곱해 누적합니다.
+### 비용 캡은 토큰이 아니라 달러 단위로도 필요합니다
 
 ```python
 PRICING = {
@@ -121,15 +134,13 @@ PRICING = {
 
 def charge(user_id: str, model: str, in_tok: int, out_tok: int) -> bool:
     p = PRICING[model]
-    cost_cents = int((in_tok * p["in"] + out_tok * p["out"]) * 100_000)  # 0.001¢ 단위
+    cost_cents = int((in_tok * p["in"] + out_tok * p["out"]) * 100_000)  # 0.001 cent units
     return token_bucket(f"u:{user_id}:cost", capacity=10_000_000, refill_per_sec=10_000_000/86400, cost=cost_cents)
 ```
 
-일일 $10 cap이 위 예시입니다. 사용자의 plan tier에 따라 capacity와 refill을 다르게 설정합니다.
+모델 단가가 다르면 같은 토큰 수라도 비용 영향이 달라집니다. plan tier별로 capacity와 refill 값을 조정하는 편이 일반적입니다.
 
-## 이상 징후 탐지
-
-단순 threshold로 걸리지 않는 패턴을 잡으려면 이상 징후 탐지가 필요합니다. 사용자별 평균과 표준편차를 추적합니다.
+### 이상 징후 탐지는 평균과 분산을 함께 봐야 합니다
 
 ```python
 import math
@@ -152,17 +163,9 @@ class AnomalyDetector:
         return z > 3.0
 ```
 
-Z-score 3을 넘으면 정상 분포에서 0.13% 미만의 이벤트입니다. 평소 분당 5건을 보내던 사용자가 갑자기 분당 200건을 보내면 잡힙니다.
+평균만 보면 평소 편차가 큰 사용자를 오탐지하기 쉽습니다. z-score를 같이 보면 false positive를 줄일 수 있습니다.
 
-## CAPTCHA와 단계적 escalation
-
-이상이 감지되면 즉시 차단보다 단계적 escalation이 사용자 경험을 보호합니다.
-
-1. **경고 응답 헤더**: `X-Rate-Warning: approaching limit`
-2. **Soft throttle**: 응답에 인공 지연 추가
-3. **CAPTCHA 요구**: 새 세션 토큰 발급 시 검증
-4. **API key 일시 중지**: 자동화된 abuse 확실 시
-5. **수동 검토**: 위 단계가 24시간 내 반복되면 ticket 생성
+### 이상 징후 이후에는 단계적 escalation이 낫습니다
 
 ```python
 def handle_anomaly(user_id: str, severity: int):
@@ -177,33 +180,275 @@ def handle_anomaly(user_id: str, severity: int):
         return {"suspended": True}
 ```
 
-## Distributed counter 정확도
+warning → soft throttle → CAPTCHA → suspend 순서가 일반적입니다. 첫 이상 신호에서 즉시 차단하면 정상 burst까지 같이 죽여 사용자 불만이 커집니다.
 
-Redis 단일 노드는 단일 장애 지점입니다. 여러 region에서 limiter를 운영하면 두 가지 옵션이 있습니다.
+### 분산 환경에서는 강한 일관성과 지역 성능을 분리합니다
 
-- **Strong consistency**: Redis Cluster나 etcd 사용. 정확하지만 지연 증가.
-- **Eventual consistency**: region별 local counter + 비동기 sync. 빠르지만 짧은 burst 허용.
+- **Strong consistency**: Redis Cluster or etcd. Accurate but adds latency.
+- **Eventual consistency**: per-region local counters with async sync. Faster but allows brief over-spend bursts.
 
-LLM API는 비용 cap이 중요하므로 보통 strong consistency를 택하고, RPS 한도는 region별 local로 둡니다.
+보통 비용 차원은 강한 일관성을, RPS 차원은 지역 로컬 카운터를 더 선호합니다.
 
-## Common Mistakes
+## 토큰·비용 기반 제한을 API 게이트웨이와 연결하기
 
-1. **RPS만 제한**: 한 요청이 100K 토큰을 쓸 수 있으므로 비용 폭주를 막지 못합니다. 토큰과 비용 차원을 함께 제한합니다.
-2. **출력 토큰 미측정**: 무한 streaming 공격이 통과합니다. 응답 도중에도 차감해야 합니다.
-3. **User 한도만 두고 IP/key 한도 생략**: 한 사용자가 IP를 돌려 우회하거나 한 조직이 quota를 폭주시킵니다.
-4. **이상 징후를 평균만으로 판단**: 표준편차와 z-score를 함께 사용해야 false positive를 줄입니다.
-5. **Anomaly 즉시 차단**: 정상 사용자의 burst도 막아 항의가 폭증합니다. 경고 → 지연 → CAPTCHA → 중지 순서로 escalation합니다.
+rate limiting을 애플리케이션 코드에만 두면 우회 경로가 생기기 쉽습니다. 게이트웨이와 서비스 레이어를 나눠 운영하는 편이 안정적입니다.
 
-## 핵심 요약
+| 계층 | 역할 | 예시 |
+| --- | --- | --- |
+| API Gateway | 1차 RPS/IP 제한 | 초당 burst 방지 |
+| App Layer | 사용자/키 TPM, OPM 제한 | 모델 비용 제어 |
+| Billing Guard | 달러 예산 상한 | 일일 지출 제한 |
 
-- LLM rate limit은 RPS, input tokens, output tokens, 비용 네 차원을 모두 추적합니다.
-- Token bucket으로 quota를, sliding window로 burst를 모니터링하는 hybrid가 표준입니다.
-- User, IP, API key 세 경계에 한도를 걸어 우회를 막습니다.
-- 출력 토큰은 streaming 도중에도 차감하고, max_tokens를 항상 명시합니다.
-- Z-score 기반 이상 탐지와 단계적 escalation으로 false positive와 abuse를 동시에 줄입니다.
+### FastAPI 의사코드 예시
+
+```python
+from fastapi import FastAPI, Request, HTTPException
+
+app = FastAPI()
+
+@app.post('/chat')
+async def chat(req: Request, body: dict):
+    user_id = req.headers.get('x-user-id', 'anon')
+    api_key = req.headers.get('x-api-key', 'none')
+    ip = req.client.host
+    in_tokens = estimate_tokens(body.get('prompt', ''))
+
+    ok, reason = allow_request(user_id=user_id, ip=ip, api_key=api_key, input_tokens=in_tokens)
+    if not ok:
+        raise HTTPException(status_code=429, detail=f'rate limited: {reason}')
+
+    return await handle_llm(body, user_id)
+```
+
+## abuse 패턴과 대응 매트릭스
+
+| 패턴 | 신호 | 대응 |
+| --- | --- | --- |
+| low-RPS high-token 공격 | 요청수는 낮고 토큰 급증 | TPM 한도 우선 차단 |
+| 키 공유 남용 | 여러 IP에서 동일 키 사용 | 키 단위 risk score 상승 |
+| streaming 소모 공격 | 출력 토큰 급증, 응답 지연 증가 | output budget 실시간 차감 |
+| 우회 재시도 | 429 직후 다른 계정/키로 반복 | 계정군 묶음 제재 |
+
+### 단계적 완화 응답
+
+```python
+def degradation_response(level: int) -> dict:
+    if level == 1:
+        return {"mode": "short_answer", "max_output_tokens": 120}
+    if level == 2:
+        return {"mode": "cheap_model", "model": "gpt-4o-mini"}
+    if level >= 3:
+        return {"mode": "block", "status": 429}
+    return {"mode": "normal"}
+```
+
+차단만 반복하면 정상 사용자도 이탈합니다. 완화 단계가 있어야 제품 품질을 지킬 수 있습니다.
+
+## 월간 비용 보호 체크리스트
+
+- [ ] 사용자, 팀, API 키, 전체 프로젝트 예산을 각각 정의합니다.
+- [ ] 예산 70/85/95% 구간 알림을 분리합니다.
+- [ ] 단가 변경 시 즉시 `PRICING` 테이블을 갱신하고 회귀 테스트를 실행합니다.
+- [ ] 고비용 모델은 allowlist 엔드포인트에서만 사용합니다.
+- [ ] 상위 1% 사용자의 토큰 소비 패턴을 주간 리뷰합니다.
+
+## 글로벌/리전별 제한 전략
+
+멀티리전 서비스에서는 한도 정책을 한 곳에서만 계산하면 지연이 커지고, 각 리전에서만 계산하면 과소차단이 생깁니다. 보통은 혼합 전략을 씁니다.
+
+| 자원 | 권장 일관성 | 이유 |
+| --- | --- | --- |
+| RPS | 리전 로컬 | 지연 최소화가 중요 |
+| 입력/출력 토큰 | 준실시간 동기화 | 과소차단 방지 |
+| 비용 예산 | 강한 일관성 | 예산 초과 방지 |
+
+### 리전별 버짓 예약 방식
+
+```python
+def reserve_global_budget(user_id: str, cents: int) -> bool:
+    # 중앙 저장소에서 예산 예약
+    return token_bucket(f"global:{user_id}:cost", capacity=5_000_000, refill_per_sec=5_000_000/86400, cost=cents)
+
+def consume_local_tokens(region: str, user_id: str, tok: int) -> bool:
+    # 리전 캐시에서 빠르게 처리
+    return token_bucket(f"{region}:{user_id}:tok", capacity=80_000, refill_per_sec=80_000/60, cost=tok)
+```
+
+## abuse 대응 런북
+
+1. 탐지: z-score > 3 또는 비용 상승률 > 200%
+2. 완화: short-answer 모드 강제
+3. 제재: CAPTCHA/쿨다운
+4. 차단: 키 일시 정지
+5. 복구: 정상 패턴 확인 후 단계적 해제
+
+### 사용자 안내 메시지 예시
+
+- "요청이 많아 응답 길이를 일시적으로 줄였습니다."
+- "잠시 후 다시 시도해 주세요. 사용량이 정상화되면 자동 해제됩니다."
+
+이런 메시지를 두면 동일 사용자의 반복 재시도를 줄일 수 있습니다.
+
+## 운영 부록: 검증 질문
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+### 운영 검증 질문 세트
+
+- 질문: 이 레이어가 실패했을 때 사용자에게 노출되는 최악의 결과는 무엇인가
+- 답변 기록: 실패 모드별 `fail-open`/`fail-closed` 정책과 책임 팀을 runbook에 남깁니다.
+- 질문: 우회 시도가 반복될 때 자동으로 강화되는 제재 단계가 있는가
+- 답변 기록: 경고, 완화, CAPTCHA, 임시 정지, 영구 차단의 단계와 기준값을 명시합니다.
+- 질문: 차단된 요청을 사람이 재검토할 수 있는 근거가 충분한가
+- 답변 기록: request id, 정책 버전, 점수, 입력 해시, 출력 해시, 시간 정보를 함께 남깁니다.
+- 질문: 정책을 변경했을 때 어떤 지표가 좋아지고 나빠졌는지 확인 가능한가
+- 답변 기록: 변경 전후 7일 기준 차단율, FP율, 지연, 비용을 비교합니다.
+
+## 흔히 헷갈리는 지점
+
+- RPS 한도만 있으면 충분하다고 생각하기 쉽습니다.
+- 입력 토큰만 계산하면 비용도 통제된다고 보기 쉽지만, 출력 스트리밍이 더 큰 구멍일 수 있습니다.
+- 사용자 기준 한도만 있으면 된다고 생각하기 쉽지만, IP 회전과 조직 키 남용을 놓칩니다.
+- anomaly가 보이면 바로 차단하는 것이 최선이라고 여기기 쉽습니다.
+
+## 운영 체크리스트
+
+- [ ] RPS, 입력 토큰, 출력 토큰, 비용 한도를 각각 정의합니다.
+- [ ] 사용자·IP·API 키 경계를 동시에 적용합니다.
+- [ ] 스트리밍 도중 출력 토큰 예산을 차감하고 별도 output cap을 둡니다.
+- [ ] z-score 기반 이상 탐지와 단계적 escalation 정책을 문서화합니다.
+- [ ] 비용 차원은 강한 일관성 저장소로, 지역 RPS는 저지연 카운터로 분리합니다.
+
+## 정리
+
+LLM rate limiting은 더 이상 초당 요청 수 제한이 아닙니다. 토큰과 비용, 출력 길이와 이상 행동을 함께 다루는 예산 시스템입니다. 이 구조를 갖춰야 남용과 비용 폭주를 동시에 막을 수 있습니다.
+
+운영에서는 token bucket이 좋은 출발점이지만, anomaly detection과 escalation이 빠지면 거친 차단 시스템이 됩니다. 반대로 이상 탐지만 있고 강제 한도가 없으면 사고를 실시간으로 막지 못합니다.
+
+여기서 기억할 문장은 하나입니다. 요청을 세지 말고, 소비를 계산해야 합니다.
+
+## 처음 질문으로 돌아가기
+
+- **LLM rate limiting은 왜 요청 수보다 리소스 소비를 기준으로 봐야 할까요?**
+  - 짧은 요청과 긴 요청의 비용이 크게 다르고, 출력 토큰 폭주나 tool loop가 요청 수만으로는 보이지 않기 때문입니다.
+- **토큰, 비용, 사용자·키 단위 한도는 각각 어떤 abuse를 막을까요?**
+  - 토큰 한도는 context·출력 폭주, 비용 한도는 예산 남용, 사용자·키 한도는 credential sharing과 automated scraping을 막습니다.
+- **한도 초과 시 차단과 완화 응답은 어떻게 나눠야 할까요?**
+  - 악성·반복 abuse는 차단하고, 정상 사용자의 일시 초과는 짧은 답변, 대기, 하위 모델, 재시도 안내로 완화할 수 있습니다.
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [AI Safety & Guardrails 101 (1/10): AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection 방어](./02-prompt-injection-defense.md)
+- [AI Safety & Guardrails 101 (3/10): 출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
+- [AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹](./04-pii-detection-redaction.md)
+- [AI Safety & Guardrails 101 (5/10): Jailbreak 탐지](./05-jailbreak-detection.md)
+- [AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지](./06-toxicity-bias-detection.md)
+- [AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증](./07-hallucination-guardrails.md)
+- **AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지 (현재 글)**
+- AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스 (예정)
+- AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
+
+### 공식 문서
 
 - [Stripe Engineering - Scaling your API with rate limiters](https://stripe.com/blog/rate-limiters)
 - [Cloudflare - How we built rate limiting capable of scaling to millions of domains](https://blog.cloudflare.com/counting-things-a-lot-of-different-things/)
 - [OpenAI API - Rate limits documentation](https://platform.openai.com/docs/guides/rate-limits)
 - [Redis - Rate limiting patterns](https://redis.io/docs/latest/develop/use/patterns/distributed-locks/)
+
+### 관련 시리즈
+
+- [LLM API 프로덕션 101 — 속도 제한 관리](../llm-api-production-101/06-rate-limit-management.md)
+- [운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-safety-guardrails-101/ko/08-rate-limiting-abuse-prevention)

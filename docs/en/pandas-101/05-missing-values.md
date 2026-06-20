@@ -1,10 +1,10 @@
 ---
 series: pandas-101
 episode: 5
-title: Handling Missing Values
-status: content-ready
+title: "Pandas 101 (5/10): Handling Missing Values"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,31 @@ tags:
   - Python
   - Beginner
 seo_description: Handle missing data with isna, dropna, fillna, and interpolate — learn the standard patterns and the why behind each choice
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Handling Missing Values
+# Pandas 101 (5/10): Handling Missing Values
 
-> Pandas 101 series (5/10)
+Real datasets are rarely complete. Sensors miss readings, surveys leave blanks behind, and transaction pipelines drop fields at inconvenient moments. That means missing-value handling is not cosmetic cleanup. It is one of the choices that most directly shapes the credibility of your analysis.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Pandas 101 series.
 
-**Core question**: Are *missing values* *something to drop*, or *something to model*?
+In this chapter, I will treat `NaN` as a signal to interpret before it becomes a value to drop or fill. The right first question is not “which method should I use?” but “why is this value missing at all?”
 
-> *Missing values are *messages from your data*. If you do not know *why* a value is missing, you do not know *how* to fill it.*
 
-<!-- a-grade-intro:end -->
+![pandas 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/05/05-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 5 flow overview*
+> *NaN is not garbage — it's a signal. Whether you drop, fill, or interpolate *changes your distribution and your sample size. Choose mindfully.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The meaning of *NaN* and its *dtype* impact
-- How to use *isna / dropna / fillna*
-- The intuition behind *interpolate*
-- A 5-step missing-value hands-on
-- Five common mistakes
+- The meaning of *NaN* and its *dtype* impact?
+- How to use *isna / dropna / fillna?
+- The intuition behind *interpolate?
 
 ## Why It Matters
 
 Real data is *full of missing values*. How you handle them decides *model performance* and *analysis credibility*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Detect["isna / sum"] --> Decide["why missing?"]
-    Decide --> Drop["dropna"]
-    Decide --> Fill["fillna / interpolate"]
-```
 
 ## Key Terms
 
@@ -76,6 +66,16 @@ import numpy as np, pandas as pd
 df = pd.DataFrame({"x": [1, np.nan, 3], "y": [np.nan, 2, 3]})
 print(df.isna())
 print(df.isna().sum())
+```
+
+Start by measuring the pattern, not by choosing a cleanup tool. A one-line diagnostic already tells you where the missingness is concentrated and which columns deserve a closer look.
+
+**Expected output:**
+
+```text
+x    1
+y    1
+dtype: int64
 ```
 
 ### Step 2 — Drop
@@ -104,6 +104,18 @@ print(df.fillna(method="bfill"))
 ```python
 ts = pd.Series([1.0, np.nan, np.nan, 4.0])
 print(ts.interpolate())
+```
+
+Interpolation preserves the shape of a gradual numeric trend better than a blunt constant fill. Time series work is where that difference becomes immediately visible.
+
+**Expected output:**
+
+```text
+0    1.0
+1    2.0
+2    3.0
+3    4.0
+dtype: float64
 ```
 
 ## What to Notice in This Code
@@ -145,21 +157,33 @@ Sensor streams, surveys, transaction logs — the *missingness pattern itself* i
 2. Print *row counts before and after dropna*.
 3. Compare *ffill* and *interpolate* on a *time series* and inspect differences.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 Missing-value handling decides *analysis integrity*. Next we cover *groupby*.
 
+## Answering the Opening Questions
+
+- **The meaning of *NaN* and its *dtype* impact?**
+  - The article treats Handling Missing Values as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to use *isna / dropna / fillna?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The intuition behind *interpolate?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
-- [Reading CSV and Excel](./03-read-csv-and-excel.md)
-- [Filtering and Selection](./04-filtering-and-selection.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
+- [Pandas 101 (3/10): Reading CSV and Excel](./03-read-csv-and-excel.md)
+- [Pandas 101 (4/10): Filtering and Selection](./04-filtering-and-selection.md)
 - **Handling Missing Values (current)**
-- groupby (upcoming)
+- Groupby and Aggregation (upcoming)
 - Merge and Join (upcoming)
 - Time Series (upcoming)
-- apply and Vectorization (upcoming)
-- Real-world Data Analysis (upcoming)
+- Apply and Vectorization (upcoming)
+- Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

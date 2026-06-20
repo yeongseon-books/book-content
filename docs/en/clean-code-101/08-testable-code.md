@@ -1,10 +1,10 @@
 ---
 series: clean-code-101
 episode: 8
-title: Testable Code
-status: content-ready
+title: "Clean Code 101 (8/10): Testable Code"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,44 +18,43 @@ tags:
   - DependencyInjection
   - Refactoring
 seo_description: Make code testable with pure functions, dependency injection, seams, fakes, and spies; isolate time and IO at boundaries.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Testable Code
+# Clean Code 101 (8/10): Testable Code
 
-> Clean Code 101 series (8/10)
+Some code takes one line to test and some code fights back with clocks, networks, databases, and hidden globals. That difference is usually a design decision, not a testing-library problem.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Clean Code 101 series.
 
-**Core question**: Why is some code one line to test while other code resists testing entirely?
+Here we will push time, IO, and randomness to the boundaries, then use seams, fakes, and adapters to make tests fast enough that they can guide everyday refactoring.
 
-> The way side effects and dependencies are handled decides it. Separate them and tests fall out naturally.
 
-<!-- a-grade-intro:end -->
+![clean code 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/08/08-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 8 flow overview*
+> Pure logic at the center, thin adapters at the boundary.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Separating pure logic from side effects
-- Creating seams with dependency injection
-- Fakes and spies as test doubles
-- Handling non-deterministic dependencies (time, randomness)
-- Refactorings that improve testability
+- What boundary should you inspect first when applying Testable Code?
+- Which signal should the example or diagram make visible for Testable Code?
+- What failure should be prevented first when Testable Code reaches a real system?
+
+## Questions this article answers
+
+- How should you separate pure logic from side effects?
+- How does dependency injection create seams for testing?
+- When should you use a fake, and when should you use a spy?
+- How do you handle non-deterministic dependencies such as time and randomness?
+- Which refactorings directly improve testability?
+
+> Testability is not an after-the-fact outcome. It is a byproduct of design, shaped by how well you push side effects and dependencies outward.
 
 ## Why It Matters
 
 Hard-to-test code is a sign of hard-to-change structure. Testability is a measure of design quality.
 
 > Testability is not an outcome. It is a result of design.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    L["Logic"] --> P["Pure functions"]
-    L --> S["Side-effect adapters"]
-    P --> T1["Unit tests"]
-    S --> T2["Integration tests"]
-```
 
 A pure core surrounded by thin adapters.
 
@@ -159,6 +158,23 @@ def fetch_user(uid, http: HttpClient):
 
 Concentrate external calls in a single adapter.
 
+## How to Verify This in a Real Codebase
+
+```bash
+python -m pytest -q tests/test_total.py tests/test_notify.py
+python -m pytest -q tests/test_http_adapter.py
+```
+
+**Expected output**
+
+- Pure-function tests should finish almost instantly.
+- Only adapter tests should cross real IO boundaries.
+
+## Failure Modes to Watch
+
+- `datetime.now()` or randomness still lives inside core logic.
+- Mock count rises but the function responsibilities stay oversized.
+
 ## What to Notice in This Code
 
 - The core logic knows nothing about IO.
@@ -203,17 +219,29 @@ Strong teams use hexagonal / ports-and-adapters to keep the domain core away fro
 
 Testability mirrors design. Next: how to safely change code — refactoring basics.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Testable Code?**
+  - The article treats Testable Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Testable Code?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Testable Code reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
-- [Naming](./02-naming.md)
-- [Small Functions](./03-small-functions.md)
-- [Simplifying Conditionals](./04-simplifying-conditionals.md)
-- [Removing Duplication](./05-removing-duplication.md)
-- [Error Handling](./06-error-handling.md)
-- [Comments and Documentation](./07-comments-and-docs.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
+- [Clean Code 101 (2/10): Naming](./02-naming.md)
+- [Clean Code 101 (3/10): Small Functions](./03-small-functions.md)
+- [Clean Code 101 (4/10): Simplifying Conditionals](./04-simplifying-conditionals.md)
+- [Clean Code 101 (5/10): Removing Duplication](./05-removing-duplication.md)
+- [Clean Code 101 (6/10): Error Handling](./06-error-handling.md)
+- [Clean Code 101 (7/10): Comments and Documentation](./07-comments-and-docs.md)
 - **Testable Code (current)**
 - Refactoring Basics (upcoming)
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -222,3 +250,5 @@ Testability mirrors design. Next: how to safely change code — refactoring basi
 - [Hexagonal Architecture (Alistair Cockburn)](https://alistair.cockburn.us/hexagonal-architecture/)
 - [Mocks Aren't Stubs (Martin Fowler)](https://martinfowler.com/articles/mocksArentStubs.html)
 - [Pytest — Fixtures](https://docs.pytest.org/en/stable/how-to/fixtures.html)
+- [Pytest fixtures](https://docs.pytest.org/en/stable/how-to/fixtures.html)
+- [Hexagonal architecture](https://alistair.cockburn.us/hexagonal-architecture/)

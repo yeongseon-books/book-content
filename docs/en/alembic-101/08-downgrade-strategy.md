@@ -1,11 +1,11 @@
 ---
-title: 'Downgrade strategy: when to write it for real and when to forbid it'
+title: "Alembic 101 (8/10): Downgrade strategy: when to write it for real and when to forbid it"
 series: alembic-101
 episode: 8
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,26 @@ tags:
 - expand-contract
 - rollback
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: 'Downgrade splits into two kinds. (1) Reversible changes: a precise
   inverse exists with no data loss (e.g., adding a nullable column).'
 ---
 
-# Downgrade strategy: when to write it for real and when to forbid it
+# Alembic 101 (8/10): Downgrade strategy: when to write it for real and when to forbid it
 
-## What you will learn
+The existence of a `downgrade()` function does not make a change safe to reverse. Some revisions can be undone precisely, while others imply immediate data loss the moment you try.
 
-- When a production downgrade is possible and when it is effectively impossible
-- The kinds of irreversible changes and how to handle them
-- How the expand-contract pattern restores the ability to downgrade
-- How to express a "no downgrade" policy at the code level
-- How to choose between forward-fix and downgrade when something goes wrong
+This is post 8 in the Alembic 101 series. Here we will separate reversible from irreversible changes and show how to encode that policy honestly.
+
+
+![alembic 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/08/08-01-diagram-deciding-between-reversible-and.en.png)
+*alembic 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- When a production downgrade is possible and when it is effectively impossible?
+- The kinds of irreversible changes and how to handle them?
+- How the expand-contract pattern restores the ability to downgrade?
 
 ## Why it matters
 
@@ -41,6 +47,8 @@ When you first learn alembic, downgrade looks like an obvious built-in feature. 
 > Downgrade splits into two kinds. **(1) Reversible changes: a precise inverse exists with no data loss (e.g., adding a nullable column). (2) Irreversible changes: the inverse implies data loss (e.g., dropping a column, a data migration).** Write the first kind for real and explicitly block the second.
 
 The git analogy: type 1 is a commit that reverts cleanly; type 2 is a merged history you cannot undo without a force-push.
+
+### Diagram: deciding between reversible and irreversible changes
 
 ## Core concepts
 
@@ -193,6 +201,14 @@ Downgrade policy:
 - Production rollback: forward-fix only; restore from backup if necessary
 ```
 
+## Verification routine
+
+```bash
+alembic downgrade -1
+```
+
+**Expected output:** for an irreversible revision, the command fails fast with `NotImplementedError` instead of appearing to succeed.
+
 ## Common mistakes
 
 - **`pass` on an irreversible change.** Silent success is the most dangerous outcome. Use `NotImplementedError` to be explicit.
@@ -230,12 +246,35 @@ Downgrade is not a "feature on by default" — it is a feature decided by policy
 
 The next post covers deploy ordering between application code and schema changes, and the blue/green safety rules.
 
-## References
+## Answering the Opening Questions
 
-- Alembic: Operation Reference — https://alembic.sqlalchemy.org/en/latest/ops.html
-- Martin Fowler: Evolutionary Database Design — https://martinfowler.com/articles/evodb.html
-- "Refactoring Databases" by Scott Ambler & Pramod Sadalage (expand-contract origin)
-- PostgreSQL Wiki: Don't Do This — https://wiki.postgresql.org/wiki/Don%27t_Do_This
+- **When a production downgrade is possible and when it is effectively impossible?**
+  - The article treats Downgrade strategy: when to write it for real and when to forbid it as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The kinds of irreversible changes and how to handle them?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How the expand-contract pattern restores the ability to downgrade?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
+## In this series
+
+- [Alembic 101 (1/10): Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [Alembic 101 (2/10): env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Alembic 101 (3/10): Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- [Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
+- [Alembic 101 (5/10): branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
+- [Alembic 101 (6/10): Data migrations: separating schema changes from data changes](./06-data-migrations.md)
+- [Alembic 101 (7/10): Online and offline modes: previewing DDL with --sql and handling SQLite batch](./07-online-vs-offline-and-batch.md)
+- **Downgrade strategy: when to write it for real and when to forbid it (current)**
+- Deploy ordering and blue/green: synchronizing schema and application code safely (upcoming)
+- Production and team workflow: PR, CI, monitoring, and incident response (upcoming)
+
 <!-- toc:end -->
+
+## References
+
+- [sqlalchemy/alembic GitHub repository](https://github.com/sqlalchemy/alembic)
+- [Alembic: Operation Reference](https://alembic.sqlalchemy.org/en/latest/ops.html)
+- [Martin Fowler: Evolutionary Database Design](https://martinfowler.com/articles/evodb.html)
+- "Refactoring Databases" by Scott Ambler & Pramod Sadalage (expand-contract origin)
+- [PostgreSQL Wiki: Don't Do This](https://wiki.postgresql.org/wiki/Don%27t_Do_This)

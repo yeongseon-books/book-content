@@ -1,10 +1,10 @@
 ---
 series: data-science-101
 episode: 10
-title: End-to-End Data Project Flow
-status: content-ready
+title: "Data Science 101 (10/10): End-to-End Data Project Flow"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,36 @@ tags:
   - Workflow
   - Beginner
 seo_description: A churn prediction capstone that walks one data project from problem framing to a decision, connecting all nine prior episodes into a single flow
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# End-to-End Data Project Flow
+# Data Science 101 (10/10): End-to-End Data Project Flow
 
-> Data Science 101 series (10/10)
+After learning each stage in isolation, the hardest remaining step is orchestration. Problem framing, collection, cleaning, EDA, modeling, evaluation, and interpretation all make sense individually, but real work rarely arrives one chapter at a time. It arrives as one messy project that has to move from question to action.
 
-<!-- a-grade-intro:begin -->
+That is why the capstone matters. The value of the series is not that you can name every stage. It is that you can connect them into a loop with a deliverable, an owner, and a follow-up review.
 
-**Core question**: How do the nine steps we have learned look when *connected into one project*?
+This is the final post in the Data Science 101 series. In this chapter, we turn the earlier episodes into one churn-prediction project so the full workflow feels operational, not just conceptual.
 
-> *The final episode is the assembly episode.*
 
-<!-- a-grade-intro:end -->
+![data science 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/10/10-01-concept-at-a-glance.en.png)
+*data science 101 chapter 10 flow overview*
+> At its core, End-to-End Data Project Flow is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying End-to-End Data Project Flow?
+- Which signal should the example or diagram make visible for End-to-End Data Project Flow?
+- What failure should be prevented first when End-to-End Data Project Flow reaches a real system?
+
+## Questions This Post Answers
+
+- How do the earlier chapters connect inside one real project?
+- What deliverable should each stage leave behind for the next one?
+- Why is a short problem-to-decision loop often more valuable than a more complex model?
+- Where do ownership and monitoring fit once the first analysis ships?
+
+> A complete project closes the loop only when each stage hands the next stage a concrete artifact and a clear decision point.
 
 ## What You Will Learn
 
@@ -46,16 +62,7 @@ Looking at parts in isolation gives you *fragments*; following one project from 
 
 > *Whoever has built the whole once builds the next project faster.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Problem["1. Problem"] --> Data["2-3. Collect/Clean"]
-    Data --> EDA["4-5. EDA/Viz"]
-    EDA --> Model["6-7. Model/Eval"]
-    Model --> Decide["8-9. Interpret/Decide"]
-    Decide --> Ship["Ship & Monitor"]
-```
+The key boundary in this episode is between the concept itself and how it operates in a real system. You need to know where the data comes in, where the decision happens, and what signal must be recorded.
 
 ## Key Terms
 
@@ -121,6 +128,8 @@ Decision: send the re-engagement campaign this Friday
 Owner: Growth team / Review: in 2 weeks
 ```
 
+**Expected output:** a project action memo with segment size, projected lift, execution date, owner, and review date.
+
 ## What to Notice in This Code
 
 - The flow *closes* from *problem to decision*.
@@ -164,17 +173,29 @@ Data teams write a *one-page project doc* (problem, metric, data, baseline, deci
 
 This series was an assembly journey through the *problem → data → model → decision* flow. Next, the *Statistics 101*, *Machine Learning 101*, and *MLOps 101* series go *deeper into each step*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying End-to-End Data Project Flow?**
+  - The article treats End-to-End Data Project Flow as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for End-to-End Data Project Flow?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when End-to-End Data Project Flow reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Data Science?](./01-what-is-data-science.md)
-- [Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
-- [Data Collection](./03-data-collection.md)
-- [Data Cleaning](./04-data-cleaning.md)
-- [Exploratory Data Analysis](./05-exploratory-data-analysis.md)
-- [Visualization](./06-visualization.md)
-- [Modeling](./07-modeling.md)
-- [Evaluation](./08-evaluation.md)
-- [Result Interpretation](./09-result-interpretation.md)
+## In this series
+
+- [Data Science 101 (1/10): What Is Data Science?](./01-what-is-data-science.md)
+- [Data Science 101 (2/10): Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
+- [Data Science 101 (3/10): Data Collection](./03-data-collection.md)
+- [Data Science 101 (4/10): Data Cleaning](./04-data-cleaning.md)
+- [Data Science 101 (5/10): Exploratory Data Analysis](./05-exploratory-data-analysis.md)
+- [Data Science 101 (6/10): Visualization](./06-visualization.md)
+- [Data Science 101 (7/10): Modeling](./07-modeling.md)
+- [Data Science 101 (8/10): Evaluation](./08-evaluation.md)
+- [Data Science 101 (9/10): Result Interpretation](./09-result-interpretation.md)
 - **End-to-End Data Project Flow (current)**
+
 <!-- toc:end -->
 
 ## References

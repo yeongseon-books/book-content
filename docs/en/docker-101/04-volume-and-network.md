@@ -1,10 +1,10 @@
 ---
 series: docker-101
 episode: 4
-title: Volumes and Networks
-status: content-ready
+title: "Docker 101 (4/10): Volumes and Networks"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,44 +17,32 @@ tags:
   - BindMount
   - Bridge
 seo_description: How volumes, bind mounts, and networks let containers persist data and talk to each other safely with named DNS.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Volumes and Networks
+# Docker 101 (4/10): Volumes and Networks
 
-> Docker 101 series (4/10)
+Running one container is the easy part. The real operational questions begin as soon as you need data to survive a restart and one container to reach another container without guessing IP addresses. Those two requirements show up almost immediately in real applications.
 
-<!-- a-grade-intro:begin -->
+Docker gives you separate tools for the two problems on purpose. Volumes control data lifetime. Networks control communication paths. Keeping those concerns separate is what prevents “the database disappeared” and “the app cannot find the database” from becoming routine incidents.
 
-**Core question**: How do you keep *data alive across restarts* and let containers *talk to each other*?
+This is post 4 in the Docker 101 series. It focuses on when to use named volumes, bind mounts, and user-defined bridge networks, plus the concrete checks you should run before you trust persistence or name-based communication.
 
-> *Volumes decide *data lifetime*; networks decide *paths between containers*.*
 
-<!-- a-grade-intro:end -->
+![docker 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.en.png)
+*docker 101 chapter 4 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The difference between *volume / bind mount / tmpfs*
-- *Bridge / host / none* network modes
-- Communicating *by container name*
-- A *backup pattern* for volumes
-- Five common pitfalls
+- The difference between *volume / bind mount / tmpfs?
+- Bridge / host / none* network modes?
+- Communicating *by container name?
 
 ## Why It Matters
 
 *Data loss* and *broken communication* are the *most common incidents* in container ops. The right *volume/network model* prevents both.
 
 > *The moment *state leaks* into a stateless container, an incident begins.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Host["Host disk"] -->|bind mount| C1["Container A"]
-    Vol["Docker volume"] -->|named| C2["Container B"]
-    C1 --- Net["bridge network"]
-    C2 --- Net
-```
 
 ## Key Terms
 
@@ -111,6 +99,16 @@ docker run --rm \
   alpine tar czf /backup/data.tgz -C /data .
 ```
 
+### Verify right after you run it
+
+- `docker volume inspect app-data` should show a named volume that exists independently of any one container, and `docker exec api ping -c 1 db` should prove name-based resolution on the bridge network.
+- If you ran the backup step, confirm that `data.tgz` was actually created in the working directory.
+
+### If it does not work, check this first
+
+- If the app still tries to reach the database on `localhost`, inspect the injected `DB_HOST` value before troubleshooting Docker networking.
+- Permission failures on a bind mount usually come from a mismatch between host ownership and the UID inside the container.
+
 ## What to Notice in This Code
 
 - A *named volume* lives *independent of containers*.
@@ -154,10 +152,21 @@ Orchestrators (e.g., Kubernetes) extend the same ideas with *PersistentVolume* a
 
 Data and networking are the *pillars* of container ops. Next, *Docker Compose* runs many containers *at once*.
 
+## Answering the Opening Questions
+
+- **The difference between *volume / bind mount / tmpfs?**
+  - The article treats Volumes and Networks as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Bridge / host / none* network modes?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Communicating *by container name?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
-- [Images and Containers](./02-image-and-container.md)
-- [Writing a Dockerfile](./03-dockerfile.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Images and Containers](./02-image-and-container.md)
+- [Docker 101 (3/10): Writing a Dockerfile](./03-dockerfile.md)
 - **Volumes and Networks (current)**
 - Docker Compose (upcoming)
 - Environment Variables and Configuration (upcoming)
@@ -165,11 +174,18 @@ Data and networking are the *pillars* of container ops. Next, *Docker Compose* r
 - Running with a Database (upcoming)
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References
+
+### Official docs
 
 - [Volumes](https://docs.docker.com/storage/volumes/)
 - [Bind mounts](https://docs.docker.com/storage/bind-mounts/)
 - [Networking overview](https://docs.docker.com/network/)
 - [Use bridge networks](https://docs.docker.com/network/bridge/)
+
+### Verification and troubleshooting
+
+- [docker volume inspect reference](https://docs.docker.com/reference/cli/docker/volume/inspect/)

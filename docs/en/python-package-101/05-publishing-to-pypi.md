@@ -1,11 +1,11 @@
 ---
-title: Publishing to PyPI — from TestPyPI to production
+title: "Python Package 101 (5/10): Publishing to PyPI — from TestPyPI to production"
 series: python-package-101
 episode: 5
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,29 +17,25 @@ tags:
 - Publishing
 - TestPyPI
 - Distribution
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: PyPI is the app store for Python packages and twine is the tool that
   uploads your built package to PyPI.
 ---
 
-# Publishing to PyPI — from TestPyPI to production
+# Python Package 101 (5/10): Publishing to PyPI — from TestPyPI to production
 
-> Python Package 101 series (5/10)
+Publishing is where packaging shifts from local correctness to operational discipline. Account setup, token handling, staging uploads, and install verification all matter before you expose a package to real users.
 
----
+This is post 5 in the Python Package 101 series. Here we separate TestPyPI from PyPI, walk through the `twine` upload flow, and build a safer release habit around staging-first validation.
 
-<!-- a-grade-intro:begin -->
+![Python Package 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/05/05-01-mental-model.en.png)
+*Python Package 101 chapter 5 flow overview*
 
-## Key Questions
+## Questions to Keep in Mind
 
 - What is the difference between PyPI and TestPyPI?
 - What role does `twine` play?
 - How do you generate and manage API tokens?
-- Can you modify a version after uploading it?
-
-> PyPI is the app store for Python packages and twine is the tool that uploads your built package to PyPI.
-
-<!-- a-grade-intro:end -->
 
 ## What you will learn
 
@@ -236,19 +232,28 @@ Package names are hard to change once chosen. Pick a name that is intuitive, doe
 
 The next post covers **versioning and releases** — SemVer, Git tags, and CHANGELOG.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is a Python Package?](./01-what-is-a-python-package.md)
-- [Project Structure — src layout and pyproject.toml](./02-project-structure.md)
-- [Dependency Management — venv, pip, uv, requirements](./03-dependency-management.md)
-- [Building Packages — wheel and sdist](./04-building-packages.md)
-- **Publishing to PyPI — from TestPyPI to production (current)**
-- Versioning and Releases (upcoming)
-- CLI Packages (upcoming)
-- Type Hints and Static Analysis (upcoming)
-- Documentation — README, MkDocs, API Reference (upcoming)
-- Production Package Template (upcoming)
+- **What is the difference between PyPI and TestPyPI?**
+  - The article treats Publishing to PyPI — from TestPyPI to production as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What role does `twine` play?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do you generate and manage API tokens?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Python Package 101 (1/10): What Is a Python Package?](./01-what-is-a-python-package.md)
+- [Python Package 101 (2/10): Project Structure — src layout and pyproject.toml](./02-project-structure.md)
+- [Python Package 101 (3/10): Dependency Management — venv, pip, uv, requirements](./03-dependency-management.md)
+- [Python Package 101 (4/10): Building Packages — wheel and sdist](./04-building-packages.md)
+- **Python Package 101 (5/10): Publishing to PyPI — from TestPyPI to production (current)**
+- Python Package 101 (6/10): Versioning and Releases (upcoming)
+- Python Package 101 (7/10): CLI Packages (upcoming)
+- Python Package 101 (8/10): Type Hints and Static Analysis (upcoming)
+- Python Package 101 (9/10): Documentation — README, MkDocs, API Reference (upcoming)
+- Python Package 101 (10/10): Production Package Template (upcoming)
 
 <!-- toc:end -->
 

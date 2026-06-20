@@ -1,10 +1,10 @@
 ---
 series: sre-101
 episode: 7
-title: Postmortem
+title: "SRE 101 (7/10): Postmortem"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,34 @@ tags:
   - Learning
   - Operations
 seo_description: A beginner-friendly guide to postmortems covering definitions, blameless culture, writing templates, action tracking, and organizational learning
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Postmortem
+# SRE 101 (7/10): Postmortem
 
-> SRE 101 series (7/10)
+Once an incident is mitigated, teams feel relief first. That is natural, but it also creates the risk that recovery becomes the end of the story even when the same weakness is still sitting in the system.
 
-<!-- a-grade-intro:begin -->
+Postmortems matter because they capture what was visible, what was missing, why decisions made sense at the time, and what has to change so the next incident is smaller or easier to resolve.
 
-**Core question**: After an outage ends, what should the *team leave behind*?
+This is post 7 in the SRE 101 series. Here we treat postmortems as a learning system built from blameless analysis, reusable structure, and tracked follow-up work.
 
-> A *postmortem* is a *learning system*, not a *document*.
 
-<!-- a-grade-intro:end -->
+![sre 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/07/07-01-concept-at-a-glance.en.png)
+*sre 101 chapter 7 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *definition* of a *postmortem*
-- *Blameless culture*
-- A writing *template*
-- *Action item* tracking
-- *Organizational learning*
+- Why is a postmortem closer to an organizational learning tool than to a simple report?
+- Why does blame suppress the very context a team needs to improve?
+- What sections should a useful postmortem always contain?
 
-## Why It Matters
+## Why this topic matters
 
-*Repeated outages* are the result of *missing learning*.
+Repeated outages are often the result of missing learning, not missing effort. If the team cannot preserve the timeline, causes, and follow-up changes, the next incident starts from the same weak foundation.
 
-## Concept at a Glance
+Good postmortems turn one painful event into shared operating knowledge. That is how incident response becomes better over time instead of merely familiar.
 
-```mermaid
-flowchart LR
-    Incident["incident"] --> Doc["postmortem"]
-    Doc --> Actions["actions"]
-    Actions --> Tracker["tracker"]
-    Tracker --> Review["review"]
-```
+> A postmortem is a learning system, not a document.
 
 ## Key Terms
 
@@ -155,17 +147,29 @@ def open_actions(items):
 
 Next, we cover *reducing toil*.
 
+## Answering the Opening Questions
+
+- **Why is a postmortem closer to an organizational learning tool than to a simple report?**
+  - The article treats Postmortem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why does blame suppress the very context a team needs to improve?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What sections should a useful postmortem always contain?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is SRE?](./01-what-is-sre.md)
-- [Reliability](./02-reliability.md)
-- [SLI, SLO, SLA](./03-sli-slo-sla.md)
-- [Error Budget](./04-error-budget.md)
-- [Monitoring](./05-monitoring.md)
-- [Incident Response](./06-incident-response.md)
+## In this series
+
+- [SRE 101 (1/10): What is SRE?](./01-what-is-sre.md)
+- [SRE 101 (2/10): Reliability](./02-reliability.md)
+- [SRE 101 (3/10): SLI, SLO, SLA](./03-sli-slo-sla.md)
+- [SRE 101 (4/10): Error Budget](./04-error-budget.md)
+- [SRE 101 (5/10): Monitoring](./05-monitoring.md)
+- [SRE 101 (6/10): Incident Response](./06-incident-response.md)
 - **Postmortem (current)**
 - Reducing Toil (upcoming)
 - Capacity Planning (upcoming)
 - Building Operable Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

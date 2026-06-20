@@ -1,10 +1,10 @@
 ---
 series: data-structures-101
 episode: 8
-title: Heaps
+title: "Data Structures 101 (8/10): Heaps"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,23 @@ seo_description: How a heap is structured, why it is the standard implementation
 last_reviewed: '2026-05-04'
 ---
 
-# Heaps
+# Data Structures 101 (8/10): Heaps
 
-> Data Structures 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
+This is the eighth post in the Data Structures 101 series.
 
 **Core question**: When you constantly need to pull out the highest-priority task, which data structure should you reach for? Keeping the data sorted makes inserts slow; leaving it unordered makes pops slow.
 
 > A heap is a complete binary tree with one rule: the parent is always less than or equal to its children (min-heap) or greater than or equal to them (max-heap). That single rule lets you read the minimum (or maximum) in O(1) and remove it in O(log n). The heap is the standard implementation of a priority queue, and Python ships it as the `heapq` module. This article walks through how heaps work, how they map onto an array, and how to implement one yourself.
 
-<!-- a-grade-intro:end -->
+
+![data structures 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/08/08-01-heap-array-mapping.en.png)
+*data structures 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Heaps?
+- Which signal should the example or diagram make visible for Heaps?
+- What failure should be prevented first when Heaps reaches a real system?
 
 ## What You Will Learn
 
@@ -46,19 +52,9 @@ Heaps are the backbone of task scheduling, Dijkstra's algorithm, event simulatio
 
 > Heap = the de facto implementation of a priority queue.
 
-## Concept at a Glance
-
 > A heap is a complete binary tree that maintains an ordering invariant between every parent-child pair. Because the tree is complete, you can store it inside an array with no gaps and find parents and children purely by index arithmetic. The result is excellent memory efficiency.
 
-```text
-Min-heap
-        1            index: 0  1  2  3  4  5  6
-       / \           array: [1, 3, 2, 5, 4, 6, 7]
-      3   2
-     / \ / \         parent(i)      = (i - 1) // 2
-    5  4 6  7        left_child(i)  = 2*i + 1
-                     right_child(i) = 2*i + 2
-```
+### Heap array mapping
 
 ## Key Terms
 
@@ -144,7 +140,6 @@ class MinHeap:
             self._data[i], self._data[smallest] = self._data[smallest], self._data[i]
             i = smallest
 
-
 h = MinHeap()
 for v in [5, 3, 8, 1, 9, 2]:
     h.push(v)
@@ -183,23 +178,47 @@ print(heapq.nlargest(3, data))    # [9, 8, 7]
 
 ```python
 import heapq
+from itertools import count
 
-# Store (priority, task) tuples
-tasks = []
-heapq.heappush(tasks, (3, "report"))
-heapq.heappush(tasks, (1, "alert"))
-heapq.heappush(tasks, (2, "email"))
+queue = []
+tie_breaker = count()
 
-while tasks:
-    priority, task = heapq.heappop(tasks)
-    print(f"[{priority}] {task}")
+def schedule(priority, task):
+    heapq.heappush(queue, (priority, next(tie_breaker), task))
 
-# [1] alert
-# [2] email
-# [3] report
+schedule(0, "critical alert")
+schedule(2, "nightly batch")
+schedule(1, "retry failed payment")
+schedule(0, "page on-call")
+schedule(1, "retry webhook")
+
+order = []
+while queue:
+    priority, _, task = heapq.heappop(queue)
+    order.append((priority, task))
+
+print(order)
+
+expected = [
+    (0, "critical alert"),
+    (0, "page on-call"),
+    (1, "retry failed payment"),
+    (1, "retry webhook"),
+    (2, "nightly batch"),
+]
+print(f"order matches expectation: {order == expected}")
+
+# [
+#   (0, 'critical alert'),
+#   (0, 'page on-call'),
+#   (1, 'retry failed payment'),
+#   (1, 'retry webhook'),
+#   (2, 'nightly batch'),
+# ]
+# order matches expectation: True
 ```
 
-If you need to break ties at the same priority, switch to `(priority, counter, task)` so the comparison stays stable.
+This is much closer to a real scheduler than a three-item toy demo. If the dequeue order differs, you probably flipped the priority direction, forgot the tie-break counter, or broke the heap invariant by mutating queue entries in place.
 
 ### Step 4: heapify — turn an array into a heap in one pass
 
@@ -218,12 +237,10 @@ Pushing n items into an empty heap costs O(n log n), but heapifying once costs O
 ```python
 import heapq
 
-
 def heap_sort(data):
     h = data[:]
     heapq.heapify(h)
     return [heapq.heappop(h) for _ in range(len(h))]
-
 
 print(heap_sort([5, 3, 8, 1, 9, 2, 7]))
 # [1, 2, 3, 5, 7, 8, 9]
@@ -284,17 +301,29 @@ A heap is a complete binary tree specialised for handling the two extremes quick
 
 The next article moves on to graphs, the most general way to represent relationships in data. A tree is a special case of a graph, and you will study the standard ways to represent graphs together with the basic algorithms.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Heaps?**
+  - The article treats Heaps as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Heaps?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Heaps reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
-- [Linked Lists](./03-linked-lists.md)
-- [Stacks and Queues](./04-stacks-and-queues.md)
-- [Hash Tables](./05-hash-tables.md)
-- [Trees](./06-trees.md)
-- [Binary Search Trees](./07-binary-search-trees.md)
+## In this series
+
+- [Data Structures 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
+- [Data Structures 101 (3/10): Linked Lists](./03-linked-lists.md)
+- [Data Structures 101 (4/10): Stacks and Queues](./04-stacks-and-queues.md)
+- [Data Structures 101 (5/10): Hash Tables](./05-hash-tables.md)
+- [Data Structures 101 (6/10): Trees](./06-trees.md)
+- [Data Structures 101 (7/10): Binary Search Trees](./07-binary-search-trees.md)
 - **Heaps (current)**
 - Graphs (upcoming)
 - Choosing Data Structures (upcoming)
+
 <!-- toc:end -->
 
 ## References

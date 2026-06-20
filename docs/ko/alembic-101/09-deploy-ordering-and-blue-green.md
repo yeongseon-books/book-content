@@ -1,13 +1,13 @@
 ---
-title: '배포 순서와 blue/green: schema와 application code의 안전한 동기화'
+title: "Alembic 101 (9/10): 배포 순서와 blue/green: schema와 application code의 안전한 동기화"
 series: alembic-101
 episode: 9
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,28 +17,36 @@ tags:
 - blue-green
 - ordering
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: migration은 항상 "코드보다 먼저, 그리고 코드보다 호환성이 넓게"입니다.
 ---
 
-# 배포 순서와 blue/green: schema와 application code의 안전한 동기화
+# Alembic 101 (9/10): 배포 순서와 blue/green: schema와 application code의 안전한 동기화
 
-## 핵심 질문
+이 글은 Alembic 101 시리즈의 아홉 번째 글입니다. 여기서는 migration과 application code를 어떤 순서로 배포해야 안전한지, 그리고 blue/green 환경에서 schema 호환성을 어떻게 설계해야 하는지 정리합니다.
 
-마이그레이션과 애플리케이션 배포 순서를 어떻게 잡아야 무중단 블루/그린 배포가 가능할까요?
+많은 schema 사고는 migration 코드 자체보다 deploy ordering에서 시작됩니다. 특히 blue/green이나 rolling 환경에서는 두 버전의 앱이 같은 DB를 동시에 사용하므로, schema는 항상 그 두 버전 모두와 호환되어야 합니다.
 
-이 글은 그 질문에 답하기 위해 배포 순서와 블루/그린의 핵심 결정과 실무 함정을 살펴봅니다.
+![Alembic 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.ko.png)
+*Alembic 101 9장 흐름 개요*
 
+## 먼저 던지는 질문
 
-## 이 글에서 다룰 문제
+- migration-first와 code-first deploy ordering은 어떻게 다를까요?
+- 왜 blue/green deploy는 두 앱 버전과 동시에 호환되는 schema를 요구할까요?
+- NOT NULL 강화는 왜 두 단계로 나눠야 할까요?
 
-production에서 가장 많은 schema 사고는 코드와 schema의 배포 순서가 어긋났을 때 발생합니다. 새 컬럼이 코드보다 먼저 만들어져 있으면 안전하지만, 코드가 새 컬럼을 먼저 사용하기 시작하는데 schema가 따라오지 않으면 즉시 500 에러입니다. blue/green 배포에서는 두 버전이 동시에 같은 schema에 접근하므로, schema는 항상 두 버전과 호환되어야 합니다.
+## 왜 중요한가
 
-## Mental Model
+production schema 사고의 상당수는 코드와 schema가 잘못된 순서로 배포될 때 발생합니다. 새 컬럼이 코드보다 먼저 존재하면 안전하지만, 코드가 새 컬럼을 먼저 가정하고 schema가 뒤따라오면 즉시 500 에러가 납니다. blue/green에서는 v1과 v2가 동시에 같은 schema를 읽고 쓰므로, schema는 전환 구간 내내 양쪽을 모두 수용해야 합니다.
 
-> migration은 항상 **"코드보다 먼저, 그리고 코드보다 호환성이 넓게"**입니다. 새 컬럼을 추가할 때는 컬럼이 먼저 존재하고, 컬럼을 제거할 때는 코드가 먼저 사용을 멈춥니다. 이 두 방향을 한 줄로 외우면 거의 모든 배포 사고가 사라집니다.
+## 멘탈 모델
 
-git에 비유하면 migration은 코드보다 빠른 PR이고, drop은 코드의 사용 중단 PR보다 늦은 PR입니다.
+> migration은 항상 **“코드보다 먼저, 그리고 코드보다 더 넓은 호환성으로”** 배포됩니다. 컬럼을 추가할 때는 컬럼이 먼저 존재해야 하고, 컬럼을 제거할 때는 코드가 먼저 사용을 멈춰야 합니다. 이 두 방향만 기억해도 deploy 사고 대부분을 피할 수 있습니다.
+
+git 비유로 보면 migration은 코드 PR보다 먼저 들어가는 PR이고, drop은 “이 컬럼 사용을 중단한다”는 코드 PR보다 나중에 들어가는 PR입니다.
+
+### 다이어그램: blue/green에서 schema가 두 버전을 동시에 받아야 하는 시점
 
 ## 핵심 개념
 
@@ -46,91 +54,105 @@ git에 비유하면 migration은 코드보다 빠른 PR이고, drop은 코드의
 
 | 변경 종류 | 배포 순서 | 이유 |
 | --- | --- | --- |
-| **컬럼/테이블 추가** | migration → code | 코드가 새 컬럼을 사용할 때 이미 존재해야 함 |
-| **컬럼/테이블 삭제** | code → migration | 코드가 사용을 멈춘 후에 안전하게 drop |
-| **타입 확장** (`String(50)` → `String(100)`) | migration → code | 더 큰 데이터 저장 가능해야 코드가 사용 |
-| **타입 축소** | code → migration | 코드가 작은 값만 쓰기 시작한 후 축소 |
+| **Add column / table** | migration → code | 코드는 새 컬럼이 이미 존재해야 쓸 수 있다 |
+| **Drop column / table** | code → migration | 코드가 사용을 멈춘 뒤에 drop해야 안전하다 |
+| **Type widen** (`String(50)` → `String(100)`) | migration → code | 더 큰 값을 저장할 수 있어야 코드가 쓸 수 있다 |
+| **Type narrow** | code → migration | 코드가 작은 값만 쓰기 시작한 뒤에 줄여야 한다 |
 
-핵심은 "이전 버전의 코드도 여전히 동작해야 한다"는 점입니다. 이것이 blue/green과 rolling deploy의 기본 가정입니다.
+전환 중에도 이전 버전 코드가 계속 살아 있어야 한다는 점이 가장 중요합니다. 이것이 blue/green과 롤링 배포의 기본 가정입니다.
 
-### blue/green 배포의 schema 호환성 요구
-
-```text
-시점 t0: blue(v1)만 동작, schema=S1
-시점 t1: schema를 S2로 migrate (S1, S2 모두 v1 호환)
-시점 t2: green(v2) 띄움, blue(v1) green(v2) 동시 동작 (둘 다 S2 동작)
-시점 t3: blue 종료, green만 동작
-시점 t4 (다음 배포): schema를 S3로 migrate (S2 호환 제거 가능)
-```
-
-t1 시점의 schema 변경은 v1과 v2 양쪽에 호환되어야 합니다. 이것이 expand-contract가 필수인 이유입니다.
-
-### NOT NULL 강화의 두 단계 분리
-
-`nullable=False`를 한 revision에 묶으면 blue/green 환경에서 즉시 사고입니다. 두 단계로 나눕니다.
+### blue/green에서의 schema 호환성
 
 ```text
-단계 1 (now):
-  - DB: nullable=True로 컬럼 추가, default 설정
-  - 코드: 새 컬럼에 항상 값을 채움
-  - 배포: migration → code
-
-(시간 경과, 모든 row에 값이 채워졌는지 확인)
-
-단계 2 (next deploy):
-  - DB: nullable=False로 강화
-  - 코드: 변경 없음
-  - 배포: migration만
+t0: only blue (v1) running, schema=S1
+t1: migrate schema to S2 (S1, S2 both compatible with v1)
+t2: bring up green (v2); blue (v1) and green (v2) run concurrently (both work with S2)
+t3: shut down blue, only green runs
+t4 (next deploy): migrate schema to S3 (now safe to drop S2 compatibility)
 ```
 
-단계 사이의 시간은 짧을 수도 길 수도 있지만, 적어도 데이터가 모두 채워졌다는 검증 후에 단계 2를 적용합니다.
+t1에서 적용하는 schema는 반드시 v1과 v2 모두를 받아야 합니다. 그래서 expand-contract가 사실상 필수입니다.
 
-### 컬럼 rename의 4단계
+### NOT NULL 강화는 2단계로
+
+`nullable=False`를 한 revision에 몰아넣으면 blue/green 전환 중 즉시 사고가 날 수 있습니다. 두 단계로 분리해야 합니다.
 
 ```text
-단계 1: 새 컬럼 추가 (nullable=True), 코드는 이전 컬럼 사용
-단계 2: 코드가 새 컬럼에 dual-write (이전, 새 모두에 쓰기)
-단계 3: 데이터 backfill, 코드가 새 컬럼만 read+write
-단계 4: 이전 컬럼 drop (코드는 이미 사용 안 함)
+phase 1 (now):
+  - DB: add column as nullable=True with a default
+  - code: always writes a value into the new column
+  - deploy: migration → code
+
+gate before phase 2:
+  - query: SELECT COUNT(*) FROM users WHERE phone IS NULL
+  - pass: null_count == 0
+  - fail: null_count > 0, stop the tighten revision and keep backfilling
+
+phase 2 (next deploy):
+  - DB: tighten column to nullable=False
+  - code: unchanged
+  - deploy: migration only
 ```
 
-각 단계가 독립 PR이고, 각 단계 사이에 production이 안정되었음을 확인합니다. 시간이 걸리지만 가장 안전합니다.
+여기서 `users.phone`이 예시 흐름입니다. v2가 `phone` 값을 쓰기 시작한 뒤에도 과거 row에는 NULL이 남아 있을 수 있으므로, phase 2는 `null_count == 0` 게이트를 통과한 다음에만 적용해야 합니다.
 
-### 다중 인스턴스에서 한 번만 실행
-
-`alembic upgrade`를 모든 인스턴스가 실행하면 race condition이 발생합니다. alembic 자체가 `alembic_version` 테이블에 락을 걸지만, 더 안전한 방법은 다음 중 하나입니다.
-
-- **deploy script가 한 번만 호출**: 여러 인스턴스가 동작하기 전에 별도 단계로 마이그레이션 실행
-- **kubernetes Job/initContainer**: 컨테이너 시작 전에 별도 Job으로 마이그레이션 실행
-- **CI/CD 파이프라인 단계 분리**: `migrate` 단계를 `deploy` 단계 앞에 둠
-
-application 시작 시 `alembic upgrade head`를 호출하는 패턴은 단일 인스턴스 dev에는 좋지만 production에서는 권장하지 않습니다.
-
-## Before-After
+### column rename의 4단계
 
 ```text
-# Before: code-first 배포로 즉시 500 에러
-1. v2 deploy (새 컬럼 사용 코드)
-2. 모든 요청이 "no such column" 에러
-3. 30분 후 schema migrate
+phase 1: add new column (nullable=True); code keeps using the old column
+phase 2: code dual-writes (writes both old and new)
+phase 3: backfill data; code reads and writes only the new column
+phase 4: drop the old column (code already stopped using it)
+```
+
+각 phase는 독립 PR로 가져가고, phase 사이마다 production 안정성을 확인해야 합니다. 느리지만 가장 안전한 패턴입니다.
+
+### 전환 후반부 rollout 상태표
+
+`users.phone`처럼 add → write → tighten 순서가 필요한 변경은 전환 후반부에 현재 상태를 표로 보면서 판단하는 편이 안전합니다.
+
+| 단계 | DB shape | 코드 동작 | 허용되는 다음 액션 |
+| --- | --- | --- | --- |
+| expand revision 적용 직후 | `phone` exists, nullable | v1은 무시, v2는 아직 배포 전 | v2 배포 |
+| blue/green overlap | `phone` exists, nullable | v1은 무시, v2는 `phone`에 write | NULL row 수 확인, backfill 계속 |
+| tighten 직전 gate 통과 | `phone` exists, nullable, `NULL` 0건 | v2만 live, write path 안정화 | `nullable=False` tighten revision 적용 |
+| contract 완료 후 | `phone` exists, NOT NULL | v2만 live, 모든 write/read가 `phone` 기준 | smoke test 후 다음 deploy cycle에서 old column drop 검토 |
+
+### 여러 인스턴스에서 정확히 한 번 실행하기
+
+모든 application instance가 `alembic upgrade`를 실행하면 race condition이 생깁니다. Alembic이 `alembic_version`에 lock을 걸긴 하지만, 더 안전한 방법은 다음 중 하나입니다.
+
+- **deploy script가 한 번만 호출**: 앱 인스턴스가 뜨기 전에 별도 stage에서 migration 실행
+- **Kubernetes Job / initContainer**: 전용 Job으로 앱 컨테이너보다 먼저 migration 수행
+- **CI/CD pipeline 분리**: `deploy` 앞에 `migrate` stage 배치
+
+application startup에서 `alembic upgrade head`를 호출하는 패턴은 단일 인스턴스 개발 환경에서는 괜찮지만 production에는 권장되지 않습니다.
+
+## 변경 전후
+
+```text
+# Before: code-first deploy, immediate 500 errors
+1. deploy v2 (code that uses the new column)
+2. every request fails with "no such column"
+3. 30 minutes later, schema migrate
 ```
 
 ```text
-# After: migration-first 배포
-1. schema migrate (새 컬럼 nullable=True 추가)
-2. v1 인스턴스 정상 동작 (새 컬럼 무시)
-3. v2 deploy (새 컬럼 사용)
-4. blue/green 양쪽 정상 동작
+# After: migration-first deploy
+1. schema migrate (add new column as nullable=True)
+2. v1 instances keep running normally (they ignore the new column)
+3. deploy v2 (code that uses the new column)
+4. blue/green both work correctly
 ```
 
-After 패턴은 사고 윈도우가 0입니다. 모든 배포에서 이 순서를 강제하는 것이 운영의 기본입니다.
+After 패턴은 전환 구간 내내 v1과 v2가 모두 해석 가능한 schema를 유지하게 해 줍니다. 여기에 NULL 게이트와 smoke test까지 붙이면 tighten 시점을 근거 있게 결정할 수 있습니다.
 
 ## 단계별 실습
 
-### 1단계: schema add 단계
+### 1단계: schema add
 
 ```python
-# revision: add_users_phone
+# 처리: add_users_phone
 def upgrade() -> None:
     op.add_column("users", sa.Column("phone", sa.String(20), nullable=True))
 
@@ -138,18 +160,18 @@ def downgrade() -> None:
     op.drop_column("users", "phone")
 ```
 
-CI에서 먼저 적용. application 코드는 아직 phone을 사용하지 않습니다. v1과 v2 모두 정상 동작.
+먼저 CI/CD에서 이 migration을 적용합니다. 아직 application code는 `phone`을 건드리지 않습니다. v1과 v2 모두 안전합니다.
 
 ### 2단계: code deploy
 
-application 코드가 phone에 값을 쓰기 시작합니다. blue/green 동시 동작 시점에서 v1은 phone을 무시하고 v2는 채웁니다. 둘 다 안전.
+이제 application code가 `phone`에 값을 쓰기 시작합니다. blue/green 전환 구간에서 v1은 이 컬럼을 무시하고, v2는 채우기만 하므로 두 버전 모두 안전합니다.
 
 ### 3단계: NOT NULL 강화
 
-모든 row에 phone이 채워졌음을 확인합니다.
+모든 row에 `phone`이 채워졌는지 확인한 뒤 schema를 조입니다.
 
 ```python
-# revision: tighten_users_phone_not_null
+# 처리: Tight_users_phone_not_null
 def upgrade() -> None:
     bind = op.get_bind()
     null_count = bind.execute(text("SELECT COUNT(*) FROM users WHERE phone IS NULL")).scalar()
@@ -162,11 +184,11 @@ def downgrade() -> None:
         batch.alter_column("phone", existing_type=sa.String(20), nullable=True)
 ```
 
-assertion으로 안전성을 확보합니다. 만약 NULL이 남아 있다면 마이그레이션이 실패하고 schema는 그대로 유지됩니다.
+assertion이 마지막 안전망입니다. NULL이 남아 있으면 migration은 실패하고 schema는 바뀌지 않습니다.
 
-### 4단계: drop 단계
+### 4단계: old column drop
 
-오래된 컬럼을 제거하려면 application이 더 이상 사용하지 않음을 확인한 후, 그 다음 배포 cycle에서 drop revision을 적용합니다.
+이전 컬럼을 제거할 때는 application code가 더 이상 쓰지 않는다는 사실을 확인하고, 다음 deploy cycle에서 내립니다.
 
 ```python
 def upgrade() -> None:
@@ -187,47 +209,310 @@ stages:
   - smoke-test
 ```
 
-`migrate`가 `deploy`보다 항상 먼저 실행되도록 강제.
+`migrate`가 항상 `deploy`보다 먼저 오도록 강제해야 합니다.
+
+## 커트오버 런북
+
+```bash
+set -euo pipefail
+
+export DATABASE_URL="postgresql+psycopg://app:secret@db/prod"
+export GREEN_DEPLOYMENT="api-green"
+export RELEASE_IMAGE="ghcr.io/acme/api:v2"
+export HEALTH_URL="https://api.example.com/health"
+
+echo "[1/5] apply expand revision"
+alembic upgrade add_users_phone
+
+echo "[2/5] deploy the app version that writes users.phone"
+kubectl set image deployment/"$GREEN_DEPLOYMENT" api="${RELEASE_IMAGE}"
+kubectl rollout status deployment/"$GREEN_DEPLOYMENT" --timeout=180s
+
+echo "[3/5] block contract until users.phone has no NULL rows"
+NULL_COUNT="$({ python3 - <<'PY'
+import os
+from sqlalchemy import create_engine, text
+
+engine = create_engine(os.environ["DATABASE_URL"])
+with engine.connect() as conn:
+    count = conn.execute(text("SELECT COUNT(*) FROM users WHERE phone IS NULL")).scalar_one()
+print(count)
+PY
+})"
+[ "$NULL_COUNT" = "0" ] || {
+  echo "Fail: users.phone still has $NULL_COUNT NULL rows; do not run tighten_users_phone_not_null"
+  exit 1
+}
+echo "Pass: users.phone NULL rows = $NULL_COUNT"
+
+echo "[4/5] apply tighten revision"
+alembic upgrade tighten_users_phone_not_null
+
+echo "[5/5] smoke test the live service"
+HEALTH_BODY="$(curl -fsS "$HEALTH_URL")"
+export HEALTH_BODY
+python3 - <<'PY'
+import json
+import os
+
+payload = json.loads(os.environ["HEALTH_BODY"])
+assert payload["status"] == "ok", payload
+print(f"Pass: status={payload['status']} alembic_version={payload.get('alembic_version', 'unknown')}")
+PY
+```
+
+예상되는 관찰 신호는 다음과 같습니다.
+
+- `[3/5]`에서 `Pass: users.phone NULL rows = 0`가 나오지 않으면 즉시 실패하고 tighten revision은 실행되지 않습니다.
+- `kubectl rollout status`가 완료되기 전까지는 cutover를 진행하지 않습니다.
+- 마지막 Python 검증은 `/health`가 `status=ok`를 반환해야 Pass입니다.
+
+### blue/green 사고 시 first checks
+
+장애가 나면 원인 추적 전에 다음 네 가지부터 확인합니다.
+
+1. `migrate` stage가 실제로 `deploy`보다 먼저 실행됐는가?
+2. 지금 live인 애플리케이션 버전이 v1인가, v2인가?
+3. `tighten_users_phone_not_null` revision이 이미 적용됐는가?
+4. `SELECT COUNT(*) FROM users WHERE phone IS NULL` 결과가 몇 건인가?
+
+이 네 질문만 빠르게 답해도 문제를 `배포 순서`, `앱 버전`, `schema tighten`, `데이터 미완료` 중 어디서 찾아야 하는지 바로 좁힐 수 있습니다.
 
 ## 자주 하는 실수
 
-- **code-first 배포.** 코드가 먼저 새 schema를 가정하면 즉시 사고.
-- **NOT NULL을 한 revision에 묶기.** blue/green에서 v1이 NULL을 쓰는 순간 fail.
-- **drop을 즉시 실행.** 코드가 사용을 멈춘 직후 drop은 위험. 한 배포 cycle을 기다립니다.
-- **application 시작 시 `alembic upgrade head` 호출.** 다중 인스턴스에서 race + 부분 적용 위험.
-- **rename을 한 단계에.** drop+add로 풀려 데이터 손실. 4단계 dual-write 패턴 필수.
+- **code-first deploy.** 코드가 새 schema를 먼저 가정하면 즉시 실패합니다.
+- **NOT NULL을 한 revision에 묶기.** blue/green에서 이전 버전이 NULL을 쓰는 순간 사고가 납니다.
+- **컬럼을 즉시 drop하기.** 코드가 사용을 멈췄더라도 최소 한 deploy cycle은 기다리는 편이 안전합니다.
+- **application startup에서 `alembic upgrade head`를 호출하기.** multi-instance 환경에서는 race와 partial application 리스크가 큽니다.
+- **rename을 한 번에 처리하기.** 실제로는 drop+add와 다르지 않아서 데이터 손실 위험이 큽니다.
 
-## 실무에서 쓰는 패턴
+## 실무 패턴
 
-- **CI 단계 분리: `migrate`가 `deploy` 앞에.** 가장 단순하고 효과적.
-- **NOT NULL 강화는 항상 두 단계.** 사이에 데이터 검증 마이그레이션.
-- **drop은 한 배포 cycle 늦춘다.** 즉시 drop 금지.
-- **kubernetes initContainer 패턴.** Job으로 한 번만 실행 보장.
-- **deploy 전 `alembic check`**: model과 schema가 어긋났는지 자동 검출.
-- **expand-contract를 PR description의 표준 항목으로.** "어떤 단계인가"를 명시.
+- **CI/CD stage를 `migrate` → `deploy`로 고정합니다.** 가장 단순하고 효과적인 규칙입니다.
+- **NOT NULL 강화는 항상 두 단계로 나눕니다.** 중간에 data verification을 넣습니다.
+- **drop은 한 deploy cycle 늦춥니다.** 즉시 제거는 피합니다.
+- **Kubernetes에서는 Job이나 initContainer로 exactly-once execution을 보장합니다.**
+- **deploy 전 `alembic check`를 실행합니다.** model/schema drift를 자동 탐지합니다.
+- **PR 템플릿에 expand-contract phase를 적게 합니다.** 지금 이 변경이 어느 단계인지 항상 드러나게 만듭니다.
 
 ## 체크리스트
 
-- [ ] 모든 schema 추가는 code 배포보다 먼저 적용된다
-- [ ] 모든 schema 삭제는 code가 사용을 멈춘 다음 배포 cycle에 적용된다
-- [ ] NOT NULL 강화는 두 단계로 나뉘어 있다
-- [ ] rename은 dual-write 4단계 패턴을 따른다
-- [ ] application 시작 시 `alembic upgrade`를 호출하지 않는다
-- [ ] CI/CD 파이프라인에서 migrate가 deploy 앞에 있다
-- [ ] kubernetes 환경이면 initContainer 또는 Job으로 한 번만 실행
+- [ ] schema add는 항상 code deploy보다 먼저 나간다
+- [ ] schema drop은 코드가 사용을 멈춘 다음 deploy cycle에 나간다
+- [ ] NOT NULL 강화는 두 단계로 분리했다
+- [ ] rename은 dual-write 4단계를 따른다
+- [ ] application startup에서 `alembic upgrade`를 호출하지 않는다
+- [ ] CI/CD는 `migrate` 후 `deploy` 순서를 강제한다
+- [ ] Kubernetes 환경에서는 Job 또는 initContainer로 exactly-once execution을 보장한다
+
+## 연습 문제
+
+1. add-column → code-deploy → NOT NULL tighten 흐름을 SQLite에서 끝까지 시뮬레이션해 보세요.
+2. column rename을 4단계 dual-write 패턴으로 설계하고 phase별 PR 순서를 그려 보세요.
+3. CI/CD pipeline을 `migrate` stage가 항상 `deploy`보다 먼저 오도록 바꿔 보세요.
 
 ## 정리, 다음 글
 
-배포 순서는 alembic 자체가 아닌 운영 정책의 영역입니다. "schema는 코드보다 먼저, 호환성이 넓게"라는 한 줄을 머릿속에 두고 모든 변경을 그 기준으로 분해하세요. blue/green에서는 schema가 두 버전과 호환되어야 한다는 점이 핵심.
+deploy ordering은 Alembic 기능이 아니라 운영 정책입니다. “schema first, broader compatibility”라는 한 문장을 머릿속에 두고, 모든 변경을 그 기준으로 분해해야 합니다. blue/green에서 가장 중요한 점은 전환 구간 내내 schema가 두 버전과 동시에 호환되어야 한다는 사실입니다.
 
-다음 글은 실제 팀에서 사용하는 PR/리뷰/CI 워크플로우와 운영 자동화 도구를 다룹니다.
+다음 글에서는 팀 단위의 실제 workflow, 즉 PR 규칙, CI 체크, 모니터링, incident response를 다룹니다.
+
+## revision 단계별 배포 게이트 예시
+
+blue/green 운영에서는 "적용했다"보다 "다음 단계로 넘어가도 되는가"가 더 중요합니다. 아래 게이트를 배포 파이프라인에 명시하면 사람 판단 오차를 줄일 수 있습니다.
+
+```text
+Gate A (expand 직후)
+- 새 컬럼/테이블 존재 확인
+- 기존 v1 트래픽 에러율 변화 없음
+
+Gate B (v2 배포 직후)
+- v2에서 새 컬럼 write 성공
+- v1/v2 혼재 구간에서 5xx 증가 없음
+
+Gate C (tighten 직전)
+- NULL row 수 0
+- 읽기/쓰기 지연 정상 범위
+
+Gate D (contract 직전)
+- old column read path 제거 확인
+- 최소 1 deploy cycle 동안 안정성 확인
+```
+
+이 게이트 체계는 expand-contract를 절차로 고정해 줍니다. 결과적으로 "일단 한 번에 내려 보자"식 배포를 줄일 수 있습니다.
+
+## 애플리케이션 코드 diff 예시: dual-write 전환
+
+schema만으로는 blue/green 호환성이 완성되지 않습니다. 코드 레벨에서 dual-write를 명시해야 합니다.
+
+```python
+# Before
+user.name = payload["name"]
+
+# 오버랩 중(2단계)
+user.name = payload["name"]
+user.display_name = payload["name"]
+
+# 컷오버 이후(3단계)
+user.display_name = payload["name"]
+```
+
+읽기 경로도 같은 방식으로 점진 전환합니다.
+
+```python
+# overlap-safe read
+name = user.display_name or user.name
+```
+
+이 한 줄이 전환 구간 장애를 크게 줄여 줍니다. 새 컬럼이 아직 완전히 채워지지 않은 상태에서도 v2가 안전하게 동작하기 때문입니다.
+
+## 배포 실패 로그 예시와 해석
+
+```text
+sqlalchemy.exc.ProgrammingError: column users.phone does not exist
+```
+
+대개 `code-first` 배포입니다. 코드가 먼저 올라갔고 expand revision이 뒤따랐다는 신호입니다.
+
+```text
+AssertionError: 1243 rows still NULL
+```
+
+`tighten` 게이트가 정상 작동한 것입니다. 실패가 아니라 보호 장치가 제 역할을 한 상태입니다. 이 경우는 backfill을 더 수행한 뒤 재시도해야 합니다.
+
+## 확장 부록: 배포/복구 실습 시나리오
+
+### 시나리오 A: add column + backfill + tighten
+
+```bash
+alembic revision -m "add users.phone nullable"
+alembic revision -m "backfill users.phone"
+alembic revision -m "tighten users.phone not null"
+alembic upgrade head
+```
+
+```sql
+SELECT COUNT(*) FROM users WHERE phone IS NULL;
+```
+
+`COUNT(*) = 0`이 아니라면 tighten 단계는 멈춰야 합니다.
+
+### 시나리오 B: 동시에 생성된 head 정리
+
+```bash
+alembic heads
+alembic merge -m "merge concurrent heads" <head1> <head2>
+alembic heads
+```
+
+merge 후 head가 하나여야 합니다.
+
+### 시나리오 C: offline SQL 승인 흐름
+
+```bash
+alembic upgrade <prev>:head --sql > review.sql
+```
+
+검토 포인트는 `DROP`, `ALTER`, 인덱스 재생성, `alembic_version` 갱신 SQL 포함 여부입니다.
+
+### 시나리오 D: incident first checks
+
+```bash
+alembic current
+alembic heads
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+애플리케이션 `/health`의 기대 버전과 DB 버전이 다르면 drift 가능성을 먼저 의심합니다.
+
+### 운영 스크립트 예시
+
+```bash
+set -euo pipefail
+alembic check
+alembic upgrade head
+alembic upgrade head --sql > /tmp/migration-preview.sql
+```
+
+### 품질 게이트 정리
+
+```text
+- autogenerate 결과 수동 검토
+- downgrade 정책 명시
+- data migration idempotency 확보
+- migration-first 배포
+- post-deploy smoke test
+```
+
+이 게이트들은 Alembic 자체 기능이라기보다 팀 운영 안전장치입니다.
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+## 처음 질문으로 돌아가기
+
+- **migration-first와 code-first deploy ordering은 어떻게 다를까요?**
+  - 이 글의 기준에서는 expand 단계에서는 migration-first가 맞습니다. `phone` 같은 새 컬럼을 nullable로 먼저 추가해 두어야 이후 코드가 값을 쓰기 시작해도 old version과 new version이 동시에 버틸 수 있습니다.
+- **왜 blue/green deploy는 두 앱 버전과 동시에 호환되는 schema를 요구할까요?**
+  - 본문 타임라인의 `t2`처럼 blue(v1)와 green(v2)가 같이 떠 있는 동안 둘 다 S2를 읽고 써야 하기 때문입니다. 그래서 schema는 항상 한 버전만 만족시키는 형태가 아니라 두 버전의 겹치는 안전 구간을 먼저 만들어야 합니다.
+- **NOT NULL 강화는 왜 두 단계로 나눠야 할까요?**
+  - `nullable=True`로 먼저 추가하고, `SELECT COUNT(*) FROM users WHERE phone IS NULL`이 0이 된 뒤에만 `nullable=False`로 조이는 것이 본문이 제시한 답입니다. 이 gate 없이 한 revision에 몰아넣으면 overlap 중인 old row 때문에 blue/green 전환이 바로 깨질 수 있습니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Alembic 101 (1/10): 왜 Alembic인가, 그리고 init까지](./01-why-alembic-and-init.md)
+- [Alembic 101 (2/10): env.py와 target_metadata: 모델과 마이그레이션 연결](./02-env-py-and-target-metadata.md)
+- [Alembic 101 (3/10): 첫 revision: upgrade와 downgrade를 손으로 작성](./03-first-revision-upgrade-downgrade.md)
+- [Alembic 101 (4/10): autogenerate: 잡는 것과 못 잡는 것의 경계](./04-autogenerate-and-its-limits.md)
+- [Alembic 101 (5/10): branch와 merge: 동시에 만든 revision을 합치는 법](./05-branches-and-merges.md)
+- [Alembic 101 (6/10): 데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기](./06-data-migrations.md)
+- [Alembic 101 (7/10): online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기](./07-online-vs-offline-and-batch.md)
+- [Alembic 101 (8/10): downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가](./08-downgrade-strategy.md)
+- **배포 순서와 blue/green: schema와 application code의 안전한 동기화 (현재 글)**
+- Production과 team workflow: PR, CI, 모니터링, 그리고 incident response (예정)
+
+<!-- toc:end -->
 
 ## 참고 자료
 
-- Alembic: Cookbook — https://alembic.sqlalchemy.org/en/latest/cookbook.html
-- Martin Fowler: Blue Green Deployment — https://martinfowler.com/bliki/BlueGreenDeployment.html
+- [sqlalchemy/alembic GitHub 저장소](https://github.com/sqlalchemy/alembic)
+- [Alembic: Cookbook](https://alembic.sqlalchemy.org/en/latest/cookbook.html)
+- [Martin Fowler: Blue Green Deployment](https://martinfowler.com/bliki/BlueGreenDeployment.html)
 - "Refactoring Databases" by Scott Ambler & Pramod Sadalage
-- Kubernetes: Init Containers — https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+- [Kubernetes: Init Containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)
 
-<!-- toc:begin -->
-<!-- toc:end -->
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/alembic-101/ko/09-deploy-ordering-and-blue-green)

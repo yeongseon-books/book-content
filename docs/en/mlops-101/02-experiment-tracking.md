@@ -1,10 +1,10 @@
 ---
 series: mlops-101
 episode: 2
-title: Experiment Tracking
-status: content-ready
+title: "MLOps 101 (2/10): Experiment Tracking"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,45 +16,52 @@ tags:
   - MLflow
   - Reproducibility
   - DataScience
-seo_description: Recording experiment metadata, parameters, metrics, and artifacts so ML experiments are reproducible, with runnable MLflow code
-last_reviewed: '2026-05-04'
+seo_description: Record runs, parameters, metrics, and artifacts so ML experiments become reproducible team memory instead of scattered notebook history.
+last_reviewed: '2026-05-15'
 ---
 
-# Experiment Tracking
+# MLOps 101 (2/10): Experiment Tracking
 
-> MLOps 101 series (2/10)
+Once a team trains a model a few times, memory usually fails before compute does. File names alone do not explain which parameter set won last week, which data version produced the result, or why today's score moved.
 
-<!-- a-grade-intro:begin -->
+The problem gets worse when multiple people are involved. One person leaves metrics in Slack, another stores only the best model, and someone else never records failed runs at all. At that point, reconstructing the past becomes harder than improving the model.
 
-**Core question**: Can you rerun last week's best experiment today?
+This is post 2 in the MLOps 101 series.
 
-> *Experiment tracking records parameters, metrics, artifacts, and environment together so reproduction is guaranteed.*
+Here, we will treat experiment tracking as the team's short-term memory and focus on what must be recorded so results can be reproduced and compared.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![mlops 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/02/02-01-see-the-flow-first.en.png)
+*mlops 101 chapter 2 flow overview*
+> An experiment tracker is not a pretty dashboard. It is the shared memory system that stores each training run in one comparable format so the team never repeats the same mistake twice.
 
-- The four elements of experiment tracking
-- The core MLflow objects
-- How runs and experiments compose
-- Tools for comparison and ranking
-- Five common pitfalls
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Experiment Tracking?
+- Which signal should the example or diagram make visible for Experiment Tracking?
+- What failure should be prevented first when Experiment Tracking reaches a real system?
+
+## Questions this article answers
+
+- Why does the same model become hard to reproduce without run tracking?
+- Which pieces of metadata must always be captured: params, metrics, artifacts, environment, or data version?
+- How should you think about experiments and runs in MLflow?
+- Why should failed runs stay visible instead of being discarded?
+- What does a team have to standardize before run comparison becomes useful?
+
+> Mental model: an experiment tracker is not a pretty dashboard. It is the shared memory system that stores each training run in one comparable format.
 
 ## Why It Matters
 
-When a folder of notebooks becomes the source of truth, team collaboration breaks. A tracker is shared memory.
+Without experiment tracking, training continues but knowledge does not accumulate. When a new score appears, the team cannot tell whether the gain came from the data change, the parameter change, or pure luck.
 
-## Concept at a Glance
+When every run is recorded, the process becomes an asset in its own right. Failed runs prevent repeated mistakes, and successful runs become promotion candidates that can be defended with evidence.
 
-```mermaid
-flowchart LR
-    Code["code + params"] --> Run["run"]
-    Data["data version"] --> Run
-    Run --> Metric["metrics"]
-    Run --> Art["artifacts"]
-    Run --> Tag["tags"]
-    Metric --> Compare["compare runs"]
-```
+## See the Flow First
+
+This is the essence of experiment tracking. Code, parameters, and data version become one run; that run emits metrics, artifacts, and tags; and the team can compare many runs on the same axis.
+
+The key point is not storage by itself, but comparability. The run table matters only when different runs can be read side by side with consistent names and metadata.
 
 ## Key Terms
 
@@ -170,8 +177,19 @@ Hyperparameter sweeps and weekly reviews use MLflow or W&B as shared memory.
 
 Experiment tracking is the team's short-term memory. Next, data versioning provides the long-term memory.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Experiment Tracking?**
+  - The article treats Experiment Tracking as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Experiment Tracking?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Experiment Tracking reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is MLOps?](./01-what-is-mlops.md)
+## In this series
+
+- [MLOps 101 (1/10): What Is MLOps?](./01-what-is-mlops.md)
 - **Experiment Tracking (current)**
 - Data Versioning (upcoming)
 - Model Training Pipeline (upcoming)
@@ -181,6 +199,7 @@ Experiment tracking is the team's short-term memory. Next, data versioning provi
 - Retraining (upcoming)
 - Feature Store (upcoming)
 - Building a Production ML System (upcoming)
+
 <!-- toc:end -->
 
 ## References

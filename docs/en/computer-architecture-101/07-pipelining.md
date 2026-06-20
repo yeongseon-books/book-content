@@ -1,10 +1,10 @@
 ---
 series: computer-architecture-101
 episode: 7
-title: Pipelining
+title: "Computer Architecture 101 (7/10): Pipelining"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: How CPU pipelining lets one instruction complete per cycle on a
 last_reviewed: '2026-05-04'
 ---
 
-# Pipelining
+# Computer Architecture 101 (7/10): Pipelining
 
 > Computer Architecture 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: An instruction takes five stages to process, yet on average a CPU completes one instruction per cycle. How is that possible?
 
 > A CPU pipeline is the same idea as a car assembly line. Processing one instruction takes several stages, but if you overlap stages so different instructions occupy them at the same time, throughput rises by the number of stages. The enemies of this trick are branches, data dependencies, and memory latency — and branch prediction is the most interesting weapon in that fight.
 
-<!-- a-grade-intro:end -->
+This is post 7 in the Computer Architecture 101 series.
+
+
+![computer architecture 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/07/07-01-big-picture.en.png)
+*computer architecture 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Pipelining?
+- Which signal should the example or diagram make visible for Pipelining?
+- What failure should be prevented first when Pipelining reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 Modern CPUs have pipelines 14 stages deep or more, and superscalar designs can finish multiple instructions per cycle. But a single branch misprediction flushes the pipeline and refills it, costing 10–20 cycles. Reducing or making predictable the branches in a hot loop is a small optimization that compounds.
 
 > Pipelining makes the average fast, but a single misprediction breaks that average.
-
-## Concept at a Glance
 
 > In a 5-stage pipeline (Fetch, Decode, Execute, Memory, Writeback), five instructions are in flight every cycle. One instruction takes 5 cycles end-to-end, but throughput is one instruction per cycle. When a branch fires, the wrongly fetched instructions are discarded and fetching restarts.
 
@@ -255,17 +261,29 @@ Pipelining lifts CPU throughput by the depth of the pipeline, and branch predict
 
 Next we step outside the CPU, to I/O and devices: how slow components like disks, networks, and keyboards connect to the fast CPU.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Pipelining?**
+  - The article treats Pipelining as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Pipelining?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Pipelining reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Architecture?](./01-what-is-computer-architecture.md)
-- [Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
-- [CPU and Instructions](./03-cpu-and-instructions.md)
-- [Registers and the ALU](./04-registers-and-alu.md)
-- [Memory Organization](./05-memory-organization.md)
-- [Cache and Locality](./06-cache-and-locality.md)
+## In this series
+
+- [Computer Architecture 101 (1/10): What Is Computer Architecture?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU and Instructions](./03-cpu-and-instructions.md)
+- [Computer Architecture 101 (4/10): Registers and the ALU](./04-registers-and-alu.md)
+- [Computer Architecture 101 (5/10): Memory Organization](./05-memory-organization.md)
+- [Computer Architecture 101 (6/10): Cache and Locality](./06-cache-and-locality.md)
 - **Pipelining (current)**
 - I/O and Devices (upcoming)
 - Parallelism and Multicore (upcoming)
 - Understanding Performance (upcoming)
+
 <!-- toc:end -->
 
 ## References

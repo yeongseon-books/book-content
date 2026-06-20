@@ -1,10 +1,10 @@
 ---
 series: clean-code-101
 episode: 1
-title: What Is Clean Code?
-status: content-ready
+title: "Clean Code 101 (1/10): What Is Clean Code?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,43 +18,43 @@ tags:
   - CodeQuality
   - Refactoring
 seo_description: What clean code actually means, the link between readability, intent, and the cost of change, and a small set of measurable signals.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is Clean Code?
+# Clean Code 101 (1/10): What Is Clean Code?
 
-> Clean Code 101 series (1/10)
+Most code problems do not show up when the code first runs. They show up a few weeks later, when someone tries to change it without breaking a nearby path.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Clean Code 101 series.
 
-**Core question**: How is working code different from clean code?
+Here we will separate working code from readable code and from code that stays cheap to change, then turn that difference into concrete signals you can inspect in a real codebase.
 
-> Working is the minimum bar. Clean is consideration for the next person.
 
-<!-- a-grade-intro:end -->
+![clean code 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 1 flow overview*
+> The code we write once gets read a hundred times. Clean code is the discipline of saving the next person's time.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The definition of clean code and four signals
-- Working vs readable vs cheap-to-change
-- How small principles compound
-- The objective markers of "clean"
-- The map of this whole series
+- What boundary should you inspect first when applying What Is Clean Code??
+- Which signal should the example or diagram make visible for What Is Clean Code??
+- What failure should be prevented first when What Is Clean Code? reaches a real system?
+
+## Questions this article answers
+
+- What signals should you inspect first when deciding whether code is clean?
+- What separates working code from readable code, and readable code from code that stays easy to change?
+- Why do small principles create such a large difference in real maintenance cost?
+- How far can the feeling that code is "clean" be turned into objective criteria?
+- How does the rest of this series build on that foundation?
+
+> Working code is the starting point. Clean code is the discipline of making the next person faster at understanding and changing it.
 
 ## Why It Matters
 
 Code is written once and read a hundred times. Readability decides the cost of change.
 
 > Clean code is the act of saving the next person's time.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    W["Works"] --> R["Readable"]
-    R --> C["Easy to change"]
-    C --> T["Trust"]
-```
 
 Working is the start, trust is the end.
 
@@ -140,6 +140,23 @@ radon cc app/ -a -s
 
 Cyclomatic complexity 10+ is a candidate for decomposition.
 
+## How to Verify This in a Real Codebase
+
+```bash
+radon cc app/ -a -s
+ruff check app/
+```
+
+**Expected output**
+
+- You can see which functions already sit in the high-complexity range.
+- Naming, branching, and function-shape issues show up in one pass.
+
+## Failure Modes to Watch
+
+- Treating complexity as the only signal and ignoring naming or responsibility.
+- Letting noisy lint debt hide the truly expensive design problems.
+
 ## What to Notice in This Code
 
 - Names speak intent.
@@ -184,7 +201,18 @@ Strong teams put thresholds on length, complexity, and naming into a code review
 
 Clean code is the sum of small, measurable principles. Next, we look at the single highest-leverage one — naming.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Clean Code??**
+  - The article treats What Is Clean Code? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Clean Code??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Clean Code? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Clean Code? (current)**
 - Naming (upcoming)
 - Small Functions (upcoming)
@@ -195,6 +223,7 @@ Clean code is the sum of small, measurable principles. Next, we look at the sing
 - Testable Code (upcoming)
 - Refactoring Basics (upcoming)
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -203,3 +232,5 @@ Clean code is the sum of small, measurable principles. Next, we look at the sing
 - [A Philosophy of Software Design — John Ousterhout](https://web.stanford.edu/~ouster/cgi-bin/aposd.php)
 - [Refactoring — Martin Fowler](https://martinfowler.com/books/refactoring.html)
 - [Google — Code Health Articles](https://testing.googleblog.com/search/label/Code%20Health)
+- [Ruff rule reference](https://docs.astral.sh/ruff/rules/)
+- [radon documentation](https://radon.readthedocs.io/en/latest/)

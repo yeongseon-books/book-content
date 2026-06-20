@@ -1,10 +1,10 @@
 ---
 series: sql-101
 episode: 4
-title: JOIN
+title: "SQL 101 (4/10): JOIN"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,37 @@ tags:
   - Database
   - Query
 seo_description: A practical tour of INNER, LEFT, RIGHT, FULL, and CROSS JOIN — cardinality traps and safe patterns for multi-table queries.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# JOIN
+# SQL 101 (4/10): JOIN
 
-> SQL 101 series (4/10)
+Once you leave single-table questions behind, SQL gets more powerful and more dangerous at the same time. The query still looks readable, but one wrong join assumption can double a metric, erase unmatched rows, or explode the result size before anyone notices.
 
-<!-- a-grade-intro:begin -->
+That is why JOIN is less about memorizing keywords and more about thinking in relationships. The real skill is predicting how many matches each row can have before you trust any aggregate built on top of the result.
 
-**Core question**: Why does combining two tables come in *five flavors*, and why do results sometimes *grow*?
+This is post 4 in the SQL 101 series. Here we treat JOIN as a relationship operation between row sets, not as a formatting trick for columns.
 
-> *JOIN combines *rows*, not columns.*
 
-<!-- a-grade-intro:end -->
+![sql 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/04/04-01-join-result-flow.en.png)
+*sql 101 chapter 4 flow overview*
+> JOIN is not about memorizing the types; it's about predicting what the result will look like when you connect two tables on a condition, and knowing when to use each type.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Differences between *INNER, LEFT, RIGHT, FULL, CROSS*
-- *Join keys* and *cardinality*
-- How results *blow up*
-- A safe approach to *multi-table joins*
-- Five common mistakes
+- How do INNER, LEFT, RIGHT, FULL, and CROSS JOIN differ?
+- Why should you inspect join keys and cardinality before anything else?
+- Why do row counts sometimes grow unexpectedly after a join?
 
 ## Why It Matters
 
-Most production queries include a JOIN. Misreading the *cardinality* doubles your totals. Joining well is what makes an analyst *trustable*.
+Most real queries include a join somewhere in the middle. Reports pull users, orders, products, payments, and events together; application debugging queries walk relationships to explain what happened to one customer. In all of those cases, the central risk is not the keyword itself. It is the hidden multiplicity behind the relationship.
 
-> *JOIN is the *math of sets*, not string concatenation.*
+Strong SQL reviewers do not just read the ON clause. They ask what kind of match count is expected on each side and whether a later SUM or COUNT will stay stable after that expansion.
 
-## Concept at a Glance
+## JOIN result flow
 
-```mermaid
-flowchart LR
-    A["Table A"] -->|key match| Inner["INNER JOIN: intersection"]
-    A -->|all of A| Left["LEFT JOIN: A-side full"]
-    A -.X.-> Cross["CROSS JOIN: all pairs"]
-```
+INNER JOIN keeps only matching rows. LEFT JOIN keeps all left rows and fills right columns with NULL where there's no match. FULL OUTER JOIN keeps both sides. CROSS JOIN produces every combination—use carefully.
 
 ## Key Terms
 
@@ -95,6 +89,12 @@ FROM users u
 LEFT JOIN orders o ON o.user_id = u.id
 WHERE o.id IS NULL;
 ```
+
+**Expected output:**
+
+| id | name |
+| --- | --- |
+| 3 | Grace |
 
 ### Step 4 — Self-join (direct manager)
 
@@ -157,10 +157,21 @@ Reports usually join *event + user + product* — three to five tables. The *fac
 
 JOIN is the language of *sets*. Next up: *GROUP BY and aggregates*.
 
+## Answering the Opening Questions
+
+- **How do INNER, LEFT, RIGHT, FULL, and CROSS JOIN differ?**
+  - The article treats JOIN as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should you inspect join keys and cardinality before anything else?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do row counts sometimes grow unexpectedly after a join?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
-- [WHERE and Conditions](./03-where-and-conditions.md)
+## In this series
+
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE and Conditions](./03-where-and-conditions.md)
 - **JOIN (current)**
 - GROUP BY and Aggregates (upcoming)
 - Subquery (upcoming)
@@ -168,6 +179,7 @@ JOIN is the language of *sets*. Next up: *GROUP BY and aggregates*.
 - INSERT, UPDATE, DELETE (upcoming)
 - Index and Query Plan (upcoming)
 - Practical Analysis SQL (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -176,3 +188,4 @@ JOIN is the language of *sets*. Next up: *GROUP BY and aggregates*.
 - [SQLBolt — Multi-table queries with JOIN](https://sqlbolt.com/lesson/select_queries_with_joins)
 - [Mode — JOIN](https://mode.com/sql-tutorial/sql-joins/)
 - [Use The Index, Luke — Joins](https://use-the-index-luke.com/sql/join)
+- [PostgreSQL — Table Expressions](https://www.postgresql.org/docs/current/queries-table-expressions.html)

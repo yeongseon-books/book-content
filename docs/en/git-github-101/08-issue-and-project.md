@@ -1,7 +1,7 @@
 ---
 episode: 8
 language: en
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 series: git-github-101
 status: publish-ready
 tags:
@@ -16,23 +16,27 @@ targets:
   hashnode: true
   medium: true
   mkdocs: true
-  tistory: true
-title: Tracking Work with Issues and Projects - How GitHub Records What's Next
+  tistory: false
+title: "Git & GitHub 101 (8/10): Tracking Work with Issues and Projects - How GitHub Records What's Next"
 seo_description: Issues record "what is to be done", Pull Requests record "how it
   was actually done", and Projects record "where the work currently sits" — three…
 ---
 
-# Tracking Work with Issues and Projects - How GitHub Records What's Next
+# Git & GitHub 101 (8/10): Tracking Work with Issues and Projects - How GitHub Records What's Next
 
-## What you will learn
+Code history tells you what changed, but teams also need a place to record what should happen next. Issues and Projects give GitHub a planning layer, so decisions, ownership, and progress do not live only in someone's memory.
 
-- What a GitHub Issue is, and how it differs from a commit or a Pull Request
-- How to open an issue and attach labels, an assignee, and a milestone
-- How a single line like `Closes #42` in a PR body auto-closes an issue on merge
-- How to set up a Project board and track issues on a Kanban-style flow
-- Why issues are useful even on a solo repository
+This is the eighth post in the Git & GitHub 101 series. Here, we connect issues, pull requests, and project boards into one visible work-tracking flow.
 
-By the end you can run a full cycle: define work as an issue, finish it through a PR, and watch the Project board reflect status as you go.
+
+![Git & GitHub 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-mental-model.en.png)
+*Git & GitHub 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- What a GitHub Issue is, and how it differs from a commit or a Pull Request?
+- How to open an issue and attach labels, an assignee, and a milestone?
+- How a single line like `Closes #42` in a PR body auto-closes an issue on merge?
 
 ## Why this matters
 
@@ -51,9 +55,6 @@ Even on a solo repository, issues earn their keep. Writing down the next thing t
 > Issues record "what is to be done", Pull Requests record "how it was actually done", and Projects record "where the work currently sits" — three complementary views of the same work.
 Here is how issues, PRs, and projects interlock.
 
-![Mental model](../../assets/git-github-101/08/08-01-mental-model.en.png)
-
-*Mental model*
 Read it as a flow:
 
 1. The issue is the starting point. It explains what to do and why.
@@ -215,6 +216,43 @@ Open the repository's `Projects` tab and click `New project`. Pick the `Board` t
 
 Start with manual moves first. Even hand-dragging cards is a clear improvement over having no board.
 
+## Define status transitions before the board fills up
+
+The fastest way for a Project board to turn into decoration is to create columns without defining what moves a card from one column to the next. If `In Progress` means “branch created” to one person and “PR open, waiting for review” to another, the board stops being operationally trustworthy.
+
+Use an explicit transition rule like this instead.
+
+![Define status transitions before the board fills up](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-define-status-transitions-before-the-boa.en.png)
+
+*A work-tracking flow that makes the Issue → PR → Project state transitions explicit*
+
+Once the team shares this rule, the board becomes a real progress view instead of a second to-do list that drifts away from reality.
+
+## When auto-closing does not work
+
+The most common failure mode in this chapter is simple: the PR merges, but the issue stays open. When that happens, check in this order.
+
+1. **Did the PR merge into the default branch?** Closing keywords fire when the change reaches the default branch.
+2. **Was the keyword in the PR body?** That is the safest place. Commit-message-only closing can become harder to reason about after squash or rebase.
+3. **Is the issue reference exact?** Use `#42` in the same repository or `owner/repo#42` across repositories.
+4. **Did you repeat the keyword for multiple issues?** `Closes #2, closes #3` closes both. `Closes #2, #3` does not.
+5. **Was the issue already closed?** GitHub will not “close it again.”
+
+That sequence is usually enough to resolve the confusion without guessing.
+
+## Verification loop before merge
+
+Because issues and Projects track flow rather than code, the verification pass is about linkage and state.
+
+- The issue body states a concrete **background** and **goal**.
+- The issue has at least one label and one assignee.
+- The branch name and the PR body point to the same issue number.
+- The PR body contains `Closes #N` plus a short verification note.
+- The Project card is in `In Review`, not still sitting in `Todo`.
+- After merge, the issue flips to `Closed` and the card lands in `Done`.
+
+This is not glamorous, but it prevents the two most common project-tracking failures: work that looks active but has no owner, and work that looks done but cannot be traced back to a decision.
+
 ## Common mistakes
 
 - Forgetting to close the issue when the work is done. Train the habit of writing `Closes #N` in the PR body so closing happens for you.
@@ -232,6 +270,8 @@ Teams use issues and projects in patterns like these:
 - **`good first issue` for new contributors.** Open source projects label easy starter issues so newcomers can find a safe place to start.
 - **Project automations.** Configure rules so a card moves to `In Progress` when its PR opens and to `Done` when the issue closes.
 - **Decision records as issues.** Even when no code changes, an issue like "We will use library X" gives the team a single place to revisit the discussion later.
+
+Projects also work better when they stay narrow. A four-column board such as `Todo / In Progress / In Review / Done` is usually enough for a small team. If cards keep drifting out of sync with reality, tighten the transition rule before adding more columns.
 
 ## Checklist
 
@@ -258,25 +298,36 @@ This article walked through one full issue-to-PR-to-board cycle. Recap:
 
 The next article looks at something even shorter than a PR body: the commit message. Why does `git log --oneline` lean so heavily on a single line, and what makes that line useful?
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What is Git? Version Control Fundamentals](./01-what-is-git.md)
-- [Your First Commit: init, add, commit](./02-first-commit.md)
-- [Inspecting Changes: status, diff, log](./03-status-diff-log.md)
-- [Understanding Branches: Diverging and Switching](./04-branch-basics.md)
-- [Merging Branches and Resolving Conflicts](./05-merge-and-conflict.md)
-- [Creating a GitHub Repository: remote, push, pull](./06-github-repository.md)
-- [Collaborating with Pull Requests](./07-pull-request.md)
-- **Tracking Work with Issues and Projects (current)**
-- [Writing Good Commit Messages](./09-good-commit-message.md)
-- Real-World Workflow at a Glance (upcoming)
+- **What a GitHub Issue is, and how it differs from a commit or a Pull Request?**
+  - The article treats Tracking Work with Issues and Projects - How GitHub Records What's Next as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to open an issue and attach labels, an assignee, and a milestone?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How a single line like `Closes #42` in a PR body auto-closes an issue on merge?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Git & GitHub 101 (1/10): What is Git? Version control fundamentals](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): Your first commit - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (3/10): Reading change history - status, diff, log](./03-status-diff-log.md)
+- [Git & GitHub 101 (4/10): Branch basics - create, switch, and compare](./04-branch-basics.md)
+- [Git & GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together](./05-merge-and-conflict.md)
+- [Git & GitHub 101 (6/10): Creating a GitHub repository - remote, push, and pull in one go](./06-github-repository.md)
+- [Git & GitHub 101 (7/10): Collaborating with Pull Requests - From Branch to Review to Main](./07-pull-request.md)
+- **Tracking Work with Issues and Projects - How GitHub Records What's Next (current)**
+- Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)
+- Building a real-world Git workflow: from issue to release in one cycle (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- GitHub Docs, "About issues": <https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues>
-- GitHub Docs, "Linking a pull request to an issue": <https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue>
-- GitHub Docs, "About Projects": <https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects>
-- GitHub Docs, "Managing labels": <https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels>
-- GitHub Docs, "About milestones": <https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/about-milestones>
+- [GitHub Docs — About issues](https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues) — Establishes issues as a planning object distinct from commits and pull requests.
+- [GitHub Docs — Managing labels](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels) — Supports the chapter's use of labels as a lightweight classification system.
+- [GitHub Docs — About milestones](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/about-milestones) — Covers the milestone concept used to group related issues and PRs into a release or time box.
+- [GitHub Docs — Linking a pull request to an issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) — Explains the exact rules behind `Closes #N` and default-branch auto-close behavior.
+- [GitHub Docs — Using keywords in issues and pull requests](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/using-keywords-in-issues-and-pull-requests) — The canonical syntax reference for closing keywords and multi-issue linkage.
+- [GitHub Docs — About Projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects) — Summarizes board views, fields, and automation for the Projects workflow used here.

@@ -1,10 +1,10 @@
 ---
 series: frontend-development-101
 episode: 6
-title: API Calls and Async
+title: "Frontend Development 101 (6/10): API Calls and Async"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,22 +20,27 @@ seo_description: fetch, async/await, loading and error states, caching — the a
 last_reviewed: '2026-05-04'
 ---
 
-# API Calls and Async
+# Frontend Development 101 (6/10): API Calls and Async
 
-> Frontend Development 101 series (6/10)
+Frontend code almost always talks to a server. It loads a user list, fetches search results, and sends data when the user clicks Save. The hard part is not writing `fetch`. The hard part is that networks are slow, unreliable, and capable of returning responses in an order you did not expect.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Frontend Development 101 series. Here we frame async work around explicit UI state. In practice, most async bugs get easier once you separate loading, success, and failure as first-class screen states instead of as afterthoughts.
 
-**Core question**: What do you show the user *during the brief moment* a server fetch is in flight?
 
-> Async code requires you to keep three states in mind at all times: *loading, success, failure*.
+![frontend development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/06/06-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 6 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying API Calls and Async?
+- Which signal should the example or diagram make visible for API Calls and Async?
+- What failure should be prevented first when API Calls and Async reaches a real system?
 
 ## What You Will Learn
 
 - The *minimum usage* of `fetch` and `async/await`
 - Handling loading/error states *explicitly*
+
 - Cancellation and race conditions
 - Caching and stale-while-revalidate
 - *Why React Query / SWR* became standard
@@ -45,16 +50,6 @@ last_reviewed: '2026-05-04'
 Async bugs make up *half of frontend defects*. They hide on a fast network and explode on a user's *slow 3G*. Explicit state management is *the only cure*.
 
 > Good async code *assumes the worst network*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Idle["idle"] --> Loading["loading"]
-    Loading --> Success["success"]
-    Loading --> Error["error"]
-    Error --> Loading
-```
 
 ## Key Terms
 
@@ -151,6 +146,16 @@ function Users() {
 }
 ```
 
+## Verification
+
+- With a working API, verify that the UI shows loading first and then renders the user list; with a broken endpoint, verify that a user-facing error appears.
+- Switch DevTools to Slow 3G and confirm that requests can be canceled cleanly when the component unmounts or the screen changes.
+
+## If It Fails, Check This First
+
+- If errors disappear into the console, make sure `res.ok` is checked and the `catch` path updates visible UI state.
+- If older responses overwrite newer ones, inspect your `AbortController` cleanup or the logic that decides which response is still current.
+
 ## What to Notice in This Code
 
 - The state is *explicit*: `idle/loading/success/error`.
@@ -195,22 +200,38 @@ Most React apps standardize on *React Query (TanStack Query)* or *SWR*. Vue uses
 
 Async is *state*. Next, we look at handling *user input* via forms and validation.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying API Calls and Async?**
+  - The article treats API Calls and Async as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for API Calls and Async?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when API Calls and Async reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
-- [HTML and CSS Basics](./02-html-and-css-basics.md)
-- [JavaScript Basics](./03-javascript-basics.md)
-- [Components and State](./04-components-and-state.md)
-- [Routing and Pages](./05-routing-and-pages.md)
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML and CSS Basics](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript Basics](./03-javascript-basics.md)
+- [Frontend Development 101 (4/10): Components and State](./04-components-and-state.md)
+- [Frontend Development 101 (5/10): Routing and Pages](./05-routing-and-pages.md)
 - **API Calls and Async (current)**
 - Forms and Validation (upcoming)
 - Styling and Design Systems (upcoming)
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [MDN Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
-- [TanStack Query](https://tanstack.com/query/latest)
-- [SWR docs](https://swr.vercel.app/)
-- [MDN AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)
+### Official Docs
+- [MDN: Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+- [MDN: AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)
+- [TanStack Query docs](https://tanstack.com/query/latest)
+
+### Verification and Further Reading
+- [SWR documentation](https://swr.vercel.app/)
+- [web.dev: Fetch API error handling](https://web.dev/articles/fetch-api-error-handling)

@@ -1,12 +1,12 @@
 ---
-title: 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
+title: "RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부"
 series: rag-deep-dive
 episode: 4
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,16 +14,29 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: PromptTemplate과 MessagesPlaceholder가 검색된 컨텍스트를 LLM 입력으로 변환하는 방식을 코드로 추적합니다.
 ---
 
-# 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
+# RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
 
-<!-- a-grade-example:begin -->
+PromptTemplate과 MessagesPlaceholder는 검색된 컨텍스트를 LLM이 읽는 실제 입력 형식으로 바꿉니다. 여기서는 그 변환 경로를 코드로 추적합니다.
+
+이 글은 RAG Deep Dive 시리즈의 네 번째 글입니다.
+
+![문자열 프롬프트와 채팅 프롬프트 계층 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.ko.png)
+*문자열 프롬프트와 채팅 프롬프트 계층 구조*
+> 프롬프트 계층은 구조화된 retrieval 결과가 모델이 실제로 읽는 입력 계약으로 바뀌는 곳입니다.
+
+## 먼저 던지는 질문
+
+- 프롬프트 템플릿은 문자열 포맷팅이 아니라 어떤 입력 계약을 검증할까요?
+- 검색된 context를 메시지에 주입할 때 누락·순서·역할은 왜 중요할까요?
+- RAG 프롬프트에서 질문과 근거를 분리하지 않으면 어떤 디버깅 문제가 생길까요?
+
 ## 최소 실행 예제
 
-예제 파일: `/root/Github/rag-deep-dive/ko/04-prompt-construction-and-context-injection/main.py`
+예제 파일: `en/04-prompt-construction-and-context-injection/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py
@@ -100,10 +113,6 @@ if __name__ == "__main__":
 
 소스에서 `PromptTemplate`는 `langchain_core.prompts.prompt.PromptTemplate`에 있지만, 실제 성격은 상속 구조를 같이 봐야 분명해집니다. `PromptTemplate`는 `StringPromptTemplate`를 상속하고, 그 위에는 다시 `BasePromptTemplate`가 있습니다. 이 구조 때문에 LangChain의 프롬프트는 “문자열 한 장”이 아닙니다. 필요한 입력 이름을 `input_variables`로 갖고, 미리 채워 둘 값은 `partial_variables`로 들고, `invoke()`로 runnable처럼 실행되며, `format_prompt()`를 호출하면 최종 문자열을 `StringPromptValue`로 감싼 결과를 돌려줍니다.
 
-![문자열 프롬프트와 채팅 프롬프트 계층 구조](../../assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.ko.png)
-
-*문자열 프롬프트와 채팅 프롬프트 계층 구조*
-
 가장 흔한 생성 경로는 `PromptTemplate.from_template(template, template_format="f-string", partial_variables=None)`입니다. 구현은 생각보다 짧습니다. 먼저 `get_template_variables(template, template_format)`로 템플릿 안의 변수 이름을 뽑아 냅니다. 그다음 `partial_variables`에 이미 들어 있는 이름을 제외한 뒤 `PromptTemplate(...)`를 생성합니다. 그런데 여기서 끝이 아닙니다. `prompt.py`와 `base.py`의 validator가 두 가지를 더 강제합니다. 첫째, `stop`이라는 이름은 입력 변수나 partial 변수로 쓸 수 없습니다. 내부 예약 이름이기 때문입니다. 둘째, `input_variables`와 `partial_variables`가 겹치면 예외를 냅니다. LangChain은 변수 바인딩을 느슨한 문자열 치환이 아니라, 충돌을 미리 막아야 하는 계약으로 취급하는 셈입니다.
 
 실제 포맷팅 경로도 소스에 선명하게 드러납니다. `PromptTemplate.format(**kwargs)`는 먼저 `_merge_partial_and_user_variables(**kwargs)`를 호출합니다. 이 단계에서 미리 바인딩된 partial 값과 호출 시점의 입력이 합쳐지고, callable partial이 있다면 여기서 평가됩니다. 그다음에야 아래 호출이 실행됩니다.
@@ -149,7 +158,7 @@ if __name__ == "__main__":
 
 문자열 프롬프트에서 채팅 프롬프트로 넘어가면 중심이 템플릿 문자열 하나에서 메시지 템플릿 목록으로 바뀝니다. `langchain_core.prompts.chat`의 구조를 보면 이 차이가 명확합니다. `SystemMessagePromptTemplate`, `HumanMessagePromptTemplate`, `AIMessagePromptTemplate`는 모두 내부적으로 문자열 프롬프트 템플릿을 감싼 얇은 래퍼입니다. 다만 최종 출력은 문자열이 아니라 각각 `SystemMessage`, `HumanMessage`, `AIMessage` 같은 concrete message 객체입니다.
 
-![메시지 템플릿이 채팅 메시지로 변환되는 흐름](../../assets/rag-deep-dive/04/04-02-chat-prompt-format-messages-flow.ko.png)
+![메시지 템플릿이 채팅 메시지로 변환되는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-02-chat-prompt-format-messages-flow.ko.png)
 
 *메시지 템플릿이 채팅 메시지로 변환되는 흐름*
 
@@ -204,7 +213,7 @@ if __name__ == "__main__":
 
 검색 결과가 실제 프롬프트의 `{context}`로 바뀌는 경로는 `langchain/chains/retrieval_qa/base.py`에서 가장 선명하게 볼 수 있습니다. `RetrievalQA`는 0.2.17 시점에도 이미 deprecated지만, 전통적인 RAG 조립 경로를 읽기에는 오히려 더 단순해서 좋습니다. 핵심은 `_get_docs()`와 `_call()`입니다.
 
-![retrieval QA가 문맥 문자열을 조립하는 경로](../../assets/rag-deep-dive/04/04-03-retrieval-qa-context-assembly.ko.png)
+![retrieval QA가 문맥 문자열을 조립하는 경로](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-03-retrieval-qa-context-assembly.ko.png)
 
 *retrieval QA가 문맥 문자열을 조립하는 경로*
 
@@ -247,7 +256,7 @@ Context:
 
 이제 `{context}`가 어디서 오는지 봤으니, 다음은 변수들이 프롬프트 계층을 어떻게 통과하는지 정리할 차례입니다. 여기서는 `BasePromptTemplate`가 기준선입니다. 이 클래스가 partial binding과 runnable `invoke()` 둘 다 정의합니다.
 
-![partial 변수와 invoke 입력이 합쳐지는 흐름](../../assets/rag-deep-dive/04/04-04-partial-variables-and-lcel-flow.ko.png)
+![partial 변수와 invoke 입력이 합쳐지는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-04-partial-variables-and-lcel-flow.ko.png)
 
 *partial 변수와 invoke 입력이 합쳐지는 흐름*
 
@@ -290,7 +299,7 @@ if __name__ == "__main__":
     main()
 ```
 
-핵심은 두 가지입니다. `partial()`은 호출 시마다 반복되는 정책 입력을 줄여 주고, `invoke()`는 프롬프트를 runnable 그래프 안에 남겨 둡니다. RAG에서는 안정적인 규칙과 매번 달라지는 증거가 공존하므로, 이 둘을 분리하는 습관이 특히 유용합니다.
+여기서 기억할 점은 두 가지입니다. `partial()`은 호출할 때마다 되풀이되는 정책 입력을 덜어 주고, `invoke()`는 프롬프트를 runnable 그래프에 그대로 연결해 둡니다. RAG에서는 고정 규칙과 매 호출마다 바뀌는 근거가 함께 움직이므로, 둘을 나눠 두는 편이 실무에서 다루기 쉽습니다.
 
 ---
 
@@ -298,7 +307,7 @@ if __name__ == "__main__":
 
 좋은 RAG 프롬프트는 단순히 “문맥을 보고 답하라”로 끝나지 않습니다. 증거를 어떻게 다뤄야 하는지, 문맥이 부족할 때는 어떻게 말해야 하는지, 여러 청크가 같은 내용을 반복하거나 일부만 겹칠 때는 출처를 어떻게 표기해야 하는지를 명시해 주는 편이 훨씬 안전합니다. LangChain의 프롬프트 계층은 이런 규칙을 구조적으로 표현하기에 충분합니다.
 
-![출처 인용 지침을 넣은 RAG 채팅 프롬프트 예시](../../assets/rag-deep-dive/04/04-05-rag-prompt-construction-example.ko.png)
+![출처 인용 지침을 넣은 RAG 채팅 프롬프트 예시](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-05-rag-prompt-construction-example.ko.png)
 
 *출처 인용 지침을 넣은 RAG 채팅 프롬프트 예시*
 
@@ -375,22 +384,54 @@ if __name__ == "__main__":
     main()
 ```
 
+## 정리
+
 이 예시는 동시에 `StuffDocumentsChain`를 언제 쓰고 언제 넘어설지에 대한 기준도 보여 줍니다. 기본 stuff 체인이 적합한 경우는 코퍼스가 크지 않고, chunk가 이미 깔끔하며, 문서별 포맷이 단순하고, 하나의 `{context}` 문자열로 충분할 때입니다. 내부 문서 검색, 운영 가이드 보조 도구, 초기 프로토타입은 대개 여기서 출발해도 괜찮습니다.
 
 반대로 직접 컨텍스트를 조립해야 하는 경우도 분명합니다. 토큰 예산을 엄격하게 관리해야 하거나, 문서마다 출처 헤더를 붙여야 하거나, 메타데이터로 우선순위를 다시 정렬해야 하거나, 중복 청크를 제거해야 하거나, 높은 신뢰도의 문서와 낮은 신뢰도의 문서를 다른 섹션으로 나눠야 한다면 기본 stuff 체인은 너무 단순합니다. 이때는 `format_document()`로 문서별 렌더링을 하고, 그 사이에 길이 계산·재정렬·중복 제거 같은 packing 단계를 직접 끼워 넣는 편이 낫습니다.
 
 이 시리즈의 관점으로 정리하면 결국 같은 결론에 닿습니다. retrieval 품질은 retrieval에서 끝나지 않습니다. 검색된 증거가 메모리에 있다는 사실과, 모델이 그 증거를 올바른 형태로 본다는 사실 사이에는 프롬프트 구성이라는 마지막 변환층이 있습니다. 이 층이 허술하면 retriever는 맞았는데 답은 틀릴 수 있습니다.
+
+## 처음 질문으로 돌아가기
+
+- **프롬프트 템플릿은 문자열 포맷팅이 아니라 어떤 입력 계약을 검증할까요?**
+  프롬프트 템플릿은 필요한 변수 이름, 입력 누락, 부분 변수, 메시지 역할처럼 모델 호출 전의 입력 계약을 검증합니다.
+
+- **검색된 context를 메시지에 주입할 때 누락·순서·역할은 왜 중요할까요?**
+  context가 빠지거나 순서가 바뀌거나 system/user 역할이 섞이면 모델이 근거를 잘못 해석하거나 지시와 데이터를 혼동할 수 있습니다.
+
+- **RAG 프롬프트에서 질문과 근거를 분리하지 않으면 어떤 디버깅 문제가 생길까요?**
+  질문과 근거가 섞이면 검색이 문제인지 프롬프트가 문제인지 분리하기 어렵습니다. 로그에도 두 값을 따로 남겨야 합니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [RAG Deep Dive (1/6): 문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
+- [RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR](./03-retriever-design.md)
+- **RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (현재 글)**
+- RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL (예정)
+- RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
+
+<!-- toc:end -->
+
 ---
 
 ## 참고 자료
 
-1. [`langchain_core/prompts/prompt.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/prompt.py)
-2. [`langchain_core/prompts/string.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/string.py)
-3. [`langchain_core/prompts/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/base.py)
-4. [`langchain_core/prompts/chat.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/chat.py)
-5. [`langchain_core/messages/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/base.py)
-6. [`langchain_core/messages/human.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/human.py)
-7. [`langchain_core/messages/system.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/system.py)
-8. [`langchain_core/messages/ai.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/ai.py)
-9. [`langchain/chains/retrieval_qa/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
-10. [`langchain/chains/combine_documents/stuff.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)
+### 공식 문서
+
+- [LangChain Prompt Templates 개념 가이드](https://python.langchain.com/docs/concepts/prompt_templates/)
+- [LangChain `PromptTemplate` API 레퍼런스](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.prompt.PromptTemplate.html)
+- [LangChain `ChatPromptTemplate` API 레퍼런스](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.chat.ChatPromptTemplate.html)
+- [LangChain `MessagesPlaceholder` API 레퍼런스](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.chat.MessagesPlaceholder.html)
+
+### 소스 코드
+
+- [LangChain `prompt.py` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/prompt.py)
+- [LangChain `chat.py` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/chat.py)
+- [LangChain `messages/base.py` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/base.py)
+- [LangChain `RetrievalQA` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
+- [LangChain `StuffDocumentsChain` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/rag-deep-dive/ko)

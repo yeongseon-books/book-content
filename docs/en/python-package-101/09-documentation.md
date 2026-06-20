@@ -1,11 +1,11 @@
 ---
-title: Documentation — README, MkDocs, API Reference
+title: "Python Package 101 (9/10): Documentation — README, MkDocs, API Reference"
 series: python-package-101
 episode: 9
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,29 +17,25 @@ tags:
 - README
 - API Reference
 - Sphinx
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: A README is the front door of your package and an API Reference is
   the manual for every function. A package without docs does not get used.
 ---
 
-# Documentation — README, MkDocs, API Reference
+# Python Package 101 (9/10): Documentation — README, MkDocs, API Reference
 
-> Python Package 101 series (9/10)
+Even a solid package gets ignored if a reader cannot figure out installation and the first useful call within half a minute. Documentation is not decoration around code; it is part of the product surface.
 
----
+This is post 9 in the Python Package 101 series. Here we connect README, guides, and API reference into a documentation stack that helps users decide, start, and verify.
 
-<!-- a-grade-intro:begin -->
+![Python Package 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/09/09-01-mental-model.en.png)
+*Python Package 101 chapter 9 flow overview*
 
-## Key Questions
+## Questions to Keep in Mind
 
 - What should a good README include?
 - What is the difference between MkDocs and Sphinx?
 - How do you auto-generate an API Reference from docstrings?
-- How do you deploy documentation to GitHub Pages?
-
-> A README is the front door of your package and an API Reference is the manual for every function. A package without docs does not get used.
-
-<!-- a-grade-intro:end -->
 
 ## What you will learn
 
@@ -143,7 +139,7 @@ pytest tests/
 ## License
 
 MIT
-```
+```text
 
 ### Step 2. Add docstrings
 
@@ -284,19 +280,28 @@ MkDocs + Material theme is the de facto standard in the Python ecosystem today. 
 
 The next post covers **production package template** — cookiecutter, copier, and GitHub Template.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is a Python Package?](./01-what-is-a-python-package.md)
-- [Project Structure — src layout and pyproject.toml](./02-project-structure.md)
-- [Dependency Management — venv, pip, uv, requirements](./03-dependency-management.md)
-- [Building Packages — wheel and sdist](./04-building-packages.md)
-- [Publishing to PyPI — from TestPyPI to production](./05-publishing-to-pypi.md)
-- [Versioning and Releases](./06-versioning-and-releases.md)
-- [CLI Packages](./07-cli-packages.md)
-- [Type Hints and Static Analysis](./08-type-hints-and-static-analysis.md)
-- **Documentation — README, MkDocs, API Reference (current)**
-- Production Package Template (upcoming)
+- **What should a good README include?**
+  - The article treats Documentation — README, MkDocs, API Reference as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What is the difference between MkDocs and Sphinx?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do you auto-generate an API Reference from docstrings?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Python Package 101 (1/10): What Is a Python Package?](./01-what-is-a-python-package.md)
+- [Python Package 101 (2/10): Project Structure — src layout and pyproject.toml](./02-project-structure.md)
+- [Python Package 101 (3/10): Dependency Management — venv, pip, uv, requirements](./03-dependency-management.md)
+- [Python Package 101 (4/10): Building Packages — wheel and sdist](./04-building-packages.md)
+- [Python Package 101 (5/10): Publishing to PyPI — from TestPyPI to production](./05-publishing-to-pypi.md)
+- [Python Package 101 (6/10): Versioning and Releases](./06-versioning-and-releases.md)
+- [Python Package 101 (7/10): CLI Packages](./07-cli-packages.md)
+- [Python Package 101 (8/10): Type Hints and Static Analysis](./08-type-hints-and-static-analysis.md)
+- **Python Package 101 (9/10): Documentation — README, MkDocs, API Reference (current)**
+- Python Package 101 (10/10): Production Package Template (upcoming)
 
 <!-- toc:end -->
 

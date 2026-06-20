@@ -1,10 +1,10 @@
 ---
 series: observability-101
 episode: 10
-title: A Production-Ready Observability Stack
-status: content-ready
+title: "Observability 101 (10/10): A Production-Ready Observability Stack"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,28 +17,35 @@ tags:
   - Grafana
   - Prometheus
 seo_description: Build a workable first observability stack with OpenTelemetry, Prometheus, Loki, Tempo, and Grafana for a small team.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# A Production-Ready Observability Stack
+# Observability 101 (10/10): A Production-Ready Observability Stack
 
-> Observability 101 series (10/10)
+The most common small-team mistake is waiting for the perfect observability stack. The perfect mix of features, cost, and future-proofing never arrives, and the team delays the first usable setup for too long.
 
-<!-- a-grade-intro:begin -->
+A good first stack is less about completeness and more about operability. Collection should be standardized, the three signals should meet in one place, and the team should be able to replace parts later without rewriting the application.
 
-**Core question**: What does a *good-enough* observability stack look like that a *small team* can build *today*?
+This is the final post in the Observability 101 series.
 
-> *OpenTelemetry to *unify collection*, Prometheus / Loki / Tempo for the *three signals*, Grafana for *one screen* — that is a small team's *realistic baseline*.*
 
-<!-- a-grade-intro:end -->
+![observability 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/10/10-01-concept-at-a-glance.en.png)
+*observability 101 chapter 10 flow overview*
+> A Production-Ready Observability Stack is about the boundary decision, not the tool choice.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The simple flow *collect → store → query*
-- An open-source *baseline stack*
-- *Correlation* on one screen
-- Five *operator SLOs*
-- Five common pitfalls
+- What boundary should you inspect first when applying A Production-Ready Observability Stack?
+- Which signal should the example or diagram make visible for A Production-Ready Observability Stack?
+- What failure should be prevented first when A Production-Ready Observability Stack reaches a real system?
+
+## Questions this article answers
+
+- What does the minimum viable observability stack for a small team look like?
+- Why is it better to put the OpenTelemetry Collector at the center?
+- What do you need to connect metrics, logs, and traces on one screen?
+- Why should operators define service-level objectives for the observability stack itself?
+- What should you evaluate when you want practical choices without deep vendor lock-in?
 
 ## Why It Matters
 
@@ -46,18 +53,7 @@ There is no *perfect* stack for a small team. The best stack is *operable* and *
 
 > *The perfect stack *will not arrive tomorrow*. Build the operable one *today*.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    App["app"] --> Otel["OpenTelemetry collector"]
-    Otel --> Prom["Prometheus (metric)"]
-    Otel --> Loki["Loki (log)"]
-    Otel --> Tempo["Tempo (trace)"]
-    Prom --> Grafana
-    Loki --> Grafana
-    Tempo --> Grafana
-```
+Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms
 
@@ -128,6 +124,23 @@ Loki  -> Tempo: log "trace_id" -> trace view
 5) Alertmanager dispatch latency < 30s
 ```
 
+## How to Verify the Stack Is Actually Connected
+
+The first success criterion is not feature count. It is whether all five core components are healthy and whether one request can move across all three signals.
+
+```bash
+docker compose ps
+curl -s http://localhost:9464/metrics | grep otelcol
+curl -s http://localhost:3000/api/health
+```
+
+```text
+Expected output:
+- collector, prometheus, loki, tempo, and grafana all report `running`.
+- Collector metrics show exporter send counters increasing.
+- Grafana health returns `ok`, and one `trace_id` lets you jump between traces and logs.
+```
+
 ## What to Notice in This Code
 
 - *Unified collector* gives *standard collection*.
@@ -171,17 +184,29 @@ Small teams start with *OTel + LGTM (Loki/Grafana/Tempo/Mimir)*. As they scale, 
 
 A small team's first stack must be *replaceable*. From here: *incident response*, *capacity planning*, *cost FinOps*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying A Production-Ready Observability Stack?**
+  - The article treats A Production-Ready Observability Stack as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for A Production-Ready Observability Stack?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when A Production-Ready Observability Stack reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
-- [Metrics, Logs, and Traces](./02-metric-log-trace.md)
-- [Collecting and Visualizing Metrics](./03-metric-collection.md)
-- [Structured Logging](./04-structured-logging.md)
-- [Distributed Tracing Basics](./05-distributed-tracing.md)
-- [Dashboard Design](./06-dashboard-design.md)
-- [Alerts and On-Call](./07-alert-and-oncall.md)
-- [SLI and SLO Basics](./08-sli-and-slo.md)
-- [Cost and Cardinality](./09-cost-and-cardinality.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
+- [Observability 101 (2/10): Metrics, Logs, and Traces](./02-metric-log-trace.md)
+- [Observability 101 (3/10): Collecting and Visualizing Metrics](./03-metric-collection.md)
+- [Observability 101 (4/10): Structured Logging](./04-structured-logging.md)
+- [Observability 101 (5/10): Distributed Tracing Basics](./05-distributed-tracing.md)
+- [Observability 101 (6/10): Dashboard Design](./06-dashboard-design.md)
+- [Observability 101 (7/10): Alerts and On-Call](./07-alert-and-oncall.md)
+- [Observability 101 (8/10): SLI and SLO Basics](./08-sli-and-slo.md)
+- [Observability 101 (9/10): Cost and Cardinality](./09-cost-and-cardinality.md)
 - **A Production-Ready Observability Stack (current)**
+
 <!-- toc:end -->
 
 ## References

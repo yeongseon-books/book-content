@@ -1,10 +1,10 @@
 ---
 series: software-design-101
 episode: 9
-title: Design Principles
+title: "Software Design 101 (9/10): Design Principles"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,28 @@ tags:
   - YAGNI
   - Principles
 seo_description: A tour of SOLID, KISS, YAGNI, DRY, and the Law of Demeter, with notes on when to actually reach for each.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Design Principles
+# Software Design 101 (9/10): Design Principles
 
-> Software Design 101 series (9/10)
+Design principles sound abstract when treated as slogans. They become useful the moment a code smell forces you to ask what kind of structural mistake you are actually looking at.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Software Design 101 series.
 
-**Core question**: Are SOLID, KISS, YAGNI… really worth memorizing?
+In this post, we recast SOLID, KISS, YAGNI, DRY, and the Law of Demeter as diagnostic tools. The point is not memorization. The point is knowing which question to ask, and which refactoring direction follows from the answer.
 
-> The point is not to memorize them but to know *when* to reach for each. Every principle is a response to a code smell.
+> Principles earn their keep when they turn vague discomfort into a concrete next move.
 
-<!-- a-grade-intro:end -->
+
+![software design 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/09/09-01-concept-at-a-glance.en.png)
+*software design 101 chapter 9 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Design Principles?
+- Which signal should the example or diagram make visible for Design Principles?
+- What failure should be prevented first when Design Principles reaches a real system?
 
 ## What You Will Learn
 
@@ -46,15 +54,6 @@ last_reviewed: '2026-05-04'
 Principles are diagnostic tools, not commandments. When the code smells, they point at which principle was broken and hint at how to fix it.
 
 > Principles make you ask "why?"
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    S["Smell"] --> P["Principle"]
-    P --> R["Refactor"]
-    R --> C["Cleaner code"]
-```
 
 Smell → principle → refactor.
 
@@ -128,6 +127,32 @@ SRP applied — small collaborators in place of one giant class.
 # Move the abstraction to the domain side.
 ```
 
+## Quick Verification
+
+Knowing the names is less important than knowing which question to ask when a smell appears. Take one recent review example and map it like this.
+
+```text
+giant class -> SRP
+growing branch chain -> OCP
+subtype throws -> LSP
+read-only implementation still exposes write -> ISP
+domain imports DB -> DIP
+```
+
+**Expected output:** if the smell, the principle, and the next refactoring move line up in one sentence, the principle is doing real work.
+
+That is what makes code review sharper. Instead of “this feels wrong,” you can say “this looks like an SRP split candidate.”
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| You know the principle name but not the next move | Map the smell to the principle first |
+| DRY increases coupling instead of lowering it | Check whether the duplicated code truly changes for the same reason |
+| A tiny script becomes ceremonially heavy | Recalibrate with YAGNI and KISS |
+
+Principles are not universal rules. They are diagnostic cards that help you choose the next question and the next cut.
+
 ## What to Notice in This Code
 
 - Each principle points at a different smell.
@@ -172,17 +197,29 @@ Principles become a shared vocabulary in code review. Saying "this looks like an
 
 Principles are guides. In the final episode we apply every tool from this series — to a small project.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Design Principles?**
+  - The article treats Design Principles as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Design Principles?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Design Principles reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
-- [Separation of Concerns](./02-separation-of-concerns.md)
-- [Modules and Boundaries](./03-modules-and-boundaries.md)
-- [Dependency Direction](./04-dependency-direction.md)
-- [Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
-- [Layered Architecture](./06-layered-architecture.md)
-- [Data Flow Design](./07-data-flow-design.md)
-- [Reducing Change Impact](./08-reducing-change-impact.md)
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): Separation of Concerns](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): Modules and Boundaries](./03-modules-and-boundaries.md)
+- [Software Design 101 (4/10): Dependency Direction](./04-dependency-direction.md)
+- [Software Design 101 (5/10): Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
+- [Software Design 101 (6/10): Layered Architecture](./06-layered-architecture.md)
+- [Software Design 101 (7/10): Data Flow Design](./07-data-flow-design.md)
+- [Software Design 101 (8/10): Reducing Change Impact](./08-reducing-change-impact.md)
 - **Design Principles (current)**
-- Small Design Practice (upcoming)
+- Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -191,3 +228,8 @@ Principles are guides. In the final episode we apply every tool from this series
 - [Law of Demeter](https://en.wikipedia.org/wiki/Law_of_Demeter)
 - [The Wrong Abstraction (Sandi Metz)](https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction)
 - [YAGNI (Martin Fowler)](https://martinfowler.com/bliki/Yagni.html)
+
+### Practical Docs
+
+- [abc — Abstract Base Classes](https://docs.python.org/3/library/abc.html)
+- [typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)

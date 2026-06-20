@@ -1,10 +1,10 @@
 ---
 series: testing-101
 episode: 8
-title: Regression Test
+title: "Testing 101 (8/10): Regression Test"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,26 @@ seo_description: How to write and operate regression tests so the same bug never
 last_reviewed: '2026-05-04'
 ---
 
-# Regression Test
+# Testing 101 (8/10): Regression Test
 
-> Testing 101 series (8/10)
+A bug is rarely expensive only once. The real cost comes when the same failure returns months later, after the original context has faded and a different engineer has to reconstruct why the system was fragile in the first place. Software does not remember fixes unless you encode the lesson.
 
-<!-- a-grade-intro:begin -->
+Regression tests are that encoded lesson. They turn a bug report into a failing example, then keep the example around so the same path cannot silently break again.
 
-**Core question**: Why does a bug you fixed *six months ago* keep coming back?
+This is post 8 in the Testing 101 series. Here we walk through the bug → repro test → fix workflow and show how to keep regression tests small, traceable, and cheap enough to live close to the code they protect.
 
-> Regression tests *freeze the fix into code*. If it ever breaks again, the alarm rings *immediately*.
+> A regression test is a bug report that learned how to execute itself.
 
-<!-- a-grade-intro:end -->
+
+![testing 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/08/08-01-concept-at-a-glance.en.png)
+*testing 101 chapter 8 flow overview*
+> Every bug-fix PR should include a test that fails before the fix and passes after.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Regression Test?
+- Which signal should the example or diagram make visible for Regression Test?
+- What failure should be prevented first when Regression Test reaches a real system?
 
 ## What You Will Learn
 
@@ -47,15 +56,7 @@ Software has *no memory*. A bug fixed once can be *reintroduced by the next cont
 > A team without regression tests fixes *the same bug forever*.
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Bug["Bug report"] --> Repro["Repro test (failing)"]
-    Repro --> Fix["Code fix"]
-    Fix --> Pass["Test passes"]
-    Pass --> CI["Locked into CI"]
-```
-
+A regression test is a test case extracted from a real bug report: it fails on the broken code, passes after the fix, and lives in the suite to ensure the same bug never silently returns during future refactors or merges.
 ## Key Terms
 
 - **Regression**: a *previously fixed behavior* that *breaks again*.
@@ -141,6 +142,20 @@ git commit -m "fix(cart): reject negative price (PROJ-1234)"
 4. **Refreshing snapshots *without thinking*.** If you do not check *why it changed*, the snapshot is *meaningless paperwork*.
 5. **Pushing regression tests into *slow E2E suites*.** Keep them at the *lowest layer* possible.
 
+## Verification Points
+
+1. Run the reproduction test against the pre-fix code first and confirm that it really goes red. Without that step, the “regression test” may be decorative.
+2. Keep the bug ID in the test name or docstring so later readers can trace why the case exists.
+3. Compare whether the regression belongs best as a unit test, integration test, or E2E scenario. The lowest effective layer is usually the cheapest long-term home.
+
+**Expected output:** the pre-fix version should fail deterministically, and the fixed version should make the same test pass without broadening the scenario unnecessarily.
+
+## Failure Signals and First Checks
+
+- Adding only a green test after the fix leaves the real regression risk unproven.
+- If the repro is too large, unrelated moving parts will blur the failure cause.
+- Blind snapshot refreshes turn regression tests into paperwork.
+
 ## How This Shows Up in Production
 
 Most teams enforce the *issue -> repro test -> fix* flow through their *default PR template*. When the *same module produces repeated regressions*, they treat it as a *signal of a design problem*.
@@ -170,22 +185,37 @@ Most teams enforce the *issue -> repro test -> fix* flow through their *default 
 
 Regression tests are *the team's memory*. In the next post we move all of these tests onto *CI that runs them automatically*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Regression Test?**
+  - The article treats Regression Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Regression Test?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Regression Test reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
-- [Integration Test](./03-integration-test.md)
-- [E2E Test](./04-e2e-test.md)
-- [Test Doubles](./05-test-double.md)
-- [Mock and Stub](./06-mock-and-stub.md)
-- [Test Coverage](./07-test-coverage.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
+- [Testing 101 (3/10): Integration Test](./03-integration-test.md)
+- [Testing 101 (4/10): E2E Test](./04-e2e-test.md)
+- [Testing 101 (5/10): Test Double](./05-test-double.md)
+- [Testing 101 (6/10): Mock and Stub](./06-mock-and-stub.md)
+- [Testing 101 (7/10): Test Coverage](./07-test-coverage.md)
 - **Regression Test (current)**
 - Running Tests in CI (upcoming)
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Martin Fowler — Regression Testing](https://martinfowler.com/articles/practical-test-pyramid.html)
-- [pytest docs](https://docs.pytest.org/)
-- [Google Testing Blog](https://testing.googleblog.com/)
+### Official Docs
+- [pytest documentation](https://docs.pytest.org/)
+- [GitHub Issues documentation](https://docs.github.com/en/issues)
+
+### Practical Reading
+- [Martin Fowler — The Practical Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
 - [The Pragmatic Programmer — Bug fixing chapter](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/)

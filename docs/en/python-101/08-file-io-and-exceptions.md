@@ -1,11 +1,11 @@
 ---
-title: File I/O and exception handling
+title: "Python 101 (8/10): File I/O and exception handling"
 series: python-101
 episode: 8
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -22,18 +22,21 @@ seo_description: 'A file is a three-step resource: open, read or write, close. E
   are labels that classify which step failed and how.'
 ---
 
-# File I/O and exception handling
+# Python 101 (8/10): File I/O and exception handling
 
-## What you will learn
+A file is a three-step resource: open it, read or write it, then close it. Exceptions are the labels that tell you which step failed and what kind of failure you hit.
 
-By the end of this chapter you can do the following.
+This post is the 8th article in the Python 101 series. This is the point in the series where resource handling and failure paths become part of normal coding.
 
-- Open and close files safely using `open()` together with the `with` statement.
-- Tell text mode (`"r"`, `"w"`, `"a"`) apart from binary mode (`"rb"`, `"wb"`) and pick the right one.
-- Describe the difference between `read`, `readline`, `readlines`, and iterating the file object in one sentence each.
-- Use the four blocks of `try`/`except`/`else`/`finally` for their distinct roles.
-- Catch narrow exceptions like `FileNotFoundError` and `PermissionError` instead of using a bare `except:` clause.
-- Use `pathlib.Path` for path manipulation and `read_text` / `write_text` for short file operations.
+
+![Python 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/08/08-01-mental-model.en.png)
+*Python 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- Open and close files safely using `open()` together with the `with` statement?
+- Tell text mode (`"r"`, `"w"`, `"a"`) apart from binary mode (`"rb"`, `"wb"`) and pick the right one?
+- Describe the difference between `read`, `readline`, `readlines`, and iterating the file object in one sentence each?
 
 ## Why it matters
 
@@ -48,9 +51,6 @@ The `with` statement and narrow `except` clauses are the simplest tools for avoi
 > A file is a three-step resource: open, read or write, close. Exceptions are labels that classify which step failed and how. Separating those two models makes the shape of `with` and `try` blocks fall out naturally.
 The diagram below shows the flow that runs whenever you open a file and do work with it.
 
-![Mental model](../../assets/python-101/08/08-01-mental-model.en.png)
-
-*Mental model*
 Two ideas hold this together.
 
 - **`with` calls `__exit__` on both normal exit and exception exit, so the handle is closed in both cases.** That removes most of the need to write `try`/`finally` and call `close()` by hand.
@@ -316,12 +316,35 @@ The shape stays the same: close resources with `with`, catch exceptions narrowly
 
 The next chapter covers classes and objects. The functions and modules from earlier chapters get one more layer of abstraction, where data and behavior live together.
 
+## Answering the Opening Questions
+
+- **Open and close files safely using `open()` together with the `with` statement?**
+  - The article treats File I/O and exception handling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Tell text mode (`"r"`, `"w"`, `"a"`) apart from binary mode (`"rb"`, `"wb"`) and pick the right one?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Describe the difference between `read`, `readline`, `readlines`, and iterating the file object in one sentence each?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- [Python 101 (1/10): Why Python, and how to install and use venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): Variables, types, and operators](./02-variables-types-operators.md)
+- [Python 101 (3/10): Strings and formatting](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): Control flow: if, for, while, comprehension](./05-control-flow.md)
+- [Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
+- [Python 101 (7/10): Modules and packages: import, __init__, __name__](./07-modules-and-packages.md)
+- **File I/O and exception handling (current)**
+- Classes and objects: bundling data with behavior (upcoming)
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Python tutorial — Reading and writing files](https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files)
-- [Python tutorial — Errors and exceptions](https://docs.python.org/3/tutorial/errors.html)
-- [Python library — pathlib](https://docs.python.org/3/library/pathlib.html)
-- [PEP 343 — The "with" statement](https://peps.python.org/pep-0343/)
+- [Python tutorial — Input and Output](https://docs.python.org/3/tutorial/inputoutput.html) — Covers `open()`, core read/write methods, and text-versus-binary file handling.
+- [Python tutorial — Errors and Exceptions](https://docs.python.org/3/tutorial/errors.html) — Official walkthrough of `try`/`except`/`else`/`finally`, propagation, and exception design.
+- [Python docs — `open()`](https://docs.python.org/3/library/functions.html#open) — Precise reference for file modes, encodings, and text/binary semantics.
+- [Python docs — `pathlib`](https://docs.python.org/3/library/pathlib.html) — Documents `Path`, path composition, and convenience helpers like `read_text()` and `write_text()`.
+- [PEP 343 — The "with" Statement](https://peps.python.org/pep-0343/) — Defines the context-manager protocol that makes `with open(...)` safe and idiomatic.

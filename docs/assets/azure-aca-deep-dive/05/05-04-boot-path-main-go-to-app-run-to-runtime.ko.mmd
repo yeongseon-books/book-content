@@ -1,0 +1,4 @@
+flowchart TD
+  Init["앱 초기화"] --> Load["컴포넌트 로드"]
+  Load --> Start["gRPC/HTTP 서버 시작"]
+  Start --> Ready["앱 요청 수신 준비 완료"]

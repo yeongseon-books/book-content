@@ -1,10 +1,10 @@
 ---
 series: sql-101
 episode: 2
-title: SELECT Basics
+title: "SQL 101 (2/10): SELECT Basics"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,46 +17,37 @@ tags:
   - Database
   - Postgres
 seo_description: A practical tour of SELECT — clause order, column projection, aliases, ORDER BY, and LIMIT — the patterns you use every day.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# SELECT Basics
+# SQL 101 (2/10): SELECT Basics
 
-> SQL 101 series (2/10)
+SELECT is usually the first SQL statement people become comfortable with, and that familiarity is exactly why teams get sloppy with it. A query that looks harmless can still waste memory, hide intent, and make later review harder if it pulls too many columns or leaves ordering vague.
 
-<!-- a-grade-intro:begin -->
+Good SELECT habits pay off long after the query leaves your editor. The column list explains the business question, aliases make the result readable, and LIMIT keeps exploration fast instead of noisy.
 
-**Core question**: Why is `SELECT *` *risky*, and what changes when you make *naming columns* a habit?
+This is post 2 in the SQL 101 series. Here we treat SELECT as the tool that shapes the result set, not as a throwaway read statement.
 
-> *SELECT looks like a simple read, but writing it well lowers the *cost for the whole team*.*
 
-<!-- a-grade-intro:end -->
+![sql 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/02/02-01-select-evaluation-flow.en.png)
+*sql 101 chapter 2 flow overview*
+> SELECT is your first tool for designing result sets. Explicit column lists, meaningful aliases, and clear sorting make the difference between a query that gets answered fast and one that creates confusion downstream.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *logical order* of SELECT clauses
-- Column projection and *aliases*
-- *ORDER BY* and *LIMIT*
-- The meaning and cost of *DISTINCT*
-- Five common mistakes
+- What is the safest way to read a SELECT statement?
+- Why is naming columns explicitly more than a style preference?
+- Where do aliases work, and where do they not?
 
 ## Why It Matters
 
-An analyst issues SELECT *hundreds of times a day*. One small habit changes *reading speed, cost, and trust*. Naming columns and using clear aliases is a gift to the *future-you in six months*.
+Analysts write SELECT statements dozens of times a day, and application code behind an ORM still emits SELECT under the hood. That makes this clause the place where readability, cost, and trust start to diverge. Two queries can answer the same question while leaving very different maintenance burdens behind.
 
-> *SELECT is *easy to say* and *easy to misread*.*
+Explicit column lists help more than the current query. They show future readers what information was actually needed, and they make it obvious when a query starts dragging along unused JSON blobs, large text columns, or unstable positional ordering.
 
-## Concept at a Glance
+## SELECT evaluation flow
 
-```mermaid
-flowchart LR
-    From["FROM table"] --> Where["WHERE filter"]
-    Where --> Group["GROUP BY"]
-    Group --> Having["HAVING"]
-    Having --> Select["SELECT columns"]
-    Select --> Order["ORDER BY"]
-    Order --> Limit["LIMIT"]
-```
+The logical flow is FROM (source) → WHERE (filter) → SELECT (shape) → ORDER BY (sort) → LIMIT (bound). Though you write them in a different order, understanding this sequence helps explain why aliases work in some clauses and not others.
 
 ## Key Terms
 
@@ -97,6 +88,14 @@ SELECT id, name FROM users ORDER BY signup_at DESC;
 ```sql
 SELECT id, name FROM users ORDER BY id LIMIT 10;
 ```
+
+**Expected output:**
+
+| id | name |
+| --- | --- |
+| 1 | Ada |
+| 2 | Linus |
+| 3 | Grace |
 
 ### Step 5 — Drop duplicates
 
@@ -147,8 +146,19 @@ Dashboards repeat the `SELECT cols + ORDER BY + LIMIT` pattern *hundreds of time
 
 SELECT is mostly about *sentence shape*. The next post is *WHERE and conditions*.
 
+## Answering the Opening Questions
+
+- **What is the safest way to read a SELECT statement?**
+  - The article treats SELECT Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is naming columns explicitly more than a style preference?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where do aliases work, and where do they not?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is SQL?](./01-what-is-sql.md)
+## In this series
+
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
 - **SELECT Basics (current)**
 - WHERE and Conditions (upcoming)
 - JOIN (upcoming)
@@ -158,6 +168,7 @@ SELECT is mostly about *sentence shape*. The next post is *WHERE and conditions*
 - INSERT, UPDATE, DELETE (upcoming)
 - Index and Query Plan (upcoming)
 - Practical Analysis SQL (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -166,3 +177,4 @@ SELECT is mostly about *sentence shape*. The next post is *WHERE and conditions*
 - [SQLBolt — SELECT queries](https://sqlbolt.com/lesson/select_queries_introduction)
 - [Mode — SELECT statement](https://mode.com/sql-tutorial/sql-select-statement/)
 - [SQL Style Guide](https://www.sqlstyle.guide/)
+- [PostgreSQL — ORDER BY](https://www.postgresql.org/docs/current/queries-order.html)

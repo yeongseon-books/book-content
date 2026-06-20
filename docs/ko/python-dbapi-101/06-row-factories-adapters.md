@@ -1,13 +1,13 @@
 ---
-title: Row factory와 type adapter (sqlite3, PEP 249)
+title: "Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249)"
 series: python-dbapi-101
 episode: 6
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,47 +17,34 @@ tags:
 - Type Adapter
 - Pydantic
 - PEP 249
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_title: Row factory와 type adapter
 seo_description: '[col1, col2, col3] row_factory │ ─────────────► {''id'': 1, ''name'':
   ''Alice''} ▼…'
 ---
 
-# Row factory와 type adapter (sqlite3, PEP 249)
+# Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249)
 
-![Row factory와 type adapter (sqlite3, PEP 249)](../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.ko.png)
+`row[3]` 같은 코드는 스키마가 바뀌는 순간 조용히 깨집니다. 이 글에서는 row factory와 type adapter를 함께 다뤄 결과 shape와 값 변환을 한 곳에서 통제하는 방법을 설명합니다.
+
+이 글은 Python DB-API 101 시리즈의 여섯 번째 글입니다.
+
+![Row factory와 type adapter (sqlite3, PEP 249)](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.ko.png)
 
 *Row factory와 type adapter (sqlite3, PEP 249)*
 
-## 이 글에서 다룰 문제
+![Python DB-API 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
+*Python DB-API 101 6장 흐름 개요*
 
-`row[3]`처럼 인덱스로 컬럼을 꺼내는 코드는 schema가 바뀌는 순간 침묵 속에 깨집니다. `row['name']`처럼 이름으로 꺼내거나, `row.name` 형태의 dataclass를 쓰면 schema 변경이 import error로 즉시 드러납니다.
+## 먼저 던지는 질문
 
-타입 변환도 마찬가지입니다. SQLite에 금액을 `REAL`(float)로 저장하면 0.1 + 0.2 = 0.30000000000000004 같은 정밀도 사고가 발생합니다. `Decimal`을 등록하고 `TEXT`로 저장하면 정확도를 유지할 수 있습니다.
-
-이 글은 row factory와 type adapter를 한 번에 정리해, repository 레이어가 schema/타입 변경에 견디게 만드는 방법을 코드로 보여 줍니다.
-
----
+- `sqlite3.Row`, dict, dataclass, Pydantic row factory는 어떤 상황에서 각각 선택해야 할까요?
+- `Decimal`, `Enum`, JSON 값을 SQLite와 안전하게 왕복하려면 adapter, converter, `detect_types`를 어떻게 묶어야 할까요?
+- 컬럼 순서 변경, `REAL` 금액 저장, view/join 결과 타입 유실 같은 문제를 이 글의 패턴으로 어떻게 줄일 수 있을까요?
 
 ## Mental Model — 두 단계 변환
 
-![Mental Model - 두 단계 변환](../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
-
-*Mental Model - 두 단계 변환*
-```
-Database row             Python value
-─────────────             ────────────
-                converter
-SQLite TEXT  ─────────────►  Decimal('19.95')
-                 (값 단계)
-                 adapter
-SQLite TEXT  ◄─────────────  Decimal('19.95')
-
-[col1, col2, col3]   row_factory
-        │       ─────────────►   {'id': 1, 'name': 'Alice'}
-        ▼                          또는 dataclass/Pydantic
-   tuple shape                    (행 단계)
-```
+> SQLite에서 Python으로 값이 넘어올 때는 먼저 **값 단위 타입 변환**이 일어나고, 그다음에 **행 단위 shape 변환**이 일어납니다. 이 순서를 분리해서 보면 adapter/converter와 row factory를 어디에 둘지 명확해집니다.
 
 - **adapter / converter** = **단일 값**의 타입 변환 (Python ↔ SQLite storage class).
 - **row_factory** = **행 전체**의 shape 변환 (tuple → 원하는 형태).
@@ -68,7 +55,7 @@ SQLite TEXT  ◄─────────────  Decimal('19.95')
 
 ## 핵심 개념
 
-![핵심 개념](../../assets/python-dbapi-101/06/06-03-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-03-core-concepts.ko.png)
 
 *핵심 개념*
 ### `sqlite3.Row`
@@ -83,116 +70,33 @@ print(row[0], row['name'], row.keys())
 
 dict는 아니지만 80% 케이스에 충분합니다.
 
-### dict factory
+### dict 팩토리
 
 진짜 dict가 필요하면:
 
-```python
-def dict_factory(cursor, row):
-    return {col[0]: value for col, value in zip(cursor.description, row)}
-
-con.row_factory = dict_factory
-```
-
-### dataclass factory
+### dataclass 팩토리
 
 타입 안전성과 IDE 자동완성을 원하면:
 
-```python
-from dataclasses import dataclass, fields
-
-@dataclass
-class User:
-    id: int
-    name: str
-    email: str
-
-def dataclass_factory(cls):
-    field_names = [f.name for f in fields(cls)]
-    def factory(cursor, row):
-        cols = [c[0] for c in cursor.description]
-        return cls(**{k: v for k, v in zip(cols, row) if k in field_names})
-    return factory
-
-con.row_factory = dataclass_factory(User)
-```
-
-### Pydantic factory
+### Pydantic 팩토리
 
 검증과 직렬화가 함께 필요하면:
 
-```python
-from pydantic import BaseModel
-
-class UserModel(BaseModel):
-    id: int
-    name: str
-    email: str
-
-def pydantic_factory(cls):
-    def factory(cursor, row):
-        cols = [c[0] for c in cursor.description]
-        return cls.model_validate({k: v for k, v in zip(cols, row)})
-    return factory
-
-con.row_factory = pydantic_factory(UserModel)
-```
-
 ### `detect_types`
 
-```python
-con = sqlite3.connect(
-    'app.db',
-    detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
-)
-```
+자동 변환은 connection을 열 때 `detect_types` 플래그로 켭니다.
 
 - `PARSE_DECLTYPES` — `CREATE TABLE`의 컬럼 declared type(예: `created_at TIMESTAMP`)을 보고 등록된 converter 호출.
 - `PARSE_COLNAMES` — `SELECT created_at AS "ts [timestamp]"`처럼 컬럼 별칭에 `[type-name]`을 붙여 강제 변환.
 
 ---
 
-## Before / After
-
+## 적용 전후 비교
 ### Before — raw tuple + 컬럼 인덱스
-
-```python
-con = sqlite3.connect('shop.db')
-row = con.execute('SELECT id, name, price FROM products WHERE id=1').fetchone()
-print(row[2] * 1.1)   # 가격에 부가세
-```
 
 `SELECT` 컬럼 순서가 바뀌면 가격이 갑자기 name으로 곱해집니다.
 
-### After — Pydantic + Decimal converter
-
-```python
-import sqlite3
-from decimal import Decimal
-from pydantic import BaseModel
-
-sqlite3.register_adapter(Decimal, lambda d: str(d))
-sqlite3.register_converter('decimal', lambda b: Decimal(b.decode()))
-
-con = sqlite3.connect('shop.db', detect_types=sqlite3.PARSE_DECLTYPES)
-con.execute('''CREATE TABLE IF NOT EXISTS products(
-    id INTEGER PRIMARY KEY, name TEXT, price decimal
-)''')
-
-class Product(BaseModel):
-    id: int
-    name: str
-    price: Decimal
-
-def factory(cursor, row):
-    return Product.model_validate(
-        {c[0]: v for c, v in zip(cursor.description, row)}
-    )
-
-con.row_factory = factory
-p = con.execute('SELECT id, name, price FROM products WHERE id=1').fetchone()
-print(p.price * Decimal('1.1'))
-```
+### 적용 후 — Pydantic + Decimal 변환기
 
 컬럼 순서가 바뀌어도 안전하고, 가격은 `Decimal`로 정확합니다.
 
@@ -200,113 +104,29 @@ print(p.price * Decimal('1.1'))
 
 ## 단계별 실습
 
-![단계별 실습](../../assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.ko.png)
+![단계별 실습](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.ko.png)
 
 *단계별 실습*
 ### 단계 1 — `sqlite3.Row`
 
-```python
-import sqlite3
+컬럼 이름 기반 접근을 도입하는 가장 가벼운 출발점입니다.
 
-con = sqlite3.connect(':memory:')
-con.row_factory = sqlite3.Row
-con.execute('CREATE TABLE users(id INTEGER PRIMARY KEY, name TEXT, email TEXT)')
-con.execute('INSERT INTO users(name, email) VALUES (?, ?)', ('Alice', 'a@x.io'))
+### 단계 2 — `Decimal` 어댑터/컨버터
+금액과 정밀 수치를 float 대신 `Decimal`로 정확하게 왕복시킵니다.
 
-row = con.execute('SELECT * FROM users WHERE id=1').fetchone()
-print(dict(row))   # {'id': 1, 'name': 'Alice', 'email': 'a@x.io'}
-```
+### 단계 3 — `Enum` 어댑터
+문자열 코드 대신 도메인 enum을 바로 받게 만들 수 있습니다.
 
-### 단계 2 — `Decimal` adapter/converter
-
-```python
-from decimal import Decimal
-
-def adapt_decimal(d: Decimal) -> str:
-    return str(d)
-
-def convert_decimal(b: bytes) -> Decimal:
-    return Decimal(b.decode())
-
-sqlite3.register_adapter(Decimal, adapt_decimal)
-sqlite3.register_converter('decimal', convert_decimal)
-
-con = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_DECLTYPES)
-con.execute('CREATE TABLE prices(value decimal)')
-con.execute('INSERT INTO prices VALUES (?)', (Decimal('19.95'),))
-row = con.execute('SELECT value FROM prices').fetchone()
-print(row[0], type(row[0]))   # → 19.95 <class 'decimal.Decimal'>
-```
-
-### 단계 3 — `Enum` adapter
-
-```python
-from enum import Enum
-
-class Status(str, Enum):
-    PENDING = 'pending'
-    PAID = 'paid'
-    CANCELLED = 'cancelled'
-
-sqlite3.register_adapter(Status, lambda s: s.value)
-sqlite3.register_converter('order_status', lambda b: Status(b.decode()))
-
-con = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_DECLTYPES)
-con.execute('CREATE TABLE orders(id INTEGER, status order_status)')
-con.execute('INSERT INTO orders VALUES (?, ?)', (1, Status.PAID))
-row = con.execute('SELECT status FROM orders').fetchone()
-print(row[0])   # → Status.PAID
-```
-
-### 단계 4 — JSON adapter
-
-```python
-import json
-
-sqlite3.register_adapter(dict, lambda d: json.dumps(d))
-sqlite3.register_converter('json', lambda b: json.loads(b.decode()))
-
-con = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_DECLTYPES)
-con.execute('CREATE TABLE events(id INTEGER, payload json)')
-con.execute('INSERT INTO events VALUES (?, ?)', (1, {'k': 'v', 'n': 42}))
-row = con.execute('SELECT payload FROM events').fetchone()
-print(row[0])   # → {'k': 'v', 'n': 42}
-```
+### 단계 4 — JSON 어댑터
+JSON 문자열을 애플리케이션 dict로 복원해 repository 밖으로 새지 않게 합니다.
 
 ### 단계 5 — `[type-name]` 컬럼 별칭
 
-declared type을 못 쓰는 view나 임시 컬럼에서는 SELECT 별칭으로 강제할 수 있습니다.
-
-```python
-con = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_COLNAMES)
-sqlite3.register_converter('decimal', lambda b: Decimal(b.decode()))
-
-con.execute('CREATE TABLE t(s TEXT)')
-con.execute('INSERT INTO t VALUES (?)', ('19.95',))
-row = con.execute('SELECT s AS "v [decimal]" FROM t').fetchone()
-print(row[0])   # → Decimal('19.95')
-```
+선언된 타입을 쓸 수 없는 view나 임시 컬럼에서는 SELECT 별칭으로 강제할 수 있습니다.
 
 ### 단계 6 — Pydantic + adapter 통합
 
-```python
-from datetime import datetime
-from pydantic import BaseModel
-
-# datetime은 sqlite3가 기본 등록 (PARSE_DECLTYPES 시 'TIMESTAMP' 컬럼 자동 변환)
-
-class Order(BaseModel):
-    id: int
-    status: Status
-    total: Decimal
-    created_at: datetime
-
-def order_factory(cursor, row):
-    cols = [c[0] for c in cursor.description]
-    return Order.model_validate(dict(zip(cols, row)))
-
-con.row_factory = order_factory
-```
+행 shape와 값 변환을 함께 묶으면 repository는 도메인 모델만 다루게 됩니다.
 
 이제 repository는 `Order` 객체만 다루며, SQLite의 storage class는 외부에 새지 않습니다.
 
@@ -329,24 +149,7 @@ con.row_factory = order_factory
 
 ### Repository 레이어 패턴
 
-```python
-class UserRepo:
-    def __init__(self, con: sqlite3.Connection):
-        con.row_factory = pydantic_factory(UserModel)
-        self.con = con
-
-    def get(self, user_id: int) -> UserModel | None:
-        return self.con.execute(
-            'SELECT id, name, email FROM users WHERE id=?', (user_id,)
-        ).fetchone()
-
-    def list_active(self) -> list[UserModel]:
-        return self.con.execute(
-            "SELECT id, name, email FROM users WHERE status='active'"
-        ).fetchall()
-```
-
-호출자는 dict 키 오타나 컬럼 순서를 신경 쓸 필요가 없습니다.
+호출자는 dict 키 오타나 컬럼 순서를 기억할 필요 없이, 도메인 모델만 받아서 쓰면 됩니다.
 
 ### 마이그레이션과 타입
 
@@ -354,13 +157,7 @@ class UserRepo:
 
 ### 컬럼 별칭으로 view 처리
 
-view나 join 결과는 declared type이 사라집니다. 별칭에 `[type-name]`을 붙이는 패턴을 운영에서 자주 씁니다.
-
-```sql
-SELECT u.id, u.name, SUM(o.total) AS "total [decimal]"
-FROM users u JOIN orders o ON o.user_id = u.id
-GROUP BY u.id;
-```
+view나 join 결과는 선언된 타입 정보가 사라집니다. 별칭에 `[type-name]`을 붙이는 패턴을 운영에서 자주 씁니다.
 
 ### 성능 vs 안전 균형
 
@@ -382,25 +179,193 @@ GROUP BY u.id;
 
 ---
 
-## 정리·다음 글
+## 실전 패턴 추가: connection/cursor/transaction 경계를 명시하는 운영 코드
 
+DB-API 코드는 SQL 문장보다 경계 관리가 더 중요합니다. 연결 수명, 커서 재사용 범위, 커밋/롤백 시점을 코드로 드러내야 장애 시 복구가 쉬워집니다.
+
+```python
+import sqlite3
+from contextlib import contextmanager
+from typing import Iterator
+
+@contextmanager
+def db_connection(path: str) -> Iterator[sqlite3.Connection]:
+    conn = sqlite3.connect(path, timeout=5.0)
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+def transfer(conn: sqlite3.Connection, sender: int, receiver: int, amount: int) -> None:
+    if amount <= 0:
+        raise ValueError("amount must be positive")
+
+    cur = conn.cursor()
+    cur.execute("UPDATE accounts SET balance = balance - ? WHERE id = ?", (amount, sender))
+    cur.execute("UPDATE accounts SET balance = balance + ? WHERE id = ?", (amount, receiver))
+
+def list_recent(conn: sqlite3.Connection, limit: int = 100) -> list[tuple[int, int, int]]:
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT sender_id, receiver_id, amount FROM transfers ORDER BY id DESC LIMIT ?",
+        (limit,),
+    )
+    return cur.fetchall()
+```
+
+이 패턴은 세 가지를 보장합니다. 첫째, 트랜잭션 성공/실패 경계를 컨텍스트 매니저 한 곳에서 통제합니다. 둘째, `execute` 파라미터 바인딩을 강제해 SQL 인젝션 리스크를 줄입니다. 셋째, 읽기/쓰기 함수를 분리해 장애 분석 시 어떤 쿼리가 상태를 바꿨는지 추적이 쉬워집니다. 소규모 서비스라도 이 구조를 일찍 도입하면 운영 중 데이터 정합성 이슈를 크게 줄일 수 있습니다.
+
+## 추가 실무 메모: 트랜잭션 로그를 남기는 기준
+
+쓰기 작업은 SQL 자체보다 실패 맥락을 남기는 편이 중요합니다. `order_id`, 영향 row 수, 예외 타입을 같은 로그 라인에 남기면 재시도 정책을 설계할 때 근거가 생깁니다. DB-API에서는 `except` 블록에서 롤백 후 재상승시키는 패턴을 기본값으로 두는 편이 안전합니다.
+
+## 심화 앵커: 타입 변환 규칙 중앙화 템플릿
+
+row factory와 converter를 파일마다 다르게 두면 데이터 모양이 흔들립니다. connection 팩토리에서 한 번에 등록하는 방식이 유지보수에 유리합니다.
+
+```python
+import sqlite3
+from decimal import Decimal
+
+sqlite3.register_adapter(Decimal, lambda v: format(v, "f"))
+sqlite3.register_converter("DECIMAL", lambda b: Decimal(b.decode()))
+
+conn = sqlite3.connect(
+    "app.db",
+    detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
+)
+conn.row_factory = sqlite3.Row
+```
+
+| row 방식 | 장점 | 단점 |
+| --- | --- | --- |
+| tuple | 빠름 | 컬럼 순서 의존 |
+| `sqlite3.Row` | 이름 접근 가능 | dict 변환 추가 필요 |
+| dataclass/Pydantic | 타입 검증 | 변환 비용 증가 |
+
+row shape와 값 타입 변환을 분리하면 스키마 변경 시 장애 반경을 빠르게 줄일 수 있습니다.
+
+## 추가 심화 노트: 운영 품질 게이트
+
+아래 항목은 개발 환경에서는 자주 생략되지만, 운영에서는 장애 예방에 직접 영향을 줍니다.
+
+### A. 배포 전 검증 스크립트 예시
+
+```bash
+python -m pytest tests/test_dbapi_contract.py -q
+python scripts/check_sql_bindings.py
+python scripts/check_transaction_boundaries.py
+```
+
+### B. 계약 테스트 예시
+
+```python
+def test_dbapi_contract(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT 1")
+    assert cur.fetchone()[0] == 1
+    cur.close()
+```
+
+### C. 관측성 필드 표준
+
+| 필드 | 설명 |
+| --- | --- |
+| `db.driver` | sqlite3 / psycopg2 |
+| `db.operation` | SELECT/INSERT/UPDATE/DELETE |
+| `db.retry.count` | 재시도 횟수 |
+| `db.elapsed_ms` | 실행 시간 |
+| `db.tx.state` | commit/rollback |
+
+### D. 성능 측정 루틴
+
+```python
+import time
+
+def timed(fn, *args, **kwargs):
+    t0 = time.perf_counter()
+    v = fn(*args, **kwargs)
+    elapsed = (time.perf_counter() - t0) * 1000
+    print(f"metric=db.elapsed_ms value={elapsed:.1f}")
+    return v
+```
+
+### E. 장애 대응 기본 규칙
+
+- `IntegrityError`: 재시도하지 않고 입력/업무 규칙 오류로 처리합니다.
+- `OperationalError`의 BUSY/LOCKED 계열: 짧은 백오프 재시도를 적용합니다.
+- `ProgrammingError`: 코드 수정 대상이므로 즉시 알림합니다.
+- `DatabaseError`의 손상 징후: 복구 런북으로 전환합니다.
+
+이 노트는 새로운 개념을 추가하기보다, 본문의 원칙을 운영 절차로 고정하는 데 목적이 있습니다.
+
+## 최종 보강: 실무 FAQ
+
+### Q1. 왜 작은 프로젝트에서도 DB-API 경계를 엄격히 지켜야 하나요?
+
+초기에는 코드량이 작아 보이지만, 운영 장애는 대부분 경계가 모호한 코드에서 시작됩니다. connect/execute/commit/close 경계를 명시하면 장애 원인을 단계별로 좁힐 수 있습니다.
+
+### Q2. SQLite와 PostgreSQL을 함께 고려할 때 가장 먼저 맞춰야 할 것은 무엇인가요?
+
+파라미터 바인딩 규칙과 트랜잭션 종료 규칙입니다. paramstyle 차이(`?` vs `%s`)는 어댑터로 흡수하고, 커밋/롤백 시점은 애플리케이션 레벨에서 동일하게 고정해야 합니다.
+
+### Q3. 성능보다 먼저 챙겨야 할 지표는 무엇인가요?
+
+`db.elapsed_ms`, `db.retry.count`, `db.busy_rate`, `db.tx.rollback.count` 네 가지입니다. 이 네 지표만 있어도 병목과 실패 패턴을 빠르게 분리할 수 있습니다.
+
+### Q4. 운영 중 가장 자주 반복되는 실수는 무엇인가요?
+
+- 예외를 `except Exception`으로 한 번에 처리해 재시도 가능/불가를 구분하지 않는 실수
+- 문자열 결합 SQL이 테스트 없이 섞여 들어가는 실수
+- 트랜잭션 경계를 함수 밖으로 흘려 보내는 실수
+- 백업 성공 여부만 보고 복구 리허설을 생략하는 실수
+
+### Q5. 팀 단위로 품질을 유지하려면 어떤 합의가 필요하나요?
+
+코드 스타일 합의보다 더 중요한 것은 실패 처리 합의입니다. 어떤 예외를 retry할지, 어떤 예외를 즉시 실패로 처리할지, 어떤 로그 필드를 남길지를 문서와 테스트로 고정해야 합니다.
+
+## 보충 메모: 릴리스 전 점검
+
+릴리스 직전에는 코드 품질보다 운영 안전성을 먼저 점검합니다.
+
+- 트랜잭션이 열리는 함수마다 commit/rollback 경로가 모두 존재하는지 확인합니다.
+- cursor가 함수 경계를 넘어 누수되지 않는지 확인합니다.
+- 예외 분기에서 retry 가능한 코드와 불가능한 코드를 분리했는지 확인합니다.
+- 관측 로그에 최소 필드(`db.operation`, `db.elapsed_ms`, `db.tx.state`)가 남는지 확인합니다.
+
+짧은 점검이지만 장애를 크게 줄이는 효과가 있습니다.
+
+## 정리
 row factory는 **shape**, adapter/converter는 **value**를 다룬다는 두 축만 분리하면 sqlite3의 데이터 변환은 단순해집니다. Repository 레이어를 Pydantic 모델 위에 올려 두면 schema 변경이 import error로 잡히고, 도메인 타입(`Decimal`, `Enum`, JSON)이 안전하게 흐릅니다.
 
 다음 글에서는 **error handling과 exception hierarchy**를 다룹니다. PEP 249가 정의한 8개 예외 클래스, sqlite3의 매핑(IntegrityError, OperationalError, ProgrammingError 등), `BUSY`와 `LOCKED`의 차이, 그리고 retry 전략을 코드로 정리합니다.
 
+## 처음 질문으로 돌아가기
+
+- **`sqlite3.Row`, dict, dataclass, Pydantic row factory는 어떤 상황에서 각각 선택해야 할까요?**
+  - 글은 `sqlite3.Row`를 가장 가벼운 기본값으로 두고, 이름 접근이 필요하지만 성능도 챙겨야 할 때 적합하다고 설명했습니다. 반면 dict는 단순 직렬화, dataclass와 Pydantic은 타입 검증과 IDE 지원이 중요한 API·도메인 계층에 맞는 선택지로 정리했습니다.
+- **`Decimal`, `Enum`, JSON 값을 SQLite와 안전하게 왕복하려면 adapter, converter, `detect_types`를 어떻게 묶어야 할까요?**
+  - 본문은 `sqlite3.register_adapter()`와 `sqlite3.register_converter()`를 connection 팩토리 수준에서 한 번 등록하고, `detect_types=PARSE_DECLTYPES | PARSE_COLNAMES`로 실제 변환을 켜는 패턴을 제시했습니다. 그래서 `Decimal`은 정밀도를 잃지 않고, `Enum`과 JSON도 repository 밖에서 문자열이나 bytes로 새지 않게 만들 수 있습니다.
+- **컬럼 순서 변경, `REAL` 금액 저장, view/join 결과 타입 유실 같은 문제를 이 글의 패턴으로 어떻게 줄일 수 있을까요?**
+  - 컬럼 순서 문제는 `row[0]` 대신 이름 기반 row factory로 줄이고, 금액은 `REAL` 대신 `Decimal` adapter와 `TEXT` 또는 `INTEGER` 저장 전략으로 다뤄야 한다고 설명했습니다. 또 선언 타입이 사라지는 view나 join 결과는 `AS "x [type]"` 별칭과 `PARSE_COLNAMES`를 써서 converter를 다시 강제하라고 정리했습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
-- [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
-- [Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- [Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
-- **Row factory와 type adapter (sqlite3, PEP 249) (현재 글)**
-- PEP 249 예외 계층과 SQLite 에러 처리 (예정)
-- SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
-- aiosqlite로 비동기 SQLite 다루기 (예정)
-- SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
+- [Python DB-API 101 (1/10): 왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Python DB-API 101 (5/10): Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- **Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249) (현재 글)**
+- Python DB-API 101 (7/10): PEP 249 예외 계층과 SQLite 에러 처리 (예정)
+- Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
+- Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기 (예정)
+- Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
 
 <!-- toc:end -->
 
@@ -413,3 +378,5 @@ row factory는 **shape**, adapter/converter는 **value**를 다룬다는 두 축
 - [Python sqlite3 — Adapters and converters](https://docs.python.org/3/library/sqlite3.html#sqlite3-adapter-converter-recipes)
 - [SQLite — Datatypes In SQLite](https://www.sqlite.org/datatype3.html)
 - [Pydantic — Models](https://docs.pydantic.dev/latest/concepts/models/)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-dbapi-101/ko)

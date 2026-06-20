@@ -1,12 +1,12 @@
 ---
-title: Tool Use 기초
+title: "AI Agent 101 (3/10): Tool Use 기초"
 series: ai-agent-101
 episode: 3
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,65 +14,67 @@ tags:
 - Tool Use
 - Function Calling
 - Integration
-last_reviewed: '2026-05-02'
-seo_description: Agent가 단순 대화 모델과 다른 이유는 도구를 사용할 수 있기 때문입니다.
+last_reviewed: '2026-05-12'
+seo_description: function calling 흐름과 tool schema 설계의 핵심을 설명합니다.
 ---
 
-# Tool Use 기초
+# AI Agent 101 (3/10): Tool Use 기초
 
-> AI Agent 101 시리즈 (3/10)
+agent를 agent답게 만드는 첫 번째 차이는 외부 세계와 상호작용할 수 있다는 데 있습니다. 검색 API를 부르고, 데이터베이스를 조회하고, 파일을 읽고, 계산 함수를 실행하는 순간 LLM은 설명자가 아니라 실행 오케스트레이터에 가까워집니다.
 
-Agent가 단순 대화 모델과 다른 이유는 도구를 사용할 수 있기 때문입니다. 날씨 API를 호출하고, 데이터베이스를 쿼리하고, 파일을 읽고 쓸 수 있습니다. 이 능력이 Agent를 실용적인 자동화 도구로 만듭니다.
+하지만 tool use는 겉보기보다 까다롭습니다. 모델이 도구를 호출한다고 해서 시스템이 자동으로 안전해지는 것은 아닙니다. 도구 이름이 모호하면 잘못된 함수를 선택하고, 입력 스키마가 약하면 형식 오류가 나고, 결과를 다시 모델에 넣는 방식이 어색하면 불필요한 루프가 길어집니다.
 
-Tool Use의 핵심은 Function Calling입니다. 모델이 "지금 날씨를 확인해야 한다"고 판단하면, 미리 정의된 도구 스키마에 맞춰 함수 호출 요청을 반환합니다. 애플리케이션은 이 요청을 해석해서 실제 API를 호출하고, 결과를 다시 모델에게 전달합니다.
+그래서 function calling은 단지 API 옵션 하나가 아니라 설계 패턴으로 봐야 합니다. 모델이 무엇을 결정하고, 애플리케이션 코드가 무엇을 책임지며, 실패를 어디서 차단할지를 분리해야 합니다.
 
-이번 글에서는 Function Calling의 기본 흐름, 도구 스키마 설계 원칙, 에러 처리 패턴, 도구 선택 전략을 다룹니다.
+이 글에서는 function calling을 "모델의 마법"이 아니라 "모델과 애플리케이션 사이의 계약"으로 이해하겠습니다.
 
----
+![도구 호출 루프](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/03/03-01-tool-calling-loop.ko.png)
+*도구 호출 루프*
+> Tool use는 모델의 추론과 코드의 실행을 분리하고, 그 사이를 schema와 검증으로 연결하는 설계입니다.
 
-## Function Calling 기본 흐름
+## 먼저 던지는 질문
 
-Function Calling은 LLM이 "지금 이 도구를 사용해야 한다"고 판단하는 순간부터 시작합니다. 전체 흐름은 4단계로 구성됩니다.
+- function calling에서 모델이 결정하는 일과 애플리케이션 코드가 실행하는 일은 어디서 갈라질까요?
+- tool schema가 애매하면 agent는 어떤 방식으로 잘못 실패할까요?
+- tool 결과를 다시 모델에게 넣기 전에 무엇을 검증해야 할까요?
 
-### 1단계: 도구 등록
+## 왜 이 글이 중요한가
 
-먼저 Agent에게 사용 가능한 도구 목록을 알려줍니다. 각 도구는 이름, 설명, 파라미터 스키마를 포함합니다.
+tool use는 agent 시스템이 현실 세계와 닿는 첫 번째 인터페이스입니다. 이 경계가 약하면 모델이 아무리 좋아도 실제 업무 자동화는 불안정합니다. 반대로 이 경계를 잘 설계하면 비교적 단순한 모델로도 강한 자동화 루프를 만들 수 있습니다.
+
+운영에서도 중요합니다. function calling 오류는 흔히 LLM 문제처럼 보이지만, 실제로는 schema 설계, 파라미터 검증, tool registry, 결과 직렬화 문제인 경우가 많습니다. 즉, 이 주제를 이해하면 agent 실패를 더 빨리 시스템 문제로 환원할 수 있습니다.
+
+또한 이후의 reliability, evaluation, operations 주제도 여기서 시작합니다. 잘못된 tool 선택률, invalid arguments 비율, per-tool latency, fallback path 같은 지표는 모두 tool use 계층이 있어야 측정할 수 있습니다.
+
+## 핵심 관점
+
+function calling은 모델이 직접 API를 호출하는 기능이 아닙니다. 모델은 어떤 도구를 어떤 인자로 호출해야 할지 제안하고, 실제 호출은 애플리케이션 코드가 수행합니다. 이 분리를 명확히 이해해야 책임 경계가 보입니다.
+
+이 구조가 좋은 이유는 두 가지입니다. 첫째, 모델은 "무엇을 할지"를 결정하고 코드는 "어떻게 할지"를 실행하므로 관심사가 분리됩니다. 둘째, 애플리케이션이 validation, authorization, retry, timeout을 통제할 수 있어 안전장치를 붙이기 쉽습니다.
+
+실무에서 agent를 안정화할 때도 결국 이 경계를 다듬게 됩니다. 도구 등록 형식, 파라미터 타입, 에러 표현, 결과 요약 방식이 모두 이 계약 안에 들어 있기 때문입니다.
+
+> 좋은 tool use 설계는 모델에게 더 많은 자유를 주는 것이 아니라, 모델의 선택을 코드가 안전하게 실행할 수 있는 형태로 제한하는 것입니다.
+
+## 핵심 개념
+
+### function calling의 기본 흐름은 네 단계입니다
 
 ```python
-from typing import Callable
+import openai
 
-def get_weather(location: str, unit: str = "celsius") -> dict:
-    """
-    특정 지역의 현재 날씨를 조회합니다.
-    
-    Args:
-        location: 도시 이름. 예: 'Seoul', 'New York'
-        unit: 온도 단위. 'celsius' 또는 'fahrenheit'
-    
-    Returns:
-        dict: {"temp": 25, "condition": "sunny", "humidity": 60}
-    """
-    # API 호출 로직
-    return {"temp": 25, "condition": "sunny", "humidity": 60}
-
-# 도구를 OpenAI function calling 형식으로 등록
 tools = [
     {
         "type": "function",
         "function": {
             "name": "get_weather",
-            "description": "특정 지역의 현재 날씨를 조회합니다.",
+            "description": "Retrieves current weather for a specific location.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "location": {
                         "type": "string",
-                        "description": "도시 이름 (예: Seoul, New York)"
-                    },
-                    "unit": {
-                        "type": "string",
-                        "enum": ["celsius", "fahrenheit"],
-                        "description": "온도 단위"
+                        "description": "City name (e.g., Seoul, New York)"
                     }
                 },
                 "required": ["location"]
@@ -80,35 +82,21 @@ tools = [
         }
     }
 ]
-```
 
-### 2단계: LLM이 도구 호출 결정
-
-사용자 질문을 받은 LLM은 등록된 도구 목록을 참고하여, 이 질문에 도구가 필요한지 판단합니다.
-
-```python
-from openai import OpenAI
-
-client = OpenAI()
-
-messages = [
-    {"role": "user", "content": "서울 날씨 어때?"}
-]
-
-response = client.chat.completions.create(
-    model="gpt-4",
-    messages=messages,
-    tools=tools,  # 등록된 도구 전달
-    tool_choice="auto"  # 모델이 자동으로 판단
+response = openai.chat.completions.create(
+    model="gpt-4.1",
+    messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
+    tools=tools,
+    tool_choice="auto"  # LLM decides whether to use tools
 )
-
-# LLM의 응답 확인
-print(response.choices[0].message)
 ```
 
-모델이 "날씨 조회가 필요하다"고 판단하면, `tool_calls` 필드에 호출 정보를 담아 반환합니다:
+이런 예제에서는 `gpt-4.1`처럼 현재 tool calling을 지원하는 모델을 쓰는 편이 안전합니다. `gpt-4`는 legacy 맥락을 명시적으로 설명할 때만 남겨 두는 것이 좋습니다.
+
+첫 단계는 도구 정의를 모델에 보여 주는 것입니다. 이때 이름, 설명, 파라미터 스키마가 곧 모델이 보는 전체 인터페이스입니다. 설명이 약하면 라우팅이 흔들리고, 타입이 약하면 인자 품질이 흔들립니다.
 
 ```python
+# LLM의 응답 예시
 {
     "role": "assistant",
     "content": null,
@@ -118,961 +106,416 @@ print(response.choices[0].message)
             "type": "function",
             "function": {
                 "name": "get_weather",
-                "arguments": '{"location": "Seoul", "unit": "celsius"}'
+                "arguments": '{"location": "Seoul"}'
             }
         }
     ]
 }
 ```
 
-### 3단계: 도구 실행
-
-애플리케이션이 `tool_calls`를 해석하여 실제 함수를 호출합니다.
+두 번째 단계에서 모델은 tool call을 제안합니다. 여기서 중요한 점은 아직 아무 도구도 실제로 실행되지 않았다는 사실입니다. 모델은 실행을 요청했을 뿐이고, 시스템은 이제부터 검증과 실행 책임을 집니다.
 
 ```python
 import json
 
-# 도구 레지스트리 (함수 이름 → 실제 함수 매핑)
-available_functions = {
-    "get_weather": get_weather
-}
+def execute_tool(tool_name: str, arguments: str) -> str:
+    """Execute the requested tool and return results."""
+    params = json.loads(arguments)
 
-# LLM 응답에서 tool_calls 추출
-tool_calls = response.choices[0].message.tool_calls
+    if tool_name == "get_weather":
+        # 실제 weather API 호출
+        weather_data = get_weather_api(params["location"])
+        return json.dumps(weather_data)
 
-# 각 도구 호출 처리
-for tool_call in tool_calls:
-    function_name = tool_call.function.name
-    function_args = json.loads(tool_call.function.arguments)
-    
-    # 실제 함수 호출
-    function_to_call = available_functions[function_name]
-    function_response = function_to_call(**function_args)
-    
-    print(f"Tool: {function_name}")
-    print(f"Args: {function_args}")
-    print(f"Result: {function_response}")
+    return json.dumps({"error": "Unknown tool"})
+
+# Execute tool
+tool_call = response.choices[0].message.tool_calls[0]
+result = execute_tool(tool_call.function.name, tool_call.function.arguments)
 ```
 
-### 4단계: 결과를 LLM에게 전달
-
-도구 실행 결과를 대화 기록에 추가하고, LLM에게 다시 전달합니다.
+세 번째 단계는 애플리케이션이 도구를 실행하는 구간입니다. 여기서는 파싱, validation, auth check, timeout, retry 같은 모든 현실 문제가 발생합니다. 그래서 production 코드에서는 이 함수가 생각보다 두꺼워지는 것이 정상입니다.
 
 ```python
-# 도구 호출 결과를 메시지로 변환
-messages.append(response.choices[0].message)  # LLM의 tool_calls 메시지
-messages.append({
-    "role": "tool",
-    "tool_call_id": tool_call.id,
-    "name": function_name,
-    "content": json.dumps(function_response)
-})
+# 대화에 도구 실행 결과 추가
+messages = [
+    {"role": "user", "content": "What's the weather in Seoul?"},
+    response.choices[0].message,  # Assistant's tool call
+    {
+        "role": "tool",
+        "tool_call_id": tool_call.id,
+        "content": result  # Tool execution result
+    }
+]
 
-# 최종 응답 생성
-final_response = client.chat.completions.create(
-    model="gpt-4",
+# 최종 답변 생성
+final_response = openai.chat.completions.create(
+    model="gpt-4.1",
     messages=messages
 )
 
 print(final_response.choices[0].message.content)
-# "서울의 현재 날씨는 맑고 기온은 25도입니다."
+# 출력: "서울의 현재 날씨는 맑고 기온은 15°C입니다."
 ```
 
-LLM은 도구 결과를 바탕으로 사용자에게 자연어 답변을 생성합니다.
+네 번째 단계는 결과를 모델에 되돌려 최종 답을 생성하는 구간입니다. 여기서 `tool_call_id` 연결이 깨지면 multi-tool turn이 흔들리고, 결과를 너무 장황하게 넣으면 context budget이 빠르게 소모됩니다.
 
-AI 에이전트가 도구를 올바르게 사용하려면 도구가 무엇을 하는지, 어떤 입력을 받는지 명확하게 이해해야 합니다. 이를 위해 도구 스키마가 필요합니다.
-
-### 스키마의 핵심 요소
-
-**도구 이름(name)**: 도구의 기능을 명확하게 표현하는 이름입니다.
+### 반복 루프로 감싸야 비로소 agent가 됩니다
 
 ```python
-# 나쁜 예: 모호한 이름
-{
-    "name": "tool1",  # 무엇을 하는 도구인가?
-    "name": "get",    # 무엇을 가져오는가?
-}
-
-# 좋은 예: 명확한 이름
-{
-    "name": "get_weather",              # 날씨 조회
-    "name": "search_customer_history",  # 고객 이력 검색
-}
-```
-
-**설명(description)**: LLM이 도구 선택 시 참고하는 가장 중요한 정보입니다.
-
-```python
-# 나쁜 예: 불충분한 설명
-{
-    "name": "get_weather",
-    "description": "날씨 정보를 가져옵니다"  # 언제? 어디? 어떤 형식?
-}
-
-# 좋은 예: 구체적인 설명
-{
-    "name": "get_weather",
-    "description": "특정 지역의 현재 날씨 정보를 조회합니다. 도시 이름을 입력하면 온도, 습도, 날씨 상태를 반환합니다."
-}
-```
-
-**파라미터(parameters)**: JSON Schema 형식으로 입력 값을 정의합니다.
-
-```python
-{
-    "name": "get_weather",
-    "description": "특정 지역의 현재 날씨를 조회합니다.",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "location": {
-                "type": "string",
-                "description": "도시 이름 (예: Seoul, New York)"
-            },
-            "unit": {
-                "type": "string",
-                "enum": ["celsius", "fahrenheit"],
-                "description": "온도 단위"
-            }
-        },
-        "required": ["location"]  # location은 필수, unit은 선택
-    }
-}
-```
-
-### 타입 정의의 중요성
-
-파라미터 타입을 명확히 정의하면 LLM이 올바른 형식으로 값을 생성합니다.
-
-```python
-# 나쁜 예: 타입 미정의
-{
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "date": {"type": "string"}  # 어떤 형식? YYYY-MM-DD? DD/MM/YYYY?
-        }
-    }
-}
-
-# 좋은 예: 형식 명시
-{
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "date": {
-                "type": "string",
-                "description": "날짜 (YYYY-MM-DD 형식, 예: 2024-03-15)",
-                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
-            }
-        }
-    }
-}
-```
-
-### 복잡한 파라미터 구조
-
-중첩된 객체나 배열도 표현할 수 있습니다.
-
-```python
-{
-    "name": "create_order",
-    "description": "새로운 주문을 생성합니다.",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "customer_id": {
-                "type": "string",
-                "description": "고객 ID"
-            },
-            "items": {
-                "type": "array",
-                "description": "주문 항목 목록",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "product_id": {"type": "string"},
-                        "quantity": {"type": "integer", "minimum": 1}
-                    },
-                    "required": ["product_id", "quantity"]
-                }
-            }
-        },
-        "required": ["customer_id", "items"]
-    }
-}
-```
-
-### 실제 도구 등록 예시
-
-```python
-from typing import Dict, Any
+from typing import Dict, Any, List
 import openai
+import json
 
-# 도구 스키마 정의
-tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "get_weather",
-            "description": "특정 지역의 현재 날씨를 조회합니다. 온도, 습도, 날씨 상태를 반환합니다.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "location": {
-                        "type": "string",
-                        "description": "도시 이름 (예: Seoul, Tokyo, New York)"
-                    },
-                    "unit": {
-                        "type": "string",
-                        "enum": ["celsius", "fahrenheit"],
-                        "description": "온도 단위 (기본값: celsius)"
-                    }
-                },
-                "required": ["location"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "search_documents",
-            "description": "문서 데이터베이스에서 키워드로 관련 문서를 검색합니다.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "검색 키워드 또는 질문"
-                    },
-                    "limit": {
-                        "type": "integer",
-                        "description": "반환할 최대 문서 수 (기본값: 5)",
-                        "minimum": 1,
-                        "maximum": 20
-                    }
-                },
-                "required": ["query"]
-            }
-        }
-    }
-]
-
-# LLM에 도구 정보 전달
-response = openai.chat.completions.create(
-    model="gpt-4",
-    messages=[{"role": "user", "content": "서울 날씨 알려줘"}],
-    tools=tools,
-    tool_choice="auto"  # LLM이 자동으로 도구 선택
-)
-```
-
-스키마를 명확하게 작성할수록 LLM이 도구를 올바르게 사용할 확률이 높아집니다.
-
-도구 호출은 언제든지 실패할 수 있습니다. 네트워크 오류, 잘못된 파라미터, API 제한 초과 등 다양한 원인이 있습니다. 견고한 에이전트는 에러를 예상하고 적절히 처리합니다.
-
-### 기본 에러 처리 패턴
-
-```python
-from typing import Dict, Any
-
-def execute_tool_with_retry(
-    tool_name: str,
-    params: Dict[str, Any],
-    max_retries: int = 3
-) -> Dict[str, Any]:
-    """도구 실행 + 재시도 로직"""
-    for attempt in range(max_retries):
-        try:
-            result = execute_tool(tool_name, params)
-            return {"success": True, "data": result}
-        
-        except ConnectionError as e:
-            # 네트워크 오류: 재시도
-            if attempt < max_retries - 1:
-                time.sleep(2 ** attempt)  # 지수 백오프
-                continue
-            return {"success": False, "error": f"Connection failed after {max_retries} attempts"}
-        
-        except ValueError as e:
-            # 파라미터 오류: 재시도 불필요
-            return {"success": False, "error": f"Invalid parameters: {str(e)}"}
-        
-        except Exception as e:
-            # 예상치 못한 오류: 기록하고 반환
-            log_error(tool_name, params, e)
-            return {"success": False, "error": f"Unexpected error: {str(e)}"}
-```
-
-### 에러 타입별 전략
-
-**일시적 오류 (Transient Errors)**: 재시도로 해결 가능
-
-```python
-# 네트워크 타임아웃, 서비스 일시 중단
-RETRYABLE_ERRORS = [
-    ConnectionError,
-    TimeoutError,
-    requests.exceptions.Timeout,
-]
-
-def is_retryable(error: Exception) -> bool:
-    """재시도 가능한 에러인지 판단"""
-    return any(isinstance(error, err_type) for err_type in RETRYABLE_ERRORS)
-```
-
-**영구적 오류 (Permanent Errors)**: 즉시 실패 처리
-
-```python
-# 인증 오류, 잘못된 파라미터, 권한 없음
-PERMANENT_ERRORS = [
-    PermissionError,
-    ValueError,
-    KeyError,
-]
-
-def is_permanent(error: Exception) -> bool:
-    """재시도 불가능한 에러인지 판단"""
-    return any(isinstance(error, err_type) for err_type in PERMANENT_ERRORS)
-```
-
-### LLM에게 에러 정보 전달
-
-에러가 발생하면 LLM이 다른 전략을 시도할 수 있도록 컨텍스트를 제공합니다.
-
-```python
-def handle_tool_error(
-    tool_name: str,
-    params: Dict[str, Any],
-    error: Exception
+def agent_with_tools(
+    user_query: str,
+    tools: List[Dict[str, Any]],
+    max_iterations: int = 5
 ) -> str:
-    """에러를 LLM이 이해할 수 있는 메시지로 변환"""
-    
-    if isinstance(error, ConnectionError):
-        return f"도구 '{tool_name}' 실행 실패: 네트워크 연결 오류. 잠시 후 다시 시도하거나 다른 방법을 사용하세요."
-    
-    elif isinstance(error, ValueError):
-        return f"도구 '{tool_name}' 실행 실패: 잘못된 파라미터 '{params}'. 파라미터를 수정하여 다시 시도하세요."
-    
-    elif isinstance(error, PermissionError):
-        return f"도구 '{tool_name}' 실행 실패: 권한 없음. 이 작업은 수행할 수 없습니다."
-    
-    else:
-        return f"도구 '{tool_name}' 실행 실패: {str(error)}. 다른 접근 방법을 시도하세요."
+    """Agent loop with tool support."""
+
+    messages = [{"role": "user", "content": user_query}]
+
+    for iteration in range(max_iterations):
+        # Call LLM
+        response = openai.chat.completions.create(
+            model="gpt-4.1",
+            messages=messages,
+            tools=tools,
+            tool_choice="auto"
+        )
+
+        assistant_message = response.choices[0].message
+
+        # LLM이 도구를 사용하려는지 확인
+        if not assistant_message.tool_calls:
+            # 도구 호출이 없으면 최종 답변 준비 완료
+            return assistant_message.content
+
+        # assistant의 도구 호출을 대화에 추가
+        messages.append(assistant_message)
+
+        # 각 도구 호출 실행
+        for tool_call in assistant_message.tool_calls:
+            tool_name = tool_call.function.name
+            tool_args = tool_call.function.arguments
+
+            # Execute tool
+            result = execute_tool(tool_name, tool_args)
+
+            # 실행 결과를 대화에 추가
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": result
+            })
+
+    return "Max iterations reached without completion."
 ```
 
-### 우아한 성능 저하 (Graceful Degradation)
+이 루프가 중요한 이유는 tool use가 한 번으로 끝나지 않는 경우가 많기 때문입니다. 검색하고, 그 결과를 바탕으로 다시 조회하고, 마지막에 요약해야 하는 작업이 흔합니다. 따라서 단일 tool call 예제만 이해하고 있으면 실제 agent의 비용, 오류, 종료 조건을 과소평가하기 쉽습니다.
 
-도구가 실패해도 에이전트가 계속 작동할 수 있도록 합니다.
+### schema 품질이 tool 선택 품질을 좌우합니다
 
-```python
-def agent_with_fallback(user_query: str) -> str:
-    """도구 실패 시 대체 전략 사용"""
-    
-    # 1차 시도: 실시간 도구 사용
-    weather_result = execute_tool_with_retry("get_weather", {"location": "Seoul"})
-    
-    if weather_result["success"]:
-        return f"현재 서울 날씨: {weather_result['data']}"
-    
-    # 2차 시도: 캐시된 데이터 사용
-    cached_data = get_cached_weather("Seoul")
-    if cached_data:
-        return f"최근 서울 날씨 (1시간 전): {cached_data}"
-    
-    # 3차 시도: LLM 지식 기반 응답
-    return "죄송합니다. 현재 실시간 날씨 정보를 가져올 수 없습니다. 날씨 관련 일반적인 정보는 제공할 수 있습니다."
+- 이름은 `tool1`보다 `search_customer_history`처럼 의도가 드러나야 합니다.
+- description은 언제 이 도구를 써야 하는지까지 포함해야 합니다.
+- parameters는 JSON Schema로 타입, enum, required 필드를 명확히 밝혀야 합니다.
+- 잘못된 입력이 오면 어디서 차단할지 실행 계층에서 정해야 합니다.
+
+모델은 결국 이름과 설명과 스키마를 읽고 도구를 고릅니다. 그래서 tool use 품질의 상당 부분은 프롬프트 엔지니어링보다 인터페이스 설계 문제입니다.
+
+## 실전 설계 보강
+
+### 도구 스키마는 API 문서가 아니라 안전 경계입니다
+
+tool schema를 자세히 쓰는 이유는 모델이 똑똑하지 않아서가 아니라, 실행 경계를 코드로 강제하기 위해서입니다. `additionalProperties: false`, enum 제한, 길이 제한 같은 제약은 토큰 비용보다 장애 비용을 줄입니다.
+
+```json
+{
+  "type": "function",
+  "name": "create_incident",
+  "description": "장애 티켓을 생성합니다.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "severity": {"type": "string", "enum": ["SEV-1", "SEV-2", "SEV-3"]},
+      "title": {"type": "string", "minLength": 10, "maxLength": 120},
+      "service": {"type": "string"}
+    },
+    "required": ["severity", "title", "service"],
+    "additionalProperties": false
+  }
+}
 ```
 
-### 에러 로깅과 모니터링
-
-프로덕션 환경에서는 에러를 기록하고 분석해야 합니다.
+### Python 도구 실행 래퍼 예시
 
 ```python
-import logging
+import time
+
+def call_tool(name: str, args: dict, registry: dict[str, callable]) -> dict:
+    started = time.time()
+    if name not in registry:
+        return {"ok": False, "error_type": "unknown_tool", "retryable": False}
+    try:
+        data = registry[name](**args)
+        return {
+            "ok": True,
+            "data": data,
+            "latency_ms": int((time.time() - started) * 1000)
+        }
+    except TimeoutError:
+        return {"ok": False, "error_type": "timeout", "retryable": True}
+    except Exception as exc:
+        return {"ok": False, "error_type": type(exc).__name__, "retryable": False}
+```
+
+반환값에 `retryable`을 포함하면 planner가 다음 행동을 결정할 때 정책 분기가 명확해집니다. 도구 실패를 예외로만 던지면 agent 루프가 중단되기 쉽고, 실패 데이터가 누락됩니다.
+
+### 병렬 도구 호출과 병합 전략
+
+```python
+from concurrent.futures import ThreadPoolExecutor
+
+def parallel_lookup(city: str):
+    with ThreadPoolExecutor(max_workers=2) as ex:
+        f1 = ex.submit(get_weather, city)
+        f2 = ex.submit(get_air_quality, city)
+        return {"weather": f1.result(), "air": f2.result()}
+```
+
+병렬 호출을 쓸 때는 병합 규칙을 미리 정해야 합니다. 서로 상충하는 데이터가 들어오면 최신 timestamp 우선, 신뢰도 점수 우선 같은 규칙이 필요합니다. 이 규칙이 없으면 동일 입력에서도 최종 답변이 흔들립니다.
+
+### 도구 관측성 대시보드 최소 항목
+
+| 지표 | 의미 | 경보 기준 예시 |
+| --- | --- | --- |
+| tool_call_count | 도구 호출량 | 평시 대비 2배 급증 |
+| tool_error_rate | 실패 비율 | 5분 평균 3% 초과 |
+| p95_tool_latency | 지연 시간 | 1500ms 초과 |
+| unknown_tool_rate | 미등록 도구 요청 비율 | 0.5% 초과 |
+
+도구 사용은 agent 정확도의 기반이면서 동시에 운영 리스크의 근원입니다. 지표가 없으면 정확도 저하를 모델 문제로 오해하기 쉽습니다.
+
+## 심화 운영 노트
+
+### 운영 관점 실패 분류 템플릿
+
+실전에서는 실패를 "모델이 틀렸다" 한 문장으로 닫지 않습니다. 다음 템플릿처럼 실패 축을 분리하면 개선 우선순위가 명확해집니다.
+
+| 분류 축 | 질문 | 예시 |
+| --- | --- | --- |
+| 계획 실패 | 목표를 잘못 분해했는가 | 불필요한 step 6회 반복 |
+| 실행 실패 | 도구 호출이 실패했는가 | timeout, 429, schema mismatch |
+| 검증 실패 | 결과 확인이 부족했는가 | 잘못된 observation 채택 |
+| 정책 실패 | 안전 경계를 넘었는가 | 민감 데이터 외부 전송 시도 |
+
+이 표를 runbook에 고정해 두면 온콜 엔지니어가 같은 기준으로 사고를 분류할 수 있습니다.
+
+### 프롬프트/도구 버전 고정 전략
+
+변경 추적이 어려운 팀은 대부분 프롬프트와 도구 스키마를 코드 릴리스와 분리해 관리합니다. 안정적인 팀은 아래처럼 버전 필드를 요청 컨텍스트에 명시합니다.
+
+```json
+{
+  "run_id": "run_2026_05_21_001",
+  "model": "gpt-4.1-mini",
+  "prompt_version": "agent-101-ko-v3",
+  "tool_schema_version": "tools-v5",
+  "policy_version": "policy-2026-05"
+}
+```
+
+버전 필드만 있어도 회귀 분석 속도가 크게 빨라집니다. 특정 시점의 품질 저하가 모델 변경인지, 프롬프트 변경인지, 도구 변경인지 즉시 좁힐 수 있기 때문입니다.
+
+### 관측성 이벤트 예시
+
+```python
+import json
 from datetime import datetime
 
-logger = logging.getLogger(__name__)
-
-def execute_tool_with_logging(
-    tool_name: str,
-    params: Dict[str, Any]
-) -> Dict[str, Any]:
-    """도구 실행 + 에러 로깅"""
-    
-    start_time = datetime.now()
-    
-    try:
-        result = execute_tool(tool_name, params)
-        
-        # 성공 로그
-        duration = (datetime.now() - start_time).total_seconds()
-        logger.info(f"Tool '{tool_name}' succeeded in {duration}s")
-        
-        return {"success": True, "data": result}
-    
-    except Exception as e:
-        # 실패 로그 (상세 정보 포함)
-        duration = (datetime.now() - start_time).total_seconds()
-        logger.error(
-            f"Tool '{tool_name}' failed in {duration}s",
-            extra={
-                "tool": tool_name,
-                "params": params,
-                "error_type": type(e).__name__,
-                "error_message": str(e)
-            }
-        )
-        
-        return {"success": False, "error": str(e)}
-```
-
-### 타임아웃 설정
-
-도구 실행이 무한정 기다리지 않도록 제한합니다.
-
-```python
-import signal
-from contextlib import contextmanager
-
-@contextmanager
-def timeout(seconds: int):
-    """함수 실행 시간 제한"""
-    def timeout_handler(signum, frame):
-        raise TimeoutError(f"Operation timed out after {seconds} seconds")
-    
-    # 타임아웃 설정
-    signal.signal(signal.SIGALRM, timeout_handler)
-    signal.alarm(seconds)
-    
-    try:
-        yield
-    finally:
-        # 타임아웃 해제
-        signal.alarm(0)
-
-# 사용 예시
-try:
-    with timeout(10):
-        result = execute_tool("slow_api_call", {"param": "value"})
-except TimeoutError:
-    result = {"success": False, "error": "Tool execution timeout"}
-```
-
-에러 처리를 잘 구현하면 에이전트의 안정성과 신뢰성이 크게 향상됩니다.
-
-에이전트가 여러 도구를 사용할 수 있을 때, 어떤 도구를 선택할지 결정하는 전략이 필요합니다.
-
-### LLM 기반 자동 선택
-
-OpenAI Function Calling에서는 `tool_choice` 파라미터로 선택 전략을 제어합니다.
-
-```python
-import openai
-
-tools = [
-    {"type": "function", "function": {...}},  # get_weather
-    {"type": "function", "function": {...}},  # search_documents
-]
-
-# 전략 1: 자동 선택 (LLM이 판단)
-response = openai.chat.completions.create(
-    model="gpt-4",
-    messages=[{"role": "user", "content": "서울 날씨 알려줘"}],
-    tools=tools,
-    tool_choice="auto"  # LLM이 필요하면 도구 사용
-)
-
-# 전략 2: 도구 사용 강제
-response = openai.chat.completions.create(
-    model="gpt-4",
-    messages=[{"role": "user", "content": "서울 날씨 알려줘"}],
-    tools=tools,
-    tool_choice="required"  # 반드시 하나의 도구 호출
-)
-
-# 전략 3: 특정 도구 지정
-response = openai.chat.completions.create(
-    model="gpt-4",
-    messages=[{"role": "user", "content": "서울 날씨 알려줘"}],
-    tools=tools,
-    tool_choice={"type": "function", "function": {"name": "get_weather"}}
-)
-
-# 전략 4: 도구 사용 금지
-response = openai.chat.completions.create(
-    model="gpt-4",
-    messages=[{"role": "user", "content": "서울 날씨 알려줘"}],
-    tools=tools,
-    tool_choice="none"  # 도구 사용 안 함
-)
-```
-
-### 컨텍스트 기반 선택
-
-사용자 쿼리의 의도에 따라 도구를 필터링할 수 있습니다.
-
-```python
-from typing import List, Dict, Any
-
-def select_relevant_tools(
-    user_query: str,
-    all_tools: List[Dict[str, Any]]
-) -> List[Dict[str, Any]]:
-    """쿼리와 관련 있는 도구만 선택"""
-    
-    # 키워드 기반 필터링
-    query_lower = user_query.lower()
-    
-    relevant_tools = []
-    for tool in all_tools:
-        tool_name = tool["function"]["name"]
-        tool_desc = tool["function"]["description"]
-        
-        # 날씨 관련 쿼리 → 날씨 도구만
-        if "날씨" in query_lower and "weather" in tool_name:
-            relevant_tools.append(tool)
-        
-        # 문서 검색 쿼리 → 검색 도구만
-        elif any(kw in query_lower for kw in ["검색", "찾아", "알려줘"]) and "search" in tool_name:
-            relevant_tools.append(tool)
-    
-    # 관련 도구가 없으면 모든 도구 반환
-    return relevant_tools if relevant_tools else all_tools
-```
-
-### 도구 우선순위 설정
-
-자주 사용하거나 신뢰도가 높은 도구를 먼저 시도합니다.
-
-```python
-def execute_with_priority(
-    tools: List[str],
-    params: Dict[str, Any]
-) -> Dict[str, Any]:
-    """우선순위 순서로 도구 실행"""
-    
-    # 우선순위: 1. 캐시 조회 2. 실시간 API 3. LLM 지식
-    priority_order = ["check_cache", "api_call", "llm_knowledge"]
-    
-    for tool_name in priority_order:
-        if tool_name not in tools:
-            continue
-        
-        result = execute_tool(tool_name, params)
-        
-        if result["success"]:
-            return result
-    
-    return {"success": False, "error": "All tools failed"}
-```
-
-### 도구 조합 (Tool Composition)
-
-여러 도구를 순차적으로 사용하여 복잡한 작업을 수행합니다.
-
-```python
-def multi_tool_workflow(user_query: str) -> str:
-    """여러 도구를 조합하여 답변 생성"""
-    
-    # 1단계: 문서 검색
-    search_result = execute_tool("search_documents", {"query": user_query})
-    
-    if not search_result["success"]:
-        return "검색 실패"
-    
-    documents = search_result["data"]
-    
-    # 2단계: 검색된 문서를 LLM에 전달하여 요약
-    summary_prompt = f"""
-    다음 문서를 바탕으로 질문에 답하세요.
-    
-    질문: {user_query}
-    
-    문서:
-    {documents}
-    """
-    
-    response = openai.chat.completions.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": summary_prompt}]
-    )
-    
-    return response.choices[0].message.content
-```
-
-### 동적 도구 등록
-
-런타임에 상황에 따라 도구를 추가하거나 제거합니다.
-
-```python
-class DynamicToolRegistry:
-    """동적 도구 레지스트리"""
-    
-    def __init__(self):
-        self.tools: Dict[str, Dict[str, Any]] = {}
-    
-    def register(self, tool_schema: Dict[str, Any]):
-        """도구 등록"""
-        tool_name = tool_schema["function"]["name"]
-        self.tools[tool_name] = tool_schema
-    
-    def unregister(self, tool_name: str):
-        """도구 제거"""
-        if tool_name in self.tools:
-            del self.tools[tool_name]
-    
-    def get_tools(self, context: str = None) -> List[Dict[str, Any]]:
-        """컨텍스트에 맞는 도구 목록 반환"""
-        
-        if context == "weather":
-            # 날씨 관련 도구만
-            return [t for name, t in self.tools.items() if "weather" in name]
-        
-        elif context == "database":
-            # 데이터베이스 관련 도구만
-            return [t for name, t in self.tools.items() if "db" in name or "sql" in name]
-        
-        else:
-            # 모든 도구
-            return list(self.tools.values())
-
-# 사용 예시
-registry = DynamicToolRegistry()
-
-# 기본 도구 등록
-registry.register({
-    "type": "function",
-    "function": {
-        "name": "get_weather",
-        "description": "날씨 조회",
-        "parameters": {...}
+def emit_event(event_type: str, payload: dict):
+    record = {
+        "ts": datetime.utcnow().isoformat() + "Z",
+        "event_type": event_type,
+        "payload": payload,
     }
-})
+    print(json.dumps(record, ensure_ascii=False))
 
-# 사용자가 데이터베이스 작업을 요청하면 관련 도구 추가
-if "데이터베이스" in user_query:
-    registry.register({
-        "type": "function",
-        "function": {
-            "name": "execute_sql",
-            "description": "SQL 쿼리 실행",
-            "parameters": {...}
-        }
-    })
-
-# 컨텍스트에 맞는 도구만 LLM에 전달
-tools = registry.get_tools(context="database")
+emit_event("agent.step", {"step": 2, "tool": "search_docs", "latency_ms": 412})
 ```
 
-### 도구 비용 고려
+구조화 로그를 먼저 도입하면 추후 OpenTelemetry, ELK, Grafana 같은 스택으로 확장할 때 마이그레이션 비용이 낮아집니다.
 
-API 호출 비용이나 실행 시간을 고려하여 선택합니다.
+### 배포 체크 항목
 
-```python
-def select_tool_by_cost(
-    query: str,
-    available_tools: List[str]
-) -> str:
-    """비용 효율적인 도구 선택"""
-    
-    # 도구별 비용 (상대적)
-    tool_costs = {
-        "cache_lookup": 0,      # 무료
-        "simple_api": 1,        # 저비용
-        "expensive_api": 10,    # 고비용
-        "llm_call": 5           # 중간 비용
-    }
-    
-    # 쿼리 복잡도 분석
-    if len(query.split()) <= 5:
-        # 간단한 쿼리: 저비용 도구 우선
-        preferred = ["cache_lookup", "simple_api"]
-    else:
-        # 복잡한 쿼리: 고비용 도구도 허용
-        preferred = available_tools
-    
-    # 사용 가능한 도구 중 가장 저렴한 것 선택
-    available_preferred = [t for t in preferred if t in available_tools]
-    return min(available_preferred, key=lambda t: tool_costs.get(t, 999))
+- 모델 API 키를 환경 변수와 Secret Manager로 분리했는지 확인합니다.
+- `max_steps`, `timeout_ms`, `retry_budget` 기본값이 운영 프로필에 맞는지 검증합니다.
+- 장애 시 fallback 응답 문구가 사용자에게 과장된 확신을 주지 않는지 점검합니다.
+- 알람 임계치(`error_rate`, `p95_latency`, `policy_violation_rate`)를 문서와 코드에서 동일하게 유지합니다.
+
+이 항목은 기능 개발보다 눈에 덜 띄지만, 실제 장애 빈도를 줄이는 데 직접적으로 기여합니다.
+
+### 비용 통제 포인트
+
+| 항목 | 설명 | 권장 기본값 |
+| --- | --- | --- |
+| max_steps | 1회 실행당 최대 루프 | 4~8 |
+| max_tool_calls | 도구 호출 상한 | 3~6 |
+| input_token_budget | 입력 토큰 예산 | 서비스별 정책 |
+| output_token_budget | 출력 토큰 예산 | 서비스별 정책 |
+
+비용 통제는 성능 최적화 이후에 붙이는 부가기능이 아닙니다. 처음부터 실행 예산을 고정해야 사용량 급증 시 서비스가 안정적으로 유지됩니다.
+
+### 품질 회귀를 막는 CI 게이트 예시
+
+```bash
+python3 scripts/eval_agent.py --dataset eval/agent_core_ko.jsonl --min-success 0.82
+python3 scripts/check_tool_schema.py --strict
+python3 scripts/check_prompt_version.py --require-changelog
 ```
 
-올바른 도구 선택 전략은 에이전트의 효율성과 비용을 크게 좌우합니다.
+배포 파이프라인에서 최소 품질 게이트를 자동화하면 "우연히 좋아 보이는 빌드"가 운영으로 유입되는 일을 줄일 수 있습니다.
 
-## 도구 선택 전략
+### 운영 관점 실패 분류 템플릿
 
-도구 사용 시 자주 발생하는 실수들과 올바른 해결 방법을 살펴봅니다.
+실전에서는 실패를 "모델이 틀렸다" 한 문장으로 닫지 않습니다. 다음 템플릿처럼 실패 축을 분리하면 개선 우선순위가 명확해집니다.
 
-### 실수 1: 불명확한 도구 설명
+| 분류 축 | 질문 | 예시 |
+| --- | --- | --- |
+| 계획 실패 | 목표를 잘못 분해했는가 | 불필요한 step 6회 반복 |
+| 실행 실패 | 도구 호출이 실패했는가 | timeout, 429, schema mismatch |
+| 검증 실패 | 결과 확인이 부족했는가 | 잘못된 observation 채택 |
+| 정책 실패 | 안전 경계를 넘었는가 | 민감 데이터 외부 전송 시도 |
 
-**나쁜 예**: LLM이 도구의 용도를 정확히 파악할 수 없습니다.
+이 표를 runbook에 고정해 두면 온콜 엔지니어가 같은 기준으로 사고를 분류할 수 있습니다.
 
-```python
+### 프롬프트/도구 버전 고정 전략
+
+변경 추적이 어려운 팀은 대부분 프롬프트와 도구 스키마를 코드 릴리스와 분리해 관리합니다. 안정적인 팀은 아래처럼 버전 필드를 요청 컨텍스트에 명시합니다.
+
+```json
 {
-    "name": "get_data",
-    "description": "데이터를 가져옵니다",  # 어떤 데이터? 어디서?
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "id": {"type": "string"}  # 무엇의 ID?
-        }
-    }
+  "run_id": "run_2026_05_21_001",
+  "model": "gpt-4.1-mini",
+  "prompt_version": "agent-101-ko-v3",
+  "tool_schema_version": "tools-v5",
+  "policy_version": "policy-2026-05"
 }
 ```
 
-**좋은 예**: 구체적인 설명으로 LLM이 올바르게 선택합니다.
+버전 필드만 있어도 회귀 분석 속도가 크게 빨라집니다. 특정 시점의 품질 저하가 모델 변경인지, 프롬프트 변경인지, 도구 변경인지 즉시 좁힐 수 있기 때문입니다.
+
+### 관측성 이벤트 예시
 
 ```python
-{
-    "name": "get_customer_profile",
-    "description": "고객 ID로 고객의 프로필 정보(이름, 이메일, 가입일)를 조회합니다. 고객 이력이나 주문 내역은 포함하지 않습니다.",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "customer_id": {
-                "type": "string",
-                "description": "고객 고유 식별자 (예: CUST-12345)"
-            }
-        },
-        "required": ["customer_id"]
+import json
+from datetime import datetime
+
+def emit_event(event_type: str, payload: dict):
+    record = {
+        "ts": datetime.utcnow().isoformat() + "Z",
+        "event_type": event_type,
+        "payload": payload,
     }
-}
+    print(json.dumps(record, ensure_ascii=False))
+
+emit_event("agent.step", {"step": 2, "tool": "search_docs", "latency_ms": 412})
 ```
 
-**교훈**: 도구 설명에는 "무엇을", "언제", "어떤 형식으로" 반환하는지 명시합니다.
+구조화 로그를 먼저 도입하면 추후 OpenTelemetry, ELK, Grafana 같은 스택으로 확장할 때 마이그레이션 비용이 낮아집니다.
 
-### 실수 2: 에러 처리 누락
+### 배포 체크 항목
 
-**나쁜 예**: 도구 실행 실패 시 에이전트가 멈춥니다.
+- 모델 API 키를 환경 변수와 Secret Manager로 분리했는지 확인합니다.
+- `max_steps`, `timeout_ms`, `retry_budget` 기본값이 운영 프로필에 맞는지 검증합니다.
+- 장애 시 fallback 응답 문구가 사용자에게 과장된 확신을 주지 않는지 점검합니다.
+- 알람 임계치(`error_rate`, `p95_latency`, `policy_violation_rate`)를 문서와 코드에서 동일하게 유지합니다.
 
-```python
-def execute_tool(tool_name: str, params: dict) -> dict:
-    """도구 실행 (에러 처리 없음)"""
-    if tool_name == "get_weather":
-        # API 호출이 실패하면 Exception 발생
-        return requests.get(f"https://api.weather.com/{params['location']}").json()
+이 항목은 기능 개발보다 눈에 덜 띄지만, 실제 장애 빈도를 줄이는 데 직접적으로 기여합니다.
+
+### 비용 통제 포인트
+
+| 항목 | 설명 | 권장 기본값 |
+| --- | --- | --- |
+| max_steps | 1회 실행당 최대 루프 | 4~8 |
+| max_tool_calls | 도구 호출 상한 | 3~6 |
+| input_token_budget | 입력 토큰 예산 | 서비스별 정책 |
+| output_token_budget | 출력 토큰 예산 | 서비스별 정책 |
+
+비용 통제는 성능 최적화 이후에 붙이는 부가기능이 아닙니다. 처음부터 실행 예산을 고정해야 사용량 급증 시 서비스가 안정적으로 유지됩니다.
+
+### 품질 회귀를 막는 CI 게이트 예시
+
+```bash
+python3 scripts/eval_agent.py --dataset eval/agent_core_ko.jsonl --min-success 0.82
+python3 scripts/check_tool_schema.py --strict
+python3 scripts/check_prompt_version.py --require-changelog
 ```
 
-**좋은 예**: 에러를 잡아서 LLM에 전달합니다.
+배포 파이프라인에서 최소 품질 게이트를 자동화하면 "우연히 좋아 보이는 빌드"가 운영으로 유입되는 일을 줄일 수 있습니다.
 
-```python
-def execute_tool(tool_name: str, params: dict) -> dict:
-    """도구 실행 (에러 처리 포함)"""
-    try:
-        if tool_name == "get_weather":
-            response = requests.get(
-                f"https://api.weather.com/{params['location']}",
-                timeout=5
-            )
-            response.raise_for_status()
-            return {"success": True, "data": response.json()}
-    
-    except requests.exceptions.Timeout:
-        return {
-            "success": False,
-            "error": "API 타임아웃. 잠시 후 다시 시도하세요."
-        }
-    
-    except requests.exceptions.HTTPError as e:
-        return {
-            "success": False,
-            "error": f"HTTP 오류 {e.response.status_code}: {e.response.text}"
-        }
-    
-    except Exception as e:
-        return {
-            "success": False,
-            "error": f"예상치 못한 오류: {str(e)}"
-        }
-```
+## 흔히 헷갈리는 지점
 
-**교훈**: 모든 도구 호출에 try-except를 적용하고, 에러 메시지를 LLM이 이해할 수 있게 작성합니다.
+- 모델이 tool call을 반환하면 실제 API가 이미 호출된 것처럼 착각하기 쉽지만, 실행 책임은 애플리케이션에 있습니다.
+- description 없이 이름만 좋아도 충분하다고 보기 쉽지만, 실제로는 description이 라우팅 품질에 큰 영향을 줍니다.
+- 결과를 그대로 모델에 다시 넣으면 된다고 생각하기 쉽지만, 너무 큰 payload는 곧 token 비용 문제로 이어집니다.
+- tool schema가 있으면 validation이 끝났다고 보기 쉽지만, 서버 측 검증과 권한 검사는 별도로 필요합니다.
+- 단일 예제가 잘 동작한다고 production readiness를 착각하기 쉽지만, multi-tool loop와 failure path를 같이 봐야 합니다.
 
-### 실수 3: 도구 결과를 무시
+## 운영 체크리스트
 
-**나쁜 예**: 도구를 호출하고 결과를 확인하지 않습니다.
+- [ ] tool name, description, parameter schema가 역할 분리를 충분히 드러내는가
+- [ ] 모델이 반환한 인자를 서버 측에서 다시 검증하는가
+- [ ] unknown tool, invalid arguments, timeout에 대한 명시적 처리 경로가 있는가
+- [ ] tool 결과를 다시 넣을 때 `tool_call_id`와 직렬화 형식을 일관되게 유지하는가
+- [ ] 최대 반복 횟수와 per-tool latency를 측정할 수 있는가
 
-```python
-def agent_loop(user_query: str) -> str:
-    """에이전트 루프 (결과 미확인)"""
-    decision = llm.decide_next_action(user_query)
-    
-    if decision["action"] == "use_tool":
-        tool_result = execute_tool(decision["tool"], decision["params"])
-        # 결과를 확인하지 않고 바로 최종 답변
-        return "작업을 완료했습니다"
-```
+## 정리
 
-**좋은 예**: 결과를 확인하고 적절히 대응합니다.
+tool use는 agent를 실세계 시스템과 연결하는 첫 번째 계층입니다. 이 계층을 이해하면 LLM이 실제로 하는 일과 애플리케이션 코드가 끝까지 책임져야 하는 일을 분리해서 볼 수 있습니다. 이 분리가 있어야 안정성이 생깁니다.
 
-```python
-def agent_loop(user_query: str) -> str:
-    """에이전트 루프 (결과 확인)"""
-    decision = llm.decide_next_action(user_query)
-    
-    if decision["action"] == "use_tool":
-        tool_result = execute_tool(decision["tool"], decision["params"])
-        
-        # 결과 확인
-        if tool_result["success"]:
-            # 성공: 결과를 LLM에 전달하여 최종 답변 생성
-            return llm.generate_answer(user_query, tool_result["data"])
-        else:
-            # 실패: LLM에게 에러를 알리고 대체 전략 요청
-            error_context = f"도구 실행 실패: {tool_result['error']}"
-            return llm.decide_next_action(user_query, context=error_context)
-```
+좋은 function calling 설계는 복잡한 프롬프트보다 좋은 인터페이스에서 나옵니다. 이름이 명확하고, 설명이 구체적이며, 파라미터 타입이 엄격하고, 실행 계층이 검증과 실패 처리를 책임질 때 모델의 판단 품질도 함께 올라갑니다.
 
-**교훈**: 도구 결과의 `success` 필드를 항상 확인하고, 실패 시 대체 전략을 준비합니다.
+다음 글에서는 이 tool use를 더 큰 작업 흐름 안에 넣는 방법을 다룹니다. 결국 agent는 도구 하나를 부르는 시스템이 아니라, 여러 단계를 어떤 순서와 조건으로 엮을지 설계하는 시스템이기 때문입니다.
 
-### 실수 4: 너무 많은 도구 등록
+## 처음 질문으로 돌아가기
 
-**나쁜 예**: 모든 가능한 도구를 한 번에 등록합니다.
-
-```python
-# 50개의 도구를 한 번에 LLM에 전달
-tools = [
-    {"name": "get_weather", ...},
-    {"name": "search_docs", ...},
-    {"name": "send_email", ...},
-    {"name": "query_database", ...},
-    # ... 46 more tools
-]
-
-response = openai.chat.completions.create(
-    model="gpt-4",
-    messages=[{"role": "user", "content": "서울 날씨 알려줘"}],
-    tools=tools  # 토큰 낭비, 선택 정확도 저하
-)
-```
-
-**좋은 예**: 쿼리와 관련 있는 도구만 선택합니다.
-
-```python
-def get_relevant_tools(user_query: str, all_tools: list) -> list:
-    """쿼리와 관련 있는 도구만 필터링"""
-    query_lower = user_query.lower()
-    
-    # 키워드 기반 필터링
-    if "날씨" in query_lower:
-        return [t for t in all_tools if "weather" in t["function"]["name"]]
-    elif "이메일" in query_lower:
-        return [t for t in all_tools if "email" in t["function"]["name"]]
-    else:
-        # 기본 도구만 (최대 5개)
-        return all_tools[:5]
-
-# 관련 도구만 LLM에 전달
-relevant_tools = get_relevant_tools(user_query, all_tools)
-
-response = openai.chat.completions.create(
-    model="gpt-4",
-    messages=[{"role": "user", "content": user_query}],
-    tools=relevant_tools  # 3-5개 도구만
-)
-```
-
-**교훈**: 한 번에 3-7개 도구만 LLM에 전달하여 토큰 비용과 선택 정확도를 최적화합니다.
-
-### 실수 5: 도구 출력 형식을 검증하지 않음
-
-**나쁜 예**: 도구가 반환한 데이터를 그대로 사용합니다.
-
-```python
-def get_weather(location: str) -> dict:
-    """날씨 조회 (검증 없음)"""
-    response = requests.get(f"https://api.weather.com/{location}")
-    return response.json()  # 응답 형식을 가정
-
-# 사용
-weather = get_weather("Seoul")
-temperature = weather["temp"]  # KeyError 발생 가능
-```
-
-**좋은 예**: 출력을 검증하고 일관된 형식으로 변환합니다.
-
-```python
-from typing import Optional
-
-def get_weather(location: str) -> dict:
-    """날씨 조회 (검증 포함)"""
-    try:
-        response = requests.get(f"https://api.weather.com/{location}", timeout=5)
-        response.raise_for_status()
-        data = response.json()
-        
-        # 응답 검증 및 표준화
-        return {
-            "success": True,
-            "data": {
-                "location": data.get("location", location),
-                "temperature": data.get("temp", data.get("temperature", None)),
-                "condition": data.get("condition", "unknown"),
-                "humidity": data.get("humidity", None)
-            }
-        }
-    
-    except Exception as e:
-        return {
-            "success": False,
-            "error": str(e)
-        }
-
-# 사용
-result = get_weather("Seoul")
-if result["success"]:
-    temp = result["data"]["temperature"]  # 안전하게 접근
-    if temp is not None:
-        print(f"현재 온도: {temp}°C")
-```
-
-**교훈**: 모든 도구는 일관된 형식(`{"success": bool, "data": ...}` 또는 `{"success": bool, "error": ...}`)을 반환하도록 설계합니다.
-
-## 핵심 요약
-
-- Tool Use는 Agent를 실용적인 자동화 도구로 만드는 핵심 기능입니다.
-- 도구 스키마는 명확하고 구체적으로 작성해야 모델이 올바르게 호출합니다.
-- 에러 처리와 도구 선택 전략이 Agent의 신뢰성을 결정합니다.
-
-<!-- a-grade-example:begin -->
-
-## 체크리스트
-
-- [ ] OpenAI function-calling 스펙으로 도구 1개를 정의해 호출시켰다.
-- [ ] 잘못된 schema가 모델을 어떻게 헷갈리게 하는지 직접 관찰했다.
-- [ ] 도구 2~3개를 후보로 두고 모델이 어떤 것을 고르는지 로깅했다.
-- [ ] 도구 결과를 모델에 다시 넣어 최종 응답을 만드는 사이클을 완성했다.
-
-<!-- a-grade-example:end -->
+- **function calling에서 모델이 결정하는 일과 애플리케이션 코드가 실행하는 일은 어디서 갈라질까요?**
+  - 모델은 어떤 도구를 어떤 인자로 부를지 요청하고, 애플리케이션 코드는 그 요청을 검증한 뒤 실제 API나 함수를 실행합니다.
+- **tool schema가 애매하면 agent는 어떤 방식으로 잘못 실패할까요?**
+  - 도구 이름과 인자 의미가 흐리면 모델은 비슷한 도구를 고르거나 잘못된 값을 채워 넣고, 실패 원인이 모델인지 schema인지 구분하기 어려워집니다.
+- **tool 결과를 다시 모델에게 넣기 전에 무엇을 검증해야 할까요?**
+  - 인자 타입, 허용 범위, 에러 형식, 민감 정보 포함 여부, 다음 판단에 필요한 최소 결과만 전달되는지를 확인해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
-- [컨텍스트 엔지니어링](./02-context-engineering.md)
-- **Tool Use 기초 (현재 글)**
-- Agent Workflow 설계 (예정)
-- Memory와 State (예정)
-- Multi-Agent 시스템 (예정)
-- Agent 평가 (예정)
-- 에러 처리와 안정성 (예정)
-- 운영 (예정)
-- 첫 Agent 만들기 (예정)
+- [AI Agent 101 (1/10): AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): 컨텍스트 엔지니어링](./02-context-engineering.md)
+- **AI Agent 101 (3/10): Tool Use 기초 (현재 글)**
+- AI Agent 101 (4/10): Agent Workflow 설계 (예정)
+- AI Agent 101 (5/10): Memory와 State (예정)
+- AI Agent 101 (6/10): Multi-Agent 시스템 (예정)
+- AI Agent 101 (7/10): Agent 평가 (예정)
+- AI Agent 101 (8/10): 에러 처리와 안정성 (예정)
+- AI Agent 101 (9/10): 운영 (예정)
+- AI Agent 101 (10/10): 첫 Agent 만들기 (예정)
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-1. **OpenAI Function Calling Guide** - https://platform.openai.com/docs/guides/function-calling  
-   OpenAI의 공식 Function Calling 문서. 도구 스키마 작성법, tool_choice 파라미터, 실전 예제를 제공합니다.
+### 공식 문서
 
-2. **LangChain Tools Documentation** - https://python.langchain.com/docs/modules/agents/tools/  
-   LangChain 프레임워크의 도구 시스템. 커스텀 도구 작성, 에러 처리, 도구 조합 패턴을 다룹니다.
+- [OpenAI Platform - Function calling guide](https://platform.openai.com/docs/guides/function-calling)
+- [JSON Schema](https://json-schema.org/)
+- [Anthropic - Building effective agents](https://www.anthropic.com/research/building-effective-agents)
+- [LangChain - Tool calling](https://python.langchain.com/docs/concepts/tools/)
 
-3. **Toolformer: Language Models Can Teach Themselves to Use Tools** - https://arxiv.org/abs/2302.04761  
-   Meta AI의 연구 논문. LLM이 스스로 도구 사용법을 학습하는 방법을 제시합니다.
+### 관련 시리즈
 
-4. **Anthropic Tool Use Best Practices** - https://docs.anthropic.com/claude/docs/tool-use  
-   Claude API의 도구 사용 가이드. 에러 처리, 재시도 전략, 보안 고려사항을 설명합니다.
+- [LangGraph 101 - Tool Calling](../langgraph-101/04-tool-calling-agent.md)
+- [Prompt Engineering 101 - 구조화 출력](../multimodal-ai-101/05-multimodal-rag.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-agent-101/ko/03-tool-use-fundamentals)

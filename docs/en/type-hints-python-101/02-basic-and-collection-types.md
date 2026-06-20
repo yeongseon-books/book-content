@@ -1,10 +1,10 @@
 ---
 series: type-hints-python-101
 episode: 2
-title: Basic Types and Collection Types
+title: "Type Hints in Python 101 (2/10): Basic Types and Collection Types"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: Master Python type hints for basic types (int, str, bool, float
 last_reviewed: '2026-05-04'
 ---
 
-# Basic Types and Collection Types
+# Type Hints in Python 101 (2/10): Basic Types and Collection Types
+
+This is post 2 in the Type Hints in Python 101 series.
 
 > Type Hints in Python 101 Series (2/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: How do you annotate containers like lists and dictionaries so the type checker knows what is inside them?
 
 > Annotating a function parameter as `list` tells the type checker it is a list — but not what the list contains. A `list[int]` is fundamentally different from a `list[str]` when it comes to the operations you can perform on its elements. This article covers Python's basic scalar types and how to parameterize collection types for precise type checking.
 
-<!-- a-grade-intro:end -->
+
+![Type Hints in Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/02/02-01-big-picture.en.png)
+*Type Hints in Python 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Basic Types and Collection Types?
+- Which signal should the example or diagram make visible for Basic Types and Collection Types?
+- What failure should be prevented first when Basic Types and Collection Types reaches a real system?
 
 ## What You Will Learn
 
@@ -47,8 +55,6 @@ Most real-world Python code works with collections. API responses are dictionari
 > Parameterized types = telling the type checker what is *inside* the container.
 
 This is where type hints start paying real dividends in large codebases.
-
-## Concept at a Glance
 
 > Basic types annotate single values. Collection types wrap basic types to describe containers and their contents.
 
@@ -119,7 +125,6 @@ matrix: list[list[int]] = [
     [4, 5, 6],
 ]
 
-
 def get_active_users(users: list[str]) -> set[str]:
     return set(users)
 ```
@@ -135,7 +140,6 @@ config: dict[str, str | int | bool] = {
     "port": 8080,
     "debug": True,
 }
-
 
 def get_headers() -> dict[str, str]:
     return {"Content-Type": "application/json"}
@@ -164,10 +168,8 @@ The `...` (Ellipsis) in `tuple[int, ...]` means "zero or more ints." Without it,
 UserScores = dict[str, list[int]]
 Config = dict[str, str | int | bool | list[str]]
 
-
 def aggregate_scores(data: UserScores) -> dict[str, float]:
     return {name: sum(scores) / len(scores) for name, scores in data.items()}
-
 
 scores: UserScores = {
     "Alice": [95, 87, 92],
@@ -230,17 +232,29 @@ Basic types (`int`, `str`, `float`, `bool`) and parameterized collections (`list
 
 In the next article, we will explore `Optional` and `Union` types for handling values that might be missing or could be one of several types.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Basic Types and Collection Types?**
+  - The article treats Basic Types and Collection Types as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Basic Types and Collection Types?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Basic Types and Collection Types reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Python Type Hints?](./01-what-is-type-hint.md)
+## In this series
+
+- [Type Hints in Python 101 (1/10): What Are Python Type Hints?](./01-what-is-type-hint.md)
 - **Basic Types and Collection Types (current)**
-- [Optional and Union](./03-optional-and-union.md)
-- [Function Type Hints](./04-function-type-hints.md)
-- [TypedDict and dataclass](./05-typeddict-and-dataclass.md)
-- [Protocol and Structural Typing](./06-protocol-and-structural-typing.md)
-- [Understanding Generics](./07-generic.md)
-- [Using mypy and pyright](./08-mypy-and-pyright.md)
-- [Pydantic and Type Hints](./09-pydantic-and-type-hints.md)
-- [Type Hint Best Practices](./10-type-hints-best-practices.md)
+- Optional and Union (upcoming)
+- Function Type Hints (upcoming)
+- TypedDict and dataclass (upcoming)
+- Protocol and Structural Typing (upcoming)
+- Understanding Generics (upcoming)
+- Using mypy and pyright (upcoming)
+- Pydantic and Type Hints (upcoming)
+- Type Hint Best Practices (upcoming)
+
 <!-- toc:end -->
 
 ## References

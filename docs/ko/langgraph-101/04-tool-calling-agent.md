@@ -1,12 +1,12 @@
 ---
-title: 도구 호출 에이전트
+title: "LangGraph 101 (4/6): 도구 호출 에이전트"
 series: langgraph-101
 episode: 4
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,147 +14,348 @@ tags:
 - Agent
 - Python
 - LLM
-last_reviewed: '2026-05-06'
+last_reviewed: '2026-05-14'
 seo_description: ToolNode와 tools_condition으로 도구 호출 루프를 명시적인 그래프로 표현합니다
 ---
 
-# 도구 호출 에이전트
+# LangGraph 101 (4/6): 도구 호출 에이전트
 
-> LangGraph 101 시리즈 (4/6)
+도구를 쓰는 에이전트는 데모에서는 늘 똑똑해 보입니다. 계산이 필요하면 계산기를 부르고, 카운팅이 필요하면 텍스트 도구를 부르고, 그 결과를 바탕으로 답을 돌려주기 때문입니다. 하지만 운영으로 들어가면 질문이 곧바로 바뀝니다. 왜 이 요청만 도구를 세 번 호출했는지, 왜 존재하지도 않는 도구를 요청했는지, 왜 실패한 결과를 읽고도 같은 도구를 다시 부르는지가 중요해집니다.
 
-## 이 글에서 다룰 문제
+이 글은 LangGraph 101 시리즈의 네 번째 글입니다. 여기서는 tool loop를 모델의 습관이 아니라, LLM 판단과 실제 도구 실행을 분리한 제어 루프로 읽습니다.
 
-*도구* *호출* 을 *루프* 안에 *직접* *짜면* *재시도*, *로깅*, *테스트* 가 *모두* *섞입니다*. *LangGraph* 의 *prebuilt* *컴포넌트* 는 *호출 결정*, *실행*, *결과 해석* 을 *별도* *노드* 로 *분리* 합니다.
+보통 핵심 문제는 모델이 도구를 사용할 수 있느냐가 아닙니다. 그 주위를 둘러싼 루프가 **명시적이고, 들여다볼 수 있고, 통제 가능한가**가 더 중요합니다. 도구 호출이 모델 내부의 불투명한 습관처럼 남아 있으면, 실패한 도구 재시도와 성공한 도구 후속 응답, 최종 답변 조립이 한 덩어리로 섞입니다. 그 순간 재현은 어려워지고, 로깅 경계는 약해지고, 비용이 어디서 커지는지도 읽기 힘들어집니다.
 
-## 전체 흐름
-```mermaid
-flowchart LR
-    S[START] --> A[agent]
-    A -- tool_call --> T[ToolNode]
-    T --> A
-    A -- no tool_call --> E[END]
-```
+특히 side effect가 있는 도구가 붙는 순간 위험은 훨씬 커집니다. 읽기 전용 계산기나 카운터는 비교적 안전합니다. 하지만 외부 API를 호출하거나 파일을 수정하거나 티켓을 생성하는 도구라면, 한 번의 잘못된 루프가 중복 실행과 잘못된 상태 변경으로 이어질 수 있습니다. 현업에서 저는 이 지점을 “도구를 붙였으니 에이전트가 더 강해졌다”는 기대만으로 넘겼다가, 나중에 실패 복구 비용과 불필요한 재시도 비용을 크게 치르는 팀을 자주 봤습니다.
 
-## Before/After
+여기서는 도구 호출 에이전트를 “모델이 알아서 도구를 쓰는 구조”가 아니라, **LLM 판단과 실제 도구 실행을 분리한 안전한 실행 환경**으로 이해해 보겠습니다. 핵심은 분명합니다. **Tool-calling agent는 LLM 노드, ToolNode, 그리고 명시적 종료 규칙이 결합된 제어 루프**입니다.
 
-**Before**: "*if response.tool_calls* 같은 *수동* *분기* 가 *함수* *안* 에 *쌓입니다*."
+![agent와 tools 사이의 도구 루프](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/04/04-01-minimal-runnable-example.ko.png)
+*agent와 tools 사이의 도구 루프*
+> Tool-calling agent의 핵심은 모델이 도구를 안다는 사실이 아니라, 도구 실행이 검증 가능한 경계 안에서 반복된다는 사실입니다.
 
-**After**: "*tools_condition* 이 *그래프* 위에서 *그* *판단* 을 *대신* *합니다*."
+## 먼저 던지는 질문
 
-## 도구 에이전트 5단계
+- LangGraph tool-calling agent는 왜 LLM과 tool 실행 envelope를 분리해서 봐야 할까요?
+- 도구 호출을 반복할 때 state에는 어떤 실행 흔적이 남아야 할까요?
+- 안전한 dispatcher 없이 tool call을 실행하면 어떤 위험이 생길까요?
 
-### 1단계 — 도구 두 개 정의
+## 왜 이 구조가 중요한가
+
+도구 호출 에이전트를 배우는 이유를 “LLM이 계산도 하고 검색도 하게 만들 수 있으니까”라고만 설명하면 너무 약합니다. 더 현실적인 이유는 근거 있는 실행과 통제 가능한 루프입니다. 모델이 모르는 걸 외부 기능으로 보완하는 순간, 팀은 반드시 “왜 이 도구가 호출됐는가”, “이 호출이 성공했는가”, “언제 종료해야 하는가”를 설명할 수 있어야 합니다.
+
+예를 들어 계산이 필요한 질문과 단순 설명 질문이 섞여 있다고 해 보겠습니다. 모델이 도구를 요청할 수도 있고, 그냥 답할 수도 있습니다. 이 흐름을 하나의 함수 안에 다 몰아넣으면 실행은 됩니다. 하지만 “왜 이 요청에서만 계산기를 두 번 불렀지?”, “도구가 실패한 뒤 어떤 기준으로 다시 답변으로 돌아왔지?”, “왜 여기서는 도구 없이 바로 끝났지?” 같은 질문에 답하기가 급격히 어려워집니다.
+
+그래서 이 글의 목표는 `ToolNode` API를 외우는 데 있지 않습니다. 더 중요한 목표는 **도구 호출 루프를 명시적인 그래프로 만들면 왜 안전성과 디버깅 가능성이 함께 좋아지는지**를 이해하는 데 있습니다.
+
+---
+
+## Tool-calling Agent를 실행 경계로 읽기
+
+도구 호출 에이전트에서 가장 먼저 잡아야 할 문장은 이것입니다. **Tool-calling Agent는 LLM + 안전한 tool 실행 envelope**입니다. 저는 이 표현이 가장 실용적이라고 생각합니다. 모델은 도구 필요 여부를 판단하고, `ToolNode`는 실제 실행과 결과 메시지 생성을 담당하며, 조건부 엣지는 이 루프가 계속될지 종료될지를 결정합니다.
+
+많은 입문자가 tool calling을 “LLM이 외부 기능을 부를 수 있게 만드는 옵션” 정도로 이해합니다. 절반은 맞지만, 절반은 놓칩니다. 중요한 차이는 도구 요청과 도구 실행이 **서로 다른 계층으로 분리된다**는 점입니다. 이 분리가 있어야 권한 검사, 로깅, 실패 복구, retry 정책을 모델 프롬프트 밖의 구조로 붙일 수 있습니다.
+
+가장 단순하게 정리하면 아래 표처럼 볼 수 있습니다.
+
+| 구성 요소 | 역할 | 실무에서 왜 중요한가 |
+| --- | --- | --- |
+| **LLM 노드** | 도구가 필요한지 판단하고 tool call을 생성 | 판단과 응답 생성 로직을 한곳에서 통제할 수 있습니다 |
+| **ToolNode** | 실제 도구 실행과 `ToolMessage` 생성 | 모델 판단과 side-effect 실행을 분리할 수 있습니다 |
+| **tools_condition** | tool call이 있으면 `tools`, 없으면 종료로 보냄 | 루프와 종료 규칙을 구조로 드러냅니다 |
+| **Tool Schema / docstring** | 입력과 출력 계약을 모델에 설명 | 잘못된 도구 요청과 해석 오류를 줄이는 기준이 됩니다 |
+| **Loop Guard** | recursion limit, fallback, timeout 같은 안전 장치 | 무한 루프와 runaway cost를 막습니다 |
+
+이 표가 중요한 이유는 운영 질문이 늘 여기서 나오기 때문입니다. 모델이 왜 도구를 요청했지? 도구는 실제로 성공했나? 실패 후 왜 또 같은 도구를 불렀지? 언제 그냥 종료해야 하지? 이런 질문은 tool calling을 단순한 LLM 기능이 아니라 실행 envelope로 봐야 제대로 답이 나옵니다.
+
+---
+
+## 최소 실행 예제
+
+가장 작은 tool loop 예제로 보겠습니다. 모델이 질문을 읽고 필요한 경우 도구 호출을 요청하고, `ToolNode`가 실제 도구를 실행한 뒤, 그 결과를 다시 모델이 읽어 최종 답을 만듭니다. 예제는 단순하지만 tool-using agent의 핵심 루프가 모두 들어 있습니다.
 
 ```python
+import ast
 import json
+import math
+import operator
+from collections.abc import Callable
+from typing import Any
+
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import tool
+from langchain_groq import ChatGroq
+from langgraph.graph import END, START, MessagesState, StateGraph
+from langgraph.prebuilt import ToolNode, tools_condition
+
+ALLOWED_BINARY_OPERATORS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.FloorDiv: operator.floordiv,
+    ast.Mod: operator.mod,
+    ast.Pow: operator.pow,
+}
+ALLOWED_UNARY_OPERATORS = {
+    ast.UAdd: operator.pos,
+    ast.USub: operator.neg,
+}
+ALLOWED_FUNCTIONS: dict[str, Callable[..., Any]] = {
+    name: value
+    for name, value in math.__dict__.items()
+    if not name.startswith("_") and callable(value)
+}
+ALLOWED_CONSTANTS = {"pi": math.pi, "e": math.e, "tau": math.tau}
+
+def evaluate_math_expression(expression: str) -> float:
+    def _evaluate(node: ast.AST) -> float:
+        if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+            return float(node.value)
+        if isinstance(node, ast.BinOp):
+            left = _evaluate(node.left)
+            right = _evaluate(node.right)
+            operation = ALLOWED_BINARY_OPERATORS.get(type(node.op))
+            if operation is None:
+                raise ValueError("unsupported operator")
+            return float(operation(left, right))
+        if isinstance(node, ast.UnaryOp):
+            operand = _evaluate(node.operand)
+            operation = ALLOWED_UNARY_OPERATORS.get(type(node.op))
+            if operation is None:
+                raise ValueError("unsupported unary operator")
+            return float(operation(operand))
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            function = ALLOWED_FUNCTIONS.get(node.func.id)
+            if function is None or node.keywords:
+                raise ValueError("unsupported function")
+            arguments = [_evaluate(argument) for argument in node.args]
+            return float(function(*arguments))
+        if isinstance(node, ast.Name):
+            value = ALLOWED_CONSTANTS.get(node.id)
+            if value is not None:
+                return float(value)
+            raise ValueError("unsupported constant")
+        raise ValueError("unsupported expression")
+
+    parsed = ast.parse(expression, mode="eval")
+    return _evaluate(parsed.body)
 
 @tool
-def add(a: int, b: int) -> int:
-    """Add two integers and return the sum."""
-    return a + b
+def calculator(expression: str) -> str:
+    """Evaluate an arithmetic expression with safe math functions like sqrt(16) or pi * 2."""
+
+    try:
+        result = evaluate_math_expression(expression)
+    except Exception as exc:
+        return f"calculation error: {exc}"
+    return str(result)
 
 @tool
 def word_stats(text: str) -> str:
-    """Return word and character counts as JSON."""
+    """Return word and character counts for a piece of text."""
+
     return json.dumps({"words": len(text.split()), "characters": len(text)})
 
-TOOLS = [add, word_stats]
-```
+TOOLS = [calculator, word_stats]
 
-### 2단계 — 모델에 도구 바인딩
-
-```python
-import os
-from langchain_core.messages import SystemMessage
-from langchain_groq import ChatGroq
-
-os.environ.setdefault("GROQ_API_KEY", "your-key-here")
-
-def call_model(state):
-    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0).bind_tools(TOOLS)
-    system = SystemMessage(content="Use tools for arithmetic and counting tasks.")
+def call_model(state: MessagesState):
+    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.0, stop_sequences=None).bind_tools(TOOLS)
+    system = SystemMessage(
+        content="You are a precise assistant. Use tools for calculations or counting tasks."
+    )
     response = llm.invoke([system, *state["messages"]])
     return {"messages": [response]}
+
+def build_graph():
+    graph = StateGraph(MessagesState)
+    graph.add_node("agent", call_model)
+    graph.add_node("tools", ToolNode(TOOLS))
+    graph.add_edge(START, "agent")
+    graph.add_conditional_edges("agent", tools_condition, {"tools": "tools", "__end__": END})
+    graph.add_edge("tools", "agent")
+    return graph.compile()
 ```
 
-### 3단계 — 그래프 빌드
+이 예제는 단순해 보여도 운영에서 중요한 것을 세 가지 보여 줍니다. 첫째, 모델이 도구 필요 여부를 판단하고 실제 실행은 `ToolNode`가 맡기 때문에, 판단 실패와 실행 실패를 서로 다른 계층에서 볼 수 있습니다. 둘째, `tools_condition`이 종료와 루프를 구조로 드러내기 때문에 “왜 여기서 끝났지?” 또는 “왜 여기서 다시 tools로 갔지?”를 코드 수준에서 설명할 수 있습니다. 셋째, `calculator`처럼 안전한 도구 구현을 별도로 두면 side-effect와 권한 범위를 모델 프롬프트 바깥에서 통제할 수 있습니다.
+
+제가 이런 구조를 좋아하는 이유도 여기에 있습니다. tool calling을 “모델이 똑똑하게 외부 기능을 쓴다”는 환상 대신, “판단-실행-재판단”이 분리된 루프로 읽게 만들기 때문입니다. 처음부터 더 많은 도구와 외부 API를 넣으면 현상은 화려해져도 제어 경계는 흐려집니다. 이 차이를 이해해야 side-effect 도구, retry 정책, timeout 정책도 같은 구조 안에서 안정적으로 붙일 수 있습니다.
+
+---
+
+## 이 코드에서 먼저 봐야 할 점
+
+코드 전체를 한 번에 읽기보다, 아래 세 지점부터 잡는 편이 좋습니다.
+
+![도구 호출과 ToolMessage 흐름](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/04/04-02-what-to-notice-in-this-code.ko.png)
+
+*도구 호출과 ToolMessage 흐름*
+
+- 도구의 docstring이 모델이 실제로 보는 사용 설명서가 됩니다.
+- `ToolNode(TOOLS)`는 실행과 `ToolMessage` 생성 책임을 함께 맡습니다.
+- `tools_condition`은 마지막 AI 메시지에 tool call이 있을 때만 `tools`로 보내고, 없으면 그래프를 종료합니다.
+
+첫 번째 포인트는 도구 계약입니다. 모델은 Python 함수 본문을 이해하는 게 아니라, tool schema와 설명을 통해 도구를 배웁니다. 그래서 입력과 출력 계약이 흐릿하면 잘못된 tool call이 늘어나기 쉽습니다. 저는 현업에서 docstring이 모호해서 모델이 도구를 잘못 고르고, 결국 프롬프트만 계속 수정하는 장면을 자주 봤습니다.
+
+두 번째 포인트는 `ToolNode`의 역할 분리입니다. 모델이 도구를 요청했다고 해서 실행까지 모델이 하는 건 아닙니다. `ToolNode`가 실제 실행과 `ToolMessage` 생성을 맡기 때문에, 권한 검사와 로깅, 실패 처리 경계를 이 계층에 붙일 수 있습니다. 이 분리가 있어야 side-effect 도구도 안전하게 다룰 여지가 생깁니다.
+
+세 번째 포인트는 종료 규칙입니다. `tools_condition`은 단순해 보여도 아주 중요합니다. tool call이 없으면 종료하고, 있으면 실행 노드로 보냅니다. 이 구조가 명시적이어야 도구가 필요 없는 질문을 괜히 loop로 돌리지 않고, 반대로 도구가 필요한 질문에서만 loop를 유지할 수 있습니다.
+
+---
+
+## 어디서 자주 헷갈릴까요?
+
+도구 호출 에이전트 입문에서 가장 흔한 오해는 “도구를 붙이면 모델이 더 정확해진다”는 기대입니다. 실제로는 정확성보다 **루프 제어와 side-effect 안전성**이 더 중요한 경우가 많습니다.
+
+![마지막 AI 메시지에서 갈라지는 분기](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/04/04-03-where-engineers-get-confused.ko.png)
+
+*마지막 AI 메시지에서 갈라지는 분기*
+
+- 도구 실행을 모델 루프 안에 직접 넣으면 재시도와 로깅, 테스트가 필요 이상으로 복잡해집니다.
+- `bind_tools()`는 모델이 도구를 요청하는 법만 알게 해 줄 뿐, 실행까지 해 주지는 않습니다.
+- 결정적인 도구일수록 디버깅이 쉽습니다. 계산기는 `eval()` 대신 엄격한 산술 파서를 쓰는 편이 안전합니다.
+
+여기서 가장 자주 보는 사고는 **Unbounded Tool Loop 안티패턴**입니다. 모델이 도구를 한 번 요청하면, 실패 여부와 종료 조건을 충분히 통제하지 않은 채 다시 같은 질문을 던지고, 또 같은 도구를 부르는 구조입니다. 처음에는 “모델이 스스로 고쳐 보겠지”처럼 보일 수 있습니다. 하지만 실제로는 같은 도구 호출이 반복되면서 token 비용과 외부 호출 비용만 커지고, 최종 답은 오히려 늦게 나오거나 아예 안 나오는 경우가 많습니다.
+
+이 안티패턴이 production에서 왜 위험할까요? 첫째, side-effect 도구라면 중복 실행이 곧 잘못된 상태 변경으로 이어질 수 있습니다. 둘째, 실패 원인이 모델 판단인지 도구 예외인지 구분하기 어려워집니다. 셋째, loop guard가 약하면 timeout과 recursion limit까지 운영 중 임기응변으로 다뤄야 해서 시스템 전체가 불안정해집니다.
+
+제가 본 강한 팀들은 tool-calling agent를 설계할 때 먼저 세 가지를 문서화했습니다. 어떤 도구가 read-only인지, 어떤 도구가 side-effect를 일으키는지, loop를 어디서 끊을지입니다. 이 세 가지가 명시되지 않으면 도구 호출 agent는 똑똑한 assistant가 아니라 통제 어려운 실행기처럼 변하기 쉽습니다.
+
+## ToolMessage를 상태 계약으로 다루기
+
+tool loop를 운영에서 재현하려면 `ToolMessage`를 단순한 중간 산출물로 넘기면 안 됩니다. `ToolMessage`는 "어떤 tool call이 실제로 실행됐고, 그 결과가 무엇이었는지"를 state에 남기는 핵심 계약입니다. 모델이 다음 턴에서 읽는 것은 사람이 머릿속으로 기억한 맥락이 아니라, 결국 메시지 리스트에 직렬화된 실행 흔적이기 때문입니다.
+
+실무에서 중요한 포인트는 `tool_call_id` 연계입니다. 하나의 AI 응답이 여러 tool call을 만들 수 있고, 각 결과가 어떤 요청에 대한 응답인지 연결되지 않으면 모델이 잘못된 결과를 참조하기 쉽습니다. `ToolNode`를 쓰면 기본적인 연결은 처리되지만, 운영 로그에서는 아래처럼 호출 식별자와 결과 길이, 실패 여부를 같이 남겨 두는 편이 안전합니다.
 
 ```python
-from langgraph.graph import StateGraph, START, END, MessagesState
-from langgraph.prebuilt import ToolNode, tools_condition
+from langchain_core.messages import ToolMessage
 
-builder = StateGraph(MessagesState)
-builder.add_node("agent", call_model)
-builder.add_node("tools", ToolNode(TOOLS))
-
-builder.add_edge(START, "agent")
-builder.add_conditional_edges("agent", tools_condition, {"tools": "tools", "__end__": END})
-builder.add_edge("tools", "agent")
-
-graph = builder.compile()
+def normalize_tool_result(name: str, tool_call_id: str, payload: str, is_error: bool) -> ToolMessage:
+    content = payload if len(payload) < 2_000 else payload[:2_000] + "...<truncated>"
+    status = "error" if is_error else "ok"
+    return ToolMessage(
+        content=f"[{status}] {content}",
+        name=name,
+        tool_call_id=tool_call_id,
+    )
 ```
 
-### 4단계 — 도구 사용 질문
+이렇게 남겨 두면 다음과 같은 운영 질문에 즉시 답할 수 있습니다. 왜 같은 도구가 두 번 호출됐는가, 첫 호출과 두 번째 호출의 입력은 같았는가, 첫 호출은 실패였는가, 실패였다면 모델이 어떤 실패 문자열을 읽고 다시 시도했는가입니다. 반대로 결과를 free-form 텍스트로만 이어 붙이면 호출 단위 재현이 거의 불가능해집니다.
+
+## agent loop를 시퀀스로 시각화하기
+
+LangGraph 코드만 보면 루프는 짧아 보이지만, 디버깅은 보통 "한 턴 안에서 몇 번 왕복했는지"를 보는 순간 쉬워집니다. 저는 팀 문서에 아래 같은 시퀀스를 항상 넣도록 권합니다.
+
+```text
+HumanMessage
+  -> agent(LLM): tool_calls=[calculator("sqrt(81)+5")]
+  -> tools(ToolNode): ToolMessage(tool_call_id=call_1, content="14.0")
+  -> agent(LLM): final answer 생성
+  -> END
+```
+
+이 표현은 단순하지만 효과가 큽니다. 첫째, 종료 판단이 언제 일어나는지 보입니다. 둘째, 도구 실패 시 재시도가 몇 번까지 허용되는지 policy를 붙이기 쉽습니다. 셋째, 관측 지표를 어디서 수집할지 명확해집니다. 예를 들어 `agent_turn_count`, `tool_call_count`, `tool_error_count`, `loop_terminated_reason`를 같은 턴 단위로 남기면 runaway loop를 조기에 잡을 수 있습니다.
+
+## 실패 복구 시나리오를 먼저 설계하기
+
+tool-calling agent를 production에 올릴 때 가장 큰 차이는 성공 경로가 아니라 실패 경로에서 드러납니다. 계산기처럼 read-only 도구라 해도 외부 API 기반 도구가 추가되면 timeout, 429, schema mismatch, 일시적 네트워크 오류가 자연스럽게 발생합니다. 이때 모델에게 "알아서 다시 해 봐"라고 맡기는 방식은 재현성과 비용 통제를 동시에 잃기 쉽습니다.
+
+아래처럼 도구 실행 계층에서 복구 정책을 고정해 두면, 모델 품질 변동과 무관하게 최소 안전선을 유지할 수 있습니다.
 
 ```python
-from langchain_core.messages import HumanMessage
+MAX_TOOL_RETRY = 2
 
-result = graph.invoke({"messages": [HumanMessage(content="What is add(144, 25)? Use a tool.")]})
-print(result["messages"][-1].content)
+def should_retry_tool(error_code: str, attempt: int) -> bool:
+    transient = {"timeout", "rate_limit", "upstream_5xx"}
+    return error_code in transient and attempt < MAX_TOOL_RETRY
 ```
 
-### 5단계 — 도구 미사용 질문
+이 정책의 핵심은 재시도 판단을 프롬프트가 아니라 실행 계층에 둔다는 사실입니다. 예를 들어 입력 검증 실패(`invalid_args`)는 즉시 중단하고, 일시적 오류만 제한적으로 재시도합니다. 그리고 최종 실패 시에는 무조건 같은 포맷의 에러 `ToolMessage`를 만들어 agent로 돌려보내 "왜 실패했고 다음에 무엇을 해야 하는지"를 모델이 읽을 수 있게 합니다.
 
-```python
-result = graph.invoke({"messages": [HumanMessage(content="Say hello in one word.")]})
-print(result["messages"][-1].content)
-```
+추가로 side-effect 도구를 붙인다면 idempotency key를 필수로 넣는 편이 좋습니다. 예를 들어 티켓 생성 도구는 `request_id`를 받아 중복 실행을 방지하고, 도구 계층은 같은 키가 다시 오면 "이미 처리된 요청"을 반환하도록 설계합니다. 이 장치가 없으면 loop 재시도 한 번이 곧 중복 티켓, 중복 결제, 중복 상태 변경으로 이어질 수 있습니다.
 
-## 이 코드에서 주목할 점
+결국 복구 전략의 목표는 단순합니다. 실패했을 때도 다음 액션이 예측 가능해야 합니다. 모델이 잘 판단하면 더 좋지만, 모델 판단이 흔들려도 시스템이 위험한 방향으로 미끄러지지 않게 만드는 것이 운영형 tool-calling agent의 핵심입니다.
 
-- *@tool* *docstring* 이 *그대로* *모델* *프롬프트* 의 *도구* *설명* 으로 *전달* 됩니다.
-- *ToolNode* 는 *tool_calls* 의 *id* 를 *맞춰* *ToolMessage* 를 *생성* 합니다. *수작업* 이 *없습니다*.
-- *agent → tools → agent* *루프* 가 *그래프* *위* 로 *드러* *납니다*.
+---
 
-## 자주 하는 실수 5가지
+## 첫 번째 운영 체크리스트
 
-1. ***bind_tools 누락*** — *모델* 이 *tool_call* 을 *낼* *방법* 자체 가 *없습니다*.
-2. ***tools → END 직결*** — *도구* *결과* 를 *모델* 에 *돌려* *주지* *않으면* *답변* 이 *비어* *있습니다*.
-3. ***tools_condition path_map 누락*** — *END* 매핑 *없으면* *종료* 가 *동작* *하지* *않습니다*.
-4. ***eval 기반 계산 도구*** — *임의* *코드* *실행* *위험*. *명시적* *함수* 만 *제공* 합니다.
-5. ***재귀* *깊이* *방치*** — *recursion limit* 까지 *돌면* *그래프* 가 *예외* 로 *멈춥니다*.
+도구 호출 루프를 붙이는 순간부터 아래 항목은 단순한 구현 점검이 아니라 실행 안정성 점검 항목이 됩니다.
 
-## 실무에서는 이렇게 쓰입니다
+- [ ] 도구 설명이 입력과 출력 계약을 분명하게 담고 있는가
+- [ ] `agent -> tools -> agent` 루프가 그래프에서 명시적으로 보이는가
+- [ ] side-effect 도구와 read-only 도구를 구분했는가
+- [ ] 도구가 필요 없는 답변은 바로 `END`로 종료되는가
+- [ ] timeout, recursion limit, fallback 같은 loop guard를 별도로 설계했는가
 
-*프로덕션* 에서는 *DB 조회*, *외부 API*, *사내* *RAG* *조회* 같은 *도구* 를 *연결* 합니다. *도구* *별* *권한*, *타임아웃*, *재시도* 정책은 *ToolNode* 옆 에 *별도* 노드 로 *분리* 합니다.
+이 체크리스트의 핵심은 “도구를 쓰느냐”가 아닙니다. “도구를 안전하게 쓰고 멈출 수 있느냐”입니다. tool calling은 기능이 아니라 실행 경계이기도 합니다.
 
-## 체크리스트
+---
 
-- [ ] *@tool* *docstring* 작성.
-- [ ] *bind_tools* 호출.
-- [ ] *agent ↔ tools* *루프* 구성.
-- [ ] *tools_condition* *path_map* 에 *END* 포함.
+## 실무에서는 이렇게 생각한다
 
-## 정리 및 다음 단계
+도구 호출 에이전트를 붙인 순간 그래프는 단순한 답변 생성기를 넘어서 실행 시스템이 됩니다. 그래서 운영 질문도 달라집니다. “답이 좋았나?”보다 먼저 “왜 이 도구가 선택됐지?”, “실패했을 때 누가 종료를 결정하지?”, “이 도구는 재시도해도 안전한가?” 같은 질문이 붙기 시작합니다.
 
-다음 글은 *멀티 에이전트 시스템* 입니다.
+또 하나 중요한 감각은 tool loop와 multi-agent handoff를 섞어 생각하지 않는 것입니다. tool loop는 한 agent가 외부 기능을 호출하는 구조에 가깝고, multi-agent는 역할이 다른 주체들이 handoff하는 구조에 가깝습니다. 둘은 함께 쓰일 수 있지만, 역할이 다릅니다. 이 구분이 흐려지면 supervisor가 도구도 직접 부르고, worker처럼 응답도 만들고, 종료 규칙까지 동시에 떠안는 구조가 되기 쉽습니다.
+
+제가 본 강한 팀들은 모델 품질보다 도구 실행 계약을 먼저 리뷰했습니다. 모델이 조금 흔들려도 loop guard와 tool contract가 분명하면 시스템은 버팁니다.
+
+---
+
+## 정리: Tool-calling Agent는 모델 기능이 아니라, 실행을 안전하게 감싸는 그래프 제어 루프다
+
+도구 호출 에이전트를 처음 보면 “모델이 외부 기능도 쓸 수 있게 된 구조”처럼 보일 수 있습니다. 그 설명도 틀리진 않지만, 운영 관점에서는 너무 약합니다. 더 중요한 설명은 이렇습니다. tool-calling agent는 모델이 도구 필요 여부를 판단하고, `ToolNode`가 실제 실행을 맡고, 종료 규칙이 loop를 안전하게 멈추게 만드는 **그래프 제어 루프**입니다.
+
+이 글에서 먼저 가져가야 할 핵심은 세 가지입니다. 첫째, 도구 요청과 실제 실행은 분리돼 있어야 합니다. 둘째, side-effect 도구일수록 schema와 loop guard를 더 엄격하게 가져가야 합니다. 셋째, 종료 규칙과 fallback은 optional 장식이 아니라 production 안전장치입니다.
+
+이 관점이 중요한 이유는 다음 글의 멀티 에이전트와 바로 이어지기 때문입니다. supervisor가 worker를 호출하는 handoff와, agent가 tool을 호출하는 loop는 서로 다른 주제지만 모두 “판단과 실행을 분리하는 구조”라는 공통점을 가집니다. tool calling을 안전한 실행 envelope로 이해하고 있어야, 이후 multi-agent에서도 책임 경계를 더 쉽게 읽을 수 있습니다.
+
+다음 글에서는 이 시리즈의 분기 구조를 supervisor-worker 협업으로 확장해 보겠습니다. 그때 tool loop가 왜 단순한 기능 확장이 아니라 멀티 에이전트 설계의 전 단계였는지가 더 선명하게 드러날 것입니다.
+
+---
+
+## 운영 체크리스트
+
+- [ ] 도구별 권한 수준과 side-effect 여부를 문서화했다
+- [ ] 실패한 tool call에 대한 fallback 또는 human-review 경로를 정했다
+- [ ] recursion limit, timeout, retry 기준을 loop 밖에서 통제하도록 설계했다
+- [ ] `ToolNode` 실행 로그와 모델 tool call 요청을 분리해 추적할 수 있게 만들었다
+- [ ] 도구가 늘어나도 schema 품질과 종료 규칙을 유지할 검증 절차를 만들었다
+
+## 처음 질문으로 돌아가기
+
+- **LangGraph tool-calling agent는 왜 LLM과 tool 실행 envelope를 분리해서 봐야 할까요?**
+  - LLM은 호출 의도를 만들고 envelope는 이름, 인자, 허용 범위, 결과 반영을 통제합니다. 둘을 분리해야 실패 지점과 책임이 선명해집니다.
+- **도구 호출을 반복할 때 state에는 어떤 실행 흔적이 남아야 할까요?**
+  - state에는 모델 메시지, tool call, tool 결과, 다음 판단에 쓰일 누적 메시지가 남아야 호출 루프를 재현할 수 있습니다.
+- **안전한 dispatcher 없이 tool call을 실행하면 어떤 위험이 생길까요?**
+  - dispatcher가 없으면 허용하지 않은 도구나 잘못된 인자가 그대로 실행되어 보안, 비용, 데이터 손상 위험이 커집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [LangGraph 소개와 그래프 기초](./01-graph-basics.md)
-- [상태 관리와 체크포인트](./02-state-and-checkpoints.md)
-- [조건부 엣지와 분기 흐름](./03-conditional-edges.md)
-- **도구 호출 에이전트 (현재 글)**
-- 멀티 에이전트 시스템 (예정)
-- LangGraph 완성 (예정)
+- [LangGraph 101 (1/6): LangGraph 소개와 그래프 기초](./01-graph-basics.md)
+- [LangGraph 101 (2/6): 상태 관리와 체크포인트](./02-state-and-checkpoints.md)
+- [LangGraph 101 (3/6): 조건부 엣지와 분기 흐름](./03-conditional-edges.md)
+- **LangGraph 101 (4/6): 도구 호출 에이전트 (현재 글)**
+- LangGraph 101 (5/6): 멀티 에이전트 시스템 (예정)
+- LangGraph 101 (6/6): LangGraph 완성 (예정)
 
 <!-- toc:end -->
 
+---
+
 ## 참고 자료
 
-- [Tool calling how-to](https://langchain-ai.github.io/langgraph/how-tos/tool-calling/)
-- [ToolNode reference](https://langchain-ai.github.io/langgraph/reference/prebuilt/#langgraph.prebuilt.tool_node.ToolNode)
+### 공식 문서
+- [LangGraph tool-calling how-to](https://langchain-ai.github.io/langgraph/how-tos/tool-calling/)
+- [ToolNode API reference](https://langchain-ai.github.io/langgraph/reference/prebuilt/#toolnode)
 - [LangChain tool concepts](https://python.langchain.com/docs/concepts/tools/)
-- [Tool calling concepts](https://python.langchain.com/docs/concepts/tool_calling/)
+
+### 관련 시리즈
+- [조건부 엣지와 분기 흐름](./03-conditional-edges.md)
+- [멀티 에이전트 시스템](./05-multi-agent.md)
+
+---
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/langgraph-101/ko/04-tool-calling-agent)

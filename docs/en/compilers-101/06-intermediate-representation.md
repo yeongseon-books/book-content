@@ -1,10 +1,10 @@
 ---
 series: compilers-101
 episode: 6
-title: intermediate representation
+title: "Compilers 101 (6/10): intermediate representation"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,25 @@ seo_description: An IR is a middle language between AST and machine code. Build 
 last_reviewed: '2026-05-04'
 ---
 
-# intermediate representation
+# Compilers 101 (6/10): intermediate representation
 
 > Compilers 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Why not just go from the AST straight to machine code? Why insert another stage in the middle?
 
 > An intermediate representation (IR) is a language simpler than an AST and more abstract than machine code. Optimization and multi-backend support all live on top of it.
 
-<!-- a-grade-intro:end -->
+This is post 6 in the Compilers 101 series.
+
+
+![compilers 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/06/06-01-big-picture.en.png)
+*compilers 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying intermediate representation?
+- Which signal should the example or diagram make visible for intermediate representation?
+- What failure should be prevented first when intermediate representation reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 The AST is a form for humans. Machine code is a form for the CPU. Without an IR between them, optimization is tightly coupled to the AST, and supporting a new CPU means rewriting every analysis. The IR splits the compiler cleanly into two halves — frontend and backend.
 
 > The bridge that turns "M languages × N architectures" into "M + N" is the IR.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -138,6 +144,19 @@ print("result:", result)
 
 A single tree walk produces a flat instruction list. The result is in the last temporary.
 
+If you run that exact snippet, you get a concrete 3AC dump like this:
+
+```text
+('LOAD', 't1', 1)
+('LOAD', 't2', 2)
+('LOAD', 't3', 3)
+('*', 't4', 't2', 't3')
+('+', 't5', 't1', 't4')
+result: t5
+```
+
+That output is the proof artifact: the nested AST has been lowered into a flat sequence of `LOAD`, `*`, and `+` instructions, and the final value now lives in `t5`.
+
 ### Step 4 — Basic blocks and the CFG
 
 ```python
@@ -151,6 +170,16 @@ entry.next = [body]; body.next = [body, exit_]   # loop
 ```
 
 The moment conditional branches and jumps appear, the IR becomes a graph. Optimization and analysis run on top of this graph.
+
+Written as plain edges, the CFG above is:
+
+```text
+entry -> body
+body  -> body   # loop back-edge
+body  -> exit
+```
+
+That is enough to make control flow explicit: one entry, one loop back-edge, and one exit edge.
 
 ### Step 5 — A taste of SSA
 
@@ -168,6 +197,37 @@ The moment conditional branches and jumps appear, the IR becomes a graph. Optimi
 ```
 
 Index every variable to enforce "single assignment." That is SSA. Data-flow analysis becomes very simple.
+
+At merge points, a `phi` node records which version flows in from each predecessor:
+
+```text
+# before SSA
+entry:
+  br cond, then, else
+then:
+  x = 1
+  br join
+else:
+  x = 2
+  br join
+join:
+  y = x + 3
+
+# after SSA
+entry:
+  br cond, then, else
+then:
+  x1 = 1
+  br join
+else:
+  x2 = 2
+  br join
+join:
+  x3 = phi(x1, x2)
+  y1 = x3 + 3
+```
+
+This is the second proof artifact: the transformation makes every assignment unique, and `phi` carries the correct value into the join block.
 
 ## What to Notice in This Code
 
@@ -214,22 +274,34 @@ LLVM IR is the canonical example. Many languages (C/C++/Rust/Swift, etc.) lower 
 
 The IR is the bridge that cleanly splits the compiler in half. The next post looks at the simplest — and most frequently used — two or three optimizations that run on top of it.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying intermediate representation?**
+  - The article treats intermediate representation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for intermediate representation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when intermediate representation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Compiler?](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
-- [parsing and AST](./03-parsing-and-ast.md)
-- [semantic analysis](./04-semantic-analysis.md)
-- [symbol table and scope](./05-symbol-table-and-scope.md)
+## In this series
+
+- [Compilers 101 (1/10): What Is a Compiler?](./01-what-is-a-compiler.md)
+- [Compilers 101 (2/10): lexical analysis](./02-lexical-analysis.md)
+- [Compilers 101 (3/10): parsing and AST](./03-parsing-and-ast.md)
+- [Compilers 101 (4/10): semantic analysis](./04-semantic-analysis.md)
+- [Compilers 101 (5/10): symbol table and scope](./05-symbol-table-and-scope.md)
 - **intermediate representation (current)**
 - optimization basics (upcoming)
 - code generation (upcoming)
 - JIT vs AOT (upcoming)
-- building a tiny interpreter (upcoming)
+- Building a Tiny Interpreter (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Three-address code (Wikipedia)](https://en.wikipedia.org/wiki/Three-address_code)
-- [Static single-assignment form (Wikipedia)](https://en.wikipedia.org/wiki/Static_single-assignment_form)
-- [LLVM Language Reference](https://llvm.org/docs/LangRef.html)
-- [Control-flow graph (Wikipedia)](https://en.wikipedia.org/wiki/Control-flow_graph)
+- Keith D. Cooper, Linda Torczon, *Engineering a Compiler* (2nd ed.), IR-design and SSA chapters.
+- [LLVM Language Reference Manual](https://llvm.org/docs/LangRef.html) — SSA-based IR overview, function structure, and the [`phi` instruction](https://llvm.org/docs/LangRef.html#phi-instruction).
+- [LLVM Kaleidoscope Tutorial — Chapter 3 “Code generation to LLVM IR”](https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl03.html)
+- Alfred V. Aho, Monica S. Lam, Ravi Sethi, Jeffrey D. Ullman, *Compilers: Principles, Techniques, and Tools* (2nd ed.), intermediate-code generation chapters.

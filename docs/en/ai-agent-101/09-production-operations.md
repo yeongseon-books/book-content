@@ -1,5 +1,5 @@
 ---
-title: Production Operations
+title: "AI Agent 101 (9/10): Production Operations"
 series: ai-agent-101
 episode: 9
 language: en
@@ -15,32 +15,28 @@ tags:
 - Operations
 - Monitoring
 - Observability
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-15'
 seo_description: When you deploy agents to production, new problems arise. You need
   to monitor how much it costs, how long responses take, where it fails, and which…
 ---
 
-# Production Operations
-
-> AI Agent 101 Series (9/10)
+# AI Agent 101 (9/10): Production Operations
 
 When you deploy agents to production, new problems arise. You need to monitor how much it costs, how long responses take, where it fails, and which tools are called most frequently.
 
 The core of agent operations is observability. You must track all agent steps, measure cost and latency, and detect anomalies. Scaling strategies and cost optimization are also important.
 
-This article covers agent observability, cost tracking, latency optimization, scaling patterns, and production checklists.
+This is post 9 in the AI Agent 101 series. Here we cover agent observability, cost tracking, latency optimization, scaling patterns, and production checklists.
 
----
-<!-- a-grade-intro:begin -->
+![Observability](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-observability.en.png)
+*Observability*
+> An operable agent does not log only the final answer. It lets you follow the path, cost, and tool calls that produced it.
 
-## Key Questions
+## Questions to Keep in Mind
 
-- What is the first observability signal you put in place for an agent?
-- What is the simplest way to track cost and enforce a ceiling?
-- When you scale an agent, where does the bottleneck appear: LLM or tools?
-- How do you design a safe deploy and rollback?
-
-<!-- a-grade-intro:end -->
+- What trace do you need first if production users ask why an agent answered that way?
+- At what unit should cost and latency be measured to reveal the real bottleneck?
+- Which observability signals should gate deployment and rollback for an agent?
 
 ## Observability
 
@@ -145,13 +141,13 @@ class TraceContext:
 trace = TraceContext()
 
 with trace.span("agent_request", user_id="u_456"):
-    with trace.span("llm_planning", model="gpt-4"):
+    with trace.span("llm_planning", model="gpt-4o"):
         plan = call_llm(user_input)
 
     with trace.span("tool_execution", tool="search"):
         result = search_tool(plan["query"])
 
-    with trace.span("llm_synthesis", model="gpt-4"):
+    with trace.span("llm_synthesis", model="gpt-4o"):
         answer = call_llm(result)
 
 # Send trace.spans to OpenTelemetry, Jaeger, etc.
@@ -208,7 +204,7 @@ metrics = MetricsCollector()
 metrics.increment("agent.requests", status="success")
 metrics.increment("agent.tool_calls", tool="search")
 metrics.increment("agent.errors", type="timeout")
-metrics.timing("agent.request.duration", 1234, model="gpt-4")
+metrics.timing("agent.request.duration", 1234, model="gpt-4o")
 metrics.timing("agent.tool.duration", 234, tool="search")
 ```
 
@@ -226,7 +222,7 @@ class BudgetEnforcer:
 
     PRICING = {
         "gpt-4": {"prompt": 0.03 / 1000, "completion": 0.06 / 1000},
-        "gpt-3.5-turbo": {"prompt": 0.0015 / 1000, "completion": 0.002 / 1000}
+        "gpt-4o-mini": {"prompt": 0.15 / 1_000_000, "completion": 0.60 / 1_000_000}
     }
 
     def __init__(self):
@@ -270,9 +266,11 @@ class BudgetEnforcer:
 budget = BudgetEnforcer()
 budget.set_limit("user_123", daily_limit_usd=5.0)
 
-if not budget.check_and_record("user_123", "gpt-4", 1500, 500):
+if not budget.check_and_record("user_123", "gpt-4o", 1500, 500):
     raise RuntimeError("daily budget exceeded")
 ```
+
+If you still run a legacy `gpt-3.5-turbo` workload, budget it with the current legacy rates of $0.50 per 1M input tokens and $1.50 per 1M output tokens. For new cost-sensitive production defaults, `gpt-4o-mini` is the better example.
 
 Without cost limits, one user can drain the entire budget.
 
@@ -580,32 +578,34 @@ A leading cause of GDPR/CCPA violations and security incidents.
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **What trace do you need first if production users ask why an agent answered that way?**
+  - You need one trace that ties together request id, user input, chosen workflow, each step, tool calls, model responses, cost, latency, and errors.
+- **At what unit should cost and latency be measured to reveal the real bottleneck?**
+  - Do not look only at totals. Break cost and latency down by step, tool call, model call, and user request to reveal the bottleneck boundary.
+- **Which observability signals should gate deployment and rollback for an agent?**
+  - Deployment gates should include success rate, error rate, cost ceilings, P95 latency, tool failure rate, and recovery after rollback.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- [Context Engineering](./02-context-engineering.md)
-- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
-- [Agent Workflow Design](./04-agent-workflow-design.md)
-- [Memory and State](./05-memory-and-state.md)
-- [Multi-Agent Systems](./06-multi-agent-systems.md)
-- [Agent Evaluation](./07-agent-evaluation.md)
-- [Error Handling and Reliability](./08-error-handling-reliability.md)
-- **Production Operations (current)**
-- Building Your First Agent (upcoming)
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): Context Engineering](./02-context-engineering.md)
+- [AI Agent 101 (3/10): Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- [AI Agent 101 (4/10): Agent Workflow Design](./04-agent-workflow-design.md)
+- [AI Agent 101 (5/10): Memory and State](./05-memory-and-state.md)
+- [AI Agent 101 (6/10): Multi-Agent Systems](./06-multi-agent-systems.md)
+- [AI Agent 101 (7/10): Agent Evaluation](./07-agent-evaluation.md)
+- [AI Agent 101 (8/10): Error Handling and Reliability](./08-error-handling-reliability.md)
+- **AI Agent 101 (9/10): Production Operations (current)**
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 
 ## References
 
-1. **OpenTelemetry: LLM Observability** - https://opentelemetry.io/docs/specs/semconv/gen-ai/  
-   OpenTelemetry semantic conventions for LLM/agent observability. Defines standard trace attributes.
-
-2. **LangSmith Production Monitoring** - https://docs.smith.langchain.com/observability  
-   LangChain's operations monitoring tool. Integrates traces, metrics, and evaluation.
-
-3. **Google SRE Book: Monitoring Distributed Systems** - https://sre.google/sre-book/monitoring-distributed-systems/  
-   Google's SRE monitoring principles. The Four Golden Signals apply to agents too.
-
-4. **OpenAI: Production Best Practices** - https://platform.openai.com/docs/guides/production-best-practices  
-   OpenAI's official operations guide. Covers rate limits, monitoring, and cost management.
+- [OpenTelemetry generative AI semantic conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/)
+- [LangSmith observability](https://docs.smith.langchain.com/observability)
+- [Google SRE Book - Monitoring Distributed Systems](https://sre.google/sre-book/monitoring-distributed-systems/)
+- [OpenAI production best practices](https://platform.openai.com/docs/guides/production-best-practices)

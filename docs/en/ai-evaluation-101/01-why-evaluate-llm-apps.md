@@ -1,11 +1,11 @@
 ---
-title: Why Evaluate LLM Applications
+title: "AI Evaluation 101 (1/10): Why Evaluate LLM Applications"
 series: ai-evaluation-101
 episode: 1
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,24 +14,31 @@ tags:
 - LLM
 - Testing
 - Quality
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: LLMs return different answers for the same input. Without evaluation,
   you cannot tell that a feature working yesterday is broken today.
 ---
 
-# Why Evaluate LLM Applications
+# AI Evaluation 101 (1/10): Why Evaluate LLM Applications
 
-> AI Evaluation 101 Series (1/10)
+LLMs return different answers for the same input. Without evaluation, you cannot tell that a feature working yesterday is broken today.
 
-LLMs return different answers for the same input. Without evaluation, you cannot tell that a feature working yesterday is broken today. This post covers why LLM evaluation differs from regular software testing and what to measure.
+This is the first post in the AI Evaluation 101 series. Here we cover why LLM evaluation differs from regular software testing and what to measure.
 
----
-![Why evaluate LLM applications](../../assets/ai-evaluation-101/01/01-01-why-evaluate-llm-applications.en.png)
 
+![Why evaluate LLM applications](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-01-why-evaluate-llm-applications.en.png)
 *Why evaluate LLM applications*
+> LLM evaluation is not decorative testing; it is the dashboard that lets you keep reading quality changes.
+
+## Questions to Keep in Mind
+
+- Why is regular feature testing not enough to judge the quality of an LLM app?
+- What problems show up too late when an LLM app runs without evaluation?
+- What small unit should a first evaluation pipeline start with?
+
 ## Why Is LLM Evaluation Different from Regular Testing?
 
-![Why is LLM evaluation different from regular Testing](../../assets/ai-evaluation-101/01/01-02-why-is-llm-evaluation-different-from-reg.en.png)
+![Why is LLM evaluation different from regular Testing](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-02-why-is-llm-evaluation-different-from-reg.en.png)
 
 *Why is LLM evaluation different from regular Testing*
 Traditional unit tests are deterministic: `assert add(2, 3) == 5`. The same input produces the same output, and there is exactly one right answer.
@@ -55,7 +62,7 @@ Send the same `text` twice and the two responses will not match exactly. Several
 
 ## What Breaks if You Run Without Evaluation?
 
-![What breaks if you run without Evaluation](../../assets/ai-evaluation-101/01/01-03-what-breaks-if-you-run-without-evaluatio.en.png)
+![What breaks if you run without Evaluation](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-03-what-breaks-if-you-run-without-evaluatio.en.png)
 
 *What breaks if you run without Evaluation*
 Three things break at once.
@@ -73,7 +80,7 @@ Three things break at once.
 
 ## What Should You Measure?
 
-![What should you Measure](../../assets/ai-evaluation-101/01/01-04-what-should-you-measure.en.png)
+![What should you Measure](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-04-what-should-you-measure.en.png)
 
 *What should you Measure*
 LLM responses have at least four dimensions, and each needs a different measurement approach.
@@ -98,7 +105,7 @@ Later posts in this series cover which metrics fit each dimension, one at a time
 
 ## The Four Stages of an Evaluation Pipeline
 
-![The four stages of an evaluation pipeline](../../assets/ai-evaluation-101/01/01-05-the-four-stages-of-an-evaluation-pipelin.en.png)
+![The four stages of an evaluation pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-05-the-four-stages-of-an-evaluation-pipelin.en.png)
 
 *The four stages of an evaluation pipeline*
 Whatever tool you use, an LLM evaluation system has the same four stages.
@@ -150,6 +157,82 @@ print(f"Accuracy: {results['accuracy']:.0%}")
 
 Even ten cases give you signals like "case #5 dropped after the prompt change." That single signal catches 90% of regressions.
 
+## A Minimal Evaluation Harness You Can Run Today
+
+If you want the first useful version, make it boring. Put the task behind one function, store a tiny eval set in version control, and print both the aggregate score and the failed case IDs.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class EvalCase:
+    case_id: str
+    prompt: str
+    must_include: list[str]
+
+def run_smoke_eval(cases: list[EvalCase], system_under_test) -> dict:
+    failed_cases = []
+    scores = []
+
+    for case in cases:
+        answer = system_under_test(case.prompt)
+        matched = sum(1 for kw in case.must_include if kw.lower() in answer.lower())
+        passed = matched == len(case.must_include)
+        scores.append(int(passed))
+        if not passed:
+            failed_cases.append(
+                {
+                    "case_id": case.case_id,
+                    "answer": answer,
+                    "missing": [kw for kw in case.must_include if kw.lower() not in answer.lower()],
+                }
+            )
+
+    return {
+        "pass_rate": sum(scores) / len(scores),
+        "failed_cases": failed_cases,
+    }
+
+smoke_cases = [
+    EvalCase("rag-001", "What is RAG?", ["retrieval", "generation"]),
+    EvalCase("async-001", "Explain async/await", ["coroutine", "await"]),
+    EvalCase("json-001", "Return valid JSON with a title field", ["title"]),
+]
+
+report = run_smoke_eval(smoke_cases, summarize)
+print(report)
+```
+
+**Expected output:**
+
+```text
+{
+  'pass_rate': 0.67,
+  'failed_cases': [
+    {
+      'case_id': 'async-001',
+      'answer': '...',
+      'missing': ['coroutine']
+    }
+  ]
+}
+```
+
+That is enough to make a pull request actionable. Instead of arguing about whether the output "feels better," you can point to the exact case that regressed.
+
+## Failure Modes to Watch in Week One
+
+The first evaluation loop usually fails for process reasons, not math reasons.
+
+| Failure mode | What it looks like | What to do next |
+|---|---|---|
+| Only happy-path cases | Pass rate looks strong, but support tickets keep rising | Add two or three recent user complaints every week |
+| One giant aggregate score | Accuracy improves while safety or format compliance worsens | Split results by correctness, relevance, safety, and style |
+| No per-case diff | The team knows the score dropped but not why | Print failed case IDs, missing keywords, and raw answers |
+| Eval is run manually | Prompt tweaks skip evaluation because "this is a tiny change" | Wire the smoke suite into CI or pre-merge review |
+
+The point of the first harness is not elegance. The point is to make regressions visible faster than user complaints.
+
 ## Five Common Mistakes
 
 1. **"We will evaluate once production stabilizes."** Without evaluation, you cannot know whether it has stabilized. Start with ten cases on day one.
@@ -167,9 +250,54 @@ Even ten cases give you signals like "case #5 dropped after the prompt change." 
 - Do not wait for data to accumulate — start with ten cases today.
 
 The next post covers how to design evaluation datasets — where to source them, how many you need, and how to label them.
+
+---
+
+## Operational checklist
+
+- [ ] Pick 10 real user tasks that represent the current product surface area.
+- [ ] Track at least correctness, relevance, safety, and style as separate signals.
+- [ ] Store the eval set in version control next to the code or prompts it protects.
+- [ ] Print failed case IDs and raw outputs, not just a single average score.
+- [ ] Run the smoke suite before every prompt or model change reaches production.
+
+## Answering the Opening Questions
+
+- **Why is regular feature testing not enough to judge the quality of an LLM app?**
+  - LLM output can be correct with different wording and wrong while looking plausible, so simple assertions do not capture semantic quality.
+- **What problems show up too late when an LLM app runs without evaluation?**
+  - Cost growth, regressions on specific cases, hallucinations, and safety misses often appear only after they accumulate in user or operations data.
+- **What small unit should a first evaluation pipeline start with?**
+  - Start with a small eval set of about ten representative requests, clear expected criteria, and failure logs that make the loop repeatable.
+<!-- toc:begin -->
+## In this series
+
+- **AI Evaluation 101 (1/10): Why Evaluate LLM Applications (current)**
+- AI Evaluation 101 (2/10): Designing Evaluation Datasets (upcoming)
+- AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE (upcoming)
+- AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models (upcoming)
+- AI Evaluation 101 (5/10): Designing Rubric-Based Scoring (upcoming)
+- AI Evaluation 101 (6/10): Evaluating RAG Systems (upcoming)
+- AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (upcoming)
+- AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)
+- AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
-- [OpenAI — Evals framework](https://github.com/openai/evals)
-- [Anthropic — Building evals](https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests)
-- [Hugging Face — Evaluating LLMs](https://huggingface.co/learn/cookbook/en/llm_judge)
+### Official docs
+
+- [OpenAI Evals](https://github.com/openai/evals)
+- [Anthropic — Develop tests and evaluations](https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests)
+- [LangSmith — Evaluation concepts](https://docs.smith.langchain.com/evaluation/concepts)
+
+### Additional reading
+
+- [Hugging Face — Evaluating LLMs as a judge](https://huggingface.co/learn/cookbook/en/llm_judge)
 - [Eugene Yan — LLM evaluation patterns](https://eugeneyan.com/writing/llm-evaluators/)
+
+### Related Series
+
+- [LLM Apps Ops 101](../llm-apps-ops-101/01-monitoring-and-logging.md) — tackles the same "LLM correctness" problem from the operations side. Where this series builds pre-release quality gates, the ops series tracks the same signal in production via monitoring, logging, and alerting.

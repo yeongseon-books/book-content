@@ -1,0 +1,17 @@
+flowchart TB
+    시스템["system\nBe brief and precise"] --> 사용자1["user 턴 1\nlists vs tuples 질문"]
+    사용자1 --> 첫호출["호출 1"]
+    첫호출 --> 답변1["assistant 답변 1"]
+    답변1 --> 재주입["assistant 답변을\nmessages[]에 다시 append"]
+    재주입 --> 사용자2["user 턴 2 append\nAdd a short code example"]
+    사용자2 --> 두번째호출["호출 2는\nsystem + user1 + assistant1 + user2 전송"]
+    두번째호출 --> 답변2["assistant 답변 2가\n1턴 문맥을 이어서 사용"]
+
+    style 시스템 fill:#e3f2fd,stroke:#1976d2
+    style 사용자1 fill:#e3f2fd,stroke:#1976d2
+    style 첫호출 fill:#fff3e0,stroke:#f57c00
+    style 답변1 fill:#ede7f6,stroke:#5e35b1
+    style 재주입 fill:#f3e5f5,stroke:#7b1fa2
+    style 사용자2 fill:#e8f5e9,stroke:#388e3c
+    style 두번째호출 fill:#fff3e0,stroke:#f57c00
+    style 답변2 fill:#fff8e1,stroke:#f9a825

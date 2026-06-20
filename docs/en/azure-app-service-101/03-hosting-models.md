@@ -5,7 +5,7 @@ episode: 3
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -27,6 +27,8 @@ Free? Basic? Standard? Premium? And Windows vs Linux? Code vs Container?
 
 In this post, we'll cover the **key criteria for choosing your Hosting Model**.
 
+This is the third post in the Azure App Service 101 series. It turns the long list of App Service options into a practical decision framework for OS, deployment model, and pricing tier.
+
 ---
 
 ## Questions this chapter answers
@@ -41,7 +43,7 @@ In this post, we'll cover the **key criteria for choosing your Hosting Model**.
 
 The flow for deciding your App Service hosting strategy:
 
-```
+```text
 1. Choose OS (Linux / Windows)
  ↓
 2. Choose Deployment Model (Code / Container)
@@ -49,7 +51,7 @@ The flow for deciding your App Service hosting strategy:
 3. Choose Plan Tier (Dev → Production)
 ```
 
-![Plan choice after OS and deployment](../../assets/azure-app-service-101/03/01-decision-flow.en.png)
+![Plan choice after OS and deployment](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/03/01-decision-flow.en.png)
 
 *Plan choice after OS and deployment*
 
@@ -72,7 +74,7 @@ An App Service Plan is the **compute resource pool** where your app runs.
 
 Deploying multiple apps to the same Plan means they **share compute resources**.
 
-```
+```text
 [App Service Plan: Standard S1]
 ├── Web App A
 ├── Web App B 
@@ -101,13 +103,15 @@ Deploying multiple apps to the same Plan means they **share compute resources**.
 | SSL Certificate | Basic |
 | Deployment Slots | Standard |
 | Autoscale | Standard |
-| VNet Integration | Standard |
-| Private Endpoint | Premium |
+| VNet Integration | Basic |
+| Private Endpoint | Basic |
 | Zone Redundancy | Premium |
 
 ### Practical Advice
 
 > "Start with Standard minimum for production. Operating without Autoscale and Deployment Slots is asking for trouble."
+
+Basic already unlocks VNet Integration and Private Endpoint, but Standard is still the more practical production floor because Autoscale and Deployment Slots start there.
 
 ---
 
@@ -196,7 +200,7 @@ az webapp create \
 
 ## Shared Plan vs Dedicated Plan
 
-![Shared and dedicated resource tradeoffs](../../assets/azure-app-service-101/03/03-shared-vs-dedicated.en.png)
+![Shared and dedicated resource tradeoffs](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/03/03-shared-vs-dedicated.en.png)
 
 *Shared and dedicated resource tradeoffs*
 
@@ -226,7 +230,7 @@ Separate Plan for each critical app:
 
 ### Recommended Approach
 
-```
+```text
 Business-critical apps → Dedicated Plan
 Internal tools, low traffic apps → Shared Plan
 ```
@@ -237,7 +241,7 @@ Internal tools, low traffic apps → Shared Plan
 
 Which features depend on Plan vs Deployment Model:
 
-![Feature availability across plan tiers](../../assets/azure-app-service-101/03/02-tier-feature-matrix.en.png)
+![Feature availability across plan tiers](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/03/02-tier-feature-matrix.en.png)
 
 *Feature availability across plan tiers*
 
@@ -265,7 +269,7 @@ Which features depend on Plan vs Deployment Model:
 
 ### Practical Patterns
 
-```
+```text
 1. Start with production-ready tier (Standard or higher)
 2. Load test with actual traffic patterns
 3. Configure Autoscale thresholds and cooldowns

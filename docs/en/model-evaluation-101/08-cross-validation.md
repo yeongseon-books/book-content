@@ -1,10 +1,10 @@
 ---
 series: model-evaluation-101
 episode: 8
-title: Cross Validation
-status: content-ready
+title: "Model Evaluation 101 (8/10): Cross Validation"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,30 @@ tags:
   - Stratified
   - scikit-learn
 seo_description: Cross-validation strategies including K-Fold, stratified, GroupKFold, and time-series splits, with score variance read directly in code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Cross Validation
+# Model Evaluation 101 (8/10): Cross Validation
 
-> Model Evaluation 101 series (8/10)
+One train/test split can make evaluation look more certain than it really is. On small or moderately noisy datasets, a tiny shift in the split can reorder two models that looked clearly separated a minute earlier.
 
-<!-- a-grade-intro:begin -->
+That is why cross validation is better understood as an uncertainty tool than as a score factory. The average matters, but the spread matters too. If the variance is large, a small lead is rarely a real lead.
 
-**Core question**: Is one test-set score enough to choose between models?
+This is post 8 in the Model Evaluation 101 series. In this post, we use fold-based evaluation to separate stable comparisons from noisy ones and to spot leakage that survives a single split.
 
-> *Cross validation quantifies estimation confidence by averaging over many splits and measuring the spread.*
 
-<!-- a-grade-intro:end -->
+![model evaluation 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/08/08-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 8 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The meaning and trade-offs of K-Fold
-- Why stratified is the default
-- GroupKFold and time-series splits
-- How to read variance
-- Five common pitfalls
+- The meaning and trade-offs of K-Fold?
+- Why stratified is the default?
+- GroupKFold and time-series splits?
 
 ## Why It Matters
 
 A single split is noisy. Reporting the standard deviation alongside the mean makes comparisons meaningful.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Data["dataset"] --> Split["k folds"]
-    Split --> Train["k-1 folds train"]
-    Split --> Val["1 fold validate"]
-    Val --> Score["k scores"]
-    Score --> Stat["mean and std"]
-```
 
 ## Key Terms
 
@@ -117,6 +104,8 @@ out = cross_validate(m, X, y, cv=cv, scoring=["f1_macro", "roc_auc"])
 print({k: v.mean() for k, v in out.items() if k.startswith("test_")})
 ```
 
+**Expected output:** You should get a mean and standard deviation rather than one fragile score, and you should see how group-aware or time-aware cross validation can reduce false confidence caused by leakage-prone splits.
+
 ## What to Notice in This Code
 
 - Stratified is the classification default.
@@ -160,17 +149,29 @@ Hyperparameter tuning runs CV for inner evaluation, then a separate held-out set
 
 CV is the confidence of the estimate. Next, error analysis dissects the predictions that go wrong.
 
+## Answering the Opening Questions
+
+- **The meaning and trade-offs of K-Fold?**
+  - The article treats Cross Validation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why stratified is the default?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **GroupKFold and time-series splits?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
-- [Train, Validation, and Test](./02-train-val-test.md)
-- [The Limits of Accuracy](./03-limits-of-accuracy.md)
-- [Precision and Recall](./04-precision-and-recall.md)
-- [F1 Score](./05-f1-score.md)
-- [ROC and AUC](./06-roc-and-auc.md)
-- [Calibration](./07-calibration.md)
+## In this series
+
+- [Model Evaluation 101 (1/10): Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): Train, Validation, and Test](./02-train-val-test.md)
+- [Model Evaluation 101 (3/10): The Limits of Accuracy](./03-limits-of-accuracy.md)
+- [Model Evaluation 101 (4/10): Precision and Recall](./04-precision-and-recall.md)
+- [Model Evaluation 101 (5/10): F1 Score](./05-f1-score.md)
+- [Model Evaluation 101 (6/10): ROC and AUC](./06-roc-and-auc.md)
+- [Model Evaluation 101 (7/10): Calibration](./07-calibration.md)
 - **Cross Validation (current)**
 - Error Analysis (upcoming)
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References

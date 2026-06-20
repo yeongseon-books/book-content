@@ -1,13 +1,13 @@
 ---
-title: '첫 revision: upgrade와 downgrade를 손으로 작성'
+title: "Alembic 101 (3/10): 첫 revision: upgrade와 downgrade를 손으로 작성"
 series: alembic-101
 episode: 3
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,34 +17,42 @@ tags:
 - upgrade
 - downgrade
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: 'revision 파일은 upgrade(): N → N+1과 downgrade(): N+1 → N이라는 함수 쌍입니다.'
 ---
 
-# 첫 revision: upgrade와 downgrade를 손으로 작성
+# Alembic 101 (3/10): 첫 revision: upgrade와 downgrade를 손으로 작성
 
-## 핵심 질문
+이 글은 Alembic 101 시리즈의 세 번째 글입니다. 여기서는 첫 revision 파일의 구조를 직접 읽어 보고, `upgrade()`와 `downgrade()`를 안전하게 손으로 작성하는 기준을 정리합니다.
 
-첫 마이그레이션을 만들 때 upgrade와 downgrade를 어떻게 짜야 안전하게 되돌릴 수 있을까요?
+autogenerate가 편리하더라도, 한 번은 직접 써 봐야 자동 생성 결과를 비판적으로 읽을 수 있습니다. 손으로 써 본 사람만 “이건 내가 의도한 migration이 아니다”라고 바로 알아챌 수 있기 때문입니다.
 
-이 글은 그 질문에 답하기 위해 첫 리비전과 업/다운그레이드의 핵심 결정과 실무 함정을 살펴봅니다.
+![Alembic 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/03/03-01-diagram-the-two-way-contract-inside-a-re.ko.png)
+*Alembic 101 3장 흐름 개요*
 
+## 먼저 던지는 질문
 
-## 이 글에서 다룰 문제
+- `alembic revision`이 만들어 주는 파일 구조는 어떻게 생겼을까요?
+- `op.create_table`, `op.add_column`, `op.drop_column`, `op.execute`는 각각 언제 쓸까요?
+- `upgrade()`와 `downgrade()`를 어떻게 대칭으로 유지할 수 있을까요?
 
-autogenerate가 아무리 좋아도 결국 만들어 주는 것은 같은 op 호출의 조합입니다. 손으로 한 번 작성해 본 사람과 그렇지 않은 사람의 차이는 큽니다. 자동 생성된 파일을 읽고 "이 부분은 의도와 다르다"라고 잡아낼 수 있느냐의 차이이기 때문입니다.
+## 왜 중요한가
 
-또 한 가지, `downgrade`를 진심으로 작성해 두는 것 자체가 production을 안전하게 합니다. "절대 downgrade는 안 한다"는 정책도 가능하지만, downgrade를 빈 함수로 두는 순간 실수로 적용된 잘못된 마이그레이션을 빠르게 되돌릴 수단이 사라집니다.
+autogenerate가 아무리 좋아도 최종 산출물은 결국 같은 `op` 호출들의 조합입니다. 직접 한 번 작성해 본 사람과 그렇지 않은 사람의 차이는 명확합니다. 자동 생성된 파일을 읽고 “여기서 rename이 drop+add로 풀렸다” 같은 문제를 눈치챌 수 있는지가 달라집니다.
 
-## Mental Model
+또 하나는 `downgrade`입니다. 운영에서 downgrade를 거의 안 쓴다고 해도, 비워 둔 순간 가장 빠른 복구 수단을 스스로 버리게 됩니다. 정말 되돌릴 수 없는 변경이라면 빈 함수가 아니라 그 정책을 코드에 명시해야 합니다.
 
-> revision 파일은 **`upgrade(): N → N+1`과 `downgrade(): N+1 → N`이라는 함수 쌍**입니다. 둘이 정확히 역연산이 되도록 짜면 alembic은 그래프를 자유롭게 위아래로 이동할 수 있습니다. 한쪽이라도 비대칭이면 그 revision은 사실상 단방향 commit이 됩니다.
+## 멘탈 모델
 
-git에 비유하면 `upgrade`는 commit이고 `downgrade`는 그 commit의 정확한 revert입니다. revert가 깔끔히 되도록 작성하는 commit이 좋은 commit인 것처럼, downgrade가 정확한 revision이 좋은 revision입니다.
+> revision 파일은 **`upgrade(): N → N+1`과 `downgrade(): N+1 → N`이라는 함수 쌍**입니다. 둘이 정확한 역연산이면 Alembic은 graph를 자유롭게 오르내릴 수 있고, 한쪽이라도 비대칭이면 사실상 단방향 commit이 됩니다.
+
+git 비유를 그대로 가져오면 `upgrade`는 commit이고 `downgrade`는 그 commit의 정밀한 revert입니다. 좋은 revision은 downgrade가 깔끔하게 정의된 revision입니다.
+
+### 다이어그램: revision 파일의 양방향 계약
 
 ## 핵심 개념
 
-### 자동 생성된 revision 파일
+### 자동 생성 revision 파일의 형태
 
 ```python
 """add users.tier
@@ -68,11 +76,11 @@ def downgrade() -> None:
     op.drop_column("users", "tier")
 ```
 
-위에서부터 읽으면 (1) 이 revision의 ID와 부모 ID, (2) `upgrade`/`downgrade` 한 쌍이 전부입니다. `branch_labels`와 `depends_on`은 5편에서 다룹니다.
+위에서부터 읽으면 (1) revision 자신의 ID와 부모 ID, (2) `upgrade`/`downgrade` 쌍이 전부입니다. `branch_labels`와 `depends_on`은 5편에서 다룹니다.
 
 ### `op` 모듈
 
-`op`는 alembic이 제공하는 DDL 헬퍼입니다. 자주 쓰는 것만 정리하면 다음과 같습니다.
+`op`는 Alembic이 노출하는 DDL helper입니다. 자주 쓰는 연산은 다음과 같습니다.
 
 | 연산 | 용도 |
 | --- | --- |
@@ -80,19 +88,19 @@ def downgrade() -> None:
 | `op.drop_table(name)` | 테이블 삭제 |
 | `op.add_column(table, column)` | 컬럼 추가 |
 | `op.drop_column(table, name)` | 컬럼 삭제 |
-| `op.alter_column(table, name, ...)` | 타입/nullable/default 변경 |
+| `op.alter_column(table, name, ...)` | 타입 / nullable / default 변경 |
 | `op.create_index(name, table, cols)` | 인덱스 생성 |
 | `op.drop_index(name, table)` | 인덱스 삭제 |
 | `op.execute(sql)` | 임의 SQL 실행 |
 
-### `down_revision` 그래프
+### `down_revision` graph
 
-새 revision이 생성될 때 alembic은 현재 head의 ID를 `down_revision`에 자동으로 박습니다. 이 한 줄이 그래프를 만듭니다. revision ID는 보통 hash로 충분히 유일하지만, 같은 시점에 두 사람이 head에서 revision을 생성하면 두 revision이 같은 `down_revision`을 가리키게 되고 → branch가 됩니다(5편).
+새 revision을 만들 때 Alembic은 현재 head의 ID를 `down_revision`에 자동으로 찍습니다. 그래프를 만드는 핵심은 이 한 줄입니다. 두 사람이 같은 head에서 동시에 revision을 만들면 두 revision이 같은 `down_revision`을 가리키고, 그 순간 branch가 생깁니다. 이 부분은 5편에서 이어집니다.
 
-## Before-After
+## 변경 전후
 
 ```python
-# Before: downgrade가 비어 있는 위험한 revision
+# 이전: 빈 다운그레이드가 포함된 위험한 개정판
 def upgrade() -> None:
     op.create_table(
         "orders",
@@ -103,11 +111,11 @@ def upgrade() -> None:
     op.create_index("ix_orders_user_id", "orders", ["user_id"])
 
 def downgrade() -> None:
-    pass  # ← 빈 채로 두면 단방향 commit
+    pass  # ← leaving this empty makes it a one-way commit
 ```
 
 ```python
-# After: 정확한 역연산
+# 이후: 정확한 역수
 def upgrade() -> None:
     op.create_table(
         "orders",
@@ -122,7 +130,7 @@ def downgrade() -> None:
     op.drop_table("orders")
 ```
 
-After 버전은 정확히 역순(인덱스 → 테이블)으로 정리합니다. 이 순서는 외래키와 인덱스 의존성 때문에 중요합니다.
+After 버전은 index → table 순서로 정확히 역순 정리합니다. 외래키와 인덱스 의존성 때문에 이 순서는 중요합니다.
 
 ## 단계별 실습
 
@@ -132,7 +140,7 @@ After 버전은 정확히 역순(인덱스 → 테이블)으로 정리합니다.
 alembic revision -m "create orders"
 ```
 
-`versions/<hash>_create_orders.py`가 생성됩니다. `upgrade`와 `downgrade`가 빈 함수로 들어 있습니다.
+그러면 `versions/<hash>_create_orders.py`가 생성되고, 안에는 비어 있는 `upgrade`와 `downgrade`가 들어 있습니다.
 
 ### 2단계: `upgrade` 작성
 
@@ -148,7 +156,7 @@ def upgrade() -> None:
     op.create_index("ix_orders_user_id", "orders", ["user_id"])
 ```
 
-`server_default=sa.func.current_timestamp()`처럼 default를 DB 측에 두면 application 코드 변경 없이 기존 row에도 값이 채워집니다.
+`server_default=sa.func.current_timestamp()`처럼 DB 쪽 default를 주면 기존 row까지 데이터베이스 차원에서 값을 채울 수 있습니다.
 
 ### 3단계: `downgrade` 작성 (역순)
 
@@ -158,7 +166,7 @@ def downgrade() -> None:
     op.drop_table("orders")
 ```
 
-생성 순서: 테이블 → 인덱스. 삭제 순서: 인덱스 → 테이블. 외래키가 있으면 자식 테이블부터 drop합니다.
+생성 순서는 table → index이고, 삭제 순서는 index → table입니다. foreign key가 있으면 child부터 내려야 합니다.
 
 ### 4단계: 적용과 되돌리기
 
@@ -168,11 +176,11 @@ alembic downgrade -1
 alembic upgrade head
 ```
 
-세 번 모두 깔끔하게 동작하면 upgrade/downgrade가 대칭이라는 증명이 됩니다.
+세 단계가 모두 깨끗하게 성공하면 `upgrade`와 `downgrade`가 대칭이라는 뜻입니다.
 
-### 5단계: SQLite에서 컬럼 변경 (batch 모드)
+### 5단계: SQLite에서 컬럼 변경하기 (batch mode)
 
-SQLite는 컬럼 type/nullable 변경을 직접 못 합니다. batch 모드로 감쌉니다.
+SQLite는 컬럼 타입과 nullability를 직접 바꾸지 못합니다. batch mode로 감쌉니다.
 
 ```python
 def upgrade() -> None:
@@ -184,7 +192,7 @@ def downgrade() -> None:
         batch.drop_column("tier")
 ```
 
-2편에서 `render_as_batch=True`를 켜 두었다면 자동으로 batch가 적용되지만, 명시적으로 `batch_alter_table` 컨텍스트 매니저를 쓰는 편이 의도가 분명합니다.
+2편에서 `render_as_batch=True`를 켰더라도, 이렇게 `batch_alter_table`을 명시하면 의도가 더 선명해집니다.
 
 ### 6단계: `op.execute`로 데이터 보정
 
@@ -194,46 +202,331 @@ def upgrade() -> None:
     op.execute("UPDATE users SET display_name = name WHERE display_name IS NULL")
 ```
 
-스키마와 데이터 변경을 같은 revision에 묶을 수 있습니다. 다만 큰 데이터셋은 별도 데이터 마이그레이션(6편)으로 분리하는 게 안전합니다.
+스키마 변경과 간단한 데이터 보정을 한 revision에 묶을 수는 있습니다. 다만 데이터가 커지면 6편처럼 별도 data migration으로 분리하는 편이 훨씬 안전합니다.
+
+## 검증 루틴
+
+```bash
+alembic upgrade head
+alembic downgrade -1
+alembic upgrade head
+sqlite3 app.db ".schema orders"
+```
+
+**확인할 점:** 세 명령이 모두 성공하고, 마지막 schema 조회에서 `orders` 테이블과 `ix_orders_user_id` 인덱스가 다시 보이면 왕복 대칭성이 확인된 것입니다.
 
 ## 자주 하는 실수
 
-- **`downgrade`를 비워 두기.** "안 쓸 거니까"라고 하다가 사고가 났을 때 빠른 회복 수단이 사라집니다. 비워 두려면 차라리 `raise NotImplementedError`로 명시합니다.
-- **`upgrade`만 테스트.** PR 로컬에서 한 번씩 `downgrade -1 && upgrade head`를 돌려야 대칭성이 확인됩니다.
-- **외래키 의존을 무시한 drop 순서.** child → parent 순서로 지웁니다. 그렇지 않으면 FK violation.
-- **autogenerate를 그대로 commit.** 자동 생성은 시작점일 뿐입니다. table 생성 순서, 인덱스 이름, server_default 등은 사람이 검토합니다.
-- **SQLite에서 batch 없이 ALTER.** "syntax error" 또는 "not supported"로 깨집니다.
+- **`downgrade`를 비워 두기.** 정말 막고 싶다면 차라리 `raise NotImplementedError`로 의도를 명시하세요.
+- **`upgrade`만 테스트하기.** PR마다 최소 한 번은 `downgrade -1 && upgrade head`를 돌려 대칭성을 확인해야 합니다.
+- **drop 순서에서 foreign key 의존성을 무시하기.** child → parent 순서를 지키지 않으면 FK violation이 납니다.
+- **autogenerate 결과를 그대로 커밋하기.** 시작점일 뿐입니다. 생성 순서, 인덱스 이름, `server_default`는 사람이 검토해야 합니다.
+- **SQLite에서 batch 없이 ALTER를 시도하기.** 지원되지 않는 문법 오류로 실패합니다.
 
-## 실무에서 쓰는 패턴
+## 실무 패턴
 
-- **`upgrade` ↔ `downgrade` 페어 리뷰.** PR 리뷰 체크리스트에 "downgrade 시 역순으로 정확한가" 항목을 둡니다.
-- **`server_default`는 DB-side default.** `default`(SQLAlchemy default)는 ORM 호출 경로에서만 동작합니다. 마이그레이션에는 `server_default`가 정답입니다.
-- **revision 메시지는 명령형 한 줄.** `add users.tier`, `create orders`처럼 짧고 직접적으로.
-- **하나의 revision에 한 가지 변경.** add column 두 개를 하나로 묶어도 되지만, 다른 모듈의 변경을 같은 revision에 합치지 않습니다. 회귀 시 분리 회복이 어렵습니다.
-- **drop은 두 단계로.** 컬럼 사용 제거 코드 → 다음 release에서 컬럼 drop revision. 9편에서 자세히.
+- **`upgrade`와 `downgrade`를 한 쌍으로 리뷰합니다.** “정확한 역순인가?”를 PR 체크리스트에 넣습니다.
+- **`server_default`는 DB-side default입니다.** SQLAlchemy의 `default`는 ORM 경로에서만 동작하므로 migration에는 맞지 않습니다.
+- **revision 메시지는 명령형 한 줄로 씁니다.** `add users.tier`, `create orders`처럼 짧고 직접적으로 씁니다.
+- **하나의 revision에는 하나의 논리 변경만 넣습니다.** 서로 무관한 모듈 변경을 묶으면 회복이 어려워집니다.
+- **drop은 보통 두 단계로 나눕니다.** 먼저 코드가 사용을 멈추고, 다음 배포에서 컬럼을 내립니다. 9편에서 자세히 다룹니다.
 
 ## 체크리스트
 
-- [ ] `upgrade()`와 `downgrade()`가 정확히 역연산이다
-- [ ] 외래키·인덱스 의존성을 고려해 순서를 잡았다
-- [ ] SQLite에서는 `batch_alter_table` 컨텍스트를 명시적으로 썼다
-- [ ] `server_default`로 DB 측 default를 지정했다 (application default와 혼동 금지)
+- [ ] `upgrade()`와 `downgrade()`가 정확한 역연산이다
+- [ ] 외래키와 인덱스 의존성을 고려해 순서를 잡았다
+- [ ] SQLite에서는 `batch_alter_table`을 명시적으로 사용했다
+- [ ] DB-side default에는 `server_default`를 썼다
 - [ ] revision 메시지가 명령형 한 줄이고 의도가 분명하다
-- [ ] 로컬에서 `downgrade -1 && upgrade head` 사이클을 한 번 돌려 검증했다
-- [ ] autogenerate 출력이라면 사람 검토를 거쳤다
+- [ ] 로컬에서 `downgrade -1 && upgrade head`를 검증했다
+- [ ] autogenerate 결과였다면 사람이 직접 검토했다
+
+## 연습 문제
+
+1. `users`에 `tier`, `last_login_at` 두 컬럼을 수동으로 추가하는 revision을 작성하고 `downgrade`가 동작하는지 확인해 보세요.
+2. `orders` 테이블을 만든 뒤 `downgrade -1 && upgrade head`를 다섯 번 연속 실행해 무결성을 확인해 보세요.
+3. SQLite에서 `op.alter_column`으로 nullability를 바꾸는 migration을 batch mode 유무 두 경우로 비교해 보세요.
 
 ## 정리, 다음 글
 
-revision 파일은 결국 `upgrade`/`downgrade` 한 쌍입니다. 둘을 대칭으로 짜는 습관 하나가 production에서 가장 큰 안전선이 됩니다. SQLite에서는 batch 모드가 거의 필수라는 점도 같이 기억합니다.
+revision 파일은 결국 `upgrade`와 `downgrade` 한 쌍으로 귀결됩니다. 이 둘을 대칭으로 유지하는 습관이 production에서 가장 강한 안전선입니다. SQLite에서는 batch mode를 사실상 기본으로 생각하는 편이 좋습니다.
 
-다음 글은 손으로 작성하던 이 작업을 자동으로 만들어 주는 `--autogenerate` 옵션을 본격적으로 다룹니다. 자동으로 잡는 것과 못 잡는 것의 경계가 어디인지가 핵심입니다.
+다음 글에서는 `--autogenerate`를 본격적으로 다룹니다. 자동으로 잘 잡는 것과 사람이 반드시 직접 봐야 하는 것의 경계가 핵심입니다.
+
+## revision 의존성 그래프를 눈으로 확인하는 습관
+
+첫 revision을 만들고 나면 바로 그래프를 확인하는 습관이 필요합니다. `down_revision` 오타는 코드 리뷰에서 놓치기 쉽고, 배포 직전에야 문제가 드러나는 경우가 많기 때문입니다.
+
+```bash
+alembic history --verbose
+alembic heads
+alembic current
+```
+
+`history --verbose` 출력에서 각 노드의 `Revises`가 예상 부모를 가리키는지 확인합니다. 특히 두 명 이상이 동시에 작업한 주간에는 `heads`가 2개 이상인지 먼저 확인하는 편이 안전합니다.
+
+## 수동 작성 시 적용 전후 스키마 앵커
+
+`upgrade`와 `downgrade`를 쓸 때는 머릿속으로만 역연산을 상상하지 말고, 실제 schema를 비교해야 합니다.
+
+```bash
+sqlite3 app.db ".schema users" > before.sql
+alembic upgrade head
+sqlite3 app.db ".schema users" > after-upgrade.sql
+alembic downgrade -1
+sqlite3 app.db ".schema users" > after-downgrade.sql
+```
+
+`before.sql`과 `after-downgrade.sql`이 의미상 동일하면 대칭성이 확보된 것입니다. 이 검증이 없으면 `downgrade`가 형식상 존재해도 실제로는 불완전한 경우가 많습니다.
+
+## 자주 깨지는 downgrade 패턴
+
+다음 패턴은 리뷰에서 자주 보이며, production에서 즉시 문제를 일으킵니다.
+
+```python
+def upgrade() -> None:
+    op.create_table("orders", ...)
+    op.create_index("ix_orders_user_id", "orders", ["user_id"])
+
+def downgrade() -> None:
+    op.drop_table("orders")
+    op.drop_index("ix_orders_user_id", table_name="orders")  # 이미 테이블이 없어 실패
+```
+
+정답은 reverse order입니다. 객체를 만든 순서의 정확한 역순으로 정리해야 합니다.
+
+## 확장 부록: 배포/복구 실습 시나리오
+
+### 시나리오 A: add column + backfill + tighten
+
+```bash
+alembic revision -m "add users.phone nullable"
+alembic revision -m "backfill users.phone"
+alembic revision -m "tighten users.phone not null"
+alembic upgrade head
+```
+
+```sql
+SELECT COUNT(*) FROM users WHERE phone IS NULL;
+```
+
+`COUNT(*) = 0`이 아니라면 tighten 단계는 멈춰야 합니다.
+
+### 시나리오 B: 동시에 생성된 head 정리
+
+```bash
+alembic heads
+alembic merge -m "merge concurrent heads" <head1> <head2>
+alembic heads
+```
+
+merge 후 head가 하나여야 합니다.
+
+### 시나리오 C: offline SQL 승인 흐름
+
+```bash
+alembic upgrade <prev>:head --sql > review.sql
+```
+
+검토 포인트는 `DROP`, `ALTER`, 인덱스 재생성, `alembic_version` 갱신 SQL 포함 여부입니다.
+
+### 시나리오 D: incident first checks
+
+```bash
+alembic current
+alembic heads
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+애플리케이션 `/health`의 기대 버전과 DB 버전이 다르면 drift 가능성을 먼저 의심합니다.
+
+### 운영 스크립트 예시
+
+```bash
+set -euo pipefail
+alembic check
+alembic upgrade head
+alembic upgrade head --sql > /tmp/migration-preview.sql
+```
+
+### 품질 게이트 정리
+
+```text
+- autogenerate 결과 수동 검토
+- downgrade 정책 명시
+- data migration idempotency 확보
+- migration-first 배포
+- post-deploy smoke test
+```
+
+이 게이트들은 Alembic 자체 기능이라기보다 팀 운영 안전장치입니다.
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+## 처음 질문으로 돌아가기
+
+- **`alembic revision`이 만들어 주는 파일 구조는 어떻게 생겼을까요?**
+  - 본문 예시처럼 revision 파일은 `revision`, `down_revision`, 그리고 `upgrade()`·`downgrade()` 함수 네 축으로 읽으면 됩니다. 즉, 이 파일은 “누구의 다음 변경인가”와 “올릴 때/내릴 때 무엇을 할까”를 같이 담는 단위입니다.
+- **`op.create_table`, `op.add_column`, `op.drop_column`, `op.execute`는 각각 언제 쓸까요?**
+  - 새 구조를 만들면 `op.create_table`, 기존 테이블에 필드를 더하면 `op.add_column`, 되돌릴 때 없애면 `op.drop_column`, helper로 표현하기 어려운 SQL은 `op.execute`를 씁니다. 이 글은 DDL helper를 먼저 쓰고, 정말 필요한 부분만 raw SQL로 내려가라는 감각을 보여 줍니다.
+- **`upgrade()`와 `downgrade()`를 어떻게 대칭으로 유지할 수 있을까요?**
+  - `upgrade(): N → N+1`, `downgrade(): N+1 → N`이라는 본문 표현 그대로, 올릴 때 추가한 것을 내릴 때 제거하는 식으로 짝을 맞추면 됩니다. `users.tier` 예시에서 `op.add_column(...)`과 `op.drop_column(...)`이 서로 거울처럼 배치된 이유가 바로 그 대칭성입니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Alembic 101 (1/10): 왜 Alembic인가, 그리고 init까지](./01-why-alembic-and-init.md)
+- [Alembic 101 (2/10): env.py와 target_metadata: 모델과 마이그레이션 연결](./02-env-py-and-target-metadata.md)
+- **첫 revision: upgrade와 downgrade를 손으로 작성 (현재 글)**
+- autogenerate: 잡는 것과 못 잡는 것의 경계 (예정)
+- branch와 merge: 동시에 만든 revision을 합치는 법 (예정)
+- 데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기 (예정)
+- online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기 (예정)
+- downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가 (예정)
+- 배포 순서와 blue/green: schema와 application code의 안전한 동기화 (예정)
+- Production과 team workflow: PR, CI, 모니터링, 그리고 incident response (예정)
+
+<!-- toc:end -->
 
 ## 참고 자료
 
-- Alembic: Operation Reference — https://alembic.sqlalchemy.org/en/latest/ops.html
-- Alembic: Working with Branches — https://alembic.sqlalchemy.org/en/latest/branches.html
-- Alembic: Batch Mode — https://alembic.sqlalchemy.org/en/latest/batch.html
-- SQLAlchemy: Schema Definition — https://docs.sqlalchemy.org/en/20/core/schema.html
+- [sqlalchemy/alembic GitHub 저장소](https://github.com/sqlalchemy/alembic)
+- [Alembic: Operation Reference](https://alembic.sqlalchemy.org/en/latest/ops.html)
+- [Alembic: Working with Branches](https://alembic.sqlalchemy.org/en/latest/branches.html)
+- [Alembic: Batch Mode](https://alembic.sqlalchemy.org/en/latest/batch.html)
+- [SQLAlchemy: Schema Definition](https://docs.sqlalchemy.org/en/20/core/schema.html)
 
-<!-- toc:begin -->
-<!-- toc:end -->
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/alembic-101/ko/03-first-revision-upgrade-downgrade)

@@ -1,10 +1,10 @@
 ---
 series: operating-systems-101
 episode: 3
-title: Scheduling
-status: content-ready
+title: "Operating Systems 101 (3/10): Scheduling"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,33 @@ tags:
   - Systems
   - Performance
 seo_description: How OS schedulers pick what runs next, the cost of context switches, and the knobs like nice and CPU affinity you can adjust in production.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Scheduling
+# Operating Systems 101 (3/10): Scheduling
 
-> Operating Systems 101 series (3/10)
+On a busy machine, many tasks are ready to run at once, but the number of CPU cores is fixed. The operating system has to decide who gets the next slice of CPU time, and that decision shows up as latency, throughput, fairness, and power draw.
 
-<!-- a-grade-intro:begin -->
+That is why scheduler behavior matters long before you start reading kernel code. It explains why a system feels sluggish, why identical runs vary, and why container CPU limits can make software feel uneven.
 
-**Core question**: Hundreds of processes are alive on your machine. How does the OS decide who gets the next millisecond of CPU?
+This is post 3 in the Operating Systems 101 series. It introduces the scheduler as the policy engine that keeps trading off responsiveness, throughput, fairness, and power.
 
-> The scheduler is one of the most frequently invoked parts of the OS. Every few milliseconds it picks "who runs next?" and that choice shapes responsiveness, throughput, fairness, and power. This article walks through why a scheduler exists, the policies it uses, and why context switch cost keeps showing up in performance discussions.
 
-<!-- a-grade-intro:end -->
+![operating systems 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.en.png)
+*operating systems 101 chapter 3 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Scheduling?
+- Which signal should the example or diagram make visible for Scheduling?
+- What failure should be prevented first when Scheduling reaches a real system?
+
+## Questions this article answers
+
+- What goals is the scheduler trying to balance against each other?
+- What practical differences do preemption, time slices, and priority actually create?
+- Why are context switches expensive even when you do not see them directly?
+- When should you tune `nice`, priority, or CPU affinity?
 
 ## What You Will Learn
 
@@ -46,9 +59,9 @@ The scheduler is invisible until things slow down or jitter. Why does the system
 
 > Responsiveness, throughput, fairness, and power — the scheduler cannot maximize all four at once. Push one and another gives.
 
-## Concept at a Glance
-
 > The scheduler picks a runnable task from a queue and puts it on the CPU. It is invoked again whenever a task blocks on I/O, exhausts its time slice, or is preempted by a higher-priority task waking up.
+
+### How tasks move through the scheduler
 
 ```text
 Runnable queue        Running              Blocked (waiting I/O)
@@ -209,9 +222,20 @@ The scheduler picks the next CPU runner from the runnable queue. The decision ba
 
 The next article looks at what happens when several flows touch the same data at once: race conditions. Knowing when the scheduler can interrupt a flow makes it obvious why these bugs are everywhere.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Scheduling?**
+  - The article treats Scheduling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Scheduling?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Scheduling reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an Operating System?](./01-what-is-an-operating-system.md)
-- [Processes and Threads](./02-processes-and-threads.md)
+## In this series
+
+- [Operating Systems 101 (1/10): What Is an Operating System?](./01-what-is-an-operating-system.md)
+- [Operating Systems 101 (2/10): Processes and Threads](./02-processes-and-threads.md)
 - **Scheduling (current)**
 - Concurrency and Race Conditions (upcoming)
 - Locks, Mutexes, and Semaphores (upcoming)
@@ -220,6 +244,7 @@ The next article looks at what happens when several flows touch the same data at
 - File Systems (upcoming)
 - System Calls (upcoming)
 - Containers and the Operating System (upcoming)
+
 <!-- toc:end -->
 
 ## References

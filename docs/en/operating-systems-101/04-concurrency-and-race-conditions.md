@@ -1,10 +1,10 @@
 ---
 series: operating-systems-101
 episode: 4
-title: Concurrency and Race Conditions
-status: content-ready
+title: "Operating Systems 101 (4/10): Concurrency and Race Conditions"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,33 @@ tags:
   - Debugging
   - Systems
 seo_description: What race conditions are, why they hide so well, and the three axes of concurrency violation — atomicity, visibility, and ordering.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Concurrency and Race Conditions
+# Operating Systems 101 (4/10): Concurrency and Race Conditions
 
-> Operating Systems 101 series (4/10)
+Concurrency bugs are usually quiet in development and loud in production. They pass tests for days, then corrupt data only under load, which makes them feel random even when the mechanism is precise.
 
-<!-- a-grade-intro:begin -->
+What makes race conditions hard is not that they fail once, but that the result depends on interleaving you did not explicitly write.
 
-**Core question**: Why does code that works perfectly with one thread break in strange, hard-to-reproduce ways once you go multi-threaded?
+This is post 4 in the Operating Systems 101 series. It explains race conditions through atomicity, visibility, and ordering so you can describe the bug before you try to fix it.
 
-> A race condition happens when two or more flows touch the same data at the same time, and the result depends on who got there first. Even a single line like `count += 1` is read-modify-write, and another thread can sneak in between those steps. This article explains why concurrency bugs hide so well, what kinds exist, and which design principles keep them out.
 
-<!-- a-grade-intro:end -->
+![operating systems 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.en.png)
+*operating systems 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Concurrency and Race Conditions?
+- Which signal should the example or diagram make visible for Concurrency and Race Conditions?
+- What failure should be prevented first when Concurrency and Race Conditions reaches a real system?
+
+## Questions this article answers
+
+- When can you say a race condition is actually happening?
+- How do atomicity, visibility, and ordering produce different kinds of failures?
+- Why is even a single line of code not automatically safe?
+- Besides locks, what design techniques reduce race conditions?
 
 ## What You Will Learn
 
@@ -46,9 +59,9 @@ Concurrency bugs are quiet during development and loud in production, especially
 
 > A race condition is worse than a wrong answer; it is a state where you cannot say which answer you will get.
 
-## Concept at a Glance
-
 > When two threads touch the same variable, the OS scheduler can interrupt either of them at any time. Steps from the two flows interleave, and the final state can differ from what either flow intended.
+
+### How one increment gets lost
 
 ```text
 Initial: count = 0   (both threads want to add 1)
@@ -252,10 +265,21 @@ Race conditions hide behind the appearance of "one line" because steps interleav
 
 Next we look at the most common synchronization primitives in detail: locks (mutexes) and their cousin the semaphore.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Concurrency and Race Conditions?**
+  - The article treats Concurrency and Race Conditions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Concurrency and Race Conditions?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Concurrency and Race Conditions reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an Operating System?](./01-what-is-an-operating-system.md)
-- [Processes and Threads](./02-processes-and-threads.md)
-- [Scheduling](./03-scheduling.md)
+## In this series
+
+- [Operating Systems 101 (1/10): What Is an Operating System?](./01-what-is-an-operating-system.md)
+- [Operating Systems 101 (2/10): Processes and Threads](./02-processes-and-threads.md)
+- [Operating Systems 101 (3/10): Scheduling](./03-scheduling.md)
 - **Concurrency and Race Conditions (current)**
 - Locks, Mutexes, and Semaphores (upcoming)
 - Memory Management (upcoming)
@@ -263,6 +287,7 @@ Next we look at the most common synchronization primitives in detail: locks (mut
 - File Systems (upcoming)
 - System Calls (upcoming)
 - Containers and the Operating System (upcoming)
+
 <!-- toc:end -->
 
 ## References

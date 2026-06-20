@@ -1,11 +1,11 @@
 ---
-title: Scaling — HPA, Cluster Autoscaler, KEDA
+title: "Azure Kubernetes Service 101 (6/7): Scaling — HPA, Cluster Autoscaler, KEDA"
 series: azure-aks-101
 episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -15,10 +15,10 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
-seo_description: Azure Kubernetes Service 101 series (6/7)
+seo_description: Master AKS scaling by understanding the roles of Horizontal Pod Autoscaler (HPA), Cluster Autoscaler, and event-driven scaling with KEDA.
 ---
 
-# Scaling — HPA, Cluster Autoscaler, KEDA
+# Azure Kubernetes Service 101 (6/7): Scaling — HPA, Cluster Autoscaler, KEDA
 
 > Azure Kubernetes Service 101 series (6/7)
 
@@ -26,21 +26,19 @@ Scaling in AKS gets confusing because the word “scale” points at more than o
 
 They are related, but they are not the same. This post separates them by input signal, control target, and operating layer.
 
----
+This is the sixth post in the Azure Kubernetes Service 101 series. Here, we sort out how HPA, Cluster Autoscaler, and KEDA each react to demand and which layer of capacity each one changes.
 
-## Questions this chapter answers
+![azure kubernetes service 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/06/06-01-one-diagram-first.en.png)
+*azure kubernetes service 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
 
 - What does each of HPA, Cluster Autoscaler, and KEDA observe and scale?
 - When does CPU/memory-based HPA fall short, and how does KEDA fill that gap?
 - Under what conditions can Cluster Autoscaler safely reschedule Pods when scaling nodes down?
-- Which workloads can scale to zero, and which fundamentally cannot?
-- What guards prevent autoscaling from blowing up your bill?
 
 ## One diagram first
 
-![Relationship among HPA, CA, and KEDA](../../assets/azure-aks-101/06/06-01-one-diagram-first.en.png)
-
-*Relationship among HPA, CA, and KEDA*
 That is the whole relationship.
 
 - HPA changes **pod count**.
@@ -75,7 +73,7 @@ If the input signal is bad, autoscaling decisions get noisy or misleading.
 
 ## The HPA loop
 
-![Metric-driven HPA scaling loop](../../assets/azure-aks-101/06/06-02-the-hpa-loop.en.png)
+![Metric-driven HPA scaling loop](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/06/06-02-the-hpa-loop.en.png)
 
 *Metric-driven HPA scaling loop*
 Suppose a FastAPI API is running with two pods and the target CPU utilization is 60%. If the average keeps sitting around 90%, HPA will try to raise the replica count.
@@ -101,7 +99,7 @@ That makes HPA and Cluster Autoscaler complementary, not competing.
 
 ## HPA and Cluster Autoscaler together
 
-![Pod growth and node expansion flow](../../assets/azure-aks-101/06/06-03-hpa-and-cluster-autoscaler-together.en.png)
+![Pod growth and node expansion flow](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/06/06-03-hpa-and-cluster-autoscaler-together.en.png)
 
 *Pod growth and node expansion flow*
 This explains a very common operational moment: pod count increases, but response quality does not improve immediately because the new pods still need actual node capacity.
@@ -130,7 +128,7 @@ That is why the most accurate short description is: KEDA translates external eve
 
 ## KEDA sits on top of HPA
 
-![Extension relationship between KEDA and HPA](../../assets/azure-aks-101/06/06-04-keda-sits-on-top-of-hpa.en.png)
+![Extension relationship between KEDA and HPA](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/06/06-04-keda-sits-on-top-of-hpa.en.png)
 
 *Extension relationship between KEDA and HPA*
 This relationship is worth being exact about.
@@ -310,16 +308,25 @@ This is part 6 of the Azure Kubernetes Service 101 series. Up to this point, the
 - [ ] Protected availability during scale-down with PodDisruptionBudgets
 - [ ] Tracked autoscaling events on alarms and dashboards
 
+## Answering the Opening Questions
+
+- **What does each of HPA, Cluster Autoscaler, and KEDA observe and scale?**
+  - The article treats Scaling — HPA, Cluster Autoscaler, KEDA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When does CPU/memory-based HPA fall short, and how does KEDA fill that gap?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Under what conditions can Cluster Autoscaler safely reschedule Pods when scaling nodes down?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
-- [Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
-- [Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
-- [Pod, Deployment, Service — the three ways you express a workload](./04-pod-deployment-service.md)
-- [Networking and Ingress — the path in and out of the cluster](./05-networking-and-ingress.md)
-- **Scaling — HPA, Cluster Autoscaler, KEDA (current)**
-- Monitoring and ops — Container Insights, logs, alerts (upcoming)
+- [Azure Kubernetes Service 101 (1/7): What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
+- [Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
+- [Azure Kubernetes Service 101 (3/7): Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
+- [Azure Kubernetes Service 101 (4/7): Pod, Deployment, Service — the three ways you express a workload](./04-pod-deployment-service.md)
+- [Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster](./05-networking-and-ingress.md)
+- **Azure Kubernetes Service 101 (6/7): Scaling — HPA, Cluster Autoscaler, KEDA (current)**
+- Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts (upcoming)
 
 <!-- toc:end -->
 

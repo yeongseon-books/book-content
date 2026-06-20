@@ -1,10 +1,10 @@
 ---
 series: sql-101
 episode: 5
-title: GROUP BY and Aggregates
+title: "SQL 101 (5/10): GROUP BY and Aggregates"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,45 +17,37 @@ tags:
   - Database
   - Analytics
 seo_description: GROUP BY explained — aggregate functions, HAVING vs WHERE, multi-column grouping, and how NULL groups work in practice.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# GROUP BY and Aggregates
+# SQL 101 (5/10): GROUP BY and Aggregates
 
-> SQL 101 series (5/10)
+As soon as someone asks for daily revenue, users per country, or the average order size, you stop reading rows one by one and start compressing them into numbers. That compression is where GROUP BY and aggregate functions become the core of analytical SQL.
 
-<!-- a-grade-intro:begin -->
+The tricky part is not writing SUM or COUNT. It is deciding what a group actually means, what detail disappears when rows collapse, and whether the resulting number still matches the business question you thought you were answering.
 
-**Core question**: A single total is easy. Why is *one total per category* harder, and how does *HAVING* differ from *WHERE*?
+This is post 5 in the SQL 101 series. Here we focus on how aggregation turns many rows into interpretable metrics.
 
-> *Aggregation is *shrinking rows to make meaning*.*
 
-<!-- a-grade-intro:end -->
+![sql 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/05/05-01-aggregation-flow.en.png)
+*sql 101 chapter 5 flow overview*
+> GROUP BY's value is not in the aggregate function names, but in deciding the right grouping level so that your summary answers the actual business question.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- When *GROUP BY* runs and what *aggregate functions* do
-- The split between *WHERE* and *HAVING*
-- Multi-column grouping
-- Handling *NULL* groups
-- Five common mistakes
+- When does GROUP BY run, and what exactly gets grouped?
+- How do SUM, COUNT, and AVG differ in practice?
+- What is the real split between WHERE and HAVING?
 
 ## Why It Matters
 
-Most dashboard numbers come from a GROUP BY. *Daily revenue, orders per user, average per country* — same shape every time. Miss *NULL* or *join cardinality* and the numbers *lie*.
+Most dashboard metrics are grouped metrics. Daily active users, revenue by country, average rating per product, and orders per customer all depend on taking raw rows and reducing them to one line per business category. That makes aggregation one of the most reusable shapes in SQL.
 
-> *Aggregation compresses rows. That means knowing *what gets dropped*.*
+It is also one of the easiest places to create plausible but incorrect numbers. A missing grouping key, a join that multiplies rows, or a misunderstood NULL rule can produce a chart that looks clean while hiding a logic bug underneath.
 
-## Concept at a Glance
+## Aggregation flow
 
-```mermaid
-flowchart LR
-    Rows["Rows"] --> Where["WHERE"]
-    Where --> Group["GROUP BY keys"]
-    Group --> Agg["SUM/COUNT/AVG"]
-    Agg --> Having["HAVING"]
-    Having --> Out["Result"]
-```
+Think of GROUP BY as a pivot: many input rows become fewer output rows. Each row in the output represents one group. You can only SELECT the grouping columns and aggregate functions; other columns have no single value per group.
 
 ## Key Terms
 
@@ -86,6 +78,13 @@ SELECT country, COUNT(*) AS users
 FROM users
 GROUP BY country;
 ```
+
+**Expected output:**
+
+| country | users |
+| --- | --- |
+| KR | 2 |
+| US | 1 |
 
 ### Step 3 — Multiple keys
 
@@ -155,17 +154,29 @@ GROUP BY country;
 
 GROUP BY makes meaning by *shrinking rows*. Next: *Subquery*.
 
+## Answering the Opening Questions
+
+- **When does GROUP BY run, and what exactly gets grouped?**
+  - The article treats GROUP BY and Aggregates as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do SUM, COUNT, and AVG differ in practice?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What is the real split between WHERE and HAVING?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
-- [WHERE and Conditions](./03-where-and-conditions.md)
-- [JOIN](./04-join.md)
+## In this series
+
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE and Conditions](./03-where-and-conditions.md)
+- [SQL 101 (4/10): JOIN](./04-join.md)
 - **GROUP BY and Aggregates (current)**
 - Subquery (upcoming)
 - Window Function (upcoming)
 - INSERT, UPDATE, DELETE (upcoming)
 - Index and Query Plan (upcoming)
 - Practical Analysis SQL (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -174,3 +185,4 @@ GROUP BY makes meaning by *shrinking rows*. Next: *Subquery*.
 - [PostgreSQL — Aggregate Functions](https://www.postgresql.org/docs/current/functions-aggregate.html)
 - [Mode — GROUP BY](https://mode.com/sql-tutorial/sql-group-by/)
 - [SQLBolt — Aggregates](https://sqlbolt.com/lesson/select_queries_with_aggregates)
+- [PostgreSQL — GROUPING SETS, CUBE, and ROLLUP](https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-GROUPING-SETS)

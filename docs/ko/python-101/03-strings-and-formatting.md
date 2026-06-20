@@ -1,13 +1,13 @@
 ---
-title: 문자열과 포매팅
+title: "Python 101 (3/10): 문자열과 포매팅"
 series: python-101
 episode: 3
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,45 +17,38 @@ tags:
 - unicode
 - string-methods
 - bytes-and-str
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: Python 3에서 str은 "Unicode 코드포인트의 불변 시퀀스"이고 bytes는 "바이트의 불변 시퀀스"라는
   두 층을 분리해 두면…
 ---
 
-# 문자열과 포매팅
+# Python 101 (3/10): 문자열과 포매팅
+
+Python 3에서 str은 Unicode 코드포인트의 불변 시퀀스이고, bytes는 바이트의 불변 시퀀스입니다. 이 두 층을 분리해 이해하면 인코딩과 포매팅에서 생기는 혼란을 줄일 수 있습니다.
+
+이 글은 Python 101 시리즈의 세 번째 글입니다.
 
 
-## 이 글에서 다룰 문제
+![Python 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/03/03-01-mental-model.ko.png)
+*Python 101 3장 흐름 개요*
+> 문자열과 포매팅의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-문자열은 거의 모든 프로그램의 입출력입니다. 사용자가 입력한 값, 파일에서 읽은 한 줄, HTTP 응답, 로그 메시지, JSON 필드 — 모두 `str`입니다. 그래서 문자열을 어설프게 다루면 다음과 같은 사고가 흔하게 일어납니다.
+## 먼저 던지는 질문
 
-- 한국어가 들어 있는 파일을 읽다가 `UnicodeDecodeError`로 멈춥니다.
-- 큰 로그를 만드는 동안 `+` 연결을 반복해서 메모리와 시간을 낭비합니다.
-- 사용자 입력을 신뢰하고 그대로 SQL에 끼워 넣어 SQL 인젝션을 만듭니다.
-- f-string의 format spec을 모른 채 `round`와 `str.zfill`을 짜집기로 씁니다.
+- 한국어가 들어 있는 파일을 읽다가 `UnicodeDecodeError`로 멈춥니다?
+- 큰 로그를 만드는 동안 `+` 연결을 반복해서 메모리와 시간을 낭비합니다?
+- 사용자 입력을 신뢰하고 그대로 SQL에 끼워 넣어 SQL 인젝션을 만듭니다?
 
-문자열을 정확히 다룰 줄 알면 이런 실수를 사전에 막을 수 있고, 코드는 짧고 명료해집니다. 무엇보다 다음 글에서 다룰 list/tuple/dict와 자연스럽게 이어집니다 — 컬렉션 안에 들어가는 값의 상당수가 결국 문자열이기 때문입니다.
-
-## Mental Model
+## 멘탈 모델
 
 > Python 3에서 `str`은 "Unicode 코드포인트의 불변 시퀀스"이고 `bytes`는 "바이트의 불변 시퀀스"라는 두 층을 분리해 두면, 인코딩·포매팅·정규표현식 어느 자리에서도 같은 도식으로 사고할 수 있습니다.
 Python의 `str`은 "코드 포인트의 시퀀스"입니다. 사람이 읽는 글자 단위로 추상화돼 있고, 디스크나 네트워크에 나갈 때만 `bytes`로 인코딩됩니다.
 
-![Mental Model](../../assets/python-101/03/03-01-mental-model.ko.png)
-
-*Mental Model*
 핵심 규칙 세 가지를 외워 두면 대부분의 혼란이 사라집니다.
 
 1. **`str`은 Unicode 코드 포인트의 시퀀스입니다.** 인코딩 정보를 갖지 않습니다.
 2. **`bytes`는 0~255 정수의 시퀀스입니다.** "어떤 인코딩의 결과물인지"는 코드를 짜는 사람이 기억해야 합니다.
 3. **외부 세계와의 경계에서만 `encode`/`decode`합니다.** 메모리 안에서는 `str`로만 다룹니다.
-
-```mermaid
-flowchart LR
-    File["파일/네트워크 (bytes)"] -->|decode UTF-8| Str["str (Unicode 코드 포인트)"]
-    Str -->|메모리 안 작업| Str
-    Str -->|encode UTF-8| Out["파일/네트워크로 전송 (bytes)"]
-```
 
 왼쪽 끝과 오른쪽 끝에서만 `bytes`를 만지고, 중앙의 모든 작업은 `str`로 합니다. 이 경계만 잘 지키면 `UnicodeDecodeError`는 입출력 한 곳에서만 발생하므로 추적이 쉬워집니다.
 
@@ -67,22 +60,22 @@ flowchart LR
 
 Python은 여러 가지 따옴표를 허용합니다. 의미는 모두 같지만, 안에 들어가는 따옴표를 escape하지 않으려고 골라 씁니다.
 
-```python
+```text
 >>> 'hello'
 'hello'
 >>> "she said \"hi\""
 'she said "hi"'
->>> 'she said "hi"'        # 큰따옴표가 본문에 있으면 작은따옴표로 감싸면 편합니다
+>>> 'she said "hi"'        # easier: wrap in single quotes
 'she said "hi"'
->>> """여러 줄
-... 문자열도
-... 가능합니다"""
-'여러 줄\n문자열도\n가능합니다'
+>>> """multi
+... line
+... strings work too"""
+'multi\nline\nstrings work too'
 ```
 
 raw 문자열은 백슬래시를 그대로 유지합니다. Windows 경로나 정규표현식에서 자주 씁니다.
 
-```python
+```text
 >>> path = r"C:\Users\name\file.txt"
 >>> print(path)
 C:\Users\name\file.txt
@@ -90,7 +83,7 @@ C:\Users\name\file.txt
 
 `b"..."`는 byte 리터럴입니다. ASCII 문자는 그대로 쓸 수 있고, 그 밖의 바이트 값은 `\xFF` 같은 escape 시퀀스로 표현해야 합니다.
 
-```python
+```text
 >>> b"hello"
 b'hello'
 >>> b"안녕"
@@ -102,13 +95,13 @@ SyntaxError: bytes can only contain ASCII literal characters
 
 OS와 프로토콜 경계에서 데이터는 결국 바이트입니다. 다만 Python의 많은 텍스트 API(`open(..., "r")`, `requests.Response.text` 등)는 그 바이트를 알아서 `str`로 디코드해 돌려줍니다. 직접 바이트를 다루는 자리에서는 UTF-8을 가정해 `decode`하면 `str`이 됩니다.
 
-```python
->>> data = "안녕".encode("utf-8")
+```text
+>>> data = "hi".encode("utf-8")
 >>> data
-b'\xec\x95\x88\xeb\x85\x95'
+b'hi'
 >>> data.decode("utf-8")
-'안녕'
->>> data.decode("ascii")
+'hi'
+>>> "안녕".encode("utf-8").decode("ascii")
 Traceback (most recent call last):
   ...
 UnicodeDecodeError: 'ascii' codec can't decode byte 0xec in position 0: ordinal not in range(128)
@@ -120,7 +113,7 @@ UnicodeDecodeError: 'ascii' codec can't decode byte 0xec in position 0: ordinal 
 
 `str`의 메서드는 모두 새 `str`을 돌려줍니다. 원본은 변하지 않습니다.
 
-```python
+```text
 >>> "  hello, world  ".strip()
 'hello, world'
 >>> "user@example.com".split("@")
@@ -133,7 +126,7 @@ UnicodeDecodeError: 'ascii' codec can't decode byte 0xec in position 0: ordinal 
 'Jython'
 >>> "image.png".endswith(".png")
 True
->>> "report.txt".startswith(("draft", "report"))    # tuple도 가능합니다
+>>> "report.txt".startswith(("draft", "report"))    # tuple is allowed
 True
 >>> "find me here".find("me")
 5
@@ -147,7 +140,7 @@ True
 
 `str`은 시퀀스이므로 인덱싱과 슬라이싱이 됩니다.
 
-```python
+```text
 >>> s = "Python"
 >>> s[0], s[-1]
 ('P', 'n')
@@ -159,7 +152,7 @@ True
 
 대신 일부분만 바꾸려면 새 문자열을 만들어야 합니다.
 
-```python
+```text
 >>> s = "hello"
 >>> s = "H" + s[1:]
 >>> s
@@ -170,7 +163,7 @@ True
 
 f-string(PEP 498)은 인라인 포매팅의 가장 분명한 기본값입니다. 변수와 식을 중괄호 안에 그대로 넣습니다.
 
-```python
+```text
 >>> name = "yeongseon"
 >>> count = 3
 >>> f"{name} has {count} books"
@@ -181,15 +174,15 @@ f-string(PEP 498)은 인라인 포매팅의 가장 분명한 기본값입니다.
 
 콜론(`:`) 뒤에는 format spec이 옵니다. 정렬·폭·소수점·진수·날짜를 한 줄로 표현할 수 있습니다.
 
-```python
+```text
 >>> import math
->>> f"{math.pi:.2f}"           # 소수점 둘째 자리까지
+>>> f"{math.pi:.2f}"           # two decimal places
 '3.14'
->>> f"{42:>6}"                 # 폭 6, 오른쪽 정렬
+>>> f"{42:>6}"                 # width 6, right-aligned
 '    42'
->>> f"{42:0>6}"                # 폭 6, 왼쪽을 0으로 채움
+>>> f"{42:0>6}"                # width 6, left-padded with zeros
 '000042'
->>> f"{255:#x}"                # 16진수, 0x 접두사
+>>> f"{255:#x}"                # hex with the 0x prefix
 '0xff'
 >>> from datetime import date
 >>> today = date(2026, 5, 3)
@@ -199,7 +192,7 @@ f-string(PEP 498)은 인라인 포매팅의 가장 분명한 기본값입니다.
 
 `!r`은 디버깅에 유용합니다. 값에 `repr()`을 씌워 따옴표가 보이게 합니다.
 
-```python
+```text
 >>> name = "ada"
 >>> f"name={name!r}"
 "name='ada'"
@@ -207,7 +200,7 @@ f-string(PEP 498)은 인라인 포매팅의 가장 분명한 기본값입니다.
 
 Python 3.8부터는 `=`을 붙이면 변수 이름과 값을 함께 출력합니다. 디버깅이 한결 쉬워집니다.
 
-```python
+```text
 >>> count = 3
 >>> f"{count=}"
 'count=3'
@@ -217,7 +210,7 @@ Python 3.8부터는 `=`을 붙이면 변수 이름과 값을 함께 출력합니
 
 옛 코드에서 자주 보이는 두 가지입니다. 새 코드는 f-string을 우선하지만, 의미는 알아 두는 편이 좋습니다.
 
-```python
+```text
 >>> "{} has {} books".format("yeongseon", 3)
 'yeongseon has 3 books'
 >>> "%s has %d books" % ("yeongseon", 3)
@@ -226,7 +219,7 @@ Python 3.8부터는 `=`을 붙이면 변수 이름과 값을 함께 출력합니
 
 `format`은 키워드 인자도 받습니다. 템플릿 문자열을 외부에서 채울 때 유용합니다. f-string은 정의되는 시점에 변수를 잡으므로 템플릿 용도로는 쓰기 어렵습니다.
 
-```python
+```text
 >>> template = "{name} owes {amount}"
 >>> template.format(name="ada", amount=12000)
 'ada owes 12000'
@@ -236,21 +229,21 @@ Python 3.8부터는 `=`을 붙이면 변수 이름과 값을 함께 출력합니
 
 `re` 모듈은 패턴으로 문자열을 다룹니다. 자세한 문법은 별도의 글이 필요하지만, 이메일을 찾는 정도는 한 줄로 가능합니다.
 
-```python
+```text
 >>> import re
->>> text = "문의는 ada@example.com 또는 bob@example.org 로 보내 주세요"
+>>> text = "Contact ada@example.com or bob@example.org"
 >>> re.findall(r"[\w.+-]+@[\w-]+\.[\w.-]+", text)
 ['ada@example.com', 'bob@example.org']
 ```
 
 raw 문자열(`r"..."`)을 쓰면 백슬래시를 두 번 쓰지 않아도 되어 가독성이 좋아집니다.
 
-## Before-After
+## 전후 비교
 
 같은 일을 옛날 방식과 f-string 방식으로 비교해 봅니다. f-string은 한눈에 의도가 보이고, 잘못된 변환을 줄여 줍니다.
 
 ```python
-# Before: %  포매팅 + 수동 zfill
+# 이전: % 포맷 + 수동 zfill
 name = "ada"
 count = 3
 price = 1234.5
@@ -258,7 +251,7 @@ line = "%s | %s | %s" % (name.ljust(10), str(count).zfill(3), "%.2f" % price)
 print(line)
 # 'ada        | 003 | 1234.50'
 
-# After: f-string + format spec
+# 이후: f-문자열 + 형식 사양
 line = f"{name:<10} | {count:0>3} | {price:.2f}"
 print(line)
 # 'ada        | 003 | 1234.50'
@@ -267,7 +260,7 @@ print(line)
 또 다른 흔한 비교는 문자열을 합치는 방식입니다. `+` 반복 대신 `join`을 쓰면 의도도 명확하고 빠릅니다.
 
 ```python
-# Before: + 연결을 반복
+# 이전: 반복 + 연결
 parts = ["alpha", "beta", "gamma", "delta"]
 out = ""
 for p in parts:
@@ -275,7 +268,7 @@ for p in parts:
 out = out.rstrip(", ")
 print(out)
 
-# After: join 한 줄
+# 이후: 단일 join으로 해결
 print(", ".join(parts))
 ```
 
@@ -350,7 +343,7 @@ CSV 한 줄을 받아 사람이 읽기 좋은 표 형태로 출력하는 함수�
 6. **`split()`과 `split(" ")`의 차이를 모른다.**
    인자 없는 `split()`은 연속 공백을 한 덩어리로 취급하지만, `split(" ")`은 공백 사이의 빈 문자열도 결과에 포함합니다. 사용자 입력을 다룰 때는 인자 없는 `split()`이 보통 더 안전합니다.
 
-## 실무
+## 실무에서는 이렇게 생각합니다
 
 - **로그 메시지.** `logger.info(f"user={user_id} action={action}")`처럼 f-string으로 키=값 형태를 만들면 grep과 파싱이 모두 쉬워집니다. 단, `logger.info("user=%s", user_id)`처럼 `%s`와 인자를 분리하면 로그 레벨이 꺼졌을 때 포매팅 비용이 들지 않아 더 효율적입니다.
 - **파일 경로.** Windows 경로를 다룰 때는 raw 문자열보다 `pathlib.Path("C:/Users/name") / "file.txt"`가 안전합니다. 슬래시 방향을 OS가 알아서 맞춥니다.
@@ -379,13 +372,194 @@ CSV 한 줄을 받아 사람이 읽기 좋은 표 형태로 출력하는 함수�
 
 다음 글에서는 list, tuple, set, dict 네 가지 컬렉션의 차이와, 언제 어떤 것을 골라야 하는지를 다룹니다. 가변·불변, 순서, 중복, 해시 가능성을 한 장에 정리합니다.
 
+## 실전 앵커: 문자열 처리에서 바로 터지는 함정과 디버깅 루틴
+
+문자열은 쉬워 보이지만 실제 서비스에서는 인코딩, 공백, 포맷, 성능이 동시에 얽힙니다. 특히 로그 메시지 조합을 `+`로 반복하는 습관은 금방 성능 문제로 이어집니다.
+
+```python
+import timeit
+
+join_t = timeit.timeit("' '.join(parts)", setup="parts=['python','is','simple']", number=2_000_000)
+plus_t = timeit.timeit("parts[0] + ' ' + parts[1] + ' ' + parts[2]", setup="parts=['python','is','simple']", number=2_000_000)
+print(join_t, plus_t)
+```
+
+예시 출력:
+
+```text
+0.152118
+0.244887
+```
+
+짧은 문자열 몇 개는 차이가 작아 보여도, 루프 내부에서 누적되면 체감이 큽니다. 그래서 반복 결합은 `list`에 담고 마지막에 `join`으로 합치는 패턴을 기본값으로 삼는 편이 안전합니다.
+
+포맷팅에서는 f-string, `str.format`, `%` 포맷이 공존합니다. 신규 코드 기준으로는 f-string을 기본으로 두고, 정렬/자리수 제어가 많을 때 format specifier를 적극적으로 씁니다.
+
+```python
+name = 'Kim'
+score = 92.3456
+print(f'{name:>10} | {score:06.2f}')
+```
+
+출력:
+
+```text
+       Kim | 092.35
+```
+
+실무에서 자주 터지는 문제는 보이지 않는 공백입니다. 다음처럼 `repr` 기반으로 관찰하면 디버깅 속도가 빨라집니다.
+
+```pycon
+>>> raw = '  user@example.com
+'
+>>> raw
+'  user@example.com
+'
+>>> raw.strip()
+'user@example.com'
+>>> repr(raw)
+"'  user@example.com\n'"
+```
+
+`strip/lstrip/rstrip` 구분도 명확히 두어야 합니다. 예를 들어 CSV 파서에서 선행 공백은 의미 있고 후행 개행만 제거해야 하는 경우 `rstrip('
+')`이 정확한 선택입니다.
+
+유니코드 정규화는 한국어/영문 혼합 데이터에서 꼭 짚고 넘어가야 합니다.
+
+```python
+import unicodedata
+
+s1 = 'é'
+s2 = 'é'
+print(s1 == s2)
+print(unicodedata.normalize('NFC', s1) == unicodedata.normalize('NFC', s2))
+```
+
+출력:
+
+```text
+False
+True
+```
+
+겉보기 글자가 같아도 내부 코드포인트가 달라 비교가 실패할 수 있습니다. 검색 인덱스, 사용자 ID 비교, 캐시 키 생성 전에는 정규화 정책을 정하는 편이 안전합니다.
+
+디버깅 관점에서 `pdb`를 문자열 처리 코드에 붙이는 예시도 하나 보겠습니다.
+
+```python
+import pdb
+
+def normalize_email(text):
+    pdb.set_trace()
+    return text.strip().lower()
+
+normalize_email('  Admin@Example.COM
+')
+```
+
+`p text`, `p repr(text)`, `n` 순서로 실행하면 공백/개행/대소문자 변화가 정확히 보입니다. 문자열 버그는 눈으로 보면 금방 끝나는 경우가 많습니다.
+
+마지막으로 템플릿 문자열을 다룰 때는 표준 라이브러리 `string.Template`도 알아 두면 좋습니다. 외부 입력을 섞어도 문법이 단순해서 운영 스크립트에서 안전하게 쓰기 쉽습니다.
+
+```python
+from string import Template
+
+t = Template('안녕하세요, $name님. 오늘 주문은 $count건입니다.')
+print(t.substitute(name='영선', count=3))
+```
+
+### 추가 실습: 로그 포맷과 안전한 텍스트 처리
+
+운영 로그는 사람이 읽는 용도와 기계가 파싱하는 용도를 동시에 만족해야 합니다. 문자열 보간 시 임의 사용자 입력을 그대로 붙이면 로그 인젝션 문제가 생길 수 있으므로 줄바꿈/탭 정규화가 필요합니다.
+
+```python
+def sanitize_log_text(text: str) -> str:
+    return text.replace('\n', '\
+').replace('\t', ' ')
+
+msg = sanitize_log_text('user=kim\nrole=admin')
+print(f'event=login {msg}')
+```
+
+또한 국제화(i18n) 메시지에서 자리수 지정 포맷은 번역 텍스트와 결합될 때 안정적입니다.
+
+```python
+name = '영선'
+count = 12
+print('{name}님의 신규 알림 {count:03d}건'.format(name=name, count=count))
+```
+
+출력:
+
+```text
+영선님의 신규 알림 012건
+```
+
+문자열 전처리 파이프라인은 보통 `strip -> normalize -> validate` 순서로 고정해 두는 편이 유지보수에 유리합니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
+## 처음 질문으로 돌아가기
+
+- **한국어가 들어 있는 파일을 읽다가 `UnicodeDecodeError`로 멈춥니다?**
+  - 파일 인코딩이 UTF-8이 아닌 경우(예: CP949로 저장된 Windows 한글 파일)에 기본 디코더가 실패하기 때문입니다. 본문에서 강조했듯이 `open()`에 `encoding="utf-8"` 또는 `encoding="cp949"`처럼 명시하고, 외부에서 받은 파일은 `errors="replace"`로 일부 손상을 허용하는 등 정책을 입구에서 정해야 합니다.
+- **큰 로그를 만드는 동안 `+` 연결을 반복해서 메모리와 시간을 낭비합니다?**
+  - 문자열은 불변이라 `+`마다 새 객체가 만들어지고, 본문에서 본 것처럼 N개 조각을 누적하면 O(N²) 비용이 들기 쉽습니다. 조각을 리스트에 모은 뒤 `"".join(parts)`로 한 번에 합치거나, 큰 로그라면 파일 핸들에 바로 `write`하는 방식이 표준 패턴입니다.
+- **사용자 입력을 신뢰하고 그대로 SQL에 끼워 넣어 SQL 인젝션을 만듭니다?**
+  - 문자열 포매팅으로 쿼리를 짜면 본문 예시처럼 `' OR 1=1 --` 같은 값이 그대로 SQL 문법으로 해석돼 인증을 우회할 수 있습니다. 모든 사용자 입력은 DB 드라이버의 파라미터 바인딩(`cursor.execute("... WHERE id=?", (uid,))`)으로 전달해 데이터와 코드 경계를 분리해야 합니다.
+
 <!-- toc:begin -->
+## 시리즈 목차
+
+- [Python 101 (1/10): 왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- **문자열과 포매팅 (현재 글)**
+- list, tuple, set, dict (예정)
+- 제어 흐름: if, for, while, comprehension (예정)
+- 함수와 인자: def, args, kwargs, default, lambda (예정)
+- 모듈과 패키지: import, __init__, __name__ (예정)
+- 파일 I/O와 예외 처리 (예정)
+- 클래스와 객체: 데이터와 동작을 함께 묶기 (예정)
+- 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
-- Python 공식 문서 — Built-in Types `str`: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str
-- Python 공식 문서 — Format Specification Mini-Language: https://docs.python.org/3/library/string.html#format-specification-mini-language
-- PEP 498 — Literal String Interpolation (f-string): https://peps.python.org/pep-0498/
-- Python 공식 문서 — `re` 모듈: https://docs.python.org/3/library/re.html
-- Unicode HOWTO: https://docs.python.org/3/howto/unicode.html
+- [Python 공식 문서 — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — `str`와 `bytes`의 불변 시퀀스 모델, 핵심 메서드, f-string 기본 동작을 함께 확인할 수 있습니다.
+- [Unicode HOWTO](https://docs.python.org/3/howto/unicode.html) — 코드 포인트, 인코딩, `encode`/`decode`, 파일 경계에서의 Unicode 처리 원칙을 설명합니다.
+- [Python 공식 문서 — `string`](https://docs.python.org/3/library/string.html) — format string 문법과 format spec mini-language의 세부 규칙을 정리합니다.
+- [PEP 498 — Literal String Interpolation](https://peps.python.org/pep-0498/) — f-string이 표현식 평가와 format specifier를 어떻게 결합하는지 보여 줍니다.
+- [Python 공식 문서 — `re`](https://docs.python.org/3/library/re.html) — raw string과 정규표현식 백슬래시 처리 규칙을 확인할 때 유용합니다.
+- [Python 공식 문서 — Input and Output](https://docs.python.org/3/tutorial/inputoutput.html) — 텍스트 포매팅, `repr()`/`str()`, 파일 입출력에서 문자열이 쓰이는 맥락을 보완합니다.
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)

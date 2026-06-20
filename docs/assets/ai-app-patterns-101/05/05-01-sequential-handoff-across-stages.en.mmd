@@ -1,0 +1,11 @@
+flowchart TD
+  I["Input article\nsource text enters pipeline"] --> T["Translate stage\nreturns {text}"]
+  T --> S["Summarize stage\nconsumes translated text"]
+  S --> H["Title stage\ncreates one-line heading"]
+  H --> O["Final artifact\ntranslation + summary + title"]
+
+  style I fill:#e3f2fd,stroke:#1976d2
+  style T fill:#fff3e0,stroke:#f57c00
+  style S fill:#e8f5e9,stroke:#388e3c
+  style H fill:#f3e5f5,stroke:#7b1fa2
+  style O fill:#fce4ec,stroke:#c2185b

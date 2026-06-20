@@ -1,36 +1,42 @@
 ---
 series: developer-career-101
 episode: 4
-title: Resume and Portfolio
-status: content-ready
+title: "Developer Career 101 (4/10): Resume and Portfolio"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
 language: en
 tags:
-  - Career
-  - Resume
-  - Portfolio
-  - Hiring
-  - Beginner
-seo_description: A beginner-friendly tour of writing a resume and portfolio that recruiters grasp in thirty seconds.
-last_reviewed: '2026-05-04'
+- Career
+- Resume
+- Portfolio
+- Hiring
+- Beginner
+seo_description: A beginner-friendly tour of writing a resume and portfolio that recruiters
+  grasp in thirty seconds.
+last_reviewed: '2026-05-14'
 ---
 
-# Resume and Portfolio
+# Developer Career 101 (4/10): Resume and Portfolio
 
-> Developer Career 101 series (4/10)
+Strong experience still gets ignored if it is hard to scan. Hiring teams usually decide within the first minute whether to keep reading, so the first job of a resume is not to tell your whole story. It is to make your role, your best evidence, and your likely interview topics obvious at a glance.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Developer Career 101 series.
 
-**Core question**: How do you make a recruiter understand you in *thirty seconds*?
 
-> Express role, results, and impact with numbers.
+![developer career 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/04/04-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 4 flow overview*
+> A resume and portfolio speak not to your technology list, but to the size of problems you solved and what you learned in solving them.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What structure lets a recruiter understand you quickly without guessing?
+- How do you rewrite responsibilities into outcome-oriented bullets with evidence?
+- Why are numbers and a compact STAR structure such strong hiring signals?
 
 ## What You Will Learn
 
@@ -44,15 +50,7 @@ last_reviewed: '2026-05-04'
 
 A resume is the ticket into the interview.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    H[Header] --> S[Summary]
-    S --> E[Experience]
-    E --> P[Projects]
-    P --> Sk[Skills]
-```
+Your evidence is strongest when it shows the scope you handled and what you learned, not the technology you used.
 
 ## Key Terms
 
@@ -100,6 +98,15 @@ Backend, 3 yrs. Cut payment p95 from 200ms to 80ms.
 Python, PostgreSQL, AWS, Kubernetes
 ```
 
+## What the screening flow actually looks for
+
+| Stage | What the reviewer wants fast | Evidence you should provide |
+| --- | --- | --- |
+| 30-second scan | Role, level, strongest number | Three-line summary and one headline outcome |
+| 3-minute read | Dense, credible result bullets | STAR-shaped bullets with quantified change |
+| Portfolio check | Do the links support the claims? | README, demo, repo, slides, shipped artifact |
+| Interview bridge | What should we ask next? | Incidents, performance wins, collaboration stories |
+
 ## What to Notice in This Code
 
 - Bullets are results.
@@ -143,10 +150,21 @@ Big companies require a short internal resume even for internal transfers.
 
 Next post covers *Preparing for Coding Interviews*.
 
+## Answering the Opening Questions
+
+- **What structure lets a recruiter understand you quickly without guessing?**
+  - The article treats Resume and Portfolio as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do you rewrite responsibilities into outcome-oriented bullets with evidence?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why are numbers and a compact STAR structure such strong hiring signals?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Developer Career](./01-what-is-developer-career.md)
-- [Understanding Roles](./02-understanding-roles.md)
-- [Building a Learning Plan](./03-learning-plan.md)
+## In this series
+
+- [Developer Career 101 (1/10): What Is a Developer Career](./01-what-is-developer-career.md)
+- [Developer Career 101 (2/10): Understanding Roles](./02-understanding-roles.md)
+- [Developer Career 101 (3/10): Building a Learning Plan](./03-learning-plan.md)
 - **Resume and Portfolio (current)**
 - Preparing for Coding Interviews (upcoming)
 - System Design Interviews (upcoming)
@@ -154,11 +172,12 @@ Next post covers *Preparing for Coding Interviews*.
 - Side Projects and Learning (upcoming)
 - Mentoring and Networking (upcoming)
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Tech Resume Inside Out](https://thetechresume.com/)
-- [Google Resume Tips](https://careers.google.com/how-we-hire/)
-- [STAR method](https://en.wikipedia.org/wiki/Situation,_task,_action,_result)
-- [ATS-friendly resume](https://www.jobscan.co/resume-writing-guide)
+- [Google Careers — Resume tips](https://careers.google.com/how-we-hire/)
+- [LinkedIn Talent Blog](https://business.linkedin.com/talent-solutions/blog)
+- [The Muse — STAR method overview](https://www.themuse.com/advice/star-interview-method)
+- [GitHub Docs — Profile README basics](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/about-your-profile)

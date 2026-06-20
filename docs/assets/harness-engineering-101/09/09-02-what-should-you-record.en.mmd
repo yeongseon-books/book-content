@@ -1,0 +1,12 @@
+flowchart LR
+    What["What\ntool name · input · output"] --> Trace["Useful trace record"]
+    Why["Why\nprompt · model · temperature · retrieved context"] --> Trace
+    Cost["Cost / latency\ntokens · duration · dollars"] --> Trace
+
+    Trace --> Metadata["Attributes\nshort metadata for search and filtering"]
+    Trace --> Events["Events\nprompt, response, and ordered payloads"]
+    Metadata --> Replay["Together they support replay, debugging, and optimization"]
+    Events --> Replay
+
+    style Trace fill:#f3e5f5,stroke:#7b1fa2
+    style Replay fill:#fff8e1,stroke:#f9a825

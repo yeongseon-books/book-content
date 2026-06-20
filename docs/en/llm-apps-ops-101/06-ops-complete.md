@@ -1,11 +1,11 @@
 ---
-title: Completing the LLM ops pipeline
+title: "LLM Apps Ops 101 (6/6): Completing the LLM ops pipeline"
 series: llm-apps-ops-101
 episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -20,28 +20,31 @@ seo_description: Operational maturity is not about stacking features. It is abou
   logs.
 ---
 
-# Completing the LLM ops pipeline
+# LLM Apps Ops 101 (6/6): Completing the LLM ops pipeline
 
-## Questions this post answers
-- How do you combine logging, cost tracking, and quality checks in one endpoint?
-- Why should health checks surface cumulative calls and cumulative cost?
-- Which failure should happen first in an integrated ops pipeline?
+Individual operational layers can look fine in isolation and still leave incidents hard to explain. The real milestone is getting one request to emit connected signals for safety, cost, quality, and logging.
 
-> Operational maturity is not about stacking features. It is about making one request produce connected signals for validation, cost, quality, and logs.
+This is the final post in the LLM Apps Ops 101 series. Here, we will connect the earlier pieces into one integrated operations pipeline.
 
-## Big picture
-![LLM ops pipeline complete overview](../../assets/llm-apps-ops-101/06/06-01-big-picture.en.png)
-
+![LLM ops pipeline complete overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/06/06-01-big-picture.en.png)
 *LLM ops pipeline complete overview*
+> LLM operations is not adding many layers; it is explaining one request across cost, quality, security, and deployment signals.
+
+## Questions to Keep in Mind
+
+- Which layers must a complete LLM operations pipeline connect inside one request?
+- What operations gap appears when monitoring, cost, evaluation, security, and deployment stay separate?
+- What cumulative signals should the health state of a minimal operations app expose?
+
 ## Why this layer matters
-![Ops flow from validation to logging](../../assets/llm-apps-ops-101/06/06-01-why-this-layer-matters.en.png)
+![Ops flow from validation to logging](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/06/06-01-why-this-layer-matters.en.png)
 
 *Ops flow from validation to logging*
 An integrated pipeline matters because one request should leave connected traces for validation, cost, quality, and logging.
 
 When each operational layer lives alone, demos look clean but incidents stay hard to explain. In production, you need one place to tell whether a bad outcome came from unsafe input, rising cost, or degrading output quality.
 
-Example file: `/root/Github/llm-apps-ops-101/en/06-ops-complete/main.py`
+Example file: `en/06-ops-complete/main.py`
 
 ## Minimal runnable example
 ```python
@@ -229,7 +232,7 @@ if __name__ == "__main__":
 ```
 
 ## What to notice in this code
-![Health state exposes cumulative calls and cost](../../assets/llm-apps-ops-101/06/06-02-what-to-notice-in-this-code.en.png)
+![Health state exposes cumulative calls and cost](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/06/06-02-what-to-notice-in-this-code.en.png)
 
 *Health state exposes cumulative calls and cost*
 - Returning `quality`, `total_tokens`, and `cost_usd` in one response gives both server and client immediate operating context.
@@ -237,7 +240,7 @@ if __name__ == "__main__":
 - The structured `quality` payload can later be aligned with batch evaluation jobs and dashboards.
 
 ## Where engineers get confused
-![Deploy monitor evaluate optimize redeploy loop](../../assets/llm-apps-ops-101/06/06-03-where-engineers-get-confused.en.png)
+![Deploy monitor evaluate optimize redeploy loop](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/06/06-03-where-engineers-get-confused.en.png)
 
 *Deploy monitor evaluate optimize redeploy loop*
 - An integrated pipeline does not remove the need for storage, alerts, and dashboards. It just gives them better signals.
@@ -253,15 +256,24 @@ if __name__ == "__main__":
 ## Summary
 At this point one request leaves a full operational trail. From here, the next step is persistence, alerting, and dashboards rather than new endpoint logic.
 
+## Answering the Opening Questions
+
+- **Which layers must a complete LLM operations pipeline connect inside one request?**
+  - Input validation, security guards, model calls, cost accounting, quality evaluation, log records, and health reporting must connect inside one request.
+- **What operations gap appears when monitoring, cost, evaluation, security, and deployment stay separate?**
+  - Metrics cannot be joined, so root cause, cost spikes, quality drops, and security blocks become separate stories.
+- **What cumulative signals should the health state of a minimal operations app expose?**
+  - Expose cumulative calls, errors, total cost, average latency, recent blocks, and last provider status.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Monitoring and logging for LLM apps](./01-monitoring-and-logging.md)
-- [LLM cost tracking and optimization](./02-cost-tracking.md)
-- [Evaluating LLM output quality](./03-evaluation.md)
-- [LLM app security](./04-security.md)
-- [LLM app deployment strategies](./05-deployment.md)
-- **Completing the LLM ops pipeline (current)**
+- [LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps](./01-monitoring-and-logging.md)
+- [LLM Apps Ops 101 (2/6): LLM cost tracking and optimization](./02-cost-tracking.md)
+- [LLM Apps Ops 101 (3/6): Evaluating LLM output quality](./03-evaluation.md)
+- [LLM Apps Ops 101 (4/6): LLM app security](./04-security.md)
+- [LLM Apps Ops 101 (5/6): LLM app deployment strategies](./05-deployment.md)
+- **LLM Apps Ops 101 (6/6): Completing the LLM ops pipeline (current)**
 
 <!-- toc:end -->
 

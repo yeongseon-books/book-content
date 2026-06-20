@@ -1,10 +1,10 @@
 ---
 series: technical-writing-101
 episode: 10
-title: Pre-publish Checklist
-status: content-ready
+title: "Technical Writing 101 (10/10): Pre-publish Checklist"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,44 +16,36 @@ tags:
   - Publishing
   - Quality
   - Beginner
-seo_description: A beginner-friendly tour of the final pre-publish checklist for any technical post before hitting the publish button.
-last_reviewed: '2026-05-04'
+seo_description: Use a repeatable pre-publish checklist for titles, links, code, visuals, and final verification before readers see the post.
+last_reviewed: '2026-05-15'
 ---
 
-# Pre-publish Checklist
+# Technical Writing 101 (10/10): Pre-publish Checklist
 
-> Technical Writing 101 series (10/10)
+The riskiest moment in writing is often the moment when the draft feels almost done. That is when broken links, stale commands, missing captions, and title typos get waved through as small details. Readers usually notice those details first.
 
-<!-- a-grade-intro:begin -->
+A pre-publish pass is not perfectionism. It is a cost-control routine. One round of automated checks plus one round of human review can remove a surprising number of expensive fixes before the post reaches real readers.
 
-**Core question**: What is the *last* thing to *review* before you hit *publish*?
+This is the final post in the Technical Writing 101 series. It turns that last-pass review into a repeatable workflow for titles, links, code, visuals, and post-publish follow-up.
 
-> Re-reading with the *eyes of a first-time visitor*.
 
-<!-- a-grade-intro:end -->
+![technical writing 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/10/10-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 10 flow overview*
+> A pre-publish pass is the difference between a fix that costs 24 hours (before readers see it) and a fix that costs a week (after they do).
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- *Title* review
-- *Link* validation
-- *Code* execution
-- *Image* checks
-- *Post-publish* review
+- Title* review?
+- Link* validation?
+- Code* execution?
 
 ## Why It Matters
 
 A *fix after publish* is far more expensive than a *check before publish*.
 
-## Concept at a Glance
+> Mental model: the final pass is an operating routine for titles, links, code, visuals, and follow-up.
 
-```mermaid
-flowchart LR
-    T[Title] --> L[Links]
-    L --> C[Code]
-    C --> I[Images]
-    I --> P[Publish]
-```
-
+A pre-publish checklist is not perfectionism; it is cost control. One round of automated checks plus one round of human review can catch broken links, stale commands, missing captions, and edge cases before real readers encounter them.
 ## Key Terms
 
 - **link rot**: A *broken link* over time.
@@ -67,6 +59,28 @@ flowchart LR
 **Before**: A *broken link* found right after publish.
 
 **After**: The *checklist* passes before publish.
+
+## Turn the checklist into a repeatable release routine
+
+For a repository like this one, the final pass is stronger when it becomes a command sequence instead of a memory exercise.
+
+```bash
+python3 .sisyphus/medium/finalize-posts.py
+bash .sisyphus/style/check-ko.sh content/technical-writing-101/ko
+python3 scripts/check_frontmatter.py
+python3 scripts/check_links.py
+python3 scripts/check_article_structure.py
+make check
+```
+
+**Expected output:**
+
+```text
+hard failures: 0
+warnings: 0
+```
+
+Automation does not replace human review. After the commands pass, it is still worth rereading the title and first three paragraphs as if you were a first-time visitor. Readers often decide whether to trust the whole post from that narrow slice alone.
 
 ## Hands-on: A Five Step Review
 
@@ -143,17 +157,29 @@ Engineering blog teams run *peer review*, *automated checks*, and *post-mortems*
 
 This is the *final* post in *Technical Writing 101*. The next series covers *Open Source Contribution*.
 
+## Answering the Opening Questions
+
+- **Title* review?**
+  - The article treats Pre-publish Checklist as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Link* validation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Code* execution?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
-- [Title and Structure](./03-title-and-structure.md)
-- [Explaining Concepts](./04-explaining-concepts.md)
-- [Explaining Example Code](./05-explaining-example-code.md)
-- [Using Figures and Tables](./06-using-figures-and-tables.md)
-- [Writing the README](./07-writing-the-readme.md)
-- [Writing Tutorials](./08-writing-tutorials.md)
-- [Blog vs Documentation](./09-blog-vs-docs.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): Title and Structure](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): Explaining Concepts](./04-explaining-concepts.md)
+- [Technical Writing 101 (5/10): Explaining Example Code](./05-explaining-example-code.md)
+- [Technical Writing 101 (6/10): Using Figures and Tables](./06-using-figures-and-tables.md)
+- [Technical Writing 101 (7/10): Writing the README](./07-writing-the-readme.md)
+- [Technical Writing 101 (8/10): Writing Tutorials](./08-writing-tutorials.md)
+- [Technical Writing 101 (9/10): Blog vs Documentation](./09-blog-vs-docs.md)
 - **Pre-publish Checklist (current)**
+
 <!-- toc:end -->
 
 ## References

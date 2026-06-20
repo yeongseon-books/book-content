@@ -1,10 +1,10 @@
 ---
 series: frontend-development-101
 episode: 1
-title: What Is Frontend Development?
+title: "Frontend Development 101 (1/10): What Is Frontend Development?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,21 @@ seo_description: Browsers, rendering, and JavaScript — a complete picture of f
 last_reviewed: '2026-05-04'
 ---
 
-# What Is Frontend Development?
+# Frontend Development 101 (1/10): What Is Frontend Development?
 
-> Frontend Development 101 series (1/10)
+Most people enter frontend development through the visual door. They see buttons, colors, and layouts, so the work looks like "making screens pretty." That is part of the job, but it is not the whole job. In production, frontend work also includes understanding how the browser renders, how user input becomes state changes, and where the boundary with the backend actually lives.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Frontend Development 101 series. In this chapter, we treat the frontend as the product layer that runs inside the browser rather than as a pile of UI tweaks. The key mental model is that the frontend draws what users see and directly shapes the speed, trust, and feedback they feel.
 
-**Core question**: Where is *everything the user can see* actually built?
 
-> The frontend is *a tiny operating system that runs inside the browser*. HTML, CSS, and JavaScript are the *languages* of that OS.
+![frontend development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/01/01-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 1 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Frontend Development??
+- Which signal should the example or diagram make visible for What Is Frontend Development??
+- What failure should be prevented first when What Is Frontend Development? reaches a real system?
 
 ## What You Will Learn
 
@@ -38,6 +42,7 @@ last_reviewed: '2026-05-04'
 - *How a browser draws* a page
 - The *distinct roles* of HTML, CSS, and JavaScript
 - A bird's-eye view of *modern frontend tooling*
+
 - A learning roadmap
 
 ## Why It Matters
@@ -45,17 +50,6 @@ last_reviewed: '2026-05-04'
 *Everything users feel* passes through the frontend. A perfect backend with a slow frontend is *judged as a slow product*. The frontend is the *first and last impression* of your product.
 
 > A great frontend is *invisible*: users just *use it* without thinking.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    User["User"] --> Browser["Browser"]
-    Browser --> HTML["HTML (structure)"]
-    Browser --> CSS["CSS (style)"]
-    Browser --> JS["JavaScript (behavior)"]
-    JS --> API["Backend API"]
-```
 
 The browser *combines* the three languages to draw the screen.
 
@@ -125,6 +119,16 @@ python3 -m http.server 8000
 
 Press `F12` and inspect the Elements, Console, and Network tabs to see *what the browser actually received*.
 
+## Verification
+
+- Run `python3 -m http.server 8000`, open the page, and confirm that clicking the button changes the heading text to `Hello, frontend!`.
+- Open DevTools Network and verify that the browser really downloads `index.html`, `app.js`, and the related static assets.
+
+## If It Fails, Check This First
+
+- If the button does nothing, check the `app.js` path first and confirm that `id="b"` and `id="t"` still match the DOM.
+- If the page looks fine but the interaction fails, inspect the Console for syntax errors or `null` selector references.
+
 ## What to Notice in This Code
 
 - HTML is *structure*, CSS is *appearance*, JS is *behavior*.
@@ -169,7 +173,18 @@ Most teams use *React/Vue/Svelte* with *TypeScript* and *Vite/Next.js*. Don't tr
 
 The frontend is *the layer where the product meets the user inside the browser*. Next, we dig into the *foundation* of that layer: HTML and CSS.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Frontend Development??**
+  - The article treats What Is Frontend Development? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Frontend Development??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Frontend Development? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Frontend Development? (current)**
 - HTML and CSS Basics (upcoming)
 - JavaScript Basics (upcoming)
@@ -180,11 +195,16 @@ The frontend is *the layer where the product meets the user inside the browser*.
 - Styling and Design Systems (upcoming)
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [MDN Web Docs](https://developer.mozilla.org/)
-- [web.dev](https://web.dev/)
-- [Frontend Roadmap](https://roadmap.sh/frontend)
-- [HTML Living Standard](https://html.spec.whatwg.org/)
+### Official Docs
+- [MDN: How browsers work](https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Performance/How_browsers_work)
+- [MDN: Client-side web APIs](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Introduction)
+- [web.dev: Learn HTML](https://web.dev/learn/html/)
+
+### Verification and Further Reading
+- [Chrome DevTools documentation](https://developer.chrome.com/docs/devtools/)
+- [Frontend Developer Roadmap](https://roadmap.sh/frontend)

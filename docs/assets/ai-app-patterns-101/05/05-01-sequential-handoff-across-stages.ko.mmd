@@ -1,0 +1,11 @@
+flowchart TD
+  I["입력 원문\n파이프라인에 소스 텍스트 진입"] --> T["번역 단계\n{text} 반환"]
+  T --> S["요약 단계\n번역된 텍스트 소비"]
+  S --> H["제목 단계\n한 줄 제목 생성"]
+  H --> O["최종 산출물\n번역 + 요약 + 제목"]
+
+  style I fill:#e3f2fd,stroke:#1976d2
+  style T fill:#fff3e0,stroke:#f57c00
+  style S fill:#e8f5e9,stroke:#388e3c
+  style H fill:#f3e5f5,stroke:#7b1fa2
+  style O fill:#fce4ec,stroke:#c2185b

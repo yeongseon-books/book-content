@@ -1,58 +1,52 @@
 ---
 series: containers-101
 episode: 5
-title: Volume
-status: content-ready
+title: "Containers 101 (5/10): Volume"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
 language: en
 tags:
-  - Containers
-  - Docker
-  - Volume
-  - Storage
-  - DevOps
-seo_description: Volumes, bind mounts, and tmpfs compared by lifecycle and use case — taught with runnable docker volume examples for beginners.
-last_reviewed: '2026-05-04'
+- Containers
+- Docker
+- Volume
+- Storage
+- DevOps
+seo_description: Volumes, bind mounts, and tmpfs compared by lifecycle and use case
+  — taught with runnable docker volume examples for beginners.
+last_reviewed: '2026-05-15'
 ---
 
-# Volume
+# Containers 101 (5/10): Volume
 
-> Containers 101 series (5/10)
+Containers are supposed to be easy to replace. Data is not. If you blur that line, local demos may still work while production quietly accumulates backup gaps, permission collisions, and data-loss risk.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Containers 101 series.
 
-**Core question**: When the container disappears, where does the data go?
+In this chapter, we compare named volumes, bind mounts, and tmpfs by lifecycle and failure mode, then turn that model into backup and restore habits you can keep in operations.
 
-> *Keep state in volumes, not in containers. Knowing volume vs bind mount vs tmpfs is what prevents data loss.*
+> Replaceable containers need durable state boundaries. Volumes are where that boundary becomes explicit.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![containers 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.en.png)
+*containers 101 chapter 5 flow overview*
+> Volumes are the mechanism to keep data alive when containers die — they decouple storage lifecycle from container lifecycle.
 
-- Volumes vs bind mounts vs tmpfs
-- Guaranteeing data persistence
-- Backup and migration
-- Permission gotchas
-- Five common pitfalls
+## Questions to Keep in Mind
+
+- Volumes vs bind mounts vs tmpfs?
+- Guaranteeing data persistence?
+- Backup and migration?
 
 ## Why It Matters
 
 Containers are immutable, but the data they manage must survive. A bad volume design is a data-loss design.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Container["container"] --> Volume["named volume"]
-    Container --> Bind["bind mount"]
-    Container --> Tmpfs["tmpfs"]
-    Volume --> Disk["host disk"]
-```
+Volumes are managed storage independent of container identity. Bind mounts let you connect a host path directly. tmpfs lives in memory and disappears when the container stops. Each has different persistence guarantees and performance trade-offs.
 
 ## Key Terms
 
@@ -127,6 +121,25 @@ def remove(name):
 - A tar-runner container standardizes backups.
 - Bind mounts are path-dependent — be careful.
 
+## Quick verification and failure signals
+
+```bash
+docker volume create pgdata
+docker run -d --name pg -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=secret postgres:16
+docker volume inspect pgdata
+docker rm -f pg
+docker run -d --name pg -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=secret postgres:16
+```
+
+**Expected output:**
+- `docker volume inspect` shows the Docker-managed mount point.
+- Re-creating the container against the same volume preserves the database directory.
+
+**Check first if it fails:**
+- If Postgres fails, inspect volume permissions and initialization logs first.
+- If you are using a bind mount, confirm host ownership matches the container user.
+- A backup plan is incomplete until you test a restore path.
+
 ## Five Common Mistakes
 
 1. **Storing DB data inside the container.**
@@ -164,17 +177,29 @@ Developers use bind mounts for code hot-reload. Databases use named volumes. Sen
 
 Once data has a home, communication is next. The next post covers Network.
 
+## Answering the Opening Questions
+
+- **Volumes vs bind mounts vs tmpfs?**
+  - The article treats Volume as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Guaranteeing data persistence?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Backup and migration?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Container?](./01-what-is-a-container.md)
-- [Image and Layer](./02-image-and-layer.md)
-- [Runtime](./03-runtime.md)
-- [Dockerfile](./04-dockerfile.md)
+## In this series
+
+- [Containers 101 (1/10): What is a Container?](./01-what-is-a-container.md)
+- [Containers 101 (2/10): Image and Layer](./02-image-and-layer.md)
+- [Containers 101 (3/10): Runtime](./03-runtime.md)
+- [Containers 101 (4/10): Dockerfile](./04-dockerfile.md)
 - **Volume (current)**
 - Network (upcoming)
 - Registry (upcoming)
 - Container Security (upcoming)
 - Containers vs VMs (upcoming)
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References

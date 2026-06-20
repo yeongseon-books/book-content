@@ -1,7 +1,7 @@
 ---
 episode: 6
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -13,61 +13,50 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
-title: Vector search pipeline — from document ingestion to query
-seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
+  tistory: false
+title: "Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query"
+seo_description: Build an end-to-end vector search pipeline from document ingestion to retrieval, including hybrid search combining keywords and embeddings.
 ---
 
-# Vector search pipeline — from document ingestion to query
-
-> Vector Search 101 (6/6)
-
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/06-vector-search-pipeline)
+# Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query
 
 The previous five posts each covered one component in isolation: embeddings, similarity metrics, FAISS, and chunking. This post assembles them into one executable pipeline that loads documents, splits them into chunks, embeds those chunks, stores them in a FAISS index, and retrieves results for natural-language queries.
 
 The post closes with the basics of hybrid search, which combines vector retrieval with keyword search.
 
-Topics:
+This is the final post in the Vector Search 101 series.
 
-- loading documents from text
-- the full indexing flow: chunking → embedding → FAISS
-- saving and reloading the index
-- querying and displaying results
-- hybrid search concept and a minimal implementation
+The emphasis here is not on one component in isolation, but on how the whole retrieval system moves from raw documents to ranked answers.
 
-![End to end indexing and retrieval flow](../../assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png)
-
+![End to end indexing and retrieval flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png)
 *End to end indexing and retrieval flow*
----
+> A vector search pipeline is not one monolithic feature. It is a structure that separates indexing from retrieval so each part can be replaced independently.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- How do you cleanly separate ingest, embedding, indexing, and search stages?
-- What event should trigger an automatic reindex?
-- How do you combine lexical search (like BM25) with vector search when vectors alone fall short?
-- When does it become necessary to add a reranker before passing results to the LLM?
-- How do you compute and track production search quality metrics (recall@k, MRR, nDCG)?
+- What stages make vector search a pipeline rather than one embedding call?
+- When is hybrid search safer than pure vector search?
+- When documents change, what should drive reindexing and operational logs?
 
 ## Pipeline structure
 
-![End to end indexing and retrieval flow](../../assets/vector-search-101/06/06-01-pipeline-structure.en.png)
+![End to end indexing and retrieval flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-01-pipeline-structure.en.png)
 
 *End to end indexing and retrieval flow*
-![Pipeline component connection structure](../../assets/vector-search-101/06/06-02-pipeline-structure-2.en.png)
+![Pipeline component connection structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-02-pipeline-structure-2.en.png)
 
 *Pipeline component connection structure*
 A vector search pipeline has two phases.
 
 **Indexing** is an offline step: process documents once and produce a searchable index.
 
-```
+```text
 load documents → chunk → embed → save FAISS index
 ```
 
 **Retrieval** is an online step: accept a query, embed it, search the index, return results.
 
-```
+```text
 embed query → FAISS search → return ranked chunks
 ```
 
@@ -77,7 +66,7 @@ Separating the two phases means you build the index once and query it many times
 
 ## Complete pipeline
 
-![Build save load search execution path](../../assets/vector-search-101/06/06-03-complete-pipeline.en.png)
+![Build save load search execution path](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-03-complete-pipeline.en.png)
 
 *Build save load search execution path*
 One self-contained, executable file.
@@ -228,28 +217,13 @@ for query in queries:
 
 <!-- injected-output:end -->
 
-Expected output:
-
-```
-total chunks: 8
-vector shape: (8, 384)
-saved: faiss.index, chunks.json
-loaded: 8 vectors
-
-query: 'how vector search differs from keyword search'
-  [1] 0.8123 — Vector search converts text into numeric vectors for meaning-based...
-  [2] 0.7234 — Unlike keyword search, it matches content even when phrasing differs.
-
-query: 'FAISS index types'
-  [1] 0.8412 — IndexFlatIP is an exact inner-product index equivalent to cosine...
-  [2] 0.7891 — FAISS is a high-speed vector search library developed at Facebook...
-```
+This example ends with 4 chunks because the input corpus is intentionally small. In real systems, the absolute number is not what matters. The real check is whether **document count → chunk count → index vector count** changes in the way you expect after a pipeline update.
 
 ---
 
 ## Hybrid search
 
-![Combining vector scores with BM25 scores](../../assets/vector-search-101/06/06-04-hybrid-search.en.png)
+![Combining vector scores with BM25 scores](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-04-hybrid-search.en.png)
 
 *Combining vector scores with BM25 scores*
 Vector search alone is weak when exact terms matter — error codes, product IDs, proper nouns. Keyword search handles those well but misses semantic variation. Hybrid search combines both.
@@ -297,11 +271,79 @@ def hybrid_search(
 
 `alpha=0.5` weights both methods equally. Increase toward 1.0 for more semantic weight; decrease toward 0.0 for more keyword weight.
 
+Running it makes the benefit clearer.
+
+```python
+bm25_ready_chunks = [
+    "FAISS IndexFlatIP supports exact inner-product search on normalized vectors.",
+    "Error code ERR_CONNECTION_REFUSED is usually better handled by exact keyword search.",
+    "Chunking strategy changes how much context each vector carries.",
+]
+
+for query in ["IndexFlatIP cosine search", "ERR_CONNECTION_REFUSED"]:
+    results = hybrid_search(query, build_index(bm25_ready_chunks)[0], bm25_ready_chunks, top_k=2, alpha=0.5)
+    print(f"\nquery: {query}")
+    for score, text in results:
+        print(f"  {score:.4f} — {text}")
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    query: IndexFlatIP cosine search
+      0.9087 — FAISS IndexFlatIP supports exact inner-product search on normalized vectors.
+      0.2173 — Chunking strategy changes how much context each vector carries.
+
+    query: ERR_CONNECTION_REFUSED
+      0.7421 — Error code ERR_CONNECTION_REFUSED is usually better handled by exact keyword search.
+      0.1036 — FAISS IndexFlatIP supports exact inner-product search on normalized vectors.
+
+<!-- injected-output:end -->
+
+The first query benefits from both semantic and lexical signals pointing at the same chunk. The second depends much more on exact token matching. That contrast is exactly why hybrid search exists.
+
+## When should reindexing run?
+
+One common operational mistake is treating the index as a one-time artifact. In practice, you need an explicit reindex trigger whenever one of these changes:
+
+- the embedding model name or version
+- chunking rules such as `chunk_size`, `chunk_overlap`, or separators
+- the source documents themselves
+- metadata fields stored alongside chunks
+
+Persisting a small manifest next to the index gives you a fast compatibility check at startup.
+
+```python
+import json
+
+manifest = {
+    "embedding_model": EMBED_MODEL,
+    "chunk_size": CHUNK_SIZE,
+    "chunk_overlap": CHUNK_OVERLAP,
+    "document_count": len(documents),
+    "index_type": "IndexFlatIP",
+}
+
+with open("index-manifest.json", "w") as f:
+    json.dump(manifest, f, indent=2)
+
+print(manifest)
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    {'embedding_model': 'sentence-transformers/all-MiniLM-L6-v2', 'chunk_size': 300, 'chunk_overlap': 30, 'document_count': 4, 'index_type': 'IndexFlatIP'}
+
+<!-- injected-output:end -->
+
+This is not glamorous infrastructure, but it gives you the first thing to compare when someone asks why retrieval quality changed after a deployment.
+
 ---
 
 ## Operational considerations
 
-![Index update and deletion constraint path](../../assets/vector-search-101/06/06-05-operational-considerations.en.png)
+![Index update and deletion constraint path](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-05-operational-considerations.en.png)
 
 *Index update and deletion constraint path*
 **Index updates.** Adding new documents is straightforward: embed them and call `index.add()`. `IndexFlatIP` does not support deletion. If you need to remove vectors, rebuild the index periodically or use `IndexIDMap` to track and skip deleted entries.
@@ -326,15 +368,26 @@ The natural next step is connecting this pipeline to an LLM to build a RAG syste
 - [ ] Maintained an eval set and an automated quality script in production
 - [ ] Surfaced latency, recall, and cost on the same dashboard
 
+## Answering the Opening Questions
+
+- **What stages make vector search a pipeline rather than one embedding call?**
+  Ingestion, cleaning, chunking, embedding, indexing, query embedding, retrieval, and result assembly all have to work together.
+
+- **When is hybrid search safer than pure vector search?**
+  Hybrid search is safer when exact identifiers, fresh keywords, filters, or symbolic matches matter and pure semantic retrieval may blur them.
+
+- **When documents change, what should drive reindexing and operational logs?**
+  Document version, input hash, model version, and chunking settings should drive reindexing; logs should keep query, result, latency, and index version together.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is an embedding — converting text into vectors](./01-what-is-embedding.md)
-- [HuggingFace embeddings in practice — creating your first vectors with sentence-transformers](./02-huggingface-embeddings.md)
-- [Cosine similarity and vector search — computing sentence distances](./03-cosine-similarity.md)
-- [FAISS fundamentals — fast approximate nearest-neighbor search](./04-faiss-fundamentals.md)
-- [Chunking strategies — how to split long documents](./05-chunking-strategies.md)
-- **Vector search pipeline — from document ingestion to query (current)**
+- [Vector Search 101 (1/6): What is an embedding — converting text into vectors](./01-what-is-embedding.md)
+- [Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers](./02-huggingface-embeddings.md)
+- [Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances](./03-cosine-similarity.md)
+- [Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search](./04-faiss-fundamentals.md)
+- [Vector Search 101 (5/6): Chunking strategies — how to split long documents](./05-chunking-strategies.md)
+- **Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query (current)**
 
 <!-- toc:end -->
 
@@ -346,3 +399,4 @@ The natural next step is connecting this pipeline to an LLM to build a RAG syste
 - [LangChain FAISS integration](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
 - [rank-bm25 library](https://github.com/dorianbrown/rank_bm25)
 - [Hybrid search introduction — Pinecone](https://www.pinecone.io/learn/hybrid-search-intro/)
+- [Sentence Transformers pretrained models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html)

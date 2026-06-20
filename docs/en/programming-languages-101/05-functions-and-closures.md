@@ -1,10 +1,10 @@
 ---
 series: programming-languages-101
 episode: 5
-title: Functions and Closures
-status: content-ready
+title: "Programming Languages 101 (5/10): Functions and Closures"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,44 +18,39 @@ tags:
   - FirstClass
   - Capture
 seo_description: A closure is not magic. It is what lexical scope and first-class functions naturally produce together. Walk through the mechanism end to end.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Functions and Closures
+# Programming Languages 101 (5/10): Functions and Closures
 
-> Programming Languages 101 series (5/10)
+A function sometimes appears to remember variables from the place it was defined. At first that feels like magic. In practice it is the natural result of the scope rules from the previous chapter meeting the fact that functions can be treated as values.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Programming Languages 101 series.
 
-**Core question**: A function seems to "remember" the variables of the place it was defined in. How is that possible?
+In this post, we will treat closures as an ordinary consequence of lexical scope plus first-class functions. Once you see that a closure captures bindings rather than copied values, callbacks, decorators, and late-binding bugs all become much easier to reason about.
 
-> Closures are not magic. They are the natural result of combining **lexical scope** with **first-class functions** — the ability to treat a function as a value. When a function is created, it captures references to the bindings of the scope it grew up in. That is a closure.
 
-<!-- a-grade-intro:end -->
+![programming languages 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/05/05-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 5 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- What first-class functions are and why they matter
-- The exact definition and behavior of a closure
-- That closures capture references, not copies
-- The classic late-binding pitfall
-- Small design patterns built on closures (callbacks, factories, memoization)
+- What boundary should you inspect first when applying Functions and Closures?
+- Which signal should the example or diagram make visible for Functions and Closures?
+- What failure should be prevented first when Functions and Closures reaches a real system?
+
+## Questions this article answers
+
+- What is the difference between first-class functions and higher-order functions?
+- What exactly does a closure capture?
+- Why do lambdas created inside a loop print the same value?
+- In what way are closures similar to objects?
 
 ## Why It Matters
 
 Closures are the foundation of callbacks, decorators, partial application, and module-style encapsulation. Without a clear mental model you fall into classics like "all functions made inside a for-loop print the same value."
 
 > A closure is "a function plus the environment it grew up in."
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    A["make_adder(10)"] --> B["function add"]
-    B --> C["captured: x = 10"]
-    D["caller"] --> B
-    B --> E["return x + n"]
-```
 
 The `add` returned by `make_adder` carries the binding `x = 10` along with it. The caller cannot see inside, but `add` computes on top of that environment.
 
@@ -227,17 +222,29 @@ In library design, "take a user-supplied function and call it inside our environ
 
 A closure is "function plus environment." It falls out naturally where lexical scope meets first-class functions. Next we look at the same idea in a different shape — objects and prototypes.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Functions and Closures?**
+  - The article treats Functions and Closures as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Functions and Closures?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Functions and Closures reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
-- [Type Systems](./03-type-system.md)
-- [Scope and Binding](./04-scope-and-binding.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
+- [Programming Languages 101 (3/10): Type Systems](./03-type-system.md)
+- [Programming Languages 101 (4/10): Scope and Binding](./04-scope-and-binding.md)
 - **Functions and Closures (current)**
 - Objects and Prototypes (upcoming)
 - Memory Management (upcoming)
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

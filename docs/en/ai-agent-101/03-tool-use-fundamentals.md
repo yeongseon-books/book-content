@@ -1,5 +1,5 @@
 ---
-title: Tool Use Fundamentals
+title: "AI Agent 101 (3/10): Tool Use Fundamentals"
 series: ai-agent-101
 episode: 3
 language: en
@@ -15,37 +15,34 @@ tags:
 - Tool Use
 - Function Calling
 - Integration
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-15'
 seo_description: Agents differ from simple conversational models because they can
   use tools. They can call weather APIs, query databases, read and write files.
 ---
 
-# Tool Use Fundamentals
-
-> AI Agent 101 Series (3/10)
+# AI Agent 101 (3/10): Tool Use Fundamentals
 
 Agents differ from simple conversational models because they can use tools. They can call weather APIs, query databases, read and write files. This capability makes agents practical automation tools.
 
 The core of tool use is function calling. When the model determines "I need to check the weather now," it returns a function call request matching a predefined tool schema. The application interprets this request, calls the actual API, and passes the result back to the model.
 
-This article covers the basic flow of function calling, tool schema design principles, error handling patterns, and tool selection strategies.
+This is post 3 in the AI Agent 101 series. Here we cover the basic flow of function calling, tool schema design principles, error handling patterns, and tool selection strategies.
 
----
+![Tool-calling loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/03/03-01-tool-calling-loop.en.png)
+*Tool-calling loop*
+> Tool use separates model reasoning from code execution and connects them with schemas and validation.
 
-<!-- a-grade-intro:begin -->
+## Questions to Keep in Mind
 
-## Key Questions
-
-- What does function calling actually look like from the model's side?
-- What failures show up when a tool schema is poorly written?
-- How does the model pick a tool when several are available?
-- What do you need to watch when feeding tool output back into the model?
-
-<!-- a-grade-intro:end -->
+- Where does the model decision end and application execution begin in function calling?
+- How does an ambiguous tool schema make an agent fail?
+- What should be validated before tool output is fed back to the model?
 
 ## Function Calling Basic Flow
 
-The core mechanism that enables AI agents to interact with external systems is Function Calling (or Tool Use). Let's explore how this works step-by-step.
+The core mechanism that enables AI agents to interact with external systems is Function Calling (or Tool Use). The steps below walk through how this works end-to-end.
+
+### Tool-calling loop
 
 ### The Four-Step Flow
 
@@ -77,12 +74,14 @@ tools = [
 ]
 
 response = openai.chat.completions.create(
-    model="gpt-4",
+    model="gpt-4.1",
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice="auto"  # LLM decides whether to use tools
 )
 ```
+
+Use a model that currently supports tool calling, such as `gpt-4.1`, for examples like this. Keep `gpt-4` only when you are explicitly discussing a legacy setup.
 
 **Step 2: LLM Decides to Call a Tool**
 
@@ -147,7 +146,7 @@ messages = [
 
 # Get final answer
 final_response = openai.chat.completions.create(
-    model="gpt-4",
+    model="gpt-4.1",
     messages=messages
 )
 
@@ -176,7 +175,7 @@ def agent_with_tools(
     for iteration in range(max_iterations):
         # Call LLM
         response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4.1",
             messages=messages,
             tools=tools,
             tool_choice="auto"
@@ -420,7 +419,7 @@ tools = [
 
 # Pass tool information to LLM
 response = openai.chat.completions.create(
-    model="gpt-4",
+    model="gpt-4.1",
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice="auto"  # LLM automatically selects tool
@@ -637,7 +636,7 @@ tools = [
 
 # Strategy 1: Automatic selection (LLM decides)
 response = openai.chat.completions.create(
-    model="gpt-4",
+    model="gpt-4.1",
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice="auto"  # LLM uses tools when needed
@@ -645,7 +644,7 @@ response = openai.chat.completions.create(
 
 # Strategy 2: Force tool use
 response = openai.chat.completions.create(
-    model="gpt-4",
+    model="gpt-4.1",
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice="required"  # Must call one tool
@@ -653,7 +652,7 @@ response = openai.chat.completions.create(
 
 # Strategy 3: Specify tool
 response = openai.chat.completions.create(
-    model="gpt-4",
+    model="gpt-4.1",
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice={"type": "function", "function": {"name": "get_weather"}}
@@ -661,7 +660,7 @@ response = openai.chat.completions.create(
 
 # Strategy 4: Disable tools
 response = openai.chat.completions.create(
-    model="gpt-4",
+    model="gpt-4.1",
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice="none"  # No tool use
@@ -754,7 +753,7 @@ def multi_tool_workflow(user_query: str) -> str:
     """
     
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4.1",
         messages=[{"role": "user", "content": summary_prompt}]
     )
     
@@ -989,7 +988,7 @@ def agent_loop(user_query: str) -> str:
 
 **Bad**: Register all possible tools at once.
 
-```python
+```text
 # Pass 50 tools to LLM at once
 tools = [
     {"name": "get_weather", ...},
@@ -1000,7 +999,7 @@ tools = [
 ]
 
 response = openai.chat.completions.create(
-    model="gpt-4",
+    model="gpt-4.1",
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools  # Token waste, reduced selection accuracy
 )
@@ -1026,7 +1025,7 @@ def get_relevant_tools(user_query: str, all_tools: list) -> list:
 relevant_tools = get_relevant_tools(user_query, all_tools)
 
 response = openai.chat.completions.create(
-    model="gpt-4",
+    model="gpt-4.1",
     messages=[{"role": "user", "content": user_query}],
     tools=relevant_tools  # 3-5 tools only
 )
@@ -1105,19 +1104,28 @@ if result["success"]:
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **Where does the model decision end and application execution begin in function calling?**
+  - The model requests which tool to call and with which arguments; application code validates that request and executes the real API or function.
+- **How does an ambiguous tool schema make an agent fail?**
+  - A vague name or argument contract makes the model choose similar tools or fill invalid values, which hides whether the failure came from the model or the schema.
+- **What should be validated before tool output is fed back to the model?**
+  - Validate argument types, allowed ranges, error shape, sensitive data exposure, and whether only the minimal useful result returns to the model.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- [Context Engineering](./02-context-engineering.md)
-- **Tool Use Fundamentals (current)**
-- Agent Workflow Design (upcoming)
-- Memory and State (upcoming)
-- Multi-Agent Systems (upcoming)
-- Agent Evaluation (upcoming)
-- Error Handling and Reliability (upcoming)
-- Production Operations (upcoming)
-- Building Your First Agent (upcoming)
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): Context Engineering](./02-context-engineering.md)
+- **AI Agent 101 (3/10): Tool Use Fundamentals (current)**
+- AI Agent 101 (4/10): Agent Workflow Design (upcoming)
+- AI Agent 101 (5/10): Memory and State (upcoming)
+- AI Agent 101 (6/10): Multi-Agent Systems (upcoming)
+- AI Agent 101 (7/10): Agent Evaluation (upcoming)
+- AI Agent 101 (8/10): Error Handling and Reliability (upcoming)
+- AI Agent 101 (9/10): Production Operations (upcoming)
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 
@@ -1125,14 +1133,7 @@ if result["success"]:
 
 ## References
 
-1. **OpenAI Function Calling Guide** - https://platform.openai.com/docs/guides/function-calling  
-   Official OpenAI Function Calling documentation. Covers tool schema design, tool_choice parameter, and practical examples.
-
-2. **LangChain Tools Documentation** - https://python.langchain.com/docs/modules/agents/tools/  
-   LangChain framework's tool system. Discusses custom tool creation, error handling, and tool composition patterns.
-
-3. **Toolformer: Language Models Can Teach Themselves to Use Tools** - https://arxiv.org/abs/2302.04761  
-   Meta AI research paper. Presents methods for LLMs to learn tool use autonomously.
-
-4. **Anthropic Tool Use Best Practices** - https://docs.anthropic.com/claude/docs/tool-use  
-   Claude API tool use guide. Explains error handling, retry strategies, and security considerations.
+- [OpenAI function calling guide](https://platform.openai.com/docs/guides/function-calling)
+- [Anthropic tool use overview](https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview)
+- [LangChain tools](https://python.langchain.com/docs/concepts/tools/)
+- [JSON Schema reference](https://json-schema.org/understanding-json-schema)

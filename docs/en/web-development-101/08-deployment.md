@@ -1,10 +1,10 @@
 ---
 series: web-development-101
 episode: 8
-title: Deployment
-status: content-ready
+title: "Web Development 101 (8/10): Deployment"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,24 @@ tags:
   - CICD
   - Hosting
 seo_description: Build artifacts, environment variables, PaaS vs IaaS, and basic CI/CD — how a small web app reaches the world, explained for new developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Deployment
+# Web Development 101 (8/10): Deployment
 
-> Web Development 101 series (8/10)
+“Works on my laptop” usually means the application is still missing part of its operating model. Once code leaves a personal machine, configuration, secrets, repeatable builds, health checks, and rollback paths all become part of the feature.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Web Development 101 series. Here we treat deployment as a reproducible release process rather than a copy-and-paste ritual so the same build can move safely across environments.
 
-**Core question**: How do you take an app that only runs on your laptop and *show it to the world*?
 
-> Separate environments (config), build (immutable artifact), host (where it runs), automate (CI/CD) — four steps in concert.
+![web development 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/08/08-01-concept-at-a-glance.en.png)
+*web development 101 chapter 8 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- Splitting dev / staging / production environments
-- Managing environment variables and secrets
-- The meaning of build and artifact
-- The difference between PaaS and IaaS
-- A basic CI/CD pipeline
+- Splitting dev / staging / production environments?
+- Managing environment variables and secrets?
+- The meaning of build and artifact?
 
 ## Why It Matters
 
@@ -47,17 +43,17 @@ Manual deploys cause weekly accidents. Automated deploys change *team velocity* 
 
 > Deployment is *habit*, not *feature*.
 
-## Concept at a Glance
+The point of this picture is repeatability. If the artifact changes per environment, you are no longer promoting the same release through a pipeline—you are rebuilding the product under different conditions and hoping the results match.
 
-```mermaid
-flowchart LR
-    Code["Source code"] --> CI["CI build"]
-    CI --> Artifact["Build artifact"]
-    Artifact --> Staging["Staging"]
-    Staging --> Prod["Production"]
-```
+### What to verify yourself
 
-Code → artifact → environment. The same artifact goes everywhere.
+- Start the app without the expected environment variables and confirm which values are truly required.
+- Build one Docker image and run it with different environment values instead of rebuilding for each stage.
+- After deployment, call `/health` directly and confirm that the platform sees a 200 response.
+
+**Expected output:** Configuration changes through environment variables only, the same image can run in multiple stages, and the health endpoint gives a fast Pass/Fail signal.
+
+**Failure mode to watch for:** Different builds per environment destroy reproducibility. No rollback path turns a small deploy failure into a long outage.
 
 ## Key Terms
 
@@ -191,22 +187,38 @@ Startups usually start on a *PaaS* (Render, Fly.io, Vercel). At scale they migra
 
 Deployment is *a habit*. Next, when the deployed app is *slow*, what do we look at? Performance and caching.
 
+## Answering the Opening Questions
+
+- **Splitting dev / staging / production environments?**
+  - The article treats Deployment as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Managing environment variables and secrets?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The meaning of build and artifact?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
-- [The Browser and the DOM](./03-browser-and-dom.md)
-- [HTTP and APIs](./04-http-and-api.md)
-- [Frontend and Backend](./05-frontend-and-backend.md)
-- [Authentication and Sessions](./06-auth-and-sessions.md)
-- [Connecting to a Database](./07-connecting-to-database.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): The Browser and the DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP and APIs](./04-http-and-api.md)
+- [Web Development 101 (5/10): Frontend and Backend](./05-frontend-and-backend.md)
+- [Web Development 101 (6/10): Authentication and Sessions](./06-auth-and-sessions.md)
+- [Web Development 101 (7/10): Connecting to a Database](./07-connecting-to-database.md)
 - **Deployment (current)**
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+### Official Docs
 - [The Twelve-Factor App](https://12factor.net/)
-- [Docker get started](https://docs.docker.com/get-started/)
-- [GitHub Actions quickstart](https://docs.github.com/en/actions/quickstart)
-- [Heroku dev center (deployment)](https://devcenter.heroku.com/categories/deployment)
+- [Docker Get Started](https://docs.docker.com/get-started/)
+- [GitHub Actions Quickstart](https://docs.github.com/en/actions/writing-workflows/quickstart)
+
+### Practical Checks
+- [Deploying Flask with Gunicorn](https://flask.palletsprojects.com/en/stable/deploying/gunicorn/)
+- [HEALTHCHECK in Dockerfiles](https://docs.docker.com/reference/dockerfile/#healthcheck)

@@ -1,10 +1,10 @@
 ---
 series: data-structures-101
 episode: 3
-title: Linked Lists
+title: "Data Structures 101 (3/10): Linked Lists"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: How singly and doubly linked lists are built, how they compare 
 last_reviewed: '2026-05-04'
 ---
 
-# Linked Lists
+# Data Structures 101 (3/10): Linked Lists
 
 > Data Structures 101 series (3/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Inserting a value in the middle of an array shifts every element by one slot. Is there a structure that avoids that?
 
 > A linked list stores each value in a node that holds a pointer to the next node. Even when scattered across memory, you can visit values in order by following the pointers. Inserting or removing a node only updates the two pointers around it — that is O(1). On the other hand, indexing must follow pointers from the head and is O(n). This article walks through singly and doubly linked lists and the trade-offs between them.
 
-<!-- a-grade-intro:end -->
+This is post 3 in the Data Structures 101 series.
+
+
+![data structures 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/03/03-01-big-picture.en.png)
+*data structures 101 chapter 3 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Linked Lists?
+- Which signal should the example or diagram make visible for Linked Lists?
+- What failure should be prevented first when Linked Lists reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 Linked lists are at the heart of system software — operating-system kernels, LRU caches, free-memory lists. They also form the foundation of more complex structures like trees and graphs. Pointer manipulation is awkward at first, but once you understand it, a far wider library of structures opens up.
 
 > An array groups data by position. A linked list groups data by relationship.
-
-## Concept at a Glance
 
 > A singly linked list stores only a "next" pointer per node — small memory footprint, but reverse traversal is hard. A doubly linked list keeps both directions, so both ends are fast, at the cost of an extra pointer per node.
 
@@ -89,7 +95,6 @@ class Node:
     def __init__(self, value, next=None):
         self.value, self.next = value, next
 
-
 head = None
 for v in range(1_000_000):
     head = Node(v, head)   # O(1) insert each time
@@ -105,7 +110,6 @@ class Node:
     def __init__(self, value, next=None):
         self.value = value
         self.next = next
-
 
 class SinglyLinkedList:
     def __init__(self):
@@ -133,7 +137,6 @@ class SinglyLinkedList:
             yield cur.value
             cur = cur.next
 
-
 lst = SinglyLinkedList()
 for v in [3, 2, 1]:
     lst.push_front(v)
@@ -159,7 +162,6 @@ def remove_value(self, target):
         prev, cur = cur, cur.next
     return False
 
-
 SinglyLinkedList.remove_value = remove_value
 
 lst = SinglyLinkedList()
@@ -180,7 +182,6 @@ class DNode:
         self.value = value
         self.prev = None
         self.next = None
-
 
 class DoublyLinkedList:
     def __init__(self):
@@ -314,9 +315,20 @@ A linked list joins nodes through pointers, giving O(1) insertion and deletion a
 
 Next we look at two ADTs built on top of arrays or linked lists — stacks and queues. We see how the simple rules LIFO and FIFO become powerful abstractions.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Linked Lists?**
+  - The article treats Linked Lists as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Linked Lists?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Linked Lists reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
+## In this series
+
+- [Data Structures 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
 - **Linked Lists (current)**
 - Stacks and Queues (upcoming)
 - Hash Tables (upcoming)
@@ -325,6 +337,7 @@ Next we look at two ADTs built on top of arrays or linked lists — stacks and q
 - Heaps (upcoming)
 - Graphs (upcoming)
 - Choosing Data Structures (upcoming)
+
 <!-- toc:end -->
 
 ## References

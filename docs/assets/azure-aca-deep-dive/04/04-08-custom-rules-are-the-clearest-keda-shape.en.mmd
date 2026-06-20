@@ -1,0 +1,4 @@
+flowchart TD
+  Custom["Custom Rule (e.g., Azure Service Bus)"] --> Meta["Metadata (Queue Name, Message Count)"]
+  Meta --> Scaler["External System Metrics"]
+  Scaler --> KEDA["KEDA Metrics Adapter"]

@@ -1,13 +1,13 @@
 ---
-title: 파일 I/O와 예외 처리
+title: "Python 101 (8/10): 파일 I/O와 예외 처리"
 series: python-101
 episode: 8
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,30 +17,33 @@ tags:
 - exception-handling
 - try-except-finally
 - pathlib
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: 파일은 "열고 → 쓰고/읽고 → 닫는다"는 세 단계의 자원이고, 예외는 "이 단계 중 어디에서 어떤 종류의 실패가 났는지"를
   분류하는…
 ---
 
-# 파일 I/O와 예외 처리
+# Python 101 (8/10): 파일 I/O와 예외 처리
+
+파일은 열고, 읽거나 쓰고, 닫는 세 단계의 자원입니다. 예외는 그 과정에서 어느 단계가 어떤 이유로 실패했는지 구분해 주는 표지판입니다.
+
+이 글은 Python 101 시리즈의 여덟 번째 글입니다.
 
 
-## 이 글에서 다룰 문제
+![Python 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/08/08-01-mental-model.ko.png)
+*Python 101 8장 흐름 개요*
+> 파일 I/O와 예외 처리의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-파일 작업은 외부 자원을 다루는 코드입니다. 메모리 안의 변수와 달리, 파일 핸들은 운영체제가 발급한 한정된 자원이고 오류 가능성도 함께 따라옵니다. 디스크가 가득 찼을 수도 있고, 권한이 없을 수도 있고, 다른 프로세스가 잠가둔 파일일 수도 있습니다.
+## 먼저 던지는 질문
 
-이런 상황을 무시하고 짠 코드는 평소에는 잘 동작하다가 운영 환경에서 갑자기 망가지는 편입니다. 핸들을 닫지 않으면 장시간 실행되는 서버에서 file descriptor가 누수되고, 예외를 무시하면 데이터가 절반만 쓰인 채 끝나기도 합니다. 반대로 예상 범위를 넘는 예외까지 `except:`로 한꺼번에 삼키면 진짜 버그가 조용히 숨어버립니다.
+- 파일을 열고 읽고 닫는 흐름에서 `with`가 직접 `close()`보다 안전한 이유는 무엇일까요?
+- `read()`, `for line in f:`, `"rb"`, `Path.read_text()`는 어떤 상황에서 각각 선택해야 할까요?
+- `except:`로 모든 예외를 삼키거나 최종 파일에 바로 쓰면 어떤 문제가 생길까요?
 
-`with` 문과 좁은 `except` 절은 이 두 가지 함정을 피하는 가장 단순한 방법입니다. 이 글에서는 두 도구를 정확히 어디에 어떻게 쓰는지 살펴봅니다.
-
-## Mental Model
+## 멘탈 모델
 
 > 파일은 "열고 → 쓰고/읽고 → 닫는다"는 세 단계의 자원이고, 예외는 "이 단계 중 어디에서 어떤 종류의 실패가 났는지"를 분류하는 라벨이라는 두 모델을 분리해 두면 `with`와 `try` 블록 설계가 자연스럽게 따라옵니다.
 다음 그림은 파일을 열고 작업하는 동안 발생할 수 있는 흐름을 보여줍니다.
 
-![Mental Model](../../assets/python-101/08/08-01-mental-model.ko.png)
-
-*Mental Model*
 두 가지 핵심 아이디어가 있습니다.
 
 - **`with`는 정상 종료 시에도, 예외가 발생했을 때에도 `__exit__`을 호출해 핸들을 닫아 줍니다.** 그래서 파일 처리에서는 `try`/`finally`로 직접 `close()`를 호출하는 일은 드뭅니다.
@@ -134,7 +137,7 @@ config_dir.mkdir(parents=True, exist_ok=True)
 
 문자열 `+`로 경로를 합치면 운영체제에 따라 구분자가 달라 문제가 생기기 쉽습니다. `pathlib`는 그런 잔실수를 줄여 줍니다.
 
-## Before-After
+## 전후 비교
 
 다음은 설정 파일을 읽어 문자열로 돌려주는 함수입니다.
 
@@ -181,13 +184,13 @@ REPL을 켜고 한 줄씩 따라가 보세요. 다음 블록은 `>>>` 표시가 
 
 ```text
 >>> with open("hello.txt", "w", encoding="utf-8") as f:
-...     f.write("안녕\n")
+...     f.write("hello\n")
 ...
-3
+6
 >>> with open("hello.txt", "r", encoding="utf-8") as f:
 ...     print(f.read())
 ...
-안녕
+hello
 ```
 
 `write`가 돌려주는 숫자는 기록한 문자 수입니다.
@@ -214,7 +217,7 @@ REPL을 켜고 한 줄씩 따라가 보세요. 다음 블록은 `>>>` 표시가 
 ...     header = f.read(4)
 ...
 >>> header
-b'\xec\x95\x88\xeb'
+b'hell'
 ```
 
 같은 파일을 바이너리로 열면 UTF-8로 인코딩된 바이트열이 그대로 보입니다.
@@ -275,7 +278,7 @@ done
 - **문자열 `+`로 경로 합치기** — 운영체제마다 구분자가 다르고 중복 슬래시가 생기기 쉽습니다. `pathlib.Path`의 `/` 연산자나 `os.path.join`을 쓰세요.
 - **큰 파일을 `read()`로 한꺼번에 읽기** — 메모리에 모두 올라갑니다. 줄 단위 순회(`for line in f:`)가 더 안전합니다.
 
-## 실무
+## 실무에서는 이렇게 생각합니다
 
 실제 프로젝트에서 파일 I/O와 예외 처리는 주로 다음 자리에서 만납니다.
 
@@ -285,7 +288,7 @@ done
 - **임시 파일**: `tempfile.NamedTemporaryFile`을 `with`와 함께 쓰면, 작업이 끝나면 파일을 자동으로 정리할 수 있습니다.
 - **재시도와 복구**: 일시적 오류(네트워크 파일 시스템의 잠깐의 끊김 등)는 좁은 예외로 잡아 재시도하고, 영구적 오류는 그대로 전파해 호출자가 결정하게 합니다.
 
-핵심은 같습니다. 자원은 `with`로 닫고, 예외는 좁게 잡고, 모르는 오류는 위로 올려 보냅니다.
+요지는 같습니다. 자원은 `with`로 닫고, 예외는 좁게 잡고, 모르는 오류는 위로 올려 보냅니다.
 
 ## 체크리스트
 
@@ -307,12 +310,202 @@ done
 
 다음 글에서는 클래스와 객체를 다룹니다. 지금까지 다뤄 온 함수와 모듈의 묶음을 한 단계 더 추상화해, 데이터와 동작을 함께 묶는 방법을 살펴봅니다.
 
+## 실전 앵커: 파일 처리 신뢰성과 예외 설계
+
+파일 I/O는 정상 경로보다 실패 경로 설계가 중요합니다. 파일이 없거나, 인코딩이 다르거나, 권한이 없거나, 중간에 프로세스가 중단되는 상황을 먼저 가정해야 합니다.
+
+```python
+from pathlib import Path
+
+path = Path('data/input.txt')
+if not path.exists():
+    raise FileNotFoundError(path)
+
+text = path.read_text(encoding='utf-8')
+print(text[:40])
+```
+
+파일 쓰기는 원자성(atomicity) 관점에서 임시 파일 + 교체 패턴을 쓰면 안전합니다.
+
+```python
+from pathlib import Path
+
+final = Path('result.json')
+tmp = final.with_suffix('.tmp')
+tmp.write_text('{"ok": true}
+', encoding='utf-8')
+tmp.replace(final)
+```
+
+중간 실패가 발생해도 손상된 결과 파일을 남길 가능성이 줄어듭니다.
+
+예외 처리에서는 폭넓은 `except Exception:`을 먼저 쓰지 않는 것이 중요합니다. 예상 가능한 예외를 좁게 잡고, 복구 불가능한 예외는 다시 올려야 합니다.
+
+```python
+try:
+    value = int('42a')
+except ValueError as e:
+    print('숫자 파싱 실패:', e)
+```
+
+체이닝도 꼭 알아두어야 합니다.
+
+```python
+try:
+    raise ValueError('bad format')
+except ValueError as e:
+    raise RuntimeError('사용자 입력 검증 실패') from e
+```
+
+`from e`를 쓰면 원인 예외가 traceback에 보존되어 운영 디버깅이 쉬워집니다.
+
+`pdb`로 파일 처리 코드를 추적하는 예시는 다음이 기본입니다.
+
+```python
+import pdb
+from pathlib import Path
+
+def load_config(path):
+    pdb.set_trace()
+    return Path(path).read_text(encoding='utf-8')
+```
+
+`p path`, `n`, `p Path(path).exists()` 순서로 보면 실패 지점을 빠르게 찾을 수 있습니다.
+
+성능 측정도 간단히 해 봅니다.
+
+```python
+import timeit
+
+line_t = timeit.timeit("sum(1 for _ in open('big.txt', encoding='utf-8'))", number=10)
+all_t = timeit.timeit("len(open('big.txt', encoding='utf-8').read().splitlines())", number=10)
+print(line_t, all_t)
+```
+
+대용량 파일은 스트리밍 처리가 메모리 안정성 면에서 유리합니다.
+
+표준 라이브러리 예시를 더하면 다음 조합이 실무에서 자주 쓰입니다.
+
+- `pathlib`: 경로 조작의 가독성 향상
+- `csv`: 구분자/인용부호 처리 자동화
+- `json`: API/설정 파일 직렬화
+- `tempfile`: 임시 파일 안전 생성
+
+예외 처리는 "모든 오류를 숨기는 기술"이 아니라 "오류를 예측 가능하게 노출하는 설계"입니다. 이 관점을 잡아야 운영에서 원인 분석 시간이 줄어듭니다.
+
+### 추가 실습: 예외 로깅과 재시도 경계 설정
+
+예외를 처리할 때는 복구 가능한 오류와 즉시 실패해야 하는 오류를 구분해야 합니다. 파일 잠금, 일시적 네트워크 오류는 재시도 가능하지만 데이터 포맷 오류는 재시도로 해결되지 않습니다.
+
+```python
+import time
+
+def retry_read(read_fn, retries=3):
+    for attempt in range(1, retries + 1):
+        try:
+            return read_fn()
+        except OSError as e:
+            if attempt == retries:
+                raise
+            time.sleep(0.2 * attempt)
+```
+
+또한 로깅 시 traceback을 반드시 남겨야 사후 분석이 가능합니다.
+
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+try:
+    1 / 0
+except ZeroDivisionError:
+    logger.exception('계산 실패')
+```
+
+`logger.exception`은 현재 예외 스택을 자동으로 붙여 주므로 운영 장애 대응에 유리합니다.
+
+텍스트 파일 처리에서는 newline 정책도 명확히 해야 합니다. CSV는 `newline=''`를 권장하고, 일반 텍스트는 기본 newline 정규화를 사용하되 플랫폼 간 결과를 테스트로 고정하는 편이 안전합니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
+### 보강 메모: 실수 줄이는 운영 습관
+
+학습 단계에서 만든 코드를 실제 프로젝트에 옮길 때는 세 가지를 같이 점검하는 편이 좋습니다. 첫째, 입력 검증 경계가 함수 시작 지점에 있는지 확인합니다. 둘째, 실패 시 사용자에게 보여 줄 메시지와 로그 메시지를 분리합니다. 셋째, 성능 판단은 추측이 아니라 `timeit` 또는 샘플 벤치마크로 남깁니다.
+
+간단한 템플릿은 다음과 같습니다.
+
+```python
+def safe_run(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        # 학습 단계에서는 원인 관찰을 우선
+        raise RuntimeError(f'실행 실패: {fn.__name__}') from e
+```
+
+또한 표준 라이브러리 문서를 읽을 때는 "모듈 개요 -> 대표 함수 3개 -> 예외 종류" 순서로 훑는 습관을 들이면 기억이 오래갑니다. 기능을 전부 외우는 것보다, 어떤 상황에서 어떤 모듈을 열어봐야 하는지 아는 것이 더 중요합니다.
+
+## 처음 질문으로 돌아가기
+
+- **파일을 열고 읽고 닫는 흐름에서 `with`가 직접 `close()`보다 안전한 이유는 무엇일까요?**
+  - 이 글은 파일을 운영체제 자원으로 보고, 정상 종료든 예외 발생이든 블록을 벗어날 때 `__exit__`이 실행되는 `with`를 기본값으로 두었습니다. 그래서 `with open(..., encoding="utf-8") as f:`나 `Path.read_text()`를 쓰면 `try`/`finally`로 `close()`를 직접 챙기지 않아도 핸들 누수를 막을 수 있습니다.
+- **`read()`, `for line in f:`, `"rb"`, `Path.read_text()`는 어떤 상황에서 각각 선택해야 할까요?**
+  - 본문은 작은 텍스트 파일은 `read()`나 `Path.read_text(encoding="utf-8")`로 단순하게 읽고, 큰 파일은 `for line in f:`로 메모리를 아끼며 순회하라고 정리했습니다. 또 이미지나 압축 파일처럼 바이트가 그대로 중요할 때는 `"rb"`를 써서 `b'hell'` 같은 바이너리 출력으로 확인해야 한다고 설명했습니다.
+- **`except:`로 모든 예외를 삼키거나 최종 파일에 바로 쓰면 어떤 문제가 생길까요?**
+  - `except:`는 `FileNotFoundError`만 처리하고 싶은 상황에서도 권한 오류나 코드 버그까지 함께 숨겨 버려 원인 분석을 어렵게 만듭니다. 또한 실전 앵커의 `tmp.write_text(...); tmp.replace(final)` 예시처럼 임시 파일 교체 패턴을 쓰지 않으면, 쓰기 도중 실패했을 때 손상된 최종 파일을 남길 위험이 커집니다.
+
 <!-- toc:begin -->
+## 시리즈 목차
+
+- [Python 101 (1/10): 왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- [Python 101 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): 제어 흐름: if, for, while, comprehension](./05-control-flow.md)
+- [Python 101 (6/10): 함수와 인자: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
+- [Python 101 (7/10): 모듈과 패키지: import, __init__, __name__](./07-modules-and-packages.md)
+- **파일 I/O와 예외 처리 (현재 글)**
+- 클래스와 객체: 데이터와 동작을 함께 묶기 (예정)
+- 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
-- [Python tutorial — Reading and writing files](https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files)
-- [Python tutorial — Errors and exceptions](https://docs.python.org/3/tutorial/errors.html)
-- [Python library — pathlib](https://docs.python.org/3/library/pathlib.html)
-- [PEP 343 — The "with" statement](https://peps.python.org/pep-0343/)
+- [Python 튜토리얼 — Input and Output](https://docs.python.org/3/tutorial/inputoutput.html) — `open()`, 읽기/쓰기 메서드, 텍스트 vs 바이너리 모드의 기본 흐름을 설명합니다.
+- [Python 튜토리얼 — Errors and Exceptions](https://docs.python.org/3/tutorial/errors.html) — `try`/`except`/`else`/`finally`, 예외 전파, 좁은 예외 처리의 예시를 제공합니다.
+- [Python 공식 문서 — `open()`](https://docs.python.org/3/library/functions.html#open) — mode, encoding, text/binary 구분의 세부 규칙을 확인할 수 있습니다.
+- [Python 공식 문서 — `pathlib`](https://docs.python.org/3/library/pathlib.html) — `Path`, `/` 연산자, `read_text()`/`write_text()` 같은 경로 기반 API를 다룹니다.
+- [PEP 343 — The "with" Statement](https://peps.python.org/pep-0343/) — 컨텍스트 매니저와 `with` 문이 자원 정리를 어떻게 표준화했는지 설명합니다.
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)

@@ -1,10 +1,10 @@
 ---
 series: math-for-cs-101
 episode: 4
-title: Graphs
-status: content-ready
+title: "Math for CS 101 (4/10): Graphs"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,39 +20,40 @@ seo_description: A beginner-friendly intro to graphs covering vertices, edges, d
 last_reviewed: '2026-05-04'
 ---
 
-# Graphs
+# Math for CS 101 (4/10): Graphs
 
-> Math for CS 101 series (4/10)
+Lists and tables are not enough once the important question becomes who is connected to whom, which task depends on which other task, or which route can reach a target. At that point the data is no longer just a collection of values. It is a web of relationships.
 
-<!-- a-grade-intro:begin -->
+Graphs are the standard way to make those relationships explicit. Social networks, road systems, build pipelines, service dependencies, and recommendation paths all look different on the surface, but a graph often exposes the common structure underneath.
 
-**Core question**: How do you *represent* and *traverse* data with *relationships*?
+This is post 4 in the Math for CS 101 series.
 
-> A *graph* is a collection of *vertices* and *edges* — the *common model* for every *network*.
+Here we treat graphs as the baseline language for relationship-heavy systems, with a focus on representation and traversal.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![math for cs 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/04/04-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 4 flow overview*
+> A graph structures relationships and transforms complex problems into connectivity and pathfinding challenges that become solvable.
 
-- *Vertices* and *edges*
-- *Directed* vs *undirected*
-- *Trees*
-- *Adjacency matrix* vs *list*
-- A starter *BFS*
+## Questions to Keep in Mind
+
+- Why do relationship-heavy problems become clearer when modeled as graphs?
+- What do vertices and edges correspond to in real systems?
+- How do directed and undirected graphs change the meaning of a model?
 
 ## Why It Matters
 
-*Social networks*, *maps*, *dependencies*, *recommendations* — all are *graphs*.
+Friend recommendations, route planning, build dependencies, and service maps all become easier to reason about once you stop pretending they are simple lists. What matters is not just the objects but the shape of the connections between them.
 
-## Concept at a Glance
+That modeling choice often determines the solution strategy. Once a problem becomes a graph, shortest path, reachability, topological order, or traversal patterns come into play almost immediately.
 
-```mermaid
-flowchart LR
-    A((A)) --> B((B))
-    A --> C((C))
-    B --> D((D))
-    C --> D
-```
+Graphs consist of *nodes*, *edges*, and *properties* (directed, weighted, cyclic). Most real problems—networks, dependencies, recommendations, social connections—naturally become graphs.
+
+## Before/After
+
+**Before**: "This is a tangled mess of relationships."
+
+**After**: "This is a graph; now I can ask structured questions about paths, cycles, and reachability.
 
 ## Key Terms
 
@@ -155,12 +156,25 @@ def is_tree(G):
 
 ## Wrap-up and Next Steps
 
-Next, we cover *combinatorics*.
+Graphs give you a way to describe systems where connections drive the behavior. Once that model is explicit, traversal and path questions become much easier to phrase and solve.
+
+Next, we turn to combinatorics, where the focus shifts from connection structure to counting how quickly possibilities grow.
+
+## Answering the Opening Questions
+
+- **Why do relationship-heavy problems become clearer when modeled as graphs?**
+  - The article treats Graphs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What do vertices and edges correspond to in real systems?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do directed and undirected graphs change the meaning of a model?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
-- [Logic and Proofs](./02-logic-and-proofs.md)
-- [Sets and Functions](./03-sets-and-functions.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
+- [Math for CS 101 (2/10): Logic and Proofs](./02-logic-and-proofs.md)
+- [Math for CS 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
 - **Graphs (current)**
 - Combinatorics (upcoming)
 - Probability (upcoming)
@@ -168,6 +182,7 @@ Next, we cover *combinatorics*.
 - Calculus (upcoming)
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -176,3 +191,4 @@ Next, we cover *combinatorics*.
 - [Graphs - Khan Academy](https://www.khanacademy.org/computing/computer-science/algorithms/graph-representation/a/representing-graphs)
 - [Introduction to Algorithms - CLRS](https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/)
 - [NetworkX Documentation](https://networkx.org/)
+- [NetworkX GitHub repository](https://github.com/networkx/networkx)

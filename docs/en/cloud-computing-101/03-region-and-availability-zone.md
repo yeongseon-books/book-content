@@ -1,10 +1,10 @@
 ---
 series: cloud-computing-101
 episode: 3
-title: Region and Availability Zone
-status: content-ready
+title: "Cloud Computing 101 (3/10): Region and Availability Zone"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,33 @@ tags:
   - HighAvailability
   - Architecture
 seo_description: Regions vs Availability Zones, Multi-AZ vs Multi-Region tradeoffs, and how to design for latency and survivability with code examples.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Region and Availability Zone
+# Cloud Computing 101 (3/10): Region and Availability Zone
 
-> Cloud Computing 101 series (3/10)
+Two teams can run the same service on the same cloud and get very different outage stories. One loses a single data center and keeps serving traffic. The other loses the same kind of fault and goes dark. The difference usually starts with placement, not features.
 
-<!-- a-grade-intro:begin -->
+Region and Availability Zone are geographic boundaries. A region is a city or continent. An AZ is a failure domain within a region — data centers separated so that failure in one does not cascade to another. Multi-AZ deployment is a foundation of reliability; Multi-Region is only for specific needs.
 
-**Core question**: Why does the same AWS service stay alive when one region fails for some teams but go down for others?
+This is post 3 in the Cloud Computing 101 series.
 
-> *A region is a geographic location, an AZ is a physically isolated cluster of data centers — distributing across AZs is the foundation of high availability.*
+In this post, we'll separate Regions, Availability Zones, and edge locations, then use that model to reason about Multi-AZ and Multi-Region designs.
 
-<!-- a-grade-intro:end -->
+> A Region is geography, an AZ is a failure boundary inside that geography, and most availability conversations should start with AZ distribution before they escalate to Multi-Region.
 
-## What You Will Learn
+
+![cloud computing 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/03/03-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 3 flow overview*
+> Decisions about regions and zones shape your latency, cost, resilience, and compliance. They are not neutral.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Region and Availability Zone?
+- Which signal should the example or diagram make visible for Region and Availability Zone?
+- What failure should be prevented first when Region and Availability Zone reaches a real system?
+
+## Questions This Chapter Answers
 
 - Region vs AZ vs Edge
 - What Multi-AZ really means
@@ -43,18 +54,6 @@ last_reviewed: '2026-05-04'
 ## Why It Matters
 
 If everything sits in one AZ, a single data center fire takes down your service. Distribution is the *prerequisite* for availability.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    R["us-east-1 region"] --> A["az a"]
-    R --> B["az b"]
-    R --> C["az c"]
-    A --> DC1["data center"]
-    B --> DC2["data center"]
-    C --> DC3["data center"]
-```
 
 ## Key Terms
 
@@ -122,6 +121,27 @@ print(placement(["a", "b", "c"], 5))
 - RTT has a hard physical floor.
 - Round-robin spreading is dumb but effective.
 
+## How to Verify This Example
+
+Placement concepts become easier to trust once you inspect your own account. AZ names are especially important to verify because the labels are account-mapped and should not be treated as a universal physical coordinate.
+
+```bash
+python -c 'import boto3; print([z["ZoneName"] for z in boto3.client("ec2", region_name="us-east-1").describe_availability_zones()["AvailabilityZones"]])'
+python -c 'import boto3; print([r["RegionName"] for r in boto3.client("ec2").describe_regions()["Regions"]][:5])'
+```
+
+**Expected output:**
+
+- The first command should return AZ names such as `us-east-1a`, `us-east-1b`, and `us-east-1c`.
+- The second should list accessible AWS Regions.
+- Seeing both outputs side by side makes the Region/AZ hierarchy much more concrete than the definition alone.
+
+### Where teams usually get stuck
+
+- A service is not really Multi-AZ if the database, cache, or queue still sits behind a single failure boundary.
+- Multi-Region is not automatically better. Replication and operational overhead have to be worth it.
+- The RTT helper is a back-of-the-envelope floor, not a production benchmark.
+
 ## Five Common Mistakes
 
 1. **Living in a single AZ.**
@@ -159,9 +179,20 @@ Payment services run Multi-AZ, global product pages cache at the edge, and disas
 
 Now that you have a place, you need things to run there. The next post covers Compute.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Region and Availability Zone?**
+  - The article treats Region and Availability Zone as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Region and Availability Zone?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Region and Availability Zone reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
 - **Region and Availability Zone (current)**
 - Compute (upcoming)
 - Storage (upcoming)
@@ -170,6 +201,7 @@ Now that you have a place, you need things to run there. The next post covers Co
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

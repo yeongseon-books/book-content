@@ -1,10 +1,10 @@
 ---
 series: software-engineering-101
 episode: 5
-title: Testing Strategy
+title: "Software Engineering 101 (5/10): Testing Strategy"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,26 @@ tags:
   - CI
   - Quality
 seo_description: The roles of unit, integration, and E2E tests, the test pyramid, the coverage trap, and how to keep CI fast.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Testing Strategy
+# Software Engineering 101 (5/10): Testing Strategy
 
-> Software Engineering 101 series (5/10)
+Most teams agree that tests matter. Disagreement starts immediately after that. Should you invest harder in unit tests, rely on integration tests, or trust end-to-end coverage because it looks closest to production? Without a strategy, test suites grow in the most expensive direction: slower feedback, shakier trust, and harder debugging.
 
-<!-- a-grade-intro:begin -->
+The real problem is not test quantity. It is test placement. A healthy test system tells you where to look when something breaks, keeps PR feedback short enough to preserve flow, and treats flaky tests as defects in the delivery system rather than background noise.
 
-**Core question**: Does more tests mean better software?
+This is post 5 in the Software Engineering 101 series. In this chapter, we use the test pyramid as a decision tool, then connect it to verification speed, expected output, and the failure modes that make CI untrustworthy.
 
-> No. The right tests at the right layer make better software.
 
-<!-- a-grade-intro:end -->
+![software engineering 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/05/05-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Testing Strategy?
+- Which signal should the example or diagram make visible for Testing Strategy?
+- What failure should be prevented first when Testing Strategy reaches a real system?
 
 ## What You Will Learn
 
@@ -46,14 +52,6 @@ last_reviewed: '2026-05-04'
 Tests determine the cost of change. Good tests let you refactor without fear; bad tests make every PR a hesitation.
 
 > Code without tests is, in practice, frozen code.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    U["Unit (many, fast)"] --> I["Integration (some)"]
-    I --> E["E2E (few, slow)"]
-```
 
 The pyramid balances cost against speed.
 
@@ -154,6 +152,28 @@ def test_uses_external_clock(): ...
 
 Quarantine, then fix next sprint. Do not mute.
 
+## A confidence-oriented test check
+
+Test strategy is easier to judge from feedback speed and diagnosability than from raw counts. Take one recent CI failure and see how quickly the suite told you where to look.
+
+### Verification steps
+
+1. Pick one recent failing build and note whether it failed in unit, integration, or E2E.
+2. Measure how long it took to identify the real cause.
+3. Ask whether the same behavior could have been asserted at a lower layer.
+
+**Expected output:**
+
+- A healthy pyramid narrows the search space immediately.
+- Too much E2E weight translates into long debugging loops.
+- Flaky tests stand out as delivery-system defects, not mere annoyances.
+
+### Failure modes to watch
+
+- Coverage is high, but no one can explain where to start debugging.
+- PR feedback time is long enough to change merge behavior.
+- Red builds are ignored because the team expects to hit rerun anyway.
+
 ## What to Notice in This Code
 
 - Unit tests are most numerous and fastest.
@@ -199,17 +219,29 @@ Fast teams gate every PR on unit and integration tests, run E2E on main merge or
 
 Tests determine the cost of change. Next we look at how to ship tested code safely to users — version control and release.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Testing Strategy?**
+  - The article treats Testing Strategy as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Testing Strategy?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Testing Strategy reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Software Engineering?](./01-what-is-software-engineering.md)
-- [Understanding Requirements](./02-understanding-requirements.md)
-- [Design vs Implementation](./03-design-vs-implementation.md)
-- [Code Review](./04-code-review.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): Understanding Requirements](./02-understanding-requirements.md)
+- [Software Engineering 101 (3/10): Design vs Implementation](./03-design-vs-implementation.md)
+- [Software Engineering 101 (4/10): Code Review](./04-code-review.md)
 - **Testing Strategy (current)**
 - Version Control and Release (upcoming)
 - Documentation (upcoming)
 - Collaboration Process (upcoming)
 - Maintenance and Tech Debt (upcoming)
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

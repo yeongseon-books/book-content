@@ -1,5 +1,5 @@
 ---
-title: Multimodal Embeddings and Cross-modal Search
+title: "Multimodal AI 101 (8/10): Multimodal Embeddings and Cross-modal Search"
 series: multimodal-ai-101
 episode: 8
 language: en
@@ -22,7 +22,9 @@ seo_description: 'Episode 5 covered the big picture of multimodal RAG. This epis
   goes deeper into the heart of that system: the multimodal embedding.'
 ---
 
-# Multimodal Embeddings and Cross-modal Search
+# Multimodal AI 101 (8/10): Multimodal Embeddings and Cross-modal Search
+
+This is post 8 in the Multimodal AI 101 series.
 
 > Multimodal AI 101 series (8/10)
 
@@ -32,13 +34,23 @@ Episode 5 covered the big picture of multimodal RAG. This episode goes deeper in
 
 We will cover how multimodal embeddings are produced, compare OpenCLIP, SigLIP, ImageBind, and Jina CLIP, build a cross-modal index with FAISS, and walk through five production pitfalls.
 
+
+![Multimodal AI 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/08/08-01-big-picture.en.png)
+*Multimodal AI 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Multimodal Embeddings and Cross-modal Search?
+- Which signal should the example or diagram make visible for Multimodal Embeddings and Cross-modal Search?
+- What failure should be prevented first when Multimodal Embeddings and Cross-modal Search reaches a real system?
+
 ## 1. What Is a Multimodal Embedding
 
 A single-modal embedding compresses meaning within one modality. A text encoder turns sentences into vectors; an image encoder turns images into vectors. Even with the same dimensionality, the two live in different spaces, so comparing them directly is meaningless.
 
 A multimodal embedding aligns two modalities into one space using contrastive learning. Training pulls (image, caption) pairs together and pushes mismatched pairs apart, so a "dog photo" and the sentence "a photo of a dog" end up at nearby vectors.
 
-```
+```text
 text "a sleeping cat"          ──┐
                                  ├──► shared space (e.g. 768-dim)
 image (sleeping cat photo)      ──┘
@@ -214,6 +226,34 @@ Pretrained models assume a specific resize, crop, and normalization. ViT-B/32 ex
 - Start with FAISS `IndexFlatIP`; move to `IndexIVFFlat` or `IndexHNSW` as the corpus grows.
 - Hybrid retrieval (BM25 ensemble, two-stage rerank) compensates for the limits of single-vector search.
 - Verify normalization, score distributions, model dimensions, multilingual support, and preprocessing before going to production.
+
+---
+
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Multimodal Embeddings and Cross-modal Search?**
+  - The article treats Multimodal Embeddings and Cross-modal Search as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Multimodal Embeddings and Cross-modal Search?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Multimodal Embeddings and Cross-modal Search reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Multimodal AI 101 (1/10): Why Multimodal AI Matters](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
+- [Multimodal AI 101 (3/10): Vision-Language Model Architecture](./03-vlm-architecture.md)
+- [Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines](./04-captioning-ocr-pipelines.md)
+- [Multimodal AI 101 (5/10): Multimodal RAG: Searching Images and Text Together](./05-multimodal-rag.md)
+- [Multimodal AI 101 (6/10): Audio Processing and Whisper STT](./06-audio-whisper.md)
+- [Multimodal AI 101 (7/10): Text-to-Image with Diffusion](./07-text-to-image-diffusion.md)
+- **Multimodal Embeddings and Cross-modal Search (current)**
+- Video Understanding - From Frame Sampling to Video-LLaVA (upcoming)
+- Building a Production Multimodal Application (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [Radford et al. - Learning Transferable Visual Models From Natural Language Supervision (CLIP)](https://arxiv.org/abs/2103.00020)

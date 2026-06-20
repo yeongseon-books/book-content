@@ -1,10 +1,10 @@
 ---
 series: web-development-101
 episode: 10
-title: Building a Small Web App
-status: content-ready
+title: "Web Development 101 (10/10): Building a Small Web App"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,24 @@ tags:
   - FullStack
   - Project
 seo_description: Tying it all together — Flask, HTML, SQLite, and deployment in one small Todo app that uses every concept from the series for new web developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Building a Small Web App
+# Web Development 101 (10/10): Building a Small Web App
 
-> Web Development 101 series (10/10)
+Concepts feel separate until you force them to cooperate inside one real project. A tiny app is where routing, templates, APIs, persistence, configuration, health checks, and deployment suddenly become one continuous engineering story instead of ten isolated lessons.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Web Development 101 series. Here we turn the series into a working Todo app so the core layers of web development can be practiced end to end in one small but complete system.
 
-**Core question**: How do the nine pieces from this series fit *into one app*?
 
-> The smallest possible *Todo app* — HTML + Flask + SQLite + deployment in one continuous flow.
+![web development 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/10/10-01-concept-at-a-glance.en.png)
+*web development 101 chapter 10 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- See every concept from the series live *in one app*
-- A folder layout for a small full-stack project
-- The full build-and-deploy flow end to end
-- A map of what to learn next
-- A retrospective on the whole series
+- See every concept from the series live *in one app?
+- A folder layout for a small full-stack project?
+- The full build-and-deploy flow end to end?
 
 ## Why It Matters
 
@@ -47,19 +43,17 @@ Knowledge sets only when you *make something small*. One small full-stack app te
 
 > Build *small* and go *all the way through*.
 
-## Concept at a Glance
+This final figure is the whole series compressed into one vertical slice. The browser submits input, Flask accepts and stores it, SQLite persists it, and the same data comes back through JSON for rendering.
 
-```mermaid
-flowchart LR
-    User["User"] --> HTML["HTML form"]
-    HTML --> API["Flask /api/todos"]
-    API --> DB[("SQLite")]
-    DB --> API
-    API --> HTML
-    HTML --> Render["Browser render"]
-```
+### What to verify yourself
 
-Every stage from the series fits *in one picture*.
+- Add a Todo through `curl` and confirm that the browser-rendered list updates from the same data source.
+- Run the app inside a container and confirm that `/health` still answers correctly.
+- Change `DB_PATH` and verify that the app switches storage locations without changing application code.
+
+**Expected output:** The HTML view and API share one source of truth, environment variables redirect storage cleanly, and container execution reproduces local behavior.
+
+**Failure mode to watch for:** If error cases still return 200, the frontend cannot tell success from failure. Hardcoded storage paths make local and deployed environments drift apart quickly.
 
 ## Key Terms
 
@@ -232,22 +226,38 @@ This little app can grow into a *blog, a budget tracker, a notebook, a chatbot*.
 
 That is *Web Development 101*. Next steps are depth — Frontend Development 101, Backend Development 101, and Database 101 take you one layer deeper. The best next book is the *next app you build*.
 
+## Answering the Opening Questions
+
+- **See every concept from the series live *in one app?**
+  - The article treats Building a Small Web App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **A folder layout for a small full-stack project?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The full build-and-deploy flow end to end?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
-- [The Browser and the DOM](./03-browser-and-dom.md)
-- [HTTP and APIs](./04-http-and-api.md)
-- [Frontend and Backend](./05-frontend-and-backend.md)
-- [Authentication and Sessions](./06-auth-and-sessions.md)
-- [Connecting to a Database](./07-connecting-to-database.md)
-- [Deployment](./08-deployment.md)
-- [Performance and Caching](./09-performance-and-caching.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): The Browser and the DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP and APIs](./04-http-and-api.md)
+- [Web Development 101 (5/10): Frontend and Backend](./05-frontend-and-backend.md)
+- [Web Development 101 (6/10): Authentication and Sessions](./06-auth-and-sessions.md)
+- [Web Development 101 (7/10): Connecting to a Database](./07-connecting-to-database.md)
+- [Web Development 101 (8/10): Deployment](./08-deployment.md)
+- [Web Development 101 (9/10): Performance and Caching](./09-performance-and-caching.md)
 - **Building a Small Web App (current)**
+
 <!-- toc:end -->
 
 ## References
 
-- [Flask quickstart](https://flask.palletsprojects.com/quickstart/)
-- [SQLite (Python docs)](https://docs.python.org/3/library/sqlite3.html)
-- [Docker get started](https://docs.docker.com/get-started/)
+### Official Docs
+- [Flask quickstart](https://flask.palletsprojects.com/en/stable/quickstart/)
+- [sqlite3 — DB-API 2.0 interface for SQLite databases](https://docs.python.org/3/library/sqlite3.html)
+- [Docker Get Started](https://docs.docker.com/get-started/)
+
+### Practical Checks
 - [The Twelve-Factor App](https://12factor.net/)
+- [Using the Fetch API (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)

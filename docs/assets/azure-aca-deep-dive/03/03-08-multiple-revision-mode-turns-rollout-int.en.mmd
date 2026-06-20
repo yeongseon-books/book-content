@@ -1,0 +1,17 @@
+flowchart TD
+  subgraph Rollout["Progressive Rollout"]
+    T1["Time 1: Rev A (100%), Rev B (0%)"] --> T2["Time 2: Rev A (80%), Rev B (20%)"]
+    T2 --> T3["Time 3: Rev A (0%), Rev B (100%)"]
+  end
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

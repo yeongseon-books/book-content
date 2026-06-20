@@ -1,10 +1,10 @@
 ---
 series: algorithms-python-101
 episode: 4
-title: Sorting Algorithms
+title: "Algorithms with Python 101 (4/10): Sorting Algorithms"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,44 +20,47 @@ seo_description: Implement bubble, selection, insertion, merge, and quick sort i
 last_reviewed: '2026-05-04'
 ---
 
-# Sorting Algorithms
+# Algorithms with Python 101 (4/10): Sorting Algorithms
 
-> Algorithms with Python 101 Series (4/10)
+This is post 4 in the Algorithms with Python 101 series. Sorting sits underneath far more problems than most beginners expect, and binary search, ranking, grouping, and deduplication all become easier once data is in order.
 
-<!-- a-grade-intro:begin -->
+This chapter uses one practical question as its spine: why is Python's built-in `sorted()` usually the default in real work? We will still implement classic algorithms, but as contrast material that helps explain performance, stability, and `key` design rather than as the main payoff.
 
-**Key Question**: Why do different sorting algorithms have such different performance on the same data?
 
-> Sorting is a prerequisite for binary search, deduplication, ranking, and many other operations. This article implements O(n^2) sorts (bubble, selection, insertion) and O(n log n) sorts (merge, quick), then compares them with Python's built-in sorted().
+![Algorithms with Python 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/04/04-01-big-picture.en.png)
+*Algorithms with Python 101 chapter 4 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Sorting Algorithms?
+- Which signal should the example or diagram make visible for Sorting Algorithms?
+- What failure should be prevented first when Sorting Algorithms reaches a real system?
 
 ## What You Will Learn
 
-- The principles and implementations of three O(n^2) sorting algorithms
+- Why `sorted()` should usually be your production default
+- The principles behind three O(n^2) sorting algorithms and where they stay educational
 - The divide-and-conquer strategies behind merge sort and quick sort
-- How Python's built-in sort works and how to use the key function
-- What sorting stability means and when it matters
+- How Python's built-in sort, `key`, and stability pay off on real data
 
 ## Why It Matters
 
-Sorting is one of the most fundamental operations in computing. Binary search, deduplication, and ranking all assume sorted data. Beyond 10,000 items, the difference between O(n^2) and O(n log n) exceeds 100x.
+Sorting is one of the most fundamental operations in computing. Binary search, deduplication, and ranking all assume sorted data. Beyond 10,000 items, the gap between O(n^2) and O(n log n) becomes large enough to feel immediately.
 
-> Sorting arranges data in a specific order. The choice of algorithm determines whether the job finishes in milliseconds or minutes.
+> Sorting is not only about rearranging values. In practice, it is often about expressing the right ordering rule and verifying that equal values keep the order your system expects.
 
-In practice, you use sorted() almost everywhere. But understanding the principles helps you design key functions, reason about stability, and diagnose performance bottlenecks.
+In practice, you use `sorted()` almost everywhere. But understanding the principles still matters because it lets you design better `key` functions, reason about stability, and tell whether a bottleneck comes from algorithm choice or from sorting the wrong shape of data.
 
 ## Concept Overview
 
-> Comparison-based sorting determines order by comparing pairs of elements
+> In comparison-based sorting, the real decision is not only how you compare elements, but also whether equal values keep their original order.
 
-```
-Bubble sort:    compare and swap adjacent elements → O(n^2)
-Selection sort: find the minimum and move it to front → O(n^2)
-Insertion sort: insert each element at its correct position → O(n^2), fast on nearly sorted data
-Merge sort:     split in half, sort, merge → O(n log n), stable
-Quick sort:     partition around a pivot → average O(n log n)
-```
+| Option | Core idea | Time complexity | Best use |
+|------|-----------|-----------------|----------|
+| `sorted(data, key=...)` | Pass an explicit ordering rule to a battle-tested built-in sort | `O(n log n)` | Production default |
+| Bubble / Selection / Insertion | Rebuild comparison and movement logic by hand | `O(n^2)` | Learning and tiny inputs |
+| Merge sort | Split, sort, and merge | `O(n log n)` | Divide-and-conquer + stable behavior |
+| Quick sort | Partition around a pivot | average `O(n log n)` | Explaining average-case speed and pivot strategy |
 
 ## Key Concepts
 
@@ -71,32 +74,88 @@ Quick sort:     partition around a pivot → average O(n log n)
 
 ## Before / After
 
-Two approaches to sorting a list.
+The same "sort employee records by department and join time" task leads to very different decisions.
 
 ```python
-# before: bubble sort — O(n^2)
-def sort_data(data):
+# before: starting with manual reimplementation spends effort on mechanics first
+def sort_people(records):
+    data = records[:]
     n = len(data)
     for i in range(n):
         for j in range(n - 1 - i):
-            if data[j] > data[j + 1]:
+            if (data[j]["department"], data[j]["joined_at"]) > (
+                data[j + 1]["department"],
+                data[j + 1]["joined_at"],
+            ):
                 data[j], data[j + 1] = data[j + 1], data[j]
     return data
 ```
 
 ```python
-# after: built-in sort — O(n log n), Timsort
-def sort_data(data):
-    return sorted(data)
+# after: production code usually means built-in sort + explicit key
+def sort_people(records):
+    return sorted(records, key=lambda record: (record["department"], record["joined_at"]))
 ```
 
 ## Hands-On Steps
 
-### Step 1: Bubble Sort
+### Step 1: Start with the production default — `sorted(..., key=...)`
 
 ```python
+records = [
+    {"name": "Mina", "score": 90, "submitted_at": 3},
+    {"name": "Joon", "score": 75, "submitted_at": 1},
+    {"name": "Sora", "score": 90, "submitted_at": 2},
+    {"name": "Luca", "score": 75, "submitted_at": 4},
+]
+
+sorted_records = sorted(records, key=lambda record: record["score"])
+print([(record["name"], record["score"]) for record in sorted_records])
+# [('Joon', 75), ('Luca', 75), ('Mina', 90), ('Sora', 90)]
+
+score_75_order = [record["name"] for record in sorted_records if record["score"] == 75]
+score_90_order = [record["name"] for record in sorted_records if record["score"] == 90]
+
+assert score_75_order == ["Joon", "Luca"]
+assert score_90_order == ["Mina", "Sora"]
+
+sorted_by_two_keys = sorted(
+    records,
+    key=lambda record: (-record["score"], record["submitted_at"]),
+)
+print([
+    (record["name"], record["score"], record["submitted_at"])
+    for record in sorted_by_two_keys
+])
+# [('Sora', 90, 2), ('Mina', 90, 3), ('Joon', 75, 1), ('Luca', 75, 4)]
+```
+
+The practical lesson is twofold. First, the high-value skill in production is usually designing the right `key`, not rewriting a sorting algorithm. Second, Python's built-in sort is stable, so equal-score groups keep their original order.
+
+These checks are deliberate.
+
+- The 75-point group should stay in `Joon → Luca` order.
+- The 90-point group should stay in `Mina → Sora` order.
+- If either group changes unexpectedly, first verify that you are using a stable sorting tool before you blame the `key` logic.
+
+### Step 2: Use classic O(n²) sorts as contrast material
+
+```python
+def verify_sort(name: str, func, cases: dict[str, list[int]]) -> None:
+    for case_name, values in cases.items():
+        expected = sorted(values)
+        actual = func(values)
+        print(f"{name:>10} | {case_name:>14} | expected={expected} | actual={actual}")
+        assert actual == expected, f"{name} failed on {case_name}"
+
+test_cases = {
+    "random": [5, 3, 8, 1, 2],
+    "sorted": [1, 2, 3, 4, 5],
+    "reversed": [5, 4, 3, 2, 1],
+    "duplicates": [4, 2, 4, 1, 2, 1],
+}
+
 def bubble_sort(data: list[int]) -> list[int]:
-    """Bubble sort — O(n^2), stable, in-place."""
     arr = data[:]
     n = len(arr)
     for i in range(n):
@@ -109,14 +168,7 @@ def bubble_sort(data: list[int]) -> list[int]:
             break
     return arr
 
-print(bubble_sort([5, 3, 8, 1, 2]))  # [1, 2, 3, 5, 8]
-```
-
-### Step 2: Selection Sort and Insertion Sort
-
-```python
 def selection_sort(data: list[int]) -> list[int]:
-    """Selection sort — O(n^2), unstable, in-place."""
     arr = data[:]
     n = len(arr)
     for i in range(n):
@@ -127,9 +179,7 @@ def selection_sort(data: list[int]) -> list[int]:
         arr[i], arr[min_idx] = arr[min_idx], arr[i]
     return arr
 
-
 def insertion_sort(data: list[int]) -> list[int]:
-    """Insertion sort — O(n^2), stable, fast on nearly sorted data."""
     arr = data[:]
     for i in range(1, len(arr)):
         key = arr[i]
@@ -140,16 +190,21 @@ def insertion_sort(data: list[int]) -> list[int]:
         arr[j + 1] = key
     return arr
 
-data = [64, 25, 12, 22, 11]
-print(selection_sort(data))   # [11, 12, 22, 25, 64]
-print(insertion_sort(data))   # [11, 12, 22, 25, 64]
+verify_sort("bubble", bubble_sort, test_cases)
+verify_sort("selection", selection_sort, test_cases)
+verify_sort("insertion", insertion_sort, test_cases)
 ```
 
-### Step 3: Merge Sort
+The point of splitting verification into four cases is to shorten debugging loops.
+
+- If bubble sort fails on an already-sorted list, inspect the inner loop bound `n - 1 - i` first.
+- If insertion sort fails on duplicate-heavy input, inspect `while j >= 0 and arr[j] > key:` first. Changing `>` to `>=` can break the stable behavior you expect.
+- If selection sort produces the right values but equal-value order changes, that is not a bug in your printout. It is the definition of an unstable sort.
+
+### Step 3: Merge sort shows where stability comes from
 
 ```python
 def merge_sort(data: list[int]) -> list[int]:
-    """Merge sort — O(n log n), stable, O(n) extra space."""
     if len(data) <= 1:
         return data[:]
     mid = len(data) // 2
@@ -157,12 +212,11 @@ def merge_sort(data: list[int]) -> list[int]:
     right = merge_sort(data[mid:])
     return _merge(left, right)
 
-
 def _merge(left: list[int], right: list[int]) -> list[int]:
-    result = []
+    result: list[int] = []
     i = j = 0
     while i < len(left) and j < len(right):
-        if left[i] <= right[j]:  # <= ensures stability
+        if left[i] <= right[j]:
             result.append(left[i])
             i += 1
         else:
@@ -172,15 +226,43 @@ def _merge(left: list[int], right: list[int]) -> list[int]:
     result.extend(right[j:])
     return result
 
-print(merge_sort([38, 27, 43, 3, 9, 82, 10]))
-# [3, 9, 10, 27, 38, 43, 82]
+verify_sort("merge", merge_sort, test_cases)
+
+def merge_sort_records(records: list[dict[str, int | str]]) -> list[dict[str, int | str]]:
+    if len(records) <= 1:
+        return records[:]
+    mid = len(records) // 2
+    left = merge_sort_records(records[:mid])
+    right = merge_sort_records(records[mid:])
+    return merge_records(left, right)
+
+def merge_records(left, right):
+    merged = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i]["score"] <= right[j]["score"]:
+            merged.append(left[i])
+            i += 1
+        else:
+            merged.append(right[j])
+            j += 1
+    merged.extend(left[i:])
+    merged.extend(right[j:])
+    return merged
+
+stable_records = merge_sort_records(records)
+assert [record["name"] for record in stable_records if record["score"] == 75] == ["Joon", "Luca"]
+assert [record["name"] for record in stable_records if record["score"] == 90] == ["Mina", "Sora"]
 ```
 
-### Step 4: Quick Sort
+Merge sort is a classic divide-and-conquer example: split, sort each half, and merge. The important practical detail is that equal-score order survives because of the `<=` comparison inside the merge step.
+
+If numeric output is correct but equal-score order changes, inspect `merge_records()` first and verify that `<=` did not become `<`.
+
+### Step 4: Quick sort is fast on average, but verify it the same way
 
 ```python
 def quick_sort(data: list[int]) -> list[int]:
-    """Quick sort — average O(n log n), worst O(n^2)."""
     if len(data) <= 1:
         return data[:]
     pivot = data[len(data) // 2]
@@ -189,18 +271,18 @@ def quick_sort(data: list[int]) -> list[int]:
     right = [x for x in data if x > pivot]
     return quick_sort(left) + middle + quick_sort(right)
 
-print(quick_sort([3, 6, 8, 10, 1, 2, 1]))
-# [1, 1, 2, 3, 6, 8, 10]
+verify_sort("quick", quick_sort, test_cases)
 ```
 
-### Step 5: Built-in Sort and Benchmarks
+Quick sort partitions around a pivot. It is often fast, but poor pivot choice can still push it toward O(n^2). If reverse-sorted data behaves suspiciously, inspect the pivot rule and partition conditions before anything else.
+
+### Step 5: Benchmark growth trends, not one noisy number
 
 ```python
+import random
 import time
 
-
-def benchmark_sort(n: int):
-    import random
+def benchmark_sort(n: int) -> list[tuple[str, float, bool]]:
     data = [random.randint(0, n) for _ in range(n)]
 
     algorithms = [
@@ -212,72 +294,91 @@ def benchmark_sort(n: int):
         ("Built-in", sorted),
     ]
 
+    results = []
     for name, func in algorithms:
-        arr = data[:]
         start = time.perf_counter()
-        func(arr)
+        actual = func(data[:])
         elapsed = time.perf_counter() - start
-        print(f"  {name}: {elapsed:.4f}s")
-
+        is_correct = actual == sorted(data)
+        results.append((name, elapsed, is_correct))
+    return results
 
 for n in [1_000, 5_000]:
     print(f"n={n:,}")
-    benchmark_sort(n)
+    for name, elapsed, is_correct in benchmark_sort(n):
+        print(f"  {name:>8}: {elapsed:.4f}s | correct={is_correct}")
+        assert is_correct, f"{name} produced a wrong result for n={n}"
 ```
+
+The goal of this benchmark is not to memorize which line is smaller on one run. The real signal is the growth trend as input size increases.
+
+If bubble sort looks less terrible on a tiny sample than you expected, do not over-read that number. Compare the curve as `n` grows rather than single-run noise.
 
 ## What to Notice in This Code
 
-- Bubble sort's early termination (swapped flag) gives O(n) on already-sorted data
-- The `<=` comparison in merge sort guarantees stability
-- Quick sort's pivot selection determines performance; choosing the middle value reduces worst-case risk
-- Python's sorted() uses Timsort, a hybrid of insertion sort and merge sort
+- The production default is not algorithm reimplementation. It is `sorted(..., key=...)`.
+- Bubble sort's early termination (`swapped`) can reduce best-case work on already-sorted input.
+- The `<=` comparison in merge sort preserves the order of equal values.
+- Quick sort's pivot choice strongly affects performance.
+- Verification loops should separate random, already-sorted, reverse-sorted, and duplicate-heavy inputs so failures are easier to diagnose.
 
 ## 5 Common Mistakes
 
 | Mistake | Why It's a Problem | How to Fix It |
 |---------|-------------------|---------------|
-| Mutating the original list | Caller sees unexpected changes | Work on a copy or use sorted() |
-| Choosing the first element as pivot | O(n^2) on already-sorted data | Use the middle element or random pivot |
-| Using an unstable sort where stability is needed | Equal elements lose their original order | Use sorted() or merge sort |
+| Mutating the original list | Caller sees unexpected changes | Work on a copy or use `sorted()` |
+| Choosing the first element as pivot | O(n^2) on already-sorted data | Use the middle element or a random pivot |
+| Treating an unstable study implementation as production-safe | Equal elements lose their original order | Use `sorted()` or merge sort and explicitly verify equal-key order |
 | Wrong sort key | Results do not match the intended order | Specify the key function explicitly |
 | Using O(n^2) sorts on large data | Takes seconds on tens of thousands of items | Use an O(n log n) algorithm or built-in sort |
 
 ## Real-World Applications
 
-- Database ORDER BY clauses use sorting algorithms internally
-- Log analysis sorts events by timestamp
-- Search engines sort results by relevance score
-- pandas sort_values() uses Timsort under the hood
-- Leaderboards and ranking systems depend on real-time sorting
+- Database `ORDER BY` clauses use sorting internally.
+- Log analysis sorts events by timestamp.
+- Search engines sort results by relevance score.
+- pandas `sort_values()` relies on sorting internally.
+- Leaderboards and ranking systems depend on real-time ordering.
 
 ## How Senior Engineers Think About This
 
-In practice, you almost never implement a sorting algorithm yourself. sorted() and list.sort() cover virtually every case. The real skill is designing the key function correctly.
+In practice, you almost never implement a sorting algorithm yourself. `sorted()` and `list.sort()` cover virtually every case. The real skill is designing the key function correctly and verifying that equal-key groups keep the order your system expects.
 
-Still, knowing the principles matters. Understanding "why this sort is slow" or "why stability matters here" helps you choose the right tool.
+Still, knowing the principles matters. Understanding "why this sort is slow," "why stability matters here," or "why the values are right but the order still looks wrong" helps you choose the right tool.
 
 ## Checklist
 
 - [ ] Explain the differences among the three O(n^2) sorts
 - [ ] Describe the divide-and-conquer process for merge sort and quick sort
 - [ ] Explain stable vs unstable sorting
-- [ ] Use sorted() with a custom key function
+- [ ] Use `sorted()` with a custom key function and verify equal-key order
 - [ ] Choose an appropriate sorting strategy for a given scenario
 
 ## Exercises
 
-1. Write a function that sorts a list of dictionaries by multiple keys (e.g., age then name).
+1. Write a function that sorts a list of dictionaries by multiple keys, such as age and then name.
 2. Modify quick sort to use a random pivot.
 3. Benchmark insertion sort on nearly-sorted data vs random data and explain the result.
 
 ## Summary and Next Steps
 
-O(n^2) sorts are easy to understand but impractical for large datasets. O(n log n) sorts — merge sort and quick sort — use divide and conquer. In the next article, we explore the divide-and-conquer pattern and recursion in depth.
+The point of learning sorting is not memorizing every algorithm equally. It is understanding that the production default is usually `sorted(..., key=...)`, while classic algorithms give you the contrast needed to reason about complexity, stability, and debugging. O(n^2) sorts are easy to understand but impractical for large datasets, and O(n log n) sorts such as merge sort and quick sort show the divide-and-conquer pattern that we explore more deeply in the next article.
+
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Sorting Algorithms?**
+  - The article treats Sorting Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Sorting Algorithms?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Sorting Algorithms reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What Are Algorithms?](./01-what-are-algorithms.md)
-- [Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
-- [Linear Search and Binary Search](./03-linear-and-binary-search.md)
+## In this series
+
+- [Algorithms with Python 101 (1/10): What Are Algorithms?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
+- [Algorithms with Python 101 (3/10): Linear Search and Binary Search](./03-linear-and-binary-search.md)
 - **Sorting Algorithms (current)**
 - Recursion and Divide and Conquer (upcoming)
 - Dynamic Programming Basics (upcoming)
@@ -285,6 +386,7 @@ O(n^2) sorts are easy to understand but impractical for large datasets. O(n log 
 - Shortest Path Basics (upcoming)
 - Greedy Algorithms (upcoming)
 - Coding Test Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

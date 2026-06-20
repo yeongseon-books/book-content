@@ -1,10 +1,10 @@
 ---
 series: computer-science-101
 episode: 9
-title: Software Engineering
-status: content-ready
+title: "Computer Science 101 (9/10): Software Engineering"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,34 @@ tags:
   - Code Review
   - Refactoring
 seo_description: Coding vs software engineering — covered through testing, version control, code review, and refactoring in the CS 101 series.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Software Engineering
+# Computer Science 101 (9/10): Software Engineering
 
-> Computer Science 101 series (9/10)
+There is a big difference between a script that runs once for you and a system that many people can keep changing for years. Software engineering is the set of habits that preserves “still works” while time passes, teammates change, and requirements shift.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Computer Science 101 series.
 
-**Key question**: What separates a small script you wrote alone from a system that 100 people maintain for 10 years?
+In this article, we'll use testing, version control, code review, and refactoring to show where coding turns into engineering.
 
-> Coding is making a program that works. Software engineering is making a system that keeps working as time passes and people change. Tests are the safety net for change, version control is the foundation for collaboration, code review is the last quality gate, and refactoring is the tool for paying down technical debt. This article walks the path from coding to engineering through these four pillars.
 
-<!-- a-grade-intro:end -->
+![Computer Science 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/09/09-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 9 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Software Engineering?
+- Which signal should the example or diagram make visible for Software Engineering?
+- What failure should be prevented first when Software Engineering reaches a real system?
+
+## Questions This Article Answers
+
+- What separates coding from software engineering in practice?
+- Why are tests the minimum safety mechanism for change?
+- What habits make a Git-based workflow sustainable for a team?
+- Why should refactoring be managed separately from feature work?
+- What happens to speed and quality when technical debt accumulates?
 
 ## What You Will Learn
 
@@ -48,17 +62,7 @@ The ability to write code that works will plateau by year five. The same code ha
 
 Good code is not the code that's quickest to write today; it's the code that's easiest to change for years.
 
-## Concept at a Glance
-
 > Engineering is the activity of guaranteeing "still works tomorrow" on top of "works today."
-
-```text
-Coding only
-  requirements -> write -> verify it runs -> deploy
-
-Software engineering
-  requirements -> design -> write + test -> review -> CI -> deploy -> monitor -> refactor
-```
 
 ## Key Terms
 
@@ -96,23 +100,18 @@ def calc_discount(price: float, user_type: str) -> float:
     rates = {"vip": 0.7, "member": 0.9}
     return price * rates.get(user_type, 1.0)
 
-
 # test_discount.py
 import pytest
 from discount import calc_discount
 
-
 def test_vip_gets_30_percent_off():
     assert calc_discount(100, "vip") == 70
-
 
 def test_member_gets_10_percent_off():
     assert calc_discount(100, "member") == 90
 
-
 def test_unknown_user_type_pays_full_price():
     assert calc_discount(100, "guest") == 100
-
 
 def test_negative_price_raises():
     with pytest.raises(ValueError):
@@ -130,6 +129,8 @@ pip install pytest
 # Place the two files above in the same folder and run
 pytest -v
 ```
+
+**Expected output:** all four tests should pass, giving you a baseline that you can rerun after a refactor to confirm behavior stayed the same.
 
 ### Step 2: Use regression tests to keep bugs from coming back
 
@@ -168,7 +169,6 @@ def calc_discount(price, user_type):
         return price * 0.85
     return price
 
-
 # After: pulled out into a data table — adding a tier is one line
 DISCOUNT_RATES = {
     "vip":     0.70,
@@ -176,10 +176,8 @@ DISCOUNT_RATES = {
     "student": 0.85,
 }
 
-
 def calc_discount(price: float, user_type: str) -> float:
     return price * DISCOUNT_RATES.get(user_type, 1.0)
-
 
 # If the same tests still pass, this is a safe refactor
 ```
@@ -255,17 +253,29 @@ Software engineering is the practice of writing code that survives time. Tests a
 
 The next article ties everything together — how all of this CS foundation feeds into AI and data science, and what to study next.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Software Engineering?**
+  - The article treats Software Engineering as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Software Engineering?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Software Engineering reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
-- [Computation and Programs](./02-computation-and-programs.md)
-- [Data Representation](./03-data-representation.md)
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
-- [Computer Architecture](./05-computer-architecture.md)
-- [Operating Systems](./06-operating-systems.md)
-- [Networks](./07-networks.md)
-- [Databases](./08-databases.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): Computation and Programs](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): Data Representation](./03-data-representation.md)
+- [Computer Science 101 (4/10): Algorithms and Complexity](./04-algorithms-and-complexity.md)
+- [Computer Science 101 (5/10): Computer Architecture](./05-computer-architecture.md)
+- [Computer Science 101 (6/10): Operating Systems](./06-operating-systems.md)
+- [Computer Science 101 (7/10): Networks](./07-networks.md)
+- [Computer Science 101 (8/10): Databases](./08-databases.md)
 - **Software Engineering (current)**
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References

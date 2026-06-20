@@ -1,10 +1,10 @@
 ---
 series: software-engineering-101
 episode: 7
-title: Documentation
+title: "Software Engineering 101 (7/10): Documentation"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,26 @@ tags:
   - ADR
   - Knowledge
 seo_description: README, ADR, docstring, and runbook roles, plus the Diataxis four-quadrant model in a practical short form.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Documentation
+# Software Engineering 101 (7/10): Documentation
 
-> Software Engineering 101 series (7/10)
+It is tempting to say that good code should make documentation unnecessary. Strong names, small modules, and readable tests do carry a lot of information. But code alone rarely explains why a decision was made, when an operator should follow a procedure, or where a new teammate should start on day one.
 
-<!-- a-grade-intro:begin -->
+The biggest failure mode of weak documentation is not inconvenience. It is dependency on specific people. Every unanswered question routes through memory, availability, and interruption cost. That is why documentation is not a side artifact. It is a core part of asynchronous engineering work.
 
-**Core question**: If the code is good, do you really need docs?
+This is post 7 in the Software Engineering 101 series. In this chapter, we split documentation by reader need, then look at the minimum useful shapes for a README, ADR, runbook, docstring, and onboarding checklist.
 
-> Code answers "how". Documentation answers "why" and "when".
 
-<!-- a-grade-intro:end -->
+![software engineering 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/07/07-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Documentation?
+- Which signal should the example or diagram make visible for Documentation?
+- What failure should be prevented first when Documentation reaches a real system?
 
 ## What You Will Learn
 
@@ -46,15 +52,6 @@ last_reviewed: '2026-05-04'
 Without docs, every question routes through a person. The moment a person becomes the bottleneck, team speed depends on their work hours.
 
 > Documentation is the infrastructure of async collaboration.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    T["Tutorial"] --> H["How-to"]
-    H --> R["Reference"]
-    R --> E["Explanation"]
-```
 
 Diataxis splits docs by reader intent.
 
@@ -148,6 +145,28 @@ It must be followable at 3 a.m.
 
 Designs the new hire's first thirty days.
 
+## A document-set verification check
+
+Documentation quality is easier to see through a real journey than through word count. Walk the repo like a new engineer or an on-call responder and see whether the right document appears at the right moment.
+
+### Verification steps
+
+1. Try to understand the project from the README alone for the first five minutes.
+2. Pick one major decision and look for an ADR or RFC that explains it.
+3. Follow an incident runbook and see whether the steps are executable as written.
+
+**Expected output:**
+
+- A strong README reveals project value and startup path quickly.
+- ADRs reduce repeated "why did we do this?" discussions.
+- A runbook gives an operator an order of operations under pressure.
+
+### Failure modes to watch
+
+- The answer is "it is somewhere in the wiki."
+- There is no owner or review date, so readers cannot trust the document.
+- The same onboarding question always routes through the same person.
+
 ## What to Notice in This Code
 
 - Splitting by intent makes docs findable.
@@ -193,17 +212,29 @@ Mature teams use docs-as-code (markdown in the repo, change via PR, build in CI)
 
 Documentation frees people. Next, we look at how those people work together — the collaboration process.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Documentation?**
+  - The article treats Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Documentation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Documentation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Software Engineering?](./01-what-is-software-engineering.md)
-- [Understanding Requirements](./02-understanding-requirements.md)
-- [Design vs Implementation](./03-design-vs-implementation.md)
-- [Code Review](./04-code-review.md)
-- [Testing Strategy](./05-testing-strategy.md)
-- [Version Control and Release](./06-version-control-and-release.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): Understanding Requirements](./02-understanding-requirements.md)
+- [Software Engineering 101 (3/10): Design vs Implementation](./03-design-vs-implementation.md)
+- [Software Engineering 101 (4/10): Code Review](./04-code-review.md)
+- [Software Engineering 101 (5/10): Testing Strategy](./05-testing-strategy.md)
+- [Software Engineering 101 (6/10): Version Control and Release](./06-version-control-and-release.md)
 - **Documentation (current)**
 - Collaboration Process (upcoming)
 - Maintenance and Tech Debt (upcoming)
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

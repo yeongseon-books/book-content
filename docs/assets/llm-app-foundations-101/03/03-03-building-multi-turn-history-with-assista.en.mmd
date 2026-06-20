@@ -1,0 +1,17 @@
+flowchart TB
+    System["system\nBe brief and precise"] --> FirstUser["user turn 1\nlists vs tuples"]
+    FirstUser --> FirstCall["Call 1"]
+    FirstCall --> Assistant1["assistant reply 1"]
+    Assistant1 --> Replay["Append assistant reply\nback into messages[]"]
+    Replay --> User2["Append user turn 2\nAdd a short code example"]
+    User2 --> SecondCall["Call 2 sends\nsystem + user1 + assistant1 + user2"]
+    SecondCall --> Assistant2["assistant reply 2\ncan build on turn 1"]
+
+    style System fill:#e3f2fd,stroke:#1976d2
+    style FirstUser fill:#e3f2fd,stroke:#1976d2
+    style FirstCall fill:#fff3e0,stroke:#f57c00
+    style Assistant1 fill:#ede7f6,stroke:#5e35b1
+    style Replay fill:#f3e5f5,stroke:#7b1fa2
+    style User2 fill:#e8f5e9,stroke:#388e3c
+    style SecondCall fill:#fff3e0,stroke:#f57c00
+    style Assistant2 fill:#fff8e1,stroke:#f9a825

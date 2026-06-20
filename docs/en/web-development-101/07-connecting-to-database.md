@@ -1,10 +1,10 @@
 ---
 series: web-development-101
 episode: 7
-title: Connecting to a Database
-status: content-ready
+title: "Web Development 101 (7/10): Connecting to a Database"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,24 @@ tags:
   - ORM
   - Backend
 seo_description: SQL basics, ORMs, and connection pools — how a web app talks to a database without falling over under load, explained for new web developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Connecting to a Database
+# Web Development 101 (7/10): Connecting to a Database
 
-> Web Development 101 series (7/10)
+A web app can feel complete while everything still lives in process memory, right up until the first restart, the first concurrent write, or the first report that data disappeared. Durable storage changes how you design correctness, concurrency, and performance.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Web Development 101 series. Here we move from in-memory thinking to database thinking by covering SQL basics, ORMs, connection pools, and transactions as the backbone of persistent application state.
 
-**Core question**: How does a web server hold onto data *forever*?
 
-> One line of SQL plus a *connection* — and a *pool* that reuses those connections.
+![web development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/07/07-01-concept-at-a-glance.en.png)
+*web development 101 chapter 7 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- Why we need a database in the first place
-- The four basic SQL operations (SELECT/INSERT/UPDATE/DELETE)
-- What an ORM is and when to use it
-- Connections and connection pools
-- The meaning of a transaction
+- Why we need a database in the first place?
+- The four basic SQL operations (SELECT/INSERT/UPDATE/DELETE)?
+- What an ORM is and when to use it?
 
 ## Why It Matters
 
@@ -47,17 +43,17 @@ Almost all *state* in a web app lives in the database. Mishandle the connection 
 
 > The database is *the keeper of truth*.
 
-## Concept at a Glance
+The app does not just “use SQL.” It opens or borrows a connection, issues work, and often needs to bundle multiple statements into one transaction. That lifecycle matters as much as the query text itself.
 
-```mermaid
-flowchart LR
-    App["Web app"] -->|"SQL"| Pool["Connection pool"]
-    Pool --> DB[("Database")]
-    DB --> Pool
-    Pool --> App
-```
+### What to verify yourself
 
-Connections are *expensive*, so a pool reuses them.
+- Create a SQLite table and confirm that inserted rows persist across process restarts.
+- Pass attacker-like input through a parameterized query and verify that the SQL shape does not change.
+- Force an exception inside a transaction and confirm that rollback leaves the database in its previous state.
+
+**Expected output:** Parameter binding treats malicious strings as values, and rollback prevents half-finished writes from surviving an error.
+
+**Failure mode to watch for:** String-built SQL introduces injection risk. Opening a brand-new connection for every request makes connection overhead the first scaling bottleneck.
 
 ## Key Terms
 
@@ -208,22 +204,38 @@ Most web backends pair PostgreSQL or MySQL with an ORM. Under traffic, *read rep
 
 The DB is *the keeper of truth*. Next, we ship our app to the world — deployment.
 
+## Answering the Opening Questions
+
+- **Why we need a database in the first place?**
+  - The article treats Connecting to a Database as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The four basic SQL operations (SELECT/INSERT/UPDATE/DELETE)?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What an ORM is and when to use it?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
-- [The Browser and the DOM](./03-browser-and-dom.md)
-- [HTTP and APIs](./04-http-and-api.md)
-- [Frontend and Backend](./05-frontend-and-backend.md)
-- [Authentication and Sessions](./06-auth-and-sessions.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): The Browser and the DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP and APIs](./04-http-and-api.md)
+- [Web Development 101 (5/10): Frontend and Backend](./05-frontend-and-backend.md)
+- [Web Development 101 (6/10): Authentication and Sessions](./06-auth-and-sessions.md)
 - **Connecting to a Database (current)**
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [SQL (MDN glossary)](https://developer.mozilla.org/en-US/docs/Glossary/SQL)
-- [sqlite3 (Python docs)](https://docs.python.org/3/library/sqlite3.html)
-- [SQLAlchemy ORM tutorial](https://docs.sqlalchemy.org/en/20/orm/quickstart.html)
-- [Database connection pool (Wikipedia)](https://en.wikipedia.org/wiki/Connection_pool)
+### Official Docs
+- [sqlite3 — DB-API 2.0 interface for SQLite databases](https://docs.python.org/3/library/sqlite3.html)
+- [SQLAlchemy ORM Quick Start](https://docs.sqlalchemy.org/en/20/orm/quickstart.html)
+- [Database transaction (Wikipedia)](https://en.wikipedia.org/wiki/Database_transaction)
+
+### Verification Resources
+- [SQL injection (OWASP)](https://owasp.org/www-community/attacks/SQL_Injection)
+- [EXPLAIN QUERY PLAN (SQLite)](https://www.sqlite.org/eqp.html)

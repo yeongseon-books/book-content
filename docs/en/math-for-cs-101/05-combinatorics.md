@@ -1,10 +1,10 @@
 ---
 series: math-for-cs-101
 episode: 5
-title: Combinatorics
-status: content-ready
+title: "Math for CS 101 (5/10): Combinatorics"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,39 +20,40 @@ seo_description: A beginner-friendly tour of product rule, sum rule, permutation
 last_reviewed: '2026-05-04'
 ---
 
-# Combinatorics
+# Math for CS 101 (5/10): Combinatorics
 
-> Math for CS 101 series (5/10)
+If you want to explain why an algorithm suddenly becomes too slow, why test cases explode, or why collisions become unavoidable, you end up counting possibilities. The problem is that real systems produce too many cases to enumerate by hand.
 
-<!-- a-grade-intro:begin -->
+Combinatorics is what lets you count without listing everything. Once you know whether order matters, whether repetition is allowed, and whether choices are independent or exclusive, the structure often tells you how to count.
 
-**Core question**: How do we *count* possibilities *correctly* without listing them?
+This is post 5 in the Math for CS 101 series.
 
-> *Combinatorics* is the *art of counting*, and it underpins *complexity analysis* and *probability*.
+Here we treat combinatorics as the language of counting behind complexity and probability, not as a bag of disconnected formulas.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![math for cs 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/05/05-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 5 flow overview*
+> Combinatorial counting becomes essential the moment you face an exponential search space; it shifts you from guessing to systematic enumeration.
 
-- *Product rule* and *sum rule*
-- *Permutations* nPr
-- *Combinations* nCr
-- *Pigeonhole principle*
-- *Binomial coefficients*
+## Questions to Keep in Mind
+
+- Why can we count accurately without enumerating every case?
+- When should you use the product rule versus the sum rule?
+- What is the practical difference between permutations and combinations?
 
 ## Why It Matters
 
-*Algorithm complexity*, *probability*, *hash collisions*, and *test case generation* all rest on counting.
+Complexity analysis, probability, collision analysis, and test generation all depend on counting. If you underestimate the size of the possibility space, you can choose an algorithm that already fails before optimization begins.
 
-## Concept at a Glance
+The useful habit is to ask structural questions first: does order matter, is repetition allowed, and are the choices independent? Those questions matter more than memorizing a formula in isolation.
 
-```mermaid
-flowchart LR
-    A[Counting] --> B[Permutation nPr]
-    A --> C[Combination nCr]
-    A --> D[Pigeonhole]
-    A --> E[Binomial]
-```
+Combinatorics counts *possibilities* systematically: permutations (order matters), combinations (order does not), and recurrence relations (recursive structure).
+
+## Before/After
+
+**Before**: Try all possibilities and hope the search finishes.
+
+**After**: Calculate the bounds and decide if brute force is even viable.
 
 ## Key Terms
 
@@ -149,19 +150,33 @@ def row(n):
 
 ## Wrap-up and Next Steps
 
-Next post: *Probability*.
+Combinatorics teaches you to read possibility spaces structurally instead of by brute force. That shift is what makes complexity analysis and probability feel connected instead of separate topics.
+
+Next, we continue into probability, where counting becomes a way to reason about uncertainty instead of certainty alone.
+
+## Answering the Opening Questions
+
+- **Why can we count accurately without enumerating every case?**
+  - The article treats Combinatorics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When should you use the product rule versus the sum rule?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What is the practical difference between permutations and combinations?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
-- [Logic and Proofs](./02-logic-and-proofs.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Graphs](./04-graphs.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
+- [Math for CS 101 (2/10): Logic and Proofs](./02-logic-and-proofs.md)
+- [Math for CS 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Math for CS 101 (4/10): Graphs](./04-graphs.md)
 - **Combinatorics (current)**
 - Probability (upcoming)
 - Linear Algebra (upcoming)
 - Calculus (upcoming)
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -170,3 +185,4 @@ Next post: *Probability*.
 - [Counting - Khan Academy](https://www.khanacademy.org/math/statistics-probability/counting-permutations-and-combinations)
 - [Concrete Mathematics - Graham, Knuth, Patashnik](https://www-cs-faculty.stanford.edu/~knuth/gkp.html)
 - [Python math.comb Documentation](https://docs.python.org/3/library/math.html#math.comb)
+- [SymPy GitHub repository](https://github.com/sympy/sympy)

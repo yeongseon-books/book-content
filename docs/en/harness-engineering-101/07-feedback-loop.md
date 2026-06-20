@@ -1,11 +1,11 @@
 ---
-title: Feedback Loops — Building Structures That Let Agents Recover from Failure
+title: "Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure"
 series: harness-engineering-101
 episode: 7
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,22 +14,29 @@ tags:
 - Harness
 - Feedback
 - Reflection
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Agents rarely succeed on the first try. A Feedback Loop is the structure
   that hands failure back to the agent so it can fix its own work.
 ---
 
-# Feedback Loops — Building Structures That Let Agents Recover from Failure
+# Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure
 
-> Harness Engineering 101 Series (7/10)
+Agents frequently fail on the first attempt. They choose the wrong tool, pass the wrong arguments, violate an output policy, or claim completion too early. The important distinction is not whether failure exists. It is whether the system can convert failure into a better next attempt.
 
-Agents rarely succeed on the first try. A Feedback Loop is the structure that hands failure back to the agent so it can fix its own work.
+Retrying blindly is usually just a cost amplifier. Returning the raw failure to the user is even worse. Productive feedback loops classify failure, choose the right recovery path, and stop before one task turns into an unbounded loop.
 
----
+This is post 7 in the Harness Engineering 101 series. Here we treat failure as structured input for the next attempt rather than as the end of the run.
 
-![Feedback loops - building structures that let agents recover from failure](../../assets/harness-engineering-101/07/07-01-feedback-loops-building-structures-that.en.png)
-
+![Feedback loops - building structures that let agents recover from failure](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-01-feedback-loops-building-structures-that.en.png)
 *Feedback loops - building structures that let agents recover from failure*
+> A good feedback loop does not merely try again; it makes the next attempt different because the system knows why the previous one failed.
+
+## Questions to Keep in Mind
+
+- What input should a Feedback Loop turn failure into instead of treating it as a stop signal?
+- Where do simple retry and reflection diverge, and when should each be used?
+- What limits and memory must remain inside the loop to prevent infinite retries?
+
 ## No Agent Succeeds on the First Try
 
 Agents fail often on the first attempt. They call the wrong tool, pass wrong arguments, produce malformed output. How you handle that failure decides production quality.
@@ -42,7 +49,7 @@ Feedback Loop is the structure that converts failure into a learning signal. Thi
 
 ## Retry vs Reflect
 
-![Retry vs reflect](../../assets/harness-engineering-101/07/07-02-retry-vs-reflect.en.png)
+![Retry vs reflect](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-02-retry-vs-reflect.en.png)
 
 *Retry vs reflect*
 Two responses to failure.
@@ -123,7 +130,7 @@ Feedback that says only "try again" makes the agent repeat the same mistake. Spe
 
 ## Preventing Infinite Loops
 
-![Preventing infinite loops](../../assets/harness-engineering-101/07/07-03-preventing-infinite-loops.en.png)
+![Preventing infinite loops](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-03-preventing-infinite-loops.en.png)
 
 *Preventing infinite loops*
 Reflect loops can run forever. The agent might repeat the same mistake or oscillate between two errors. Three safeties.
@@ -228,7 +235,7 @@ Self-critique has two risks. (1) The agent misses its own mistakes (false positi
 
 ## Failure Memory
 
-![Failure memory](../../assets/harness-engineering-101/07/07-04-failure-memory.en.png)
+![Failure memory](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-04-failure-memory.en.png)
 
 *Failure memory*
 When the same task type runs many times, remembering past failures cuts repeated mistakes. Failure memory accumulates which approaches failed per task.
@@ -299,19 +306,36 @@ An agent that meets the same mistakes fresh every time does not improve. Failure
 - Prevent infinite loops with max attempts, cost limit, and repetition detection.
 - Failure memory injected into the first-attempt prompt makes the system improve over time.
 
+## Operational checklist
+
+- [ ] Classify failures into transient, reasoning, and deterministic buckets before recovery.
+- [ ] Do not use identical logic for retry and reflect paths.
+- [ ] Include What, Why, How, and a constraint in every reflect message.
+- [ ] Cap attempts, cumulative cost, and repeated failure patterns together.
+- [ ] Escalate unresolved loops to humans and record failure memory for the next run.
+
+## Answering the Opening Questions
+
+- **What input should a Feedback Loop turn failure into instead of treating it as a stop signal?**
+  - It should become structured input: failure reason, observed evidence, constraints to change, and actions forbidden on the next attempt.
+- **Where do simple retry and reflection diverge, and when should each be used?**
+  - Retry fits transient errors where the same action may succeed. Reflection fits bad plans or judgments where the next action must change.
+- **What limits and memory must remain inside the loop to prevent infinite retries?**
+  - Keep max attempts, cost limits, failure memory, stop conditions, and human-escalation rules inside the loop.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
-- [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
-- [Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
-- [Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
-- [Test Harness — Turning Completion Criteria into Tests](./06-test-harness.md)
-- **Feedback Loops — Building Structures That Let Agents Recover from Failure (current)**
-- Approval Gates — Designing Where Humans Must Approve (upcoming)
-- Observability — Tracing and Replaying Agent Work (upcoming)
-- Production Harness — Building Operational Environments for Agents (upcoming)
+- [Harness Engineering 101 (1/10): What Is Harness Engineering?](./01-what-is-harness-engineering.md)
+- [Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
+- [Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
+- [Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
+- [Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
+- [Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests](./06-test-harness.md)
+- **Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure (current)**
+- Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (upcoming)
+- Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)
 
 <!-- toc:end -->
 
@@ -319,7 +343,13 @@ An agent that meets the same mistakes fresh every time does not improve. Failure
 
 ## References
 
+### Official docs and research
+
 - [Shinn et al. — Reflexion: Language Agents with Verbal Reinforcement Learning](https://arxiv.org/abs/2303.11366)
 - [Madaan et al. — Self-Refine: Iterative Refinement with Self-Feedback](https://arxiv.org/abs/2303.17651)
 - [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
 - [LangGraph — Reflection Patterns](https://langchain-ai.github.io/langgraph/tutorials/reflection/reflection/)
+
+### Verification-friendly references
+
+- [OpenAI Cookbook — Techniques to Improve Reliability](https://cookbook.openai.com/articles/techniques_to_improve_reliability)

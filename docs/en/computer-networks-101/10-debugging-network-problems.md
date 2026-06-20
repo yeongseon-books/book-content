@@ -1,10 +1,10 @@
 ---
 series: computer-networks-101
 episode: 10
-title: Debugging Network Problems
-status: content-ready
+title: "Computer Networks 101 (10/10): Debugging Network Problems"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,28 @@ tags:
   - Troubleshooting
   - Diagnostics
 seo_description: How to narrow a network problem layer by layer with ping, dig, nc, openssl, curl, ss, and tcpdump, and how to read what each tool tells you.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Debugging Network Problems
+# Computer Networks 101 (10/10): Debugging Network Problems
 
 > Computer Networks 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: When the report is "the site is broken," what do you check first, and in what order, to find the cause as quickly as possible?
 
 > Network debugging is not guesswork. It is **walking down the layers and killing hypotheses one at a time**. Link → routing → DNS → TCP → TLS → HTTP. Five short commands usually decide which layer owns the problem within a minute. A good tool is one that quickly invalidates a wrong hypothesis, not one that gives you more output to stare at.
 
-<!-- a-grade-intro:end -->
+This is the final post in the Computer Networks 101 series.
+
+
+![computer networks 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/10/10-01-concept-at-a-glance.en.png)
+*computer networks 101 chapter 10 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Debugging Network Problems?
+- Which signal should the example or diagram make visible for Debugging Network Problems?
+- What failure should be prevented first when Debugging Network Problems reaches a real system?
 
 ## What You Will Learn
 
@@ -45,18 +53,6 @@ last_reviewed: '2026-05-04'
 Under pressure, the first instinct is "what did we just change?" That is necessary but not enough. Without knowing where the path breaks, code changes are guesses. The habit of confirming "this layer is fine" one step at a time is what lets you stay calm at 3 a.m.
 
 > Debugging is less about finding what is broken and more about **confirming, one layer at a time, what is fine**.
-
-## Concept at a Glance
-
-```mermaid
-flowchart TB
-    A["User: the site is down"] --> B["1. Link/path: ping, traceroute"]
-    B --> C["2. Name resolution: dig"]
-    C --> D["3. TCP connect: nc, ss"]
-    D --> E["4. TLS: openssl s_client"]
-    E --> F["5. HTTP: curl -v"]
-    F --> G["6. Packets: tcpdump"]
-```
 
 Each step you confirm as healthy cuts the hypothesis space roughly in half.
 
@@ -163,6 +159,20 @@ curl -v https://api.example.com/health
 
 `-v` is the point. It shows DNS, TCP connect, TLS negotiation, request headers, and response headers in one go. If you reach a 4xx or 5xx response, the problem is no longer the network — it is the application. If everything looks healthy here, suspicion shifts to the client environment.
 
+## Step 6: Use the failure shape to guess the layer immediately
+
+Even before you run all five commands, the failure shape tells you which layer deserves the next minute.
+
+| Symptom | Most likely layer | Immediate next action |
+| --- | --- | --- |
+| `Could not resolve host` | DNS | `dig +short`, then `dig +trace` |
+| `Connection refused` | TCP / process | Check `ss -tlnp` on the server |
+| `Operation timed out` | Firewall / path | Check `traceroute`, security groups, ACLs |
+| `SSL certificate problem` | TLS | Run `openssl s_client -servername ...` |
+| `HTTP/1.1 502` or `503` | App / LB | Check `/health`, upstream status, app logs |
+
+The goal is not to memorize canned answers. It is to recognize **which layer's language** the error message is written in. Once that habit forms, half the hypotheses disappear before `tcpdump` even enters the conversation.
+
 ## What to Notice in This Code
 
 - Each tool eliminates a different hypothesis: `ping` for link, `dig` for name, `nc` for port, `openssl` for cert, `curl` for application behavior.
@@ -219,17 +229,29 @@ Network debugging is, in the end, **walking the layers and killing hypotheses**.
 
 That closes Computer Networks 101. From "what is a network" through IP, TCP, DNS, HTTP, TLS, routing, load balancers, WebSocket, and now debugging — you have walked one full loop of what happens when you load a web page. The next time a pager fires at 3 a.m., I hope the first five commands come out without thinking.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Debugging Network Problems?**
+  - The article treats Debugging Network Problems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Debugging Network Problems?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Debugging Network Problems reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a network?](./01-what-is-a-network.md)
-- [IP and subnets](./02-ip-and-subnet.md)
-- [TCP and UDP](./03-tcp-and-udp.md)
-- [DNS](./04-dns.md)
-- [HTTP and HTTPS](./05-http-and-https.md)
-- [TLS basics](./06-tls-basics.md)
-- [Routing and NAT](./07-routing-and-nat.md)
-- [Load Balancer](./08-load-balancer.md)
-- [WebSocket and Real-Time Communication](./09-websocket-and-realtime.md)
+## In this series
+
+- [Computer Networks 101 (1/10): What Is a Network?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP and Subnet](./02-ip-and-subnet.md)
+- [Computer Networks 101 (3/10): TCP and UDP](./03-tcp-and-udp.md)
+- [Computer Networks 101 (4/10): DNS](./04-dns.md)
+- [Computer Networks 101 (5/10): HTTP and HTTPS](./05-http-and-https.md)
+- [Computer Networks 101 (6/10): TLS Basics](./06-tls-basics.md)
+- [Computer Networks 101 (7/10): Routing and NAT](./07-routing-and-nat.md)
+- [Computer Networks 101 (8/10): Load Balancer](./08-load-balancer.md)
+- [Computer Networks 101 (9/10): WebSocket and Real-Time Communication](./09-websocket-and-realtime.md)
 - **Debugging Network Problems (current)**
+
 <!-- toc:end -->
 
 ## References
@@ -238,3 +260,5 @@ That closes Computer Networks 101. From "what is a network" through IP, TCP, DNS
 - [Wireshark User's Guide](https://www.wireshark.org/docs/wsug_html_chunked/)
 - [`ss(8)` Linux Manual](https://man7.org/linux/man-pages/man8/ss.8.html)
 - [Julia Evans — Networking debugging zines](https://wizardzines.com/zines/networking/)
+- [curl Manual](https://curl.se/docs/manpage.html)
+- [OpenSSL `s_client` documentation](https://docs.openssl.org/master/man1/openssl-s_client/)

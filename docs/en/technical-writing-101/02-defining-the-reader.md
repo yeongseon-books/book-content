@@ -1,10 +1,10 @@
 ---
 series: technical-writing-101
 episode: 2
-title: Defining the Reader
-status: content-ready
+title: "Technical Writing 101 (2/10): Defining the Reader"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,43 +16,36 @@ tags:
   - Persona
   - Writing
   - Beginner
-seo_description: A beginner-friendly tour of defining the reader through personas so a technical post stays focused and useful.
-last_reviewed: '2026-05-04'
+seo_description: Define the reader with persona, prior knowledge, goal, and non-goal so a technical post stays narrow and useful.
+last_reviewed: '2026-05-15'
 ---
 
-# Defining the Reader
+# Technical Writing 101 (2/10): Defining the Reader
 
-> Technical Writing 101 series (2/10)
+The same FastAPI example can be a friendly introduction for a junior engineer and a useless wall of text for the on-call engineer trying to restore service. The writing is not necessarily wrong. The target moved.
 
-<!-- a-grade-intro:begin -->
+Once the reader is blurry, everything else drifts with it: how much background to include, which terms need explanation, how hard the example can be, and what the post should deliberately leave out. A concrete reader makes those decisions faster.
 
-**Core question**: Why does a post for *everyone* end up *helping no one*?
+This is post 2 in the Technical Writing 101 series. Here we turn the reader into a working model with persona, prior knowledge, goal, and non-goal.
 
-> A *clear reader* makes *clear sentences*.
 
-<!-- a-grade-intro:end -->
+![technical writing 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/02/02-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 2 flow overview*
+> When the reader is blurry, everything else—depth, vocabulary, scope—drifts with it.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Building a *persona*
-- Mapping *prior knowledge*
-- Aligning the *goal*
-- Tightening the *scope*
-- Matching example *difficulty*
+- Building a *persona?
+- Mapping *prior knowledge?
+- Aligning the *goal?
 
 ## Why It Matters
 
 A blurry *reader* leads to blurry *sentences*.
 
-## Concept at a Glance
+> Mental model: once one reader becomes concrete, scope and vocabulary stop drifting.
 
-```mermaid
-flowchart LR
-    P[Persona] --> K[Knowledge]
-    K --> G[Goal]
-    G --> S[Scope]
-```
-
+A persona is not a demographic profile; it is a decision boundary. It answers how much background to include, which terms need explanation, how hard examples can be, and what the post should deliberately skip.
 ## Key Terms
 
 - **persona**: A *model of the reader*.
@@ -66,6 +59,16 @@ flowchart LR
 **Before**: "A post for *developers*."
 
 **After**: "A post for a *first-year Python* engineer learning *FastAPI*."
+
+## The same feature changes shape for different readers
+
+| Reader | Already knows | Needs right now | Should be left out |
+| --- | --- | --- | --- |
+| Beginner | Python syntax, `pip` | A first FastAPI endpoint | Deployment strategy, performance tuning |
+| Reviewer | API basics | Missing prerequisites in the draft | Full install walkthrough |
+| On-call engineer | Production environment | Triage steps and logs | Refresher on beginner concepts |
+
+The same `/health` endpoint example serves different purposes for each row. That is why a persona is not decorative UX language. It is an editing boundary for depth, vocabulary, and scope.
 
 ## Hands-on: A Persona Card
 
@@ -89,9 +92,7 @@ unknown = ["async", "type hints"]
 
 ### Step 4 — Goal
 
-```python
-goal = "Ship the first FastAPI endpoint"
-```
+Write the goal as a concrete next action: ship the first FastAPI endpoint.
 
 ### Step 5 — Non-goal
 
@@ -142,8 +143,19 @@ API references, user guides, and tutorials all split by *persona*.
 
 The next post is *Title and Structure*.
 
+## Answering the Opening Questions
+
+- **Building a *persona?**
+  - The article treats Defining the Reader as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Mapping *prior knowledge?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Aligning the *goal?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
 - **Defining the Reader (current)**
 - Title and Structure (upcoming)
 - Explaining Concepts (upcoming)
@@ -153,6 +165,7 @@ The next post is *Title and Structure*.
 - Writing Tutorials (upcoming)
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

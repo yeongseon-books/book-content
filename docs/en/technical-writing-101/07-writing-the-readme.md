@@ -1,10 +1,10 @@
 ---
 series: technical-writing-101
 episode: 7
-title: Writing the README
-status: content-ready
+title: "Technical Writing 101 (7/10): Writing the README"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,44 +16,36 @@ tags:
   - OpenSource
   - Documentation
   - Beginner
-seo_description: A beginner-friendly tour of writing a README that lets a first-time visitor run the project in five minutes.
-last_reviewed: '2026-05-04'
+seo_description: Write a README that gives first-time visitors a five-minute path to install, run, and verify the project.
+last_reviewed: '2026-05-15'
 ---
 
-# Writing the README
+# Technical Writing 101 (7/10): Writing the README
 
-> Technical Writing 101 series (7/10)
+Most readers decide whether to stay in a repository before they inspect a single source file. If the README hides the purpose, the install path, or the first success, the project already feels expensive to approach.
 
-<!-- a-grade-intro:begin -->
+A strong README does not try to explain everything. It lowers entry friction. It tells the reader what this project is, why it exists, how to try it quickly, and what result should appear when the happy path works.
 
-**Core question**: Can a *first-time visitor* run the project in *five minutes* using only the *README*?
+This is post 7 in the Technical Writing 101 series. It focuses on designing that five-minute first-run experience.
 
-> A *kind entrance* makes the whole *house* feel *kind*.
 
-<!-- a-grade-intro:end -->
+![technical writing 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/07/07-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 7 flow overview*
+> A README succeeds when a first-time visitor reaches a visible success without leaving the screen.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *five part* structure
-- Writing the *Quick Start*
-- Using *badges*
-- Adding an *FAQ*
-- Stating the *license*
+- The *five part* structure?
+- Writing the *Quick Start?
+- Using *badges?
 
 ## Why It Matters
 
 The *README* is the *first impression* of a project.
 
-## Concept at a Glance
+> Mental model: the README should get a first-time visitor to a visible success with minimal scrolling.
 
-```mermaid
-flowchart LR
-    W[What] --> Y[Why]
-    Y --> H[How]
-    H --> D[Demo]
-    D --> L[License]
-```
-
+A strong README compresses the install, run, and verification steps into one screen so the reader gets a first success before reading the full backstory. That early win makes the rest of the README feel safer to trust.
 ## Key Terms
 
 - **What**: What it *is*.
@@ -67,6 +59,29 @@ flowchart LR
 **Before**: "A *Python* package called *Hello*."
 
 **After**: A README with all *five* parts.
+
+## Treat the README like a five-minute contract
+
+You can compress the first-run path near the top of the README like this.
+
+~~~markdown
+## Quick Start
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app:app --reload
+```
+~~~
+
+**Expected output:**
+
+```text
+Uvicorn running on http://127.0.0.1:8000
+```
+
+This pattern works because install, run, and proof live in one screen. The reader does not need to absorb the whole backstory before seeing a first success. Once the project feels runnable, the rest of the README becomes easier to trust.
 
 ## Hands-on: Five README Parts
 
@@ -147,17 +162,29 @@ Most trending GitHub projects follow nearly the same *five part* pattern.
 
 The next post is *Writing Tutorials*.
 
+## Answering the Opening Questions
+
+- **The *five part* structure?**
+  - The article treats Writing the README as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Writing the *Quick Start?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Using *badges?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
-- [Title and Structure](./03-title-and-structure.md)
-- [Explaining Concepts](./04-explaining-concepts.md)
-- [Explaining Example Code](./05-explaining-example-code.md)
-- [Using Figures and Tables](./06-using-figures-and-tables.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): Title and Structure](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): Explaining Concepts](./04-explaining-concepts.md)
+- [Technical Writing 101 (5/10): Explaining Example Code](./05-explaining-example-code.md)
+- [Technical Writing 101 (6/10): Using Figures and Tables](./06-using-figures-and-tables.md)
 - **Writing the README (current)**
 - Writing Tutorials (upcoming)
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

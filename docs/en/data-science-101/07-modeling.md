@@ -1,10 +1,10 @@
 ---
 series: data-science-101
 episode: 7
-title: Modeling
-status: content-ready
+title: "Data Science 101 (7/10): Modeling"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,36 @@ tags:
   - MachineLearning
   - Beginner
 seo_description: From baseline to a first classifier with scikit-learn — five safe steps to build your first supervised model without leaking data
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Modeling
+# Data Science 101 (7/10): Modeling
 
-> Data Science 101 series (7/10)
+Modeling gets the spotlight, but it is easiest to misuse precisely because it looks sophisticated. A first model can produce a clean metric and still teach you nothing if you do not know what baseline it beat, whether preprocessing leaked information, or whether a different data split would change the story.
 
-<!-- a-grade-intro:begin -->
+The safe way to start modeling is to reduce the room for self-deception. Build the simplest reference first, keep training and evaluation cleanly separated, and only then ask whether a more capable model is actually earning its complexity.
 
-**Core question**: How do you build a *first model* — and why must you start with a *baseline*?
+This is post 7 in the Data Science 101 series. Here we build that safer path: baseline first, pipeline second, and only then a model you can compare and trust.
 
-> *A model without a baseline has *nothing to stand on*.*
 
-<!-- a-grade-intro:end -->
+![data science 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/07/07-01-concept-at-a-glance.en.png)
+*data science 101 chapter 7 flow overview*
+> At its core, Modeling is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Modeling?
+- Which signal should the example or diagram make visible for Modeling?
+- What failure should be prevented first when Modeling reaches a real system?
+
+## Questions This Post Answers
+
+- Why is the baseline the real starting point of modeling?
+- What does train/test separation protect you from in practice?
+- Why is preprocessing outside the pipeline such a common leakage source?
+- What extra signal does cross-validation variance add beyond a single score?
+
+> A model only earns trust after it beats a baseline under a leakage-safe evaluation path.
 
 ## What You Will Learn
 
@@ -46,16 +62,7 @@ A *good baseline* is the real starting line — much more than a fancy model. Wi
 
 > *Every model competes against a *baseline*.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Data["Cleaned Data"] --> Split["Train / Test Split"]
-    Split --> Base["Baseline"]
-    Split --> Model["Model"]
-    Base --> Compare["Compare"]
-    Model --> Compare
-```
+The key boundary in this episode is between the concept itself and how it operates in a real system. You need to know where the data comes in, where the decision happens, and what signal must be recorded.
 
 ## Key Terms
 
@@ -131,6 +138,8 @@ scores = cross_val_score(model, X_train, y_train, cv=5, scoring="accuracy")
 print(scores.mean(), "+/-", scores.std())
 ```
 
+**Expected output:** one comparison view that shows baseline score, first-model score, and cross-validation mean plus variance.
+
 ## What to Notice in This Code
 
 - *Baseline first*, every time.
@@ -174,17 +183,29 @@ Teams log experiments with *MLflow / Weights & Biases*. The *baseline* is always
 
 Modeling is a *conversation with the baseline*. Next we step into the world of *evaluation metrics*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Modeling?**
+  - The article treats Modeling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Modeling?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Modeling reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Data Science?](./01-what-is-data-science.md)
-- [Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
-- [Data Collection](./03-data-collection.md)
-- [Data Cleaning](./04-data-cleaning.md)
-- [Exploratory Data Analysis](./05-exploratory-data-analysis.md)
-- [Visualization](./06-visualization.md)
+## In this series
+
+- [Data Science 101 (1/10): What Is Data Science?](./01-what-is-data-science.md)
+- [Data Science 101 (2/10): Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
+- [Data Science 101 (3/10): Data Collection](./03-data-collection.md)
+- [Data Science 101 (4/10): Data Cleaning](./04-data-cleaning.md)
+- [Data Science 101 (5/10): Exploratory Data Analysis](./05-exploratory-data-analysis.md)
+- [Data Science 101 (6/10): Visualization](./06-visualization.md)
 - **Modeling (current)**
 - Evaluation (upcoming)
 - Result Interpretation (upcoming)
 - End-to-End Data Project Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

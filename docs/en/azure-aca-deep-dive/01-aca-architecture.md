@@ -1,25 +1,31 @@
 ---
-title: ACA architecture — what Microsoft layered on a hidden Kubernetes
-series: azure-aca-deep-dive
 episode: 1
 language: en
+last_reviewed: '2026-05-15'
+seo_description: 'Inside Azure Container Apps: the hidden Kubernetes layer, the ACA
+  control plane, and the line between platform and tenant workload.'
+series: azure-aca-deep-dive
 status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
 tags:
 - Container Apps
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-04-29'
-seo_description: 'External references in this post are pinned to these upstream baselines:
-  - Dapr: v1.13.x (https://github.com/dapr/dapr) - KEDA: v2.14.x…'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: false
+title: "Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes"
 ---
 
-# ACA architecture — what Microsoft layered on a hidden Kubernetes
+# Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes
+
+The public story for Azure Container Apps is intentionally simple. You push a container, turn on ingress, Dapr, or scale rules, and Microsoft runs the platform.
+
+That simplicity is useful, but it also makes the internals easy to blur together. Container Apps is not a raw Kubernetes service, and it is not just AKS with nicer defaults either.
+
+This is the first post in the Azure Container Apps Deep Dive series. Here, I start with the full map of what Azure Container Apps adds on top of Microsoft-managed Kubernetes.
 
 ## Source Version
 
@@ -36,44 +42,21 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: the hidden substrate most plausibly composes Kubernetes primitives with Envoy, KEDA, and Dapr-like runtime pieces.
 - **Out of bounds**: exact cluster topology, private control-plane binaries, and per-environment implementation details Microsoft does not publish.
 
-> Azure Container Apps Deep Dive series (1/6)
+![azure container apps deep dive chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.en.png)
+*azure container apps deep dive chapter 1 flow overview*
 
-The public story for Azure Container Apps is intentionally simple.
-You push a container.
-You turn on ingress, Dapr, or scale rules.
-Microsoft runs the platform.
-
-That simplicity is useful.
-It is also exactly why the internals are easy to blur together.
-
-Container Apps is not a raw Kubernetes service.
-It is not "just AKS with nicer defaults" either.
-Microsoft documents ACA as Kubernetes-powered, but does not expose the exact substrate behind each environment.
-The safest description is that it is a serverless container platform built on Microsoft-managed Kubernetes infrastructure, with its own control surfaces for revisions, ingress, autoscaling, Dapr integration, logging, and environment scoping.
-
-This series is about that layering.
-Episode 1 draws the map.
-The later episodes zoom into each box.
-
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What abstractions does ACA stack on top of which abstractions, exactly?
 - Who owns and upgrades the managed components (KEDA, Dapr, Envoy) inside an environment?
 - ACA runs on AKS under the hood — what obligations does that move to Microsoft, and what stays with you?
-- If the control plane fails, what does your app look like, and how does it recover?
-- Inside one environment, where does isolation end and where does it leak?
 
-## The big picture — one Container Apps environment
+## One Container Apps environment
 
 This is the map for the whole series.
 Every later post expands one box from this picture.
 Get the shape first, then the platform behaviors stop looking like isolated features.
 
-![Request path and hidden substrate layers](../../assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.en.png)
-
-*Request path and hidden substrate layers*
 The left edge is the user-facing path.
 The middle is the runtime surface you configure as Container Apps.
 The dotted boundary is the Kubernetes layer you do not directly control.
@@ -123,7 +106,7 @@ That is the frame for the rest of the series.
 
 The stack is easier to reason about when split into layers.
 
-![Declared layers and runtime translation path](../../assets/azure-aca-deep-dive/01/01-02-a-simpler-model-aca-is-a-product-surface.en.png)
+![Declared layers and runtime translation path](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-02-a-simpler-model-aca-is-a-product-surface.en.png)
 
 *Declared layers and runtime translation path*
 The top layer is what you declare.
@@ -158,7 +141,7 @@ That means the Environment is where several platform-wide concerns become real.
 
 This is why an environment choice is architectural, not cosmetic.
 
-![Environment-scoped network, logging, and Dapr boundary](../../assets/azure-aca-deep-dive/01/01-03-what-the-environment-really-is.en.png)
+![Environment-scoped network, logging, and Dapr boundary](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-03-what-the-environment-really-is.en.png)
 
 *Environment-scoped network, logging, and Dapr boundary*
 If two apps must never share those boundaries, they do not belong in the same environment.
@@ -179,7 +162,7 @@ That revision is immutable.
 
 You can think of the runtime expansion like this:
 
-![App-to-revision-to-replica runtime expansion](../../assets/azure-aca-deep-dive/01/01-04-what-a-container-app-becomes-at-runtime.en.png)
+![App-to-revision-to-replica runtime expansion](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-04-what-a-container-app-becomes-at-runtime.en.png)
 
 *App-to-revision-to-replica runtime expansion*
 The user experience says, "I updated my app."
@@ -207,7 +190,7 @@ You can:
 
 This is why ACA can do canary and blue-green without making you design that wiring from scratch.
 
-![Revision-centered rollout and scaling control](../../assets/azure-aca-deep-dive/01/01-05-revisions-are-the-operational-center-of.en.png)
+![Revision-centered rollout and scaling control](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-05-revisions-are-the-operational-center-of.en.png)
 
 *Revision-centered rollout and scaling control*
 The important nuance is that traffic policy is app-facing, but scale happens per revision.
@@ -238,7 +221,7 @@ For HTTP, ACA exposes a built-in HTTP scaling feature based on request concurren
 That resembles the KEDA HTTP add-on idea, but it is not a promise that ACA literally runs the upstream `kedacore/http-add-on` project one-to-one.
 The product surface is ACA's own.
 
-![ACA scale rules and KEDA translation path](../../assets/azure-aca-deep-dive/01/01-06-why-keda-matters-even-if-you-never-see-a.en.png)
+![ACA scale rules and KEDA translation path](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-06-why-keda-matters-even-if-you-never-see-a.en.png)
 
 *ACA scale rules and KEDA translation path*
 Episode 4 opens that black box.
@@ -259,7 +242,7 @@ The most useful way to picture this is simple.
 - ACA documents the Dapr HTTP API on port 3500 and the Dapr gRPC API on port 50001.
 - Components are configured at the environment level, then loaded according to Dapr scopes.
 
-![App container with daprd sidecar runtime](../../assets/azure-aca-deep-dive/01/01-07-dapr-in-aca-is-not-a-mock-integration.en.png)
+![App container with daprd sidecar runtime](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-07-dapr-in-aca-is-not-a-mock-integration.en.png)
 
 *App container with daprd sidecar runtime*
 That is a real sidecar process, not a control-plane simulation.
@@ -281,7 +264,7 @@ The critical detail for this series is how weights are applied.
 In Envoy terminology, a cluster is an upstream service target, not a Kubernetes cluster.
 Traffic splitting across ACA revisions maps most naturally onto weighted upstream cluster selection, which is the best-supported inference rather than an ACA-public implementation guarantee.
 
-![Ingress settings to Envoy routing path](../../assets/azure-aca-deep-dive/01/01-08-envoy-is-where-ingress-becomes-runtime-r.en.png)
+![Ingress settings to Envoy routing path](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-08-envoy-is-where-ingress-becomes-runtime-r.en.png)
 
 *Ingress settings to Envoy routing path*
 Episode 6 follows this path in full.
@@ -292,7 +275,7 @@ Episode 6 follows this path in full.
 
 This split helps when debugging.
 
-![ACA control plane and data plane split](../../assets/azure-aca-deep-dive/01/01-09-control-plane-versus-data-plane-in-aca.en.png)
+![ACA control plane and data plane split](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-09-control-plane-versus-data-plane-in-aca.en.png)
 
 *ACA control plane and data plane split*
 If a new revision exists but serves no traffic, that is usually a control-plane decision.
@@ -368,6 +351,22 @@ az containerapp env workload-profile list \
   -o table
 ```
 
+Add one app-level check and the architecture map becomes concrete immediately.
+
+```bash
+az containerapp show \
+  --name my-app --resource-group my-rg \
+  --query "{app:name, env:properties.managedEnvironmentId, latestRevision:properties.latestRevisionName, ingress:properties.configuration.ingress.external}"
+```
+
+**Expected output:**
+
+- `env` tells you which environment boundary the app belongs to.
+- `latestRevision` confirms that the app name is only the logical surface, while runtime execution hangs off a distinct revision snapshot.
+- `ingress` tells you whether the user-facing path is exposed.
+
+Together, these commands turn the big-picture diagram into an operator check: environment as boundary, revision as runtime unit, ingress as exposure surface.
+
 ## Operational checklist
 
 - [ ] Recorded ownership boundaries (Microsoft vs your team) in an ADR
@@ -376,15 +375,24 @@ az containerapp env workload-profile list \
 - [ ] Confirmed the upgrade policy for managed components (KEDA, Dapr, Envoy)
 - [ ] Catalogued changes that require environment recreation (VNet, log workspace)
 
+## Answering the Opening Questions
+
+- **What abstractions does ACA stack on top of which abstractions, exactly?**
+  - The article treats ACA architecture — what Microsoft layered on a hidden Kubernetes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Who owns and upgrades the managed components (KEDA, Dapr, Envoy) inside an environment?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **ACA runs on AKS under the hood — what obligations does that move to Microsoft, and what stays with you?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- **ACA architecture — what Microsoft layered on a hidden Kubernetes (current)**
-- Environment internals — the network, observability, and Dapr scope boundary (upcoming)
-- Revisions and traffic splitting — where Envoy weights come from (upcoming)
-- KEDA inside ACA — what a scale rule actually creates (upcoming)
-- Dapr sidecar internals — the Go process that lives next to your container (upcoming)
-- The Envoy ingress path — how the first request reaches your container (upcoming)
+- **Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes (current)**
+- Azure Container Apps Deep Dive (2/6): Environment internals — the network, observability, and Dapr scope boundary (upcoming)
+- Azure Container Apps Deep Dive (3/6): Revisions and traffic splitting — where Envoy weights come from (upcoming)
+- Azure Container Apps Deep Dive (4/6): KEDA inside ACA — what a scale rule actually creates (upcoming)
+- Azure Container Apps Deep Dive (5/6): Dapr sidecar internals — the Go process that lives next to your container (upcoming)
+- Azure Container Apps Deep Dive (6/6): The Envoy ingress path — how the first request reaches your container (upcoming)
 
 <!-- toc:end -->
 

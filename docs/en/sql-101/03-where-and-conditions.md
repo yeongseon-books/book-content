@@ -1,10 +1,10 @@
 ---
 series: sql-101
 episode: 3
-title: WHERE and Conditions
+title: "SQL 101 (3/10): WHERE and Conditions"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,37 @@ tags:
   - Database
   - "NULL"
 seo_description: A practical guide to WHERE — comparison operators, AND/OR precedence, IN, BETWEEN, LIKE, and NULL-safe comparisons.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# WHERE and Conditions
+# SQL 101 (3/10): WHERE and Conditions
 
-> SQL 101 series (3/10)
+Most SQL mistakes do not come from exotic syntax. They come from one condition that was slightly too broad, one NULL comparison that silently dropped rows, or one expression shape that forced the database into a full scan.
 
-<!-- a-grade-intro:begin -->
+That is why WHERE deserves more attention than its short syntax suggests. It decides both correctness and cost, and it is often the line that determines whether a query stays cheap or turns into a production incident.
 
-**Core question**: How does *one condition* drop millions of rows, and where do the *NULLs we miss* sneak in?
+This is post 3 in the SQL 101 series. Here we treat WHERE as the gate that controls both accuracy and performance.
 
-> *WHERE is the *front gate* for data. It must block precisely and pass precisely.*
 
-<!-- a-grade-intro:end -->
+![sql 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/03/03-01-where-evaluation-flow.en.png)
+*sql 101 chapter 3 flow overview*
+> WHERE determines which rows even make it into the result. Getting the logic right is non-negotiable; getting the performance is about knowing when the database can use an index.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- *Comparison operators* and the precedence of *AND / OR*
-- The differences between *IN, BETWEEN, LIKE*
-- Why NULL comparisons are different
-- How condition shape affects *performance*
-- Five common mistakes
+- How should you read comparison operators and predicates?
+- Why do AND and OR precedence mistakes keep showing up in production?
+- When do IN, BETWEEN, and LIKE fit best?
 
 ## Why It Matters
 
-A single line in WHERE often decides *90% of the cost*. Whether an *index hits*, how many rows scan, how much memory the server uses — it all flows from WHERE. And *NULL* is the most common silent corruptor of results.
+A single predicate often decides most of the cost of a query. Whether an index is used, how many rows survive, and how much memory the database spends all flow from the condition shape. A broad filter and a selective filter can look almost identical while behaving very differently on large tables.
 
-> *Returning a *wrong answer fast* happens *more often than people think*.*
+Correctness is just as important. A query that returns the wrong answer quickly is more dangerous than one that fails loudly, and NULL handling plus precedence mistakes are common reasons apparently reasonable queries end up lying quietly.
 
-## Concept at a Glance
+## WHERE evaluation flow
 
-```mermaid
-flowchart LR
-    Rows["All rows"] --> Where["WHERE evaluation"]
-    Where -->|true| Pass["Next step"]
-    Where -->|false or NULL| Drop["Discarded"]
-```
+WHERE is evaluated before SELECT, which means column aliases from SELECT aren't visible in WHERE. This is why you sometimes need to repeat the same expression—the evaluation order dictates visibility.
 
 ## Key Terms
 
@@ -101,6 +95,13 @@ SELECT * FROM users WHERE email LIKE '%@example.com';
 SELECT * FROM users WHERE deleted_at IS NULL;
 ```
 
+**Expected output:**
+
+| id | name | deleted_at |
+| --- | --- | --- |
+| 1 | Ada | NULL |
+| 2 | Linus | NULL |
+
 ## What to Notice in This Code
 
 - `LIKE '%xxx'` *cannot use an index*. Trailing wildcards are *expensive*.
@@ -144,9 +145,20 @@ Dashboard filters, *search boxes*, and *permission checks* all funnel into WHERE
 
 WHERE is the *gatekeeper*. The next post is *JOIN*.
 
+## Answering the Opening Questions
+
+- **How should you read comparison operators and predicates?**
+  - The article treats WHERE and Conditions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do AND and OR precedence mistakes keep showing up in production?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When do IN, BETWEEN, and LIKE fit best?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
+## In this series
+
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
 - **WHERE and Conditions (current)**
 - JOIN (upcoming)
 - GROUP BY and Aggregates (upcoming)
@@ -155,6 +167,7 @@ WHERE is the *gatekeeper*. The next post is *JOIN*.
 - INSERT, UPDATE, DELETE (upcoming)
 - Index and Query Plan (upcoming)
 - Practical Analysis SQL (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -163,3 +176,4 @@ WHERE is the *gatekeeper*. The next post is *JOIN*.
 - [PostgreSQL — Pattern Matching](https://www.postgresql.org/docs/current/functions-matching.html)
 - [Use The Index, Luke — Where Clause](https://use-the-index-luke.com/sql/where-clause)
 - [Mode — WHERE](https://mode.com/sql-tutorial/sql-where/)
+- [PostgreSQL — Comparison Functions and Operators](https://www.postgresql.org/docs/current/functions-comparison.html)

@@ -1,10 +1,10 @@
 ---
 series: discrete-math-101
 episode: 7
-title: Combinatorics
+title: "Discrete Math 101 (7/10): Combinatorics"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: Permutations, combinations, the binomial theorem, the pigeonhol
 last_reviewed: '2026-05-04'
 ---
 
-# Combinatorics
+# Discrete Math 101 (7/10): Combinatorics
+
+This is post 7 in the Discrete Math 101 series.
 
 > Discrete Math 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Why are hash collisions inevitable? How long does it take to brute-force every possible password?
 
 > Combinatorics is the math of counting "how many cases are there?" Permutations, combinations, the binomial theorem, and the pigeonhole principle are the tools we use to size an algorithm's input space, a cipher's key space, or the probability of a hash collision. This article walks through the basic counting laws, the pigeonhole principle, and inclusion-exclusion, with code to verify each result.
 
-<!-- a-grade-intro:end -->
+
+![discrete math 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/07/07-01-big-picture.en.png)
+*discrete math 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Combinatorics?
+- Which signal should the example or diagram make visible for Combinatorics?
+- What failure should be prevented first when Combinatorics reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 Cipher key-space size, brute-force attack time, the birthday paradox — all combinatorics. To analyze how an algorithm behaves over every possible input, you need to know how big the input space is, and that calculation is combinatorics.
 
 > Combinatorics is the tool for measuring the exact size of possibility.
-
-## Concept at a Glance
 
 > Two basic counting laws (product, sum) extend into permutations, combinations, the binomial theorem, the pigeonhole principle, and inclusion-exclusion.
 
@@ -122,16 +128,13 @@ print(f"lunch options: {korean + japanese}")
 ```python
 from math import factorial
 
-
 def permutation(n: int, r: int) -> int:
     """Ordered selection of r items from n."""
     return factorial(n) // factorial(n - r)
 
-
 def combination(n: int, r: int) -> int:
     """Unordered selection of r items from n."""
     return factorial(n) // (factorial(r) * factorial(n - r))
-
 
 # Line up 3 people from 5 (order matters)
 print(f"P(5, 3) = {permutation(5, 3)}")
@@ -160,10 +163,8 @@ def pascal_triangle(rows: int) -> list[list[int]]:
         triangle.append(new_row)
     return triangle
 
-
 for row in pascal_triangle(7):
     print(" ".join(str(x).rjust(3) for x in row).center(40))
-
 
 # (x + y)⁴ expansion: coefficients 1, 4, 6, 4, 1
 n = 4
@@ -179,11 +180,9 @@ print(f"(x+y)^{n} coefficients: {[combination(n, k) for k in range(n + 1)]}")
 def will_collide(input_space: int, hash_space: int) -> bool:
     return input_space > hash_space
 
-
 # A 32-bit hash has 4 × 10⁹ outputs.
 # Hashing 10 billion IDs into 32 bits guarantees a collision.
 print(f"10B → 32-bit collision? {will_collide(10 ** 10, 2 ** 32)}")
-
 
 # Birthday paradox: with just 23 people, two share a birthday with prob ~50%.
 def birthday_collision_prob(n: int, days: int = 365) -> float:
@@ -191,7 +190,6 @@ def birthday_collision_prob(n: int, days: int = 365) -> float:
     for i in range(n):
         no_collision *= (days - i) / days
     return 1 - no_collision
-
 
 for n in [10, 23, 50, 100]:
     print(f"n={n}: collision probability = {birthday_collision_prob(n):.3f}")
@@ -205,18 +203,15 @@ The pigeonhole principle is simple but powerful. The fact that no lossless compr
 # |A ∪ B| = |A| + |B| - |A ∩ B|
 # |A ∪ B ∪ C| = |A| + |B| + |C| - |A∩B| - |A∩C| - |B∩C| + |A∩B∩C|
 
-
 # Example: 100 students, 60 study English, 40 Japanese, 20 both
 def union_two(a: int, b: int, ab: int) -> int:
     return a + b - ab
-
 
 print(f"studying at least one: {union_two(60, 40, 20)} students")
 
 # Multiples of 2 or 3 or 5 between 1 and 100
 def multiples_count(limit: int, n: int) -> int:
     return limit // n
-
 
 limit = 100
 m2, m3, m5 = multiples_count(limit, 2), multiples_count(limit, 3), multiples_count(limit, 5)
@@ -280,17 +275,29 @@ Combinatorics is the math of measuring possibility. The product/sum rules, permu
 
 The next article enters another major area of discrete math: graph theory.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Combinatorics?**
+  - The article treats Combinatorics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Combinatorics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Combinatorics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
-- [Propositions and Logic](./02-propositions-and-logic.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Relations and Equivalence](./04-relations-and-equivalence.md)
-- [Proof Techniques](./05-proof-techniques.md)
-- [Sequences and Recurrence](./06-sequences-and-recurrence.md)
+## In this series
+
+- [Discrete Math 101 (1/10): What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
+- [Discrete Math 101 (2/10): Propositions and Logic](./02-propositions-and-logic.md)
+- [Discrete Math 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Discrete Math 101 (4/10): Relations and Equivalence](./04-relations-and-equivalence.md)
+- [Discrete Math 101 (5/10): Proof Techniques](./05-proof-techniques.md)
+- [Discrete Math 101 (6/10): Sequences and Recurrence](./06-sequences-and-recurrence.md)
 - **Combinatorics (current)**
 - Graph Theory Basics (upcoming)
 - Trees and Graph Traversal (upcoming)
 - Discrete Mathematics and Algorithms (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 episode: 3
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -13,50 +13,39 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
-title: Cosine similarity and vector search — computing sentence distances
-seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
+  tistory: false
+title: "Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances"
+seo_description: Compare cosine similarity, dot product, and Euclidean distance for vector search to understand how normalization affects semantic ranking results.
 ---
 
-# Cosine similarity and vector search — computing sentence distances
-
-> Vector Search 101 (3/6)
-
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/03-cosine-similarity)
+# Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances
 
 Once you have vectors, the next question is how to compare them. Several distance metrics exist, and the one you choose changes search results. Cosine similarity is the most common, but dot product and Euclidean distance (L2) each have cases where they fit better.
 
+This is post 3 in the Vector Search 101 series.
+
 This post implements all three metrics from scratch, shows why normalization matters, and builds a brute-force nearest-neighbor search without any external library.
 
-- implementing cosine similarity, dot product, and Euclidean distance
-- the relationship between normalization and each metric
-- building a brute-force nearest-neighbor search
-- running a real query and examining the results
-- when to use each metric
-
-![Cosine dot and euclidean comparison structure](../../assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
-
+![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
 *Cosine dot and euclidean comparison structure*
----
+> In vector search, the similarity function is not just a math formula. It is a retrieval policy that decides what counts as similar.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Do cosine similarity, dot product, and Euclidean distance produce the same ranking or different ones?
-- How does pre-normalizing vectors collapse cosine and dot product into the same computation?
-- What data should you actually look at when picking a similarity threshold?
-- High similarity does not always mean the same meaning - what are the traps?
-- How should negative similarity (opposite meaning) be handled in search results?
+- If you already have vectors, why is choosing a distance metric still part of the search design?
+- How do cosine similarity, inner product, and L2 distance change ranking behavior?
+- Why does normalization affect both ranking results and FAISS index choice?
 
 ## Three distance metrics
 
-![Cosine dot and euclidean comparison structure](../../assets/vector-search-101/03/03-01-three-distance-metrics.en.png)
+![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-three-distance-metrics.en.png)
 
 *Cosine dot and euclidean comparison structure*
 ### Cosine similarity
 
 Cosine similarity measures the angle between two vectors, ignoring their magnitudes.
 
-```
+```text
 cos(θ) = (A · B) / (|A| × |B|)
 ```
 
@@ -73,7 +62,7 @@ def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
 
 The dot product multiplies element-wise and sums the result.
 
-```
+```text
 A · B = Σ(Aᵢ × Bᵢ)
 ```
 
@@ -88,7 +77,7 @@ def dot_product(a: np.ndarray, b: np.ndarray) -> float:
 
 Euclidean distance is the straight-line distance between two points.
 
-```
+```text
 L2(A, B) = √Σ(Aᵢ - Bᵢ)²
 ```
 
@@ -103,7 +92,7 @@ def euclidean_distance(a: np.ndarray, b: np.ndarray) -> float:
 
 ## Comparing all three metrics
 
-![Three metrics on one pair flow](../../assets/vector-search-101/03/03-02-comparing-all-three-metrics.en.png)
+![Three metrics on one pair flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-02-comparing-all-three-metrics.en.png)
 
 *Three metrics on one pair flow*
 Apply all three to the same sentence pairs.
@@ -169,7 +158,7 @@ With normalized vectors, cosine and dot product match exactly. Euclidean distanc
 
 ## Why normalization matters
 
-![Before and after normalization difference](../../assets/vector-search-101/03/03-03-why-normalization-matters.en.png)
+![Before and after normalization difference](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-03-why-normalization-matters.en.png)
 
 *Before and after normalization difference*
 Without normalization, dot product and cosine similarity diverge.
@@ -221,7 +210,7 @@ Without normalization, the raw dot product (14.15) is dominated by the vector ma
 
 ## Brute-force nearest-neighbor search
 
-![Brute force nearest neighbor execution path](../../assets/vector-search-101/03/03-04-brute-force-nearest-neighbor-search.en.png)
+![Brute force nearest neighbor execution path](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-04-brute-force-nearest-neighbor-search.en.png)
 
 *Brute force nearest neighbor execution path*
 For a few hundred documents, NumPy alone is sufficient for retrieval.
@@ -288,7 +277,7 @@ This approach is called exact search or brute-force search. It is accurate but s
 
 ## When to use each metric
 
-![Metric selection decision flow](../../assets/vector-search-101/03/03-05-when-to-use-each-metric.en.png)
+![Metric selection decision flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-05-when-to-use-each-metric.en.png)
 
 *Metric selection decision flow*
 | Metric | Best for | Watch out for |
@@ -315,15 +304,26 @@ The next post introduces FAISS. We will look at index types, how to build and pe
 - [ ] Decided how many candidates to pass to a reranker after scoring
 - [ ] Captured false-positive examples as regression cases
 
+## Answering the Opening Questions
+
+- **If you already have vectors, why is choosing a distance metric still part of the search design?**
+  The metric defines what close means. Without that rule, vectors cannot be ranked consistently.
+
+- **How do cosine similarity, inner product, and L2 distance change ranking behavior?**
+  Cosine emphasizes direction, inner product includes direction and magnitude, and L2 emphasizes coordinate distance, so rankings can diverge.
+
+- **Why does normalization affect both ranking results and FAISS index choice?**
+  Normalization changes the relationship between cosine and inner product, which also changes whether an IP or L2 FAISS index matches the intended metric.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is an embedding — converting text into vectors](./01-what-is-embedding.md)
-- [HuggingFace embeddings in practice — creating your first vectors with sentence-transformers](./02-huggingface-embeddings.md)
-- **Cosine similarity and vector search — computing sentence distances (current)**
-- FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)
-- Chunking strategies — how to split long documents (upcoming)
-- Vector search pipeline — from document ingestion to query (upcoming)
+- [Vector Search 101 (1/6): What is an embedding — converting text into vectors](./01-what-is-embedding.md)
+- [Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers](./02-huggingface-embeddings.md)
+- **Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances (current)**
+- Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)
+- Vector Search 101 (5/6): Chunking strategies — how to split long documents (upcoming)
+- Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query (upcoming)
 
 <!-- toc:end -->
 

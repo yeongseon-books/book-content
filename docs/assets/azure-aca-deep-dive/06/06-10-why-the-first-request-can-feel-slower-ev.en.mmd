@@ -1,0 +1,5 @@
+flowchart TD
+  Req["First Request"] --> Envoy["Envoy Proxy"]
+  Envoy --> DNS["DNS / Discovery Lookup"]
+  DNS --> TLS["Establish Connection"]
+  TLS --> App["App receives request"]

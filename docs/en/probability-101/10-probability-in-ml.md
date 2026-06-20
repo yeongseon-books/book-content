@@ -1,10 +1,10 @@
 ---
 series: probability-101
 episode: 10
-title: Probability in Machine Learning
-status: content-ready
+title: "Probability 101 (10/10): Probability in Machine Learning"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,60 +16,50 @@ tags:
   - Likelihood
   - Inference
   - Beginner
-seo_description: How probability lives inside machine learning loss functions likelihood Bayesian inference and calibration metrics, wrapping the series end to end
-last_reviewed: '2026-05-04'
+seo_description: See how probability shapes machine learning through loss functions, calibration, and Bayesian updates so model scores become interpretable.
+last_reviewed: '2026-05-15'
 ---
 
-# Probability in Machine Learning
+# Probability 101 (10/10): Probability in Machine Learning
 
-> Probability 101 series (10/10)
+If you make it through a probability series, one question naturally remains: where do all of these ideas actually live inside machine learning? If that question stays unanswered, probability remains background theory. Once it is answered, probability becomes an operational tool for reading model behavior.
 
-<!-- a-grade-intro:begin -->
+Much of modern machine learning is probability wearing different names. Cross-entropy, negative log-likelihood, classifier probabilities, calibration, and Bayesian updates are not separate islands. They are different views of uncertainty, prediction, and decision cost.
 
-**Core question**: Where does *all the probability* we have learned actually *live inside ML*?
+This is the final post in the Probability 101 series. Here we connect probability to loss functions, conditional model outputs, calibration metrics, and Bayesian thinking so the earlier ideas show up in a recognizable ML workflow.
 
-> *Modern ML is *a machine for solving probability problems*.*
 
-<!-- a-grade-intro:end -->
+![probability 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/10/10-01-concept-at-a-glance.en.png)
+*probability 101 chapter 10 flow overview*
+> Probability in Machine Learning requires both definition and intuition, learned through concrete examples.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- *Loss functions* and *likelihood*
-- The probability meaning of *classifier outputs*
-- *Bayesian inference* and *MAP*
-- A 5-step ML probability exercise
-- Five common mistakes
+- Where probability is hiding inside common machine learning workflows?
+- Why cross-entropy and negative log-likelihood point to the same idea?
+- What a classifier score like 0.8 should mean before you trust it?
 
 ## Why It Matters
 
-*Cross-entropy, MSE, NLL* are all faces of *probability*. *Without probability you cannot interpret model output*.
+If you read model outputs as generic scores rather than as probabilistic statements, decision-making gets fuzzy quickly. You need to know whether 0.8 should be interpreted as “about 80% likely,” whether it is just a ranking score, where the threshold should sit, and how distribution shift may have changed that meaning.
 
-> *Modern ML is applied probability.*
+Training itself is tied to probability as well. Cross-entropy in classification is another face of negative log-likelihood. Regression losses often reveal an implicit distributional assumption about the error. In that sense, the loss function is not just a computational device. It is a window into what kind of probabilistic world the model is assuming.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Data["Data"] --> Model["Model p(y|x; theta)"]
-    Model --> NLL["Loss: -log p(y|x)"]
-    NLL --> Train["Training"]
-    Train --> Inf["Inference: p(y|x)"]
-    Inf --> Eval["Calibration / AUC"]
-```
+> Machine learning is not only about guessing the right label. It is also about organizing uncertainty and tying that uncertainty to decision cost.
 
 ## Key Terms
 
 - **Likelihood**: L(θ) = ∏ p(yᵢ | xᵢ; θ).
-- **MLE**: θ that *maximizes* the likelihood.
-- **MAP**: θ that *maximizes* prior × likelihood.
+- **MLE**: θ that maximizes the likelihood.
+- **MAP**: θ that maximizes prior × likelihood.
 - **Cross-entropy**: -Σ y log p̂.
-- **Calibration**: how closely *predicted probabilities* match *actual frequencies*.
+- **Calibration**: how closely predicted probabilities match actual frequencies.
 
 ## Before / After
 
-**Before**: *“Model output 0.8”* — *what does it mean*?
+**Before**: “The model output is 0.8.” That says almost nothing by itself.
 
-**After**: *p(y=1 | x) = 0.8* — an estimate of a *conditional probability*; verified via *calibration*.
+**After**: “The model estimates p(y=1 | x) ≈ 0.8, and calibration tells us whether that estimate behaves honestly in the real world.”
 
 ## Hands-on: 5-step ML Probability
 
@@ -126,58 +116,70 @@ print("Brier:", brier)
 
 ## What to Notice in This Code
 
-- *Cross-entropy* = *NLL* = *negative log-likelihood*.
-- A logistic regression output is a *conditional probability p(y|x)*.
-- *Calibration* is an evaluation axis *separate from accuracy*.
+- Cross-entropy = NLL = negative log-likelihood.
+- A logistic regression output is a conditional probability p(y|x).
+- Calibration is an evaluation axis separate from accuracy.
 
 ## Five Common Mistakes
 
-1. **Treating *raw scores* directly as *probabilities*.**
-2. **Ignoring *calibration*.**
-3. **Evaluating only on *accuracy*.**
-4. **Using *threshold 0.5* on *imbalanced data*.**
-5. **Pretending there is *no Bayesian prior*.**
+1. **Treating raw scores directly as probabilities.**
+2. **Ignoring calibration.**
+3. **Evaluating only on accuracy.**
+4. **Using threshold 0.5 on imbalanced data.**
+5. **Pretending there is no Bayesian prior.**
 
 ## How This Shows Up in Production
 
-Spam classification, medical diagnosis, recommendation scores, anomaly detection — *probability outputs* meet *decision rules* and *cost*. *Calibration*, *Brier*, *log-loss* are the standard metrics.
+Spam classification, medical diagnosis, recommendation scores, anomaly detection — probability outputs meet decision rules and cost. Calibration, Brier, log-loss are the standard metrics.
 
 ## How a Senior Engineer Thinks
 
-- Knows that *loss = probability*.
-- Measures *calibration*.
-- Sets *thresholds* by *cost*.
-- *Includes uncertainty* in predictions.
-- Uses *both Bayesian and frequentist* tools.
+- Knows that loss = probability.
+- Measures calibration.
+- Sets thresholds by cost.
+- Includes uncertainty in predictions.
+- Uses both Bayesian and frequentist tools.
 
 ## Checklist
 
-- [ ] I know *cross-entropy = NLL*.
-- [ ] I measure *calibration*.
-- [ ] I understand *p(y|x)*.
-- [ ] I use *Brier / log-loss*.
+- [ ] I know cross-entropy = NLL.
+- [ ] I measure calibration.
+- [ ] I understand p(y|x).
+- [ ] I use Brier / log-loss.
 
 ## Practice Problems
 
-1. Describe what goes wrong with *threshold 0.5* on *90:10 imbalanced* data.
-2. Explain why a *calibration plot* matters.
-3. Give the difference between *MAP* and *MLE* in one line.
+1. Describe what goes wrong with threshold 0.5 on 90:10 imbalanced data.
+2. Explain why a calibration plot matters.
+3. Give the difference between MAP and MLE in one line.
 
 ## Wrap-up and Next Steps
 
-Probability is the *native language of ML*. The next steps are *Linear Algebra 101* and *Machine Learning 101*, which add the *other axes of modeling*.
+Probability is the native language of ML. The next steps are Linear Algebra 101 and Machine Learning 101, which add the other axes of modeling.
+
+## Answering the Opening Questions
+
+- **Where probability is hiding inside common machine learning workflows?**
+  - The article treats Probability in Machine Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why cross-entropy and negative log-likelihood point to the same idea?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What a classifier score like 0.8 should mean before you trust it?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What Is Probability?](./01-what-is-probability.md)
-- [Events and Sample Space](./02-events-and-sample-space.md)
-- [Conditional Probability](./03-conditional-probability.md)
-- [Bayes' Theorem](./04-bayes-theorem.md)
-- [Random Variables](./05-random-variables.md)
-- [Expectation and Variance](./06-expectation-and-variance.md)
-- [Discrete Distributions](./07-discrete-distributions.md)
-- [Continuous Distributions](./08-continuous-distributions.md)
-- [Law of Large Numbers and CLT](./09-lln-and-clt.md)
+## In this series
+
+- [Probability 101 (1/10): What Is Probability?](./01-what-is-probability.md)
+- [Probability 101 (2/10): Events and Sample Space](./02-events-and-sample-space.md)
+- [Probability 101 (3/10): Conditional Probability](./03-conditional-probability.md)
+- [Probability 101 (4/10): Bayes' Theorem](./04-bayes-theorem.md)
+- [Probability 101 (5/10): Random Variables](./05-random-variables.md)
+- [Probability 101 (6/10): Expectation and Variance](./06-expectation-and-variance.md)
+- [Probability 101 (7/10): Discrete Distributions](./07-discrete-distributions.md)
+- [Probability 101 (8/10): Continuous Distributions](./08-continuous-distributions.md)
+- [Probability 101 (9/10): Law of Large Numbers and CLT](./09-lln-and-clt.md)
 - **Probability in Machine Learning (current)**
+
 <!-- toc:end -->
 
 ## References

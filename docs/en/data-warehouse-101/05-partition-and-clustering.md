@@ -1,10 +1,10 @@
 ---
 series: data-warehouse-101
 episode: 5
-title: Partition and Clustering
-status: content-ready
+title: "Data Warehouse 101 (5/10): Partition and Clustering"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,35 @@ tags:
   - Performance
   - Analytics
 seo_description: How partitioning and clustering differ, the principle of pruning, and the two axes that make huge tables fast to read.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Partition and Clustering
+# Data Warehouse 101 (5/10): Partition and Clustering
 
-> Data Warehouse 101 series (5/10)
+Warehouse performance is often less about reading faster than about refusing to read what you do not need. On large fact tables, that one design choice is the difference between a cheap daily dashboard refresh and an expensive full-table scan.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Data Warehouse 101 series.
 
-**Core question**: How can you pull *today's data* from a *fact with billions of rows* in seconds? How does the engine *decide what to skip*?
+In this post, we focus on how partitioning and clustering help the engine skip work. The useful mental model is simple: first narrow the chunks, then organize what remains inside each chunk.
 
-> *Partitions split the file into chunks; clustering sorts inside each chunk.*
 
-<!-- a-grade-intro:end -->
+![data warehouse 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/05/05-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 5 flow overview*
+> Partitioning reduces the data scanned by skipping irrelevant partitions; clustering arranges data physically to minimize I/O. Together they make large-table queries cheap.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Partition and Clustering?
+- Which signal should the example or diagram make visible for Partition and Clustering?
+- What failure should be prevented first when Partition and Clustering reaches a real system?
+
+## Questions this article answers
+
+- What problem does partitioning solve, and what problem does clustering solve?
+- How does pruning reduce query cost in practice?
+- What should guide your choice of partition key and cluster key?
+- What kind of cost does bad partitioning create on a large fact table?
+- Why do experienced teams check bytes scanned before almost anything else?
 
 ## What You Will Learn
 
@@ -46,15 +61,7 @@ Warehouse facts often hold *billions of rows*. A daily partition alone lets the 
 
 > *You do not pay for data you do not read.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Query["WHERE date = '2026-05-04'"] --> Engine["Query Engine"]
-    Engine --> P1["partition: 2026-05-03 (skip)"]
-    Engine --> P2["partition: 2026-05-04 (scan)"]
-    Engine --> P3["partition: 2026-05-05 (skip)"]
-```
+This picture shows how partitioning and clustering shrink query scope and I/O. The key is not to memorize when to use each, but to measure where your queries spend time.
 
 ## Key Terms
 
@@ -169,17 +176,29 @@ BigQuery, Snowflake, and Redshift all expose *partition + clustering* as primary
 
 Partition and clustering improve *cost and speed* together. Next, we look at *ETL* and *ELT* — how data gets in.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Partition and Clustering?**
+  - The article treats Partition and Clustering as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Partition and Clustering?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Partition and Clustering reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
-- [OLTP and OLAP](./02-oltp-and-olap.md)
-- [Fact and Dimension](./03-fact-and-dimension.md)
-- [Star Schema](./04-star-schema.md)
+## In this series
+
+- [Data Warehouse 101 (1/10): What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
+- [Data Warehouse 101 (2/10): OLTP and OLAP](./02-oltp-and-olap.md)
+- [Data Warehouse 101 (3/10): Fact and Dimension](./03-fact-and-dimension.md)
+- [Data Warehouse 101 (4/10): Star Schema](./04-star-schema.md)
 - **Partition and Clustering (current)**
 - ETL and ELT (upcoming)
 - BI and Dashboard (upcoming)
 - Data Mart (upcoming)
 - Performance Optimization (upcoming)
 - Warehouse Design Example (upcoming)
+
 <!-- toc:end -->
 
 ## References

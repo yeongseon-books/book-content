@@ -1,10 +1,10 @@
 ---
 series: kubernetes-101
 episode: 10
-title: Kubernetes in Operation
-status: content-ready
+title: "Kubernetes 101 (10/10): Kubernetes in Operation"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,32 @@ tags:
   - GitOps
   - DevOps
 seo_description: A beginner-friendly tour of operating Kubernetes covering probes, RBAC, network policies, observability, capacity planning, GitOps, and runbooks.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Kubernetes in Operation
+# Kubernetes 101 (10/10): Kubernetes in Operation
 
-> Kubernetes 101 series (10/10)
+A running cluster is not the same thing as an operable one. You can have healthy-looking Pods and still lack safe traffic gates, clear permissions, useful telemetry, and a repeatable incident path when something breaks at night.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Kubernetes 101 series.
 
-**Core question**: does *the cluster is running* mean *the cluster is operable*?
+Here, we will connect probes, RBAC, network boundaries, observability, GitOps, and runbooks into one operating model instead of treating them as unrelated checkboxes.
 
-> *Probes, RBAC, policies, observability,* and *runbooks* together make *operations*.
+> Kubernetes operations become reliable only when traffic rules, permissions, telemetry, and change procedures reinforce each other.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![kubernetes 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 10 flow overview*
 
-- *liveness/readiness/startup* probes
-- *RBAC* and *NetworkPolicy*
-- *metrics/logs/traces*
-- *capacity planning* and *GitOps*
-- the shape of a *runbook*
+## Questions to Keep in Mind
+
+- liveness/readiness/startup* probes?
+- RBAC* and *NetworkPolicy?
+- metrics/logs/traces?
 
 ## Why It Matters
 
 *Functionally working* and *staying up overnight without issues* are different. *Operability* is *service trust*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Probe["probes"] --> App["application"]
-    App --> Obs["metrics/logs/traces"]
-    Obs --> SRE["sre runbooks"]
-    SRE --> GitOps["gitops"]
-```
 
 ## Key Terms
 
@@ -134,6 +124,22 @@ def runbook_step(name):
     }
 ```
 
+## Verification workflow
+
+```bash
+kubectl describe pod web-xxxxx
+kubectl auth can-i get pods --as system:serviceaccount:web:default -n web
+kubectl get networkpolicy -n web
+```
+
+**Expected output:** `describe pod` should let you separate readiness failures from restart signals, `auth can-i` should confirm the service account permissions you intended, and the NetworkPolicy list should show that communication boundaries exist as declared objects rather than assumptions.
+
+**Failure modes to check first:**
+
+- A running Pod with failed readiness is an operations contract failure even when the process itself is alive.
+- RBAC that looks correct in YAML may still fail if the actual service-account binding is missing.
+- An empty NetworkPolicy list usually means the security problem is the absence of a boundary, not one broken rule.
+
 ## What to Notice in This Code
 
 - When *readiness* is *0/1*, *traffic is blocked*.
@@ -178,17 +184,29 @@ def runbook_step(name):
 
 That wraps the *Kubernetes 101* series. Next, the *Serverless* and *SRE* series go deeper into *operability*.
 
+## Answering the Opening Questions
+
+- **liveness/readiness/startup* probes?**
+  - The article treats Kubernetes in Operation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **RBAC* and *NetworkPolicy?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **metrics/logs/traces?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
-- [Ingress](./05-ingress.md)
-- [ConfigMap and Secret](./06-configmap-and-secret.md)
-- [Volume](./07-volume.md)
-- [HPA](./08-hpa.md)
-- [Helm](./09-helm.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap and Secret](./06-configmap-and-secret.md)
+- [Kubernetes 101 (7/10): Volume](./07-volume.md)
+- [Kubernetes 101 (8/10): HPA](./08-hpa.md)
+- [Kubernetes 101 (9/10): Helm](./09-helm.md)
 - **Kubernetes in Operation (current)**
+
 <!-- toc:end -->
 
 ## References
@@ -197,3 +215,4 @@ That wraps the *Kubernetes 101* series. Next, the *Serverless* and *SRE* series 
 - [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
 - [NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 - [Argo CD](https://argo-cd.readthedocs.io/)
+- [kubectl auth can-i](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_auth/kubectl_auth_can-i/)

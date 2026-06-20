@@ -1,0 +1,5 @@
+flowchart TD
+  ARM["ARM API (가중치 구성)"] --> ControlPlane["ACA 컨트롤 플레인"]
+  ControlPlane --> EnvoyConfig["xDS 구성"]
+  EnvoyConfig --> Envoy["Envoy 프록시 (데이터 플레인)"]
+  Envoy -- "트래픽 라우팅" --> Revisions["앱 리비전"]

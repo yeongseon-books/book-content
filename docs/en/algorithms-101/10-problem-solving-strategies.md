@@ -1,10 +1,10 @@
 ---
 series: algorithms-101
 episode: 10
-title: Algorithm Problem-Solving Strategies
+title: "Algorithms 101 (10/10): Algorithm Problem-Solving Strategies"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,23 @@ seo_description: A five-step procedure for algorithm problems — recognise patt
 last_reviewed: '2026-05-04'
 ---
 
-# Algorithm Problem-Solving Strategies
-
-> Algorithms 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
+# Algorithms 101 (10/10): Algorithm Problem-Solving Strategies
 
 **Core question**: Does being good at algorithms mean memorising lots of solutions, or having a thinking procedure that decomposes new problems?
 
-> Solving algorithm problems is a game of pattern recognition and tool selection. The sorting, searching, recursion, DP, greedy, graph, and string topics in this series form a toolbox. When you meet a new problem, you narrow which tool fits by reading the input size, structure, and constraints. Senior engineers are not separated from others by the number of solutions they have memorised; they are separated by the consistency of their thinking procedure. This article makes that procedure explicit while wrapping up the series.
+Solving algorithm problems is a game of pattern recognition and tool selection. The sorting, searching, recursion, DP, greedy, graph, and string topics in this series form a toolbox, but the real leverage comes from the procedure you use to choose among them.
 
-<!-- a-grade-intro:end -->
+This is the final post in the Algorithms 101 series. Here we wrap up the series with a practical thinking procedure for reading constraints, choosing tools, and verifying an approach before coding.
+
+
+![algorithms 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/10/10-01-big-picture.en.png)
+*algorithms 101 chapter 10 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Algorithm Problem-Solving Strategies?
+- Which signal should the example or diagram make visible for Algorithm Problem-Solving Strategies?
+- What failure should be prevented first when Algorithm Problem-Solving Strategies reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +51,6 @@ last_reviewed: '2026-05-04'
 The point of studying algorithms is not memorising solutions but gaining the ability to decompose new problems. That matters in interviews and just as much in production system design. Two engineers with the same toolbox produce very different work depending on how they pick from it.
 
 > A good solution is the product of a consistent procedure, not a memorised answer.
-
-## Concept at a Glance
 
 > The standard procedure has five steps. (1) Restate the problem. (2) Write down inputs, outputs, and constraints. (3) Estimate the allowed complexity from input size. (4) Recognise the pattern and narrow the candidate tools. (5) Verify on a small example before writing code. The same procedure works in interviews.
 
@@ -229,17 +233,29 @@ The essence of studying algorithms is not the volume of solutions but the consis
 
 This concludes the Algorithms 101 series. Natural next steps include advanced data structures (tree/heap/hash variants), advanced graphs (flows, matching, SCC), or domain applications (search engines, recommender systems, compilers). The thinking procedure you built here transfers directly to all of them.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Algorithm Problem-Solving Strategies?**
+  - The article treats Algorithm Problem-Solving Strategies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Algorithm Problem-Solving Strategies?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Algorithm Problem-Solving Strategies reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an Algorithm?](./01-what-is-an-algorithm.md)
-- [Time and Space Complexity](./02-time-and-space-complexity.md)
-- [Search Algorithms](./03-search-algorithms.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
-- [Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
-- [Dynamic Programming](./06-dynamic-programming.md)
-- [Greedy Algorithms](./07-greedy-algorithms.md)
-- [Graph Algorithms](./08-graph-algorithms.md)
-- [String Algorithm Basics](./09-string-algorithms.md)
+## In this series
+
+- [Algorithms 101 (1/10): What Is an Algorithm?](./01-what-is-an-algorithm.md)
+- [Algorithms 101 (2/10): Time and Space Complexity](./02-time-and-space-complexity.md)
+- [Algorithms 101 (3/10): Search Algorithms](./03-search-algorithms.md)
+- [Algorithms 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
+- [Algorithms 101 (5/10): Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
+- [Algorithms 101 (6/10): Dynamic Programming](./06-dynamic-programming.md)
+- [Algorithms 101 (7/10): Greedy Algorithms](./07-greedy-algorithms.md)
+- [Algorithms 101 (8/10): Graph Algorithms](./08-graph-algorithms.md)
+- [Algorithms 101 (9/10): String Algorithm Basics](./09-string-algorithms.md)
 - **Algorithm Problem-Solving Strategies (current)**
+
 <!-- toc:end -->
 
 ## References

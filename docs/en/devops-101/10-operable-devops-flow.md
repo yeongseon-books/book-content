@@ -1,10 +1,10 @@
 ---
 series: devops-101
 episode: 10
-title: An Operable DevOps Flow
-status: content-ready
+title: "DevOps 101 (10/10): An Operable DevOps Flow"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,27 @@ tags:
   - Capstone
   - Engineering
 seo_description: From code to postmortem in one flow. Make DevOps measurable with DORA metrics and small team rituals.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# An Operable DevOps Flow
+# DevOps 101 (10/10): An Operable DevOps Flow
 
-> DevOps 101 series (10/10)
+It is possible to have CI, CD, dashboards, and postmortems and still not have an actual DevOps system. The missing piece is often the loop between them: what ships, what breaks, what gets measured, and how that knowledge changes the next release.
 
-<!-- a-grade-intro:begin -->
+Operational maturity appears when those parts stop behaving like isolated tools and start behaving like one learning system. That is where DORA metrics, team rituals, and platform choices become more than reporting overhead.
 
-**Core question**: Does *Code -> CI -> CD -> Monitor -> Incident -> Postmortem* close as a *feedback loop*?
+This is the final post in the DevOps 101 series. Here we connect the earlier chapters into one operable feedback loop and show how a team can measure, review, and improve the whole path from pull request to postmortem.
 
-> *DevOps* is *a flow*, not *a toolbox*.
 
-<!-- a-grade-intro:end -->
+![devops 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/10/10-01-concept-at-a-glance.en.png)
+*devops 101 chapter 10 flow overview*
+> DevOps is complete when *build*, *deploy*, *monitor*, and *respond to failure* form *one feedback loop* the whole team closes together.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying An Operable DevOps Flow?
+- Which signal should the example or diagram make visible for An Operable DevOps Flow?
+- What failure should be prevented first when An Operable DevOps Flow reaches a real system?
 
 ## What You Will Learn
 
@@ -45,17 +52,7 @@ Adopting tools *one by one* creates *islands*. Only when they connect as a *flow
 
 > What is *not measured* is *not improved*.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Code["code"] --> CI["CI"]
-    CI --> CD["CD"]
-    CD --> Monitor["monitor & log"]
-    Monitor --> Incident["incident"]
-    Incident --> Postmortem["postmortem"]
-    Postmortem --> Code
-```
+All the pieces—CI, CD, IaC, monitoring, on-call—work only when they *feed back* into each other. Fast deployment is safe when you monitor. Monitoring is useful when response is fast. The cycle closes when every team member owns the full path.
 
 ## Key Terms
 
@@ -119,6 +116,31 @@ metrics = {
 - Propose org-structure changes
 ```
 
+## Turn DORA Metrics Into Operating Questions
+
+DORA metrics become ceremony when teams collect the numbers but never connect them to decisions. Each metric is most useful when it drives a concrete operating question.
+
+```text
+Deploy frequency      -> Are changes small enough to ship routinely?
+Lead time             -> Is the bottleneck review, build, approval, or rollout?
+Change failure rate   -> Which kinds of changes create the most incidents?
+MTTR                  -> Is detection, diagnosis, or recovery the slow step?
+```
+
+Reading the metrics this way turns them from status reporting into input for the next engineering change.
+
+## A Practical 90-Day Improvement Plan
+
+The final chapter is most useful when it ends with a plan that a small team could actually execute. One workable first quarter looks like this:
+
+```text
+Days 1-30   Clean up required PR checks, add staging smoke tests, write 3 runbooks
+Days 31-60  Build a RED dashboard, link alerts to runbooks, start hand-tracking DORA
+Days 61-90  Lock weekly deploy review and monthly postmortems, automate one repeated failure mode
+```
+
+This kind of plan works because it optimizes the loop, not the tool count. It helps the team ship smaller changes, learn faster, and recover with less guesswork.
+
 ## What to Notice in This Code
 
 - *Metrics can start by hand*. Automate them later.
@@ -168,17 +190,29 @@ This concludes DevOps 101. Suggested learning paths next:
 
 > *DevOps* is not a *collection of tools* but *the way a team learns*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying An Operable DevOps Flow?**
+  - The article treats An Operable DevOps Flow as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for An Operable DevOps Flow?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when An Operable DevOps Flow reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is DevOps?](./01-what-is-devops.md)
-- [The CI Pipeline](./02-ci-pipeline.md)
-- [CD and Deployment Strategies](./03-cd-and-deployment.md)
-- [Environments and Configuration](./04-environments-and-config.md)
-- [Infrastructure as Code](./05-infrastructure-as-code.md)
-- [Containers and Builds](./06-containers-and-build.md)
-- [Monitoring and Alerting](./07-monitoring-and-alerting.md)
-- [Logging and Analysis](./08-logging-and-analysis.md)
-- [Incident Response and On-Call](./09-incident-and-oncall.md)
+## In this series
+
+- [DevOps 101 (1/10): What Is DevOps?](./01-what-is-devops.md)
+- [DevOps 101 (2/10): CI Pipeline](./02-ci-pipeline.md)
+- [DevOps 101 (3/10): CD and Deployment Strategies](./03-cd-and-deployment.md)
+- [DevOps 101 (4/10): Environments and Configuration](./04-environments-and-config.md)
+- [DevOps 101 (5/10): Infrastructure as Code](./05-infrastructure-as-code.md)
+- [DevOps 101 (6/10): Containers and Build](./06-containers-and-build.md)
+- [DevOps 101 (7/10): Monitoring and Alerting](./07-monitoring-and-alerting.md)
+- [DevOps 101 (8/10): Logging and Analysis](./08-logging-and-analysis.md)
+- [DevOps 101 (9/10): Incident Response and On-Call](./09-incident-and-oncall.md)
 - **An Operable DevOps Flow (current)**
+
 <!-- toc:end -->
 
 ## References

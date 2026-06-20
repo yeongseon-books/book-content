@@ -1,10 +1,10 @@
 ---
 series: technical-writing-101
 episode: 4
-title: Explaining Concepts
-status: content-ready
+title: "Technical Writing 101 (4/10): Explaining Concepts"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,43 +16,36 @@ tags:
   - Explanation
   - Analogy
   - Beginner
-seo_description: A beginner-friendly tour of explaining hard technical concepts with definitions, analogies, and worked examples.
-last_reviewed: '2026-05-04'
+seo_description: Explain technical concepts with definition, analogy, counterexample, and worked example so first-time readers grasp the boundary.
+last_reviewed: '2026-05-15'
 ---
 
-# Explaining Concepts
+# Technical Writing 101 (4/10): Explaining Concepts
 
-> Technical Writing 101 series (4/10)
+The most common failure in concept writing is accuracy without traction. The definition may be technically correct, yet the reader still cannot predict where the concept applies, where it breaks, or how it should affect code and design decisions.
 
-<!-- a-grade-intro:begin -->
+Useful concept writing needs more than a polished sentence. It needs a boundary. That usually means pairing a definition with an analogy, a counterexample, and a worked example so the reader can test the idea instead of just memorizing it.
 
-**Core question**: How do you make a *first-time reader* grasp a *concept* right away?
+This is post 4 in the Technical Writing 101 series. Here we build that four-part concept explanation pattern.
 
-> *Analogies* and *counterexamples* must travel *together*.
 
-<!-- a-grade-intro:end -->
+![technical writing 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/04/04-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 4 flow overview*
+> A concept without a boundary is just a fact to memorize; with a boundary, it becomes a tool to apply.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- A *one line* definition
-- Using an *analogy*
-- Using a *counterexample*
-- Using a *diagram*
-- Building a *worked example*
+- A *one line* definition?
+- Using an *analogy?
+- Using a *counterexample?
 
 ## Why It Matters
 
 If the *concept* stays blurry, everything after it is a *sandcastle*.
 
-## Concept at a Glance
+> Mental model: define the concept, mark the boundary, then prove it with an example.
 
-```mermaid
-flowchart LR
-    D[Definition] --> A[Analogy]
-    A --> C[Counterexample]
-    C --> E[Example]
-```
-
+The strongest concept explanations follow a pattern: definition, analogy, counterexample, and a worked example. This combination helps readers test the idea instead of just memorizing it.
 ## Key Terms
 
 - **definition**: A *one line definition*.
@@ -67,25 +60,36 @@ flowchart LR
 
 **After**: "*Async* means *doing other work while you wait*."
 
+## The fastest way to test whether a definition works
+
+This explanation is technically correct but still weak.
+
+```text
+A cache stores frequently used data.
+```
+
+It does not tell the reader what belongs in the cache, what should stay out, or where the boundary breaks. Adding a boundary and counterexample turns the concept into a decision tool.
+
+```text
+A cache stores answers that are expensive to fetch or compute again.
+A large file read once during a migration is usually a poor cache candidate.
+```
+
+A strong concept explanation helps the reader classify the next example without asking you again. That is why edge cases and counterexamples often teach more than an expanded definition alone.
+
 ## Hands-on: One Concept Explained
 
 ### Step 1 — Definition
 
-```python
-definition = "A cache stores frequent answers ahead of time"
-```
+Start with a direct definition: a cache stores frequent answers ahead of time.
 
 ### Step 2 — Analogy
 
-```python
-analogy = "Side dishes you keep at the front of the fridge"
-```
+An everyday analogy helps here: think of the side dishes you keep at the front of the fridge because you reach for them often.
 
 ### Step 3 — Counterexample
 
-```python
-counterexample = "Data you read only once does not belong in a cache"
-```
+Then draw the boundary with a counterexample: data you read only once usually does not belong in a cache.
 
 ### Step 4 — Code example
 
@@ -96,9 +100,7 @@ cache["user:1"] = {"name": "Jimin"}
 
 ### Step 5 — Common misconception
 
-```python
-misconception = "A cache can grow forever"
-```
+A useful misconception to break early is the idea that a cache can grow forever.
 
 ## What to Notice in This Code
 
@@ -143,10 +145,21 @@ The best internal wiki pages always open with *definition*, *analogy*, *countere
 
 The next post is *Explaining Example Code*.
 
+## Answering the Opening Questions
+
+- **A *one line* definition?**
+  - The article treats Explaining Concepts as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Using an *analogy?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Using a *counterexample?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
-- [Title and Structure](./03-title-and-structure.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): Title and Structure](./03-title-and-structure.md)
 - **Explaining Concepts (current)**
 - Explaining Example Code (upcoming)
 - Using Figures and Tables (upcoming)
@@ -154,6 +167,7 @@ The next post is *Explaining Example Code*.
 - Writing Tutorials (upcoming)
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

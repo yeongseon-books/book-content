@@ -1,10 +1,10 @@
 ---
 series: statistics-101
 episode: 2
-title: Mean, Median, and Variance
+title: "Statistics 101 (2/10): Mean, Median, and Variance"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,25 +20,24 @@ seo_description: A practical comparison of mean, median, and variance, with rule
 last_reviewed: '2026-05-04'
 ---
 
-# Mean, Median, and Variance
+# Statistics 101 (2/10): Mean, Median, and Variance
 
-> Statistics 101 series (2/10)
+The moment you compress a dataset into one or two numbers, you are already shaping the story the report will tell. Whether you write down only the mean, add the median, or explain spread with variance and standard deviation changes the reader's interpretation.
 
-<!-- a-grade-intro:begin -->
+That choice becomes especially important when the data has outliers or a long tail. In those cases, the mean can move far away from what most observations actually look like.
 
-**Core question**: When summarizing data with *one or two numbers*, when do we use the *mean* and when do we use the *median*? What does *variance* tell us?
+This is post 2 in the Statistics 101 series. Here we will compare mean, median, and variance, and clarify why the right summary statistic depends on the shape of the data.
 
-> *A summary statistic changes shape with the question you ask.*
 
-<!-- a-grade-intro:end -->
+![statistics 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/02/02-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 2 flow overview*
+> The *right* summary statistic depends on the *shape* of your data — not just the *math*, but the *meaning*.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Measures of *central tendency* — *mean / median / mode*
-- Measures of *spread* — *variance / standard deviation / IQR*
-- Why the *mean is dangerous* on *skewed distributions*
-- A 5-step summary statistics exercise
-- Five common mistakes
+- When should we use the mean, and when should we use the median?
+- What do variance and standard deviation tell us that the mean cannot?
+- What happens to summary statistics when one extreme outlier appears?
 
 ## Why It Matters
 
@@ -47,15 +46,7 @@ Data has *thousands of rows*, but humans decide with *one or two numbers*. *Whic
 > *One wrong mean writes one wrong decision.*
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Data["Data"] --> Center["Center: mean/median/mode"]
-    Data --> Spread["Spread: variance/std/IQR"]
-    Center --> Story["Summary Story"]
-    Spread --> Story
-```
-
+A single number—the mean—can hide crucial facts. If you report only the average, you may misrepresent what a *typical* user experiences. Choosing between mean, median, and measures of spread is a *design decision*, not just a calculation.
 ## Key Terms
 
 - **Mean**: sum / count. *Sensitive to outliers*.
@@ -152,8 +143,19 @@ Revenue, response time, ad cost — all of these tend to be *long-tail*, so *med
 
 Summary statistics is a tool for *briefly conveying the shape* of data. The next episode goes one level deeper into the *shape itself* — *distributions*.
 
+## Answering the Opening Questions
+
+- **When should we use the mean, and when should we use the median?**
+  - The article treats Mean, Median, and Variance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What do variance and standard deviation tell us that the mean cannot?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What happens to summary statistics when one extreme outlier appears?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
 - **Mean, Median, and Variance (current)**
 - Distributions (upcoming)
 - Sample and Population (upcoming)
@@ -163,6 +165,7 @@ Summary statistics is a tool for *briefly conveying the shape* of data. The next
 - Correlation and Regression (upcoming)
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

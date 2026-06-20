@@ -1,11 +1,11 @@
 ---
-title: Transactions and isolation levels (sqlite3, PEP 249)
+title: "Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249)"
 series: python-dbapi-101
 episode: 5
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   hashnode: true
   medium: true
   mkdocs: true
@@ -18,27 +18,27 @@ tags:
 - WAL
 - PEP 249
 last_reviewed: '2026-05-03'
-seo_description: 'Two operational data incidents dominate in production:'
+seo_description: Master Python sqlite3 transactions and isolation levels. Learn about implicit BEGIN, WAL mode, and Python 3.12 autocommit to ensure data safety.
 ---
 
-# Transactions and isolation levels (sqlite3, PEP 249)
+# Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249)
 
-![Transactions and isolation levels (sqlite3, PEP 249)](../../assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.en.png)
+sqlite3 starts transactions for you, which is convenient until an implicit `BEGIN` quietly holds a lock or a missing `commit()` drops data on exit. This post maps that behavior to PEP 249 so isolation levels and autocommit stop feeling magical.
+
+This is the 5th article in the Python DB-API 101 series.
+
+![Transactions and isolation levels (sqlite3, PEP 249)](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.en.png)
 
 *Transactions and isolation levels (sqlite3, PEP 249)*
-## Questions this post answers
+
+![python db-api 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.en.png)
+*python db-api 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
 
 - Why does sqlite3 issue an implicit BEGIN by default?
 - What does `isolation_level=None` actually mean?
 - How do `BEGIN DEFERRED`, `IMMEDIATE`, and `EXCLUSIVE` differ in lock behaviour?
-- How does WAL mode change transaction semantics?
-- How does Python 3.12's new `autocommit` parameter differ from the legacy `isolation_level`?
-
-> A transaction is not "calling commit/rollback" — it is "deciding what runs as one unit." Because sqlite3 picks that unit for you automatically, you must understand the auto-behaviour to avoid surprise locks and data loss.
-
-> Python DB-API 101 (5/10)
-
----
 
 ## What you will learn
 
@@ -68,10 +68,7 @@ This post compares the five modes through code and lock scenarios. Once you have
 
 ## Mental Model — connection is the transaction scope
 
-![Mental model - connection is the transaction scope](../../assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.en.png)
-
-*Mental model - connection is the transaction scope*
-```
+```text
 Connection lifecycle (sqlite3 default)
 ─────────────────────────────────────────
   open
@@ -97,7 +94,7 @@ Two essentials:
 
 ## Core concepts
 
-![Core concepts](../../assets/python-dbapi-101/05/05-03-core-concepts.en.png)
+![Core concepts](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-03-core-concepts.en.png)
 
 *Core concepts*
 ### The five `isolation_level` values
@@ -175,7 +172,7 @@ with sqlite3.connect('shop.db') as con:
 
 ## Step-by-step walkthrough
 
-![Step-by-step walkthrough](../../assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.en.png)
+![Step-by-step walkthrough](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.en.png)
 
 *Step-by-step walkthrough*
 ### Step 1 — observe default behaviour
@@ -260,7 +257,7 @@ import sqlite3
 assert sqlite3.sqlite_version_info >= (3, 24)   # SAVEPOINT stable
 
 con = sqlite3.connect('shop.db', autocommit=False)
-con.execute('BEGIN IMMEDIATE')
+print(con.in_transaction)   # → True
 try:
     con.execute('UPDATE accounts SET balance = balance - 1000 WHERE id = 1')
     con.execute('UPDATE accounts SET balance = balance + 1000 WHERE id = 2')
@@ -270,7 +267,7 @@ except Exception:
     raise
 ```
 
-With `autocommit=False`, you write BEGIN explicitly and the driver does not interfere.
+With `autocommit=False`, sqlite3 keeps a transaction open for you and uses `BEGIN DEFERRED` implicitly after `connect()`, `commit()`, and `rollback()`. In the normal 3.12+ PEP 249 flow, do not pair `autocommit=False` with a redundant manual `BEGIN`.
 
 ---
 
@@ -353,9 +350,9 @@ with dst:
 - [ ] Functions that write start with `isolation_level='IMMEDIATE'`.
 - [ ] Production databases default to WAL + `synchronous=NORMAL` + `busy_timeout=5000`.
 - [ ] Read-only queries use a separate connection or do not begin a transaction explicitly.
-- [ ] `autocommit=None` (legacy) is never used for batch inserts.
+- [ ] `sqlite3.LEGACY_TRANSACTION_CONTROL` legacy mode is never used for batch inserts.
 - [ ] Nested behaviour uses explicit `SAVEPOINT`.
-- [ ] New code on Python 3.12+ uses `autocommit=False` plus explicit BEGIN.
+- [ ] New code on Python 3.12+ uses `autocommit=False` for PEP 249 semantics and does not add a redundant manual `BEGIN`.
 
 ---
 
@@ -375,19 +372,28 @@ sqlite3's transaction handling is conveniently automatic, but that very automati
 
 The next post covers **row factories and type adapters** — returning rows as dicts, dataclasses, or Pydantic models; `detect_types` with custom adapters/converters; and safely mapping new types such as `Decimal` or `Enum`.
 
+## Answering the Opening Questions
+
+- **Why does sqlite3 issue an implicit BEGIN by default?**
+  - The article treats Transactions and isolation levels (sqlite3, PEP 249) as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does `isolation_level=None` actually mean?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do `BEGIN DEFERRED`, `IMMEDIATE`, and `EXCLUSIVE` differ in lock behaviour?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
-- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
-- [Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- **Transactions and isolation levels (sqlite3, PEP 249) (current)**
-- Row factories and type adapters (sqlite3, PEP 249) (upcoming)
-- PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
-- SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
-- Asynchronous SQLite with aiosqlite (upcoming)
-- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+- [Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- **Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249) (current)**
+- Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249) (upcoming)
+- Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
+- Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
+- Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite (upcoming)
+- Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
 
 <!-- toc:end -->
 

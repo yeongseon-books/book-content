@@ -1,12 +1,12 @@
 ---
 series: functional-programming-101
 episode: 10
-title: 객체지향과 함수형의 균형
-status: content-ready
+title: "Functional Programming 101 (10/10): 객체지향과 함수형의 균형"
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -16,52 +16,61 @@ tags:
   - OOP
   - 다중 패러다임
   - 설계 판단
-seo_description: 객체지향과 함수형 프로그래밍을 적절히 혼용하는 실용적 설계 기준을 다룹니다.
-last_reviewed: '2026-05-04'
+seo_description: Python에서 객체지향과 함수형을 함께 쓰는 실전 설계 기준을 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
-# 객체지향과 함수형의 균형
+# Functional Programming 101 (10/10): 객체지향과 함수형의 균형
 
-> Functional Programming 101 시리즈 (10/10)
+함수형 프로그래밍을 배우다 보면 어느 순간 "그럼 객체지향은 버려야 하나?"라는 질문이 나옵니다. 반대로 객체지향에 익숙한 팀에서는 함수형 기법을 도입할 때 "결국 클래스가 더 익숙한데 굳이 왜?"라는 반응도 나옵니다. 둘 다 문제를 너무 이분법으로 보는 시선입니다.
 
+Python은 애초에 다중 패러다임 언어입니다. 데이터 모델은 객체지향적으로 두고, 핵심 계산은 순수 함수로 분리하고, 프레임워크 경계에서는 다시 클래스나 핸들러를 쓰는 식의 혼합 설계가 가장 현실적입니다. 중요한 것은 신념이 아니라 선택 기준입니다.
 
-## 이 글에서 다룰 문제
+![Functional Programming 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.ko.png)
+*Functional Programming 101 10장 흐름 개요*
 
-"OOP만 사용" 또는 "FP만 사용"은 비현실적입니다. 실무 코드는 상태 관리가 필요한 부분(OOP)과 데이터 변환이 필요한 부분(FP)이 공존합니다. 두 패러다임을 적절히 조합하는 것이 좋은 설계의 핵심입니다.
+## 먼저 던지는 질문
 
-> 좋은 설계 = 문제에 맞는 패러다임 선택
+- 객체지향과 함수형은 각각 어떤 문제에 더 잘 맞을까요?
+- 두 패러다임을 섞을 때 가장 실용적인 기본 패턴은 무엇일까요?
+- Functional Core, Imperative Shell은 Python에서 어떻게 적용할 수 있을까요?
 
-Python의 표준 라이브러리도 `pathlib`(OOP)과 `itertools`(FP)를 함께 제공합니다. 언어가 지원하는 모든 도구를 활용하는 것이 Pythonic합니다.
+## 왜 중요한가
 
-## 핵심 개념 잡기
+"OOP만 써라" 또는 "FP만 써라"는 생산 코드 기준으로는 비현실적입니다. 실제 시스템에는 상태를 오래 들고 있어야 하는 부분도 있고, 입력을 받아 값을 변환하기만 하면 되는 부분도 있습니다. 두 성격을 같은 도구로 밀어붙이면 오히려 코드가 더 나빠집니다.
 
-> OOP vs FP — 강점 비교
+Python 표준 라이브러리만 봐도 `pathlib` 같은 객체지향 도구와 `itertools` 같은 함수형 도구가 함께 존재합니다. Pythonic하다는 말은 한 패러다임만 고집하는 것이 아니라, 언어가 주는 여러 도구를 목적에 맞게 조합하는 데 더 가깝습니다.
 
+## 개념 개요
+
+> 상태 관리와 데이터 변환은 같은 문제처럼 보여도 요구 사항이 다릅니다.
+
+```text
+OOP Fits Best                  FP Fits Best
+─────────────────             ─────────────────
+State + behavior together     Stateless data transformation
+Managing multiple instances   Pipeline data processing
+Framework integration         Concurrency / parallelism
+Complex domain models         Mathematical / declarative logic
 ```
-OOP가 적합한 상황                FP가 적합한 상황
-─────────────────               ─────────────────
-상태 + 행위가 결합               상태 없는 데이터 변환
-여러 인스턴스 관리               파이프라인 데이터 처리
-프레임워크 통합                  동시성 / 병렬 처리
-복잡한 도메인 모델               수학적 / 선언적 로직
-```
+
+## OOP와 FP의 경계를 나누는 기준
 
 ## 핵심 개념
 
 | 용어 | 설명 |
 |------|------|
-| 다중 패러다임(multi-paradigm) | 여러 프로그래밍 스타일을 지원하는 언어입니다 |
-| 하이브리드 설계 | OOP와 FP를 목적에 맞게 조합하는 설계 방식입니다 |
-| Functional Core, Imperative Shell | 순수 함수 핵심 + 부수효과 경계 아키텍처입니다 |
-| 값 객체(value object) | 불변이고 동등성으로 비교되는 객체입니다 |
-| 서비스 함수 | 상태 없이 동작하는 비즈니스 로직 함수입니다 |
+| 다중 패러다임(multi-paradigm) | 여러 프로그래밍 스타일을 지원하는 언어 특성입니다 |
+| 하이브리드 설계(hybrid design) | 목적에 따라 OOP와 FP를 함께 쓰는 설계 방식입니다 |
+| Functional Core, Imperative Shell | 순수 함수 코어와 부수효과 경계를 분리하는 아키텍처입니다 |
+| 값 객체(value object) | 동일성보다 값의 동등성으로 비교하는 불변 객체입니다 |
+| 서비스 함수(service function) | 상태 없이 비즈니스 로직을 수행하는 함수입니다 |
 
-## Before / After
-
-순수 OOP를 하이브리드로 전환합니다.
+## 적용 전후 비교
+모든 것을 클래스 안에 넣는 설계는 익숙하지만, 계산 로직까지 상태 객체에 묶어 버릴 수 있습니다. 값 객체와 순수 함수를 분리하면 테스트성과 재사용성이 좋아집니다.
 
 ```python
-# before: 모든 것을 클래스로
+# 이전: 모든 것을 class에 배치
 class OrderProcessor:
     def __init__(self, tax_rate: float) -> None:
         self.tax_rate = tax_rate
@@ -72,14 +81,14 @@ class OrderProcessor:
 
     def format_receipt(self, items: list[dict]) -> str:
         total = self.calculate_total(items)
-        return f"합계: {total:,.0f}원"
+        return f"Total: ${total:,.2f}"
 
 processor = OrderProcessor(0.1)
-print(processor.format_receipt([{"price": 10000, "qty": 2}]))
+print(processor.format_receipt([{"price": 25.00, "qty": 2}]))
 ```
 
 ```python
-# after: 값 객체(OOP) + 순수 함수(FP) 혼합
+# 이후: value object(OOP) + 순수 함수(FP)
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
@@ -94,32 +103,30 @@ def calculate_total(items: list[OrderItem], tax_rate: float) -> float:
 
 def format_receipt(items: list[OrderItem], tax_rate: float) -> str:
     total = calculate_total(items, tax_rate)
-    return f"합계: {total:,.0f}원"
+    return f"Total: ${total:,.2f}"
 
-items = [OrderItem("커피", 10000, 2)]
+items = [OrderItem("Coffee", 25.00, 2)]
 print(format_receipt(items, 0.1))
 ```
 
 ## 단계별 실습
 
-### Step 1: 값 객체 + 순수 함수
+### 단계 1: 값 객체와 순수 함수 조합하기
 
 ```python
 from dataclasses import dataclass, replace
 from typing import NamedTuple
 
-
-# 값 객체: 불변, 동등성 기반
+# value object: 불변, 동등성 기반
 @dataclass(frozen=True)
 class Money:
     amount: int
-    currency: str = "KRW"
+    currency: str = "USD"
 
 class Percentage(NamedTuple):
     value: float
 
-
-# 순수 함수: 값 객체를 변환
+# 순수 함수: value object를 변환
 def apply_discount(price: Money, discount: Percentage) -> Money:
     discounted = int(price.amount * (1 - discount.value))
     return replace(price, amount=discounted)
@@ -129,25 +136,25 @@ def add_tax(price: Money, tax: Percentage) -> Money:
     return replace(price, amount=taxed)
 
 def format_money(money: Money) -> str:
-    return f"{money.amount:,}{money.currency}"
-
+    return f"{money.amount:,} {money.currency}"
 
 price = Money(50000)
 discounted = apply_discount(price, Percentage(0.1))
 final = add_tax(discounted, Percentage(0.1))
 
-print(f"원가: {format_money(price)}")         # 원가: 50,000KRW
-print(f"할인 후: {format_money(discounted)}")  # 할인 후: 45,000KRW
-print(f"세금 후: {format_money(final)}")       # 세금 후: 49,500KRW
+print(f"Original: {format_money(price)}")       # Original: 50,000 USD
+print(f"After discount: {format_money(discounted)}")  # After discount: 45,000 USD
+print(f"After tax: {format_money(final)}")       # After tax: 49,500 USD
 ```
 
-### Step 2: Functional Core, Imperative Shell
+값 객체는 OOP의 명시적인 데이터 모델링 장점을 가져오고, 순수 함수는 FP의 예측 가능성을 제공합니다. 둘을 함께 쓰면 서로의 약점을 상당 부분 보완할 수 있습니다.
+
+### 단계 2: Functional Core, Imperative Shell 적용하기
 
 ```python
 from dataclasses import dataclass
 
-
-# === Functional Core (순수 함수) ===
+# === Functional Core(순수 함수) ===
 @dataclass(frozen=True)
 class User:
     name: str
@@ -155,54 +162,54 @@ class User:
     active: bool = True
 
 def validate_email(email: str) -> list[str]:
-    """이메일 검증 — 순수 함수."""
+    """Email validation — pure function."""
     errors = []
     if "@" not in email:
-        errors.append("@ 기호가 필요합니다")
+        errors.append("@ symbol is required")
     if "." not in email.split("@")[-1]:
-        errors.append("도메인에 .이 필요합니다")
+        errors.append("Domain must contain a dot")
     return errors
 
 def create_user_data(name: str, email: str) -> User | list[str]:
-    """사용자 생성 검증 — 순수 함수."""
+    """User creation validation — pure function."""
     errors = validate_email(email)
     if not name.strip():
-        errors.append("이름이 비어있습니다")
+        errors.append("Name is empty")
     if errors:
         return errors
     return User(name=name.strip(), email=email.lower())
 
-
-# === Imperative Shell (부수효과) ===
+# === Imperative Shell(부수 효과) ===
 def handle_registration(name: str, email: str) -> None:
-    """등록 처리 — 부수효과 포함."""
+    """Registration handler — contains side effects."""
     result = create_user_data(name, email)
     if isinstance(result, list):
         for error in result:
-            print(f"  오류: {error}")
+            print(f"  Error: {error}")
     else:
-        print(f"  등록 완료: {result}")
-        # 실제로는 DB 저장, 이메일 발송 등
-
+        print(f"  Registered: {result}")
+        # 운영 환경: DB 저장, 이메일 발송 등
 
 handle_registration("Alice", "alice@example.com")
-# 등록 완료: User(name='Alice', email='alice@example.com', active=True)
+# 등록됨: User(name='Alice', email='alice@example.com', active=True)
 
 handle_registration("", "invalid-email")
 # 오류: @ 기호가 필요합니다
-# 오류: 이름이 비어있습니다
+# 오류: 이름이 비어 있습니다
 ```
 
-### Step 3: 클래스 + 함수형 메서드
+이 패턴은 Python에서 함수형 사고를 가장 실용적으로 도입하는 방법입니다. 핵심 규칙은 순수 함수로 두고, 실제 부수효과는 가장 바깥쪽 핸들러에서만 수행합니다.
+
+### 단계 3: 클래스와 함수형 메서드 함께 쓰기
 
 ```python
 from dataclasses import dataclass
-from typing import Callable, Iterator
-
+from collections.abc import Callable
+from typing import Iterator
 
 @dataclass
 class DataPipeline:
-    """클래스로 파이프라인을 구성하되, 각 단계는 순수 함수입니다."""
+    """A class that composes a pipeline where each stage is a pure function."""
     steps: list[Callable] = None
 
     def __post_init__(self) -> None:
@@ -210,16 +217,15 @@ class DataPipeline:
             self.steps = []
 
     def add_step(self, func: Callable) -> "DataPipeline":
-        """새 단계를 추가한 새 파이프라인을 반환합니다 (불변)."""
+        """Returns a new pipeline with the added step (immutable)."""
         return DataPipeline(steps=[*self.steps, func])
 
     def run(self, data):
-        """파이프라인을 실행합니다."""
+        """Executes the pipeline."""
         result = data
         for step in self.steps:
             result = step(result)
         return result
-
 
 # 순수 함수 단계
 def normalize(records: list[dict]) -> list[dict]:
@@ -231,8 +237,7 @@ def enrich(records: list[dict]) -> list[dict]:
 def filter_valid(records: list[dict]) -> list[dict]:
     return [r for r in records if r.get("score", 0) > 0]
 
-
-# 파이프라인 조립 (OOP 인터페이스 + FP 실행)
+# pipeline 조립(OOP 인터페이스 + FP 실행)
 pipeline = (
     DataPipeline()
     .add_step(normalize)
@@ -253,10 +258,12 @@ for r in result:
 # {'name': 'Charlie', 'score': 92, 'name_len': 7}
 ```
 
-### Step 4: 패러다임 선택 가이드
+공개 인터페이스는 클래스로 두고, 내부 실행은 순수 함수로 흘려보내는 방식도 아주 효과적입니다. 프레임워크 친화성과 테스트성을 동시에 챙길 수 있습니다.
+
+### 단계 4: 패러다임 선택 기준 세우기
 
 ```python
-# 상황 1: 상태 관리 → OOP
+# 상황 1: 상태 관리 -> OOP
 class ShoppingCart:
     def __init__(self) -> None:
         self._items: list[dict] = []
@@ -268,77 +275,62 @@ class ShoppingCart:
     def total(self) -> int:
         return sum(i["price"] for i in self._items)
 
-
-# 상황 2: 데이터 변환 → FP
+# 상황 2: 데이터 변환 -> FP
 def transform_prices(
     items: list[dict],
     rate: float,
 ) -> list[dict]:
     return [{**i, "price": int(i["price"] * rate)} for i in items]
 
-
-# 상황 3: 프레임워크 통합 → OOP (프레임워크가 요구)
+# 상황 3: framework 통합 -> OOP(framework 요구)
 class UserSerializer:
     def to_dict(self, user) -> dict:
         return {"name": user.name, "email": user.email}
 
-
-# 상황 4: 유틸리티 → FP
+# 상황 4: 유틸리티 -> FP
 def slugify(text: str) -> str:
     return text.lower().strip().replace(" ", "-")
 
-
-# 혼합 사용
+# mixed usage
 cart = ShoppingCart()
-cart.add("커피", 4500)
-cart.add("케이크", 6000)
+cart.add("Coffee", 450)
+cart.add("Cake", 600)
 
-# OOP 객체의 데이터를 FP로 변환
+# FP로 OOP 객체 데이터를 변환
 discounted = transform_prices(cart._items, 0.9)
-print(f"할인 전: {cart.total:,}원")
-print(f"할인 후: {sum(i['price'] for i in discounted):,}원")
-# 할인 전: 10,500원
-# 할인 후: 9,450원
+print(f"Before discount: {cart.total:,}")
+print(f"After discount: {sum(i['price'] for i in discounted):,}")
+# Before discount: 1,050
+# After discount: 945
 ```
 
-### Step 5: 설계 결정 체크리스트
+이 예제는 패러다임 선택이 정체성이 아니라 상황 판단임을 잘 보여 줍니다. 상태를 오래 들고 있어야 하면 OOP, 데이터만 바꾸면 되면 FP가 더 자연스럽습니다.
+
+### 단계 5: 실행 가능한 하이브리드 설계 워크플로
 
 ```python
-"""
-패러다임 선택 체크리스트:
-
-1. 상태 + 행위가 함께 변경되는가?
-   → Yes: 클래스 (OOP)
-   → No: 함수 (FP)
-
-2. 여러 인스턴스가 필요한가?
-   → Yes: 클래스 (OOP)
-   → No: 모듈 수준 함수 (FP)
-
-3. 데이터 변환이 주목적인가?
-   → Yes: 순수 함수 파이프라인 (FP)
-   → No: 상황에 따라 판단
-
-4. 프레임워크가 클래스를 요구하는가?
-   → Yes: 클래스 (OOP) + 내부 로직은 FP
-   → No: 자유롭게 선택
-
-5. 테스트 용이성이 중요한가?
-   → Yes: 순수 함수 우선 (FP)
-   → 상태 테스트가 필요하면: 클래스 (OOP)
-"""
-
-# 실전 하이브리드 패턴: 불변 값 객체 + 순수 함수 + 얇은 클래스 셸
 from dataclasses import dataclass
 
+@dataclass(frozen=True)
+class RawConfig:
+    host: str
+    port: str
+    debug: str
 
 @dataclass(frozen=True)
-class Config:
+class AppConfig:
     host: str
     port: int
     debug: bool
 
-def validate_config(config: Config) -> list[str]:
+def normalize_config(raw: RawConfig) -> AppConfig:
+    return AppConfig(
+        host=raw.host.strip(),
+        port=int(raw.port),
+        debug=raw.debug.strip().lower() in {"1", "true", "yes"},
+    )
+
+def validate_config(config: AppConfig) -> list[str]:
     errors = []
     if not config.host:
         errors.append("host is required")
@@ -346,68 +338,252 @@ def validate_config(config: Config) -> list[str]:
         errors.append("port must be 1-65535")
     return errors
 
+class AppServer:
+    def __init__(self, config: AppConfig) -> None:
+        self.config = config
 
-config = Config(host="localhost", port=8080, debug=True)
-errors = validate_config(config)
-if not errors:
-    print(f"설정 유효: {config}")
-# 설정 유효: Config(host='localhost', port=8080, debug=True)
+    def start(self) -> str:
+        mode = "debug" if self.config.debug else "prod"
+        return f"starting server on {self.config.host}:{self.config.port} ({mode})"
+
+def boot(raw: RawConfig) -> str:
+    normalized = normalize_config(raw)
+    errors = validate_config(normalized)
+    if errors:
+        return f"validation failed: {errors}"
+    server = AppServer(normalized)
+    return server.start()
+
+good = RawConfig(host=" localhost ", port="8080", debug="yes")
+bad_host = RawConfig(host="   ", port="8080", debug="yes")
+bad_port = RawConfig(host="api.internal", port="70000", debug="no")
+
+assert normalize_config(good) == AppConfig(host="localhost", port=8080, debug=True)
+assert boot(good) == "starting server on localhost:8080 (debug)"
+assert boot(bad_host) == "validation failed: ['host is required']"
+assert boot(bad_port) == "validation failed: ['port must be 1-65535']"
+
+print("Normalized config:", normalize_config(good))
+print("Success run:", boot(good))
+print("Missing host:", boot(bad_host))
+print("Bad port:", boot(bad_port))
+# 정규화된 config: AppConfig(host='localhost', port=8080, debug=True)
+# 실행 성공: localhost:8080에서 서버 시작(debug)
+# host 누락: 검증 실패 ['host is required']
+# 잘못된 port: 검증 실패 ['port must be 1-65535']
 ```
+
+팀 차원의 기준을 만들 때도 결국 이런 질문이 필요합니다. 상태가 핵심인가, 변환이 핵심인가, 테스트 우선순위는 무엇인가. 이 기준이 없으면 패러다임 논쟁은 금방 취향 싸움이 됩니다.
+
+#### 예상 출력
+
+```text
+Normalized config: AppConfig(host='localhost', port=8080, debug=True)
+Success run: starting server on localhost:8080 (debug)
+Missing host: validation failed: ['host is required']
+Bad port: validation failed: ['port must be 1-65535']
+```
+
+#### 결과가 다르면 먼저 확인할 점
+
+- `normalize_config()`가 `host.strip()`을 호출하는지 확인합니다. 공백만 있는 호스트는 정규화 뒤 빈 문자열이어야 합니다.
+- `port`를 `int`로 바꾼 뒤 범위를 검사하는지 확인합니다. 문자열 상태로 비교하면 잘못된 포트가 통과할 수 있습니다.
+- 검증 실패 시 `AppServer`를 만들지 않는지 확인합니다. 이 경계가 무너지면 shell이 core의 오류를 무시하게 됩니다.
+- 성공 경로는 클래스 셸이 맡고, 정규화와 검증은 순수 함수가 맡는지 확인합니다. 이 역할 분리가 하이브리드 설계의 핵심입니다.
 
 ## 이 코드에서 주목할 점
 
-- 값 객체(frozen dataclass)는 OOP의 구조와 FP의 불변성을 결합합니다
-- "Functional Core, Imperative Shell"은 테스트 가능한 핵심을 만드는 아키텍처입니다
-- 클래스의 공개 인터페이스를 OOP로, 내부 로직을 FP로 구현하는 하이브리드가 효과적입니다
-- 선택 기준은 "상태 관리가 필요한가?"입니다
+- 값 객체(`frozen dataclass`)는 OOP의 구조화와 FP의 불변성을 함께 제공합니다.
+- Functional Core, Imperative Shell은 테스트 가능한 코어를 만드는 실용 패턴입니다.
+- 공개 인터페이스는 OOP, 내부 계산은 FP로 두는 혼합 설계가 매우 효과적입니다.
+- 선택 기준은 결국 "상태 관리가 필요한가"입니다.
 
 ## 흔한 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| 패러다임 순수주의 고집 | 불필요한 복잡성이 추가됩니다 | 문제에 맞는 도구를 선택합니다 |
-| 모든 것을 클래스로 래핑 | 함수로 충분한 경우가 많습니다 | "상태가 필요한가?" 먼저 질문합니다 |
-| 함수형만 고집하며 상태 회피 | 상태 관리가 필요한 곳에서는 비효율적입니다 | 상태가 필요하면 클래스를 사용합니다 |
-| 팀 내 스타일 불일치 | 코드 리뷰와 협업이 어려워집니다 | 팀 가이드라인을 합의합니다 |
-| 과도한 추상화 | 간단한 코드가 더 나은 경우가 많습니다 | YAGNI 원칙을 적용합니다 |
+| 패러다임 순수주의 | 불필요한 복잡성을 만듭니다 | 문제에 맞는 도구를 고릅니다 |
+| 모든 것을 클래스에 넣음 | 함수로 충분한 로직까지 무거워집니다 | 먼저 상태가 필요한지 묻습니다 |
+| 상태를 무조건 피하려 함 | 상태 관리가 필요한 곳에서 오히려 비효율적입니다 | 필요한 곳에서는 클래스를 사용합니다 |
+| 팀 안에서 스타일이 뒤섞임 | 리뷰와 협업 비용이 커집니다 | 팀 기준을 명확히 합의합니다 |
+| 과도한 추상화 | 단순한 코드가 더 읽기 좋을 수 있습니다 | YAGNI를 적용합니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- Django/FastAPI: 클래스 기반 뷰 + 순수 함수 비즈니스 로직을 조합합니다
-- 데이터 파이프라인: 함수형 변환 + OOP 커넥터를 함께 사용합니다
-- 테스트: 순수 함수는 단위 테스트, 클래스는 통합 테스트로 검증합니다
-- 설정 관리: frozen dataclass(OOP) + 검증 함수(FP)를 조합합니다
-- 이벤트 처리: 이벤트 객체(OOP) + 핸들러 함수(FP)를 조합합니다
+- Django/FastAPI에서 클래스 기반 인터페이스와 순수 함수 비즈니스 로직을 함께 사용합니다.
+- 데이터 파이프라인에서는 OOP 커넥터와 FP 변환 단계를 결합합니다.
+- 테스트는 순수 함수에 단위 테스트, 클래스에는 통합 테스트를 집중합니다.
+- 설정은 frozen dataclass, 검증은 순수 함수로 분리합니다.
+- 이벤트 객체는 OOP로, 핸들러 로직은 FP로 구성합니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 현업에서는 이렇게 판단합니다
 
-"OOP vs FP"는 잘못된 이분법입니다. Python의 강점은 두 패러다임을 자유롭게 조합할 수 있다는 것입니다. 데이터 모델은 dataclass로, 비즈니스 로직은 순수 함수로, 프레임워크 통합은 클래스로 — 이것이 실용적인 Python 코드입니다.
+"OOP vs FP"는 Python에서는 대체로 잘못된 질문입니다. 더 좋은 질문은 "이 코드는 테스트하기 쉬운가", "변경하기 쉬운가", "읽기 쉬운가"입니다. 값 객체는 dataclass로, 비즈니스 로직은 순수 함수로, 프레임워크 경계는 클래스나 핸들러로 두는 방식이 실무적으로 가장 자주 성공합니다.
 
-"어떤 패러다임을 사용하는가?"보다 "코드가 테스트하기 쉬운가?", "변경이 쉬운가?", "읽기 쉬운가?"가 더 중요한 질문입니다. 이 시리즈에서 다룬 순수 함수, 불변 데이터, 고차 함수, 파이프라인이 여러분의 도구상자에 새로운 도구가 되길 바랍니다.
+이 시리즈에서 다룬 순수 함수, 불변 데이터, 고차 함수, 클로저, 제너레이터, 함수 합성은 서로 따로 떨어진 기술이 아닙니다. 모두 더 작고 예측 가능한 계산 단위를 만들기 위한 도구입니다. 객체지향과 함수형의 균형을 잡는 일은 그 도구들을 상황에 맞게 조합하는 판단에서 시작합니다.
 
 ## 체크리스트
 
-- [ ] OOP와 FP의 강점과 약점을 비교할 수 있다
-- [ ] "Functional Core, Imperative Shell" 패턴을 설명할 수 있다
-- [ ] 값 객체와 순수 함수를 조합하여 설계할 수 있다
+- [ ] 객체지향과 함수형의 장단점을 비교할 수 있다
+- [ ] Functional Core, Imperative Shell 패턴을 설명할 수 있다
+- [ ] 값 객체와 순수 함수를 함께 사용하는 설계를 할 수 있다
 - [ ] 상황별 패러다임 선택 기준을 적용할 수 있다
-- [ ] 하이브리드 설계 패턴을 실무에 적용할 수 있다
+- [ ] 하이브리드 설계 패턴을 실제 코드에 적용할 수 있다
 
-## 정리 및 다음 글 안내
+## 연습 문제
 
-객체지향과 함수형은 대립이 아니라 상호 보완입니다. Python에서는 값 객체(OOP) + 순수 함수(FP) + 얇은 클래스 셸의 하이브리드가 가장 실용적입니다. 이 시리즈에서 다룬 순수 함수, 불변 데이터, 고차 함수, 클로저, 제너레이터, 함수 합성이 여러분의 코드를 더 깔끔하고 테스트 가능하게 만들어줄 것입니다.
+1. 장바구니를 OOP(`Cart` 클래스) + FP(할인, 세금 계산 함수) 혼합 구조로 설계해 보세요.
+2. 파일 기반 설정 로더를 Functional Core, Imperative Shell 패턴으로 구현해 보세요.
+3. 기존 OOP 코드에서 순수 함수로 뽑아낼 수 있는 부분을 찾아 리팩터링해 보세요.
+
+## 정리와 다음 글
+
+객체지향과 함수형은 경쟁 관계가 아니라 상호 보완 관계입니다. Python에서는 불변 값 객체(OOP) + 순수 함수(FP) + 얇은 클래스 셸이라는 조합이 가장 실용적인 경우가 많습니다. 이 시리즈에서 다룬 함수형 도구들을 적절히 섞어 쓰면 더 읽기 쉽고 테스트하기 쉬운 코드를 만들 수 있습니다.
+
+## 심화 앵커: 하이브리드 설계를 검증 가능한 형태로 고정하기
+
+여기서는 시리즈 전체에서 다룬 패턴을 하나의 실행 흐름으로 묶습니다. 핵심은 클래스 경계와 함수 경계를 분리하는 것입니다. 상태를 가진 객체는 조립과 라이프사이클을 담당하고, 계산은 순수 함수 파이프라인으로 고정합니다.
+
+```python
+from dataclasses import dataclass, replace
+from functools import reduce
+from itertools import islice
+
+@dataclass(frozen=True)
+class Event:
+    event_id: str
+    amount: int
+    kind: str
+
+@dataclass(frozen=True)
+class LedgerRow:
+    event_id: str
+    gross: int
+    fee: int
+    net: int
+
+def normalize(event: Event) -> Event:
+    return replace(event, kind=event.kind.strip().lower())
+
+def paid_only(event: Event) -> bool:
+    return event.kind == "paid"
+
+def to_ledger(event: Event) -> LedgerRow:
+    fee = int(event.amount * 0.02)
+    return LedgerRow(event_id=event.event_id, gross=event.amount, fee=fee, net=event.amount - fee)
+
+def summarize(rows: list[LedgerRow]) -> dict[str, int]:
+    return reduce(
+        lambda acc, row: {
+            "count": acc["count"] + 1,
+            "gross": acc["gross"] + row.gross,
+            "fee": acc["fee"] + row.fee,
+            "net": acc["net"] + row.net,
+        },
+        rows,
+        {"count": 0, "gross": 0, "fee": 0, "net": 0},
+    )
+
+def settle(events: list[Event]) -> dict[str, int]:
+    normalized = map(normalize, events)
+    filtered = filter(paid_only, normalized)
+    rows = list(map(to_ledger, filtered))
+    return summarize(rows)
+
+sample = [
+    Event("E-1", 10000, "paid"),
+    Event("E-2", 7000, "cancelled"),
+    Event("E-3", 12000, "paid"),
+]
+
+print(settle(sample))
+# {'count': 2, 'gross': 22000, 'fee': 440, 'net': 21560}
+```
+
+이 구조는 monad-like `Result` 패턴, 재귀적 변환, 지연 파이프라인으로 확장하기 쉽습니다. 특히 검증 단계에서 속성 기반 테스트를 추가하면 변경이 잦은 정산 규칙도 안정적으로 운영할 수 있습니다.
+
+```python
+from hypothesis import given, strategies as st
+
+@given(st.integers(min_value=0, max_value=10_000))
+def test_fee_never_negative(amount: int) -> None:
+    row = to_ledger(Event("X", amount, "paid"))
+    assert row.fee >= 0
+    assert row.net <= row.gross
+```
+
+테스트에서 중요한 것은 "예제가 맞다"가 아니라 "성질이 유지된다"입니다. 이 관점을 유지하면 OOP와 FP를 섞어도 설계 품질이 흔들리지 않습니다.
+
+## 검증 시나리오: 경계 조건을 먼저 잠그기
+
+실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
+
+```python
+from functools import reduce
+
+def pipeline(values: list[int]) -> dict[str, int]:
+    filtered = [v for v in values if v >= 0]
+    squared = [v * v for v in filtered]
+    total = reduce(lambda acc, x: acc + x, squared, 0)
+    return {
+        "count": len(squared),
+        "total": total,
+        "max": max(squared) if squared else 0,
+    }
+
+# 경계 조건 검증
+assert pipeline([]) == {"count": 0, "total": 0, "max": 0}
+assert pipeline([-3, -1]) == {"count": 0, "total": 0, "max": 0}
+assert pipeline([0, 2, 3]) == {"count": 3, "total": 13, "max": 9}
+
+print("Pass")
+```
+
+또한 지연 평가를 사용할 때는 소비 시점을 테스트에 명시해 두는 편이 좋습니다. generator는 한 번 소비하면 비어야 정상이며, 이 성질이 깨지면 중간 단계에서 의도치 않은 materialize가 발생했을 가능성이 큽니다.
+
+```python
+from itertools import islice
+
+def naturals():
+    n = 0
+    while True:
+        yield n
+        n += 1
+
+stream = naturals()
+first_five = list(islice(stream, 5))
+next_three = list(islice(stream, 3))
+
+assert first_five == [0, 1, 2, 3, 4]
+assert next_three == [5, 6, 7]
+print("Pass")
+```
+
+이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
+
+## 처음 질문으로 돌아가기
+
+- **객체지향과 함수형은 각각 어떤 문제에 더 잘 맞을까요?**
+  - 이 글은 오래 유지되는 상태와 프레임워크 인터페이스는 객체지향이, 입력을 받아 값을 바꾸는 계산은 함수형이 더 잘 맞는다고 정리합니다. `ShoppingCart`와 `AppServer`는 상태와 라이프사이클을 맡고, `transform_prices()`, `validate_email()`, `normalize_config()` 같은 함수는 순수 변환 규칙을 맡는 예제가 그 기준입니다.
+- **두 패러다임을 섞을 때 가장 실용적인 기본 패턴은 무엇일까요?**
+  - 가장 실용적인 패턴은 불변 값 객체와 순수 함수를 조합하고, 필요할 때만 클래스 셸을 두는 방식입니다. `Money`와 `Percentage`를 순수 함수 `apply_discount()`와 `add_tax()`에 넘기거나, `DataPipeline` 클래스가 인터페이스만 제공하고 실제 단계는 순수 함수로 실행하는 구조가 대표 예시입니다.
+- **Functional Core, Imperative Shell은 Python에서 어떻게 적용할 수 있을까요?**
+  - Python에서는 정규화·검증 같은 핵심 규칙을 `create_user_data()`나 `validate_config()` 같은 순수 함수로 두고, 출력·서버 시작 같은 부수효과는 `handle_registration()`이나 `AppServer.start()`로 밀어내면 됩니다. `boot()`가 먼저 `normalize_config()`와 `validate_config()`를 통과시킨 뒤에만 `AppServer`를 만드는 흐름이 바로 Functional Core, Imperative Shell의 적용 예입니다.
 
 <!-- toc:begin -->
-- [함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)
-- [순수 함수와 부수효과](./02-pure-functions.md)
-- [immutable 데이터](./03-immutable-data.md)
-- [고차 함수](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [클로저와 partial](./06-closure-and-partial.md)
-- [재귀와 꼬리 호출](./07-recursion.md)
-- [지연 평가와 제너레이터](./08-lazy-evaluation.md)
-- [함수 합성과 파이프라인](./09-function-composition.md)
+## 시리즈 목차
+
+- [Functional Programming 101 (1/10): 함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): 순수 함수와 부수효과](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): immutable 데이터](./03-immutable-data.md)
+- [Functional Programming 101 (4/10): 고차 함수](./04-higher-order-functions.md)
+- [Functional Programming 101 (5/10): map, filter, reduce](./05-map-filter-reduce.md)
+- [Functional Programming 101 (6/10): 클로저와 partial](./06-closure-and-partial.md)
+- [Functional Programming 101 (7/10): 재귀와 꼬리 호출](./07-recursion.md)
+- [Functional Programming 101 (8/10): 지연 평가와 제너레이터](./08-lazy-evaluation.md)
+- [Functional Programming 101 (9/10): 함수 합성과 파이프라인](./09-function-composition.md)
 - **객체지향과 함수형의 균형 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -416,3 +592,5 @@ if not errors:
 - [Clean Architecture — Robert C. Martin](https://www.oreilly.com/library/view/clean-architecture-a/9780134494272/)
 - [Fluent Python — Chapter 7: Functions as First-Class Objects](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/)
 - [Python 공식 문서 — Programming FAQ](https://docs.python.org/3/faq/programming.html)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/functional-programming-101/ko)

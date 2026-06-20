@@ -1,10 +1,10 @@
 ---
 series: mlops-101
 episode: 4
-title: Model Training Pipeline
-status: content-ready
+title: "MLOps 101 (4/10): Model Training Pipeline"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,44 +16,52 @@ tags:
   - Airflow
   - DAG
   - DataScience
-seo_description: Designing ML training pipelines with explicit ingest, preprocess, train, evaluate, and register stages, plus orchestrator choices in code
-last_reviewed: '2026-05-04'
+seo_description: Break ML training into explicit ingest, preprocess, train, evaluate, and register stages so re-runs, retries, and recovery become manageable.
+last_reviewed: '2026-05-15'
 ---
 
-# Model Training Pipeline
+# MLOps 101 (4/10): Model Training Pipeline
 
-> MLOps 101 series (4/10)
+Scheduling one `train.py` file does not automatically give you an operable training system. When ingest, preprocessing, training, evaluation, and registration are fused into one script, failures are hard to localize and partial re-runs become expensive.
 
-<!-- a-grade-intro:begin -->
+The more the training process depends on manual steps, the faster reproducibility and recovery speed fall apart. In MLOps, a pipeline is not a convenience feature. It is the structure that turns training into explicit, repeatable stages.
 
-**Core question**: How do you turn a training script that "behaves differently every run" into a reliable, staged pipeline?
+This is post 4 in the MLOps 101 series.
 
-> *A training pipeline splits ingest, preprocess, train, evaluate, and register into explicit stages, so re-runs and caching become possible.*
+Here, we will distinguish a training pipeline from simple script automation and show why stage boundaries and a DAG matter.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![mlops 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/04/04-01-see-the-flow-first.en.png)
+*mlops 101 chapter 4 flow overview*
+> A training pipeline is not a large script with a scheduler attached. It is a DAG of small stages with clear inputs and outputs, designed so failed stages do not force the whole run to restart.
 
-- The five stages of a training pipeline
-- The meaning of a DAG
-- How Airflow, Prefect, and Kubeflow differ
-- Retries and caching
-- Five common pitfalls
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Model Training Pipeline?
+- Which signal should the example or diagram make visible for Model Training Pipeline?
+- What failure should be prevented first when Model Training Pipeline reaches a real system?
+
+## Questions this article answers
+
+- Why split a single training script into multiple pipeline stages?
+- How is a DAG different from a plain execution order?
+- Where do Airflow, Prefect, and Kubeflow fit into the picture?
+- Why do retries and caching matter so much in training pipelines?
+- Which design mistakes force the whole pipeline to re-run unnecessarily?
+
+> Mental model: a training pipeline is not a large script with a scheduler attached. It is a DAG of small stages with clear inputs and outputs, designed to shrink the re-run scope.
 
 ## Why It Matters
 
-Manual training is unreproducible, slow, and a team bottleneck. Pipelines are automatic and auditable.
+Manual training is slow, hard to reproduce, and difficult to debug. When a nightly training job fails and the whole process has to restart from the beginning, the operating cost rises quickly.
 
-## Concept at a Glance
+When stages are split cleanly, the team can narrow the failure immediately and rerun only the part whose inputs changed. A pipeline is the mechanism that raises both observability and recoverability for training.
 
-```mermaid
-flowchart LR
-    Ingest["ingest"] --> Prep["preprocess"]
-    Prep --> Train["train"]
-    Train --> Eval["evaluate"]
-    Eval --> Reg["register"]
-    Reg --> Deploy["deploy"]
-```
+## See the Flow First
+
+The most important part of this diagram is not the stage names, but the boundaries between them. Ingest, preprocess, train, evaluate, and register have to be separate if the team wants partial re-runs and faster root-cause analysis.
+
+The goal of a training pipeline is not fancy scheduling. It is clear stage boundaries.
 
 ## Key Terms
 
@@ -173,10 +181,21 @@ A nightly Airflow DAG runs data, train, register. The weekly report is just the 
 
 Pipelines provide repeatability. Next, model deployment turns trained artifacts into live services.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Model Training Pipeline?**
+  - The article treats Model Training Pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Model Training Pipeline?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Model Training Pipeline reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is MLOps?](./01-what-is-mlops.md)
-- [Experiment Tracking](./02-experiment-tracking.md)
-- [Data Versioning](./03-data-versioning.md)
+## In this series
+
+- [MLOps 101 (1/10): What Is MLOps?](./01-what-is-mlops.md)
+- [MLOps 101 (2/10): Experiment Tracking](./02-experiment-tracking.md)
+- [MLOps 101 (3/10): Data Versioning](./03-data-versioning.md)
 - **Model Training Pipeline (current)**
 - Model Deployment (upcoming)
 - Model Monitoring (upcoming)
@@ -184,6 +203,7 @@ Pipelines provide repeatability. Next, model deployment turns trained artifacts 
 - Retraining (upcoming)
 - Feature Store (upcoming)
 - Building a Production ML System (upcoming)
+
 <!-- toc:end -->
 
 ## References

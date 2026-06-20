@@ -1,10 +1,10 @@
 ---
 series: observability-101
 episode: 2
-title: Metrics, Logs, and Traces
-status: content-ready
+title: "Observability 101 (2/10): Metrics, Logs, and Traces"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,27 @@ tags:
   - Tracing
   - SRE
 seo_description: How metrics, logs, and traces differ, and when to reach for each — answers to how much, what happened, and where it slowed down.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Metrics, Logs, and Traces
+# Observability 101 (2/10): Metrics, Logs, and Traces
 
-> Observability 101 series (2/10)
+Many teams say they use all three signals, but still send every question to the same place. Everything becomes a log search, or everything gets flattened into dashboards. That is where cost grows faster than understanding.
 
-<!-- a-grade-intro:begin -->
+The real skill is not collecting more signals. It is choosing the right one for the question in front of you.
 
-**Core question**: How do the three signals *differ*, and *when do you reach for which*?
+This is post 2 in the Observability 101 series.
 
-> *Metrics answer *how much*, logs answer *what happened*, traces answer *where and how*. None of them *replaces* the others.*
 
-<!-- a-grade-intro:end -->
+![observability 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.en.png)
+*observability 101 chapter 2 flow overview*
+> Metrics, Logs, and Traces is about the boundary decision, not the tool choice.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Metrics, Logs, and Traces?
+- Which signal should the example or diagram make visible for Metrics, Logs, and Traces?
+- What failure should be prevented first when Metrics, Logs, and Traces reaches a real system?
 
 ## What You Will Learn
 
@@ -46,14 +53,7 @@ Picking the *wrong signal* makes cost *explode* and answers *vanish*. Knowing th
 
 > *One right signal beats *ten wrong dashboards*.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Q["question"] --> M["how much? → metric"]
-    Q --> L["what happened? → log"]
-    Q --> T["where? → trace"]
-```
+Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms
 
@@ -123,6 +123,29 @@ def span(name, trace_id):
 "which service was slow for this request" → trace
 ```
 
+## One Failed Order, Three Different Questions
+
+If order failures spike, start by separating the questions instead of mixing them.
+
+```text
+Question 1. Is the failure broad or isolated?       → metric
+Question 2. Which order failed, and why?            → log
+Question 3. Which service call consumed the time?   → trace
+```
+
+```text
+metric: 5xx ratio 0.4% → 6.2%
+log: payment_failed reason=card_gateway_timeout
+trace: checkout → payment-gateway span p95 2.4s
+```
+
+```text
+Expected output:
+- Metrics show the blast radius.
+- Logs classify the failure type.
+- Traces identify the slow or broken hop.
+```
+
 ## What to Notice in This Code
 
 - A *counter* only goes *up*. A *gauge* moves *up and down*.
@@ -166,8 +189,19 @@ Most teams use a three-step pattern: *metrics for alerts*, *logs for debugging*,
 
 The three signals are tools with *different boundaries*. Next we look at *collecting and visualizing metrics*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Metrics, Logs, and Traces?**
+  - The article treats Metrics, Logs, and Traces as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Metrics, Logs, and Traces?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Metrics, Logs, and Traces reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
 - **Metrics, Logs, and Traces (current)**
 - Collecting and Visualizing Metrics (upcoming)
 - Structured Logging (upcoming)
@@ -177,6 +211,7 @@ The three signals are tools with *different boundaries*. Next we look at *collec
 - SLI and SLO Basics (upcoming)
 - Cost and Cardinality (upcoming)
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

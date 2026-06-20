@@ -1,10 +1,10 @@
 ---
 series: operating-systems-101
 episode: 5
-title: Locks, Mutexes, and Semaphores
-status: content-ready
+title: "Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,33 @@ tags:
   - Semaphore
   - Concurrency
 seo_description: How mutexes, semaphores, and condition variables work, why deadlock happens, and how a single misordered lock can freeze a whole system.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Locks, Mutexes, and Semaphores
+# Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores
 
-> Operating Systems 101 series (5/10)
+Once you realize a race condition is real, the next instinct is usually "add a lock." That instinct is useful, but incomplete. A badly scoped lock or one inconsistent lock order can freeze an entire system just as effectively as the original bug.
 
-<!-- a-grade-intro:begin -->
+Synchronization primitives are simple only on the surface. Safety depends on the exact rules around ownership, order, and duration.
 
-**Core question**: How do the locks that prevent concurrency bugs actually work, and why can misusing them freeze an entire system?
+This is post 5 in the Operating Systems 101 series. It breaks down mutexes, semaphores, reentrant locks, and condition variables, then shows how deadlock appears and how to avoid it.
 
-> Mutexes, semaphores, and condition variables are the most basic OS-level tools for writing concurrent code. They look simple, but the order in which you take them, how long you hold them, and what they protect change the outcome dramatically. This article walks through the lock families, how deadlock is constructed and avoided, and the lock-free alternatives that often produce safer designs.
 
-<!-- a-grade-intro:end -->
+![operating systems 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.en.png)
+*operating systems 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Locks, Mutexes, and Semaphores?
+- Which signal should the example or diagram make visible for Locks, Mutexes, and Semaphores?
+- What failure should be prevented first when Locks, Mutexes, and Semaphores reaches a real system?
+
+## Questions this article answers
+
+- What are the actual differences between mutexes, reentrant locks, semaphores, and condition variables?
+- Under what conditions does deadlock form?
+- Why do throughput and latency both get worse when locks are held too long?
+- What alternatives can preserve safety while reducing the amount of locking?
 
 ## What You Will Learn
 
@@ -46,9 +59,9 @@ A lock is the seat belt of concurrent code, but a wrongly fastened belt can pin 
 
 > A lock does not guarantee safety. It enforces the rules that, if followed, produce safety. Wrong rules produce wrong locks.
 
-## Concept at a Glance
-
 > A mutex lets one flow at a time enter the critical section. A semaphore lets up to N flows enter at once. An RLock (reentrant lock) lets the same flow take the same lock multiple times. A condition variable is a mechanism for waiting until some predicate becomes true and then waking the waiter.
+
+### How synchronization tools gate entry
 
 ```text
 Mutex     : capacity = 1
@@ -258,17 +271,29 @@ Mutex, semaphore, RLock, and condition variable are the basic synchronization to
 
 The next article moves on to another OS fundamental — memory management. We will look at how a process gets its memory and how the OS divides limited RAM across many processes.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Locks, Mutexes, and Semaphores?**
+  - The article treats Locks, Mutexes, and Semaphores as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Locks, Mutexes, and Semaphores?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Locks, Mutexes, and Semaphores reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Operating System?](./01-what-is-an-operating-system.md)
-- [Processes and Threads](./02-processes-and-threads.md)
-- [Scheduling](./03-scheduling.md)
-- [Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
+## In this series
+
+- [Operating Systems 101 (1/10): What Is an Operating System?](./01-what-is-an-operating-system.md)
+- [Operating Systems 101 (2/10): Processes and Threads](./02-processes-and-threads.md)
+- [Operating Systems 101 (3/10): Scheduling](./03-scheduling.md)
+- [Operating Systems 101 (4/10): Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
 - **Locks, Mutexes, and Semaphores (current)**
 - Memory Management (upcoming)
 - Virtual Memory (upcoming)
 - File Systems (upcoming)
 - System Calls (upcoming)
 - Containers and the Operating System (upcoming)
+
 <!-- toc:end -->
 
 ## References

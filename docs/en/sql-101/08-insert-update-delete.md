@@ -1,10 +1,10 @@
 ---
 series: sql-101
 episode: 8
-title: INSERT, UPDATE, DELETE
+title: "SQL 101 (8/10): INSERT, UPDATE, DELETE"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,44 +17,37 @@ tags:
   - Database
   - Postgres
 seo_description: Safely insert, change, and remove data — transactions, UPSERT, RETURNING, and the habit of never forgetting WHERE.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# INSERT, UPDATE, DELETE
+# SQL 101 (8/10): INSERT, UPDATE, DELETE
 
-> SQL 101 series (8/10)
+So far the series has mostly focused on reading data. Writing data is different. One misplaced condition can update or delete far more rows than intended, and by the time you notice, the mistake may already be live in production.
 
-<!-- a-grade-intro:begin -->
+That is why data-changing SQL is less about syntax and more about safety procedure. Transactions, preview queries, RETURNING, and rollback habits matter as much as the actual INSERT, UPDATE, or DELETE statement.
 
-**Core question**: If SELECT is *reading*, why is *writing* an order of magnitude scarier, and how do we build *a safety net to undo it*?
+This is post 8 in the SQL 101 series. Here we focus on how to change rows safely instead of treating DML as just another clause to memorize.
 
-> *Statements that *change data* deserve *ten times more care* than statements that read.*
 
-<!-- a-grade-intro:end -->
+![sql 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/08/08-01-safe-data-change-flow.en.png)
+*sql 101 chapter 8 flow overview*
+> Data-changing operations demand more care than reads. A single WHERE typo in DELETE can erase months of data. Always test your filter conditions on a SELECT first.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The basics of *INSERT*, *UPDATE*, *DELETE*
-- *Transactions* and `BEGIN / COMMIT / ROLLBACK`
-- *UPSERT* with `ON CONFLICT`
-- *RETURNING* to verify affected rows
-- Five common mistakes
+- What are the basic shapes of INSERT, UPDATE, and DELETE?
+- Why is a transaction the default safety net for data changes?
+- Why is RETURNING so useful during verification?
 
 ## Why It Matters
 
-Forgetting *one WHERE* in production wipes the whole table. Transactions, an explicit WHERE, and RETURNING are the *team's safety net*. The habit prevents incidents.
+Production data is harder to repair than to damage. A missing WHERE clause or a multi-step change executed without a transaction can leave the system in a half-updated state that is difficult to reason about later. That is why strong teams treat DML as operational work, not just query writing.
 
-> *DML turns *irreversible* work into *reversible* work — when you do it right.*
+Transactions and RETURNING help turn risky changes into auditable ones. They let you see what changed before you commit, and they make rollback part of the default workflow instead of an afterthought.
 
-## Concept at a Glance
+## Safe data-change flow
 
-```mermaid
-flowchart LR
-    Begin["BEGIN"] --> Op["INSERT/UPDATE/DELETE"]
-    Op --> Check["RETURNING / SELECT"]
-    Check -->|OK| Commit["COMMIT"]
-    Check -->|wrong| Rollback["ROLLBACK"]
-```
+Before you INSERT, check PRIMARY KEY and NOT NULL constraints. Before you UPDATE or DELETE, always write a SELECT with the same WHERE condition first, and verify you're changing the right rows. Use transactions so you can ROLLBACK if something goes wrong.
 
 ## Key Terms
 
@@ -93,6 +86,12 @@ DELETE FROM users WHERE id = 4 RETURNING *;
 -- review the output, then
 COMMIT;
 ```
+
+**Expected output:**
+
+| id | name | signup_at |
+| --- | --- | --- |
+| 4 | Margaret Hamilton | 2026-04-10 |
 
 ### Step 4 — UPSERT
 
@@ -155,17 +154,29 @@ Production changes go through *PR review* and *migration tools*. Ad-hoc changes 
 
 DML is the craft of making the *irreversible* feel safe. Next: *Index and query plan*.
 
+## Answering the Opening Questions
+
+- **What are the basic shapes of INSERT, UPDATE, and DELETE?**
+  - The article treats INSERT, UPDATE, DELETE as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is a transaction the default safety net for data changes?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is RETURNING so useful during verification?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
-- [WHERE and Conditions](./03-where-and-conditions.md)
-- [JOIN](./04-join.md)
-- [GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
-- [Subquery](./06-subquery.md)
-- [Window Function](./07-window-function.md)
+## In this series
+
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE and Conditions](./03-where-and-conditions.md)
+- [SQL 101 (4/10): JOIN](./04-join.md)
+- [SQL 101 (5/10): GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
+- [SQL 101 (6/10): Subquery](./06-subquery.md)
+- [SQL 101 (7/10): Window Function](./07-window-function.md)
 - **INSERT, UPDATE, DELETE (current)**
 - Index and Query Plan (upcoming)
 - Practical Analysis SQL (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -174,3 +185,4 @@ DML is the craft of making the *irreversible* feel safe. Next: *Index and query 
 - [PostgreSQL — UPDATE](https://www.postgresql.org/docs/current/sql-update.html)
 - [PostgreSQL — DELETE](https://www.postgresql.org/docs/current/sql-delete.html)
 - [PostgreSQL — Transactions](https://www.postgresql.org/docs/current/tutorial-transactions.html)
+- [PostgreSQL — Constraints](https://www.postgresql.org/docs/current/ddl-constraints.html)

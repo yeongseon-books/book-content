@@ -1,10 +1,10 @@
 ---
 series: programming-languages-101
 episode: 4
-title: Scope and Binding
-status: content-ready
+title: "Programming Languages 101 (4/10): Scope and Binding"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,43 +18,39 @@ tags:
   - Lexical
   - Dynamic
 seo_description: Where a name resolves to which value is one of the most foundational language design decisions. Compare lexical and dynamic scope.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Scope and Binding
+# Programming Languages 101 (4/10): Scope and Binding
 
-> Programming Languages 101 series (4/10)
+The same variable name can refer to different values inside and outside a function, and yet the program still behaves predictably. That ordinary-looking fact rests on one of the most important rule sets in language design.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Programming Languages 101 series.
 
-**Core question**: How does the same variable name end up referring to different values inside and outside a function, in a way that is consistent and predictable?
+In this post, we will look at binding — attaching a value to a name — and scope — the region where that attachment is visible. Once lexical scope feels concrete, closures, modules, and shadowing stop looking like separate topics.
 
-> Every language has to decide, at every position in the source, **which value a name refers to**. The rule for that decision is called **scope**, and the act of attaching a value to a name is called **binding**. Almost every modern language picks lexical scope, but what that choice means and what it costs is easy to forget.
 
-<!-- a-grade-intro:end -->
+![programming languages 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/04/04-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 4 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Precise definitions of scope and binding
-- Lexical vs dynamic scope
-- The intent and danger of variable shadowing
-- Python's LEGB rule
-- The foundation needed for closures (next episode)
+- What boundary should you inspect first when applying Scope and Binding?
+- Which signal should the example or diagram make visible for Scope and Binding?
+- What failure should be prevented first when Scope and Binding reaches a real system?
+
+## Questions this article answers
+
+- What is the precise difference between scope and binding?
+- How do lexical scope and dynamic scope change the result?
+- Why can shadowing the same name in an inner scope be risky?
+- In what order does Python's LEGB rule resolve names?
 
 ## Why It Matters
 
 Without a grasp of scope, "why isn't this variable updating?" or "why am I suddenly getting NameError?" become mysteries. With it, you see that functions, modules, and closures are all variations of the same rule.
 
 > Binding ties a name to a value; scope is the region where that tie is visible.
-
-## Concept at a Glance
-
-```mermaid
-flowchart TB
-    A["Built-in (print, len)"] --> B["Global (module)"]
-    B --> C["Enclosing (outer function)"]
-    C --> D["Local (inner function)"]
-```
 
 Python's LEGB rule is the order — innermost to outermost — in which a name is looked up. The first binding found wins.
 
@@ -225,10 +221,21 @@ Testing follows the same pattern. A function that depends on global state is har
 
 Scope is the region a name is visible in; binding is the act of attaching a value to a name. Once you understand lexical scope deeply, the next episode — closures — falls out of it naturally, because closures are what lexical scope plus first-class functions allow.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Scope and Binding?**
+  - The article treats Scope and Binding as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Scope and Binding?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Scope and Binding reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
-- [Type Systems](./03-type-system.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
+- [Programming Languages 101 (3/10): Type Systems](./03-type-system.md)
 - **Scope and Binding (current)**
 - Functions and Closures (upcoming)
 - Objects and Prototypes (upcoming)
@@ -236,6 +243,7 @@ Scope is the region a name is visible in; binding is the act of attaching a valu
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

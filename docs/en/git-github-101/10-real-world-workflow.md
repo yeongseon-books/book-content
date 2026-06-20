@@ -1,7 +1,7 @@
 ---
 episode: 10
 language: en
-last_reviewed: '2026-05-05'
+last_reviewed: '2026-05-15'
 series: git-github-101
 status: publish-ready
 tags:
@@ -16,20 +16,27 @@ targets:
   hashnode: true
   medium: true
   mkdocs: true
-  tistory: true
-title: 'Building a real-world Git workflow: from issue to release in one cycle'
+  tistory: false
+title: "Git & GitHub 101 (10/10): Building a real-world Git workflow: from issue to release in one cycle"
 seo_description: 'A realistic workflow is one repeating cycle: an issue defines the
   work, a branch carries the change, a Pull Request invites review, a merge brings…'
 ---
 
-# Building a real-world Git workflow: from issue to release in one cycle
+# Git & GitHub 101 (10/10): Building a real-world Git workflow: from issue to release in one cycle
 
-## What you will learn
+Knowing isolated Git commands is not the same as knowing how a team actually ships work. The last step is to connect those commands into one repeatable loop that starts with an issue and ends with a merge, a tag, and a clean main branch.
 
-- How the commands from Episodes 1–9 fit together as one realistic workflow.
-- How to walk a single change through issue, branch, commit, PR, review, merge, tag, and close.
-- Which recovery commands to reach for when something goes wrong mid-flow.
-- Which automated guardrails (branch protection, PR template, CI) keep the same flow stable across a team.
+This is the final post in the Git & GitHub 101 series. Here, we stitch the earlier lessons into one practical workflow from issue to release.
+
+
+![Git & GitHub 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-mental-model.en.png)
+*Git & GitHub 101 chapter 10 flow overview*
+
+## Questions to Keep in Mind
+
+- How the commands from Episodes 1–9 fit together as one realistic workflow?
+- How to walk a single change through issue, branch, commit, PR, review, merge, tag, and close?
+- Which recovery commands to reach for when something goes wrong mid-flow?
 
 ## Why it matters
 
@@ -44,9 +51,6 @@ When the loop becomes muscle memory, accidents drop. Force-pushing over a teamma
 > A realistic workflow is one repeating cycle: an issue defines the work, a branch carries the change, a Pull Request invites review, a merge brings it into the shared state, a tag marks the point, and the issue is closed.
 A GitHub Flow cycle looks like this.
 
-![Mental model](../../assets/git-github-101/10/10-01-mental-model.en.png)
-
-*Mental model*
 The issue is the entrance, the tag and issue close are the exit. Every step in the middle is a command from earlier episodes. The job here is to make the diagram run as a single sentence in your head.
 
 ## Core concepts
@@ -222,6 +226,41 @@ Closed • yeongseon opened about 1 hour ago
 
 That is one full cycle. The next change starts at a new issue.
 
+## The decision flow before you press merge
+
+In practice, the risky part is rarely opening the PR. The risky part is deciding whether the branch is truly ready to merge. A simple decision flow makes that judgment repeatable.
+
+![The decision flow before you press merge](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-the-decision-flow-before-you-press-merge.en.png)
+
+*A GitHub Flow decision map from issue scope to merge method and release tagging*
+
+This turns the merge button from a habit into the last step of a checklist.
+
+## Verification loop just before merge
+
+The most useful workflow guardrail is a fixed pre-merge review pass.
+
+1. Run `git status` and confirm the working tree is clean.
+2. Run `git log --oneline origin/main..HEAD` and read the exact commits entering the PR.
+3. Run `git diff --stat origin/main...HEAD` and confirm the scope is still what the issue promised.
+4. Re-read the PR body: `Closes #N`, verification steps, and release-tag intent should all be present.
+5. Confirm CI and required reviews are green.
+6. After the merge, pull `main`, create an annotated tag if needed, and delete the branch.
+
+That sequence catches the most common workflow failures: oversized PRs, missing issue linkage, and merge-ready branches that were never actually verified.
+
+## Choosing squash, merge commit, or rebase merge
+
+Beginners should usually follow one team default, but it still helps to understand the trade-off.
+
+| Method | Best fit | Main trade-off |
+| --- | --- | --- |
+| Squash merge | Keep `main` readable as one line per PR | Branch-level commit detail disappears from `main` |
+| Merge commit | Preserve the branch structure and the exact landing point | The graph grows more complex faster |
+| Rebase merge | Keep each commit while avoiding a merge bubble | Rewritten commit hashes can make tracing discussion harder |
+
+For small teams and tutorial repositories, squash merge is usually the clearest default. If the branch structure itself matters, or if individual commits inside the PR are worth preserving on `main`, a merge commit can be the better fit.
+
 ## Recovery flows
 
 Here are the mid-flow accidents teams run into most often, paired with the first command to type when they happen.
@@ -259,6 +298,8 @@ Add the `commit-msg` hook and `commitlint` from Episode 9 on top, and the format
 
 Defaulting to squash merge keeps the history readable too. Small commits inside a feature branch collapse into one commit per PR, so `git log --oneline` on `main` reads as one line per PR.
 
+The recovery table belongs in team documentation too. If a branch gets force-pushed incorrectly or a secret leaks into history, the team should not be inventing the response live during the incident. A small runbook linked from the repository makes the workflow much calmer under pressure.
+
 ## Checklist
 
 - [ ] Did an issue come first, with its number landing in the PR body as `Closes #N`?
@@ -283,27 +324,36 @@ Every command from Episodes 1 through 9 was a step inside this single cycle. Def
 
 This post closes the Git & GitHub 101 series. The natural next step is automation. Wiring GitHub Actions into the same repository so that every PR runs lint and tests, and pushing a tag triggers an auto-generated release note, is the topic of the next series. Until then, the most useful thing you can do is run this loop once on a project of your own. A command becomes your tool only when your fingers can type it without thinking.
 
-<!-- toc:begin -->
-## Series TOC
+## Answering the Opening Questions
 
-- [What is Git? Version Control Fundamentals](./01-what-is-git.md)
-- [Your First Commit: init, add, commit](./02-first-commit.md)
-- [Inspecting Changes: status, diff, log](./03-status-diff-log.md)
-- [Understanding Branches: Diverging and Switching](./04-branch-basics.md)
-- [Merging Branches and Resolving Conflicts](./05-merge-and-conflict.md)
-- [Creating a GitHub Repository: remote, push, pull](./06-github-repository.md)
-- [Collaborating with Pull Requests](./07-pull-request.md)
-- [Tracking Work with Issues and Projects](./08-issue-and-project.md)
-- [Writing Good Commit Messages](./09-good-commit-message.md)
-- **Building a Real-World Git Workflow (current)**
+- **How the commands from Episodes 1–9 fit together as one realistic workflow?**
+  - The article treats Building a real-world Git workflow: from issue to release in one cycle as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to walk a single change through issue, branch, commit, PR, review, merge, tag, and close?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which recovery commands to reach for when something goes wrong mid-flow?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Git & GitHub 101 (1/10): What is Git? Version control fundamentals](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): Your first commit - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (3/10): Reading change history - status, diff, log](./03-status-diff-log.md)
+- [Git & GitHub 101 (4/10): Branch basics - create, switch, and compare](./04-branch-basics.md)
+- [Git & GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together](./05-merge-and-conflict.md)
+- [Git & GitHub 101 (6/10): Creating a GitHub repository - remote, push, and pull in one go](./06-github-repository.md)
+- [Git & GitHub 101 (7/10): Collaborating with Pull Requests - From Branch to Review to Main](./07-pull-request.md)
+- [Git & GitHub 101 (8/10): Tracking Work with Issues and Projects - How GitHub Records What's Next](./08-issue-and-project.md)
+- [Git & GitHub 101 (9/10): Writing Good Commit Messages: Conventional Commits and Useful Bodies](./09-good-commit-message.md)
+- **Building a real-world Git workflow: from issue to release in one cycle (current)**
+
 <!-- toc:end -->
 
 ## References
 
-- GitHub Docs, "GitHub flow": <https://docs.github.com/en/get-started/using-github/github-flow>
-- Semantic Versioning 2.0.0: <https://semver.org/spec/v2.0.0.html>
-- Git docs, `git tag`: <https://git-scm.com/docs/git-tag>
-- Git docs, `git push --force-with-lease`: <https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-lease>
-- Git docs, `git revert -m`: <https://git-scm.com/docs/git-revert>
-- GitHub Docs, "About protected branches": <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches>
-- GitHub Docs, "About code owners": <https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-security/customizing-your-repository/about-code-owners>
+- [GitHub Docs — GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow) — The official end-to-end description of the issue → branch → PR → merge → branch cleanup loop this chapter teaches.
+- [GitHub Docs — About merge methods on GitHub](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github) — The direct reference for choosing between squash, merge-commit, and rebase-merge workflows.
+- [git-push manual](https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-lease) — Explains why `--force-with-lease` is safer than plain `--force` in the recovery section.
+- [git-tag manual](https://git-scm.com/docs/git-tag) — The canonical reference for creating and publishing annotated release tags.
+- [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html) — Defines the `MAJOR.MINOR.PATCH` rules the release-tag examples rely on.
+- [GitHub Docs — About protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches) — Covers the branch-protection guardrails behind no-direct-push, review, and status-check requirements.

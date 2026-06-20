@@ -1,5 +1,5 @@
 ---
-title: Multi-Agent Systems
+title: "AI Agent 101 (6/10): Multi-Agent Systems"
 series: ai-agent-101
 episode: 6
 language: en
@@ -15,32 +15,28 @@ tags:
 - Multi-Agent
 - Coordination
 - Delegation
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-15'
 seo_description: Sometimes it's difficult to handle all tasks with a single agent.
   This happens when tasks span multiple domains, require different expertise at each…
 ---
 
-# Multi-Agent Systems
-
-> AI Agent 101 Series (6/10)
+# AI Agent 101 (6/10): Multi-Agent Systems
 
 Sometimes it's difficult to handle all tasks with a single agent. This happens when tasks span multiple domains, require different expertise at each step, or need parallel processing. In such cases, coordinating multiple agents creates a multi-agent system.
 
 The core of multi-agent systems is coordination and delegation. Patterns include the Orchestrator pattern where one agent coordinates everything, the Peer-to-Peer pattern where multiple agents cooperate as equals, and the Hierarchical pattern that divides work hierarchically.
 
-This article covers multi-agent patterns, inter-agent communication protocols, delegation strategies, and when to use multi-agent systems.
+This is post 6 in the AI Agent 101 series. Here we cover multi-agent patterns, inter-agent communication protocols, delegation strategies, and when to use multi-agent systems.
 
----
-<!-- a-grade-intro:begin -->
+![Multi-Agent Patterns](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/06/06-01-multi-agent-patterns.en.png)
+*Multi-Agent Patterns*
+> You need multiple agents not when you want more agents, but when responsibilities conflict inside one agent.
 
-## Key Questions
+## Questions to Keep in Mind
 
-- How do you tell a single-agent task from a real multi-agent task?
-- What do Supervisor, Hierarchical, and Swarm patterns actually look like?
-- What is the most common failure mode in agent-to-agent protocols?
-- Which delegation mistakes blow up cost the fastest?
-
-<!-- a-grade-intro:end -->
+- Where is the line between a task that fits one agent and a task that needs multiple agents?
+- What responsibilities should the supervisor, workers, and handoff contract each own?
+- How do cost and failure points grow as you split work across more agents?
 
 ## Multi-Agent Patterns
 
@@ -65,7 +61,7 @@ class WorkerAgent:
     def execute(self, task: str) -> str:
         """Execute a task."""
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": f"You are a {self.role}."},
                 {"role": "user", "content": task}
@@ -105,7 +101,7 @@ Respond in JSON format:
 ]
 """
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
         )
@@ -181,7 +177,7 @@ Message from {sender.name}: {message}
 Respond appropriately. If you need help from another peer, mention it."""
 
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7
         )
@@ -221,7 +217,7 @@ Respond appropriately. If you need help from another peer, mention it."""
     def _handle_alone(self, task: str) -> str:
         """Handle the task alone."""
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": f"You are {self.name}, a {self.role}."},
                 {"role": "user", "content": task}
@@ -301,7 +297,7 @@ Child agents:
 Respond with one subtask per line, in the same order as the child agents."""
 
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
         )
@@ -314,7 +310,7 @@ Respond with one subtask per line, in the same order as the child agents."""
     def _do_work(self, task: str) -> str:
         """Execute the task directly (leaf nodes)."""
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": f"You are {self.name}, a {self.role}."},
                 {"role": "user", "content": task}
@@ -336,7 +332,7 @@ Subtask results:
 Synthesize the results into a coherent final answer."""
 
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.5
         )
@@ -451,7 +447,8 @@ A central broker handles message routing. Senders only send messages to the brok
 
 ```python
 from collections import defaultdict, deque
-from typing import Callable, Dict, List
+from collections.abc import Callable
+from typing import Dict, List
 import threading
 
 class MessageBroker:
@@ -1016,32 +1013,34 @@ Handling individual agent failures explicitly increases system reliability.
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **Where is the line between a task that fits one agent and a task that needs multiple agents?**
+  - Consider multiple agents when domains, tools, success criteria, or task ownership are distinct enough that one prompt and state contract become overloaded.
+- **What responsibilities should the supervisor, workers, and handoff contract each own?**
+  - The supervisor owns routing and stopping decisions, workers own assigned execution, and the handoff contract owns the input and output shape passed between them.
+- **How do cost and failure points grow as you split work across more agents?**
+  - More agents add LLM calls, handoff gaps, state mismatches, and supervisor bottlenecks. Split only when role separation pays for that overhead.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- [Context Engineering](./02-context-engineering.md)
-- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
-- [Agent Workflow Design](./04-agent-workflow-design.md)
-- [Memory and State](./05-memory-and-state.md)
-- **Multi-Agent Systems (current)**
-- Agent Evaluation (upcoming)
-- Error Handling and Reliability (upcoming)
-- Production Operations (upcoming)
-- Building Your First Agent (upcoming)
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): Context Engineering](./02-context-engineering.md)
+- [AI Agent 101 (3/10): Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- [AI Agent 101 (4/10): Agent Workflow Design](./04-agent-workflow-design.md)
+- [AI Agent 101 (5/10): Memory and State](./05-memory-and-state.md)
+- **AI Agent 101 (6/10): Multi-Agent Systems (current)**
+- AI Agent 101 (7/10): Agent Evaluation (upcoming)
+- AI Agent 101 (8/10): Error Handling and Reliability (upcoming)
+- AI Agent 101 (9/10): Production Operations (upcoming)
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 
 ## References
 
-1. **AutoGPT Multi-Agent Architecture** - https://github.com/Significant-Gravitas/AutoGPT  
-   An autonomous system that demonstrates cooperation among multiple agents. Showcases the Orchestrator and Worker patterns.
-
-2. **LangGraph Multi-Agent Systems** - https://langchain-ai.github.io/langgraph/tutorials/multi_agent/  
-   LangGraph's multi-agent tutorial. Covers message routing and shared state.
-
-3. **CrewAI Documentation** - https://docs.crewai.com/  
-   A role-based multi-agent framework. Explains agent collaboration patterns and delegation strategies.
-
-4. **Microsoft Semantic Kernel: Agent Orchestration** - https://learn.microsoft.com/en-us/semantic-kernel/agents/  
-   Microsoft's guide to agent orchestration. Presents how to design hierarchical agent systems.
+- [Anthropic - Building effective agents](https://www.anthropic.com/research/building-effective-agents)
+- [LangGraph multi-agent workflows](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/)
+- [CrewAI documentation](https://docs.crewai.com/)
+- [Semantic Kernel agents overview](https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/)

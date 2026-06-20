@@ -1,10 +1,10 @@
 ---
 series: information-security-101
 episode: 7
-title: Secret Management
+title: "Information Security 101 (7/10): Secret Management"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,26 @@ seo_description: A short, code-first guide to managing secrets with environment 
 last_reviewed: '2026-05-04'
 ---
 
-# Secret Management
+# Information Security 101 (7/10): Secret Management
 
 > Information Security 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: What do we lose the moment a secret enters source code?
 
 > Secret management is not about where you put them; it is about how you rotate them.
 
-<!-- a-grade-intro:end -->
+This is post 7 in the Information Security 101 series.
+
+
+![information security 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/07/07-01-big-picture.en.png)
+*information security 101 chapter 7 flow overview*
+> Secret management is not just storing encrypted keys. It is tracking who accessed what secret when, detecting abnormal access patterns, and proving that no key was exposed during its lifetime.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Secret Management?
+- Which signal should the example or diagram make visible for Secret Management?
+- What failure should be prevented first when Secret Management reaches a real system?
 
 ## What You Will Learn
 
@@ -46,8 +55,6 @@ last_reviewed: '2026-05-04'
 More than half of large incidents start with leaked secrets. A leaked secret without rotation is a permanent risk.
 
 > Secrets are liabilities, not assets — keep their lifetime short.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -188,17 +195,29 @@ Kubernetes uses `Secret` plus External Secrets Operator (ESO) to sync from vault
 
 Secret management is about lifetime, not location. Next we look at what the holder of a secret should be allowed to do — least privilege.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Secret Management?**
+  - The article treats Secret Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Secret Management?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Secret Management reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Information Security?](./01-what-is-information-security.md)
-- [Authentication and Authorization](./02-authentication-and-authorization.md)
-- [Cryptography and Hashes](./03-cryptography-and-hash.md)
-- [TLS and Certificates](./04-tls-and-certificates.md)
-- [Web Security Basics](./05-web-security-basics.md)
-- [SQL Injection and XSS](./06-sql-injection-and-xss.md)
+## In this series
+
+- [Information Security 101 (1/10): What Is Information Security?](./01-what-is-information-security.md)
+- [Information Security 101 (2/10): Authentication and Authorization](./02-authentication-and-authorization.md)
+- [Information Security 101 (3/10): Cryptography and Hashing](./03-cryptography-and-hash.md)
+- [Information Security 101 (4/10): TLS and Certificates](./04-tls-and-certificates.md)
+- [Information Security 101 (5/10): Web Security Basics](./05-web-security-basics.md)
+- [Information Security 101 (6/10): SQL Injection and XSS](./06-sql-injection-and-xss.md)
 - **Secret Management (current)**
 - Least Privilege (upcoming)
 - Logging and Audit (upcoming)
 - Incident Response (upcoming)
+
 <!-- toc:end -->
 
 ## References

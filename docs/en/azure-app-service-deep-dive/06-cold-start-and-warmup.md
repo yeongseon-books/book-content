@@ -1,11 +1,11 @@
 ---
-title: Cold start and warmup — why the first request is expensive
+title: "Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive"
 series: azure-app-service-deep-dive
 episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,12 +14,15 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-04-29'
-seo_description: Microsoft doesn't publicly document the full implementation details
-  of the App Service Front-End, Worker, and File Server layers.
+last_reviewed: '2026-05-15'
+seo_description: Reduce App Service first-request latency by separating Always On, warm-up readiness, health checks, and slot warm-up.
 ---
 
-# Cold start and warmup — why the first request is expensive
+# Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive
+
+The first slow request is usually not “just latency.” It is the visible cost of turning an idle, recycled, or newly allocated execution path into something that can safely take real traffic.
+
+This is the final post in the Azure App Service Deep Dive series.
 
 ## Source Version
 
@@ -42,21 +45,17 @@ Cold start is not a vague symptom.
 It means there is no warm execution unit ready yet,
 or the new process or container has not finished becoming traffic-eligible.
 
----
+![azure app service deep dive chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.en.png)
+*azure app service deep dive chapter 6 flow overview*
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What sequence of steps actually adds up to cold-start on App Service?
 - How much does Always On reduce cold-start, and when does it not help at all?
 - What must a warm-up ping hit to be meaningful, and what would give false confidence?
-- Per runtime (.NET, Node, Python), where does the dominant cold-start cost live?
-- How do you express cold-start latency in an SLO — mean or p99?
 
 ## The cold path and the warm path
 
-![First request waiting for a ready worker](../../assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.en.png)
-
-*First request waiting for a ready worker*
 That one diagram is the whole story.
 The cost the user feels on the first request is usually the cost of turning an execution unit from “not ready” into “ready.”
 
@@ -78,7 +77,7 @@ The mechanisms are not.
 - the platform can repeatedly call `WEBSITE_WARMUP_PATH`
 - startup timeout is shaped by `WEBSITES_CONTAINER_START_TIME_LIMIT`
 
-![Linux warm-up path and startup limit](../../assets/azure-app-service-deep-dive/06/06-02-linux-apps.en.png)
+![Linux warm-up path and startup limit](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-02-linux-apps.en.png)
 
 *Linux warm-up path and startup limit*
 You need that split in your head before you design a warm-up strategy.
@@ -97,7 +96,7 @@ that means:
 - app-pool unload or equivalent idle behavior becomes less visible
 - worst-case first-request latency often improves
 
-![Periodic pings reducing idle coldness](../../assets/azure-app-service-deep-dive/06/06-03-what-always-on-really-does.en.png)
+![Periodic pings reducing idle coldness](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-03-what-always-on-really-does.en.png)
 
 *Periodic pings reducing idle coldness*
 Always On does not erase all startup cost.
@@ -120,7 +119,7 @@ Examples include:
 
 That is where IIS `applicationInitialization` matters.
 
-![Extra warm-up path beyond the root ping](../../assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.en.png)
+![Extra warm-up path beyond the root ping](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.en.png)
 
 *Extra warm-up path beyond the root ping*
 Endpoint design matters here.
@@ -138,7 +137,7 @@ The App Service app-settings reference gives the critical Linux startup contract
 - `WEBSITE_WARMUP_STATUSES` can narrow accepted status codes
 - `WEBSITES_CONTAINER_START_TIME_LIMIT` bounds how long the platform waits
 
-![Warm-up responses and startup timeout contract](../../assets/azure-app-service-deep-dive/06/06-05-linux-warm-up-path-and-startup-timeout.en.png)
+![Warm-up responses and startup timeout contract](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-05-linux-warm-up-path-and-startup-timeout.en.png)
 
 *Warm-up responses and startup timeout contract*
 That model creates two very common Linux mistakes.
@@ -159,7 +158,7 @@ The first-request cost is usually a stack of smaller costs.
 - cache, module import, or JIT work
 - health and warm-up eligibility gates
 
-![Costs stacked inside a cold start](../../assets/azure-app-service-deep-dive/06/06-06-what-makes-cold-start-expensive.en.png)
+![Costs stacked inside a cold start](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-06-what-makes-cold-start-expensive.en.png)
 
 *Costs stacked inside a cold start*
 That is why cold-start reduction is rarely a single magic setting.
@@ -192,7 +191,7 @@ you usually get one of two bad outcomes.
 
 Slots let the platform pay the cold-start cost off the production URL.
 
-![Traffic switching after staging warm-up completes](../../assets/azure-app-service-deep-dive/06/06-07-why-deployment-slots-help-so-much.en.png)
+![Traffic switching after staging warm-up completes](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-07-why-deployment-slots-help-so-much.en.png)
 
 *Traffic switching after staging warm-up completes*
 That is the value proposition in one line.
@@ -212,7 +211,7 @@ They do not do the same work.
 - **warm-up path**: decide readiness during startup
 - **health check**: decide whether the instance should keep receiving traffic
 
-![Different roles of Always On, warm-up, and health](../../assets/azure-app-service-deep-dive/06/06-08-always-on-warm-up-and-health-are-not-the.en.png)
+![Different roles of Always On, warm-up, and health](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-08-always-on-warm-up-and-health-are-not-the.en.png)
 
 *Different roles of Always On, warm-up, and health*
 If you blur them together,
@@ -273,15 +272,24 @@ done | sort -k2 -n | tail -10
 - [ ] Pinned p99 cold-start in the SLO document
 - [ ] Load-tested the scenario where scale-out exposes cold-start to users
 
+## Answering the Opening Questions
+
+- **What sequence of steps actually adds up to cold-start on App Service?**
+  - The article treats Cold start and warmup — why the first request is expensive as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How much does Always On reduce cold-start, and when does it not help at all?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What must a warm-up ping hit to be meaningful, and what would give false confidence?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
-- [Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
-- [Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
-- [Deployment and Kudu — build, sync, release from the inside](./04-deployment-and-kudu.md)
-- [Scaling internals — how Scale Out decisions become new workers](./05-scaling-internals.md)
-- **Cold start and warmup — why the first request is expensive (current)**
+- [Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
+- [Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
+- [Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
+- [Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside](./04-deployment-and-kudu.md)
+- [Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers](./05-scaling-internals.md)
+- **Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive (current)**
 
 <!-- toc:end -->
 

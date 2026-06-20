@@ -1,10 +1,10 @@
 ---
 series: backend-development-101
 episode: 2
-title: Building an HTTP Server
-status: content-ready
+title: "Backend Development 101 (2/10): Building an HTTP Server"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,46 +17,30 @@ tags:
   - FastAPI
   - Networking
 seo_description: Build an HTTP server from a raw socket up to FastAPI to truly understand requests, responses, status codes, and headers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Building an HTTP Server
+# Backend Development 101 (2/10): Building an HTTP Server
 
-> Backend Development 101 series (2/10)
+After using frameworks for a while, it is easy to forget what an HTTP server is actually doing. The moment a response gets truncated, a header disappears, or behavior changes behind a proxy, you have to go back down to raw requests and responses.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Backend Development 101 series. Here, we start from the fact that HTTP is text over a socket and use both a raw socket server and FastAPI to rebuild that mental model from the bottom up.
 
-**Core question**: What does an HTTP server *actually do* under the hood?
 
-> It reads text from a TCP socket, parses it as a request, and writes text back. An HTTP server is a *read-and-write* program.
+![backend development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 2 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The actual shape of an HTTP request and response
-- How HTTP rides on top of TCP
-- The meaning of status codes and headers
-- How to build a real server with FastAPI
-- How to run a raw-socket server and watch the traffic
+- The actual shape of an HTTP request and response?
+- How HTTP rides on top of TCP?
+- The meaning of status codes and headers?
 
 ## Why It Matters
 
 Once you have *seen* what frameworks hide, every future debugging session gets faster. Without it, you guess at why a status code looks wrong or why a header is missing.
 
 > Frameworks are convenient, but seniors know what is *behind* the framework.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Client["Client"] -->|"GET / HTTP/1.1"| Sock["TCP socket"]
-    Sock --> Parser["Parser"]
-    Parser --> App["Handler"]
-    App --> Resp["Response builder"]
-    Resp --> Sock2["TCP socket"]
-    Sock2 -->|"HTTP/1.1 200 OK"| Client
-```
 
 Both request and response are just *blocks of text*.
 
@@ -158,6 +142,18 @@ curl -i http://127.0.0.1:9000/
 
 `-i` shows the *headers and status line* alongside the body.
 
+## Verification points
+
+**Expected output:** the raw socket server should print the incoming request text in the terminal, and the browser or `curl -i` should show `HTTP/1.1 200 OK` plus `hello`.
+
+### First failure modes to check
+
+- If the browser hangs, inspect `Content-Length` and whether the connection gets closed.
+- If the response parses oddly, confirm the line endings are `
+` rather than plain `
+`.
+- If the FastAPI example does not boot, re-check the import path in `uvicorn 2_fastapi:app --port 9000`.
+
 ## What to Notice in This Code
 
 - Without `Content-Length`, the client cannot know where the body ends.
@@ -202,8 +198,19 @@ In production, FastAPI handles the socket plumbing for you. But when an outage h
 
 An HTTP server is a *text-protocol program*. Next, we add the layer that decides *which function handles which path* — the router.
 
+## Answering the Opening Questions
+
+- **The actual shape of an HTTP request and response?**
+  - The article treats Building an HTTP Server as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How HTTP rides on top of TCP?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The meaning of status codes and headers?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Backend Development?](./01-what-is-backend-development.md)
+## In this series
+
+- [Backend Development 101 (1/10): What Is Backend Development?](./01-what-is-backend-development.md)
 - **Building an HTTP Server (current)**
 - Routing and Controllers (upcoming)
 - The Service Layer (upcoming)
@@ -213,11 +220,17 @@ An HTTP server is a *text-protocol program*. Next, we add the layer that decides
 - Testing the Backend (upcoming)
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+### Official Docs
+
 - [HTTP messages (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages)
 - [HTTP status codes (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
 - [FastAPI responses](https://fastapi.tiangolo.com/advanced/response-directly/)
+
+### Further Reading
+
 - [curl manual](https://curl.se/docs/manual.html)

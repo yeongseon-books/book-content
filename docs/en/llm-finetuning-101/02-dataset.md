@@ -1,11 +1,11 @@
 ---
-title: Dataset Preparation and Preprocessing
+title: "LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing"
 series: llm-finetuning-101
 episode: 2
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -17,25 +17,23 @@ tags:
 - HuggingFace
 - Python
 last_reviewed: '2026-05-01'
-seo_description: 'Treat the dataset as three layers:'
+seo_description: Learn how to preprocess LLM datasets by breaking them into raw samples, templated text, and tokenized tensors to ensure consistent fine-tuning.
 ---
 
-# Dataset Preparation and Preprocessing
+# LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing
 
-## Questions this post answers
+Dataset work fails less often because of size than because of shape. This article breaks the problem into raw samples, templated text, and tokenized tensors so you can verify each layer before training starts.
 
-![Questions this post answers](../../assets/llm-finetuning-101/02/02-01-questions-this-post-answers.en.png)
+This is the second post in the LLM Fine-tuning 101 series.
 
-*Questions this post answers*
+![LLM Fine-tuning 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png)
+*LLM Fine-tuning 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
 
 - How should we shape the three fields instruction / input / output?
 - How do we read a small JSONL file directly with Hugging Face datasets?
 - What minimum verification points must we hit during preprocessing?
-- Where should the prompt/response boundary live so training stays stable?
-
-> A good fine-tuning dataset is not a pile of sentences but a **request-response contract** the model is asked to imitate, repeatedly.
-
-Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/02-dataset)
 
 ## Why this matters
 
@@ -47,7 +45,7 @@ Nailing the format in post 2 means the same template flows untouched into the tr
 
 Treat the dataset as three layers:
 
-```
+```text
 ┌───────────────────────────────┐
 │ Layer 1: Raw samples (JSONL)  │  ← humans read and review here
 ├───────────────────────────────┤
@@ -79,7 +77,7 @@ Separating the three layers lets you diagnose "filtering problems," "token lengt
 
 **After** — Every sample passes through the same instruction template and becomes one string:
 
-```
+```text
 ### Instruction:
 Explain two ways to reverse a Python list.
 
@@ -94,13 +92,9 @@ The prompt prefix (everything up to `### Response:`) is masked to -100; only the
 
 ## What to fix first about the dataset
 
-![Three layers of dataset preparation](../../assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png)
-
-*Three layers of dataset preparation*
-
 Fine-tuning data is usually three layers: **raw samples**, **template-applied text**, and **tokenized tensors**. Separating them is what lets you isolate filtering issues from token-length issues.
 
-![Three layers of dataset preparation](../../assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.en.png)
+![Three layers of dataset preparation](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.en.png)
 
 *Three layers of dataset preparation*
 
@@ -176,7 +170,7 @@ print(len(tokenized[0]["input_ids"]))   # 64
 
 ## What to notice in this code
 
-![Format checking and length verification flow](../../assets/llm-finetuning-101/02/02-03-what-to-notice-in-this-code.en.png)
+![Format checking and length verification flow](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-03-what-to-notice-in-this-code.en.png)
 
 *Format checking and length verification flow*
 
@@ -187,7 +181,7 @@ print(len(tokenized[0]["input_ids"]))   # 64
 
 ## Common mistakes
 
-![Deduplication and split decision flow](../../assets/llm-finetuning-101/02/02-04-where-engineers-get-confused.en.png)
+![Deduplication and split decision flow](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-04-where-engineers-get-confused.en.png)
 
 *Deduplication and split decision flow*
 
@@ -226,15 +220,24 @@ The point of dataset preparation is to make the input/output boundary the model 
 
 Post 3 moves on to LoRA adapter configuration. We dissect `LoraConfig`'s `r`, `alpha`, `target_modules`, and `dropout` line by line and see how each one shows up in training behavior.
 
+## Answering the Opening Questions
+
+- **How should we shape the three fields instruction / input / output?**
+  - The article treats Dataset Preparation and Preprocessing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do we read a small JSONL file directly with Hugging Face datasets?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What minimum verification points must we hit during preprocessing?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LLM Fine-tuning Primer](./01-intro.md)
-- **Dataset Preparation and Preprocessing (current)**
-- Configuring LoRA Adapters (upcoming)
-- Training Loop and Hyperparameters (upcoming)
-- Model Evaluation (upcoming)
-- Model Serving (upcoming)
+- [LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer](./01-intro.md)
+- **LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing (current)**
+- LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters (upcoming)
+- LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters (upcoming)
+- LLM Fine-tuning 101 (5/6): Model Evaluation (upcoming)
+- LLM Fine-tuning 101 (6/6): Model Serving (upcoming)
 
 <!-- toc:end -->
 

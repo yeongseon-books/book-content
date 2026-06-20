@@ -1,10 +1,10 @@
 ---
 series: model-evaluation-101
 episode: 7
-title: Calibration
-status: content-ready
+title: "Model Evaluation 101 (7/10): Calibration"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,30 @@ tags:
   - Reliability
   - scikit-learn
 seo_description: How to make model probabilities trustworthy with reliability diagrams, Brier score, and Platt or isotonic calibration in code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Calibration
+# Model Evaluation 101 (7/10): Calibration
 
-> Model Evaluation 101 series (7/10)
+When a model predicts 0.8, most teams instinctively read that as "about an 80% chance." That interpretation only holds if the model is calibrated. Without that check, the score may still be useful for ranking while being misleading as a probability.
 
-<!-- a-grade-intro:begin -->
+This matters most when probabilities flow directly into pricing, prioritization, or expected-value calculations. A model can have strong AUC and still overstate or understate risk badly enough to damage downstream decisions.
 
-**Core question**: When a model says "80% confident," is it actually right 80% of the time?
+This is post 7 in the Model Evaluation 101 series. In this post, we separate ranking quality from probability quality and walk through reliability curves, Brier score, and post-fit calibration.
 
-> *Calibration measures how well predicted probabilities match observed frequencies. It is a different axis from threshold tuning.*
 
-<!-- a-grade-intro:end -->
+![model evaluation 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 7 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The definition and purpose of calibration
-- How to read a reliability diagram
-- The meaning of Brier score
-- Platt scaling and isotonic regression
-- Five common pitfalls
+- The definition and purpose of calibration?
+- How to read a reliability diagram?
+- The meaning of Brier score?
 
 ## Why It Matters
 
 Systems that multiply probabilities by costs to make decisions need calibration more than AUC.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Raw["raw score"] --> Bin["bin by predicted probability"]
-    Bin --> Freq["empirical frequency per bin"]
-    Freq --> Reli["reliability curve"]
-    Raw --> Calib["Platt / Isotonic"]
-```
 
 ## Key Terms
 
@@ -113,6 +101,8 @@ iso = CalibratedClassifierCV(rf, method="isotonic", cv=5).fit(Xtr, ytr)
 print("brier (isotonic):", brier_score_loss(yte, iso.predict_proba(Xte)[:, 1]))
 ```
 
+**Expected output:** You should see raw probabilities drift away from observed frequencies, then compare whether sigmoid or isotonic calibration improves the Brier score without changing the ranking story very much.
+
 ## What to Notice in This Code
 
 - Raw RF probabilities tend to be over- or under-confident.
@@ -156,17 +146,29 @@ Expected-value bidding (ads, insurance) ties calibrated probabilities directly t
 
 Calibration is the truth of the probability itself. Next, cross validation tackles the variance of evaluation.
 
+## Answering the Opening Questions
+
+- **The definition and purpose of calibration?**
+  - The article treats Calibration as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to read a reliability diagram?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The meaning of Brier score?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
-- [Train, Validation, and Test](./02-train-val-test.md)
-- [The Limits of Accuracy](./03-limits-of-accuracy.md)
-- [Precision and Recall](./04-precision-and-recall.md)
-- [F1 Score](./05-f1-score.md)
-- [ROC and AUC](./06-roc-and-auc.md)
+## In this series
+
+- [Model Evaluation 101 (1/10): Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): Train, Validation, and Test](./02-train-val-test.md)
+- [Model Evaluation 101 (3/10): The Limits of Accuracy](./03-limits-of-accuracy.md)
+- [Model Evaluation 101 (4/10): Precision and Recall](./04-precision-and-recall.md)
+- [Model Evaluation 101 (5/10): F1 Score](./05-f1-score.md)
+- [Model Evaluation 101 (6/10): ROC and AUC](./06-roc-and-auc.md)
 - **Calibration (current)**
 - Cross Validation (upcoming)
 - Error Analysis (upcoming)
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References

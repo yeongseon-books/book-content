@@ -1,12 +1,12 @@
 ---
 series: software-design-101
 episode: 4
-title: 의존성 방향
+title: "Software Design 101 (4/10): 의존성 방향"
 status: content-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -18,35 +18,48 @@ tags:
   - Inversion
   - Architecture
 seo_description: 의존성의 방향을 통제해 변경 비용을 낮추는 방법, DIP와 포트/어댑터를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# 의존성 방향
+# Software Design 101 (4/10): 의존성 방향
 
-> Software Design 101 시리즈 (4/10)
+도메인 규칙을 고치려는데 데이터베이스 드라이버와 외부 SDK까지 함께 따라오면 변경 비용은 빠르게 커집니다. 모듈 사이 연결 자체보다 더 중요한 것은 그 화살표가 어디를 향하느냐입니다.
 
+여기서는 의존성이 결합도와 어떻게 이어지는지, 안정적인 모듈과 변동이 큰 모듈은 어떻게 구분하는지, DIP와 포트·어댑터 패턴이 왜 실무에서 자주 쓰이는지 정리합니다. 설계에서 “방향”이 왜 자유를 사는 문제인지도 함께 보겠습니다.
 
-## 이 글에서 다룰 문제
+![Software Design 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.ko.png)
+*Software Design 101 4장 흐름 개요*
 
-코드는 결국 그래프입니다. 어디로 화살표가 향하느냐에 따라 한쪽 변경이 다른 쪽으로 새는지가 결정됩니다.
+## 먼저 던지는 질문
 
-> 안정적인 것이 불안정한 것을 향해서는 안 된다.
+- 의존성 방향은 왜 변경 비용을 크게 좌우할까요?
+- 안정적인 모듈과 변동이 큰 모듈은 어떻게 구분할까요?
+- 도메인이 세부 구현을 모르게 만드는 방법은 무엇일까요?
 
-## 전체 흐름
-```mermaid
-flowchart LR
-    D["Domain (stable)"] --> P["Port (interface)"]
-    A["Adapter (volatile)"] -- implements --> P
-```
+## 왜 중요한가
 
-세부가 핵심을 향한다.
+코드는 결국 그래프입니다. 한 모듈이 다른 모듈을 import하거나 호출하면 둘 사이에는 화살표가 생깁니다. 그 화살표가 불안정한 세부를 향하면 작은 변경도 핵심 규칙으로 쉽게 번집니다.
 
-## Before/After
+데이터베이스, HTTP 클라이언트, 외부 SaaS는 자주 바뀌는 편입니다. 반대로 도메인 규칙은 비교적 오래 유지됩니다. 그래서 안정적인 것과 변동이 큰 것을 같은 방향으로 묶어 두면, 덜 바뀌어야 할 코드가 더 자주 흔들립니다.
 
-**Before**
+## 전체 그림
+
+핵심 아이디어는 간단합니다. 세부 구현이 코어를 향하게 하고, 코어는 자신이 필요한 모양만 추상으로 선언합니다. 그러면 구현 교체가 코어를 직접 흔들지 않습니다.
+
+## 기본 용어
+
+- <strong>의존성</strong>: A가 B를 import하거나 호출하면 A는 B에 의존합니다.
+- <strong>안정적인 모듈</strong>: 자주 바뀌지 않는 모듈입니다. 대개 더 추상적인 쪽입니다.
+- <strong>변동이 큰 모듈</strong>: DB, HTTP, 외부 SaaS처럼 변경 가능성이 큰 모듈입니다.
+- <strong>DIP</strong>: 코어는 구체 구현이 아니라 추상에 의존하고, 세부 구현이 그 추상을 따르는 원칙입니다.
+- <strong>포트 / 어댑터</strong>: 코어가 인터페이스를 정의하고, 외부 어댑터가 그것을 구현하는 구조입니다.
+
+## 변경 전과 변경 후
+
+**변경 전**
 
 ```python
-# domain이 직접 DB를 안다
+# domain이 DB를 직접 알고 있음
 import psycopg2
 
 def charge(user_id, amount):
@@ -54,10 +67,10 @@ def charge(user_id, amount):
     conn.execute("UPDATE wallet SET ...")
 ```
 
-**After**
+**변경 후**
 
 ```python
-# domain은 추상만 안다
+# domain은 abstraction만 알고 있음
 class WalletRepo:
     def debit(self, user_id, amount): ...
 
@@ -65,21 +78,21 @@ def charge(repo: WalletRepo, user_id, amount):
     repo.debit(user_id, amount)
 ```
 
-DB 교체가 도메인을 흔들지 않는다.
+이 구조에서는 데이터베이스 구현이 바뀌어도 도메인 함수 `charge`는 거의 손대지 않아도 됩니다. 변경의 충격이 어댑터 쪽에 머물 가능성이 커집니다.
 
-## 의존성 방향을 바로잡는 5단계
+## 의존성 방향을 바로잡는 다섯 단계
 
-### 1단계 — 화살표 그려 보기
+### 1단계 — 화살표를 그린다
 
 ```python
 # 1_arrows.py
-# 어떤 모듈이 어떤 모듈을 import하는지 종이에 그려 본다.
-# 핵심이 세부를 import하면 빨간 신호.
+# 종이에 어떤 모듈이 어떤 모듈을 import하는지 그려보세요.
+# core가 detail을 import하면 위험 신호입니다.
 ```
 
-먼저 보이게 만들어야 고칠 수 있습니다.
+눈에 보이지 않는 구조는 고치기 어렵습니다. 종이나 화이트보드에 import 방향만 그려도 설계 문제가 금방 드러납니다.
 
-### 2단계 — 핵심에서 추상 정의
+### 2단계 — 코어에서 추상을 정의한다
 
 ```python
 # 2_port.py
@@ -89,21 +102,21 @@ class WalletRepo(Protocol):
     def debit(self, user_id: str, amount: int) -> None: ...
 ```
 
-핵심이 필요한 모양을 직접 선언합니다.
+중요한 점은 추상이 인프라 폴더가 아니라 코어 쪽에 놓여야 한다는 사실입니다. 코어가 필요한 모양을 직접 말해야 방향이 유지됩니다.
 
-### 3단계 — 어댑터에서 구현
+### 3단계 — 어댑터에서 구현한다
 
 ```python
 # 3_adapter.py
 class PostgresWalletRepo:
     def debit(self, user_id, amount):
-        # SQL 구체 구현
+        # 구체적인 SQL 구현
         ...
 ```
 
-세부가 추상에 맞춥니다 — 반대가 아닙니다.
+세부 구현은 추상에 맞춰집니다. 반대로 추상이 구현 세부에 끌려가면 의존성은 다시 뒤집힙니다.
 
-### 4단계 — 조립은 가장자리에서
+### 4단계 — 조립은 가장자리에서 한다
 
 ```python
 # 4_compose.py
@@ -112,9 +125,9 @@ def main():
     charge(repo, "u-1", 1000)
 ```
 
-도메인은 어떤 구현이 들어올지 모릅니다.
+도메인은 어떤 구현이 들어왔는지 몰라야 합니다. 객체 조립은 `main` 같은 composition root에 몰아 두는 편이 좋습니다.
 
-### 5단계 — 테스트는 가짜로
+### 5단계 — 가짜 구현으로 검증한다
 
 ```python
 # 5_fake.py
@@ -128,42 +141,271 @@ def test_charge():
     assert repo.calls == [("u-1", 500)]
 ```
 
-DB 없이도 도메인을 검증할 수 있습니다.
+가짜 어댑터로 도메인을 검증할 수 있다면 방향이 잘 잡혔을 가능성이 높습니다. 이 단계에서 DB 연결이 필요하다면 코어와 세부가 너무 가깝게 붙어 있는 편입니다.
 
-## 이 코드에서 주목할 점
+## 빠르게 검증해 보기
 
-- 도메인이 외부 라이브러리에서 자유롭습니다.
-- 추상은 도메인 쪽에 있습니다 — 인프라가 아니라.
-- 조립은 가장자리(`main`, `composition root`)에서만 일어납니다.
+의존성 방향은 import 목록만 그려도 상당 부분 확인할 수 있습니다. 도메인 패키지에서 외부 DB 드라이버나 HTTP 클라이언트를 직접 import하는지 먼저 적어 보세요.
 
-## 자주 하는 실수 5가지
+```text
+domain -> typing, dataclasses
+domain -> psycopg2        # 위험 신호
+infra  -> domain          # 기대하는 방향
+```
 
-1. **인터페이스를 인프라 폴더에 둠.** 의존이 다시 뒤집힌다.
-2. **추상을 너무 잘게 자름.** 포트가 100개면 의미가 없다.
-3. **어댑터 안에 비즈니스 로직.** 도메인이 새 나간다.
-4. **조립을 도메인 안에서 함.** `new PostgresRepo()`가 도메인에 등장.
-5. **DIP를 모든 곳에 적용.** 정말 안정/불안정이 갈리는 경계에서만 쓴다.
+**Expected output:** 도메인에서 인프라 라이브러리로 가는 화살표가 보이면, 포트 위치나 구현 조립 위치를 다시 봐야 한다는 결론이 나옵니다.
 
-## 실무에서는 이렇게 쓰입니다
+이 확인은 테스트로도 이어집니다. 가짜 저장소로 도메인 테스트가 가능하면 방향이 맞을 가능성이 높습니다.
 
-결제, 알림, 외부 SaaS 연동에 DIP가 빛납니다. 벤더 교체나 모킹이 도메인을 건드리지 않고 끝납니다.
+## 실패 신호와 먼저 볼 것
+
+| 실패 신호 | 먼저 볼 것 |
+| --- | --- |
+| 도메인 테스트가 DB 없이는 못 돈다 | 도메인이 구체 저장소를 직접 아는지 확인합니다 |
+| 인터페이스가 인프라 폴더에 있다 | 필요를 누가 정의하는지 다시 봅니다 |
+| 포트 수가 지나치게 많다 | 안정적/변동 경계가 아닌 곳까지 역전했는지 점검합니다 |
+
+의존성 방향을 바로잡는 목적은 추상화를 늘리는 것이 아니라, 코어를 세부 구현 변경에서 보호하는 데 있습니다.
+
+## 이 코드에서 먼저 볼 점
+
+- 도메인 코드가 외부 라이브러리로부터 비교적 자유롭습니다.
+- 추상은 인프라가 아니라 도메인 쪽에 놓입니다.
+- 실제 구현 선택은 가장자리에서만 일어납니다.
+
+## 어디서 많이 헷갈릴까
+
+인터페이스를 만들어 두기만 하면 DIP가 적용됐다고 생각하기 쉽습니다. 하지만 그 인터페이스가 인프라 폴더에 있다면 방향은 여전히 인프라 중심일 수 있습니다. 추상은 누가 필요를 정의하는가와 함께 봐야 합니다.
+
+또 다른 실수는 모든 경계에 포트를 남발하는 것입니다. 안정적인 코어와 변동이 큰 세부가 만나는 곳에서는 유용하지만, 단순한 내부 헬퍼 함수까지 전부 역전시키면 구조가 과하게 무거워집니다. 실제로 바뀔 가능성이 높은 경계에서 먼저 쓰는 편이 낫습니다.
+
+## 실무에서는 이렇게 본다
+
+결제 게이트웨이, 알림 채널, 외부 SaaS 연동은 의존성 방향이 특히 중요합니다. 벤더를 교체하거나 테스트에서 가짜 구현을 써야 할 때, 도메인이 구체 구현을 모르고 있으면 변경은 훨씬 조용하게 끝납니다.
+
+코드 리뷰에서도 경고 신호는 분명합니다. 도메인이 ORM 모델을 import하는가, `new PostgresRepo()` 같은 구체 생성이 업무 로직 안에 들어왔는가, 포트 수가 실제 필요보다 과도한가를 먼저 봅니다.
 
 ## 체크리스트
 
-- [ ] 도메인이 인프라를 import하지 않는가?
-- [ ] 포트가 도메인 쪽에 정의돼 있는가?
-- [ ] 조립이 가장자리에 모여 있는가?
-- [ ] 가짜 구현으로 도메인을 테스트할 수 있는가?
-- [ ] 포트 수가 과하지 않은가?
+- [ ] 도메인이 인프라 라이브러리를 직접 import하지 않는가?
+- [ ] 포트가 도메인 쪽에 정의되어 있는가?
+- [ ] 구현 조립이 가장자리에 모여 있는가?
+- [ ] 가짜 어댑터로 도메인 테스트를 작성할 수 있는가?
+- [ ] 포트 수가 실제 경계 수에 비해 과하지 않은가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-방향을 잡으면 변경 비용이 줄어듭니다. 다음 글에서는 그 방향을 떠받치는 도구 — 인터페이스와 추상 — 를 봅니다.
+1. 현재 도메인이 직접 import하는 외부 모듈 하나를 골라 DIP 적용이 필요한지 판단해 보세요.
+2. 결제 모듈의 DB 호출을 포트와 어댑터로 분리해 보세요.
+3. 가짜 어댑터를 사용하는 도메인 단위 테스트를 하나 작성해 보세요.
+
+## 현업 적용 관점에서 다시 정리
+
+의존성 방향은 아키텍처의 중력 방향입니다. 핵심 규칙이 세부 구현을 바라보는 순간 테스트 비용이 커지고, 기술 교체가 사실상 불가능해집니다.
+
+## 의존 관계를 수치로 읽는 실전 점검
+
+설계 품질을 문장으로만 평가하면 팀마다 기준이 달라집니다. 그래서 실무에서는 결합도 지표를 함께 봅니다. 가장 단순한 시작점은 모듈 단위 `Ca(유입 의존성)`, `Ce(유출 의존성)`, `I=Ce/(Ca+Ce)` 입니다. 값이 정답을 보장하지는 않지만, 경계가 틀어진 지점을 빠르게 찾는 데 매우 유용합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class CouplingMetric:
+    module: str
+    ca: int  # 외부 모듈이 이 모듈에 의존하는 수
+    ce: int  # 이 모듈이 외부 모듈에 의존하는 수
+
+    @property
+    def instability(self) -> float:
+        total = self.ca + self.ce
+        return 0.0 if total == 0 else self.ce / total
+
+def report(metrics: list[CouplingMetric]) -> None:
+    for m in metrics:
+        print(f"{m.module:12} Ca={m.ca:2d} Ce={m.ce:2d} I={m.instability:.2f}")
+
+report(
+    [
+        CouplingMetric("domain", ca=6, ce=1),
+        CouplingMetric("application", ca=4, ce=4),
+        CouplingMetric("infrastructure", ca=1, ce=7),
+    ]
+)
+```
+
+도메인 모듈의 `I` 값이 0에 가깝고 인프라 모듈의 `I` 값이 1에 가깝다면 방향이 대체로 건강합니다. 반대로 도메인의 `Ce`가 늘어나면 의존성 방향이 뒤집히고 있다는 신호입니다. 이때는 코드 리뷰에서 "왜 import가 생겼는가"를 먼저 질문해야 합니다.
+
+## 모듈 의존 그래프를 먼저 그린 뒤 코드로 옮기기
+
+설계 회의에서 말로만 합의하면 구현 단계에서 금방 흔들립니다. 아래처럼 다이어그램을 먼저 합의하고, 그 다음 import 규칙과 테스트를 붙여 두면 경계를 유지하기 쉽습니다.
+
+```mermaid
+flowchart LR
+    UI["프레젠테이션 계층"] --> APP["애플리케이션 서비스"]
+    APP --> DOMAIN["도메인 모델과 규칙"]
+    APP --> PORT["포트 인터페이스"]
+    ADAPTER["인프라 어댑터"] --> PORT
+    ADAPTER --> EXT["DB/외부 API"]
+```
+
+이 그림의 핵심은 화살표 개수가 아니라 방향입니다. 도메인은 외부 기술을 모른 채 규칙만 유지하고, 어댑터가 세부 구현을 담당합니다. 이렇게 분리해 두면 기능 요구가 변해도 도메인 코드의 파손 범위가 작아집니다.
+
+## 추상 클래스와 인터페이스를 경계에 배치하기
+
+포트-어댑터 구조를 도입할 때 가장 흔한 실수는 추상화를 인프라 패키지 안에 두는 것입니다. 추상화는 반드시 도메인 또는 애플리케이션 쪽 경계에 둬야 의존성 역전이 성립합니다.
+
+```python
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class PaymentCommand:
+    order_id: str
+    user_id: str
+    amount: int
+
+class PaymentGateway(ABC):
+    @abstractmethod
+    def charge(self, command: PaymentCommand) -> str:
+        raise NotImplementedError
+
+class FakePaymentGateway(PaymentGateway):
+    def charge(self, command: PaymentCommand) -> str:
+        return f"paid:{command.order_id}"
+```
+
+호출자는 `PaymentGateway`만 의존하고, 실제 결제 제공자 교체는 구현 클래스에서 흡수합니다. 이 방식은 테스트에도 유리합니다. 단위 테스트는 `FakePaymentGateway`를 사용해 비즈니스 규칙만 검증하고, 통합 테스트에서만 실제 I/O를 붙이면 됩니다.
+
+## 리팩터링 전후를 나란히 비교하기
+
+좋은 설계 글은 "좋다"고 말하는 대신 전후 차이를 보여 줘야 합니다. 아래는 책임이 섞인 코드와 책임을 분리한 코드의 대비입니다.
+
+```python
+# before.py
+
+def place_order(request: dict) -> dict:
+    # HTTP 입력 파싱, 규칙 검증, 결제 호출, 저장, 응답 구성까지 한 함수에 섞임
+    user_id = request["user_id"]
+    amount = int(request["amount"])
+    if amount <= 0:
+        return {"status": 400, "message": "invalid amount"}
+
+    payment_id = charge_with_vendor_api(user_id, amount)
+    save_order_row(user_id=user_id, amount=amount, payment_id=payment_id)
+    return {"status": 200, "payment_id": payment_id}
+```
+
+```python
+# after.py
+
+def place_order_controller(request: dict, service: "PlaceOrderService") -> dict:
+    command = PlaceOrderCommand.from_http(request)
+    result = service.execute(command)
+    return result.to_http()
+
+class PlaceOrderService:
+    def __init__(self, gateway: PaymentGateway, repo: OrderRepository) -> None:
+        self.gateway = gateway
+        self.repo = repo
+
+    def execute(self, command: "PlaceOrderCommand") -> "PlaceOrderResult":
+        command.validate()
+        payment_id = self.gateway.charge(command.to_payment_command())
+        self.repo.save(command.to_order(payment_id))
+        return PlaceOrderResult.success(payment_id)
+```
+
+전후를 비교하면 무엇이 바뀌었는지 즉시 보입니다. 컨트롤러는 입력/출력 변환만 담당하고, 서비스는 유스케이스 규칙만 담당하며, 외부 연동은 포트 뒤로 이동합니다. 구조가 이렇게 바뀌면 장애 분석과 테스트 설계가 훨씬 단순해집니다.
+
+## 계층별 체크포인트와 운영 연결
+
+설계는 개발 단계에서 끝나지 않습니다. 운영 지표와 연결되어야 품질 개선이 누적됩니다.
+
+- 프레젠테이션 계층: 요청 검증 실패율, 4xx 응답 분포
+- 애플리케이션 계층: 유스케이스별 처리 시간, 재시도 횟수
+- 도메인 계층: 규칙 위반 빈도, 불변식 실패 로그
+- 인프라 계층: 외부 API 오류율, DB 지연 시간
+
+지표를 계층별로 분리해 보면 어디를 고쳐야 하는지가 명확해집니다. 모든 지표가 한 대시보드에서 섞여 있으면 "느리다"는 사실만 보이고 원인은 보이지 않습니다. 설계 경계를 운영 지표 경계와 맞추면 개선 사이클이 빠르게 돌아갑니다.
+
+## 리뷰와 리팩터링을 위한 실전 질문 세트
+
+설계는 한 번 작성하고 끝나는 산출물이 아니라, 변경 요청이 들어올 때마다 점검하는 운영 습관입니다. 아래 질문은 코드 리뷰와 리팩터링 계획에서 바로 사용할 수 있는 최소 점검 세트입니다.
+
+1. 이번 변경은 어느 계층의 책임인가요?
+2. 새 의존성이 도메인 중심 방향을 깨뜨리나요?
+3. 인터페이스 이름이 구현 세부를 누설하나요?
+4. 테스트 더블 없이 규칙 검증이 가능한가요?
+5. 다음 변경이 들어와도 같은 위치를 수정하게 되나요?
+
+이 다섯 질문은 단순하지만 강력합니다. 특히 "다음 변경도 같은 위치를 건드리게 되는가"라는 질문은 설계의 탄력성을 빠르게 드러냅니다. 지금 요구사항을 통과하는 코드와 다음 요구사항까지 받아내는 코드는 여기서 갈립니다.
+
+## 계층 아키텍처 예시를 한 단계 더 구체화하기
+
+아래 예시는 요청-유스케이스-도메인-어댑터 경계를 코드로 고정하는 방법을 보여 줍니다.
+
+```python
+from dataclasses import dataclass
+from typing import Protocol
+
+@dataclass(frozen=True)
+class CreateCouponCommand:
+    code: str
+    discount_percent: int
+
+class CouponRepository(Protocol):
+    def exists(self, code: str) -> bool: ...
+    def save(self, code: str, discount_percent: int) -> None: ...
+
+class CreateCouponService:
+    def __init__(self, repo: CouponRepository) -> None:
+        self.repo = repo
+
+    def execute(self, command: CreateCouponCommand) -> None:
+        if not (1 <= command.discount_percent <= 90):
+            raise ValueError("할인율은 1~90 범위여야 합니다.")
+        if self.repo.exists(command.code):
+            raise ValueError("이미 존재하는 쿠폰 코드입니다.")
+        self.repo.save(command.code, command.discount_percent)
+```
+
+핵심은 서비스가 저장소의 구체 구현을 모른다는 사실입니다. SQLAlchemy를 쓰든, 파일 저장을 쓰든, 외부 API를 쓰든 서비스 규칙은 바뀌지 않습니다. 그래서 정책 변경과 기술 변경이 서로 다른 속도로 진화할 수 있습니다.
+
+## 설계 부채를 남기지 않는 배포 순서
+
+설계를 개선할 때 기능 배포와 구조 개선을 한 커밋에 묶으면 위험이 커집니다. 다음 순서를 지키면 안전하게 개선할 수 있습니다.
+
+- 1단계: 새 경계와 인터페이스를 추가합니다. 기존 경로는 유지합니다.
+- 2단계: 호출자를 새 경계로 점진 이행합니다. 로그로 구경로 사용량을 기록합니다.
+- 3단계: 구경로 트래픽이 0에 가까워지면 제거합니다.
+- 4단계: 제거 이후 메트릭과 에러율을 비교해 회귀를 확인합니다.
+
+이 순서는 확장-이행-수축 전략과 같습니다. 설계는 깔끔해지고, 사용자 영향은 최소화됩니다. 특히 여러 팀이 동시에 작업하는 환경에서는 이 순서를 문서화해 공통 작업 규칙으로 삼는 것이 효과적입니다.
+
+## 정리
+
+의존성 방향이 맞으면 변경 비용은 줄어듭니다. 코어가 세부 구현을 모르게 만들수록 시스템은 더 오래 자유를 유지합니다. 포트와 어댑터는 그 자유를 코드로 구현하는 실용적인 도구입니다.
+
+다음 글에서는 이 방향을 더 안정적으로 붙잡아 두는 수단, 인터페이스와 추상화를 다룹니다.
+
+## 처음 질문으로 돌아가기
+
+- **의존성 방향은 왜 변경 비용을 크게 좌우할까요?**
+  - 화살표가 안정적인 도메인에서 `psycopg2` 같은 세부 구현으로 향하면, 저장 기술 하나의 변화가 핵심 규칙까지 흔듭니다. 반대로 `charge(repo, user_id, amount)`처럼 코어가 추상만 알면 변경 충격은 어댑터 쪽에 머무를 가능성이 커집니다.
+- **안정적인 모듈과 변동이 큰 모듈은 어떻게 구분할까요?**
+  - 글에서는 도메인 규칙은 오래 남고, DB 드라이버나 외부 SaaS는 자주 바뀌는 쪽으로 구분했습니다. import 화살표를 그려 보고 도메인에서 외부 라이브러리로 직접 나가는 선이 보이면 안정적이어야 할 코드가 변동 큰 코드에 끌려가고 있다는 뜻입니다.
+- **도메인이 세부 구현을 모르게 만드는 방법은 무엇일까요?**
+  - `WalletRepo` 같은 포트를 코어 쪽에 정의하고, `PostgresWalletRepo` 같은 구현은 어댑터에서 맞추고, `main()` 같은 composition root에서만 실제 구현을 조립하면 됩니다. `FakeRepo`로 도메인 테스트가 가능해지는지도 함께 확인해야 방향이 제대로 잡혔다고 볼 수 있습니다.
 
 <!-- toc:begin -->
-- [소프트웨어 설계란 무엇인가?](./01-what-is-software-design.md)
-- [관심사 분리](./02-separation-of-concerns.md)
-- [모듈과 경계](./03-modules-and-boundaries.md)
+## 시리즈 목차
+
+- [Software Design 101 (1/10): 소프트웨어 설계란 무엇인가?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): 관심사 분리](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): 모듈과 경계](./03-modules-and-boundaries.md)
 - **의존성 방향 (현재 글)**
 - 인터페이스와 추상화 (예정)
 - 계층 아키텍처 (예정)
@@ -171,11 +413,19 @@ DB 없이도 도메인을 검증할 수 있습니다.
 - 변경 영향 줄이기 (예정)
 - 설계 원칙 모음 (예정)
 - 작은 프로젝트로 설계 연습 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [software-design-101 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/software-design-101/ko)
 
 - [Robert C. Martin — Dependency Inversion Principle](https://web.archive.org/web/20110714224327/http://www.objectmentor.com/resources/articles/dip.pdf)
 - [Hexagonal Architecture (Alistair Cockburn)](https://alistair.cockburn.us/hexagonal-architecture/)
 - [Clean Architecture — Dependency Rule](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Ports and Adapters Pattern](https://herbertograca.com/2017/09/14/ports-adapters-architecture/)
+
+### 실전 확인용 문서
+
+- [typing — Support for type hints](https://docs.python.org/3/library/typing.html)
+- [abc — Abstract Base Classes](https://docs.python.org/3/library/abc.html)

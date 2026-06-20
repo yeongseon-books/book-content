@@ -1,10 +1,10 @@
 ---
 series: web-development-101
 episode: 5
-title: Frontend and Backend
-status: content-ready
+title: "Web Development 101 (5/10): Frontend and Backend"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,24 @@ tags:
   - Architecture
   - FullStack
 seo_description: Where the frontend ends and the backend begins — SPA, SSR, and the API contract that joins them, explained for new web developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Frontend and Backend
+# Web Development 101 (5/10): Frontend and Backend
 
-> Web Development 101 series (5/10)
+New developers often memorize technology names before they learn responsibility boundaries. That makes it easy to build something that works once and much harder to keep data ownership, authorization, and rendering decisions clean when the product grows.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Web Development 101 series. Here we draw the boundary between frontend and backend around source of truth, rendering style, and API contracts so full-stack decisions become easier to justify.
 
-**Core question**: *Where* does the frontend's job end and the backend's begin?
 
-> Whoever owns the *source of truth* is the backend; whoever *shows* it to the user is the frontend.
+![web development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.en.png)
+*web development 101 chapter 5 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- How responsibility splits between frontend and backend
-- SPA (Single Page App) vs SSR (Server-Side Rendering)
-- How the API contract bridges the two worlds
-- Tradeoffs when the same logic could live on either side
-- The picture a full-stack engineer holds in mind
+- How responsibility splits between frontend and backend?
+- SPA (Single Page App) vs SSR (Server-Side Rendering)?
+- How the API contract bridges the two worlds?
 
 ## Why It Matters
 
@@ -47,19 +43,17 @@ Even when one person writes both sides, blurring the *boundary of responsibility
 
 > Good systems have *clear boundaries*.
 
-## Concept at a Glance
+This figure emphasizes direction: durable data usually starts in the database, the backend decides what may be returned, and the frontend turns that response into a user experience. Visible state and source of truth are not the same thing.
 
-```mermaid
-flowchart LR
-    User["User"] --> FE["Frontend (browser)"]
-    FE -->|"API call"| BE["Backend (server)"]
-    BE --> DB["Database"]
-    DB --> BE
-    BE --> FE
-    FE --> User
-```
+### What to verify yourself
 
-Data flows *DB → BE → FE → User*.
+- Build a tiny `/api/items` endpoint and render its response in the browser.
+- Compare the same feature as a fetch-driven SPA and as server-rendered HTML.
+- Trigger a CORS error on purpose and read exactly which origin restriction the browser reports.
+
+**Expected output:** When the backend response shape changes, the frontend must adjust with it, and the browser blocks cross-origin requests until the server explicitly allows them.
+
+**Failure mode to watch for:** Authorization logic on the frontend can be bypassed. Changing both sides without a contract quickly leads to mismatched field names and broken assumptions.
 
 ## Key Terms
 
@@ -197,22 +191,38 @@ Startups often start with SPA + REST API. Content sites prefer SSR (Next.js, Rem
 
 Boundaries are *promises about responsibility*. Next, we layer *authentication and sessions* on top of that boundary.
 
+## Answering the Opening Questions
+
+- **How responsibility splits between frontend and backend?**
+  - The article treats Frontend and Backend as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **SPA (Single Page App) vs SSR (Server-Side Rendering)?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How the API contract bridges the two worlds?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
-- [The Browser and the DOM](./03-browser-and-dom.md)
-- [HTTP and APIs](./04-http-and-api.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): The Browser and the DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP and APIs](./04-http-and-api.md)
 - **Frontend and Backend (current)**
 - Authentication and Sessions (upcoming)
 - Connecting to a Database (upcoming)
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Client-side vs server-side (MDN)](https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Client-Server_overview)
-- [SPA (MDN)](https://developer.mozilla.org/en-US/docs/Glossary/SPA)
+### Official Docs
+- [Client-side and server-side website programming (MDN)](https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/First_steps/Client-Server_overview)
+- [Single-page application (MDN)](https://developer.mozilla.org/en-US/docs/Glossary/SPA)
 - [Server-side rendering (MDN)](https://developer.mozilla.org/en-US/docs/Glossary/SSR)
-- [CORS (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
+
+### Verification Resources
+- [CORS guide (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS)
+- [Using the Fetch API (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)

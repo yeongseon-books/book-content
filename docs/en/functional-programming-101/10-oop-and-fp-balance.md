@@ -1,10 +1,10 @@
 ---
 series: functional-programming-101
 episode: 10
-title: Balancing OOP and Functional Programming
+title: "Functional Programming 101 (10/10): Balancing OOP and Functional Programming"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,23 @@ seo_description: Practical guidelines for combining OOP and functional programmi
 last_reviewed: '2026-05-04'
 ---
 
-# Balancing OOP and Functional Programming
+# Functional Programming 101 (10/10): Balancing OOP and Functional Programming
 
-> Functional Programming 101 Series (10/10)
+Teams rarely fail because they picked OOP or FP. They fail because stateful orchestration, validation rules, persistence, and formatting all get mixed into the same place. Once that happens, the debate becomes ideological even though the real problem is boundary design.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Functional Programming 101 series.
 
-**Key Question**: Do you have to choose between OOP and functional programming, or can you use both together?
+Python gives you a practical escape hatch because it does not force a single paradigm. You can model long-lived state with objects, keep business rules in pure functions, and leave persistence or messaging at the edge. The hard part is not choosing a side. It is deciding where each concern belongs.
 
-> Python is a multi-paradigm language. OOP and functional programming are not opposites — they complement each other. This article covers practical guidelines for choosing the right paradigm for each situation and combining their strengths.
 
-<!-- a-grade-intro:end -->
+![Functional Programming 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.en.png)
+*Functional Programming 101 chapter 10 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Balancing OOP and Functional Programming?
+- Which signal should the example or diagram make visible for Balancing OOP and Functional Programming?
+- What failure should be prevented first when Balancing OOP and Functional Programming reaches a real system?
 
 ## What You Will Learn
 
@@ -51,7 +57,7 @@ Python's standard library ships both `pathlib` (OOP) and `itertools` (FP). Using
 
 > OOP vs FP — strength comparison
 
-```
+```text
 OOP Fits Best                  FP Fits Best
 ─────────────────             ─────────────────
 State + behavior together     Stateless data transformation
@@ -59,6 +65,8 @@ Managing multiple instances   Pipeline data processing
 Framework integration         Concurrency / parallelism
 Complex domain models         Mathematical / declarative logic
 ```
+
+## Where to draw the OOP/FP boundary
 
 ## Key Concepts
 
@@ -122,7 +130,6 @@ print(format_receipt(items, 0.1))
 from dataclasses import dataclass, replace
 from typing import NamedTuple
 
-
 # value objects: immutable, equality-based
 @dataclass(frozen=True)
 class Money:
@@ -131,7 +138,6 @@ class Money:
 
 class Percentage(NamedTuple):
     value: float
-
 
 # pure functions: transform value objects
 def apply_discount(price: Money, discount: Percentage) -> Money:
@@ -144,7 +150,6 @@ def add_tax(price: Money, tax: Percentage) -> Money:
 
 def format_money(money: Money) -> str:
     return f"{money.amount:,} {money.currency}"
-
 
 price = Money(50000)
 discounted = apply_discount(price, Percentage(0.1))
@@ -159,7 +164,6 @@ print(f"After tax: {format_money(final)}")       # After tax: 49,500 USD
 
 ```python
 from dataclasses import dataclass
-
 
 # === Functional Core (pure functions) ===
 @dataclass(frozen=True)
@@ -186,7 +190,6 @@ def create_user_data(name: str, email: str) -> User | list[str]:
         return errors
     return User(name=name.strip(), email=email.lower())
 
-
 # === Imperative Shell (side effects) ===
 def handle_registration(name: str, email: str) -> None:
     """Registration handler — contains side effects."""
@@ -197,7 +200,6 @@ def handle_registration(name: str, email: str) -> None:
     else:
         print(f"  Registered: {result}")
         # In production: save to DB, send email, etc.
-
 
 handle_registration("Alice", "alice@example.com")
 # Registered: User(name='Alice', email='alice@example.com', active=True)
@@ -211,8 +213,8 @@ handle_registration("", "invalid-email")
 
 ```python
 from dataclasses import dataclass
-from typing import Callable, Iterator
-
+from collections.abc import Callable
+from typing import Iterator
 
 @dataclass
 class DataPipeline:
@@ -234,7 +236,6 @@ class DataPipeline:
             result = step(result)
         return result
 
-
 # pure function stages
 def normalize(records: list[dict]) -> list[dict]:
     return [{**r, "name": r["name"].strip().title()} for r in records]
@@ -244,7 +245,6 @@ def enrich(records: list[dict]) -> list[dict]:
 
 def filter_valid(records: list[dict]) -> list[dict]:
     return [r for r in records if r.get("score", 0) > 0]
-
 
 # assemble the pipeline (OOP interface + FP execution)
 pipeline = (
@@ -282,7 +282,6 @@ class ShoppingCart:
     def total(self) -> int:
         return sum(i["price"] for i in self._items)
 
-
 # Situation 2: data transformation -> FP
 def transform_prices(
     items: list[dict],
@@ -290,17 +289,14 @@ def transform_prices(
 ) -> list[dict]:
     return [{**i, "price": int(i["price"] * rate)} for i in items]
 
-
 # Situation 3: framework integration -> OOP (framework requires it)
 class UserSerializer:
     def to_dict(self, user) -> dict:
         return {"name": user.name, "email": user.email}
 
-
 # Situation 4: utility -> FP
 def slugify(text: str) -> str:
     return text.lower().strip().replace(" ", "-")
-
 
 # mixed usage
 cart = ShoppingCart()
@@ -315,44 +311,31 @@ print(f"After discount: {sum(i['price'] for i in discounted):,}")
 # After discount: 945
 ```
 
-### Step 5: Design Decision Checklist
+### Step 5: Executable Hybrid Workflow
 
 ```python
-"""
-Paradigm selection checklist:
-
-1. Does state change together with behavior?
-   -> Yes: class (OOP)
-   -> No: function (FP)
-
-2. Do you need multiple instances?
-   -> Yes: class (OOP)
-   -> No: module-level function (FP)
-
-3. Is data transformation the main goal?
-   -> Yes: pure function pipeline (FP)
-   -> No: judge by context
-
-4. Does the framework require classes?
-   -> Yes: class (OOP) + internal logic as FP
-   -> No: choose freely
-
-5. Is testability a priority?
-   -> Yes: pure functions first (FP)
-   -> State testing needed: class (OOP)
-"""
-
-# practical hybrid pattern: immutable value objects + pure functions + thin class shell
 from dataclasses import dataclass
 
+@dataclass(frozen=True)
+class RawConfig:
+    host: str
+    port: str
+    debug: str
 
 @dataclass(frozen=True)
-class Config:
+class AppConfig:
     host: str
     port: int
     debug: bool
 
-def validate_config(config: Config) -> list[str]:
+def normalize_config(raw: RawConfig) -> AppConfig:
+    return AppConfig(
+        host=raw.host.strip(),
+        port=int(raw.port),
+        debug=raw.debug.strip().lower() in {"1", "true", "yes"},
+    )
+
+def validate_config(config: AppConfig) -> list[str]:
     errors = []
     if not config.host:
         errors.append("host is required")
@@ -360,13 +343,56 @@ def validate_config(config: Config) -> list[str]:
         errors.append("port must be 1-65535")
     return errors
 
+class AppServer:
+    def __init__(self, config: AppConfig) -> None:
+        self.config = config
 
-config = Config(host="localhost", port=8080, debug=True)
-errors = validate_config(config)
-if not errors:
-    print(f"Config valid: {config}")
-# Config valid: Config(host='localhost', port=8080, debug=True)
+    def start(self) -> str:
+        mode = "debug" if self.config.debug else "prod"
+        return f"starting server on {self.config.host}:{self.config.port} ({mode})"
+
+def boot(raw: RawConfig) -> str:
+    normalized = normalize_config(raw)
+    errors = validate_config(normalized)
+    if errors:
+        return f"validation failed: {errors}"
+    server = AppServer(normalized)
+    return server.start()
+
+good = RawConfig(host=" localhost ", port="8080", debug="yes")
+bad_host = RawConfig(host="   ", port="8080", debug="yes")
+bad_port = RawConfig(host="api.internal", port="70000", debug="no")
+
+assert normalize_config(good) == AppConfig(host="localhost", port=8080, debug=True)
+assert boot(good) == "starting server on localhost:8080 (debug)"
+assert boot(bad_host) == "validation failed: ['host is required']"
+assert boot(bad_port) == "validation failed: ['port must be 1-65535']"
+
+print("Normalized config:", normalize_config(good))
+print("Success run:", boot(good))
+print("Missing host:", boot(bad_host))
+print("Bad port:", boot(bad_port))
+# Normalized config: AppConfig(host='localhost', port=8080, debug=True)
+# Success run: starting server on localhost:8080 (debug)
+# Missing host: validation failed: ['host is required']
+# Bad port: validation failed: ['port must be 1-65535']
 ```
+
+#### Expected output
+
+```text
+Normalized config: AppConfig(host='localhost', port=8080, debug=True)
+Success run: starting server on localhost:8080 (debug)
+Missing host: validation failed: ['host is required']
+Bad port: validation failed: ['port must be 1-65535']
+```
+
+#### If your result differs, inspect this first
+
+- Make sure `normalize_config()` still calls `host.strip()`. A host made of whitespace should become an empty string before validation.
+- Check that `port` is converted to `int` before range validation. Comparing the raw string can let invalid ports slip through.
+- Make sure validation failure stops before `AppServer` is constructed. That edge is the whole point of keeping shell code outside the functional core.
+- Confirm the success path lives in the thin class shell while normalization and validation stay pure. That separation is the design rule the example is trying to prove.
 
 ## What to Notice in This Code
 
@@ -417,17 +443,29 @@ if not errors:
 
 OOP and functional programming are not opposites — they complement each other. In Python, the most practical approach is immutable value objects (OOP) + pure functions (FP) + thin class shells. The pure functions, immutable data, higher-order functions, closures, generators, and composition covered in this series will help you write cleaner, more testable code.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Balancing OOP and Functional Programming?**
+  - The article treats Balancing OOP and Functional Programming as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Balancing OOP and Functional Programming?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Balancing OOP and Functional Programming reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Functional Programming?](./01-what-is-fp.md)
-- [Pure Functions and Side Effects](./02-pure-functions.md)
-- [Immutable Data](./03-immutable-data.md)
-- [Higher-Order Functions](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [Closures and Partial Application](./06-closure-and-partial.md)
-- [Recursion and Tail Calls](./07-recursion.md)
-- [Lazy Evaluation and Generators](./08-lazy-evaluation.md)
-- [Function Composition and Pipelines](./09-function-composition.md)
+## In this series
+
+- [Functional Programming 101 (1/10): What Is Functional Programming?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): Pure Functions and Side Effects](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): Immutable Data](./03-immutable-data.md)
+- [Functional Programming 101 (4/10): Higher-Order Functions](./04-higher-order-functions.md)
+- [Functional Programming 101 (5/10): map, filter, reduce](./05-map-filter-reduce.md)
+- [Functional Programming 101 (6/10): Closures and Partial Application](./06-closure-and-partial.md)
+- [Functional Programming 101 (7/10): Recursion and Tail Calls](./07-recursion.md)
+- [Functional Programming 101 (8/10): Lazy Evaluation and Generators](./08-lazy-evaluation.md)
+- [Functional Programming 101 (9/10): Function Composition and Pipelines](./09-function-composition.md)
 - **Balancing OOP and Functional Programming (current)**
+
 <!-- toc:end -->
 
 ## References

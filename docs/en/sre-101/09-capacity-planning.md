@@ -1,10 +1,10 @@
 ---
 series: sre-101
 episode: 9
-title: Capacity Planning
+title: "SRE 101 (9/10): Capacity Planning"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,34 @@ tags:
   - Performance
   - Operations
 seo_description: A beginner-friendly guide to capacity planning covering demand forecasting, headroom, load testing, scaling units, and cost trade-offs
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Capacity Planning
+# SRE 101 (9/10): Capacity Planning
 
-> SRE 101 series (9/10)
+Capacity conversations often start with the last traffic graph because it is the easiest artifact to reach for. But planning is not about copying the past. It is about estimating future demand, checking what the system can really sustain, and leaving enough room for mistakes, spikes, and lead times.
 
-<!-- a-grade-intro:begin -->
+That is why capacity planning belongs with reliability, not just cost control. If you wait until traffic has already risen, the most important decision has already been made for you by production behavior.
 
-**Core question**: How do you *prepare* for *next year's traffic*?
+This is post 9 in the SRE 101 series. Here we connect demand forecasting, headroom, load testing, scaling units, and cost so growth does not turn into a preventable outage.
 
-> *Capacity planning* is the work of *aligning supply with demand* using *numbers*.
 
-<!-- a-grade-intro:end -->
+![sre 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/09/09-01-concept-at-a-glance.en.png)
+*sre 101 chapter 9 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *definition* of *capacity planning*
-- *Demand forecasting*
-- Sizing *headroom*
-- *Load testing*
-- The *cost* trade-off
+- Why is capacity planning a future-demand problem instead of a past-usage replay?
+- Why is headroom closer to insurance than to waste?
+- How should load tests be used to correct a forecast model?
 
-## Why It Matters
+## Why this topic matters
 
-Without a *forecast*, the next *traffic spike* takes the service *down*.
+Without a forecast, the next traffic spike usually gets handled too late. By the time the team is discussing more instances or more budget, users may already be feeling the impact.
 
-## Concept at a Glance
+At the same time, excess capacity is not free. Good planning explains how much uncertainty the team wants to absorb and what that protection costs.
 
-```mermaid
-flowchart LR
-    Demand["forecast demand"] --> Sizing["sizing"]
-    LoadTest["load test"] --> Sizing
-    Sizing --> Buy["provision"]
-    Buy --> Monitor["monitor"]
-```
+> Capacity planning is the work of aligning supply with demand using numbers.
 
 ## Key Terms
 
@@ -107,6 +99,29 @@ def cost(nodes, monthly_per_node):
     return nodes * monthly_per_node
 ```
 
+### Step 6 — Turn a forecast into a promotion-week plan
+
+```python
+history = [1200, 1350, 1500, 1650]
+forecast = linear_forecast(history, weeks_ahead=4)
+promotion_peak = int(forecast * 1.3)
+required_nodes = nodes(predicted_rps=promotion_peak, rps_per_node=350)
+monthly_cost = cost(required_nodes, monthly_per_node=180)
+```
+
+This kind of calculation turns an abstract growth trend into an operating decision. Once the team translates the forecast into expected peak traffic, it can add headroom, pick an instance count, and explain the cost of that decision in the same review.
+
+### Step 7 — Ask the load test questions that forecasts cannot answer
+
+Forecasts tell you how much demand might arrive. Load tests tell you where the system bends first when that demand actually hits.
+
+| Question | Why it matters |
+| --- | --- |
+| Does latency rise smoothly or collapse after a threshold? | A cliff usually means a queue, pool, or dependency limit is being crossed. |
+| Which dependency saturates first? | The app tier may look healthy while the database or cache is already near failure. |
+| How long does recovery take after the peak passes? | Slow recovery can create user impact even when raw capacity looks adequate. |
+| Does autoscaling react before or after the service degrades? | Scaling policy and workload shape have to be tested together, not separately. |
+
 ## What to Notice in This Code
 
 - The *forecast* is *data-driven*.
@@ -150,17 +165,29 @@ A peak event like *Black Friday* is *modeled* months ahead.
 
 The final episode is *Building Operable Systems*.
 
+## Answering the Opening Questions
+
+- **Why is capacity planning a future-demand problem instead of a past-usage replay?**
+  - The article treats Capacity Planning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is headroom closer to insurance than to waste?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should load tests be used to correct a forecast model?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is SRE?](./01-what-is-sre.md)
-- [Reliability](./02-reliability.md)
-- [SLI, SLO, SLA](./03-sli-slo-sla.md)
-- [Error Budget](./04-error-budget.md)
-- [Monitoring](./05-monitoring.md)
-- [Incident Response](./06-incident-response.md)
-- [Postmortem](./07-postmortem.md)
-- [Reducing Toil](./08-reducing-toil.md)
+## In this series
+
+- [SRE 101 (1/10): What is SRE?](./01-what-is-sre.md)
+- [SRE 101 (2/10): Reliability](./02-reliability.md)
+- [SRE 101 (3/10): SLI, SLO, SLA](./03-sli-slo-sla.md)
+- [SRE 101 (4/10): Error Budget](./04-error-budget.md)
+- [SRE 101 (5/10): Monitoring](./05-monitoring.md)
+- [SRE 101 (6/10): Incident Response](./06-incident-response.md)
+- [SRE 101 (7/10): Postmortem](./07-postmortem.md)
+- [SRE 101 (8/10): Reducing Toil](./08-reducing-toil.md)
 - **Capacity Planning (current)**
 - Building Operable Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

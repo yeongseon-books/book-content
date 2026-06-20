@@ -1,10 +1,10 @@
 ---
 series: machine-learning-101
 episode: 4
-title: Linear Regression
-status: content-ready
+title: "Machine Learning 101 (4/10): Linear Regression"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,28 @@ tags:
   - scikit-learn
   - Beginner
 seo_description: The intuition behind linear regression, the least-squares loss, R-squared, and residual diagnostics, with runnable scikit-learn examples
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Linear Regression
+# Machine Learning 101 (4/10): Linear Regression
 
-> Machine Learning 101 series (4/10)
+When people call linear regression “too simple,” they usually mean “easy to underestimate.” A straight line that explains most of the variation is already an operationally strong baseline, and it often teaches you more about the data than a more complex model that scores slightly higher but hides why.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Machine Learning 101 series. Here we will treat linear regression as both a prediction model and a diagnostic tool by reading coefficients, residuals, MSE, and `R^2` together.
 
-**Core question**: If a single line can explain 80% of the variation, why bother with anything more complex?
 
-> *Linear regression is the simplest model and the strongest baseline. It is also the gold standard for interpretability.*
+![machine learning 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 4 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The equation and intuition of linear regression
-- Mean squared error and the least-squares solution
-- The meaning of R-squared
-- How residual analysis validates model assumptions
-- Five common pitfalls
+- How does the linear regression equation produce a prediction?
+- What does least squares actually minimize?
+- What does `R^2` explain, and what does it hide?
 
 ## Why It Matters
 
 Linear regression is interpretable, fast, and surprisingly strong. Always run it first. Without a baseline, no complex model is justified.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    X["features X"] --> Lin["y_hat = X w + b"]
-    Lin --> Loss["MSE(y, y_hat)"]
-    Loss --> Fit["minimize w, b"]
-```
 
 ## Key Terms
 
@@ -106,11 +93,19 @@ for name, coef in zip(range(Xtr.shape[1]), model.coef_):
     print(f"x{name}: {coef:.3f}")
 ```
 
+**Expected output:** you should see an MSE value, an `R^2` value, and a list of signed coefficients. The important part is not a perfect score. It is whether the coefficient directions make sense and whether the residual story suggests the line is missing structure.
+
 ## What to Notice in This Code
 
 - Sign and magnitude of `coef_` drive interpretation.
 - A low R-squared often signals nonlinearity.
 - MSE squares the error, so it reacts strongly to outliers.
+
+## Read the first failure signal this way
+
+- If `R^2` is weak and residuals curve, suspect missing nonlinear features before abandoning regression entirely.
+- If coefficients flip sign run to run, inspect multicollinearity and feature scaling.
+- If a few points dominate the error, treat outliers as a modeling decision, not a cleanup footnote.
 
 ## Five Common Mistakes
 
@@ -149,10 +144,21 @@ Pricing, demand modeling, and A/B effect estimation lean on linear regression be
 
 Linear regression is the starting point for every regression task. Next, we move to logistic regression for classification.
 
+## Answering the Opening Questions
+
+- **How does the linear regression equation produce a prediction?**
+  - The article treats Linear Regression as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does least squares actually minimize?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What does `R^2` explain, and what does it hide?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
 - **Linear Regression (current)**
 - Logistic Regression (upcoming)
 - Decision Tree and Random Forest (upcoming)
@@ -160,6 +166,7 @@ Linear regression is the starting point for every regression task. Next, we move
 - Overfitting and Regularization (upcoming)
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

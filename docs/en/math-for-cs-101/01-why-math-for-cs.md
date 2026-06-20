@@ -1,10 +1,10 @@
 ---
 series: math-for-cs-101
 episode: 1
-title: Why Math for CS
-status: content-ready
+title: "Math for CS 101 (1/10): Why Math for CS"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,40 +20,40 @@ seo_description: A beginner-friendly look at why math matters for CS, covering a
 last_reviewed: '2026-05-04'
 ---
 
-# Why Math for CS
+# Math for CS 101 (1/10): Why Math for CS
 
-> Math for CS 101 series (1/10)
+When you first learn programming, it is easy to think that running code is enough. If a script works on your laptop or a small feature behaves correctly in a quick test, math can feel like an optional detour.
 
-<!-- a-grade-intro:begin -->
+That feeling usually disappears as systems grow. You start needing better answers to harder questions: why does this implementation stay correct for every input, where does it slow down, and what kind of counterexample breaks a design that looked reasonable at first glance?
 
-**Core question**: If you can already *code*, *why* do you need *math*?
+This is the first post in the Math for CS 101 series.
 
-> *Math* is the *common language* of *abstraction*, *proof*, *modeling*, and *analysis*.
+Here we start with the big picture: math in CS is less about memorizing formulas and more about building a language for abstraction, proof, modeling, and analysis.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![math for cs 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/01/01-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 1 flow overview*
+> Math is not a subject about memorizing formulas; it is about building a language for abstraction, proof, modeling, and analysis that spans code, systems, and engineering decisions.
 
-- The *role* of math
-- *Abstraction* and *proof*
-- *Modeling* and *analysis*
-- The big picture across *nine areas*
-- A *learning* order
+## Questions to Keep in Mind
+
+- Why do you need math even if you can already write code?
+- How do abstraction, proof, modeling, and analysis show up in day-to-day engineering work?
+- What changes when you can restate a problem mathematically instead of relying on intuition alone?
 
 ## Why It Matters
 
-Half of what makes a *problem* feel *hard* is missing *mathematical vocabulary*.
+In software work, a successful run only verifies one moment, one environment, and one slice of the input space. It does not automatically explain why the implementation is correct in general, how the cost grows with larger inputs, or which assumptions fail once real data arrives.
 
-## Concept at a Glance
+Math helps you separate those concerns. Sets make boundaries explicit. Logic makes conditions and conclusions precise. Combinatorics shows when the search space is already exploding. Probability gives you a way to reason about uncertainty without hand-waving. Linear algebra, calculus, and information theory later become the language behind modern ML, optimization, and compression.
 
-```mermaid
-flowchart LR
-    Math["math"] --> Abs["abstraction"]
-    Math --> Proof["proof"]
-    Math --> Model["modeling"]
-    Math --> Anal["analysis"]
-    Anal --> CS["computer science"]
-```
+Math in CS consists of five overlapping tools: **abstraction** (extracting patterns), **proof** (guaranteeing truth), **modeling** (turning reality into equations), **analysis** (measuring behavior), and **invariant** (properties that persist).
+
+## Before/After
+
+**Before**: If the *code runs*, you're done.
+
+**After**: Explain *why it runs* and *when it fails* with math.
 
 ## Key Terms
 
@@ -148,9 +148,22 @@ def proof_sketch(claim):
 
 ## Wrap-up and Next Steps
 
-Next, we cover *logic and proofs*.
+This chapter sets up the full series. Math does not replace implementation, but it gives you a sharper way to explain correctness, model behavior, and detect fragile assumptions earlier.
+
+Next, we move into logic and proofs, where that abstract promise becomes a concrete way to reason about program behavior.
+
+## Answering the Opening Questions
+
+- **Why do you need math even if you can already write code?**
+  - The article treats Why Math for CS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do abstraction, proof, modeling, and analysis show up in day-to-day engineering work?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What changes when you can restate a problem mathematically instead of relying on intuition alone?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
+## In this series
+
 - **Why Math for CS (current)**
 - Logic and Proofs (upcoming)
 - Sets and Functions (upcoming)
@@ -161,6 +174,7 @@ Next, we cover *logic and proofs*.
 - Calculus (upcoming)
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -169,3 +183,4 @@ Next, we cover *logic and proofs*.
 - [Mathematics for Computer Science - MIT OCW](https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-fall-2010/)
 - [Mathematical Foundations of CS - ACM](https://cacm.acm.org/magazines/2014/2/171688-mathematical-foundations-of-computer-science/)
 - [The Importance of Math in Programming - Dev.to](https://dev.to/codenameone/the-importance-of-math-in-programming-21k0)
+- [TheAlgorithms/Python GitHub repository](https://github.com/TheAlgorithms/Python)

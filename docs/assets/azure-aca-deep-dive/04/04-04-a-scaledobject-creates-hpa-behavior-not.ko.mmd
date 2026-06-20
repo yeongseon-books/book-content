@@ -1,0 +1,4 @@
+flowchart TD
+  KEDA["KEDA 오퍼레이터"] -->|생성| HPA["Horizontal Pod Autoscaler"]
+  HPA -->|메트릭 감시| Metrics["메트릭 API"]
+  HPA -->|조정| Deploy["디플로이먼트/레플리카셋"]

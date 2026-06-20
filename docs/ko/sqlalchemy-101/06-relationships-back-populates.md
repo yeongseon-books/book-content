@@ -1,13 +1,13 @@
 ---
-title: 'ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기'
+title: "SQLAlchemy 101 (6/10): ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기"
 series: sqlalchemy-101
 episode: 6
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,23 +17,34 @@ tags:
 - relationship
 - back_populates
 - SQLite
-last_reviewed: '2026-05-03'
-seo_description: ForeignKey는 SQL 레벨의 참조이고, relationship()은 객체 레벨의 탐색 통로입니다.
+last_reviewed: '2026-05-12'
+seo_description: relationship과 back_populates로 양방향 ORM 관계를 안전하게 모델링하는 방법을 설명합니다
 ---
 
-# ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기
+# SQLAlchemy 101 (6/10): ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기
 
-데이터베이스에서 가장 많이 다루는 작업 중 하나는 "관련된 행을 함께 가져오는 것"입니다. 사용자 한 명의 주문 목록, 게시글 한 건의 댓글, 태그가 여러 개 달린 글. SQL에서는 JOIN으로 처리하지만, ORM에서는 객체의 속성 접근(`user.orders`)으로 자연스럽게 표현됩니다. 그 다리를 놓는 도구가 `relationship()`이고, 양방향 탐색을 모순 없이 잇는 장치가 `back_populates`입니다. 이번 글에서는 일대다, 다대일, 다대다 관계를 차례로 정의하고, 양쪽이 같은 데이터를 가리키도록 안전하게 동기화하는 패턴을 정리합니다.
+관계형 데이터베이스를 다룬다면 결국 "연결된 행을 함께 읽고 함께 수정하는 문제"를 피할 수 없습니다. SQL에서는 JOIN으로 풀지만, ORM에서는 객체 그래프를 어떻게 안전하게 표현하느냐가 더 중요한 질문이 됩니다.
 
-![ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기](../../assets/sqlalchemy-101/06/06-01-orm-relationships-connecting-both-sides.ko.png)
+이 글은 SQLAlchemy 101 시리즈의 여섯 번째 글입니다. 여기서는 `relationship()`과 `back_populates`를 이용해 일대다, 다대일, 다대다 관계를 어떻게 정의하는지 정리합니다.
 
-*ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기*
+중요한 점은 외래키와 관계 속성이 같은 역할이 아니라는 사실입니다. `ForeignKey`는 SQL 레벨의 참조를, `relationship()`은 Python 객체 레벨의 탐색을 맡습니다. 둘이 어떻게 맞물리는지 이해해야 이후 로딩 전략과 cascade 정책도 덜 헷갈립니다.
 
-## 이 글에서 다룰 문제
+![ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-01-orm-relationships-connecting-both-sides.ko.png)
 
-![핵심 개념](../../assets/sqlalchemy-101/06/06-02-why-it-matters.ko.png)
+*ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기*
 
-*핵심 개념*
+![SQLAlchemy 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-02-why-it-matters.ko.png)
+*SQLAlchemy 101 6장 흐름 개요*
+> ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
+## 먼저 던지는 질문
+
+- `ForeignKey`와 `relationship()`은 왜 항상 한 쌍처럼 이해해야 할까요?
+- `back_populates`와 `backref`는 어떤 기준으로 선택할까요?
+- 컬렉션 조작, flush, SQL 실행 시점은 어떻게 연결될까요?
+
+## 왜 중요한가
+
 관계 정의가 어긋나면 다음과 같은 문제가 자주 생깁니다.
 
 - "한쪽에서 객체를 추가했는데 다른 쪽 컬렉션에는 보이지 않습니다." → `back_populates`가 빠졌거나 양쪽 정의가 일치하지 않습니다.
@@ -43,14 +54,14 @@ seo_description: ForeignKey는 SQL 레벨의 참조이고, relationship()은 객
 
 관계는 도메인 모델의 골격입니다. 처음에 깔끔하게 잡아 두면 이후 SELECT 패턴 최적화(Ep7), 마이그레이션, 테스트 fixture까지 모두 단순해집니다.
 
-## Mental Model
+## 멘탈 모델
 
-![Mental model](../../assets/sqlalchemy-101/06/06-03-mental-model.ko.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-03-mental-model.ko.png)
 
-*Mental model*
+*멘탈 모델*
 > `ForeignKey`는 SQL 레벨의 참조이고, `relationship()`은 객체 레벨의 탐색 통로입니다. `back_populates`는 양방향 통로의 두 끝을 연결해 "한쪽에서 바뀐 컬렉션이 다른 쪽에서도 즉시 반영"되게 만드는 장치입니다.
 
-```
+```text
 User (parent)                           Order (child)
 ─────────────────                       ─────────────────
 id (PK)                                 id (PK)
@@ -64,7 +75,7 @@ orders: list[Order]   ←──┐         ┌─→  user: User
 
 ## 핵심 개념
 
-![핵심 개념](../../assets/sqlalchemy-101/06/06-04-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-04-core-concepts.ko.png)
 
 *핵심 개념*
 ### 1) ForeignKey와 relationship은 한 쌍
@@ -188,9 +199,9 @@ class User(Base):
 
 가장 흔한 실수는 부모-자식 모델에서 cascade를 빼두는 것입니다. 부모를 삭제했는데 자식이 살아남아 외래키 무결성 오류로 SQL이 실패하는 경우가 잦습니다. SQLite에서는 별도로 `PRAGMA foreign_keys=ON`을 켜야 외래키 제약 자체가 동작한다는 점도 함께 기억해 두십시오 (Ep2).
 
-## Before-After
+## 이전 방식과 개선 방식
 
-### Before: ForeignKey만 두고 객체 탐색을 손으로 처리
+### 이전: ForeignKey만 두고 객체 탐색을 손으로 처리
 
 ```python
 def get_user_orders(session, user_id):
@@ -201,7 +212,7 @@ def get_user_orders(session, user_id):
 
 매번 새 SELECT를 작성해야 하고, 부모-자식 관계가 코드에 드러나지 않습니다.
 
-### After: relationship으로 객체 그래프 표현
+### 개선 후: relationship으로 객체 그래프 표현
 
 ```python
 def get_user_orders(session, user_id):
@@ -213,7 +224,7 @@ def get_user_orders(session, user_id):
 
 ## 단계별 실습
 
-![단계별 실습](../../assets/sqlalchemy-101/06/06-05-step-by-step-walkthrough.ko.png)
+![단계별 실습](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-05-step-by-step-walkthrough.ko.png)
 
 *단계별 실습*
 ```python
@@ -320,19 +331,130 @@ association table은 단순 다대다 매핑에만 적합합니다. "언제 태�
 - [ ] 다대다 관계에 추가 컬럼이 생길 가능성이 있다면 association object를 고려했는가?
 - [ ] 컬렉션을 응답 단계에서 활용한다면 미리 list로 변환했는가?
 
+## 관계 매핑 실전 앵커: 쿼리와 flush 순서
+
+관계를 정의한 뒤 가장 먼저 확인할 것은 SQL 순서입니다. 아래 시나리오에서 ORM은 부모를 먼저 INSERT하고 자식을 뒤에 INSERT합니다.
+
+```python
+with Session(engine) as session:
+    user = User(email="new@example.com")
+    user.orders.append(Order(amount=120))
+    user.orders.append(Order(amount=340))
+    session.add(user)
+    session.commit()
+```
+
+```text
+INSERT INTO users (email) VALUES (?)
+INSERT INTO orders (user_id, amount) VALUES (?, ?)
+INSERT INTO orders (user_id, amount) VALUES (?, ?)
+COMMIT
+```
+
+의존성 정렬을 ORM이 자동으로 처리하기 때문에 FK 무결성이 깨지지 않습니다. 이 로그를 직접 보는 습관이 있으면 관계 설정 오류를 빠르게 잡을 수 있습니다.
+
+## 다대다에서 association object를 미리 선택하는 기준
+
+초기에는 `secondary` 테이블이 간단하지만, 다음 요구가 하나라도 보이면 바로 association object로 가는 편이 낫습니다.
+
+- 관계 자체에 상태(`active`, `muted`)가 필요함
+- 생성자/수정자(`created_by`)를 남겨야 함
+- 관계 생성 시각(`created_at`)이 분석 지표로 필요함
+
+이 시점을 지나서 마이그레이션하면 코드와 데이터 양쪽 변경이 커집니다. 10편 배포 정책 기준으로도, 관계 모델 전환은 작은 release로 나눠 진행하는 편이 안전합니다.
+
+## orphan 삭제 검증 테스트
+
+`delete-orphan`을 쓴다면 아래 테스트를 팀 표준으로 두는 것이 좋습니다.
+
+```python
+def test_orphan_deleted(session: Session):
+    u = User(email="a@x.com")
+    u.orders.append(Order(amount=10))
+    session.add(u)
+    session.commit()
+
+    loaded = session.get(User, u.id)
+    loaded.orders.clear()
+    session.commit()
+
+    assert session.scalar(select(func.count()).select_from(Order)) == 0
+```
+
+테스트 한 개로 cascade 설정 누락 회귀를 대부분 차단할 수 있습니다.
+
+## relationship와 로딩 전략의 접점
+
+관계 정의 단계에서 7편 로딩 전략까지 같이 고려하면 품질이 올라갑니다. 예를 들어 아래처럼 기본 lazy를 `raise`로 두면 N+1을 개발 단계에서 즉시 노출할 수 있습니다.
+
+```python
+orders: Mapped[list["Order"]] = relationship(
+    back_populates="user",
+    lazy="raise",
+    cascade="all, delete-orphan",
+)
+```
+
+핸들러는 항상 `selectinload(User.orders)`를 명시해야 하므로, 의도하지 않은 lazy SQL을 구조적으로 금지할 수 있습니다.
+
+## 보강 앵커: 관계 변경과 마이그레이션 순서
+
+관계 모델을 바꾸는 작업은 코드보다 데이터 정합성이 더 중요합니다. 예를 들어 `Order.user_id`를 필수에서 선택으로 바꾸거나, 다대다를 association object로 전환할 때는 다음 순서를 권장합니다.
+
+1. 새 컬럼/새 테이블 추가(기존 경로 유지)
+2. 애플리케이션 이중 쓰기 적용
+3. 백필 배치로 과거 데이터 이동
+4. 읽기 경로 전환
+5. 구 경로 제거
+
+이 순서는 10편 배포 전략과 동일한 원칙이며, 관계 계층에서도 그대로 적용됩니다.
+
+## 보강 앵커: 관계 로딩 실패를 조기 감지하는 테스트
+
+```python
+def test_relationship_contract(session: Session):
+    u = User(email="contract@example.com")
+    o = Order(amount=10)
+    u.orders.append(o)
+    session.add(u)
+    session.commit()
+
+    loaded = session.scalar(select(User).where(User.email == "contract@example.com"))
+    assert loaded.orders[0].user is loaded
+```
+
+양방향 contract를 테스트로 못 박아 두면 `back_populates` 이름 변경 회귀를 빠르게 잡을 수 있습니다.
+
+## 보강 메모
+
+관계 모델 리뷰에서는 코드 스타일보다 데이터 무결성 질문을 먼저 던지는 편이 안전합니다. 부모 삭제, 자식 이관, 고아 데이터, 다대다 확장 시나리오를 각각 한 줄 테스트로 확보해 두면 배포 위험이 낮아집니다.
+
+관계 변경은 기능 변경보다 데이터 계약 변경으로 다루는 편이 안전합니다.
+
+이 원칙을 지키면 관계 버그를 조기에 차단할 수 있습니다.
+
+## 처음 질문으로 돌아가기
+
+- **`ForeignKey`와 `relationship()`은 왜 항상 한 쌍처럼 이해해야 할까요?**
+  - `ForeignKey("users.id")`는 SQL 레벨에서 어떤 컬럼이 부모를 가리키는지 알려 주고, `relationship()`은 그 위에 `user.orders`와 `order.user` 같은 객체 탐색 통로를 만듭니다. 두 정의가 함께 있어야 ORM이 JOIN 경로를 이해하고, `user.orders.append(order)`와 `order.user = user`가 같은 관계로 동기화됩니다.
+- **`back_populates`와 `backref`는 어떤 기준으로 선택할까요?**
+  - 이 글의 기준에서는 양쪽 속성을 모두 코드에 드러내고 타입 힌트와 옵션을 명시할 수 있는 `back_populates`가 기본 선택입니다. `backref`는 짧지만 반대편 정의가 숨어 버려 `order_by`, `cascade`, `lazy` 같은 옵션이 복잡해질수록 유지보수성이 떨어집니다.
+- **컬렉션 조작, flush, SQL 실행 시점은 어떻게 연결될까요?**
+  - `alice.orders.append(Order(amount=100))` 같은 컬렉션 조작은 즉시 SQL을 보내지 않고 세션에 변경만 기록해 두었다가 commit 직전에 부모와 자식 INSERT 순서를 맞춰 발사합니다. 또한 `cascade="all, delete-orphan"`를 켜 두면 컬렉션에서 제거된 주문이 실제 DELETE로 이어져, 본문의 orphan 삭제 테스트처럼 관계 계약을 코드와 데이터 양쪽에서 지킬 수 있습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
-- [SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](./02-core-metadata-table-types.md)
-- [SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기](./03-core-select-insert-update-delete.md)
-- [ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기](./04-orm-declarative-mapped-column.md)
-- [Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리](./05-session-unit-of-work-identity-map.md)
-- **ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (현재 글)**
-- 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
-- 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
-- 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
-- production 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
+- [SQLAlchemy 101 (1/10): SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy 101 (2/10): SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](./02-core-metadata-table-types.md)
+- [SQLAlchemy 101 (3/10): SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기](./03-core-select-insert-update-delete.md)
+- [SQLAlchemy 101 (4/10): ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기](./04-orm-declarative-mapped-column.md)
+- [SQLAlchemy 101 (5/10): Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리](./05-session-unit-of-work-identity-map.md)
+- **SQLAlchemy 101 (6/10): ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (현재 글)**
+- SQLAlchemy 101 (7/10): 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
+- SQLAlchemy 101 (8/10): 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
+- SQLAlchemy 101 (9/10): 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
+- SQLAlchemy 101 (10/10): 프로덕션 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
 
 <!-- toc:end -->
 
@@ -346,3 +468,5 @@ association table은 단순 다대다 매핑에만 적합합니다. "언제 태�
 ## 정리와 다음 글
 
 `relationship()`은 객체 레벨에서 관계 탐색을 담당하고, SQL 레벨의 `ForeignKey`와 짝을 이뤄 동작합니다. `back_populates`는 양방향 관계의 두 끝을 명시적으로 잇는 권장 패턴입니다. 일대다는 가장 흔한 형태이고, 다대다는 단순할 때 association table, 추가 컬럼이 필요할 때 association object로 표현합니다. cascade 정책은 부모-자식 관계의 안전망이고, SQLite에서는 외래키 PRAGMA가 함께 켜져야 합니다. 다음 글에서는 이 관계가 lazy 로딩으로 인해 N+1 문제를 만드는 시점을 살펴보고, joined/selectin 로딩으로 어떻게 미리 끌어오는지를 다룹니다.
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sqlalchemy-101/ko)

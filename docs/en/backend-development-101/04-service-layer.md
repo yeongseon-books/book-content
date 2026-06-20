@@ -1,10 +1,10 @@
 ---
 series: backend-development-101
 episode: 4
-title: The Service Layer
-status: content-ready
+title: "Backend Development 101 (4/10): The Service Layer"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,44 +17,30 @@ tags:
   - Python
   - DDD
 seo_description: Use a service layer to keep business rules in one place — handle transactions, validation, and domain events without polluting your controllers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# The Service Layer
+# Backend Development 101 (4/10): The Service Layer
 
-> Backend Development 101 series (4/10)
+Once controllers start doing too much, the same business rule gets copied into REST handlers, batch jobs, and other entry points. The first thing that breaks is not style — it is the existence of one reliable place where the rule lives.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Backend Development 101 series. Here, we define what belongs in the service layer, why transactions usually start there, and how that boundary improves reuse, testing, and long-term operability.
 
-**Core question**: Where does *business logic* belong?
 
-> Not in the controller. Not in the repository. In the *service layer*. One business action — register, transfer, refund — becomes one function with a meaningful name.
+![backend development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/04/04-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 4 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The role of the service layer
-- How to split responsibility across controller, service, and repository
-- Where to start a transaction
-- How to inject dependencies into a service
-- Where domain events fit in
+- The role of the service layer?
+- How to split responsibility across controller, service, and repository?
+- Where to start a transaction?
 
 ## Why It Matters
 
 Putting business logic in controllers spreads the same rule across *three places* — REST, gRPC, batch jobs. Move it into services and *every entry point* enforces the same rule. This single principle determines how long your service survives.
 
 > Business rules do not change when the door changes.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Ctrl["Controller"] --> Svc["Service"]
-    Svc --> Repo["Repository"]
-    Svc --> Ext["External API"]
-    Svc --> Bus["Event bus"]
-```
 
 A service is the *orchestrator* — it coordinates the repo, external APIs, and the event bus.
 
@@ -171,6 +157,16 @@ class OrderService:
         return order
 ```
 
+## Verification points
+
+**Expected output:** a service method should return the same result from plain inputs without touching any HTTP object, and both operations inside a transaction block should commit or roll back together.
+
+### First failure modes to check
+
+- If the service throws `HTTPException`, the controller boundary is leaking inward.
+- If the repository opens the transaction, verify whether the full use-case boundary is still visible anywhere.
+- If you cannot explain call order around an external API, orchestration responsibility is already getting blurry.
+
 ## What to Notice in This Code
 
 - A service *receives* its dependencies — it does not construct them.
@@ -215,10 +211,21 @@ Large backends keep one service directory per domain (`services/orders/`, `servi
 
 The service layer is the *home of business rules*. Next, we go a layer deeper to the *Database Layer*, where data finally lives.
 
+## Answering the Opening Questions
+
+- **The role of the service layer?**
+  - The article treats The Service Layer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to split responsibility across controller, service, and repository?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where to start a transaction?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Backend Development?](./01-what-is-backend-development.md)
-- [Building an HTTP Server](./02-building-an-http-server.md)
-- [Routing and Controllers](./03-routing-and-controllers.md)
+## In this series
+
+- [Backend Development 101 (1/10): What Is Backend Development?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): Building an HTTP Server](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing and Controllers](./03-routing-and-controllers.md)
 - **The Service Layer (current)**
 - The Database Layer (upcoming)
 - Authentication and Authorization (upcoming)
@@ -226,11 +233,17 @@ The service layer is the *home of business rules*. Next, we go a layer deeper to
 - Testing the Backend (upcoming)
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+### Official Docs
+
+- [FastAPI dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/)
+
+### Further Reading
+
 - [Service Layer pattern (Martin Fowler)](https://martinfowler.com/eaaCatalog/serviceLayer.html)
 - [DDD reference (Eric Evans)](https://www.domainlanguage.com/ddd/reference/)
 - [Architecture Patterns with Python](https://www.cosmicpython.com/)
-- [FastAPI dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/)

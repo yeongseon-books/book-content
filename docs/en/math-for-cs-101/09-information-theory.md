@@ -1,10 +1,10 @@
 ---
 series: math-for-cs-101
 episode: 9
-title: Information Theory
-status: content-ready
+title: "Math for CS 101 (9/10): Information Theory"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,39 +20,40 @@ seo_description: A beginner-friendly tour of bits, entropy, cross entropy, KL di
 last_reviewed: '2026-05-04'
 ---
 
-# Information Theory
+# Math for CS 101 (9/10): Information Theory
 
-> Math for CS 101 series (9/10)
+To understand why compression works, why cross entropy appears in classifier loss functions, or why language-model perplexity drops when predictions improve, you need a common concept underneath all three. That concept is information theory.
 
-<!-- a-grade-intro:begin -->
+Information theory treats information as something measurable instead of something merely descriptive. It lets you ask how surprising an event is, how uncertain a distribution is, and how far a predictive distribution is from the real one, all in a shared quantitative language.
 
-**Core question**: How do we *measure* the *amount* of information?
+This is post 9 in the Math for CS 101 series.
 
-> *Information theory* gives us a *bit-level* unit for uncertainty behind *compression*, *communication*, and *ML loss*.
+Here we connect information content, entropy, cross entropy, KL divergence, and compression limits into one mental model.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![math for cs 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/09/09-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 9 flow overview*
+> Entropy and information measure the theoretical limits of communication, compression, and storage; they set the boundaries of what is possible.
 
-- *Bits* and *information content*
-- *Entropy*
-- *Cross entropy*
-- *KL divergence*
-- *Compression* intuition
+## Questions to Keep in Mind
+
+- What does it mean to measure information in bits?
+- Why is entropy called average information content?
+- Why is cross entropy so common as an ML loss function?
 
 ## Why It Matters
 
-*Classifier losses*, *zip compression*, *communication codes*, and *language models* are all defined on top of information theory.
+Classifier losses, communication codes, compression formats, and language-model evaluation all rely on information-theoretic ideas. The formulas differ by domain, but the underlying questions are similar: how surprising is this event, how uncertain is this source, and how expensive is it to encode reality with the wrong distribution?
 
-## Concept at a Glance
+Once you see that connection, entropy stops feeling like a standalone definition. It becomes the lower-level quantity that explains why common messages should be short, rare messages should be long, and wrong probability models get penalized.
 
-```mermaid
-flowchart LR
-    P[Distribution] --> H[Entropy]
-    P --> C[Cross Entropy]
-    C --> K[KL Divergence]
-    H --> Z[Compression]
-```
+Information theory measures *entropy* (uncertainty), *mutual information* (shared knowledge), and compression ratios. It defines what is theoretically possible.
+
+## Before/After
+
+**Before**: "Compress this data as much as you can."
+
+**After**: "The Shannon limit sets an absolute lower bound; anything better is impossible.
 
 ## Key Terms
 
@@ -148,19 +149,33 @@ def avg_len(probs, lengths):
 
 ## Wrap-up and Next Steps
 
-Next post: the *Algorithms and Math* capstone.
+Information theory gives you a way to read surprise, uncertainty, and coding cost as parts of the same system. That makes compression, language modeling, and classification losses much easier to interpret.
+
+Next, we close the series by tying these mathematical tools back into algorithm design as one capstone view.
+
+## Answering the Opening Questions
+
+- **What does it mean to measure information in bits?**
+  - The article treats Information Theory as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is entropy called average information content?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is cross entropy so common as an ML loss function?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
-- [Logic and Proofs](./02-logic-and-proofs.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Graphs](./04-graphs.md)
-- [Combinatorics](./05-combinatorics.md)
-- [Probability](./06-probability.md)
-- [Linear Algebra](./07-linear-algebra.md)
-- [Calculus](./08-calculus.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
+- [Math for CS 101 (2/10): Logic and Proofs](./02-logic-and-proofs.md)
+- [Math for CS 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Math for CS 101 (4/10): Graphs](./04-graphs.md)
+- [Math for CS 101 (5/10): Combinatorics](./05-combinatorics.md)
+- [Math for CS 101 (6/10): Probability](./06-probability.md)
+- [Math for CS 101 (7/10): Linear Algebra](./07-linear-algebra.md)
+- [Math for CS 101 (8/10): Calculus](./08-calculus.md)
 - **Information Theory (current)**
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -169,3 +184,4 @@ Next post: the *Algorithms and Math* capstone.
 - [A Mathematical Theory of Communication - Shannon](https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf)
 - [Elements of Information Theory - Cover and Thomas](https://www.wiley.com/en-us/Elements+of+Information+Theory%2C+2nd+Edition-p-9780471241959)
 - [SciPy Stats Entropy Documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.entropy.html)
+- [SciPy GitHub repository](https://github.com/scipy/scipy)

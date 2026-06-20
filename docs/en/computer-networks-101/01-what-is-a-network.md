@@ -1,10 +1,10 @@
 ---
 series: computer-networks-101
 episode: 1
-title: What Is a Network?
-status: content-ready
+title: "Computer Networks 101 (1/10): What Is a Network?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,28 @@ tags:
   - Layered Model
   - OSI
 seo_description: A network is not cables but a bundle of agreements. Learn the three words that organize the rest of the series — packet, protocol, layered model.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is a Network?
+# Computer Networks 101 (1/10): What Is a Network?
 
 > Computer Networks 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: When you hear the word "network", what picture should be in your head so that IP, TCP, DNS, and HTTP all sit on the same canvas later?
 
 > A network is not cables. It is a bundle of agreements. Two computers exchange data only because they have agreed who speaks first, how to cut the data into pieces, and how to put it back together. Those agreements are protocols, and the way they stack on top of each other is the layered model. Before we start the series, draw that picture in your head.
 
-<!-- a-grade-intro:end -->
+This is the first post in the Computer Networks 101 series.
+
+
+![computer networks 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png)
+*computer networks 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is a Network??
+- Which signal should the example or diagram make visible for What Is a Network??
+- What failure should be prevented first when What Is a Network? reaches a real system?
 
 ## What You Will Learn
 
@@ -46,17 +54,7 @@ Open any networking book and a flood of acronyms appears at once: IP, TCP, UDP, 
 
 > Learning networking is not memorizing new words. It is deciding which shelf each word belongs on.
 
-## Concept at a Glance
-
 > Data is cut into small units called packets and pushed through the network. At each layer, a different kind of agreement takes responsibility — physical signals, frames between adjacent devices, packets routed worldwide, reliable connections, and finally meaningful messages such as HTTP requests. That division of labor is the layered model.
-
-```text
-[Application] HTTP, DNS, SMTP, gRPC ...
-[Transport]   TCP / UDP
-[Network]     IP, ICMP, routing
-[Link]        Ethernet, Wi-Fi
-[Physical]    electrical / optical / radio signals
-```
 
 ## Key Terms
 
@@ -205,17 +203,29 @@ A network is not cables but a bundle of agreements. Three words — packet, prot
 
 Next we move to the most basic addressing system on the Internet — IP and subnet.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is a Network??**
+  - The article treats What Is a Network? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is a Network??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is a Network? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Network? (current)**
-- IP and subnet (upcoming)
+- IP and Subnet (upcoming)
 - TCP and UDP (upcoming)
 - DNS (upcoming)
 - HTTP and HTTPS (upcoming)
-- TLS basics (upcoming)
+- TLS Basics (upcoming)
 - Routing and NAT (upcoming)
 - Load Balancer (upcoming)
-- WebSocket and real-time (upcoming)
-- Debugging network problems (upcoming)
+- WebSocket and Real-Time Communication (upcoming)
+- Debugging Network Problems (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -224,3 +234,4 @@ Next we move to the most basic addressing system on the Internet — IP and subn
 - [Kurose & Ross — Computer Networking: A Top-Down Approach](https://gaia.cs.umass.edu/kurose_ross/)
 - [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/)
 - [Cloudflare Learning — What is the Internet?](https://www.cloudflare.com/learning/network-layer/what-is-the-internet/)
+- [RFC 1122 — Requirements for Internet Hosts](https://www.rfc-editor.org/rfc/rfc1122)

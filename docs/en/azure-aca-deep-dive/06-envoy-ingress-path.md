@@ -1,25 +1,31 @@
 ---
-title: The Envoy ingress path — how the first request reaches your container
-series: azure-aca-deep-dive
 episode: 6
 language: en
+last_reviewed: '2026-04-29'
+seo_description: Tracing the first HTTPS request into Azure Container Apps through
+  the public Envoy fleet, the per-environment frontend, and the per-app data path.
+series: azure-aca-deep-dive
 status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
 tags:
 - Container Apps
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-04-29'
-seo_description: 'External references in this post are pinned to these upstream baselines:
-  - Dapr: v1.13.x (https://github.com/dapr/dapr) - KEDA: v2.14.x…'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: false
+title: "Azure Container Apps Deep Dive (6/6): The Envoy ingress path — how the first request reaches your container"
 ---
 
-# The Envoy ingress path — how the first request reaches your container
+# Azure Container Apps Deep Dive (6/6): The Envoy ingress path — how the first request reaches your container
+
+The public story for ingress in Azure Container Apps is concise. Enable ingress, get an FQDN, receive HTTPS traffic, and optionally split traffic across revisions.
+
+That is enough to ship a service, but it is not enough to explain the first request path. To understand that path, you have to separate what ACA documents directly from what has to be inferred from Envoy and Kubernetes patterns.
+
+This is the final post in the Azure Container Apps Deep Dive series. Here, I trace how the first ingress request most likely moves through the Envoy layer before it reaches your container.
 
 ## Source Version
 
@@ -36,42 +42,20 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: Envoy-style routing and Kubernetes-style service hops from ingress state to ready revision replicas.
 - **Out of bounds**: the exact private 0 -> 1 request path, buffering behavior, and hidden ingress control-plane topology.
 
-> Azure Container Apps Deep Dive series (6/6)
+![azure container apps deep dive chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-01-start-with-the-full-path-not-with-the-ap.en.png)
+*azure container apps deep dive chapter 6 flow overview*
 
-The public story for ingress in Azure Container Apps is concise.
-
-Enable ingress.
-Get an FQDN.
-Receive HTTPS traffic.
-Optionally split traffic across revisions.
-
-That is enough to ship a service.
-It is not enough to explain the first request path.
-
-This final episode follows that path at the right resolution for ACA operators, but with explicit evidence boundaries:
-
-- **[Documented]** external client -> ACA-managed ingress surface with FQDN, TLS termination, traffic splitting, and session affinity.
-- **[Inferred from Envoy upstream behavior]** ingress proxy route matching and weighted upstream selection.
-- **[Inferred from Kubernetes Service patterns]** a service-style hop from ingress routing state to ready revision replicas.
-
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Is ACA's ingress just one layer of Envoy, or is there another proxy on top?
 - How does the same hostname split between external and internal ingress?
 - Where does TLS terminate, and how is mTLS to the backend actually guaranteed?
-- Where do header rewriting, sticky sessions, and websockets each unlock or hit a wall?
-- What do 5xx codes at the ingress mean, and which metric flags them first?
 
 ## Start with the full path, not with the app
 
 The first mistake in ingress debugging is to start at the user container.
 The request has already crossed several platform layers before that point.
 
-![End-to-end ingress path to the pod](../../assets/azure-aca-deep-dive/06/06-01-start-with-the-full-path-not-with-the-ap.en.png)
-
-*End-to-end ingress path to the pod*
 If you keep this order in your head, ingress incidents become easier to localize.
 
 - No connection at all may be outside the pod entirely.
@@ -109,7 +93,7 @@ That is why Envoy is the right runtime anchor.
 This matters because the public endpoint is a platform endpoint.
 Your container is one downstream destination behind it.
 
-![Managed edge and Envoy routing split](../../assets/azure-aca-deep-dive/06/06-02-the-load-balancer-is-the-first-managed-e.en.png)
+![Managed edge and Envoy routing split](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-02-the-load-balancer-is-the-first-managed-e.en.png)
 
 *Managed edge and Envoy routing split*
 **[Documented]** ACA owns the public ingress edge.
@@ -125,7 +109,7 @@ The exact internal object names and hop-by-hop data-plane wiring are not.
 Microsoft documents TLS termination at the ingress point for HTTP ingress.
 That means the HTTPS connection from the client is terminated before the request is forwarded to the user container.
 
-![TLS termination and internal HTTP forwarding](../../assets/azure-aca-deep-dive/06/06-03-tls-ends-at-ingress-not-at-your-containe.en.png)
+![TLS termination and internal HTTP forwarding](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-03-tls-ends-at-ingress-not-at-your-containe.en.png)
 
 *TLS termination and internal HTTP forwarding*
 Operationally, this explains several things.
@@ -148,7 +132,7 @@ ACA ingress documents headers such as:
 
 These headers exist because the app is behind a proxy boundary.
 
-![Forwarded headers and original request context](../../assets/azure-aca-deep-dive/06/06-04-forwarded-headers-are-part-of-the-ingres.en.png)
+![Forwarded headers and original request context](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-04-forwarded-headers-are-part-of-the-ingres.en.png)
 
 *Forwarded headers and original request context*
 If your app builds absolute URLs, enforces scheme-aware redirects, or logs client IP, these headers are part of the real runtime path, not optional decoration.
@@ -163,7 +147,7 @@ That choice can be simple or weighted.
 **[Documented]** Microsoft documents revision traffic splitting as an ingress feature.
 **[Inferred from Envoy upstream behavior]** If multiple revisions are active, the most defensible explanation is that Envoy applies weighted upstream selection before forwarding.
 
-![Revision routing before the service hop](../../assets/azure-aca-deep-dive/06/06-05-the-routing-step-happens-before-the-serv.en.png)
+![Revision routing before the service hop](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-05-the-routing-step-happens-before-the-serv.en.png)
 
 *Revision routing before the service hop*
 This is exactly why episode 3 framed traffic splitting as ingress routing data.
@@ -181,7 +165,7 @@ It is not a Kubernetes cluster.
 Pinned Envoy route API source defines weighted cluster configuration at the routing layer.
 That is the right conceptual match for ACA revision traffic splitting, but still an inference rather than an ACA-published configuration dump.
 
-![Envoy weights across revision upstreams](../../assets/azure-aca-deep-dive/06/06-06-envoy-weight-means-upstream-cluster-weig.en.png)
+![Envoy weights across revision upstreams](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-06-envoy-weight-means-upstream-cluster-weig.en.png)
 
 *Envoy weights across revision upstreams*
 So when readers ask where ACA's 80/20 split "really lives," the safest answer is: in ingress routing state that, by the best-supported Envoy inference, selects among revision upstreams using weighted destinations.
@@ -193,7 +177,7 @@ So when readers ask where ACA's 80/20 split "really lives," the safest answer is
 From the user's point of view, traffic goes to "the revision."
 **[Inferred from Kubernetes Service patterns]** The most defensible hidden data-plane model is still a service-style hop between ingress routing and pod replicas.
 
-![Service-style fan-out behind ingress routing](../../assets/azure-aca-deep-dive/06/06-07-the-service-hop-is-easy-to-forget-becaus.en.png)
+![Service-style fan-out behind ingress routing](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-07-the-service-hop-is-easy-to-forget-becaus.en.png)
 
 *Service-style fan-out behind ingress routing*
 That hop matters because the upstream destination chosen by the proxy is unlikely to be one individual pod.
@@ -213,7 +197,7 @@ Here both ideas meet.
 **[Documented]** ACA does not shift traffic to a new revision until it is ready.
 **[Inferred from Envoy upstream behavior + Kubernetes Service patterns]** Even if ingress knows a revision exists, the request still needs healthy upstream endpoints behind the selected revision target to complete.
 
-![Revision readiness and ready replica availability](../../assets/azure-aca-deep-dive/06/06-08-readiness-is-part-of-the-ingress-path-wh.en.png)
+![Revision readiness and ready replica availability](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-08-readiness-is-part-of-the-ingress-path-wh.en.png)
 
 *Revision readiness and ready replica availability*
 That is why ingress debugging is inseparable from revision state and replica readiness.
@@ -229,7 +213,7 @@ That means the first request path may target a revision with no warm replicas ye
 Microsoft documents the wake-from-zero behavior at the scale-rule level.
 The exact Envoy, queueing, and routing behavior during a private 0 -> 1 transition is Microsoft-owned and closed-source.
 
-![Wake-up path for a scale-to-zero revision](../../assets/azure-aca-deep-dive/06/06-09-the-first-request-to-a-scale-to-zero-rev.en.png)
+![Wake-up path for a scale-to-zero revision](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-09-the-first-request-to-a-scale-to-zero-rev.en.png)
 
 *Wake-up path for a scale-to-zero revision*
 This is the point where ingress and autoscaling stop being separate topics.
@@ -248,7 +232,7 @@ If a revision is at zero, the first request is paying for several hidden steps.
 - probe success
 - sidecar startup if Dapr is enabled
 
-![Hidden stages behind first-request latency](../../assets/azure-aca-deep-dive/06/06-10-why-the-first-request-can-feel-slower-ev.en.png)
+![Hidden stages behind first-request latency](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-10-why-the-first-request-can-feel-slower-ev.en.png)
 
 *Hidden stages behind first-request latency*
 **[Documented]** Microsoft documents the scale-to-zero and revision-readiness behaviors that make this delay possible.
@@ -263,7 +247,7 @@ If a revision is at zero, the first request is paying for several hidden steps.
 **[Inferred from Kubernetes Service patterns]** The ingress path still terminates at a pod endpoint rather than inside the control plane.
 **[Documented + upstream Dapr context]** What happens immediately after that may involve the sidecar when Dapr is enabled.
 
-![Dapr participation inside the target pod](../../assets/azure-aca-deep-dive/06/06-11-dapr-adds-another-runtime-participant-be.en.png)
+![Dapr participation inside the target pod](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-11-dapr-adds-another-runtime-participant-be.en.png)
 
 *Dapr participation inside the target pod*
 This is why one failing end-user request can span ingress routing, revision readiness, pod startup, and sidecar behavior in one chain.
@@ -289,7 +273,7 @@ For internal-only apps, the internet-facing part disappears.
 **[Documented]** The app still sits behind ACA ingress.
 **[Inferred from Kubernetes Service patterns]** The downstream service-routing shape is likely still similar even though the public edge is gone.
 
-![Internal ingress on the same routing shape](../../assets/azure-aca-deep-dive/06/06-12-internal-ingress-follows-the-same-broad.en.png)
+![Internal ingress on the same routing shape](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-12-internal-ingress-follows-the-same-broad.en.png)
 
 *Internal ingress on the same routing shape*
 **[Documented]** The transport path changes at the edge.
@@ -308,7 +292,7 @@ When the request fails, walk the path in order.
 5. Does the chosen revision have ready replicas behind its inferred service/upstream target?
 6. Does the user container respond correctly once the request arrives?
 
-![Ordered ingress debugging checks](../../assets/azure-aca-deep-dive/06/06-13-a-practical-ingress-debugging-ladder.en.png)
+![Ordered ingress debugging checks](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-13-a-practical-ingress-debugging-ladder.en.png)
 
 *Ordered ingress debugging checks*
 This ladder is just the request path turned into an operator checklist.
@@ -317,7 +301,7 @@ This ladder is just the request path turned into an operator checklist.
 
 ## The whole request path in one diagram
 
-![Full ACA request path end to end](../../assets/azure-aca-deep-dive/06/06-14-the-whole-request-path-in-one-diagram.en.png)
+![Full ACA request path end to end](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-14-the-whole-request-path-in-one-diagram.en.png)
 
 *Full ACA request path end to end*
 This is the final "all boxes connected" picture for the series.
@@ -379,15 +363,24 @@ az containerapp hostname list -n my-app -g my-rg -o table
 - [ ] Separated alerts for ingress 5xx rate and p95 latency
 - [ ] Simulated traffic-split behaviour when backend health checks fail
 
+## Answering the Opening Questions
+
+- **Is ACA's ingress just one layer of Envoy, or is there another proxy on top?**
+  - The article treats The Envoy ingress path — how the first request reaches your container as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How does the same hostname split between external and internal ingress?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where does TLS terminate, and how is mTLS to the backend actually guaranteed?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
-- [Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
-- [Revisions and traffic splitting — where Envoy weights come from](./03-revision-and-traffic-split.md)
-- [KEDA inside ACA — what a scale rule actually creates](./04-keda-in-aca.md)
-- [Dapr sidecar internals — the Go process that lives next to your container](./05-dapr-sidecar-internals.md)
-- **The Envoy ingress path — how the first request reaches your container (current)**
+- [Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
+- [Azure Container Apps Deep Dive (2/6): Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
+- [Azure Container Apps Deep Dive (3/6): Revisions and traffic splitting — where Envoy weights come from](./03-revision-and-traffic-split.md)
+- [Azure Container Apps Deep Dive (4/6): KEDA inside ACA — what a scale rule actually creates](./04-keda-in-aca.md)
+- [Azure Container Apps Deep Dive (5/6): Dapr sidecar internals — the Go process that lives next to your container](./05-dapr-sidecar-internals.md)
+- **Azure Container Apps Deep Dive (6/6): The Envoy ingress path — how the first request reaches your container (current)**
 
 <!-- toc:end -->
 

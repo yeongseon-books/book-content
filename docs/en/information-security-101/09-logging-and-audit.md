@@ -1,10 +1,10 @@
 ---
 series: information-security-101
 episode: 9
-title: Logging and Audit
+title: "Information Security 101 (9/10): Logging and Audit"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,26 @@ seo_description: A short, code-first guide to security logging and audit trails 
 last_reviewed: '2026-05-04'
 ---
 
-# Logging and Audit
+# Information Security 101 (9/10): Logging and Audit
 
 > Information Security 101 series (9/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Some incidents cannot be prevented — so how do we notice them?
 
 > Logs are the system's memory. A system without memory does not even know it was breached.
 
-<!-- a-grade-intro:end -->
+This is post 9 in the Information Security 101 series.
+
+
+![information security 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/09/09-01-big-picture.en.png)
+*information security 101 chapter 9 flow overview*
+> Logging and audit are not post-incident analysis tools. They are real-time detection systems that catch anomalies as they happen and trigger immediate response.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Logging and Audit?
+- Which signal should the example or diagram make visible for Logging and Audit?
+- What failure should be prevented first when Logging and Audit reaches a real system?
 
 ## What You Will Learn
 
@@ -46,8 +55,6 @@ last_reviewed: '2026-05-04'
 Without detection there is no response. The mean time to detect a breach is over 200 days — good logging cuts that to hours.
 
 > A breach noticed in 200 days is not an incident; it is a disaster.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -188,17 +195,29 @@ Kubernetes uses audit policy to record every API server call. AWS uses CloudTrai
 
 Logs are how incidents become visible. The final episode covers what to do once you see one — incident response.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Logging and Audit?**
+  - The article treats Logging and Audit as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Logging and Audit?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Logging and Audit reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Information Security?](./01-what-is-information-security.md)
-- [Authentication and Authorization](./02-authentication-and-authorization.md)
-- [Cryptography and Hashes](./03-cryptography-and-hash.md)
-- [TLS and Certificates](./04-tls-and-certificates.md)
-- [Web Security Basics](./05-web-security-basics.md)
-- [SQL Injection and XSS](./06-sql-injection-and-xss.md)
-- [Secret Management](./07-secret-management.md)
-- [Least Privilege](./08-least-privilege.md)
+## In this series
+
+- [Information Security 101 (1/10): What Is Information Security?](./01-what-is-information-security.md)
+- [Information Security 101 (2/10): Authentication and Authorization](./02-authentication-and-authorization.md)
+- [Information Security 101 (3/10): Cryptography and Hashing](./03-cryptography-and-hash.md)
+- [Information Security 101 (4/10): TLS and Certificates](./04-tls-and-certificates.md)
+- [Information Security 101 (5/10): Web Security Basics](./05-web-security-basics.md)
+- [Information Security 101 (6/10): SQL Injection and XSS](./06-sql-injection-and-xss.md)
+- [Information Security 101 (7/10): Secret Management](./07-secret-management.md)
+- [Information Security 101 (8/10): Least Privilege](./08-least-privilege.md)
 - **Logging and Audit (current)**
 - Incident Response (upcoming)
+
 <!-- toc:end -->
 
 ## References

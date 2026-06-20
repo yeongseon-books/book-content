@@ -1,11 +1,11 @@
 ---
-title: What is Git? Version control fundamentals
+title: "Git & GitHub 101 (1/10): What is Git? Version control fundamentals"
 series: git-github-101
 episode: 1
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,26 @@ tags:
 - snapshot-model
 - git-install
 - git-config
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-15'
 seo_description: 'Git''s core model is "a tool that keeps snapshots of your files
   in time order", and each snapshot is produced through three areas: the working…'
 ---
 
-# What is Git? Version control fundamentals
+# Git & GitHub 101 (1/10): What is Git? Version control fundamentals
 
-## What you will learn
+If version control still feels like a tool you are supposed to learn before real work begins, this is the place to reset that picture. Git becomes much easier once you see it less as a command list and more as a way to preserve and recover changes over time.
 
-- The problem that a version control system (VCS) solves
-- Why Git is a distributed VCS
-- The "snapshot" model and how it differs from line-by-line tracking
-- How to install Git and finish the initial `git config`
-- What you need before making the first commit in the next post
+This is the first post in the Git & GitHub 101 series. Here, we build the mental model behind Git itself before moving on to the everyday commands.
+
+
+![Git & GitHub 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/01/01-01-mental-model.en.png)
+*Git & GitHub 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- The problem that a version control system (VCS) solves?
+- Why Git is a distributed VCS?
+- The "snapshot" model and how it differs from line-by-line tracking?
 
 ## Why it matters
 
@@ -49,9 +55,6 @@ Many teams and open-source projects treat Git as a standard tool. Learning it is
 > Git's core model is "a tool that keeps snapshots of your files in time order", and each snapshot is produced through three areas: the working directory, the staging area, and the repository.
 In one sentence, Git is "a tool that stores snapshots of your files in time order." Each commit is a photograph of the tracked files at that moment.
 
-![Mental model](../../assets/git-github-101/01/01-01-mental-model.en.png)
-
-*Mental model*
 Git distinguishes three areas.
 
 - **Working Directory**: where the files you are editing live.
@@ -75,7 +78,7 @@ Compare two ways a small team might share code.
 
 **Before (without Git)**
 
-```
+```text
 project_v1.zip
 project_v2_FINAL.zip
 project_v2_FINAL_real.zip
@@ -213,12 +216,36 @@ When you are first learning Git, the most useful exercise is not memorizing comm
 
 In the next post we start from an empty directory and build the first commit. `git init`, `git status`, `git add`, and `git commit` come in, in that order.
 
+## Answering the Opening Questions
+
+- **The problem that a version control system (VCS) solves?**
+  - The article treats What is Git? Version control fundamentals as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why Git is a distributed VCS?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The "snapshot" model and how it differs from line-by-line tracking?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- **What is Git? Version control fundamentals (current)**
+- Your first commit - init, status, add, commit (upcoming)
+- Reading change history - status, diff, log (upcoming)
+- Branch basics - create, switch, and compare (upcoming)
+- Merge and Conflict Resolution - Bringing Two Lines Back Together (upcoming)
+- Creating a GitHub repository - remote, push, and pull in one go (upcoming)
+- Collaborating with Pull Requests - From Branch to Review to Main (upcoming)
+- Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)
+- Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)
+- Building a real-world Git workflow: from issue to release in one cycle (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Git docs — About Version Control](https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control)
-- [Git docs — First-Time Git Setup](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup)
-- [Git downloads](https://git-scm.com/downloads)
-- [GitHub Docs — Set up Git](https://docs.github.com/en/get-started/quickstart/set-up-git)
+- [Pro Git — About Version Control](https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control) — Grounds the chapter's opening problem statement by explaining what version control solves and how centralized and distributed models differ.
+- [Pro Git — What is Git?](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F) — Maps directly to the snapshot model and distributed-repository mental model used throughout the article.
+- [Pro Git — First-Time Git Setup](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup) — Backs up the first-run configuration flow for `user.name` and `user.email` with the canonical walkthrough.
+- [git-config manual](https://git-scm.com/docs/git-config) — The precise reference for `git config --global` syntax and `init.defaultBranch` settings.
+- [Git downloads](https://git-scm.com/downloads) — The official installation entry point for each operating system.
+- [GitHub Docs — Set up Git](https://docs.github.com/en/get-started/quickstart/set-up-git) — Summarizes the first-time Git setup steps in a GitHub-oriented workflow.

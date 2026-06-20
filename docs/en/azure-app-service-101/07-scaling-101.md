@@ -5,7 +5,7 @@ episode: 7
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -25,6 +25,8 @@ seo_description: '"Traffic increased and the app is slow." "Want to reduce costs
 
 **Scaling** is the key strategy for solving these problems. In this post, we'll cover the difference between Scale Up and Scale Out, when to choose each, and how to configure Autoscale.
 
+This is the final post in the Azure App Service 101 series. It ties the earlier platform, deployment, configuration, and monitoring topics into concrete scaling decisions.
+
 ---
 
 > Scale rules without cost ceilings are how a single bad release becomes a five-figure invoice.
@@ -39,7 +41,7 @@ seo_description: '"Traffic increased and the app is slow." "Want to reduce costs
 
 ## Two Directions of Scaling
 
-```
+```text
  ┌─────────────┐
  │ Larger │ ← Scale Up (Vertical)
  │ Instance │
@@ -57,7 +59,7 @@ More instances
 | **Vertical** | Scale Up/Down | Change instance size |
 | **Horizontal** | Scale Out/In | Change instance count |
 
-![Scaling up versus adding instances](../../assets/azure-app-service-101/07/01-scale-up-vs-scale-out.en.png)
+![Scaling up versus adding instances](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/07/01-scale-up-vs-scale-out.en.png)
 
 *Scaling up versus adding instances*
 
@@ -118,7 +120,7 @@ az appservice plan show \
 - Need multiple instances for **high availability**
 - App is designed to be **stateless**
 
-![Scaling choices by bottleneck type](../../assets/azure-app-service-101/07/04-scaling-decision-tree.en.png)
+![Scaling choices by bottleneck type](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/07/04-scaling-decision-tree.en.png)
 
 *Scaling choices by bottleneck type*
 
@@ -174,13 +176,13 @@ az appservice plan update \
 
 **Automatically** increase or decrease instances based on traffic.
 
-![Autoscale loop from metrics to actions](../../assets/azure-app-service-101/07/02-autoscale-feedback-loop.en.png)
+![Autoscale loop from metrics to actions](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/07/02-autoscale-feedback-loop.en.png)
 
 *Autoscale loop from metrics to actions*
 
 ### Autoscale Flow
 
-```
+```text
 Collect Metrics → Evaluate Rules → Scale Action → Cooldown → Re-evaluate
 ```
 
@@ -253,7 +255,7 @@ az monitor autoscale show \
 
 ### 1. Separate Scale Out/In Thresholds
 
-```
+```text
 Scale Out: CPU > 70%
 Scale In: CPU < 35% ← Gap prevents oscillation
 ```
@@ -269,8 +271,8 @@ Scale In: CPU < 35% ← Gap prevents oscillation
 
 ### 3. Set Minimum/Maximum Instances
 
-```
-Minimum: 2 ← Ensures availability (Health Check needs this)
+```text
+Minimum: 2 ← Availability baseline and full Health Check benefit
 Maximum: 10 ← Cost control
 ```
 
@@ -291,11 +293,11 @@ az monitor autoscale rule create \
 
 When instances increase, **load on external dependencies also increases**.
 
-![Instance growth cascading into dependency load](../../assets/azure-app-service-101/07/03-dependency-cascade.en.png)
+![Instance growth cascading into dependency load](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/07/03-dependency-cascade.en.png)
 
 *Instance growth cascading into dependency load*
 
-```
+```text
 2 instances → 20 DB connections
 10 instances → 100 DB connections (!)
 ```

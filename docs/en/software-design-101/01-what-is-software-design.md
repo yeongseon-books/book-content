@@ -1,10 +1,10 @@
 ---
 series: software-design-101
 episode: 1
-title: What Is Software Design?
+title: "Software Design 101 (1/10): What Is Software Design?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,28 @@ tags:
   - DesignPrinciples
   - Maintainability
 seo_description: Define software design, distinguish it from clean coding, and learn signals of good and failing design across a code base.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is Software Design?
+# Software Design 101 (1/10): What Is Software Design?
 
-> Software Design 101 series (1/10)
+Changing one line is easy. Changing a feature without dragging half the code base with it is where software design starts to matter.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Software Design 101 series.
 
-**Core question**: How is good design different from good coding?
+In this post, we treat software design not as code prettiness but as a bundle of decisions that determines the cost of the next change. The working question is simple: what signals tell you that a structure will stay changeable six months from now?
 
 > Good code makes one line easier to read; good design makes the whole code base easier to change.
 
-<!-- a-grade-intro:end -->
+
+![software design 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/01/01-01-concept-at-a-glance.en.png)
+*software design 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Software Design??
+- Which signal should the example or diagram make visible for What Is Software Design??
+- What failure should be prevented first when What Is Software Design? reaches a real system?
 
 ## What You Will Learn
 
@@ -46,17 +54,6 @@ last_reviewed: '2026-05-04'
 Design is invisible. But it shows itself every time the next change is more expensive than expected.
 
 > Design debt always charges interest.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    R["Requirements"] --> D["Design decisions"]
-    D --> C["Code"]
-    C --> M["Change cost"]
-    M --> R2["New requirements"]
-    R2 --> D
-```
 
 Design determines change cost.
 
@@ -138,6 +135,31 @@ Can a new teammate understand a module in 30 minutes?
 
 Design is, in the end, a human task.
 
+## Quick Verification
+
+The fastest way to evaluate design is to replay a real change against the code base. Pick a frequent request and write down the actual change footprint, dependency shape, and test scope.
+
+```text
+Change scenario: add a payment method
+Files touched: 1 / 4 / 9
+Dependency cycle: no / yes
+Test scope: domain only / domain+DB / full regression
+```
+
+**Expected output:** the healthier design touches fewer files, avoids cycles, and keeps the verification scope narrow.
+
+That simple exercise moves the conversation away from “is the code clean?” and toward “how expensive is the next change?”
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| One feature request forces you through many folders | Find the module boundary where the change leaks |
+| A tiny change still demands full regression | Check whether domain rules are glued to IO |
+| A new teammate cannot explain the structure quickly | Ask for a one-sentence responsibility per module |
+
+Once you learn to read these early signals, design stops being an abstract aesthetic debate and becomes a cost-control tool.
+
 ## What to Notice in This Code
 
 - Change footprint, dependencies, responsibility, and testability viewed together.
@@ -181,7 +203,18 @@ Strong teams keep ADRs (Architecture Decision Records). Decisions and their reas
 
 Design decides the cost of the next change. Next we start with the most fundamental tool: separation of concerns.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Software Design??**
+  - The article treats What Is Software Design? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Software Design??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Software Design? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Software Design? (current)**
 - Separation of Concerns (upcoming)
 - Modules and Boundaries (upcoming)
@@ -192,6 +225,7 @@ Design decides the cost of the next change. Next we start with the most fundamen
 - Reducing Change Impact (upcoming)
 - Design Principles (upcoming)
 - Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -200,3 +234,8 @@ Design decides the cost of the next change. Next we start with the most fundamen
 - [Software Architecture Guide (Martin Fowler)](https://martinfowler.com/architecture/)
 - [Architecture Decision Records (ADR)](https://adr.github.io/)
 - [Designing Data-Intensive Applications](https://dataintensive.net/)
+
+### Practical Docs
+
+- [The Python Tutorial — Modules](https://docs.python.org/3/tutorial/modules.html)
+- [unittest.mock — mock object library](https://docs.python.org/3/library/unittest.mock.html)

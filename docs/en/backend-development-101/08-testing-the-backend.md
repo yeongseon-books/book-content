@@ -1,10 +1,10 @@
 ---
 series: backend-development-101
 episode: 8
-title: Testing the Backend
-status: content-ready
+title: "Backend Development 101 (8/10): Testing the Backend"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,44 +17,30 @@ tags:
   - Python
   - QualityAssurance
 seo_description: Split backend tests into unit, integration, and E2E levels and use pytest plus FastAPI TestClient to make every change safe.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Testing the Backend
+# Backend Development 101 (8/10): Testing the Backend
 
-> Backend Development 101 series (8/10)
+Changing backend code without tests is a bet every single time. As a system grows, the real skill is not writing perfect code once, but making sure you can change it later without breaking the parts that already matter.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Backend Development 101 series. Here, we split tests into unit, integration, and end-to-end layers and use pytest plus FastAPI TestClient to build a backend that stays safe to modify.
 
-**Core question**: Why is "no time to write tests" the *biggest* time waste of all?
 
-> Without tests, every change is a *bet*. A single unit test prevents *hours* of debugging later.
+![backend development 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/08/08-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 8 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The difference between unit, integration, and E2E tests
-- How to test a service with pytest
-- How to call endpoints with FastAPI's `TestClient`
-- How to test without spinning up a *real* database
-- When to use fixtures and when to mock
+- The difference between unit, integration, and E2E tests?
+- How to test a service with pytest?
+- How to call endpoints with FastAPI's `TestClient`?
 
 ## Why It Matters
 
 Code without tests can be *read but not changed safely*. The mark of a good backend is *how easily it can be changed*, and automated tests are what create that safety.
 
 > Tests are the *insurance* of code — invisible day to day, decisive in incidents.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Unit["Unit"] --> Int["Integration"]
-    Int --> E2E["E2E"]
-    Unit -->|"fast and many"| Pyramid
-    E2E -->|"slow and few"| Pyramid
-```
 
 The test pyramid — *many* at the bottom, *few* at the top.
 
@@ -157,6 +143,16 @@ def test_create_user(client, engine):
 
 FastAPI's `dependency_overrides` lets you test *without a real database*.
 
+## Verification points
+
+**Expected output:** `pytest -q` should pass the basic unit test, `/health` via `TestClient` should return `200`, and the bad-login path should return `401`.
+
+### First failure modes to check
+
+- If tests interfere with each other, revisit fixture scope and database reset strategy first.
+- If mocks replace too much behavior, add one integration test on the real path.
+- When you use `dependency_overrides`, clear them after the test so later cases do not inherit hidden state.
+
 ## What to Notice in This Code
 
 - Unit tests *cut external dependencies* with mocks.
@@ -201,22 +197,39 @@ CI (GitHub Actions and friends) runs `pytest` on every PR. Units take *seconds*,
 
 Tests are the *safety net for change*. Next, we deliver the code to real users — *deploying the backend*.
 
+## Answering the Opening Questions
+
+- **The difference between unit, integration, and E2E tests?**
+  - The article treats Testing the Backend as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to test a service with pytest?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to call endpoints with FastAPI's `TestClient`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Backend Development?](./01-what-is-backend-development.md)
-- [Building an HTTP Server](./02-building-an-http-server.md)
-- [Routing and Controllers](./03-routing-and-controllers.md)
-- [The Service Layer](./04-service-layer.md)
-- [The Database Layer](./05-database-layer.md)
-- [Authentication and Authorization](./06-auth-and-authorization.md)
-- [Logging and Error Handling](./07-logging-and-error-handling.md)
+## In this series
+
+- [Backend Development 101 (1/10): What Is Backend Development?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): Building an HTTP Server](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing and Controllers](./03-routing-and-controllers.md)
+- [Backend Development 101 (4/10): The Service Layer](./04-service-layer.md)
+- [Backend Development 101 (5/10): The Database Layer](./05-database-layer.md)
+- [Backend Development 101 (6/10): Authentication and Authorization](./06-auth-and-authorization.md)
+- [Backend Development 101 (7/10): Logging and Error Handling](./07-logging-and-error-handling.md)
 - **Testing the Backend (current)**
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+### Official Docs
+
 - [pytest documentation](https://docs.pytest.org/en/stable/)
 - [FastAPI testing](https://fastapi.tiangolo.com/tutorial/testing/)
-- [Testing pyramid (Martin Fowler)](https://martinfowler.com/articles/practical-test-pyramid.html)
 - [unittest.mock](https://docs.python.org/3/library/unittest.mock.html)
+
+### Further Reading
+
+- [Testing pyramid (Martin Fowler)](https://martinfowler.com/articles/practical-test-pyramid.html)

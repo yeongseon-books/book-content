@@ -1,10 +1,10 @@
 ---
 series: discrete-math-101
 episode: 1
-title: What Is Discrete Mathematics?
+title: "Discrete Math 101 (1/10): What Is Discrete Mathematics?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: What discrete mathematics is, how it differs from calculus, and
 last_reviewed: '2026-05-04'
 ---
 
-# What Is Discrete Mathematics?
+# Discrete Math 101 (1/10): What Is Discrete Mathematics?
+
+This is the first post in the Discrete Math 101 series.
 
 > Discrete Math 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: How is discrete mathematics different from calculus, and why is it the first math course in every computer science curriculum?
 
 > Discrete mathematics studies "countable" objects — integers, propositions, sets, graphs — entities that come in distinct, separated units. Computers are inherently discrete machines, so every theory in computer science is built on discrete math. This article maps the field, contrasts it with continuous math, and previews the topics covered in this series.
 
-<!-- a-grade-intro:end -->
+
+![discrete math 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/01/01-01-big-picture.en.png)
+*discrete math 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Discrete Mathematics??
+- Which signal should the example or diagram make visible for What Is Discrete Mathematics??
+- What failure should be prevented first when What Is Discrete Mathematics? reaches a real system?
 
 ## What You Will Learn
 
@@ -47,8 +55,6 @@ Analyzing algorithms requires recurrences and combinatorics. Understanding datab
 > Discrete math = the language a computer scientist uses to organize their thinking.
 
 This series walks through the core concepts one episode at a time, drawing the link to computer science at every step.
-
-## Concept at a Glance
 
 > Discrete math rests on five pillars: logic, sets, functions, combinatorics, and graphs. They are unified by the property of "discreteness."
 
@@ -151,7 +157,6 @@ def is_prime(n: int) -> bool:
             return False
     return True
 
-
 # "7 is prime" is a true proposition
 # "9 is prime" is a false proposition
 print(f"7 is prime: {is_prime(7)}")  # True
@@ -188,11 +193,9 @@ graph = {
     "E": ["D"],
 }
 
-
 def neighbors(g: dict, node: str) -> list:
     """Return neighbors of the given vertex."""
     return g.get(node, [])
-
 
 for node in graph:
     print(f"{node} neighbors: {neighbors(graph, node)}")
@@ -273,7 +276,18 @@ Discrete math is the study of countable objects, and it is the universal languag
 
 Next, we examine the smallest unit of discrete math — the proposition — together with the logical operators that drive every computer's reasoning.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Discrete Mathematics??**
+  - The article treats What Is Discrete Mathematics? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Discrete Mathematics??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Discrete Mathematics? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Discrete Mathematics? (current)**
 - Propositions and Logic (upcoming)
 - Sets and Functions (upcoming)
@@ -284,6 +298,7 @@ Next, we examine the smallest unit of discrete math — the proposition — toge
 - Graph Theory Basics (upcoming)
 - Trees and Graph Traversal (upcoming)
 - Discrete Mathematics and Algorithms (upcoming)
+
 <!-- toc:end -->
 
 ## References

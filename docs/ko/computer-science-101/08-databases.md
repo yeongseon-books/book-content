@@ -1,12 +1,12 @@
 ---
 series: computer-science-101
 episode: 8
-title: 데이터베이스
-status: content-ready
+title: "Computer Science 101 (8/10): 데이터베이스"
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -17,16 +17,33 @@ tags:
   - 인덱스
   - 트랜잭션
   - ACID
-seo_description: 데이터베이스가 데이터를 어떻게 저장·조회·보호하는지 인덱스와 트랜잭션 중심으로 다루는 CS 입문 시리즈입니다.
-last_reviewed: '2026-05-04'
+seo_description: SQL, 인덱스, 트랜잭션이 데이터베이스 성능과 무결성을 어떻게 좌우하는지 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
-# 데이터베이스
+# Computer Science 101 (8/10): 데이터베이스
 
-> Computer Science 101 시리즈 (8/10)
+수억 행 중 한 행을 1ms 안에 찾는 일은 SQL 문장 자체보다 그 뒤에 숨어 있는 자료구조와 실행 계획의 힘에 가깝습니다. 서비스 장애가 데이터베이스에서 시작되는 이유도, 짧은 쿼리 뒤에 깊은 비용이 숨어 있기 때문입니다.
 
+여기서는 관계형 데이터베이스의 기본 개념, SQL 조회와 수정, 인덱스, 트랜잭션과 ACID를 실무 중심으로 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+![Computer Science 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/08/08-01-concept-at-a-glance.ko.png)
+*Computer Science 101 8장 흐름 개요*
+
+## 먼저 던지는 질문
+
+- 데이터베이스는 많은 데이터를 어떻게 영구 저장하고 동시에 안전하게 읽고 쓸까요?
+- 인덱스는 왜 조회 속도를 급격하게 바꿀까요?
+- SQL 한 줄과 실제 실행 계획 사이에는 어떤 차이가 있을까요?
+
+## 이 글에서 배울 것
+
+- 관계형 데이터베이스의 기본 개념
+- SQL로 데이터를 조회하고 수정하는 방법
+- 인덱스가 조회를 빠르게 만드는 원리
+- 트랜잭션과 ACID의 의미
+
+## 왜 중요한가
 
 대부분의 서비스 장애는 데이터베이스에서 일어납니다. 느린 쿼리 하나가 전체 시스템을 마비시키고, 트랜잭션 한 줄을 놓치면 데이터가 깨집니다. SQL과 인덱스, 트랜잭션을 이해하지 못하면 백엔드 엔지니어로 성장할 수 없습니다.
 
@@ -34,27 +51,26 @@ last_reviewed: '2026-05-04'
 
 쿼리는 짧지만 그 뒤에는 깊은 알고리즘이 있습니다.
 
-## 전체 흐름
+## 한눈에 보는 개념
+
 > 인덱스는 책의 색인과 같습니다. 본문 전체를 뒤지지 않고 색인을 따라 곧장 페이지를 펼칩니다.
 
-```text
-인덱스 없이 SELECT * FROM users WHERE email = 'a@b.com'
-  → 모든 행을 스캔 (Full Table Scan)  — O(n)
+## 핵심 용어
 
-인덱스 있을 때 (B-Tree)
-  → 트리에서 이진 탐색       — O(log n)
+| 용어 | 설명 |
+| --- | --- |
+| Table | 행과 열로 구성된 관계형 데이터의 기본 단위 |
+| Primary key | 한 행을 유일하게 식별하는 열 |
+| Index | 특정 열 기준으로 행을 빠르게 찾게 해 주는 자료구조 |
+| Transaction | 여러 SQL 문을 하나의 논리 작업으로 묶는 단위 |
+| ACID | 원자성·일관성·격리성·지속성 네 가지 속성 |
+| Query planner | SQL을 어떤 방식으로 실행할지 결정하는 DB 구성 요소 |
 
-100만 행 기준
-  - 풀 스캔  : 약 1,000,000번 비교
-  - B-Tree   : 약 20번 비교
-```
-
-## Before / After
-
+## 적용 전후 비교
 **Before — 인덱스 없이 N+1 쿼리:**
 
 ```python
-# 사용자 100명의 주문을 가져오기 — 101번의 쿼리
+# 사용자 100명의 주문 조회 — 쿼리 101개
 users = cursor.execute("SELECT id FROM users").fetchall()
 orders = []
 for (user_id,) in users:
@@ -65,7 +81,7 @@ for (user_id,) in users:
 **After — JOIN과 인덱스 활용:**
 
 ```python
-# 한 번의 쿼리로 끝, user_id에 인덱스가 있으면 빠릅니다
+# 단일 쿼리, user_id에 index가 있으면 빠름
 cursor.execute("""
     SELECT u.id, o.id, o.amount
     FROM users u
@@ -116,7 +132,7 @@ conn.commit()
 for row in cur.execute("SELECT id, email FROM users"):
     print(row)
 
-# WHERE + ORDER BY + LIMIT
+# WHERE + ORDER BY + LIMIT 절 조합
 for row in cur.execute(
     "SELECT name, email FROM users WHERE name LIKE 'A%' ORDER BY id LIMIT 10"
 ):
@@ -152,21 +168,23 @@ target = 12345
 
 start = time.perf_counter()
 cur.execute("SELECT COUNT(*) FROM big WHERE k = ?", (target,)).fetchone()
-print(f"인덱스 전: {time.perf_counter() - start:.4f}s")
+print(f"before index: {time.perf_counter() - start:.4f}s")
 
 cur.execute("CREATE INDEX idx_big_k ON big(k)")
 
 start = time.perf_counter()
 cur.execute("SELECT COUNT(*) FROM big WHERE k = ?", (target,)).fetchone()
-print(f"인덱스 후: {time.perf_counter() - start:.6f}s")
+print(f"after  index: {time.perf_counter() - start:.6f}s")
 ```
+
+**Expected output:** `after index`가 `before index`보다 훨씬 짧아지고, 이어지는 `EXPLAIN QUERY PLAN`에서 인덱스 사용 여부를 확인할 수 있어야 합니다.
 
 ### 4단계: EXPLAIN QUERY PLAN으로 들여다보기
 
 ```python
 for row in cur.execute("EXPLAIN QUERY PLAN SELECT * FROM big WHERE k = 12345"):
     print(row)
-# (… USING INDEX idx_big_k …) 같은 줄이 보이면 인덱스를 사용하는 것
+# (… USING INDEX idx_big_k …) 같은 줄로 index 사용 확인
 ```
 
 ### 5단계: 트랜잭션과 ACID
@@ -181,9 +199,8 @@ cur.executemany(
 )
 conn.commit()
 
-
 def transfer(src: int, dst: int, amount: int) -> None:
-    """원자적으로 두 계좌 간 이체 — 둘 다 성공하거나 둘 다 실패."""
+    """Atomic transfer between two accounts — both succeed or both fail."""
     try:
         cur.execute("BEGIN")
         cur.execute("UPDATE accounts SET balance = balance - ? WHERE id = ?", (amount, src))
@@ -193,12 +210,11 @@ def transfer(src: int, dst: int, amount: int) -> None:
         conn.rollback()
         raise
 
-
 transfer(1, 2, 300)
 print(cur.execute("SELECT * FROM accounts").fetchall())
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
 - 인덱스 하나로 같은 쿼리가 수백 배 빨라질 수 있습니다
 - N+1 쿼리는 거의 항상 JOIN 또는 IN 절로 한 번에 해결할 수 있습니다
@@ -223,6 +239,219 @@ print(cur.execute("SELECT * FROM accounts").fetchall())
 - 트랜잭션 격리 수준 선택 — Read Committed, Repeatable Read, Serializable
 - 마이그레이션 전략 — Zero-downtime schema change, online DDL
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+시니어 엔지니어는 SQL을 쓰면서 동시에 실행 계획을 머릿속에 그립니다. 화면에 보이는 SQL과 DB가 실제로 밟는 단계는 다르기 때문에, `EXPLAIN`으로 인덱스 사용과 예상 row 수를 먼저 확인합니다.
+
+또한 데이터베이스는 시스템에서 가장 위험한 상태 저장 구성 요소라는 사실을 압니다. 코드 배포는 롤백할 수 있어도 잘못된 마이그레이션은 되돌리기 어렵습니다. 그래서 스키마 변경은 항상 호환 가능하게, 트랜잭션은 짧게, 운영 SQL은 실행 전 `EXPLAIN`으로 검증합니다.
+
+### B-Tree 인덱스의 내부 구조
+
+관계형 데이터베이스의 기본 인덱스는 B+Tree입니다. 디스크 I/O를 최소화하도록 설계된 균형 트리입니다.
+
+```text
+                    ┌──────────────┐
+                    │  [30 | 60]   │  ← 루트 노드
+                    └──────────────┘
+                   ╱       │        ╲
+        ┌─────────┐  ┌─────────┐  ┌─────────┐
+        │[10 | 20]│  │[40 | 50]│  │[70 | 80]│  ← 내부 노드
+        └─────────┘  └─────────┘  └─────────┘
+       ╱    │    ╲      │    ╲       │    ╲
+   ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐
+   │1-9│→│11 │→│21 │→│31 │→│41 │→│61 │→│71 │  ← 리프 노드 (연결 리스트)
+   │   │ │-19│ │-29│ │-39│ │-59│ │-69│ │-89│
+   └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └───┘
+```
+
+핵심 특성:
+- 리프 노드만 실제 데이터(또는 데이터 포인터)를 저장합니다
+- 리프 노드끼리 연결 리스트로 이어져 범위 스캔이 효율적입니다
+- 트리 높이가 3-4이면 수억 행도 3-4회 디스크 접근으로 찾습니다
+- 각 노드는 디스크 페이지(보통 8-16 KB)에 맞춰 설계됩니다
+
+```sql
+-- 인덱스 유무에 따른 실행 계획 차이
+-- 테이블: users (1,000,000행)
+
+-- 인덱스 없이 조회
+EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'hong@example.com';
+-- Seq Scan on users  (cost=0.00..22456.00 rows=1 width=128)
+--   Filter: (email = 'hong@example.com')
+-- Planning Time: 0.1 ms
+-- Execution Time: 95.3 ms  ← 전체 테이블 스캔
+
+-- 인덱스 생성 후
+CREATE INDEX idx_users_email ON users(email);
+
+EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'hong@example.com';
+-- Index Scan using idx_users_email on users  (cost=0.42..8.44 rows=1 width=128)
+--   Index Cond: (email = 'hong@example.com')
+-- Planning Time: 0.2 ms
+-- Execution Time: 0.05 ms  ← 1900배 빠름
+```
+
+### 쿼리 실행 계획 읽는 법
+
+`EXPLAIN` 출력의 핵심 항목을 정리합니다.
+
+| 항목 | 의미 | 주의점 |
+|------|------|--------|
+| Seq Scan | 테이블 전체를 순서대로 읽음 | 행이 많으면 느림 |
+| Index Scan | 인덱스를 통해 필요한 행만 접근 | 선택도(selectivity)가 높을 때 유리 |
+| Index Only Scan | 인덱스만으로 결과 반환 (covering) | 가장 빠름 |
+| Nested Loop | 외부 행마다 내부를 반복 | 외부가 작을 때 적합 |
+| Hash Join | 한쪽을 해시 테이블로 빌드 | 메모리 충분할 때 |
+| Merge Join | 양쪽이 정렬되어 있을 때 병합 | 정렬 비용 고려 |
+| Sort | 정렬 수행 | work_mem 초과 시 디스크 사용 |
+| rows | 예상 행 수 | 실제와 차이가 크면 통계 갱신 필요 |
+| cost | 상대적 비용 (시작..총) | 단위는 시퀀셜 페이지 읽기 기준 |
+
+```sql
+-- 복합 쿼리 실행 계획 예시
+EXPLAIN ANALYZE
+SELECT u.name, COUNT(o.id) as order_count
+FROM users u
+JOIN orders o ON u.id = o.user_id
+WHERE u.created_at > '2025-01-01'
+GROUP BY u.name
+ORDER BY order_count DESC
+LIMIT 10;
+
+-- 예상 실행 계획:
+-- Limit (rows=10)
+--   → Sort (sort key: count(o.id) DESC)
+--       → HashAggregate (group key: u.name)
+--           → Hash Join (join condition: u.id = o.user_id)
+--               → Seq Scan on users (filter: created_at > '2025-01-01')
+--               → Hash
+--                   → Seq Scan on orders
+```
+
+### 트랜잭션 격리 수준과 이상 현상
+
+ACID 중 Isolation은 동시 트랜잭션 간 간섭을 얼마나 허용하느냐의 문제입니다.
+
+| 격리 수준 | Dirty Read | Non-repeatable Read | Phantom Read | 성능 |
+|-----------|-----------|---------------------|--------------|------|
+| Read Uncommitted | 가능 | 가능 | 가능 | 최고 |
+| Read Committed | 불가 | 가능 | 가능 | 높음 |
+| Repeatable Read | 불가 | 불가 | 가능 | 중간 |
+| Serializable | 불가 | 불가 | 불가 | 낮음 |
+
+PostgreSQL 기본값은 Read Committed, MySQL InnoDB 기본값은 Repeatable Read입니다.
+
+```python
+# Python에서 트랜잭션 격리를 제어하는 예시 (psycopg2)
+import psycopg2
+from psycopg2 import extensions
+
+conn = psycopg2.connect("dbname=myapp")
+conn.set_isolation_level(extensions.ISOLATION_LEVEL_SERIALIZABLE)
+
+try:
+    with conn.cursor() as cur:
+        cur.execute("SELECT balance FROM accounts WHERE id = 1")
+        balance = cur.fetchone()[0]
+
+        if balance >= 100:
+            cur.execute("UPDATE accounts SET balance = balance - 100 WHERE id = 1")
+            cur.execute("UPDATE accounts SET balance = balance + 100 WHERE id = 2")
+
+    conn.commit()
+except psycopg2.errors.SerializationFailure:
+    conn.rollback()
+    # 직렬화 실패 → 재시도 로직
+```
+
+### 정규화와 비정규화 트레이드오프
+
+| 정규화 수준 | 장점 | 단점 | 적합한 경우 |
+|-------------|------|------|-------------|
+| 1NF | 반복 그룹 제거 | — | 모든 경우 (기본) |
+| 2NF | 부분 종속 제거 | JOIN 증가 | 트랜잭션 중심 |
+| 3NF | 이행 종속 제거 | JOIN 더 증가 | 데이터 무결성 중요 |
+| 비정규화 | JOIN 감소, 읽기 빠름 | 갱신 이상, 용량 증가 | 읽기 중심 분석 |
+
+실무 패턴: OLTP(트랜잭션)는 3NF로 설계하고, OLAP(분석)용 데이터 웨어하우스는 Star/Snowflake 스키마로 비정규화합니다. ETL 파이프라인이 두 세계를 연결합니다.
+
+### 인덱스 전략과 안티패턴
+
+인덱스는 읽기를 빠르게 하지만 쓰기를 느리게 합니다. 모든 INSERT/UPDATE/DELETE 시 관련 인덱스도 갱신해야 하기 때문입니다.
+
+```sql
+-- 복합 인덱스의 컬럼 순서가 중요합니다
+-- (status, created_at) vs (created_at, status)
+
+-- 자주 사용하는 쿼리 패턴
+SELECT * FROM orders
+WHERE status = 'pending'
+  AND created_at > '2026-01-01'
+ORDER BY created_at DESC
+LIMIT 20;
+
+-- 좋은 인덱스: 등호 조건 먼저, 범위 조건 나중에
+CREATE INDEX idx_orders_status_created
+  ON orders(status, created_at DESC);
+
+-- 나쁜 인덱스: 범위 조건이 먼저 오면 status 필터링에 인덱스 사용 불가
+CREATE INDEX idx_orders_created_status
+  ON orders(created_at DESC, status);
+```
+
+인덱스 안티패턴 목록:
+
+| 안티패턴 | 문제 | 해결 |
+|----------|------|------|
+| 모든 컬럼에 개별 인덱스 | 쓰기 성능 저하, 저장 공간 낭비 | WHERE 조합 기준 복합 인덱스 |
+| 선택도 낮은 컬럼 인덱스 | `gender` 같은 2값 컬럼은 풀 스캔과 비슷 | 선택도 5% 이하일 때만 유효 |
+| 함수로 감싼 컬럼 | `WHERE YEAR(created_at) = 2026` → 인덱스 무용 | `WHERE created_at >= '2026-01-01'` |
+| LIKE '%keyword' | 앞에 와일드카드 → 인덱스 사용 불가 | Full-text search 또는 trigram |
+| 사용하지 않는 인덱스 방치 | 쓰기마다 불필요한 갱신 | `pg_stat_user_indexes`로 모니터링 |
+
+### 커넥션 풀링과 운영 패턴
+
+데이터베이스 연결은 TCP 핸드셰이크 + 인증 + 세션 초기화를 거치므로 비용이 큽니다.
+
+```python
+# 잘못된 패턴: 요청마다 연결 생성/해제
+def get_user_bad(user_id: int):
+    conn = psycopg2.connect("dbname=myapp")  # ~50ms
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    result = cur.fetchone()
+    conn.close()
+    return result
+
+# 올바른 패턴: 커넥션 풀 사용
+from psycopg2 import pool
+
+connection_pool = pool.ThreadedConnectionPool(
+    minconn=5,
+    maxconn=20,
+    dsn="dbname=myapp"
+)
+
+def get_user_good(user_id: int):
+    conn = connection_pool.getconn()  # ~0.01ms (풀에서 꺼냄)
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+        return cur.fetchone()
+    finally:
+        connection_pool.putconn(conn)  # 풀에 반환
+```
+
+운영 환경에서의 커넥션 풀 설정 가이드:
+
+| 설정 | 권장값 | 이유 |
+|------|--------|------|
+| max_connections (DB) | CPU 코어 × 2 + 디스크 수 | PostgreSQL 권장 공식 |
+| pool_size (앱) | DB max의 80% / 앱 인스턴스 수 | 여유 확보 |
+| pool_timeout | 5-30초 | 무한 대기 방지 |
+| idle_timeout | 300초 | 유휴 연결 정리 |
+
+PgBouncer나 ProxySQL 같은 외부 풀링 프록시를 두면 앱 서버가 수백 대로 늘어나도 DB 커넥션 수를 제한할 수 있습니다.
 ## 체크리스트
 
 - [ ] 기본 키와 인덱스의 차이를 설명할 수 있는가
@@ -231,23 +460,59 @@ print(cur.execute("SELECT * FROM accounts").fetchall())
 - [ ] N+1 쿼리 문제를 알아차리고 고칠 수 있는가
 - [ ] 운영 환경에 SQL을 쏘기 전에 `EXPLAIN`을 확인하는가
 
+## 연습 문제
+
+1. 200만 행짜리 테이블을 만들고 인덱스 추가 전후의 `SELECT` 시간을 측정해 보세요.
+2. 사용자별 주문 총액을 (a) N+1 쿼리와 (b) JOIN + GROUP BY 한 번으로 각각 구해 시간을 비교해 보세요.
+3. 중간에 예외를 발생시키는 계좌 이체 함수를 만들어 트랜잭션이 일관성을 지키는지 확인해 보세요.
+
 ## 정리 및 다음 단계
 
 데이터베이스는 데이터를 영구적으로 보관하고, 동시 접근에서도 일관성을 보장합니다. SQL은 그 데이터를 다루는 언어, 인덱스는 빠른 조회를 가능케 하는 자료구조, 트랜잭션은 무결성을 지키는 장치입니다. EXPLAIN으로 쿼리를 들여다보는 습관이 좋은 백엔드 엔지니어를 만듭니다.
 
 다음 글에서는 이 모든 시스템을 안정적으로 만들고 유지하는 방법 — 소프트웨어 엔지니어링 — 을 다룹니다.
 
+## 학습 설계 지도: 이 글을 커리큘럼에 연결하기
+
+컴퓨터 과학 입문을 빠르게 끝내는 접근보다, 서로 연결된 개념을 축적하는 접근이 이후 학습 효율을 높입니다. 이 글의 핵심 개념은 단독 지식이 아니라 운영체제, 네트워크, 데이터베이스, 소프트웨어 공학으로 이어지는 선행 지식입니다. 따라서 한 주 단위 학습에서 이 글을 기준점으로 삼고, 다음과 같은 연결 훈련을 함께 수행하는 것이 좋습니다.
+
+| 학습 축 | 이 글에서 확인할 포인트 | 다음 과목 연결 |
+| --- | --- | --- |
+| 계산 모델 | 입력, 상태, 출력의 관계를 명확히 정의 | 알고리즘 설계, 분산 시스템 모델링 |
+| 추상화 | 세부 구현을 숨기고 인터페이스를 구분 | API 설계, 모듈 경계 설계 |
+| 자원 제약 | 시간·메모리·I/O 비용을 동시에 고려 | 성능 튜닝, 인프라 비용 최적화 |
+| 검증 가능성 | 주장 대신 측정과 반례로 판단 | 테스트 전략, 실험 설계 |
+
+연결 학습을 할 때는 "개념 정의 1회 + 사례 적용 2회 + 반례 점검 1회" 구조를 반복합니다. 예를 들어 시간 복잡도를 배웠다면, 단순히 O 표기법을 외우지 않고 입력 크기 변화에 따른 실행 시간 그래프를 직접 기록합니다. 그래프가 기대와 다를 때 원인을 추정하고, 캐시 지역성이나 상수항의 영향을 설명해 보는 과정이 필요합니다. 이 연습이 쌓이면 글에서 다룬 개념이 시험 대비 지식이 아니라 실무 의사결정 기준으로 바뀝니다.
+
+또한 과목 간 언어를 통일해 두는 것이 중요합니다. 같은 현상을 운영체제에서는 스케줄링, 네트워크에서는 큐잉, 데이터베이스에서는 트랜잭션 대기라고 부를 수 있습니다. 이름은 달라도 "경합 상태에서 자원을 배분한다"는 본질은 동일합니다. 학습 노트에 용어 사전을 만들어 개념 동치 관계를 표시해 두면, 새로운 분야를 배울 때 기존 이해를 재사용하기 쉬워집니다.
+
+마지막으로 주간 복습은 요약보다 질문 중심으로 구성합니다. "왜 이 추상화가 필요한가", "어떤 조건에서 깨지는가", "대안의 비용은 무엇인가"를 각각 한 문장으로 답하면 학습 깊이가 빠르게 올라갑니다. 이렇게 축적한 질문-답변 세트는 면접, 설계 리뷰, 코드 리뷰에서 그대로 활용 가능한 사고 프레임이 됩니다.
+
+데이터베이스 단원에서는 인덱스 구조와 트랜잭션 격리 수준이 질의 성능과 정합성에 주는 트레이드오프를 사례로 점검합니다.
+
+## 처음 질문으로 돌아가기
+
+- **데이터베이스는 많은 데이터를 어떻게 영구 저장하고 동시에 안전하게 읽고 쓸까요?**
+  - WAL(Write-Ahead Log)로 변경을 먼저 기록해 정전에도 복구할 수 있고, ACID 트랜잭션과 격리 수준으로 동시 접근 시 데이터 일관성을 보장합니다. 물리적으로는 페이지 단위로 디스크에 저장하고, 버퍼 풀로 자주 쓰는 페이지를 메모리에 캐싱합니다.
+- **인덱스는 왜 조회 속도를 급격하게 바꿀까요?**
+  - B+Tree 인덱스는 수억 행에서도 3-4회의 디스크 접근으로 원하는 행을 찾습니다. 인덱스 없이는 전체 테이블을 순차 스캔해야 하므로 O(n) vs O(log n)의 차이가 발생합니다. 100만 행 기준 약 1900배 속도 차이를 만듭니다.
+- **SQL 한 줄과 실제 실행 계획 사이에는 어떤 차이가 있을까요?**
+  - SQL은 "무엇을 원하는지"를 선언하고, 옵티마이저가 "어떻게 실행할지"를 결정합니다. 같은 SQL도 인덱스 유무, 테이블 크기, 통계 정보에 따라 Seq Scan, Index Scan, Hash Join 등 전혀 다른 계획으로 실행될 수 있습니다.
 <!-- toc:begin -->
-- [Computer Science란 무엇인가?](./01-what-is-computer-science.md)
-- [계산과 프로그램](./02-computation-and-programs.md)
-- [데이터 표현](./03-data-representation.md)
-- [알고리즘과 복잡도](./04-algorithms-and-complexity.md)
-- [컴퓨터 구조](./05-computer-architecture.md)
-- [운영체제](./06-operating-systems.md)
-- [네트워크](./07-networks.md)
+## 시리즈 목차
+
+- [Computer Science 101 (1/10): Computer Science란 무엇인가?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): 계산과 프로그램](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): 데이터 표현](./03-data-representation.md)
+- [Computer Science 101 (4/10): 알고리즘과 복잡도](./04-algorithms-and-complexity.md)
+- [Computer Science 101 (5/10): 컴퓨터 구조](./05-computer-architecture.md)
+- [Computer Science 101 (6/10): 운영체제](./06-operating-systems.md)
+- [Computer Science 101 (7/10): 네트워크](./07-networks.md)
 - **데이터베이스 (현재 글)**
-- [소프트웨어 엔지니어링](./09-software-engineering.md)
-- [AI와 데이터사이언스까지의 연결](./10-ai-and-data-science.md)
+- 소프트웨어 엔지니어링 (예정)
+- AI와 데이터사이언스까지의 연결 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -256,3 +521,5 @@ print(cur.execute("SELECT * FROM accounts").fetchall())
 - [Use The Index, Luke! — SQL 인덱싱 가이드](https://use-the-index-luke.com/)
 - [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html)
 - [Designing Data-Intensive Applications — Martin Kleppmann](https://dataintensive.net/)
+
+- [이 시리즈의 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-science-101/ko)

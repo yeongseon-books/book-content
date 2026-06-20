@@ -1,10 +1,10 @@
 ---
 series: data-structures-101
 episode: 1
-title: What Are Data Structures?
+title: "Data Structures 101 (1/10): What Are Data Structures?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: What data structures are, how they map to abstract data types, 
 last_reviewed: '2026-05-04'
 ---
 
-# What Are Data Structures?
+# Data Structures 101 (1/10): What Are Data Structures?
 
 > Data Structures 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: The same data, the same task — yet one program finishes in one second and another takes an hour. What makes the difference?
 
 > A data structure defines how data is laid out in memory and which operations it can support efficiently. The task "find a user among 10 million" needs five million comparisons on average if you scan an array, but only one if you use a hash table. This article defines data structures, contrasts them with abstract data types (ADTs), and maps out the entire series.
 
-<!-- a-grade-intro:end -->
+This is the first post in the Data Structures 101 series.
+
+
+![data structures 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/01/01-01-big-picture.en.png)
+*data structures 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Are Data Structures??
+- Which signal should the example or diagram make visible for What Are Data Structures??
+- What failure should be prevented first when What Are Data Structures? reaches a real system?
 
 ## What You Will Learn
 
@@ -47,8 +55,6 @@ Writing good code ultimately means making good decisions about how to represent 
 > Algorithms + Data Structures = Programs — Niklaus Wirth
 
 This series walks through nine core data structures: how they work, their time and space complexity, and when to reach for each one.
-
-## Concept at a Glance
 
 > A data structure has two layers: the logical structure of the data and its physical layout in memory. An ADT defines what you can do; a data structure decides how to do it.
 
@@ -84,13 +90,11 @@ This series walks through nine core data structures: how they work, their time a
 # Find a specific ID among 10 million users
 users = [{"id": i, "name": f"user{i}"} for i in range(10_000_000)]
 
-
 def find_user(target_id: int):
     for user in users:
         if user["id"] == target_id:
             return user
     return None
-
 
 # 5 million comparisons on average, 10 million in the worst case
 ```
@@ -101,10 +105,8 @@ def find_user(target_id: int):
 # Index the same data with a hash table
 users = {i: {"id": i, "name": f"user{i}"} for i in range(10_000_000)}
 
-
 def find_user(target_id: int):
     return users.get(target_id)
-
 
 # One comparison on average
 ```
@@ -121,13 +123,11 @@ N = 1_000_000
 list_data = list(range(N))
 set_data = set(list_data)
 
-
 def measure(label, fn):
     start = time.perf_counter()
     fn()
     elapsed = (time.perf_counter() - start) * 1000
     print(f"{label}: {elapsed:.2f} ms")
-
 
 measure("list lookup", lambda: (N - 1) in list_data)
 measure("set lookup", lambda: (N - 1) in set_data)
@@ -140,7 +140,6 @@ A list scans from start to end; a set jumps straight to the bucket via a hash. T
 ```python
 from abc import ABC, abstractmethod
 
-
 class Stack(ABC):
     """ADT: pop returns whatever was pushed last."""
 
@@ -149,7 +148,6 @@ class Stack(ABC):
 
     @abstractmethod
     def pop(self): ...
-
 
 class ListStack(Stack):
     def __init__(self):
@@ -160,7 +158,6 @@ class ListStack(Stack):
 
     def pop(self):
         return self._data.pop()
-
 
 class LinkedStack(Stack):
     def __init__(self):
@@ -210,7 +207,6 @@ def add_wrong(priority, event):
 heap = []
 def add_right(priority, event):
     heapq.heappush(heap, (priority, event))
-
 
 # add_wrong is O(n log n) per insert
 # add_right is O(log n) per insert
@@ -290,7 +286,18 @@ A data structure decides how data sits in memory and which operations it can run
 
 Next we look at the most basic structure — the array. We compare fixed-size and dynamic arrays and trace what Python's `list` actually does under the hood.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Are Data Structures??**
+  - The article treats What Are Data Structures? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Are Data Structures??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Are Data Structures? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Are Data Structures? (current)**
 - Arrays and Dynamic Arrays (upcoming)
 - Linked Lists (upcoming)
@@ -301,6 +308,7 @@ Next we look at the most basic structure — the array. We compare fixed-size an
 - Heaps (upcoming)
 - Graphs (upcoming)
 - Choosing Data Structures (upcoming)
+
 <!-- toc:end -->
 
 ## References

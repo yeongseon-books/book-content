@@ -1,7 +1,7 @@
 ---
 episode: 5
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -13,16 +13,12 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
-title: Retry and error handling — making API calls reliable
-seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
+  tistory: false
+title: "LLM API Production 101 (5/6): Retry and error handling — making API calls reliable"
+seo_description: Build reliable LLM applications by implementing an error classification system and bounded retry policies using exponential backoff and jitter.
 ---
 
-# Retry and error handling — making API calls reliable
-
-> LLM API Production 101 (5/6)
-
-Example code: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/en/05-retry-and-error-handling)
+# LLM API Production 101 (5/6): Retry and error handling — making API calls reliable
 
 Once an LLM API call sits on a production path, failure stops being an exception in the human sense. It becomes part of the runtime. Networks stall. Providers slow down. Requests hit time limits. A client process can lose connectivity at the wrong moment. The real question is not whether failures happen. It is whether the application reacts to them predictably.
 
@@ -30,20 +26,17 @@ One of the most common mistakes is retrying everything. Teams catch a broad exce
 
 That is why retries work only when they begin with error classification. A retry policy is not “try again when something goes wrong.” It is “retry only the failures that are likely to be transient, with bounded backoff and explicit stop conditions.” In this post, we will use `tenacity` to build that policy around a Groq API call.
 
-The main idea is simple: **a retry is not a friendly loop, it is a bounded recovery strategy built on top of error classification**.
+This is the fifth post in the LLM API Production 101 series. Here we focus on error classification and bounded retry policies for reliable API calls.
 
-![Retry and error handling: making API calls reliable](../../assets/llm-api-production-101/05/05-01-retry-and-error-handling-making-api-call.en.png)
-
+![Retry and error handling: making API calls reliable](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/05/05-01-retry-and-error-handling-making-api-call.en.png)
 *Retry and error handling: making API calls reliable*
----
+> Retry is useful only after the system knows which failures can recover by trying again.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Which LLM API errors are safe to retry, and which must never be retried?
-- Why must exponential backoff and jitter always travel together?
-- What is the right retry unit when a streaming response errors mid-flight?
-- How do you cap retries so they don't explode token spend?
-- How do you prevent duplicate calls when an LLM API has no idempotency key?
+- Why should API failures not share one retry policy?
+- Which failures are retryable, and which should fail fast?
+- After final failure, how should user messages and internal logs differ?
 
 ## Runtime setup
 
@@ -60,7 +53,7 @@ export GROQ_API_KEY="your-issued-key"
 
 ## Why all failures should not share one retry policy
 
-![Comparison between transient and permanent failures](../../assets/llm-api-production-101/05/05-01-why-all-failures-should-not-share-one-re.en.png)
+![Comparison between transient and permanent failures](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/05/05-01-why-all-failures-should-not-share-one-re.en.png)
 
 *Comparison between transient and permanent failures*
 Retries help only when the failure is likely to go away. A short network interruption may resolve on the next attempt. A temporary timeout may succeed after a brief pause. Some 5xx provider failures are also retry candidates.
@@ -99,7 +92,7 @@ That is only the shape. In a real LLM path, the important part is constraining *
 
 ## Creating an error hierarchy for retry decisions
 
-![Structure for wrapping provider exceptions](../../assets/llm-api-production-101/05/05-02-creating-an-error-hierarchy-for-retry-de.en.png)
+![Structure for wrapping provider exceptions](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/05/05-02-creating-an-error-hierarchy-for-retry-de.en.png)
 
 *Structure for wrapping provider exceptions*
 One practical pattern is to normalize low-level exceptions into application-level categories.
@@ -118,7 +111,7 @@ Once those exist, the retry layer can ignore provider-specific details and focus
 
 ## Adding exponential backoff to a Groq call
 
-![Retry flow with exponential backoff](../../assets/llm-api-production-101/05/05-03-adding-exponential-backoff-to-a-groq-cal.en.png)
+![Retry flow with exponential backoff](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/05/05-03-adding-exponential-backoff-to-a-groq-cal.en.png)
 
 *Retry flow with exponential backoff*
 The example below retries only errors that the application classifies as transient. One operational detail matters before the code starts: the Groq client can apply its own retries. To avoid stacking SDK retries on top of `tenacity` retries by accident, the sample disables SDK retries and lets the application policy own the loop.
@@ -203,7 +196,7 @@ Third, `reraise=True` ensures that the final failure is not swallowed after all 
 
 ## Which failures are retryable
 
-![Decision flow for retryable error classes](../../assets/llm-api-production-101/05/05-04-which-failures-are-retryable.en.png)
+![Decision flow for retryable error classes](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/05/05-04-which-failures-are-retryable.en.png)
 
 *Decision flow for retryable error classes*
 In practice, a useful first-pass classification looks like this.
@@ -271,7 +264,7 @@ For interactive UI paths, two or three attempts are often enough. Background job
 
 ## What the user should see after final failure
 
-![Paths after the final failed attempt](../../assets/llm-api-production-101/05/05-05-what-the-user-should-see-after-final-fai.en.png)
+![Paths after the final failed attempt](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/05/05-05-what-the-user-should-see-after-final-fai.en.png)
 
 *Paths after the final failed attempt*
 Retries do not eliminate failure. They shape failure.
@@ -300,15 +293,26 @@ Caching reduced repeated work. Retries smooth over temporary failure. The final 
 - [ ] Added a guard that caps token spend across retry attempts
 - [ ] Propagated a correlation ID across every retry of the same request
 
+## Answering the Opening Questions
+
+- **Why should API failures not share one retry policy?**
+  Authentication, input, rate limit, network, and provider failures have different recovery paths, so one policy hides the real cause.
+
+- **Which failures are retryable, and which should fail fast?**
+  Transient network errors and some 429/5xx failures are retry candidates; bad keys, bad model ids, and invalid request schemas usually need a fix instead.
+
+- **After final failure, how should user messages and internal logs differ?**
+  Users need a short actionable message; internal logs need classification, provider response, attempt count, and correlation id.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Structured output — JSON mode and response schemas](./01-structured-output.md)
-- [Tool calling — connecting functions to the model](./02-tool-calling.md)
-- [Streaming in depth — chunk handling and error recovery](./03-streaming-in-depth.md)
-- [Caching strategies — reducing cost and latency](./04-caching-strategies.md)
-- **Retry and error handling — making API calls reliable (current)**
-- Rate limit management — patterns for staying within limits (upcoming)
+- [LLM API Production 101 (1/6): Structured output — JSON mode and response schemas](./01-structured-output.md)
+- [LLM API Production 101 (2/6): Tool calling — connecting functions to the model](./02-tool-calling.md)
+- [LLM API Production 101 (3/6): Streaming in depth — chunk handling and error recovery](./03-streaming-in-depth.md)
+- [LLM API Production 101 (4/6): Caching strategies — reducing cost and latency](./04-caching-strategies.md)
+- **LLM API Production 101 (5/6): Retry and error handling — making API calls reliable (current)**
+- LLM API Production 101 (6/6): Rate limit management — patterns for staying within limits (upcoming)
 
 <!-- toc:end -->
 
@@ -316,5 +320,16 @@ Caching reduced repeated work. Retries smooth over temporary failure. The final 
 
 ## References
 
-- <https://tenacity.readthedocs.io/en/latest/>
-- <https://console.groq.com/docs/text-chat>
+### Official Docs
+
+- [Tenacity documentation](https://tenacity.readthedocs.io/en/latest/)
+- [Groq Text Chat docs](https://console.groq.com/docs/text-chat)
+
+### Verification-Friendly References
+
+- [HTTP Semantics — 429 Too Many Requests](https://www.rfc-editor.org/rfc/rfc9110.html#name-429-too-many-requests)
+
+### Related Series
+
+- [Caching strategies — reducing cost and latency](./04-caching-strategies.md)
+- [Rate limit management — patterns for staying within limits](./06-rate-limit-management.md)

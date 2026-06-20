@@ -1,10 +1,10 @@
 ---
 series: machine-learning-101
 episode: 2
-title: Supervised and Unsupervised Learning
-status: content-ready
+title: "Machine Learning 101 (2/10): Supervised and Unsupervised Learning"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,28 @@ tags:
   - Classification
   - Clustering
 seo_description: When to use supervised vs unsupervised learning, the difference between classification, regression, clustering, with runnable code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Supervised and Unsupervised Learning
+# Machine Learning 101 (2/10): Supervised and Unsupervised Learning
 
-> Machine Learning 101 series (2/10)
+Most beginner ML mistakes are not model mistakes. They are framing mistakes. Teams jump into logistic regression or KMeans before agreeing on the more important question: do we have labels, do we need a numeric prediction, or are we only trying to surface structure in the data?
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Machine Learning 101 series. Here we will separate supervised learning from unsupervised learning and use that split to clarify where classification, regression, and clustering actually belong.
 
-**Core question**: When labels are present versus absent, do we reach for the same algorithms?
 
-> *Supervised learning fits a function to labeled examples; unsupervised learning discovers structure on its own.*
+![machine learning 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 2 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The boundaries between supervised, unsupervised, semi-supervised, and reinforcement learning
-- How to tell classification from regression
-- The role of clustering versus dimensionality reduction
-- A 5-step paradigm comparison
-- Five common pitfalls
+- When labels are present versus absent, do we reach for the same algorithms?
+- How do classification and regression differ if both are supervised learning?
+- Why is clustering not just “classification without labels”?
 
 ## Why It Matters
 
 Picking the wrong paradigm makes any model improvement meaningless. Problem framing is the first lever.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Problem["problem"] --> Labeled{"labels?"}
-    Labeled -->|yes| Sup["supervised (clf / reg)"]
-    Labeled -->|no| Unsup["unsupervised (cluster / DR)"]
-```
 
 ## Key Terms
 
@@ -107,11 +94,19 @@ km = KMeans(n_clusters=3, n_init=10).fit(X)
 print("inertia:", km.inertia_)
 ```
 
+**Expected output:** the classifier prints a training accuracy, the regression example prints an `R^2` score, and KMeans returns an inertia value. Those numbers are not comparable, which is exactly the point: changing the paradigm changes the success criterion too.
+
 ## What to Notice in This Code
 
 - `clf.score` returns accuracy, `reg.score` returns R-squared, `km.inertia_` measures cluster cohesion. Different metrics, different meaning.
 - `KMeans(n_init=...)` matters for reproducibility and stability.
 - Unsupervised results are harder to interpret because there is no ground truth.
+
+## Read the first failure signal this way
+
+- If the team cannot say what the label is, start by asking what action the prediction should change downstream.
+- If clustering output gets treated like a true class label, stop and decide how you will validate it with business or experimental outcomes.
+- If a metric discussion becomes confusing, verify whether people are comparing a supervised score to an unsupervised cohesion number.
 
 ## Five Common Mistakes
 
@@ -150,8 +145,19 @@ Spam and fraud rely on classification, pricing and demand forecasting on regress
 
 Picking the paradigm sets the ceiling on model performance. Next, we measure generalization with train/test splits.
 
+## Answering the Opening Questions
+
+- **When labels are present versus absent, do we reach for the same algorithms?**
+  - The article treats Supervised and Unsupervised Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do classification and regression differ if both are supervised learning?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is clustering not just “classification without labels”?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
 - **Supervised and Unsupervised Learning (current)**
 - Train/Test Split (upcoming)
 - Linear Regression (upcoming)
@@ -161,6 +167,7 @@ Picking the paradigm sets the ceiling on model performance. Next, we measure gen
 - Overfitting and Regularization (upcoming)
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

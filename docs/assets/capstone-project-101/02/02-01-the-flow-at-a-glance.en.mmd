@@ -1,0 +1,6 @@
+flowchart TD
+    A["Brainstorm Topics"] --> B{"Feasibility"}
+    B -- "Yes" --> C{"User Value"}
+    B -- "No" --> A
+    C -- "High" --> D["Select Final Topic"]
+    C -- "Low" --> A

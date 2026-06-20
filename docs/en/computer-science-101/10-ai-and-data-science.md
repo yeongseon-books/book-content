@@ -1,10 +1,10 @@
 ---
 series: computer-science-101
 episode: 10
-title: From CS to AI and Data Science
-status: content-ready
+title: "Computer Science 101 (10/10): From CS to AI and Data Science"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,34 @@ tags:
   - Statistics
   - Career
 seo_description: How CS fundamentals connect to AI and data science, plus a learning roadmap — the closing article of the CS 101 series.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# From CS to AI and Data Science
+# Computer Science 101 (10/10): From CS to AI and Data Science
 
-> Computer Science 101 series (10/10)
+AI and data science did not arrive from some separate universe. They sit on top of data representation, algorithmic cost, memory hierarchy, databases, and engineering habits, with statistics and domain knowledge added on top.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Computer Science 101 series.
 
-**Key question**: How do the CS fundamentals you just learned actually show up in AI and data science work?
+In this article, we'll connect the previous nine posts to machine learning and data science work, then turn that map into a concrete study roadmap.
 
-> AI and data science are computer science with statistics and domain knowledge layered on top. The data representations, algorithmic complexity, memory hierarchy, databases, and engineering habits we've covered are used every single day in ML/DS. This closing article explains how ML works, how every previous article connects to it, and where to study next.
 
-<!-- a-grade-intro:end -->
+![Computer Science 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/10/10-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 10 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying From CS to AI and Data Science?
+- Which signal should the example or diagram make visible for From CS to AI and Data Science?
+- What failure should be prevented first when From CS to AI and Data Science reaches a real system?
+
+## Questions This Article Answers
+
+- Where do the CS fundamentals from this series show up directly in AI and data science?
+- What is the core difference between rule-based systems and machine-learning systems?
+- Why are training, inference, and data validation still computation and systems problems?
+- Why do AI systems need the same testing, monitoring, and cost awareness as any other service?
+- What should you study next if you want to keep going toward AI/DS?
 
 ## What You Will Learn
 
@@ -48,16 +62,7 @@ AI is not magic. Models are trained on data, inference is matrix arithmetic, and
 
 Tools change quickly; foundations stay valid for a long time.
 
-## Concept at a Glance
-
 > A rule-based system has humans write the rules. Machine learning infers the rules from data.
-
-```text
-Rule-based                              Machine learning
-input ──┐                               input ──┐
-        ├─ human-written rules ─→ out          ├─ learned model ─→ out
-rules ──┘                               model ←── estimated from training data
-```
 
 ## Key Terms
 
@@ -81,7 +86,6 @@ def classify_email(text: str) -> str:
     score = sum(word in text for word in spam_words)
     return "spam" if score >= 2 else "ham"
 
-
 print(classify_email("free coupon, you are the winner"))   # spam
 # Every new phrasing forces a human to update the rules
 ```
@@ -100,12 +104,10 @@ def train_naive_bayes(samples: list[tuple[str, str]]) -> dict:
             totals[label] += 1
     return {"counts": counts, "totals": totals}
 
-
 def predict(model: dict, text: str) -> str:
     spam_score = sum(model["counts"]["spam"].get(w, 0) for w in text.split())
     ham_score  = sum(model["counts"]["ham"].get(w, 0)  for w in text.split())
     return "spam" if spam_score > ham_score else "ham"
-
 
 model = train_naive_bayes([
     ("free coupon winner", "spam"),
@@ -147,7 +149,6 @@ def train_test_split(data: list, ratio: float = 0.8) -> tuple[list, list]:
     cut = int(len(data) * ratio)
     return data[:cut], data[cut:]
 
-
 train, test = train_test_split(list(zip(xs, ys)))
 print("train:", train)
 print("test :", test)
@@ -168,6 +169,8 @@ print(f"1M inferences: {time.perf_counter() - start:.3f}s")
 # Simpler models infer faster — a key metric for real-time services
 ```
 
+**Expected output:** the script should print the time for one million inferences and make it obvious why model simplicity matters for latency-sensitive systems.
+
 ### Step 4: Inspect data quality
 
 ```python
@@ -177,7 +180,6 @@ def basic_stats(values: list[float]) -> dict:
     var = sum((v - mean) ** 2 for v in values) / n
     return {"n": n, "mean": mean, "std": var ** 0.5,
             "min": min(values), "max": max(values)}
-
 
 print(basic_stats(ys))
 # Looking at distribution, missing values, and outliers before training is half the job in ML
@@ -269,17 +271,29 @@ A suggested learning path:
 
 Tools change; foundations stay. Thank you for reading the series.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying From CS to AI and Data Science?**
+  - The article treats From CS to AI and Data Science as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for From CS to AI and Data Science?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when From CS to AI and Data Science reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
-- [Computation and Programs](./02-computation-and-programs.md)
-- [Data Representation](./03-data-representation.md)
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
-- [Computer Architecture](./05-computer-architecture.md)
-- [Operating Systems](./06-operating-systems.md)
-- [Networks](./07-networks.md)
-- [Databases](./08-databases.md)
-- [Software Engineering](./09-software-engineering.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): Computation and Programs](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): Data Representation](./03-data-representation.md)
+- [Computer Science 101 (4/10): Algorithms and Complexity](./04-algorithms-and-complexity.md)
+- [Computer Science 101 (5/10): Computer Architecture](./05-computer-architecture.md)
+- [Computer Science 101 (6/10): Operating Systems](./06-operating-systems.md)
+- [Computer Science 101 (7/10): Networks](./07-networks.md)
+- [Computer Science 101 (8/10): Databases](./08-databases.md)
+- [Computer Science 101 (9/10): Software Engineering](./09-software-engineering.md)
 - **From CS to AI and Data Science (current)**
+
 <!-- toc:end -->
 
 ## References

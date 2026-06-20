@@ -1,10 +1,10 @@
 ---
 series: api-design-101
 episode: 5
-title: Request and Response Schemas
-status: content-ready
+title: "API Design 101 (5/10): Request and Response Schemas"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,27 @@ tags:
   - Validation
   - Backend
 seo_description: A junior backend engineer's guide to JSON schemas, content types, naming, validation, and date and money handling in REST APIs.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Request and Response Schemas
+# API Design 101 (5/10): Request and Response Schemas
 
-> API Design 101 series (5/10)
+At first, schemas look like a minor JSON-formatting concern. A few months later, they are often where APIs hurt the most: field names drift, time zones disagree, and one silent nullability change breaks multiple clients at once.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the API Design 101 series.
 
-**Core question**: How do you define the *shape of the data* an API exchanges so that it does not wobble?
+Here, we treat schemas as boundary contracts that must be enforced, not as optional documentation. Input validation, response serialization, and standard handling for time and money all need to line up if you want later versioning to stay manageable.
 
-> Treat the schema as a *contract outside the code*, and validate at the *boundary*.
 
-<!-- a-grade-intro:end -->
+![api design 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/05/05-01-concept-at-a-glance.en.png)
+*api design 101 chapter 5 flow overview*
+> A schema is not documentation — it is a testable promise that every request and response will match the shape the client and server agreed upon.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- JSON and content types
-- Field naming conventions
-- Where and how to validate
-- Handling dates, time zones, and numbers
-- Stability principles for response schemas
+- JSON and content types?
+- Field naming conventions?
+- Where and how to validate?
 
 ## Why It Matters
 
@@ -47,17 +46,7 @@ If schemas wobble, *everything* on the client wobbles. Good schemas are *readabl
 
 > A schema is the *grammar* of your data.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Client["client"] -->|"JSON request"| Validate["validate"]
-    Validate -->|"typed object"| Handler["handler"]
-    Handler -->|"typed object"| Serialize["serialize"]
-    Serialize -->|"JSON response"| Client
-```
-
-Validate at the entrance; serialize at the exit.
+That separation keeps handlers focused on business logic instead of ad hoc coercion. Once validation leaks inward, type fixing, defaulting, and edge-case cleanup start spreading across the service layer.
 
 ## Key Terms
 
@@ -178,6 +167,12 @@ Large APIs converge on *snake_case*, ISO 8601, and integer minor-unit currency (
 - Add new fields; never reinterpret existing ones.
 - Design responses so clients can *ignore unknown fields*.
 
+## Verification Signals and Failure Modes
+
+- **Expected output:** The wrong `Content-Type` should fail with `415`, missing required fields should trigger validation errors, and valid payloads should come back in a predictable JSON shape.
+- **First check:** If response examples expose ORM field names or temporary abbreviations, input and output schemas are not truly separated.
+- **Failure mode:** Leave time zones and money representation undefined early on, and every downstream client and analytics job starts inventing its own correction logic.
+
 ## Checklist
 
 - [ ] Does every endpoint have an input schema?
@@ -196,17 +191,29 @@ Large APIs converge on *snake_case*, ISO 8601, and integer minor-unit currency (
 
 Schemas are the grammar of data. The next episode tackles a topic that no list endpoint can avoid — pagination and filtering.
 
+## Answering the Opening Questions
+
+- **JSON and content types?**
+  - The article treats Request and Response Schemas as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Field naming conventions?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where and how to validate?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
-- [REST Basics](./02-rest-basics.md)
-- [Resource Design](./03-resource-design.md)
-- [HTTP Methods and Status Codes](./04-http-methods-and-status.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
+- [API Design 101 (2/10): REST Basics](./02-rest-basics.md)
+- [API Design 101 (3/10): Resource Design](./03-resource-design.md)
+- [API Design 101 (4/10): HTTP Methods and Status Codes](./04-http-methods-and-status.md)
 - **Request and Response Schemas (current)**
 - Pagination and Filtering (upcoming)
 - Designing Error Responses (upcoming)
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

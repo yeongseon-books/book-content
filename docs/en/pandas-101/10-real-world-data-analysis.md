@@ -1,10 +1,10 @@
 ---
 series: pandas-101
 episode: 10
-title: Real-world Data Analysis
-status: content-ready
+title: "Pandas 101 (10/10): Real-World Data Analysis"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,31 @@ tags:
   - Workflow
   - Beginner
 seo_description: Tie load, clean, transform, aggregate, and visualize into one reproducible end-to-end Pandas analysis pipeline
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Real-world Data Analysis
+# Pandas 101 (10/10): Real-World Data Analysis
 
-> Pandas 101 series (10/10)
+The earlier chapters covered loading, cleaning, selecting, grouping, joining, time handling, and performance habits one piece at a time. Real analysis becomes useful only when those pieces connect into one repeatable flow. That is usually where the gap between knowing Pandas features and delivering analysis results becomes visible.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Pandas 101 series.
 
-**Core question**: Can we tie everything we learned into *a single analysis flow*?
+In this chapter, we will connect everything into one standard workflow: load, clean, enrich, aggregate, and visualize. The goal is not a flashy notebook. It is a pipeline you can rerun, review, and share with confidence.
 
-> *Analysis is *load → clean → transform → aggregate → visualize* — *five steps*. We connect them all in one episode.*
 
-<!-- a-grade-intro:end -->
+![pandas 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/10/10-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 10 flow overview*
+> *Analysis is *iteration*. First read is never perfect, first aggregation is never final, you always come back to re-validate.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The standard *EDA workflow*
-- The value of *function-level separation*
-- Building *reproducible analysis*
-- A 5-step end-to-end run
-- Five common mistakes
+- The standard *EDA workflow?
+- The value of *function-level separation?
+- Building *reproducible analysis?
 
 ## Why It Matters
 
 Knowing each tool separately is not the same as *producing a result*. *Pro analysts* are defined by their *connecting ability*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Load["load (read_csv)"] --> Clean["clean (dropna / dtype)"]
-    Clean --> Reshape["reshape (groupby / merge)"]
-    Reshape --> Agg["aggregate (KPI)"]
-    Agg --> Vis["visualize / report"]
-```
 
 ## Key Terms
 
@@ -117,6 +106,17 @@ monthly = kpi(df)
 print(monthly)
 ```
 
+A monthly KPI table is a great checkpoint because it proves the pipeline actually made it from raw input to a business-facing summary. Once this table looks right, visualization becomes a presentation step instead of a debugging step.
+
+**Expected output:**
+
+```text
+         total  n   mean
+month                    
+2026-01  450.0  3  150.0
+2026-02  520.0  4  130.0
+```
+
 ### Step 5 — Visualize
 
 ```python
@@ -124,6 +124,14 @@ import matplotlib.pyplot as plt
 monthly["total"].plot(kind="bar", title="Monthly Sales")
 plt.tight_layout()
 plt.savefig("monthly.png")
+```
+
+Do not stop at rendering inside a notebook cell. Saving the figure turns the chart into a reusable artifact for reviews, reports, and scheduled jobs.
+
+**Expected output:**
+
+```text
+monthly.png saved
 ```
 
 ## What to Notice in This Code
@@ -165,21 +173,33 @@ KPI report automation, marketing analytics, ops dashboards — *analysis pipelin
 2. Compute *monthly* and *weekly* KPIs *simultaneously*.
 3. Save the *result* as both *PNG and CSV*.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 You have completed *Pandas 101*. Next stops: *Polars, Dask*, or *visualization (Matplotlib/Plotly)*, then *ML preprocessing (scikit-learn)*. Every road in data work *starts at Pandas*.
 
+## Answering the Opening Questions
+
+- **The standard *EDA workflow?**
+  - The article treats Real-World Data Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The value of *function-level separation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Building *reproducible analysis?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
-- [Reading CSV and Excel](./03-read-csv-and-excel.md)
-- [Filtering and Selection](./04-filtering-and-selection.md)
-- [Handling Missing Values](./05-missing-values.md)
-- [groupby](./06-groupby.md)
-- [Merge and Join](./07-merge-and-join.md)
-- [Time Series](./08-time-series.md)
-- [apply and Vectorization](./09-apply-and-vectorization.md)
-- **Real-world Data Analysis (current)**
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
+- [Pandas 101 (3/10): Reading CSV and Excel](./03-read-csv-and-excel.md)
+- [Pandas 101 (4/10): Filtering and Selection](./04-filtering-and-selection.md)
+- [Pandas 101 (5/10): Handling Missing Values](./05-missing-values.md)
+- [Pandas 101 (6/10): Groupby and Aggregation](./06-groupby.md)
+- [Pandas 101 (7/10): Merge and Join](./07-merge-and-join.md)
+- [Pandas 101 (8/10): Time Series](./08-time-series.md)
+- [Pandas 101 (9/10): Apply and Vectorization](./09-apply-and-vectorization.md)
+- **Real-World Data Analysis (current)**
+
 <!-- toc:end -->
 
 ## References

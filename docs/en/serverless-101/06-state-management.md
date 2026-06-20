@@ -1,10 +1,10 @@
 ---
 series: serverless-101
 episode: 6
-title: State Management
+title: "Serverless 101 (6/10): State Management"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,23 @@ seo_description: A beginner-friendly tour of state in serverless covering extern
 last_reviewed: '2026-05-04'
 ---
 
-# State Management
+# Serverless 101 (6/10): State Management
 
-> Serverless 101 series (6/10)
+Sooner or later, serverless beginners hit the same objection. “If functions must stay stateless, where do sessions, carts, workflow progress, and deduplication state go?” If that question stays fuzzy, serverless feels like an arbitrary restriction instead of a usable design rule.
 
-<!-- a-grade-intro:begin -->
+The important distinction is simple: the business still has state, but the function process is not the place to trust that state. Once you accept that, the rest becomes an architecture exercise about choosing the right external stores.
 
-**Core question**: how do *stateless* functions handle a *stateful business*?
+This is post 6 in the Serverless 101 series.
 
-> *Functions* are *stateless*; *state* lives in an *external store*.
 
-<!-- a-grade-intro:end -->
+![serverless 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/06/06-01-concept-at-a-glance.en.png)
+*serverless 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying State Management?
+- Which signal should the example or diagram make visible for State Management?
+- What failure should be prevented first when State Management reaches a real system?
 
 ## What You Will Learn
 
@@ -42,16 +48,11 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-A *function instance* can vanish at any moment. State that is not *external* is *data lost*.
+A function instance can disappear at any time, and the next request from the same user may land on a different instance. That makes in-memory or local-disk state look acceptable in a local demo and dangerously unreliable in production.
 
-## Concept at a Glance
+State management is not a side concern in serverless. It determines where sessions live, how retries become safe, where workflow progress is stored, and how much complexity you keep inside one function versus pushing into a clearer orchestration model.
 
-```mermaid
-flowchart LR
-    Func["function"] --> Cache["redis"]
-    Func --> DB["database"]
-    Func --> Workflow["state machine"]
-```
+This is the core serverless shape: functions do work, but external systems own durable memory. Caches hold short-lived state, databases own long-lived state, and workflow engines track multi-step progress that would be painful to reconstruct from function code alone.
 
 ## Key Terms
 
@@ -162,24 +163,44 @@ def model(record):
 
 ## Wrap-up and Next Steps
 
+The goal is not to erase state. The goal is to put each kind of state in the place that matches its lifetime, consistency needs, and recovery model.
+
 Next, we cover *Queues* and *Event-driven Architecture*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying State Management?**
+  - The article treats State Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for State Management?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when State Management reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
-- [Function as a Service](./02-function-as-a-service.md)
-- [Trigger and Event](./03-trigger-and-event.md)
-- [Cold Start](./04-cold-start.md)
-- [Scaling](./05-scaling.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
+- [Serverless 101 (2/10): Function as a Service](./02-function-as-a-service.md)
+- [Serverless 101 (3/10): Trigger and Event](./03-trigger-and-event.md)
+- [Serverless 101 (4/10): Cold Start](./04-cold-start.md)
+- [Serverless 101 (5/10): Scaling](./05-scaling.md)
 - **State Management (current)**
 - Queue and Event-driven Architecture (upcoming)
 - Observability (upcoming)
 - Cost (upcoming)
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [DynamoDB single-table design](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-modeling-nosql-B.html)
-- [ElastiCache overview](https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/WhatIs.html)
-- [Step Functions](https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html)
+### Official Docs
+
+- [DynamoDB data modeling best practices](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-modeling-nosql-B.html)
+- [Amazon ElastiCache overview](https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/WhatIs.html)
+- [AWS Step Functions developer guide](https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html)
+
+### Patterns and Code
+
 - [Idempotency pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/idempotency.html)
+- [AWS Powertools idempotency utility (GitHub)](https://github.com/aws-powertools/powertools-lambda-python)

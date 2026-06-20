@@ -1,11 +1,11 @@
 ---
-title: Managing conversation state — building a multi-turn chatbot
+title: "LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot"
 series: llm-app-foundations-101
 episode: 5
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -15,25 +15,20 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-01'
-seo_description: 'Example code: github.com/yeongseon-books/llm-app-foundations-101'
+seo_description: Build stateful LLM chatbots by managing conversation history through full-replay, sliding-window, and summary-based compression strategies.
 ---
 
-# Managing conversation state — building a multi-turn chatbot
+# LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot
 
 > LLM App Foundations 101 (5/6)
 
-Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/05-conversation-state)
-
 The diagram below summarizes how message history accumulates across turns.
 
-![Managing conversation state: building a multi-turn chatbot](../../assets/llm-app-foundations-101/05/05-01-managing-conversation-state-building-a-m.en.png)
-
-*Managing conversation state: building a multi-turn chatbot*
 One of the first surprises in chatbot development is how quickly the illusion breaks. The first answer looks fine. The second user message refers to the previous turn, and the model suddenly behaves as if the conversation started from zero. That is not a provider bug. It is the default API contract.
 
 An LLM does not carry your application's conversation state for free. A chat product feels stateful because the application keeps rebuilding context and resending it on every request. The memory is not hidden in the model. It is a data structure you own.
 
-This post uses Groq's `llama-3.1-8b-instant` to build that mental model and turn it into runnable Python. We will cover seven things:
+This is the fifth post in the LLM App Foundations 101 series. Here, we use Groq's `llama-3.1-8b-instant` to build that mental model and turn it into runnable Python. We will cover seven things:
 
 - why LLM calls are fundamentally stateless
 - how multi-turn chat emerges from accumulated `messages`
@@ -47,17 +42,19 @@ The main idea is simple: **conversation memory lives in your application layer, 
 
 ---
 
-## Questions this chapter answers
+![Managing conversation state: building a multi-turn chatbot](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-01-managing-conversation-state-building-a-m.en.png)
+*Managing conversation state: building a multi-turn chatbot*
+> Conversation memory is application state replayed into each request.
 
-- Given that LLM calls are stateless, what constraints does that put on multi-turn design?
-- When does full-history, sliding-window, or summary compression each fit best?
-- What is the safest way to detect context overflow before the call fails?
-- How do you instruct the model on what to keep vs. drop during summary compression?
-- What is the minimum set of pieces needed to build a one-file CLI chatbot end to end?
+## Questions to Keep in Mind
+
+- Does multi-turn memory live inside the model or inside the request?
+- When do full history, sliding windows, and summary compression split apart?
+- How can you detect context overflow before the request fails?
 
 ## Why LLM calls are stateless
 
-![Stateless calls with and without replayed history](../../assets/llm-app-foundations-101/05/05-01-why-llm-calls-are-stateless.en.png)
+![Stateless calls with and without replayed history](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-01-why-llm-calls-are-stateless.en.png)
 
 *Stateless calls with and without replayed history*
 At the API boundary, each chat completion request is independent. The model sees only the payload you send. If you do not include earlier turns, those turns do not exist from the model's point of view.
@@ -86,7 +83,7 @@ This statelessness is easy to misread as a limitation, but it is also what makes
 
 ## Multi-turn chat comes from replaying history in messages
 
-![History append loop across user turns](../../assets/llm-app-foundations-101/05/05-02-multi-turn-chat-comes-from-replaying-his.en.png)
+![History append loop across user turns](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-02-multi-turn-chat-comes-from-replaying-his.en.png)
 
 *History append loop across user turns*
 Every new request includes prior turns alongside the latest user input. The model reads the whole array and continues from there.
@@ -141,7 +138,7 @@ The important part is not just the last question. It is the replayed context bef
 
 ## Keeping the full history is the simplest memory pattern
 
-![Full history payload growth and token cost](../../assets/llm-app-foundations-101/05/05-03-keeping-the-full-history-is-the-simplest.en.png)
+![Full history payload growth and token cost](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-03-keeping-the-full-history-is-the-simplest.en.png)
 
 *Full history payload growth and token cost*
 The first implementation most teams write is also the easiest to understand: keep the entire conversation and resend it every time. For short sessions, that is still a perfectly reasonable design.
@@ -191,7 +188,7 @@ The appeal is obvious: implementation is trivial, context retention is strong, a
 
 ## Sliding windows retain only the last N turns
 
-![Full history window and summary comparison](../../assets/llm-app-foundations-101/05/05-04-sliding-windows-retain-only-the-last-n-t.en.png)
+![Full history window and summary comparison](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-04-sliding-windows-retain-only-the-last-n-t.en.png)
 
 *Full history window and summary comparison*
 In many conversations, the most important details live near the end. Sliding-window memory takes advantage of that. You keep the fixed `system` message, then preserve only the most recent N user and assistant turns.
@@ -292,7 +289,7 @@ The practical risk here is information loss. A summary is lossy. If it drops a c
 
 ## Detecting context overflow before the request fails
 
-![Budget check before context overflow](../../assets/llm-app-foundations-101/05/05-05-detecting-context-overflow-before-the-re.en.png)
+![Budget check before context overflow](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-05-detecting-context-overflow-before-the-re.en.png)
 
 *Budget check before context overflow*
 Long conversations usually fail because the prompt gets too large. Once accumulated history grows past the usable context budget, the provider may reject the request or force trade-offs between prompt size and completion length.
@@ -486,15 +483,26 @@ If you can answer those clearly, conversation memory stops being magic and becom
 - [ ] Cumulative tokens are checked before each call, with a warning at ~80% of the limit
 - [ ] The CLI loop supports `/exit` and `/reset` (clear history) commands
 
+## Answering the Opening Questions
+
+- Does multi-turn memory live inside the model or inside the request?
+  - Memory does not stay inside the model automatically. The app creates the multi-turn effect by replaying prior messages in the next request.
+
+- When do full history, sliding windows, and summary compression split apart?
+  - Full history is simplest for short conversations; sliding windows and summary compression become necessary as cost and context pressure grow.
+
+- How can you detect context overflow before the request fails?
+  - Estimate the message budget before sending the request, including expected output, so overflow is caught before the API rejects or truncates the call.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LLM API first call — sending your first request](./01-llm-api-first-call.md)
-- [Understanding tokens — cost, limits, and context windows](./02-understanding-tokens.md)
-- [Prompt engineering basics — system, user, and assistant roles](./03-prompt-engineering-basics.md)
-- [Few-shot and chain-of-thought — steering better answers](./04-few-shot-and-cot.md)
-- **Managing conversation state — building a multi-turn chatbot (current)**
-- Handling streaming responses — real-time output (upcoming)
+- [LLM App Foundations 101 (1/6): LLM API first call — sending your first request](./01-llm-api-first-call.md)
+- [LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows](./02-understanding-tokens.md)
+- [LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles](./03-prompt-engineering-basics.md)
+- [LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers](./04-few-shot-and-cot.md)
+- **LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot (current)**
+- LLM App Foundations 101 (6/6): Handling streaming responses — real-time output (upcoming)
 
 <!-- toc:end -->
 

@@ -1,11 +1,11 @@
 ---
-title: Regression Testing — Don't Let Yesterday's Wins Break Today
+title: "AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today"
 series: ai-evaluation-101
 episode: 8
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,24 +14,31 @@ tags:
 - Regression Testing
 - CI
 - GitHub Actions
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Changing one line of a prompt can break other cases. This post covers
   a CI-integrated LLM regression test suite, golden datasets, and…
 ---
 
-# Regression Testing — Don't Let Yesterday's Wins Break Today
+# AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today
 
-> AI Evaluation 101 Series (8/10)
+Changing one line of a prompt can break other cases.
 
-Changing one line of a prompt can break other cases. This post covers a CI-integrated LLM regression test suite, golden datasets, and threshold-based failure policies.
+This is post 8 in the AI Evaluation 101 series. Here we cover a CI-integrated LLM regression test suite, golden datasets, and threshold-based failure policies.
 
----
-![Regression testing - Don't let Yesterday's wins break today](../../assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.en.png)
 
+![Regression testing - Don't let Yesterday's wins break today](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.en.png)
 *Regression testing - Don't let Yesterday's wins break today*
+> Regression testing is not a one-time evaluation ritual; it is the guardrail that protects quality whenever change enters.
+
+## Questions to Keep in Mind
+
+- Why should regression testing move LLM evaluation from a pre-release event into the PR gate?
+- What changes should the golden dataset and thresholds block?
+- What tolerance and fail policy are needed when non-determinism makes evals noisy?
+
 ## Evaluate Every Time, Not Just Once
 
-![Evaluate every Time, not just once](../../assets/ai-evaluation-101/08/08-02-evaluate-every-time-not-just-once.en.png)
+![Evaluate every Time, not just once](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-02-evaluate-every-time-not-just-once.en.png)
 
 *Evaluate every Time, not just once*
 Ep1-Ep7 covered evaluation methods. But **when** do you run them? The common pattern:
@@ -53,7 +60,7 @@ This post covers:
 
 ## Golden Dataset — The Tests That Should Never Move
 
-![Golden dataset - the tests that should never move](../../assets/ai-evaluation-101/08/08-03-golden-dataset-the-tests-that-should-nev.en.png)
+![Golden dataset - the tests that should never move](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-03-golden-dataset-the-tests-that-should-nev.en.png)
 
 *Golden dataset - the tests that should never move*
 A regression dataset is different from your production eval dataset (Ep2).
@@ -102,7 +109,7 @@ with open("regression/golden.jsonl", "w") as f:
 
 ## Thresholds and Fail Policy
 
-![Thresholds and fail policy](../../assets/ai-evaluation-101/08/08-04-thresholds-and-fail-policy.en.png)
+![Thresholds and fail policy](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-04-thresholds-and-fail-policy.en.png)
 
 *Thresholds and fail policy*
 A score is not enough. You must define **what counts as fail**.
@@ -134,7 +141,7 @@ Three fail policies compared:
 
 ## CI Integration — GitHub Actions
 
-![CI integration - GitHub actions](../../assets/ai-evaluation-101/08/08-05-ci-integration-github-actions.en.png)
+![CI integration - GitHub actions](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-05-ci-integration-github-actions.en.png)
 
 *CI integration - GitHub actions*
 A workflow that runs evaluation on every PR:
@@ -301,6 +308,41 @@ $5 per PR over 100 PRs/month = $500/month. **Track CI cost weekly**; if it climb
 - On failure: re-run → diff → decide if it's an intentional change (raise threshold) or a bug (fix it).
 
 The next post covers **A/B testing** to decide statistically which of two models or prompts is actually better.
+
+---
+
+## Operational checklist
+
+- [ ] Keep the golden regression suite small enough to run on every PR.
+- [ ] Encode thresholds and fail policy in code instead of tribal memory.
+- [ ] Add a tolerance policy that reflects recent baseline variance.
+- [ ] Diff failed cases against main so reviewers can see the exact regression.
+- [ ] Revisit thresholds on a schedule instead of freezing them forever.
+
+## Answering the Opening Questions
+
+- **Why should regression testing move LLM evaluation from a pre-release event into the PR gate?**
+  - Prompts, models, retrieval, and tools can regress in small PRs, so quality must be checked at each change rather than once before release.
+- **What changes should the golden dataset and thresholds block?**
+  - They should block changes that break core flows, past incidents, safety standards, or cost and latency limits.
+- **What tolerance and fail policy are needed when non-determinism makes evals noisy?**
+  - Use seeds where possible, repeated runs, confidence intervals, dimension-level tolerances, and a policy that fails critical cases regardless of the average.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
+- [AI Evaluation 101 (5/10): Designing Rubric-Based Scoring](./05-rubric-based-scoring.md)
+- [AI Evaluation 101 (6/10): Evaluating RAG Systems](./06-rag-evaluation.md)
+- [AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses](./07-agent-evaluation.md)
+- **AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (current)**
+- AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [OpenAI — Reproducible Outputs with seed parameter](https://platform.openai.com/docs/api-reference/chat/create#chat-create-seed)

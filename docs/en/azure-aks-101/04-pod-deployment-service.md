@@ -1,11 +1,11 @@
 ---
-title: Pod, Deployment, Service — the three ways you express a workload
+title: "Azure Kubernetes Service 101 (4/7): Pod, Deployment, Service — the three ways you express a workload"
 series: azure-aks-101
 episode: 4
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -15,10 +15,10 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
-seo_description: Azure Kubernetes Service 101 series (4/7)
+seo_description: Learn the core Kubernetes objects—Pod, Deployment, and Service—and how they work together to manage application workloads in AKS.
 ---
 
-# Pod, Deployment, Service — the three ways you express a workload
+# Azure Kubernetes Service 101 (4/7): Pod, Deployment, Service — the three ways you express a workload
 
 > Azure Kubernetes Service 101 series (4/7)
 
@@ -26,21 +26,19 @@ The first time you read Kubernetes manifests, the objects can feel unnecessarily
 
 This post breaks those three apart. If they stay fuzzy, Ingress and autoscaling stay fuzzy too.
 
----
+This is the fourth post in the Azure Kubernetes Service 101 series. Here, we separate Pod, Deployment, and Service so the workload model behind the earlier FastAPI example becomes explicit.
 
-## Questions this chapter answers
+![azure kubernetes service 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/04/04-01-one-picture-first.en.png)
+*azure kubernetes service 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
 
 - How do Pod, ReplicaSet, and Deployment split responsibilities?
 - How does a Service hide Pod IP churn and route traffic underneath?
 - How do rolling and blue/green deploys express themselves in a Deployment?
-- When a Pod dies, which controller restores it and in what order?
-- Which options control packing pods onto one node versus spreading them?
 
 ## One picture first
 
-![Relationship between Pod, Deployment, and Service](../../assets/azure-aks-101/04/04-01-one-picture-first.en.png)
-
-*Relationship between Pod, Deployment, and Service*
 That diagram carries most of the model.
 
 - **Pod** is the minimum scheduling unit.
@@ -211,7 +209,7 @@ That separation is why the model scales well. Lifecycle control and traffic iden
 
 Suppose you roll out a new image version. The Deployment usually does not kill every old pod at once. It creates replacement pods gradually.
 
-![Deployment and Service during rolling updates](../../assets/azure-aks-101/04/04-02-deployment-becomes-clearer-when-you-imag.en.png)
+![Deployment and Service during rolling updates](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/04/04-02-deployment-becomes-clearer-when-you-imag.en.png)
 
 *Deployment and Service during rolling updates*
 That is why readiness probes matter so much. The Service starts using new pods only when they are considered ready to receive traffic.
@@ -271,16 +269,25 @@ This is part 4 of the Azure Kubernetes Service 101 series. Part 3 used Pod, Depl
 - [ ] Guaranteed an availability floor with a PodDisruptionBudget
 - [ ] Spread pods across nodes with topologySpreadConstraints or anti-affinity
 
+## Answering the Opening Questions
+
+- **How do Pod, ReplicaSet, and Deployment split responsibilities?**
+  - The article treats Pod, Deployment, Service — the three ways you express a workload as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How does a Service hide Pod IP churn and route traffic underneath?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do rolling and blue/green deploys express themselves in a Deployment?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
-- [Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
-- [Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
-- **Pod, Deployment, Service — the three ways you express a workload (current)**
-- Networking and Ingress — the path in and out of the cluster (upcoming)
-- Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
-- Monitoring and ops — Container Insights, logs, alerts (upcoming)
+- [Azure Kubernetes Service 101 (1/7): What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
+- [Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
+- [Azure Kubernetes Service 101 (3/7): Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
+- **Azure Kubernetes Service 101 (4/7): Pod, Deployment, Service — the three ways you express a workload (current)**
+- Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster (upcoming)
+- Azure Kubernetes Service 101 (6/7): Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
+- Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts (upcoming)
 
 <!-- toc:end -->
 

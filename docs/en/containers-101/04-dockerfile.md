@@ -1,57 +1,52 @@
 ---
 series: containers-101
 episode: 4
-title: Dockerfile
-status: content-ready
+title: "Containers 101 (4/10): Dockerfile"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
 language: en
 tags:
-  - Containers
-  - Docker
-  - Dockerfile
-  - Build
-  - DevOps
-seo_description: Dockerfile rules, cache-friendly ordering, multi-stage builds, and security defaults — taught with a runnable Python app example.
-last_reviewed: '2026-05-04'
+- Containers
+- Docker
+- Dockerfile
+- Build
+- DevOps
+seo_description: Dockerfile rules, cache-friendly ordering, multi-stage builds, and
+  security defaults — taught with a runnable Python app example.
+last_reviewed: '2026-05-15'
 ---
 
-# Dockerfile
+# Containers 101 (4/10): Dockerfile
 
-> Containers 101 series (4/10)
+A Dockerfile is not just a text file that happens to build an image. Instruction order changes cache hit rate, base-image choice changes image size and CVE count, and one user directive can change the security posture of the runtime.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Containers 101 series.
 
-**Core question**: How can a five-line difference in a Dockerfile produce a 10x size and 5x build-time gap for the same app?
+In this chapter, we focus on cache-friendly instruction order, multi-stage builds, non-root defaults, and secret handling so the resulting image is faster, smaller, and safer to ship.
 
-> *Three principles — instruction order, cache friendliness, and multi-stage — completely change the result.*
+> Dockerfile quality is really cache quality, image quality, and runtime safety compressed into one file.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![containers 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/04/04-01-concept-at-a-glance.en.png)
+*containers 101 chapter 4 flow overview*
+> The quality of a Dockerfile lives or dies by cache efficiency. Change a layer deep in the file, and you rebuild everything below it.
 
-- The role and order of instructions
-- Cache-friendly authoring
-- Multi-stage builds
-- Security defaults
-- Five common pitfalls
+## Questions to Keep in Mind
+
+- The role and order of instructions?
+- Cache-friendly authoring?
+- Multi-stage builds?
 
 ## Why It Matters
 
 A Dockerfile directly drives team productivity and security. Get it right once and it pays back for years.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Dockerfile["dockerfile"] --> Builder["builder stage"]
-    Builder --> Runtime["runtime stage"]
-    Runtime --> Image["final image"]
-```
+Each Dockerfile instruction creates one layer. Layers below are cached if their inputs match; changes above invalidate everything below. Multi-stage builds let you discard build artifacts before the final layer.
 
 ## Key Terms
 
@@ -128,6 +123,22 @@ def finalize():
 - `--from=builder` brings results from the previous stage.
 - `USER app` avoids root.
 
+## Quick verification and failure signals
+
+```bash
+docker build -t demo-app:dev .
+docker image inspect demo-app:dev --format "user={{.Config.User}} size={{.Size}}"
+```
+
+**Expected output:**
+- The dependency layer sits early enough to be cached between source-only rebuilds.
+- `Config.User` is not empty and points to a non-root runtime user.
+
+**Check first if it fails:**
+- If dependencies reinstall every time, inspect where `COPY requirements.txt` sits.
+- If the app still runs as root, confirm `USER` exists in the final stage.
+- If the image is too large, check whether build tools leaked into runtime.
+
 ## Five Common Mistakes
 
 1. **`COPY .` first — kills the cache.**
@@ -165,10 +176,21 @@ Multi-stage separates build tools. `.dockerignore` shrinks the build context. Di
 
 Once images exist, the next question is *where to put state*. The next post covers Volume.
 
+## Answering the Opening Questions
+
+- **The role and order of instructions?**
+  - The article treats Dockerfile as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Cache-friendly authoring?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Multi-stage builds?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Container?](./01-what-is-a-container.md)
-- [Image and Layer](./02-image-and-layer.md)
-- [Runtime](./03-runtime.md)
+## In this series
+
+- [Containers 101 (1/10): What is a Container?](./01-what-is-a-container.md)
+- [Containers 101 (2/10): Image and Layer](./02-image-and-layer.md)
+- [Containers 101 (3/10): Runtime](./03-runtime.md)
 - **Dockerfile (current)**
 - Volume (upcoming)
 - Network (upcoming)
@@ -176,6 +198,7 @@ Once images exist, the next question is *where to put state*. The next post cove
 - Container Security (upcoming)
 - Containers vs VMs (upcoming)
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References

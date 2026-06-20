@@ -1,10 +1,10 @@
 ---
 series: data-warehouse-101
 episode: 6
-title: ETL and ELT
-status: content-ready
+title: "Data Warehouse 101 (6/10): ETL and ELT"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,35 @@ tags:
   - Pipeline
   - Analytics
 seo_description: How ETL and ELT differ, where to perform transformations, and why modern warehouses lean toward ELT for clarity and replay.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# ETL and ELT
+# Data Warehouse 101 (6/10): ETL and ELT
 
-> Data Warehouse 101 series (6/10)
+The argument is not really about acronym order. It is about where you want complexity to live when a pipeline fails at 2 a.m. If raw data disappears before you can replay it, the recovery story gets expensive fast.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Data Warehouse 101 series.
 
-**Core question**: Should we transform *before* loading or *after*? The answer hinges on *how warehouse compute has evolved*.
+In this post, we compare ETL and ELT from an operational point of view: where transformation happens, why modern warehouse teams prefer replayable SQL, and what that choice changes in day-to-day debugging.
 
-> *Yesterday it was *transform then load*. Today it is *load then transform in SQL*.*
 
-<!-- a-grade-intro:end -->
+![data warehouse 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/06/06-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 6 flow overview*
+> ETL transforms before loading; ELT loads first and transforms in-warehouse. Each has different cost, flexibility, and operational tradeoffs.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying ETL and ELT?
+- Which signal should the example or diagram make visible for ETL and ELT?
+- What failure should be prevented first when ETL and ELT reaches a real system?
+
+## Questions this article answers
+
+- Where do ETL and ELT differ in where transformation happens?
+- Why do modern warehouse teams tend to prefer ELT?
+- What breaks when you skip a staging layer?
+- Why are idempotent pipelines so closely tied to operational stability?
+- What team problems do tools like dbt help reduce?
 
 ## What You Will Learn
 
@@ -46,15 +61,7 @@ As warehouse *compute became cheap*, loading the *raw source* and *transforming 
 
 > *Pull transforms into SQL. Visibility and reproducibility come along for the ride.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Src["Source"] --> ELoad["Load (raw)"]
-    ELoad --> DW["Warehouse"]
-    DW --> Transform["Transform (SQL)"]
-    Transform --> Mart["Mart"]
-```
+This picture shows where ETL and ELT sit in the data flow. The key is not to memorize the names, but to see who owns the transformation responsibility.
 
 ## Key Terms
 
@@ -165,17 +172,29 @@ INSERT INTO marts.fact_orders SELECT ...;
 
 ELT is the shape of the *SQL era*. Next, we look at *BI and dashboards* — turning data into a story.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying ETL and ELT?**
+  - The article treats ETL and ELT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for ETL and ELT?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when ETL and ELT reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
-- [OLTP and OLAP](./02-oltp-and-olap.md)
-- [Fact and Dimension](./03-fact-and-dimension.md)
-- [Star Schema](./04-star-schema.md)
-- [Partition and Clustering](./05-partition-and-clustering.md)
+## In this series
+
+- [Data Warehouse 101 (1/10): What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
+- [Data Warehouse 101 (2/10): OLTP and OLAP](./02-oltp-and-olap.md)
+- [Data Warehouse 101 (3/10): Fact and Dimension](./03-fact-and-dimension.md)
+- [Data Warehouse 101 (4/10): Star Schema](./04-star-schema.md)
+- [Data Warehouse 101 (5/10): Partition and Clustering](./05-partition-and-clustering.md)
 - **ETL and ELT (current)**
 - BI and Dashboard (upcoming)
 - Data Mart (upcoming)
 - Performance Optimization (upcoming)
 - Warehouse Design Example (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,0 +1,18 @@
+flowchart LR
+    작업["실제 작업\nclassify or solve"] --> 요청["하나의 chat 요청"]
+    예시["Few-shot 예시\n답변 스키마를 보여 줌"] --> 요청
+    단계유도["CoT 신호\nLet's think step by step"] --> 요청
+    요청 --> 모델["같은 base model"]
+    모델 --> 형식안정["더 안정적인 형식\n라벨, 순서, 톤"]
+    모델 --> 추론안정["더 꼼꼼한 중간 점검\n순서, 계산, 규칙"]
+    형식안정 --> 최종답["더 신뢰할 수 있는 최종 답변"]
+    추론안정 --> 최종답
+
+    style 작업 fill:#e3f2fd,stroke:#1976d2
+    style 예시 fill:#f3e5f5,stroke:#7b1fa2
+    style 단계유도 fill:#f3e5f5,stroke:#7b1fa2
+    style 요청 fill:#fff3e0,stroke:#f57c00
+    style 모델 fill:#e8f5e9,stroke:#388e3c
+    style 형식안정 fill:#ede7f6,stroke:#5e35b1
+    style 추론안정 fill:#ede7f6,stroke:#5e35b1
+    style 최종답 fill:#fff8e1,stroke:#f9a825

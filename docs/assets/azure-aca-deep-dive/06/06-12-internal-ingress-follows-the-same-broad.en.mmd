@@ -1,0 +1,4 @@
+flowchart TD
+  VNetClient["VNet Client"] --> ILB["Internal Load Balancer"]
+  ILB --> Envoy["Envoy Proxy"]
+  Envoy --> Pod["App Pod"]

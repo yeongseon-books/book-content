@@ -1,10 +1,10 @@
 ---
 series: data-science-career-101
 episode: 3
-title: Designing the Learning Path
-status: content-ready
+title: "Data Science Career 101 (3/10): Designing the Learning Path"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,27 @@ tags:
   - Python
   - Beginner
 seo_description: A beginner-friendly tour of a 12-week learning roadmap for data roles.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Designing the Learning Path
+# Data Science Career 101 (3/10): Designing the Learning Path
 
-> Data Science Career 101 series (3/10)
+Many beginners do not fail because they study too little. They fail because they study in a way that never compounds. A course here, a notebook there, a few SQL exercises over the weekend—effort accumulates, but the path does not, so it becomes hard to tell what is foundational and what is optional.
 
-<!-- a-grade-intro:begin -->
+In data work, sequence matters. If you jump into modeling before you are comfortable with SQL, data cleaning, and basic statistics, you end up building on a surface that cannot support the kinds of questions interviews and real projects actually ask.
 
-**Core question**: In what order should you learn what?
+This is post 3 in the Data Science Career 101 series.
 
-> Fundamentals to analytics to modeling to product.
 
-<!-- a-grade-intro:end -->
+![data science career 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/03/03-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 3 flow overview*
+> In learning structure, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
+## Questions to Keep in Mind
+
+- What should a beginner learn first, and what can wait?
+- Why is a 12-week roadmap a more useful frame than a loose reading list?
+- What outcomes should each four-week phase produce?
 
 ## What You Will Learn
 
@@ -42,17 +49,11 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-Random study burns you out. A path keeps you going.
+Random study usually produces random confidence. You touch many topics, but you cannot tell which ones you can actually use.
 
-## Concept at a Glance
+An ordered path gives you something more valuable than motivation: it gives you checkpoints. You know when to move from syntax to analysis, when to build a small project, and when to pause and correct the pace instead of just collecting more material.
 
-```mermaid
-flowchart LR
-    F[Fundamentals] --> A[Analytics]
-    A --> M[Modeling]
-    M --> P[Product]
-```
-
+The first 12 weeks matter more than the next 12 months. By pacing basics, analytics, and modeling in order—and leaving a small artifact each week—you build both skill and confidence.
 ## Key Terms
 
 - **fundamentals**: Core building blocks.
@@ -69,6 +70,7 @@ flowchart LR
 
 ## Hands-on: 12-Week Learning Path
 
+Block out 12 weeks on a calendar. Each week has a specific output: a small script, a dashboard, a written analysis. The output is proof.
 ### Step 1 — Fundamentals (Weeks 1-4)
 
 ```text
@@ -128,7 +130,9 @@ What went well / Improve / Next
 
 ## How This Shows Up in Production
 
-Bootcamps run on roughly the same 12-week roadmap.
+Most bootcamps and internal training programs follow some version of this progression because the dependency chain is hard to escape: fundamentals first, analysis second, modeling third, product judgment throughout.
+
+The exact tools vary, but the structure holds because real work still depends on being able to query data, clean it, explain it, and only then decide whether a model is even the right move.
 
 ## How a Senior Engineer Thinks
 
@@ -153,11 +157,24 @@ Bootcamps run on roughly the same 12-week roadmap.
 
 ## Wrap-up and Next Steps
 
-Next post covers *The Data Portfolio*.
+The goal is not to consume the maximum number of resources in 12 weeks. It is to finish the period with a stronger base, a set of reusable artifacts, and at least one small body of work that proves you can turn study into output.
+
+The next post shows how those artifacts become a portfolio instead of a pile of disconnected exercises.
+
+## Answering the Opening Questions
+
+- **What should a beginner learn first, and what can wait?**
+  - The article treats Designing the Learning Path as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is a 12-week roadmap a more useful frame than a loose reading list?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What outcomes should each four-week phase produce?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What Is a Data Career](./01-what-is-data-career.md)
-- [Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
+## In this series
+
+- [Data Science Career 101 (1/10): What Is a Data Career](./01-what-is-data-career.md)
+- [Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
 - **Designing the Learning Path (current)**
 - The Data Portfolio (upcoming)
 - SQL and Analytics Interviews (upcoming)
@@ -166,11 +183,12 @@ Next post covers *The Data Portfolio*.
 - Settling into the First Data Job (upcoming)
 - Building Domain Expertise (upcoming)
 - The Path to Senior in Data (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Mode SQL Tutorial](https://mode.com/sql-tutorial/)
-- [pandas docs](https://pandas.pydata.org/docs/)
-- [scikit-learn user guide](https://scikit-learn.org/stable/user_guide.html)
-- [Trustworthy Online Controlled Experiments](https://experimentguide.com/)
+- [Mode - SQL Tutorial](https://mode.com/sql-tutorial/)
+- [pandas documentation - User Guide](https://pandas.pydata.org/docs/user_guide/index.html)
+- [scikit-learn - User Guide](https://scikit-learn.org/stable/user_guide.html)
+- [Ron Kohavi et al. - Trustworthy Online Controlled Experiments](https://experimentguide.com/)

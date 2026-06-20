@@ -1,0 +1,10 @@
+flowchart LR
+    subgraph EnvA["환경 A"]
+        App1["앱 1 (Dapr)"]
+        App2["앱 2 (Dapr)"]
+        App1 -- "서비스 호출" --> App2
+    end
+    subgraph EnvB["환경 B"]
+        App3["앱 3 (Dapr)"]
+    end
+    App1 -. "기본적으로 실패" .-x App3

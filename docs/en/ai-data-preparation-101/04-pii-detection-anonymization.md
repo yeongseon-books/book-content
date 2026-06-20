@@ -1,11 +1,11 @@
 ---
-title: PII Detection and Anonymization for Training Data
+title: "AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data"
 series: ai-data-preparation-101
 episode: 4
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,16 +14,27 @@ tags:
 - PII
 - Anonymization
 - Privacy
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: LLMs leaking email addresses or phone numbers that came from training
   data is no longer hypothetical. Carlini et al.
 ---
 
-# PII Detection and Anonymization for Training Data
+# AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data
 
-> AI Data Preparation 101 series (4/10)
+Training-data leaks are no longer theoretical once email addresses, phone numbers, or names make it into the corpus. The later you try to handle PII, the more expensive cleanup becomes across the rest of the pipeline.
 
----
+This is post 4 in the AI Data Preparation 101 series. Here we cover the stages required to detect, anonymize, and verify PII handling in training data.
+
+
+![AI data preparation chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/04/04-01-big-picture.en.png)
+*AI data preparation chapter 4 flow overview*
+
+## Questions to Keep in Mind
+
+- Why should PII handling be split into detection, classification, anonymization, and audit?
+- What does regex catch quickly, and where do you need NER or review queues?
+- When should you redact, mask, pseudonymize, or synthesize instead?
+
 ## "We Can't Have PII in Training Data, Right?"
 
 LLMs leaking email addresses or phone numbers that came from training data is no longer hypothetical. Carlini et al. (2021), "Extracting Training Data from Large Language Models," demonstrated real names and contact info being extracted from GPT-2. Whatever PII you put in at training time can leak at inference time.
@@ -72,6 +83,53 @@ def detect_regex(text: str) -> dict[str, list[str]]:
 sample = "Contact: alice@example.com or 010-1234-5678."
 print(detect_regex(sample))
 ```
+
+**Expected output:**
+
+```text
+{'email': ['alice@example.com'], 'phone_kr': ['010-1234-5678']}
+```
+
+This is the fast-path verification. If the obvious identifiers do not show up here, the rest of the pipeline is already blind.
+
+## Verification before the dataset moves forward
+
+Regex and NER need a shared verification step, otherwise false negatives quietly survive. A small harness is enough to catch many regressions.
+
+```python
+TEST_ROWS = [
+    {"text": "Contact Alice at alice@example.com or 010-1234-5678."},
+    {"text": "John Smith from Acme lives in Seoul."},
+]
+
+for row in TEST_ROWS:
+    regex_hits = detect_regex(row["text"])
+    ner_hits = detect_ner(row["text"], language="en")
+    print({
+        "text": row["text"],
+        "regex_types": sorted(regex_hits.keys()),
+        "ner_types": sorted({hit["type"] for hit in ner_hits}),
+    })
+```
+
+**Expected output:**
+
+```text
+{'text': 'Contact Alice at alice@example.com or 010-1234-5678.', 'regex_types': ['email', 'phone_kr'], 'ner_types': ['EMAIL_ADDRESS', 'PERSON', 'PHONE_NUMBER']}
+{'text': 'John Smith from Acme lives in Seoul.', 'regex_types': [], 'ner_types': ['LOCATION', 'PERSON']}
+```
+
+That output is useful for two reasons. It proves the cheap regex layer still catches direct identifiers, and it proves the NER layer is filling the natural-language gap that regex cannot see.
+
+## Failure modes to test before signing off
+
+Three mistakes routinely escape the happy path:
+
+1. **Audit logs store the original string**: the log becomes a new PII repository.
+2. **NER confidence threshold is too high**: names and locations disappear from the review queue.
+3. **Korean identifiers are missing from tests**: English-only samples hide gaps in RRN, business-number, or Korean-name handling.
+
+If you cannot show one test row for each class of identifier you care about, you do not yet have a privacy pipeline.
 
 Regex alone misses natural-language PII like names and addresses. Add a NER stage.
 
@@ -222,6 +280,42 @@ Korean data has traps that English code misses.
 - Korean data needs separate handling for RRN, business numbers, and Korean names.
 - Maintain sampling-based human review to keep false negatives from compounding.
 - Episode 5 covers tokenization and chunking strategies.
+
+---
+
+## Operational checklist
+
+- [ ] Run regex and NER detection as separate stages and compare their hit counts
+- [ ] Choose anonymization mode by use case instead of defaulting every field to the same transformation
+- [ ] Keep the pseudonymization pepper outside the dataset and out of logs
+- [ ] Store only counts, types, and reduction metrics in audit logs
+- [ ] Review a sampled subset of anonymized rows before promoting the dataset
+
+## Answering the Opening Questions
+
+- **Why should PII handling be split into detection, classification, anonymization, and audit?**
+  - The article treats PII Detection and Anonymization for Training Data as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does regex catch quickly, and where do you need NER or review queues?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When should you redact, mask, pseudonymize, or synthesize instead?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
+- [AI Data Preparation 101 (2/10): Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
+- [AI Data Preparation 101 (3/10): Cleaning and Deduplication](./03-cleaning-deduplication.md)
+- **PII Detection and Anonymization for Training Data (current)**
+- Tokenization and Chunking Strategies (upcoming)
+- Quality Filtering - Heuristics and Classifiers (upcoming)
+- Synthetic Data Generation - From Self-Instruct to Distillation (upcoming)
+- Data Augmentation - From EDA to Back-Translation (upcoming)
+- Train/Eval/Test Splitting and Contamination Control (upcoming)
+- Building a Production Data Pipeline (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [Microsoft Presidio - PII detection and anonymization](https://microsoft.github.io/presidio/)

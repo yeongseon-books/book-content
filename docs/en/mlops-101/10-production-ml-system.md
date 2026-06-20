@@ -1,10 +1,10 @@
 ---
 series: mlops-101
 episode: 10
-title: Building a Production ML System
-status: content-ready
+title: "MLOps 101 (10/10): Building a Production ML System"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,48 +16,52 @@ tags:
   - Production
   - DataScience
   - Pipeline
-seo_description: A blueprint that wires data, training, deployment, monitoring, and retraining into one production ML system, with a maturity checklist.
-last_reviewed: '2026-05-04'
+seo_description: Connect data, training, deployment, monitoring, drift detection, and retraining into one closed-loop production ML system.
+last_reviewed: '2026-05-15'
 ---
 
-# Building a Production ML System
+# MLOps 101 (10/10): Building a Production ML System
 
-> MLOps 101 series (10/10)
+Earlier in this series, we looked at experiment tracking, data versioning, training pipelines, deployment, monitoring, drift detection, retraining, and feature stores one by one. But knowing the parts individually is very different from wiring them into one operating system.
 
-<!-- a-grade-intro:begin -->
+This is where many real teams struggle. Knowing the tool names does not create a system. Data has to move into training on a clear path, trained artifacts need an explicit promotion rule, and when something degrades in production the team needs a known response path.
 
-**Core question**: How do you assemble the *nine pieces* from this series into *one running production system*?
+This is the final post in the MLOps 101 series.
 
-> *A production ML system runs the loop of data → training → deployment → monitoring → retraining automatically.*
+Here, we will connect the previous nine pieces into one closed operational loop and end with a practical maturity checklist.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![mlops 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/10/10-01-see-the-loop-first.en.png)
+*mlops 101 chapter 10 flow overview*
+> Production ML is not one tool or one team. It is a system where data integrity, model quality, deployment safety, and operational alertness all work together so a model can stay alive and useful in production.
 
-- The full system blueprint
-- How nine components connect
-- Runbooks and on-call
-- Maturity stages
-- Five common pitfalls
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Building a Production ML System?
+- Which signal should the example or diagram make visible for Building a Production ML System?
+- What failure should be prevented first when Building a Production ML System reaches a real system?
+
+## Questions this article answers
+
+- How do the earlier nine components connect in a real system?
+- Why is tool knowledge alone not enough to create an operating model?
+- How do runbooks, on-call, and SLI/SLOs fit into the technical path?
+- What is a practical way to assess team maturity?
+- In what order should a team improve without absorbing too much complexity at once?
+
+> Mental model: a production ML system is not a box of tools. It is a closed loop where data → training → deployment → observation → retraining are connected and each stage has a clear owner.
 
 ## Why It Matters
 
-Knowing each tool individually does not give you a system. The wiring and the boundaries are the real work.
+Building one good model and building an operable system are different jobs. The first is closer to experimentation. The second is closer to boundary design and recovery design. That is why individual tool knowledge is never enough.
 
-## Concept at a Glance
+An operable system needs three things at the same time. Data and model flow have to connect automatically, observation has to trigger response when signals go abnormal, and the team has to distinguish between what automation should do and what still needs human judgment.
 
-```mermaid
-flowchart LR
-    Data["data versioning"] --> Pipe["training pipeline"]
-    Pipe --> Reg["model registry"]
-    Reg --> Deploy["deployment"]
-    Deploy --> Mon["monitoring"]
-    Mon --> Drift["drift"]
-    Drift --> Retrain["retraining"]
-    Retrain --> Pipe
-    Feat["feature store"] --> Pipe
-    Feat --> Deploy
-```
+## See the Loop First
+
+This diagram compresses the whole series into one loop. Data versioning and the feature store stabilize the inputs, the training pipeline produces a candidate model, the registry holds the version, deployment puts it into production, monitoring observes it, and drift plus retraining feed the next cycle.
+
+The key detail is that this is a loop, not a line. Production signals have to flow back into training for MLOps to be complete.
 
 ## Key Terms
 
@@ -181,17 +185,29 @@ A fintech runs a payments model on Airflow + MLflow + Feast + Prometheus, with o
 
 This series gave you the basic circuitry of MLOps. Now go pick *one* component and ship it inside a real project.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Building a Production ML System?**
+  - The article treats Building a Production ML System as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Building a Production ML System?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Building a Production ML System reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is MLOps?](./01-what-is-mlops.md)
-- [Experiment Tracking](./02-experiment-tracking.md)
-- [Data Versioning](./03-data-versioning.md)
-- [Model Training Pipeline](./04-training-pipeline.md)
-- [Model Deployment](./05-model-deployment.md)
-- [Model Monitoring](./06-model-monitoring.md)
-- [Data Drift and Model Drift](./07-data-and-model-drift.md)
-- [Retraining](./08-retraining.md)
-- [Feature Store](./09-feature-store.md)
+## In this series
+
+- [MLOps 101 (1/10): What Is MLOps?](./01-what-is-mlops.md)
+- [MLOps 101 (2/10): Experiment Tracking](./02-experiment-tracking.md)
+- [MLOps 101 (3/10): Data Versioning](./03-data-versioning.md)
+- [MLOps 101 (4/10): Model Training Pipeline](./04-training-pipeline.md)
+- [MLOps 101 (5/10): Model Deployment](./05-model-deployment.md)
+- [MLOps 101 (6/10): Model Monitoring](./06-model-monitoring.md)
+- [MLOps 101 (7/10): Data Drift and Model Drift](./07-data-and-model-drift.md)
+- [MLOps 101 (8/10): Retraining](./08-retraining.md)
+- [MLOps 101 (9/10): Feature Store](./09-feature-store.md)
 - **Building a Production ML System (current)**
+
 <!-- toc:end -->
 
 ## References

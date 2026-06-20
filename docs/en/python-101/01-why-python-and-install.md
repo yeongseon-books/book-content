@@ -1,11 +1,11 @@
 ---
-title: Why Python, and how to install and use venv
+title: "Python 101 (1/10): Why Python, and how to install and use venv"
 series: python-101
 episode: 1
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -22,16 +22,21 @@ seo_description: One computer can host many Pythons at once, and every project g
   its own.
 ---
 
-# Why Python, and how to install and use venv
+# Python 101 (1/10): Why Python, and how to install and use venv
 
-## What you will learn
+One computer can host many Pythons at once, and every project gets its own. If you miss that model early, environment problems pile up faster than syntax problems.
 
-- Why "just installing Python" is risky, and why you must separate system Python from project Python
-- How to install Python 3.12 safely on macOS, Windows, and Linux
-- What a venv (virtual environment) actually solves
-- The difference between `python` and `python3`, and which one to use when
-- How to create, activate, and **verify** that you are inside a project venv
-- How to install packages with pip and reproduce environments with `requirements.txt`
+This post is the first article in the Python 101 series. This is the first step in the series, where you set up the environment model the rest of the articles depend on.
+
+
+![Python 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/01/01-01-mental-model.en.png)
+*Python 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- Why "just installing Python" is risky, and why you must separate system Python from project Python?
+- How to install Python 3.12 safely on macOS, Windows, and Linux?
+- What a venv (virtual environment) actually solves?
 
 ## Why this matters
 
@@ -53,9 +58,6 @@ That single sentence is the heart of this article.
 - project Python (venv): a copy living inside the project folder. You install packages only here.
 - Ten projects? Ten venvs. They cannot affect each other.
 
-![Mental Model](../../assets/python-101/01/01-01-mental-model.en.png)
-
-*Mental Model*
 System Python is the OS's territory. Each venv is the project's territory. As a developer you only ever activate a venv and work inside it.
 
 ## Core Concepts
@@ -289,7 +291,7 @@ If you have multiple Python versions installed (3.10 and 3.12, say), `python3` i
 
 Start every project with the same shape so you have zero cognitive overhead when you open it months later:
 
-```
+```text
 hello-python/
 ├── .venv/              # not committed
 ├── .gitignore          # includes .venv/ and __pycache__/
@@ -352,13 +354,36 @@ Newer tools like `uv` and `poetry` are faster and more powerful, but they are bu
 
 The next article covers variables, types, and operators: what dynamic typing really means, why type hints exist, and how int, float, str, bool, and None behave differently in practice.
 
+## Answering the Opening Questions
+
+- **Why "just installing Python" is risky, and why you must separate system Python from project Python?**
+  - The article treats Why Python, and how to install and use venv as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to install Python 3.12 safely on macOS, Windows, and Linux?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What a venv (virtual environment) actually solves?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- **Why Python, and how to install and use venv (current)**
+- Variables, types, and operators (upcoming)
+- Strings and formatting (upcoming)
+- list, tuple, set, dict (upcoming)
+- Control flow: if, for, while, comprehension (upcoming)
+- Functions and arguments: def, args, kwargs, default, lambda (upcoming)
+- Modules and packages: import, __init__, __name__ (upcoming)
+- File I/O and exception handling (upcoming)
+- Classes and objects: bundling data with behavior (upcoming)
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- Python official docs — venv: https://docs.python.org/3/library/venv.html
-- Python official docs — pip user guide: https://pip.pypa.io/en/stable/user_guide/
-- PEP 405 — Python Virtual Environments: https://peps.python.org/pep-0405/
-- Python.org downloads: https://www.python.org/downloads/
-- Real Python — Python Virtual Environments Primer: https://realpython.com/python-virtual-environments-a-primer/
+- [Python docs — venv](https://docs.python.org/3/library/venv.html) — Authoritative reference for `python -m venv`, activation scripts, and environment isolation.
+- [PEP 405 — Python Virtual Environments](https://peps.python.org/pep-0405/) — Explains the design behind venv, including `sys.prefix` and site-packages separation.
+- [pip User Guide](https://pip.pypa.io/en/stable/user_guide/) — Canonical guide for `python -m pip`, `pip freeze`, and requirements-based installs.
+- [Python Packaging User Guide — Install packages in a virtual environment using pip and venv](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) — Maps directly to the project-level `.venv` workflow used in the chapter.
+- [Python.org Downloads](https://www.python.org/downloads/) — Official source for installer downloads and supported release lines.
+- [Python docs — Using Python on Windows](https://docs.python.org/3/using/windows.html) — Covers the Windows launcher, install manager, and venv usage described for Windows users.

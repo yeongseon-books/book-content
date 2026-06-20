@@ -1,0 +1,4 @@
+flowchart TD
+  Envoy["Envoy 프록시"] --> Svc["ClusterIP 서비스"]
+  Svc --> Endpoints["엔드포인트 (파드 IP)"]
+  Endpoints --> Pod["앱 파드"]

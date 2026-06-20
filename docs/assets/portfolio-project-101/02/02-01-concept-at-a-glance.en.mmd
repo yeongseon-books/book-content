@@ -1,0 +1,20 @@
+flowchart LR
+    subgraph A["Traits of Bad Projects"]
+        A1["Clone Coding"] --> A2["Architecture without Thought"]
+        A1 --> A5["Copy Course Code"]
+        A2 --> A3["Listing Tech Stacks"]
+        A5 --> A3
+        A3 --> A4["No Real Problem Solved"]
+        A3 --> A6["Lack of Differentiation"]
+    end
+
+    subgraph B["Traits of Good Projects"]
+        B1["Specific Context"] --> B2["Unique Solution"]
+        B1 --> B5["Understand Needs"]
+        B2 --> B3["Trade-off Analysis"]
+        B5 --> B3
+        B3 --> B4["Validation and Improvement"]
+        B3 --> B6["Growth Experience"]
+    end
+
+    A2 -. "Difference in Authenticity" .- B2

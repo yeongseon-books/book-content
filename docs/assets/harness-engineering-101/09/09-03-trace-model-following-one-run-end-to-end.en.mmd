@@ -1,0 +1,15 @@
+flowchart TB
+    Root["trace 7a3f...\nspan: agent.run (12.3s, $0.04)"]
+    Root --> Plan["span: llm.plan\n1.2s, $0.01"]
+    Root --> Search["span: tool.search\n0.8s"]
+    Root --> Synthesize["span: llm.synthesize\n2.1s, $0.02"]
+    Root --> Send["span: tool.send_email\n0.3s"]
+
+    Plan --> Questions["Planning stage\nwhat did the model decide first?"]
+    Search --> Lookup["Retrieval stage\nwhich tool call was slow or wrong?"]
+    Synthesize --> Cost["Reasoning stage\nwhere did cost spike?"]
+    Send --> Action["Effect stage\nwhich external action actually ran?"]
+
+    style Root fill:#f3e5f5,stroke:#7b1fa2
+    style Send fill:#e8f5e9,stroke:#388e3c
+    style Cost fill:#fff8e1,stroke:#f9a825

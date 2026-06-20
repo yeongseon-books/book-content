@@ -1,10 +1,10 @@
 ---
 series: statistics-101
 episode: 3
-title: Distributions
+title: "Statistics 101 (3/10): Distributions"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,25 +20,24 @@ seo_description: A walkthrough of normal, uniform, exponential, and power-law sh
 last_reviewed: '2026-05-04'
 ---
 
-# Distributions
+# Statistics 101 (3/10): Distributions
 
-> Statistics 101 series (3/10)
+Two datasets can share the same mean and still behave in completely different ways. One may stay tightly clustered around the center, while the other may have a long tail or a few values far away from the rest. Matching one summary number does not mean the data has the same character.
 
-<!-- a-grade-intro:begin -->
+In statistics, the distribution is the shape of the data. If you misread that shape, later decisions about averages, confidence intervals, tests, or SLAs start to drift.
 
-**Core question**: Why does the *shape* of data matter? Why do datasets with the *same mean* sometimes *behave so differently*?
+This is post 3 in the Statistics 101 series. Here we will build intuition for reading data shape and explain why assuming normality too quickly causes real problems.
 
-> *A distribution is the personality of the data.*
 
-<!-- a-grade-intro:end -->
+![statistics 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/03/03-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 3 flow overview*
+> Understanding the *shape* of your data unlocks why the *same mean* can hide *different realities*.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Four *common distributions*
-- The *risk of assuming normality*
-- The meaning of *skewness* and *kurtosis*
-- A 5-step distribution diagnosis exercise
-- Five common mistakes
+- Why does the shape of a distribution matter?
+- How do normal, uniform, exponential, and power-law distributions differ?
+- What do skewness and kurtosis tell us numerically?
 
 ## Why It Matters
 
@@ -47,14 +46,7 @@ last_reviewed: '2026-05-04'
 > *Pick the tool by the shape.*
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Data["Data"] --> Hist["Histogram"]
-    Hist --> Shape["Shape: normal/skew/uniform"]
-    Shape --> Tool["Statistical Tool"]
-```
-
+Visualizing distributions reveals patterns that summaries alone cannot capture. A distribution tells you not just where data *lives*, but how *wide* the variation is and whether there are *outliers* or *gaps*.
 ## Key Terms
 
 - **Normal**: a *symmetric bell* shape; common in nature and measurement noise.
@@ -149,9 +141,20 @@ Response-time SLAs, revenue, click-through, defect frequency — *most operation
 
 A distribution is the *personality of the data*. The next episode opens up *uncertainty* through *sample and population*.
 
+## Answering the Opening Questions
+
+- **Why does the shape of a distribution matter?**
+  - The article treats Distributions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do normal, uniform, exponential, and power-law distributions differ?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What do skewness and kurtosis tell us numerically?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
 - **Distributions (current)**
 - Sample and Population (upcoming)
 - Estimation (upcoming)
@@ -160,6 +163,7 @@ A distribution is the *personality of the data*. The next episode opens up *unce
 - Correlation and Regression (upcoming)
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

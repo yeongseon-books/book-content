@@ -1,10 +1,10 @@
 ---
 series: sre-101
 episode: 1
-title: What is SRE?
+title: "SRE 101 (1/10): What is SRE?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,34 @@ tags:
   - Operations
   - Engineering
 seo_description: A beginner-friendly overview of Site Reliability Engineering, its origin, how it differs from DevOps, the core activities, and where to start
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# What is SRE?
+# SRE 101 (1/10): What is SRE?
 
-> SRE 101 series (1/10)
+Teams usually meet reliability through pain first: midnight pages, releases that suddenly feel dangerous, and a few people carrying too much operational knowledge in their heads. When that happens, adding more effort or more meetings rarely fixes the underlying problem.
 
-<!-- a-grade-intro:begin -->
+SRE starts by changing the frame. Instead of treating operations as heroics, it treats reliability as an engineering system with measurable goals, automation, feedback loops, and explicit trade-offs.
 
-**Core question**: *Whose* job is it to keep the *service* from *going down*?
+This is the first post in the SRE 101 series. It sets up the mental model for the rest of the series: reliability is part of the product, and operating it well requires code, metrics, and deliberate policies.
 
-> *SRE* is the discipline that treats *operations* as a *software problem*.
 
-<!-- a-grade-intro:end -->
+![sre 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/01/01-01-concept-at-a-glance.en.png)
+*sre 101 chapter 1 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *definition* of *SRE*
-- How it differs from *DevOps*
-- The *five core activities*
-- Where SRE fits in the *org*
-- How to *get started*
+- What does SRE actually mean beyond “the people who handle incidents”?
+- How is SRE different from DevOps even though the two ideas often overlap?
+- Why does SRE treat reliability work as a software problem instead of a staffing problem?
 
-## Why It Matters
+## Why this topic matters
 
-You can ship *features* quickly, but if the *service* keeps *going down* customers leave. *Reliability* is part of the *product*.
+You can ship features quickly, but if the service keeps going down customers leave. Reliability is part of the product, not a clean-up task after the product ships.
 
-## Concept at a Glance
+Teams that ignore this usually become dependent on memory, heroics, and manual recovery. Teams that adopt the SRE frame turn those same problems into measurable indicators, automation work, and explicit operating rules.
 
-```mermaid
-flowchart LR
-    Dev["dev"] --> Build["build"]
-    Build --> Run["run"]
-    Run --> SLO["measure"]
-    SLO --> Feedback["feedback"]
-    Feedback --> Dev
-```
+> SRE is the discipline that treats operations as a software problem.
 
 ## Key Terms
 
@@ -148,7 +139,18 @@ An *SRE team* sits between *platform* and *product* teams and helps *negotiate* 
 
 Next, we look at the *definition* and *models* of *reliability*.
 
+## Answering the Opening Questions
+
+- **What does SRE actually mean beyond “the people who handle incidents”?**
+  - The article treats What is SRE? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How is SRE different from DevOps even though the two ideas often overlap?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why does SRE treat reliability work as a software problem instead of a staffing problem?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What is SRE? (current)**
 - Reliability (upcoming)
 - SLI, SLO, SLA (upcoming)
@@ -159,6 +161,7 @@ Next, we look at the *definition* and *models* of *reliability*.
 - Reducing Toil (upcoming)
 - Capacity Planning (upcoming)
 - Building Operable Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

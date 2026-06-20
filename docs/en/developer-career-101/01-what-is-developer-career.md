@@ -1,36 +1,42 @@
 ---
 series: developer-career-101
 episode: 1
-title: What Is a Developer Career
-status: content-ready
+title: "Developer Career 101 (1/10): What Is a Developer Career"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
 language: en
 tags:
-  - Career
-  - Developer
-  - Growth
-  - Junior
-  - Beginner
-seo_description: A beginner-friendly tour of the stages and growth axes of a developer career.
-last_reviewed: '2026-05-04'
+- Career
+- Developer
+- Growth
+- Junior
+- Beginner
+seo_description: A beginner-friendly tour of the stages and growth axes of a developer
+  career.
+last_reviewed: '2026-05-14'
 ---
 
-# What Is a Developer Career
+# Developer Career 101 (1/10): What Is a Developer Career
 
-> Developer Career 101 series (1/10)
+People often start by mapping a developer career to company names, years of experience, or the next title. In practice, two engineers with the same title can be operating at very different levels because the real difference shows up in problem scope, judgment, and how much leverage they create for other people.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Developer Career 101 series.
 
-**Core question**: Is a developer *career* just a chronological list of *job titles*?
 
-> It is the joint growth of role, skill, and impact.
+![developer career 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/01/01-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 1 flow overview*
+> Career growth has three axes: role (what level of work you own), skill (which of technical, collaborative, or domain understanding is weakest), and impact (who benefits from your work).
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- Why is a developer career easier to manage when you treat it as a growth structure rather than a title ladder?
+- What actually changes between junior, mid-level, senior, and staff-like expectations?
+- Why do skill, influence, and written evidence matter together instead of separately?
 
 ## What You Will Learn
 
@@ -44,15 +50,7 @@ last_reviewed: '2026-05-04'
 
 Without direction, five years later you are still at square one.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    J[Junior] --> M[Mid]
-    M --> S[Senior]
-    S --> L[Lead]
-    S --> P[Principal]
-```
+Career stages are continuous—junior to mid to senior represent growing scope of responsibility, not separate boxes. Growth happens on multiple axes at once.
 
 ## Key Terms
 
@@ -110,6 +108,15 @@ one of: junior / mid / senior
 - one thing for next quarter
 ```
 
+## Decision frame for reading your own career
+
+| Axis | Question to ask now | Useful next move |
+| --- | --- | --- |
+| Role | Are you mostly executing assigned work, or are you defining the work too? | Review the last four weeks and count how many tasks included framing, not just implementation. |
+| Skill | Which of technical depth, collaboration, or domain understanding is weakest? | Pick the weakest axis and connect one concrete deliverable to it this quarter. |
+| Impact | Who gets faster or safer because of your work besides you? | Leave one reusable artifact behind: a doc, review pattern, template, or automation. |
+| Record | Could you prove your growth in the next review loop? | Start a weekly work log and a monthly retro. |
+
 ## What to Notice in This Code
 
 - Stages are continuous.
@@ -153,7 +160,18 @@ Career ladders at companies make role, impact, and responsibility explicit on mu
 
 Next post covers *Understanding Roles*.
 
+## Answering the Opening Questions
+
+- **Why is a developer career easier to manage when you treat it as a growth structure rather than a title ladder?**
+  - The article treats What Is a Developer Career as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What actually changes between junior, mid-level, senior, and staff-like expectations?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do skill, influence, and written evidence matter together instead of separately?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Developer Career (current)**
 - Understanding Roles (upcoming)
 - Building a Learning Plan (upcoming)
@@ -164,11 +182,12 @@ Next post covers *Understanding Roles*.
 - Side Projects and Learning (upcoming)
 - Mentoring and Networking (upcoming)
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Career Ladders for Software Engineers](https://www.progression.fyi/)
+- [Progression.fyi — Engineering career ladders](https://www.progression.fyi/)
 - [Dropbox Engineering Career Framework](https://dropbox.github.io/dbx-career-framework/)
-- [Staff Engineer's Path](https://noidea.dog/staff)
-- [Developer roadmap](https://roadmap.sh/)
+- [Staff Engineer: The Path](https://staffeng.com/guides/staff-engineer-path/)
+- [The Pragmatic Engineer — Career ladders and scope](https://newsletter.pragmaticengineer.com/)

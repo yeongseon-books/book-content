@@ -1,12 +1,12 @@
 ---
-title: 콜드 스타트와 Warmup — 첫 요청이 비싼 이유
+title: "Azure App Service Deep Dive (6/6): 콜드 스타트와 Warmup — 첫 요청이 비싼 이유"
 series: azure-app-service-deep-dive
 episode: 6
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,234 +14,135 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-04-29'
-seo_description: App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지
-  않았습니다.
+last_reviewed: '2026-05-15'
+seo_description: Always On, warm-up path, health check로 App Service 첫 요청 지연을 줄이는 방법을 설명합니다.
 ---
 
-# 콜드 스타트와 Warmup — 첫 요청이 비싼 이유
+# Azure App Service Deep Dive (6/6): 콜드 스타트와 Warmup — 첫 요청이 비싼 이유
 
-## Source Version
+첫 요청이 느리다는 말은 보통 그냥 latency가 컸다는 뜻이 아닙니다. 더 정확히 말하면 아직 준비되지 않은 실행 단위가 사용자 요청을 받기 직전에 급히 준비되었다는 뜻입니다. worker가 막 할당되었을 수도 있고, 프로세스나 컨테이너가 막 올라오고 있을 수도 있으며, readiness를 판정하는 warm-up 경로가 아직 끝나지 않았을 수도 있습니다.
 
-이 글의 인용과 판단은 다음 공개 출처를 기준으로 합니다.
+그래서 Always On, warm-up path, health check를 모두 켰는데도 기대한 만큼 빨라지지 않는 장면이 자주 나옵니다. 이 셋은 관련은 있지만 같은 기능이 아니기 때문입니다. idle coldness를 줄이는 일, startup 직후 readiness를 여는 일, 이미 서비스 중인 인스턴스가 계속 traffic을 받을 자격이 있는지 판단하는 일은 각기 다른 질문입니다.
 
-- Microsoft Learn — Azure App Service 문서 (https://learn.microsoft.com/azure/app-service)
-- Project Kudu (https://github.com/projectkudu/kudu) — 배포 엔진과 Windows 샌드박스 문맥에 한해
+이번 글에서는 Windows와 Linux에서 warm-up 신호가 어떻게 다른지, Always On이 실제로 줄여 주는 비용과 줄여 주지 못하는 비용이 무엇인지, 좋은 warm-up endpoint는 어떤 성질을 가져야 하는지, 그리고 deployment slot이 왜 cold-start 비용을 production URL 밖으로 밀어내는지 정리하겠습니다.
 
-App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지 않았습니다.
-따라서 이 시리즈에서는 Learn 문서가 1차 출처이고, Kudu 공개 자료는 보조 출처로만 사용합니다.
+이제 새 worker가 실제 사용자 요청을 안전하게 받을 수 있기까지의 마지막 준비 시간을 보겠습니다.
 
-> Azure App Service Deep Dive 시리즈 (6/6)
+![Azure App Service Deep Dive 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.ko.png)
+*Azure App Service Deep Dive 6장 흐름 개요*
+> 콜드 스타트와 Warmup — 첫 요청이 비싼 이유의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-이번 시리즈의 마지막 질문은 가장 체감이 강한 질문입니다.
+## 먼저 던지는 질문
 
-**왜 첫 요청은 유난히 비싸고,
-그 비용을 App Service는 어떻게 줄이려 하는가.**
+- App Service에서 cold start 비용은 실제로 어떤 준비 단계들의 합일까요?
+- Always On은 어떤 종류의 coldness를 줄이고, 어떤 종류의 startup cost에는 거의 도움을 주지 못할까요?
+- Windows와 Linux는 warm-up readiness를 어떤 다른 도구와 설정으로 표현할까요?
 
-cold start는 추상적 현상이 아닙니다.
-worker가 아직 준비되지 않았거나,
-프로세스가 막 올라오고 있거나,
-새 container가 readiness를 통과하기 전이라는 뜻입니다.
+## 왜 이 글이 중요한가
 
----
+cold start를 정확히 이해하지 못하면 운영 설정이 전부 감각 의존이 됩니다. Always On을 켜면 다 해결될 것처럼 기대하거나, health endpoint를 warm-up endpoint 대신 사용하거나, Linux에서 `WEBSITE_WARMUP_STATUSES`를 좁히지 않아 아직 준비되지 않은 응답이 readiness로 받아들여지는 실수가 반복됩니다. 이런 문제는 앱이 나빠서가 아니라 startup contract를 잘못 이해해서 생깁니다.
 
-## 큰 그림 — cold path와 warm path
+또한 scale-out과 deployment는 결국 warm-up으로 닫힙니다. 새 worker를 하나 더 배정받았다고 곧바로 traffic을 보내면 안 되고, 새 코드가 staging에 배포됐다고 바로 production에서 안전해지는 것도 아닙니다. worker 또는 새 artifact가 실제로 traffic-eligible 상태가 되어야 비로소 사용자 체감이 좋아집니다.
 
-![첫 요청이 ready worker를 기다리는 경로](../../assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.ko.png)
+마지막으로 이 글은 시리즈 전체를 하나의 운영 모델로 묶는 역할을 합니다. 1화에서 박스를 나눴고, 2화에서 요청이 worker에 도달하는 길을 봤고, 3화에서 실행 경계를 봤고, 4화에서 배포 경로를 봤고, 5화에서 scale-out control loop를 봤습니다. 6화는 그 마지막 박스, 즉 traffic readiness를 설명합니다.
 
-*첫 요청이 ready worker를 기다리는 경로*
-이 한 그림이 핵심입니다.
-사용자가 느끼는 첫 요청 비용은,
-사실상 “아직 ready하지 않은 실행 단위를 ready 상태로 만드는 비용”입니다.
+## 핵심 관점
 
----
+이 주제를 가장 정확하게 보는 문장은 이것입니다. **App Service의 cold start는 "첫 요청이 느리다"는 추상적 현상이 아니라, 아직 not ready인 worker·process·container를 ready 상태로 바꾸는 비용이 사용자의 요청 경로에 노출된 상황입니다.**
 
-## Windows와 Linux의 warm-up 신호는 같은가
+이 관점이 중요한 이유는 startup cost를 한 항목으로 보지 않게 만들기 때문입니다. worker allocation, process startup, framework bootstrap, dependency connection warm-up, cache or JIT priming, health 또는 warm-up gate 통과가 각각 따로 비용을 가질 수 있습니다. 첫 요청 지연은 대개 이 비용들의 합입니다.
 
-같지 않습니다.
-목표는 같지만 수단이 다릅니다.
+그리고 이 구분은 운영 선택에도 직접 연결됩니다. Always On은 idle coldness를 줄여 줄 수 있지만 redeploy, restart, scale-out 직후의 startup readiness를 대신하지는 못합니다. 반대로 좋은 warm-up endpoint와 slot warm-up은 그 이후 경계를 훨씬 더 안전하게 만들어 줍니다.
 
-### Windows code app
+> cold start 최적화는 설정 하나를 찾는 일이 아니라, 플랫폼이 readiness를 판단하는 방식과 애플리케이션이 실제 준비 완료를 선언하는 시점을 맞추는 일입니다.
 
-- IIS `applicationInitialization` 사용 가능
-- Always On이 루트 경로 ping으로 idle unload를 줄임
+## 핵심 개념
 
-### Linux app
+### cold path와 warm path를 먼저 구분해야 합니다
 
-- 플랫폼이 `WEBSITE_WARMUP_PATH`를 반복 호출 가능
-- startup timeout은 `WEBSITES_CONTAINER_START_TIME_LIMIT` 영향을 받음
+사용자가 느끼는 첫 요청 비용은 사실상 ready worker를 바로 쓰는 warm path와, 아직 ready하지 않은 실행 단위를 깨워서 준비시키는 cold path의 차이입니다. 이 차이를 그림으로 보면 시리즈 전체에서 가장 체감적인 주제가 무엇인지 바로 보입니다.
 
-![Linux 앱의 warm-up 경로와 startup 제한](../../assets/azure-app-service-deep-dive/06/06-02-linux-apps.ko.png)
+첫 요청 지연은 단순 네트워크 지연이 아닙니다. 사용자는 앱 로직보다 앞서, 준비되지 않은 실행 단위가 ready 상태가 될 때까지 걸리는 시간을 먼저 기다립니다.
+
+### Windows와 Linux는 warm-up 신호를 같은 방식으로 표현하지 않습니다
+
+목표는 같지만 수단은 다릅니다. Windows code app에서는 IIS `applicationInitialization`을 쓸 수 있고, Always On이 idle unload를 줄이는 역할을 합니다. Linux app에서는 플랫폼이 `WEBSITE_WARMUP_PATH`를 반복 호출할 수 있고, startup timeout은 `WEBSITES_CONTAINER_START_TIME_LIMIT`의 영향을 받습니다.
+
+![Linux 앱의 warm-up 경로와 startup 제한](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-02-linux-apps.ko.png)
 
 *Linux 앱의 warm-up 경로와 startup 제한*
-이 차이를 구분해야 warm-up 전략이 플랫폼과 맞습니다.
 
----
+이 차이를 먼저 머리에 넣어야 warm-up 전략이 플랫폼과 맞습니다. Windows에서는 root ping만으로는 준비가 끝나지 않는 경우 `applicationInitialization`을 통해 추가 준비 경로를 열어야 할 수 있고, Linux에서는 readiness를 어떤 응답 코드로 인정할지까지 명시적으로 조정해야 할 수 있습니다.
 
-## Always On이 실제로 하는 일
+### Always On은 idle coldness를 줄이지만 모든 startup cost를 없애지는 못합니다
 
-App Service 관련 Microsoft 문서와 App Service 팀 블로그는 Always On의 역할을 비교적 일관되게 설명합니다.
-idle 상태로 앱이 내려가거나 식는 것을 줄이기 위해 주기적으로 ping을 보냅니다.
+Microsoft 문서와 App Service 팀 블로그는 Always On을 비슷한 언어로 설명합니다. idle 상태로 앱이 식는 빈도를 줄이기 위해 주기적으로 ping을 보내는 기능입니다. 운영적으로 번역하면 앱이 idle cold path로 다시 떨어질 가능성을 줄이고, app-pool unload 또는 유사한 idle behavior가 덜 보이게 하며, 최악의 first-request latency를 낮추는 기능입니다.
 
-현업에서는 보통 이렇게 이해하면 충분합니다.
-
-- 유휴 시간을 오래 두지 않게 한다
-- app pool unload 또는 cold path 진입 빈도를 낮춘다
-- 첫 요청의 최악값을 줄인다
-
-![주기 ping으로 idle coldness를 줄이는 흐름](../../assets/azure-app-service-deep-dive/06/06-03-what-always-on-really-does.ko.png)
+![주기 ping으로 idle coldness를 줄이는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-03-what-always-on-really-does.ko.png)
 
 *주기 ping으로 idle coldness를 줄이는 흐름*
-중요한 건 Always On이 “모든 시작 비용을 제거”하지는 않는다는 점입니다.
-재배포,
-재시작,
-새 scale-out worker,
-container recycle은 여전히 별도 warm-up이 필요할 수 있습니다.
 
----
+하지만 Always On은 redeploy, restart, 새로운 scale-out worker, container recycle에 따른 startup cost까지 없애 주지는 못합니다. 따라서 Always On만 켜고 warm-up 설계를 생략하면 배포 직후나 scale-out 직후의 느림은 여전히 남을 수 있습니다.
 
-## Windows: `applicationInitialization`이 필요한 경우
+### Windows에서는 root ping 외에 `applicationInitialization`이 필요할 수 있습니다
 
-루트 URL 한 번 치는 것만으로 앱이 완전히 준비되지 않는 경우가 많습니다.
-예를 들면,
+루트 URL을 한 번 치는 것만으로 앱이 완전히 준비되지 않는 경우가 많습니다. 첫 데이터베이스 connection pool 열기, 큰 cache priming, template compilation, JIT 또는 무거운 초기화 경로가 대표적입니다. 이런 경우 IIS `applicationInitialization`은 별도의 warm-up endpoint를 명시적으로 호출하게 해 줍니다.
 
-- 첫 DB connection pool 준비
-- 큰 메모리 캐시 채우기
-- 템플릿 컴파일
-- JIT 또는 무거운 초기화 경로
-
-이때 IIS `applicationInitialization`은 warm-up endpoint를 명시적으로 호출하게 해 줍니다.
-
-![루트 ping 밖에 별도 준비 경로가 필요한 경우](../../assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.ko.png)
+![루트 ping 밖에 별도 준비 경로가 필요한 경우](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.ko.png)
 
 *루트 ping 밖에 별도 준비 경로가 필요한 경우*
-중요한 포인트는 endpoint 설계입니다.
-200을 너무 빨리 주면 아직 안 된 인스턴스가 traffic pool에 들어갑니다.
-반대로 너무 무거우면 warm-up 자체가 병목이 됩니다.
 
----
+여기서 중요한 것은 endpoint design입니다. 성공을 너무 빨리 반환하면 아직 준비가 덜 된 인스턴스가 traffic pool에 들어가고, 반대로 endpoint가 지나치게 무거우면 warm-up 자체가 병목이 됩니다. warm-up은 느려도 안 되고, 성급해도 안 됩니다.
 
-## Linux: warm-up path와 startup timeout
+### Linux에서는 warm-up path와 accepted status code가 startup contract를 만듭니다
 
-App settings reference는 Linux startup에 대해 매우 중요한 사실을 적습니다.
+App settings reference는 Linux startup 계약을 꽤 명확하게 설명합니다. 플랫폼은 `WEBSITE_WARMUP_PATH`에 반복 요청을 보낼 수 있고, `WEBSITE_WARMUP_STATUSES`를 지정하지 않으면 거의 어떤 응답이든 readiness로 받아들일 수 있습니다. 또한 `WEBSITES_CONTAINER_START_TIME_LIMIT` 안에 ready 상태가 되지 않으면 startup failure로 간주될 수 있습니다.
 
-- 플랫폼이 `WEBSITE_WARMUP_PATH`에 반복 요청을 보냅니다.
-- 기본적으로는 거의 어떤 응답이라도 readiness 신호로 간주할 수 있습니다.
-- `WEBSITE_WARMUP_STATUSES`로 허용 상태 코드를 좁힐 수 있습니다.
-- `WEBSITES_CONTAINER_START_TIME_LIMIT` 안에 ready가 안 되면 startup 실패로 간주됩니다.
-
-![warm-up 응답과 startup timeout의 준비 계약](../../assets/azure-app-service-deep-dive/06/06-05-linux-warm-up-path-and-startup-timeout.ko.png)
+![warm-up 응답과 startup timeout의 준비 계약](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-05-linux-warm-up-path-and-startup-timeout.ko.png)
 
 *warm-up 응답과 startup timeout의 준비 계약*
-이 설정을 모르면 Linux 앱은 아주 자주 두 가지 실수를 합니다.
 
-1. 아직 준비 안 됐는데도 404/500이 readiness로 받아들여짐
-2. startup time limit이 짧아 초기화 중 재시작 루프에 빠짐
+이 모델은 Linux App Service에서 아주 흔한 두 실수를 만듭니다. 아직 준비되지 않았는데도 permissive response가 readiness로 취급되는 경우, 그리고 startup limit이 너무 짧아 앱이 initialization 중 restart loop에 빠지는 경우입니다. Linux에서는 status code contract를 느슨하게 두지 않는 습관이 중요합니다.
 
----
+### cold start는 여러 비용의 합으로 읽어야 합니다
 
-## cold start를 비싸게 만드는 구성 요소
+첫 요청 비용은 보통 하나의 병목이 아니라 여러 준비 비용의 합입니다. worker 또는 container allocation, app process startup, framework bootstrap, dependency connection warm-up, cache·module import·JIT 작업, 그리고 health 또는 warm-up eligibility gate까지 겹쳐질 수 있습니다.
 
-첫 요청 비용은 보통 한 원인이 아니라 여러 비용의 합입니다.
-
-- worker 또는 container 생성
-- 앱 프로세스 시작
-- framework bootstrap
-- dependency connection warm-up
-- cache/JIT/module import
-- health or warm-up path 성공까지의 시간
-
-![콜드 스타트를 키우는 준비 비용의 합](../../assets/azure-app-service-deep-dive/06/06-06-what-makes-cold-start-expensive.ko.png)
+![콜드 스타트를 키우는 준비 비용의 합](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-06-what-makes-cold-start-expensive.ko.png)
 
 *콜드 스타트를 키우는 준비 비용의 합*
-그래서 cold start 최적화는 한 줄 설정이 아니라,
-앱과 플랫폼의 계약을 같이 다루는 작업입니다.
 
----
+그래서 cold start 최적화는 magic setting 하나를 찾는 일이 아닙니다. 앱이 실제로 무엇을 준비해야 하는지와, 플랫폼이 readiness를 언제 열어 줄지를 함께 설계하는 작업입니다.
 
-## 좋은 warm-up endpoint의 조건
+### 좋은 warm-up endpoint는 "정말 준비됐는가"를 정확히 말해야 합니다
 
-warm-up endpoint는 health endpoint와 비슷하지만 목적이 조금 다릅니다.
-traffic eligibility를 열기 전에 “정말 준비됐는가”를 판단하는 신호이기 때문입니다.
+warm-up endpoint는 health endpoint와 겹치는 부분이 있지만 완전히 같지는 않습니다. 목적이 다르기 때문입니다. warm-up endpoint의 역할은 traffic eligibility를 열기 전에 앱이 실제로 준비됐는지 판단하는 것입니다.
 
-좋은 warm-up endpoint는 보통 이 조건을 만족합니다.
+좋은 warm-up endpoint는 보통 인증 없이 플랫폼이 호출할 수 있고, 핵심 dependency readiness를 포함하며, startup이 끝나기 전에는 성공을 반환하지 않고, 필요 이상으로 무거운 작업을 매번 반복하지 않습니다. 너무 빨리 성공하면 미완성 worker가 traffic을 받고, 너무 늦게 성공하면 scale-out과 slot swap이 불필요하게 늦어집니다.
 
-- 인증 없이 platform이 호출할 수 있다
-- 핵심 dependency readiness를 포함한다
-- 끝나기 전에는 성공 코드를 주지 않는다
-- 불필요한 heavy work는 반복하지 않는다
+### deployment slot은 cold-start 비용을 production URL 밖으로 밀어냅니다
 
-이 endpoint가 부정확하면 두 가지 나쁜 방향이 생깁니다.
+slot이 강력한 이유는 새 버전의 startup cost를 production 사용자 대신 staging 쪽에서 먼저 치를 수 있기 때문입니다. staging worker가 이미 boot와 warm-up을 끝냈다면, production traffic이 새 버전에 넘어갈 때 사용자는 그 비용을 덜 직접적으로 느낍니다.
 
-- 너무 빨리 성공해서 미완성 worker가 traffic을 받음
-- 너무 늦게 성공해서 scale-out과 swap이 계속 지연됨
-
----
-
-## deployment slot warm-up이 중요한 이유
-
-slot은 cold start를 사용자 앞에서 치르지 않게 해 주는 장치입니다.
-
-![staging에서 warm-up을 끝내고 라우팅을 넘기는 흐름](../../assets/azure-app-service-deep-dive/06/06-07-why-deployment-slots-help-so-much.ko.png)
+![staging에서 warm-up을 끝내고 라우팅을 넘기는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-07-why-deployment-slots-help-so-much.ko.png)
 
 *staging에서 warm-up을 끝내고 라우팅을 넘기는 흐름*
-이 흐름이 의미하는 바는 분명합니다.
-warm-up이 staging에서 끝났다면 production 사용자 요청이 그 비용을 직접 부담할 가능성이 낮아집니다.
 
-그래서 4화의 배포와 이번 화의 warm-up은 사실 같은 이야기의 앞뒤입니다.
+이 때문에 4화의 deployment slot 설명과 이번 화의 warm-up 설명은 사실 같은 이야기의 앞뒤입니다. 배포를 production URL 밖에서 끝내는 것만으로는 부족하고, startup readiness까지 그 바깥에서 끝내야 slot의 가치가 완성됩니다.
 
----
+### Always On, warm-up, health check는 서로 다른 역할을 합니다
 
-## Always On, health, warm-up은 서로 다른가
+이 셋을 같은 기능으로 섞어 생각하면 설정은 켰는데 체감은 어긋납니다. Always On은 idle coldness를 줄이고, warm-up path는 startup 직후 readiness를 판단하며, health check는 이미 서비스 중인 인스턴스가 계속 traffic을 받을 자격이 있는지 판정합니다.
 
-서로 다릅니다.
-
-- **Always On**: idle coldness를 줄임
-- **warm-up path**: 시작 직후 readiness 판단
-- **health check**: traffic을 계속 받을 자격 판단
-
-![Always On, warm-up, health check의 역할 차이](../../assets/azure-app-service-deep-dive/06/06-08-always-on-warm-up-and-health-are-not-the.ko.png)
+![Always On, warm-up, health check의 역할 차이](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-08-always-on-warm-up-and-health-are-not-the.ko.png)
 
 *Always On, warm-up, health check의 역할 차이*
-이 셋을 섞어 생각하면 설정은 켰는데 효과는 엇갈립니다.
-특히 “Always On 켰는데 왜 배포 직후는 느리지?”라는 질문이 여기서 나옵니다.
 
----
+그래서 "Always On을 켰는데 왜 배포 직후는 여전히 느리지"라는 질문이 자연스럽게 나옵니다. idle warmness와 new-start readiness는 서로 다른 문제이기 때문입니다.
 
-## 6화 정리
+### cold-start 분포는 실제로 측정해야 합니다
 
-이번 화의 핵심을 한 문단으로 줄이면 이렇습니다.
-
-> App Service에서 cold start는 warm worker가 아직 없거나 새 process/container가 readiness를 통과하지 못한 상태에서 첫 요청이 들어올 때의 비용입니다. Windows에서는 `applicationInitialization`과 Always On이, Linux에서는 `WEBSITE_WARMUP_PATH`, `WEBSITE_WARMUP_STATUSES`, `WEBSITES_CONTAINER_START_TIME_LIMIT`이 중요한 계약입니다. Always On은 idle coldness를 줄일 뿐이고, 배포·재시작·scale-out 직후의 startup readiness는 별도 warm-up 경로가 책임집니다.
-
-이번 화로 시리즈를 닫습니다.
-이제 App Service를 “코드 올리는 곳”이 아니라,
-Front-End,
-ARR,
-worker,
-sandbox,
-Kudu,
-shared storage,
-autoscale,
-warm-up이 한 시스템으로 이어진 플랫폼으로 볼 수 있습니다.
-
----
-
-## 이 시리즈에서의 위치
-
-이번 글은 앞선 다섯 편에서 계속 예고했던 마지막 박스, 즉 새로운 worker가 실제 트래픽을 받기 전까지의 준비 시간을 정리합니다.
-시리즈 전체를 다시 따라가면 요청 진입, 실행 경계, 배포, 스케일링, warm-up이 하나의 운영 모델로 이어진다는 점이 보일 것입니다.
-
----
-
-## Documented Behavior Summary
-
-- Always On은 idle 상태로 식는 빈도를 줄이지만, 재배포·재시작·새 scale-out worker의 startup 비용까지 없애지는 않습니다.
-- Linux App Service는 `WEBSITE_WARMUP_PATH`, `WEBSITE_WARMUP_STATUSES`, `WEBSITES_CONTAINER_START_TIME_LIMIT`으로 startup readiness 계약을 조정합니다.
-- Windows App Service는 IIS `applicationInitialization`과 slot warm-up 흐름을 통해 production 전 준비를 앞당길 수 있습니다.
-- slot swap은 warm-up이 끝난 뒤 Front-End 라우팅 규칙을 바꾸므로, cold start 비용을 production URL 바깥에서 치르게 해 줍니다.
-
-### warm-up 경로와 응답 분포 측정
+아래 명령은 앱을 재시작한 뒤 warm-up 경로의 응답 시간과 상태 코드를 여러 번 찍어 분포를 보는 간단한 출발점입니다. 운영자가 cold path를 추측만 하지 않고 실측 기반으로 보기 위한 최소 도구입니다.
 
 ```bash
 az webapp restart -n my-app -g my-rg
@@ -252,38 +153,145 @@ for i in $(seq 1 50); do
 done | sort -k2 -n | tail -10
 ```
 
+이 측정은 평균값보다 tail latency를 보는 데 더 유용합니다. cold start는 드물어 보여도 사용자 경험에는 p99 형태로 남기 쉽기 때문입니다. 운영 문서에 cold-start SLO를 넣을 때 평균이 아니라 tail을 같이 보는 이유가 여기에 있습니다.
+
+### Warm-up 경로 설계: readiness를 너무 이르게 열지 않는다
+
+warm-up endpoint의 핵심은 단순한 200 반환이 아니라 "실제 트래픽을 받아도 되는 상태"를 선언하는 것입니다. DB 연결 풀 초기화, 필수 캐시 적재, 외부 의존성 최소 확인이 끝나기 전에는 성공을 반환하지 않도록 설계해야 합니다.
+
+```python
+@app.get("/warmup")
+def warmup():
+    db_ok = check_db_pool_ready()
+    cache_ok = check_required_cache_keys()
+    if not (db_ok and cache_ok):
+        return {"ready": False}, 503
+    return {"ready": True}, 200
+```
+
+Linux 앱이라면 이 endpoint를 `WEBSITE_WARMUP_PATH=/warmup`으로 맞추고, `WEBSITE_WARMUP_STATUSES=200`으로 제한해 false readiness를 줄이는 편이 안전합니다. 준비가 덜 된 302나 404를 성공처럼 받아들이게 두면 첫 사용자 요청이 실제 warm-up 역할을 대신하게 됩니다.
+
+### 콜드 스타트 계측과 성능 프로파일링 명령
+
+체감 개선을 확인하려면 warm-up 도입 전후의 분포를 같은 방식으로 측정해야 합니다.
+
+```bash
+# 앱 재시작 후 첫 30회 측정
+az webapp restart -n my-app -g my-rg
+for i in $(seq 1 30); do
+  curl -o /dev/null -s -w "%{http_code} connect=%{time_connect} ttfb=%{time_starttransfer} total=%{time_total}
+"     https://my-app.azurewebsites.net/warmup
+done
+
+# 운영 경로의 p95/p99 관측용 원시 로그 수집
+for i in $(seq 1 120); do
+  curl -o /dev/null -s -w "%{time_total}
+" https://my-app.azurewebsites.net/api/orders
+done > orders-latency.txt
+```
+
+또한 scale-out 직후 증상을 분리하려면 인스턴스 식별자를 함께 찍어야 합니다.
+
+```bash
+for i in $(seq 1 20); do
+  curl -s https://my-app.azurewebsites.net/diag/worker
+  echo
+done
+```
+
+**Expected output:** warm-up 개선 전후의 tail latency가 줄고, 새 인스턴스 투입 시점에서만 지연이 솟는 패턴이 보이면 startup readiness 경계가 원인임을 강하게 시사합니다. 이 데이터가 있어야 Always On, warm-up endpoint, slot 전략의 효과를 객관적으로 비교할 수 있습니다.
+
+### 네트워크 트레이스 기반 콜드 스타트 분석
+
+cold start를 애플리케이션 로그만으로 보면 네트워크 구간과 실행 구간이 섞입니다. 요청 시간 분해를 함께 기록하면 어디서 비용이 커지는지 더 명확해집니다.
+
+```bash
+for i in $(seq 1 40); do
+  curl -o /dev/null -s -w "code=%{http_code} dns=%{time_namelookup} connect=%{time_connect} tls=%{time_appconnect} ttfb=%{time_starttransfer} total=%{time_total}
+"     https://my-app.azurewebsites.net/warmup
+done
+```
+
+TTFB만 크게 튀고 네트워크 구간이 안정적이면 startup/readiness 구간 비용일 가능성이 높습니다. 반대로 connect/tls 구간까지 같이 늘면 네트워크 경로 또는 외부 프록시 설정을 추가로 점검해야 합니다.
+
+### 배포/스케일 직후 워밍 상태 확인 루틴
+
+```bash
+# 슬롯 스왑 직후
+for i in $(seq 1 15); do
+  curl -s https://my-app.azurewebsites.net/diag/runtime
+  echo
+done
+
+# 인스턴스 상태와 health check 동시 확인
+az webapp show -n my-app -g my-rg --query "{state:state,host:defaultHostName}" -o json
+```
+
+이 루틴을 release checklist에 넣어 두면 "성공 배포 후 첫 3분" 품질을 일정하게 유지할 수 있습니다.
+
+### warm-up 실패 시 즉시 확인할 항목
+
+warm-up이 반복 실패하면 endpoint 로직보다 먼저 status code 계약과 timeout 값을 확인합니다. Linux에서는 `WEBSITE_WARMUP_STATUSES`와 `WEBSITES_CONTAINER_START_TIME_LIMIT`, Windows에서는 초기화 경로와 dependency 연결 시간을 함께 봐야 합니다.
+
+이 값을 런북 첫 페이지에 고정해 두면, 새 팀원도 warm-up 문제를 네트워크 지연과 혼동하지 않고 바로 readiness 계약부터 점검할 수 있습니다.
+
+이 점검은 정기적으로 반복해야 합니다.
+
+## 흔히 헷갈리는 지점
+
+- **Always On이 모든 startup cost를 없애 주는 것은 아닙니다.** idle coldness를 줄여 줄 뿐 redeploy·restart·new worker startup까지 대체하지는 못합니다.
+- **warm-up endpoint와 health endpoint는 목적이 같습니다가 아니라 겹칩니다입니다.** 하나는 startup readiness, 다른 하나는 ongoing traffic eligibility를 더 강하게 담당합니다.
+- **Linux에서 아무 응답이나 readiness로 받아들이게 두면 위험합니다.** `WEBSITE_WARMUP_STATUSES`를 좁히지 않으면 false readiness가 생길 수 있습니다.
+- **slot swap의 가치는 단순 파일 교체가 아닙니다.** warm-up이 끝난 인스턴스로 routing을 넘겨 production 사용자가 cold start를 덜 보게 만드는 데 있습니다.
+- **cold start는 한 원인의 문제가 아닙니다.** worker allocation, process bootstrap, dependency warm-up, readiness gate가 누적된 결과일 수 있습니다.
+
 ## 운영 체크리스트
 
-- [ ] warm-up ping이 main 의존성(DB, cache)까지 깨우는지 확인했다
-- [ ] Always On 사용 여부의 비용/지연 균형을 결정했다
-- [ ] 런타임 별 cold-start 프로파일을 측정해 두었다
-- [ ] cold-start p99를 SLO 문서에 명시했다
-- [ ] scale-out 시 cold-start가 사용자에게 노출되는 시나리오를 부하 테스트했다
+- [ ] warm-up ping이 실제 핵심 dependency readiness까지 깨우는지 검증했습니다.
+- [ ] Always On의 비용 대비 지연 개선 효과를 팀 기준으로 정했습니다.
+- [ ] 런타임별 cold-start profile을 실측해 문서화했습니다.
+- [ ] cold-start p99를 SLO 문서에 별도 항목으로 반영했습니다.
+- [ ] scale-out 직후 사용자가 cold start를 맞는 시나리오를 부하 테스트로 검증했습니다.
+
+## 정리
+
+6화의 핵심은 cold start를 막연한 "느린 첫 요청"으로 보지 않는 것입니다. App Service에서 cold start는 warm worker가 아직 없거나 새 process·container가 readiness를 통과하지 못한 상태에서 사용자의 요청이 들어올 때 생기는 비용입니다. Windows에서는 `applicationInitialization`과 Always On이 중요한 도구이고, Linux에서는 `WEBSITE_WARMUP_PATH`, `WEBSITE_WARMUP_STATUSES`, `WEBSITES_CONTAINER_START_TIME_LIMIT`이 startup 계약을 강하게 좌우합니다.
+
+운영적으로는 Always On, warm-up, health check의 역할을 정확히 나누는 감각이 가장 중요합니다. idle coldness를 줄이는 기능과 startup readiness를 여는 기능, 그리고 서비스 중 인스턴스의 지속 건강 상태를 보는 기능은 서로 다릅니다. 이 셋을 구분해야 배포 직후 느림, scale-out 직후 느림, 장시간 유휴 후 느림을 각각 다른 처방으로 다룰 수 있습니다.
+
+이 글로 시리즈를 마무리합니다. 이제 App Service는 더 이상 "코드 올리는 곳"이 아니라 Front-End, ARR, worker, sandbox, Kudu, shared storage, autoscale, warm-up이 연결된 하나의 운영 체계로 보일 것입니다. 그 관점이 잡히면 App Service 운영 문제는 훨씬 덜 추상적이고 훨씬 더 설명 가능해집니다.
+
+## 처음 질문으로 돌아가기
+
+- **App Service에서 cold start 비용은 실제로 어떤 준비 단계들의 합일까요?**
+  - cold start는 단일 병목이 아니라 worker allocation, 프로세스 또는 컨테이너 startup, 프레임워크 bootstrap, dependency 연결, cache·JIT priming, readiness gate 통과가 겹쳐진 비용입니다. 첫 요청이 느린 이유는 이 준비 단계들이 staging이나 warm-up 경로가 아니라 실제 사용자 요청 경로에서 뒤늦게 실행되기 때문입니다.
+- **Always On은 어떤 종류의 coldness를 줄이고, 어떤 종류의 startup cost에는 거의 도움을 주지 못할까요?**
+  - Always On은 주기 ping으로 유휴 상태에서 앱이 다시 식는 일을 줄여 idle coldness를 완화합니다. 하지만 redeploy, restart, 새 scale-out worker 투입, container recycle 뒤에 다시 필요한 startup readiness 비용까지 대신 처리해 주지는 않으므로, 배포 직후와 확장 직후 지연은 warm-up endpoint와 slot 전략으로 따로 줄여야 합니다.
+- **Windows와 Linux는 warm-up readiness를 어떤 다른 도구와 설정으로 표현할까요?**
+  - Windows는 IIS `applicationInitialization`과 Always On으로 별도 준비 경로를 열고, Linux는 `WEBSITE_WARMUP_PATH`, `WEBSITE_WARMUP_STATUSES`, `WEBSITES_CONTAINER_START_TIME_LIMIT`으로 readiness 계약을 더 직접적으로 정의합니다. 특히 Linux에서는 accepted status를 느슨하게 두면 302나 404 같은 응답도 warm 상태로 오해될 수 있으므로, warm-up endpoint와 status contract를 함께 설계해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [App Service 플랫폼 아키텍처 — Front-End·Worker·File Server](./01-platform-architecture.md)
-- [Front-End과 ARR — 요청은 어떻게 워커에 도달하는가](./02-front-end-and-arr.md)
-- [Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가](./03-worker-and-sandbox.md)
-- [배포와 Kudu — 빌드·동기화·릴리스의 안쪽](./04-deployment-and-kudu.md)
-- [스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로](./05-scaling-internals.md)
-- **콜드 스타트와 Warmup — 첫 요청이 비싼 이유 (현재 글)**
+- [Azure App Service Deep Dive (1/6): App Service 플랫폼 아키텍처 — Front-End·Worker·File Server](./01-platform-architecture.md)
+- [Azure App Service Deep Dive (2/6): Front-End과 ARR — 요청은 어떻게 워커에 도달하는가](./02-front-end-and-arr.md)
+- [Azure App Service Deep Dive (3/6): Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가](./03-worker-and-sandbox.md)
+- [Azure App Service Deep Dive (4/6): 배포와 Kudu — 빌드·동기화·릴리스의 안쪽](./04-deployment-and-kudu.md)
+- [Azure App Service Deep Dive (5/6): 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로](./05-scaling-internals.md)
+- **Azure App Service Deep Dive (6/6): 콜드 스타트와 Warmup — 첫 요청이 비싼 이유 (현재 글)**
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-### 1차 출처
+### 공식 문서
 - [Environment variables and app settings reference](https://learn.microsoft.com/azure/app-service/reference-app-settings)
 - [Deploy staging slots in Azure App Service](https://learn.microsoft.com/azure/app-service/deploy-staging-slots)
 - [IIS 8.0 Application Initialization](https://learn.microsoft.com/iis/get-started/whats-new-in-iis-8/iis-80-application-initialization)
-
-### 2차 출처
 - [Robust Apps for the Cloud — App Service team blog](https://azure.github.io/AppService/2020/05/15/Robust-Apps-for-the-cloud.html)
 
 ### 관련 시리즈
 - [Azure App Service 101 — Request Lifecycle](../azure-app-service-101/02-request-lifecycle.md)
-- [Azure Functions Deep Dive — 콜드 스타트와 Placeholder Mode](../azure-functions-deep-dive/06-cold-start-placeholder.md)
+- [Azure Functions Deep Dive — Cold start and Placeholder Mode](../azure-functions-deep-dive/06-cold-start-placeholder.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-deep-dive/ko/06-cold-start-and-warmup)

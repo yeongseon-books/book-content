@@ -1,10 +1,10 @@
 ---
 series: software-design-101
 episode: 4
-title: Dependency Direction
+title: "Software Design 101 (4/10): Dependency Direction"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,28 @@ tags:
   - Inversion
   - Architecture
 seo_description: How to control the direction of dependencies to lower change cost, with DIP and ports and adapters.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Dependency Direction
+# Software Design 101 (4/10): Dependency Direction
 
-> Software Design 101 series (4/10)
+The expensive part of a dependency is not the line of code that imports something. It is the direction of the arrow and who now has to absorb future change.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Software Design 101 series.
 
-**Core question**: Why does the direction of a dependency matter so much?
+In this post, we look at dependency direction as the mechanism that keeps a stable core from depending on volatile details. DIP and ports-and-adapters matter because they buy freedom where vendors, databases, and SDKs churn fastest.
 
-> Because the way arrows point decides who pays the cost of change. Make the core ignorant of the details and you buy yourself freedom.
+> Stable code should define what it needs; volatile code should adapt to it.
 
-<!-- a-grade-intro:end -->
+
+![software design 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.en.png)
+*software design 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Dependency Direction?
+- Which signal should the example or diagram make visible for Dependency Direction?
+- What failure should be prevented first when Dependency Direction reaches a real system?
 
 ## What You Will Learn
 
@@ -46,14 +54,6 @@ last_reviewed: '2026-05-04'
 Code is a graph. Where the arrows point determines whether a change in one place leaks into another.
 
 > Stable things must not depend on volatile things.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    D["Domain (stable)"] --> P["Port (interface)"]
-    A["Adapter (volatile)"] -- implements --> P
-```
 
 Details point toward the core.
 
@@ -154,6 +154,30 @@ def test_charge():
 
 You can verify the domain without any database.
 
+## Quick Verification
+
+Dependency direction becomes visible as soon as you sketch the imports. Start by listing whether the domain imports any DB driver, HTTP client, or SDK directly.
+
+```text
+domain -> typing, dataclasses
+domain -> psycopg2        # warning sign
+infra  -> domain          # expected direction
+```
+
+**Expected output:** if an arrow runs from the domain into infrastructure, you know immediately that either the port location or the composition location needs work.
+
+That same check should hold in tests. If a fake repository is enough to test the domain, the direction is probably healthy.
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| The domain test cannot run without a real DB | Check whether the domain knows the concrete repository |
+| The interface lives in an infrastructure folder | Revisit who is defining the need |
+| You created too many ports | Check whether you inverted places that are not real stable/volatile boundaries |
+
+The point of fixing dependency direction is not “more abstraction.” It is protecting the core from detail churn.
+
 ## What to Notice in This Code
 
 - The domain is free of external libraries.
@@ -198,17 +222,29 @@ DIP shines around payments, notifications, and third-party SaaS integrations. Ve
 
 Once direction is right, the cost of change drops. Next up we look at the tools that hold that direction in place — interfaces and abstraction.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Dependency Direction?**
+  - The article treats Dependency Direction as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Dependency Direction?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Dependency Direction reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
-- [Separation of Concerns](./02-separation-of-concerns.md)
-- [Modules and Boundaries](./03-modules-and-boundaries.md)
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): Separation of Concerns](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): Modules and Boundaries](./03-modules-and-boundaries.md)
 - **Dependency Direction (current)**
 - Interfaces and Abstraction (upcoming)
 - Layered Architecture (upcoming)
 - Data Flow Design (upcoming)
 - Reducing Change Impact (upcoming)
 - Design Principles (upcoming)
-- Small Design Practice (upcoming)
+- Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -217,3 +253,8 @@ Once direction is right, the cost of change drops. Next up we look at the tools 
 - [Hexagonal Architecture (Alistair Cockburn)](https://alistair.cockburn.us/hexagonal-architecture/)
 - [Clean Architecture — Dependency Rule](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Ports and Adapters Pattern](https://herbertograca.com/2017/09/14/ports-adapters-architecture/)
+
+### Practical Docs
+
+- [typing — Support for type hints](https://docs.python.org/3/library/typing.html)
+- [abc — Abstract Base Classes](https://docs.python.org/3/library/abc.html)

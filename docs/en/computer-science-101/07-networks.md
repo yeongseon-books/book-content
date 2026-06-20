@@ -1,10 +1,10 @@
 ---
 series: computer-science-101
 episode: 7
-title: Networks
-status: content-ready
+title: "Computer Science 101 (7/10): Networks"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,34 @@ tags:
   - DNS
   - Sockets
 seo_description: How TCP/IP, HTTP, and DNS actually work — explained with hands-on socket programming as part of the CS 101 series.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Networks
+# Computer Science 101 (7/10): Networks
 
-> Computer Science 101 series (7/10)
+Typing a domain into a browser does not trigger one magical request. It kicks off a layered exchange where DNS, TCP, TLS, and HTTP each do a different job. Engineers who can draw those layers mentally usually find latency and failure faster.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Computer Science 101 series.
 
-**Key question**: When you type an address into a browser, how does data from another computer end up on your screen?
+In this article, we'll build a practical network model through the TCP/IP layers, HTTP messages, DNS lookups, and direct socket examples.
 
-> A network is built from layered agreements (protocols). IP decides where a packet should go, TCP guarantees reliability on top of IP, and HTTP rides on top of TCP to exchange meaningful requests and responses. Once you understand the layered structure, you can quickly narrow down where a failure happened or why a response is slow. This article covers TCP/IP, HTTP, DNS, and the basics of socket programming.
 
-<!-- a-grade-intro:end -->
+![Computer Science 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/07/07-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Networks?
+- Which signal should the example or diagram make visible for Networks?
+- What failure should be prevented first when Networks reaches a real system?
+
+## Questions This Article Answers
+
+- What path does data follow after you type an address into a browser?
+- What does each of IP, TCP, HTTP, and DNS do in its own layer?
+- What does an HTTP request and response look like on the wire?
+- Why do DNS lookup time and the TLS handshake count toward latency?
+- When should you choose TCP versus UDP for a workload?
 
 ## What You Will Learn
 
@@ -48,18 +62,7 @@ When an API response is slow, when a certificate error pops up, when an odd time
 
 Each layer trusts the one below it and focuses on its own job.
 
-## Concept at a Glance
-
 > Data flows down through the layers (each adding a header) on the sending side, and up the layers (each stripping its header) on the receiving side.
-
-```text
-Layer (TCP/IP)        Example protocols          Unit
-────────────────────────────────────────────────────────
-Application           HTTP, DNS, SMTP, SSH       message
-Transport             TCP, UDP                   segment
-Internet              IP, ICMP                   packet
-Network Access        Ethernet, Wi-Fi            frame
-```
 
 ## Key Terms
 
@@ -208,6 +211,8 @@ print(f"TCP    : {(t2 - t1) * 1000:6.1f} ms")
 print(f"HTTPS  : {(t4 - t3) * 1000:6.1f} ms (total)")
 ```
 
+**Expected output:** the script should print separate `DNS`, `TCP`, and `HTTPS` timings so you can see which layer dominates the request.
+
 ## Notable Points in This Code
 
 - HTTP is, in the end, a chunk of text where headers and body are separated by a blank line.
@@ -261,17 +266,29 @@ A network is a stack of agreements, where each layer trusts the layer below and 
 
 The next article moves beyond the network to how we store data permanently and query it efficiently — databases.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Networks?**
+  - The article treats Networks as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Networks?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Networks reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
-- [Computation and Programs](./02-computation-and-programs.md)
-- [Data Representation](./03-data-representation.md)
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
-- [Computer Architecture](./05-computer-architecture.md)
-- [Operating Systems](./06-operating-systems.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): Computation and Programs](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): Data Representation](./03-data-representation.md)
+- [Computer Science 101 (4/10): Algorithms and Complexity](./04-algorithms-and-complexity.md)
+- [Computer Science 101 (5/10): Computer Architecture](./05-computer-architecture.md)
+- [Computer Science 101 (6/10): Operating Systems](./06-operating-systems.md)
 - **Networks (current)**
-- [Databases](./08-databases.md)
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Databases (upcoming)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References

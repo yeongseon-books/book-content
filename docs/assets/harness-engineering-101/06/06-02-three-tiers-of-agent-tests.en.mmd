@@ -1,0 +1,14 @@
+flowchart TB
+    Release["Release confidence"]
+    Eval["3. Eval tests\nDataset + rubrics\nnon-deterministic but statistically stable"] --> Release
+    Integration["2. Integration tests\nMulti-step task flow\nreal or mock LLM"] --> Release
+    Unit["1. Unit tests\nTool schema and validation\ndeterministic and fast"] --> Release
+
+    Unit --> Foundation["Debug quickly\nfind exactly what broke"]
+    Integration --> Scenarios["Check tool combinations\nin realistic task paths"]
+    Eval --> Quality["Measure user-facing quality\nbefore production sees it"]
+
+    style Release fill:#fff8e1,stroke:#f9a825
+    style Unit fill:#e3f2fd,stroke:#1976d2
+    style Integration fill:#e8f5e9,stroke:#388e3c
+    style Eval fill:#f3e5f5,stroke:#7b1fa2

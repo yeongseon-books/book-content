@@ -1,10 +1,10 @@
 ---
 series: probability-101
 episode: 8
-title: Continuous Distributions
-status: content-ready
+title: "Probability 101 (8/10): Continuous Distributions"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,58 +16,50 @@ tags:
   - Normal
   - Exponential
   - Beginner
-seo_description: A tour of uniform normal exponential and gamma continuous distributions with PDFs, mean and variance, and why the normal appears everywhere in ML
-last_reviewed: '2026-05-04'
+seo_description: Learn how continuous distributions model measurements, waiting times, and uncertainty with Uniform, Normal, Exponential, and Gamma examples.
+last_reviewed: '2026-05-15'
 ---
 
-# Continuous Distributions
+# Probability 101 (8/10): Continuous Distributions
 
-> Probability 101 series (8/10)
+In discrete distributions, you can count the possible values one by one. Many real variables do not behave that way. Height, response time, measurement error, weight, and price move along a continuous scale, so they need a different language. That language is the continuous distribution.
 
-<!-- a-grade-intro:begin -->
+Once continuous distributions click, several things become easier at once: why a PDF value is not itself a probability, why the normal distribution appears so often, and why standardization is such a common move in analysis and machine learning.
 
-**Core question**: How do we model *continuous quantities* like *height, time, error*?
+This is post 8 in the Probability 101 series. Here we use Uniform, Normal, Exponential, and Gamma distributions to build intuition for density, interval probability, waiting-time models, and standardized comparisons.
 
-> *The normal distribution is the *most frequently encountered* distribution in the world.*
 
-<!-- a-grade-intro:end -->
+![probability 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/08/08-01-concept-at-a-glance.en.png)
+*probability 101 chapter 8 flow overview*
+> Continuous Distributions requires both definition and intuition, learned through concrete examples.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- *Uniform / Normal / Exponential / Gamma*
-- The *PDF, E, Var* of each
-- *Why the normal* appears so often
-- A 5-step continuous-distribution exercise
-- Five common mistakes
+- What it means to model a continuous quantity probabilistically?
+- Why a density is not the same thing as a probability?
+- When Uniform, Normal, Exponential, and Gamma distributions make sense?
 
 ## Why It Matters
 
-In *ML, signal processing, measurement error*, *continuous distributions* are the *default assumption*. The *normal* arises *naturally* via the *CLT*.
+Much of the data you see in production is continuous: sensor readings, latency, error magnitudes, temperatures, prices, and model residuals. A distribution gives you a way to reason not just about a single measurement, but about typical ranges, rare regions, and the shape of the uncertainty.
 
-> *Continuous distributions model the analog world.*
+The practical payoff is that a good continuous model turns loose numbers into decisions you can reason about. You can talk about tail probability, expected wait time, standard deviations from the mean, or whether a normal approximation is reasonable at all.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    U["Uniform(a,b)"] --> N["Normal(mu, sigma)"]
-    N --> Std["Standardize Z = (X-mu)/sigma"]
-    E["Exponential(lambda)"] --> G["Gamma(k, theta)"]
-```
+> In continuous probability, the key habit is to think in intervals. Probability lives in area, not in a single point.
 
 ## Key Terms
 
 - **Uniform(a,b)**: equal density on the interval. E=(a+b)/2.
 - **Normal(μ,σ)**: bell shape. E=μ, Var=σ².
-- **Exponential(λ)**: *waiting time*. E=1/λ.
-- **Gamma(k,θ)**: *generalization of exponential*.
+- **Exponential(λ)**: waiting time. E=1/λ.
+- **Gamma(k,θ)**: generalization of exponential.
 - **Standardization**: Z = (X-μ)/σ → N(0,1).
 
 ## Before / After
 
-**Before**: *“Height data”* — hard to analyze.
+**Before**: “Height data” is just a column of numbers.
 
-**After**: assume *Normal(170, 7)* → *top 5%* of heights from a *formula*.
+**After**: “Approximate it as Normal(170, 7)” immediately lets you estimate percentiles, tails, and standardized comparisons.
 
 ## Hands-on: 5-step Continuous Distributions
 
@@ -115,58 +107,70 @@ print("Z mean ~ 0:", z.mean(), "std ~ 1:", z.std())
 
 ## What to Notice in This Code
 
-- A *PDF value* is *not a probability* — *integrate* to get one.
-- The *exponential* is *memoryless*.
-- The *normal* arises from *sums and averages* (CLT).
+- A PDF value is not a probability — integrate to get one.
+- The exponential is memoryless.
+- The normal arises from sums and averages (CLT).
 
 ## Five Common Mistakes
 
-1. **Reading *PDF values as probabilities*.**
-2. **Assuming *normality* without checking.**
-3. **Forgetting the *units* of standard deviation.**
-4. **Forgetting the *memorylessness* of the exponential.**
-5. **Ignoring *skewed* shapes like *log-normal*.**
+1. **Reading PDF values as probabilities.**
+2. **Assuming normality without checking.**
+3. **Forgetting the units of standard deviation.**
+4. **Forgetting the memorylessness of the exponential.**
+5. **Ignoring skewed shapes like log-normal.**
 
 ## How This Shows Up in Production
 
-The *normal* model for measurement error, *exponential* waiting times, *log-normal* prices, the *foundation* distributions for confidence intervals and tests — *continuous distributions* are the *vocabulary of modeling*.
+The normal model for measurement error, exponential waiting times, log-normal prices, the foundation distributions for confidence intervals and tests — continuous distributions are the vocabulary of modeling.
 
 ## How a Senior Engineer Thinks
 
-- *Visualizes* every distribution assumption.
-- Uses *Q-Q plots* to check *normality*.
-- Tries *log transforms* on *skewed* data.
-- Exploits *standardization*.
-- Acknowledges the *limits* of distributions.
+- Visualizes every distribution assumption.
+- Uses Q-Q plots to check normality.
+- Tries log transforms on skewed data.
+- Exploits standardization.
+- Acknowledges the limits of distributions.
 
 ## Checklist
 
-- [ ] I know each *PDF* and its *E/Var*.
-- [ ] I can *standardize*.
-- [ ] I know *PDF ≠ probability*.
-- [ ] I can draw a *Q-Q plot*.
+- [ ] I know each PDF and its E/Var.
+- [ ] I can standardize.
+- [ ] I know PDF ≠ probability.
+- [ ] I can draw a Q-Q plot.
 
 ## Practice Problems
 
-1. For *N(0,1)*, compute *P(|X| > 2)*.
-2. For *Exponential(λ=2)*, find the *median*.
-3. Describe how *log-normal* differs in *shape* from *normal*.
+1. For N(0,1), compute P(|X| > 2).
+2. For Exponential(λ=2), find the median.
+3. Describe how log-normal differs in shape from normal.
 
 ## Wrap-up and Next Steps
 
-Continuous distributions are the *priors of measurement*. The next episode shows *why the normal appears everywhere* via the LLN and CLT.
+Continuous distributions are the priors of measurement. The next episode shows why the normal appears everywhere via the LLN and CLT.
+
+## Answering the Opening Questions
+
+- **What it means to model a continuous quantity probabilistically?**
+  - The article treats Continuous Distributions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why a density is not the same thing as a probability?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When Uniform, Normal, Exponential, and Gamma distributions make sense?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What Is Probability?](./01-what-is-probability.md)
-- [Events and Sample Space](./02-events-and-sample-space.md)
-- [Conditional Probability](./03-conditional-probability.md)
-- [Bayes' Theorem](./04-bayes-theorem.md)
-- [Random Variables](./05-random-variables.md)
-- [Expectation and Variance](./06-expectation-and-variance.md)
-- [Discrete Distributions](./07-discrete-distributions.md)
+## In this series
+
+- [Probability 101 (1/10): What Is Probability?](./01-what-is-probability.md)
+- [Probability 101 (2/10): Events and Sample Space](./02-events-and-sample-space.md)
+- [Probability 101 (3/10): Conditional Probability](./03-conditional-probability.md)
+- [Probability 101 (4/10): Bayes' Theorem](./04-bayes-theorem.md)
+- [Probability 101 (5/10): Random Variables](./05-random-variables.md)
+- [Probability 101 (6/10): Expectation and Variance](./06-expectation-and-variance.md)
+- [Probability 101 (7/10): Discrete Distributions](./07-discrete-distributions.md)
 - **Continuous Distributions (current)**
 - Law of Large Numbers and CLT (upcoming)
 - Probability in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

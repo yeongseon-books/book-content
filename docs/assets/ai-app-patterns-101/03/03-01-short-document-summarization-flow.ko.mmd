@@ -1,0 +1,11 @@
+flowchart TD
+  D["짧은 문서\n전체 텍스트가 한 프롬프트에 들어감"] --> P["요약 프롬프트\nstyle + length + audience"]
+  P --> L["LLM\n문서 전체를 한 번에 읽음"]
+  L --> E["경영진 요약\n짧고 business-focused"]
+  L --> V["개발자 요약\n더 기술적이고 자세함"]
+
+  style D fill:#e3f2fd,stroke:#1976d2
+  style P fill:#fff3e0,stroke:#f57c00
+  style L fill:#f3e5f5,stroke:#7b1fa2
+  style E fill:#e8f5e9,stroke:#388e3c
+  style V fill:#fce4ec,stroke:#c2185b

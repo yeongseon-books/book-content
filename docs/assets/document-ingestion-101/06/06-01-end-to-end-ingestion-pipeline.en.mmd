@@ -1,0 +1,5 @@
+flowchart TD
+  A["Upload Document"] --> B["Routing & Parsing"]
+  B --> C["Chunking & Embedding"]
+  C --> D["Save to Vector Store"]
+  D --> E["Index Update Complete"]

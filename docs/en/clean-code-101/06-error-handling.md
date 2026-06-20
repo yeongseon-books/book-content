@@ -1,10 +1,10 @@
 ---
 series: clean-code-101
 episode: 6
-title: Error Handling
-status: content-ready
+title: "Clean Code 101 (6/10): Error Handling"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,45 +18,43 @@ tags:
   - Robustness
   - Reliability
 seo_description: Choose between exceptions and return values, fail fast, use errors as values, and apply retry with backoff safely.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Error Handling
+# Clean Code 101 (6/10): Error Handling
 
-> Clean Code 101 series (6/10)
+Error handling becomes dangerous when it is everywhere and nowhere at the same time. The code catches broadly, logs vaguely, and leaves the caller guessing which failures still matter.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Clean Code 101 series.
 
-**Core question**: Should you raise an exception or return a value?
+Here we will set boundaries for validation, typed exceptions, return-value failures, and retries so that robustness increases without letting the happy path disappear.
 
-> Use values when the caller is expected to decide what to do; use exceptions when the caller cannot reasonably handle the situation.
 
-<!-- a-grade-intro:end -->
+![clean code 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/06/06-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 6 flow overview*
+> Validate input first, then use exceptions only when flow is lost.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- When to use exceptions vs return values
-- The Fail Fast principle
-- The "errors as values" pattern
-- Retry with exponential backoff
-- Try/except anti-patterns
+- What boundary should you inspect first when applying Error Handling?
+- Which signal should the example or diagram make visible for Error Handling?
+- What failure should be prevented first when Error Handling reaches a real system?
+
+## Questions this article answers
+
+- How do you decide between raising an exception and returning a value?
+- When is Fail Fast especially important?
+- When is the "errors as values" pattern the better fit?
+- Under what conditions is retry with exponential backoff actually safe?
+- What try/except anti-patterns show up most often?
+
+> If the caller can make a reasonable local decision, return a value. If not, raise a meaningful exception.
 
 ## Why It Matters
 
 When error handling code outweighs business logic, the code stops being readable.
 
 > Error handling is a first-class citizen, but never the lead role.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    I["Input"] --> V["Validate"]
-    V -->|"Invalid"| F["Fail fast"]
-    V -->|"Valid"| L["Logic"]
-    L -->|"Expected"| R["Value"]
-    L -->|"Unexpected"| E["Exception"]
-```
 
 Validate up front; raise only when control is lost.
 
@@ -171,6 +169,23 @@ def handle_request(req):
 
 Use broad catches only at outer boundaries.
 
+## How to Verify This in a Real Codebase
+
+```bash
+python -m pytest -q tests/test_error_handling.py
+python -m pytest -q tests/test_retry_idempotency.py
+```
+
+**Expected output**
+
+- Typed exceptions and boundary mappings stay locked in by tests.
+- Retry logic should pass only for idempotent operations.
+
+## Failure Modes to Watch
+
+- Broad catches still sit deep inside business logic.
+- Retry is added to operations that can duplicate side effects such as billing.
+
 ## What to Notice in This Code
 
 - Validation and handling are separated.
@@ -215,17 +230,29 @@ In an API server the handler is the boundary. Domain logic raises typed exceptio
 
 Treat errors as first-class but never as the lead role. Next: an often misused tool — comments and documentation.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Error Handling?**
+  - The article treats Error Handling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Error Handling?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Error Handling reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
-- [Naming](./02-naming.md)
-- [Small Functions](./03-small-functions.md)
-- [Simplifying Conditionals](./04-simplifying-conditionals.md)
-- [Removing Duplication](./05-removing-duplication.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
+- [Clean Code 101 (2/10): Naming](./02-naming.md)
+- [Clean Code 101 (3/10): Small Functions](./03-small-functions.md)
+- [Clean Code 101 (4/10): Simplifying Conditionals](./04-simplifying-conditionals.md)
+- [Clean Code 101 (5/10): Removing Duplication](./05-removing-duplication.md)
 - **Error Handling (current)**
 - Comments and Documentation (upcoming)
 - Testable Code (upcoming)
 - Refactoring Basics (upcoming)
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -234,3 +261,5 @@ Treat errors as first-class but never as the lead role. Next: an often misused t
 - [Joel Spolsky — Exceptions](https://www.joelonsoftware.com/2003/10/13/13/)
 - [Google SRE — Handling Overload](https://sre.google/sre-book/handling-overload/)
 - [AWS — Exponential Backoff and Jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/)
+- [Python exception hierarchy](https://docs.python.org/3/library/exceptions.html)
+- [AWS Builders Library — timeouts, retries, and backoff with jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/)

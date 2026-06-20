@@ -1,0 +1,11 @@
+flowchart TD
+    A["Client (Browser)"]
+    B["Web Server (Nginx/Apache)"]
+    C["Application Server"]
+    D["Cache Server (Redis)"]
+    E["Database (MySQL)"]
+    A -->|"HTTP Request"| B
+    B -->|"Load Balancing"| C
+    C -->|"Lookup"| D
+    D -->|"Cache Miss"| E
+    E -->|"Return Data"| C

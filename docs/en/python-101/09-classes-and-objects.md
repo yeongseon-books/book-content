@@ -1,11 +1,11 @@
 ---
-title: 'Classes and objects: bundling data with behavior'
+title: "Python 101 (9/10): Classes and objects: bundling data with behavior"
 series: python-101
 episode: 9
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -22,19 +22,21 @@ seo_description: A class is not a mold for data; it is the definition of behavio
   shared by objects of the same kind.
 ---
 
-# Classes and objects: bundling data with behavior
+# Python 101 (9/10): Classes and objects: bundling data with behavior
 
-## What you will learn
+A class is not just a mold for data; it is a shared definition of behavior for objects of the same kind. An instance is one concrete object carrying that behavior with its own state.
 
-By the end of this chapter you can do the following.
+This post is the 9th article in the Python 101 series. This is the stage in the series where behavior, state, and object design come together.
 
-- Define a class with the `class` statement and create instances from it.
-- Explain the role of `__init__` in instance initialization.
-- Explain what `self` refers to and why it is the first parameter of a method.
-- Tell instance attributes apart from class attributes and pick the right one.
-- Describe the basic role of dunder methods like `__repr__`, `__str__`, and `__eq__`.
-- Describe single inheritance and method overriding.
-- Use `@dataclass` for simple data containers.
+
+![Python 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/09/09-01-mental-model.en.png)
+*Python 101 chapter 9 flow overview*
+
+## Questions to Keep in Mind
+
+- Define a class with the `class` statement and create instances from it?
+- Explain the role of `__init__` in instance initialization?
+- Explain what `self` refers to and why it is the first parameter of a method?
 
 ## Why it matters
 
@@ -51,9 +53,6 @@ This chapter introduces the simplest tools for building that bundle: the `class`
 > A class is not a mold for data; it is the definition of behavior shared by objects of the same kind. An instance is an individual object that follows that definition. With that one line in mind, `self`, class attributes, and dunder methods all find their place.
 The diagram below shows the path from a class definition to a method call on an instance.
 
-![Mental model](../../assets/python-101/09/09-01-mental-model.en.png)
-
-*Mental model*
 Three ideas hold this together.
 
 - **A class is a template for objects.** The `class User:` statement creates a class object named `User`, and calling `User(...)` produces an instance from that template.
@@ -363,12 +362,35 @@ Plenty of business logic is fine as plain functions. Classes earn their cost whe
 
 The next chapter is a tour of the standard library. Now that functions, modules, and classes are in place, you will see what Python ships with by default.
 
+## Answering the Opening Questions
+
+- **Define a class with the `class` statement and create instances from it?**
+  - The article treats Classes and objects: bundling data with behavior as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Explain the role of `__init__` in instance initialization?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Explain what `self` refers to and why it is the first parameter of a method?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- [Python 101 (1/10): Why Python, and how to install and use venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): Variables, types, and operators](./02-variables-types-operators.md)
+- [Python 101 (3/10): Strings and formatting](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): Control flow: if, for, while, comprehension](./05-control-flow.md)
+- [Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
+- [Python 101 (7/10): Modules and packages: import, __init__, __name__](./07-modules-and-packages.md)
+- [Python 101 (8/10): File I/O and exception handling](./08-file-io-and-exceptions.md)
+- **Classes and objects: bundling data with behavior (current)**
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Python tutorial — Classes](https://docs.python.org/3/tutorial/classes.html)
-- [Python data model — Special method names](https://docs.python.org/3/reference/datamodel.html#special-method-names)
-- [Python library — dataclasses](https://docs.python.org/3/library/dataclasses.html)
-- [PEP 557 — Data Classes](https://peps.python.org/pep-0557/)
+- [Python tutorial — Classes](https://docs.python.org/3/tutorial/classes.html) — Core guide to `class`, instances, methods, inheritance, and class-versus-instance variables.
+- [Python docs — Data model](https://docs.python.org/3/reference/datamodel.html) — Formal source for attribute lookup, method binding, and special method behavior.
+- [Python docs — Built-in Functions](https://docs.python.org/3/library/functions.html) — Useful reference for `isinstance()`, `super()`, and related builtins used with classes.
+- [Python docs — `dataclasses`](https://docs.python.org/3/library/dataclasses.html) — Standard-library tool for generating `__init__`, `__repr__`, and comparison methods automatically.
+- [PEP 557 — Data Classes](https://peps.python.org/pep-0557/) — Explains the rationale and semantics behind dataclass generation.

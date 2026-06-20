@@ -1,12 +1,12 @@
 ---
 series: operating-systems-101
 episode: 2
-title: 프로세스와 스레드
-status: content-ready
+title: "Operating Systems 101 (2/10): 프로세스와 스레드"
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -17,23 +17,31 @@ tags:
   - 스레드
   - 동시성
   - 시스템
-seo_description: 프로세스의 구성, 스레드와의 차이, fork/exec 모델, 그리고 실무에서의 선택 기준을 정리합니다.
-last_reviewed: '2026-05-04'
+seo_description: 프로세스의 구성, 스레드와의 차이, fork/exec 모델, 선택 기준을 정리합니다.
+last_reviewed: '2026-05-15'
 ---
 
-# 프로세스와 스레드
+# Operating Systems 101 (2/10): 프로세스와 스레드
 
-> Operating Systems 101 시리즈 (2/10)
+"실행 중인 프로그램"이라는 표현은 익숙하지만, 운영체제 관점에서는 너무 뭉뚱그린 말입니다. 메모리, 열린 파일, 권한, CPU 상태까지 묶인 단위가 무엇인지 분리해서 봐야 동시성 설계가 선명해집니다.
 
+특히 프로세스와 스레드를 섞어 이해하면 공유 범위와 격리 경계를 계속 헷갈리게 됩니다. 그래서 이 글에서는 두 단위를 운영체제가 실제로 다루는 기준으로 다시 정리합니다.
 
-## 이 글에서 다룰 문제
+이 글은 Operating Systems 101 시리즈의 2번째 글입니다.
 
-프로세스와 스레드는 동시성을 구현하는 두 가지 기본 빌딩 블록입니다. 둘을 혼동하면 메모리 격리가 깨지거나, 스레드 안전성을 잘못 가정하거나, 자식 프로세스를 좀비로 남기는 식의 문제가 생깁니다. "왜 같은 데이터인데 한쪽에서는 보이고 다른 쪽에서는 안 보이지?"라는 질문 대부분은 프로세스/스레드 모델로 풀립니다.
+![Operating Systems 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.ko.png)
+*Operating Systems 101 2장 흐름 개요*
 
-> 프로세스는 격리의 단위, 스레드는 동시성의 단위입니다. 둘을 같은 도구로 쓰면 거의 항상 한쪽이 새거나 한쪽이 막힙니다.
+## 먼저 던지는 질문
 
-## 전체 흐름
+- 프로세스는 어떤 자원을 자기 것으로 가지고 있을까요?
+- 스레드는 무엇을 공유하고 무엇은 따로 가질까요?
+- `fork`와 `exec`는 왜 두 단계로 나뉘어 있을까요?
+
+## 기본 모델
 > 한 프로세스는 자기만의 가상 주소 공간, 파일 디스크립터 테이블, 신호 처리기, 권한을 가집니다. 그 안에 한 개 이상의 스레드가 있고, 스레드는 메모리와 fd는 공유하지만 자신만의 스택과 레지스터 상태를 갖습니다.
+
+### 프로세스와 스레드의 공유 경계
 
 ```text
 +-----------------------------------------+
@@ -52,49 +60,49 @@ last_reviewed: '2026-05-04'
 +-----------------------------------------+
 ```
 
-## Before / After
+## 같은 코드를 다르게 읽는 법
 
-**Before — "스레드와 프로세스는 그냥 다 동시 실행":**
+**이전 관점 — "스레드와 프로세스는 그냥 둘 다 동시 실행 도구":**
 
 ```python
-# 두 작업을 "동시에" 돌리고 싶다
+# 이 두 작업이 "동시에" 실행되길 원합니다
 import threading, multiprocessing
 ```
 
 이 한 줄은 둘 중 어느 것을 골라야 하는지 알려 주지 않습니다.
 
-**After — "공유 모델이 다르다"는 모델:**
+**바꿔서 보면 — "공유하는 것이 다르다"는 모델:**
 
 ```text
-multiprocessing.Process : 메모리 따로, 통신은 큐/파이프/공유 메모리
-threading.Thread        : 메모리 같이, 락이 필요하고 GIL이 있음
+multiprocessing.Process : separate memory, talk via queue/pipe/shared mem
+threading.Thread        : same memory, needs locks, GIL applies
 
-CPU 바운드(numpy로 큰 행렬 곱) → 멀티프로세스가 보통 빠름
-I/O 바운드(HTTP 요청 100건)    → 멀티스레드 또는 asyncio가 보통 충분
+CPU-bound (large numpy matmul)  -> multiprocessing usually wins
+I/O-bound (100 HTTP requests)   -> threading or asyncio is enough
 ```
 
 같은 "동시 실행"이라도 무엇을 공유하느냐로 도구가 갈립니다.
 
-## 단계별로 따라하기
+## 단계별로 확인하기
 
-### 1단계: PID와 부모-자식 관계 보기
+### 1단계: 프로세스 식별자와 부모-자식 관계 보기
 
 ```python
 import os
 
-print(f"부모 PID(이 프로세스): {os.getpid()}")
+print(f"Parent PID (this process): {os.getpid()}")
 
 pid = os.fork()
 if pid == 0:
-    print(f"자식  PID: {os.getpid()}, 부모: {os.getppid()}")
+    print(f"Child  PID: {os.getpid()}, parent: {os.getppid()}")
 else:
     os.waitpid(pid, 0)
-    print(f"부모: 자식 {pid} 종료 확인")
+    print(f"Parent: child {pid} exited")
 ```
 
 `fork`는 한 번 호출되어 두 번 리턴합니다. 부모에는 자식 PID가, 자식에는 0이 돌아옵니다. 같은 코드인데 두 줄기로 갈라지는 경험이 핵심입니다.
 
-### 2단계: `fork` 이후의 메모리 격리 확인
+### 2단계: 자식 분기 이후의 메모리 격리 확인
 
 ```python
 import os
@@ -102,10 +110,10 @@ import os
 x = [1, 2, 3]
 if os.fork() == 0:
     x.append(99)
-    print(f"자식의 x: {x}")
+    print(f"Child x:  {x}")
     os._exit(0)
 os.wait()
-print(f"부모의 x: {x}")
+print(f"Parent x: {x}")
 ```
 
 자식이 `x`를 바꿔도 부모의 `x`는 그대로입니다. 두 프로세스는 같은 메모리를 보지 못합니다(겉보기는 같지만 내부적으로는 copy-on-write).
@@ -121,12 +129,12 @@ def worker():
 
 t = threading.Thread(target=worker)
 t.start(); t.join()
-print(f"메인의 x: {x}")
+print(f"Main x: {x}")
 ```
 
 같은 `x` 리스트가 보입니다. 스레드는 같은 주소 공간을 공유하기 때문에 동기화가 필요해집니다.
 
-### 4단계: 스레드 vs 프로세스 성능 직관
+### 4단계: 스레드와 프로세스의 성능 감각 보기
 
 ```python
 import time, math
@@ -147,20 +155,20 @@ for Pool, label in [(ThreadPoolExecutor, "Thread"), (ProcessPoolExecutor, "Proce
 
 CPU 바운드 작업에서는 보통 프로세스 풀이 빠릅니다. CPython의 GIL 때문에 스레드는 같은 시점에 하나만 파이썬 코드를 실행할 수 있습니다.
 
-### 5단계: `exec`로 다른 프로그램 되기
+### 5단계: 다른 프로그램으로 실행 이미지 바꾸기
 
 ```python
 import os
 
 if os.fork() == 0:
-    os.execvp("ls", ["ls", "-la"])  # 자식이 ls로 변신
-    # 여기는 도달하지 않음
+    os.execvp("ls", ["ls", "-la"])  # child becomes ls
+    # 이 줄은 절대 실행되지 않습니다
 os.wait()
 ```
 
 `fork`로 자식을 만들고 곧바로 `exec`로 다른 프로그램이 되는 패턴이 셸이 명령을 실행하는 표준 방식입니다. 자식 프로세스의 메모리는 새 프로그램의 이미지로 통째로 교체됩니다.
 
-## 이 코드에서 주목할 점
+## 여기서 먼저 볼 점
 
 - `fork`는 한 번 호출되고 두 번 리턴합니다
 - 프로세스 간 메모리는 격리되어 있고, 스레드 간 메모리는 공유됩니다
@@ -177,7 +185,7 @@ os.wait()
 | `fork` 직후 큰 라이브러리 임포트 가정 | macOS에서 동작 차이, 안전성 문제 | `multiprocessing.set_start_method('spawn')` 고려 |
 | 프로세스를 가볍다고 가정 | 수천 개 프로세스 생성으로 OS 자원 고갈 | 워커 풀 패턴으로 재사용 |
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 본다
 
 - 웹 서버: gunicorn은 워커 프로세스, uvicorn은 비동기, 둘을 조합
 - 데이터 처리: `multiprocessing.Pool`로 CPU 바운드 ETL 분산
@@ -193,27 +201,128 @@ os.wait()
 - [ ] `fork`와 `exec`의 역할 분리를 설명할 수 있는가
 - [ ] 자식 프로세스 회수의 필요성을 안다
 
-## 정리 및 다음 단계
+## 연습 문제
+
+1. `os.fork()` 예제를 직접 실행해서 부모와 자식이 각각 어떤 PID를 보는지 정리해 보세요.
+2. 같은 작업을 `ThreadPoolExecutor`와 `ProcessPoolExecutor`로 돌리고, CPU 바운드인지 I/O 바운드인지에 따라 결과가 어떻게 달라지는지 비교해 보세요.
+3. `ps -ef`, `pstree`, `htop` 중 하나를 골라 지금 실행 중인 서비스의 프로세스/스레드 구조를 캡처하고, 무엇이 공유되고 무엇이 분리되는지 설명해 보세요.
+
+## 마무리와 다음 글
 
 프로세스는 격리된 자원 묶음이고, 스레드는 그 안에서 흐르는 동시 실행 단위입니다. 둘을 헷갈리면 동시성 코드가 미묘하게 깨지거나 성능이 기대만큼 나오지 않습니다. CPU 바운드와 I/O 바운드, 격리의 필요성, 메모리 공유 정도라는 세 가지 축으로 도구를 고를 수 있습니다.
 
 다음 글에서는 OS가 그 많은 프로세스와 스레드 중 누구에게 CPU를 줄지를 결정하는 메커니즘 — 스케줄링을 봅니다.
 
+## 시스템 관찰 지표와 커널 동작의 연결
+
+### run queue와 CPU 사용률을 함께 읽기
+CPU 사용률이 낮다고 항상 여유가 있는 것은 아닙니다. run queue 길이가 길고 I/O wait가 높으면 병목이 디스크나 네트워크일 수 있습니다.
+
+```bash
+vmstat 1
+mpstat -P ALL 1
+iostat -xz 1
+```
+
+세 도구를 같이 보면 CPU 바운드인지 I/O 바운드인지 분리할 수 있습니다. 운영체제 관점에서 중요한 것은 단일 지표가 아니라 지표 간 관계입니다.
+
+### 페이지 폴트와 메모리 압박 해석
+메모리 문제는 OOM 직전에야 드러나는 경우가 많습니다. 아래 지표를 주기적으로 보면 이상 징후를 조기에 잡을 수 있습니다.
+
+- major page fault 증가: 디스크에서 페이지를 자주 끌어오는 상태
+- swap in/out 급증: 워킹셋이 물리 메모리를 초과한 상태
+- reclaim 스레드 활동 증가: 커널이 메모리 회수에 과도한 시간을 쓰는 상태
+
+애플리케이션이 GC를 쓰는 런타임이라면, 힙 크기 조정과 객체 생존 시간 최적화가 커널 메모리 압박을 완화하는 직접 수단이 됩니다.
+
+### 시스템 콜 추적으로 성능 병목 찾기
+`strace`는 느리지만 원인 파악에는 매우 강력합니다. 호출 빈도와 지연 구간을 보면 어떤 API 사용이 비효율적인지 확인할 수 있습니다.
+
+```bash
+strace -f -c -p <pid>
+```
+
+요약표에서 `read`, `write`, `futex`, `epoll_wait` 비중이 높게 나오면 각각 I/O, 락 경합, 이벤트 대기 구조를 의심할 수 있습니다. 이후 애플리케이션 코드에서 버퍼 크기, 락 범위, 이벤트 루프 타임아웃을 조정하는 식으로 대응합니다.
+
+### 스케줄링과 우선순위 튜닝 주의점
+`nice`와 `ionice`는 빠른 응급처치지만, 남용하면 전체 시스템 공정성을 해칠 수 있습니다. 특정 작업의 우선순위를 올리면 다른 서비스의 tail latency가 악화될 수 있기 때문입니다.
+
+운영 환경에서는 다음 원칙을 권장합니다. 첫째, 우선순위 조정은 임시 대응으로 제한합니다. 둘째, 조정 전후 지표를 캡처해 회귀를 확인합니다. 셋째, 근본 원인은 워크로드 분리, 큐 제어, 배치 시간 분산으로 해결합니다. 운영체제 기능은 문제를 숨기는 도구가 아니라 구조를 개선하기 위한 관측/제어 도구입니다.
+
+## 프로세스와 스레드를 선택할 때 쓰는 실무 기준표
+
+프로세스와 스레드는 "무엇이 더 빠른가"보다 "무엇을 격리하고 무엇을 공유할 것인가"로 고르는 편이 정확합니다.
+
+| 상황 | 권장 단위 | 이유 |
+| --- | --- | --- |
+| CPU 바운드 이미지 변환 | 프로세스 풀 | GIL 영향 회피, 장애 격리 |
+| I/O 바운드 API 크롤링 | 스레드 또는 asyncio | 공유 메모리로 통신 단순 |
+| 멀티테넌트 작업자 | 프로세스 | 테넌트 간 메모리 격리 |
+| 고빈도 상태 공유 | 스레드 | 직렬화 비용 없이 공유 |
+
+### `/proc`로 프로세스와 스레드 상태 확인
+
+```bash
+PID=$(pgrep -f "gunicorn" | head -n 1)
+cat /proc/$PID/status | grep -E "Name|State|Threads|VmRSS"
+ps -L -p "$PID" -o pid,tid,stat,pcpu,comm
+```
+
+```text
+Name:   gunicorn
+State:  S (sleeping)
+Threads:        33
+VmRSS:  512340 kB
+```
+
+스레드 수가 급증하고 `VmRSS`도 함께 상승하면, 스레드 스택과 큐 적체를 동시에 의심할 수 있습니다.
+
+### `fork` 이후 copy-on-write가 깨지는 지점
+
+`fork` 직후에는 부모/자식이 페이지를 공유하지만, 자식이 쓰기를 시작하면 페이지 복사가 발생합니다. 대용량 데이터 구조를 가진 부모에서 자식이 초기에 큰 쓰기를 하면 메모리 사용량이 급증합니다.
+
+```python
+import os
+
+buf = bytearray(200 * 1024 * 1024)
+pid = os.fork()
+if pid == 0:
+    for i in range(0, len(buf), 4096):
+        buf[i] = 1  # 페이지 단위로 CoW 유발
+    os._exit(0)
+os.waitpid(pid, 0)
+```
+
+이 패턴은 워커 모델의 시작 지연과 메모리 폭증을 동시에 만들 수 있습니다.
+
+## 처음 질문으로 돌아가기
+
+- **프로세스는 어떤 자원을 자기 것으로 가지고 있을까요?**
+  - 프로세스는 자기만의 가상 주소 공간, 파일 디스크립터 테이블, 신호 처리기, 권한과 PID를 가진 자원 묶음입니다. `os.fork()` 예제에서 부모와 자식이 같은 코드에서 갈라져도 각자 다른 PID를 받고, 리스트 `x`를 수정했을 때 부모 값이 바뀌지 않는 점이 메모리 격리를 보여 줍니다.
+- **스레드는 무엇을 공유하고 무엇은 따로 가질까요?**
+  - 스레드는 같은 프로세스 안에서 코드, 힙, 전역 변수, 파일 디스크립터를 공유하지만 스택과 레지스터 상태는 각자 따로 가집니다. 그래서 `threading.Thread` 예제에서는 같은 리스트 `x`에 `99`가 추가되지만, 동시에 같은 메모리를 만지므로 락 같은 동기화가 필요해집니다.
+- **`fork`와 `exec`는 왜 두 단계로 나뉘어 있을까요?**
+  - `fork`는 부모의 실행 문맥을 복제해 자식 프로세스를 만들고, `exec`는 그 자식의 메모리 이미지를 완전히 다른 프로그램으로 바꿉니다. 셸이 `fork` 뒤에 `os.execvp("ls", ["ls", "-la"])`를 호출하는 패턴을 쓰는 이유는 부모의 환경과 fd 상태를 이어받은 채 다른 실행 파일로 자연스럽게 전환할 수 있기 때문입니다.
+
 <!-- toc:begin -->
-- [운영체제란 무엇인가?](./01-what-is-an-operating-system.md)
+## 시리즈 목차
+
+- [Operating Systems 101 (1/10): 운영체제란 무엇인가?](./01-what-is-an-operating-system.md)
 - **프로세스와 스레드 (현재 글)**
 - 스케줄링 (예정)
-- 동시성과 race condition (예정)
-- lock, mutex, semaphore (예정)
+- 동시성과 경쟁 상태 (예정)
+- 락, 뮤텍스, 세마포어 (예정)
 - 메모리 관리 (예정)
 - 가상 메모리 (예정)
 - 파일 시스템 (예정)
 - 시스템 콜 (예정)
 - 컨테이너와 운영체제 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
+- [Operating Systems 101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/operating-systems-101/ko)
 - [Tanenbaum & Bos — Modern Operating Systems](https://www.pearson.com/store/p/modern-operating-systems/P100000869539)
 - [The Linux Programming Interface — Michael Kerrisk](https://man7.org/tlpi/)
 - [Python multiprocessing 문서](https://docs.python.org/3/library/multiprocessing.html)

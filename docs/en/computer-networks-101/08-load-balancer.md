@@ -1,10 +1,10 @@
 ---
 series: computer-networks-101
 episode: 8
-title: Load Balancer
-status: content-ready
+title: "Computer Networks 101 (8/10): Load Balancer"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,28 @@ tags:
   - L7
   - Health Check
 seo_description: How a load balancer distributes traffic and isolates failures, the differences between L4 and L7, and the cost of sticky sessions in production.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Load Balancer
+# Computer Networks 101 (8/10): Load Balancer
 
 > Computer Networks 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: With 100 servers behind one domain, how does the client always reach a "live and good enough" server?
 
 > A load balancer hides many backends behind one virtual IP, distributes traffic, and removes dead servers. An L4 LB balances based on IP and port. An L7 LB understands HTTP and routes by path or header. Both are the front door of modern services and the first line of reliability.
 
-<!-- a-grade-intro:end -->
+This is post 8 in the Computer Networks 101 series.
+
+
+![computer networks 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.en.png)
+*computer networks 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Load Balancer?
+- Which signal should the example or diagram make visible for Load Balancer?
+- What failure should be prevented first when Load Balancer reaches a real system?
 
 ## What You Will Learn
 
@@ -45,15 +53,6 @@ last_reviewed: '2026-05-04'
 A load balancer is more than a distributor — it is the device that decides reliability and deployment strategy. Blue-green deploys, canary releases, region failover, and autoscaling all happen on top of the LB. One wrong line in a health check sends traffic to a dead server or removes a healthy one entirely.
 
 > A load balancer is not a tool for picking the "best" server. It is a tool for picking a "good enough, live" server quickly.
-
-## Concept at a Glance
-
-```text
-client → LB (1 virtual IP) → [backend 1, 2, 3, ...]
-            ├─ health check (HTTP / TCP)
-            ├─ algorithm   (round-robin / least conn / hash)
-            └─ TLS terminate (optional)
-```
 
 An L4 LB sees only TCP flows. An L7 LB balances per HTTP request.
 
@@ -169,6 +168,26 @@ upstream backend {
 
 `ip_hash` sends the same client IP to the same backend. It is a temporary fix when sessions live in memory; the right answer is to make the service stateless.
 
+## Step 6: Design graceful drain and canary together
+
+The load balancer matters most during a deploy, not during a demo. Instead of flipping all traffic at once, let only a small share of new connections hit the new version while old connections drain naturally.
+
+```nginx
+upstream backend {
+    server 127.0.0.1:9001 weight=19;
+    server 127.0.0.1:9002 weight=1;
+}
+```
+
+A 19:1 split is roughly a 5% canary. The usual sequence looks like this.
+
+1. Add the new version to the pool at a low weight.
+2. Watch error rate plus p95/p99 latency for a short window.
+3. Raise the weight gradually if the signals stay clean.
+4. Mark the old instance unhealthy for new traffic, let in-flight requests finish, then stop it.
+
+Sticky sessions make this harder because traffic weight no longer maps cleanly to user weight. The same users stay pinned to the same backends, so you lose control over who actually experiences the canary.
+
 ## What to Notice in This Code
 
 - The value of an LB is in health checks and deployment strategy, not just distribution
@@ -222,17 +241,29 @@ A load balancer does the simple job of "hide many servers behind one address and
 
 Next we move from request/response to bidirectional streams — WebSocket and real-time communication.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Load Balancer?**
+  - The article treats Load Balancer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Load Balancer?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Load Balancer reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Network?](./01-what-is-a-network.md)
-- [IP and Subnet](./02-ip-and-subnet.md)
-- [TCP and UDP](./03-tcp-and-udp.md)
-- [DNS](./04-dns.md)
-- [HTTP and HTTPS](./05-http-and-https.md)
-- [TLS Basics](./06-tls-basics.md)
-- [Routing and NAT](./07-routing-and-nat.md)
+## In this series
+
+- [Computer Networks 101 (1/10): What Is a Network?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP and Subnet](./02-ip-and-subnet.md)
+- [Computer Networks 101 (3/10): TCP and UDP](./03-tcp-and-udp.md)
+- [Computer Networks 101 (4/10): DNS](./04-dns.md)
+- [Computer Networks 101 (5/10): HTTP and HTTPS](./05-http-and-https.md)
+- [Computer Networks 101 (6/10): TLS Basics](./06-tls-basics.md)
+- [Computer Networks 101 (7/10): Routing and NAT](./07-routing-and-nat.md)
 - **Load Balancer (current)**
-- WebSocket and real-time (upcoming)
-- Debugging network problems (upcoming)
+- WebSocket and Real-Time Communication (upcoming)
+- Debugging Network Problems (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -241,3 +272,4 @@ Next we move from request/response to bidirectional streams — WebSocket and re
 - [HAProxy Documentation](https://docs.haproxy.org/)
 - [Envoy Proxy Docs](https://www.envoyproxy.io/docs)
 - [AWS ELB User Guide](https://docs.aws.amazon.com/elasticloadbalancing/)
+- [Google SRE Book — Handling Overload](https://sre.google/sre-book/handling-overload/)

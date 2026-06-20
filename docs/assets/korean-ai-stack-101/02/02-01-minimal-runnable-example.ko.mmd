@@ -1,0 +1,10 @@
+flowchart LR
+    A["FAQ 질문 3개"] --> B["KoSimCSE 인코딩"]
+    B --> C["정규화된 벡터"]
+    C --> D["FAISS IndexFlatIP"]
+    E["새 질의:\n로그인 비밀번호를\n다시 설정하고 싶어요"] --> F["같은 KoSimCSE 인코딩"]
+    F --> G["정규화된 질의 벡터"]
+    G --> D
+    D --> H["top-2 검색 결과"]
+    H --> I["0.91 비밀번호 재설정 FAQ"]
+    H --> J["0.32 주문 내역 FAQ"]

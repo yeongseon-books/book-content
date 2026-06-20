@@ -1,10 +1,10 @@
 ---
 series: api-design-101
 episode: 9
-title: API Versioning
-status: content-ready
+title: "API Design 101 (9/10): API Versioning"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,27 @@ tags:
   - Deprecation
   - Backend
 seo_description: A backend junior's guide to URL and header versioning, compatibility policy, and the deprecation and sunset workflow for REST APIs.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# API Versioning
+# API Design 101 (9/10): API Versioning
 
-> API Design 101 series (9/10)
+Running an API for a long time teaches the same lesson repeatedly: the hard part is not changing the contract, but changing it without breaking trust. A field tweak that feels minor to the backend can still be a production incident for clients that upgrade months later.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the API Design 101 series.
 
-**Core question**: When you must *change* a contract, how do you do it without breaking external clients?
+Here, we treat versioning as change-management discipline rather than just `/v1` syntax. First define what counts as breaking. Then choose how URLs, headers, deprecation notices, and sunset timelines make that policy visible.
 
-> Define your *compatibility rules* first; isolate change behind *version channels*.
 
-<!-- a-grade-intro:end -->
+![api design 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/09/09-01-concept-at-a-glance.en.png)
+*api design 101 chapter 9 flow overview*
+> API versioning is not admitting defeat — it is the contract recognizing that both client and server evolve, and building compatibility into that evolution from the start.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Distinguishing breaking from non-breaking changes
-- URL versioning vs header versioning
-- Compatibility policy (semver, calver)
-- Deprecation notices and sunsetting
-- The cost of running multiple versions
+- Distinguishing breaking from non-breaking changes?
+- URL versioning vs header versioning?
+- Compatibility policy (semver, calver)?
 
 ## Why It Matters
 
@@ -47,14 +46,7 @@ External clients depend on your API. One break stops *dozens or hundreds* of cli
 
 > Compatibility is not free.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    V1["/v1/users"] --> H1["v1 handler"]
-    V2["/v2/users"] --> H2["v2 handler"]
-    H1 -.deprecated.-> Sunset["sunset 2027-01"]
-```
+That transition has to be operational, not symbolic. Usage monitoring, successor links, and explicit sunset headers must keep moving after the code ships, or clients will still be surprised on shutdown day.
 
 ## Key Terms
 
@@ -68,13 +60,13 @@ flowchart LR
 
 **Before (silently broken)**
 
-```
+```text
 PATCH /users/42  → response date format changes one day
 ```
 
 **After (explicit version)**
 
-```
+```text
 PATCH /v2/users/42
 Sunset: Wed, 31 Jan 2027 23:59:59 GMT  (set on v1 responses)
 ```
@@ -114,7 +106,7 @@ URLs stay clean, but *debugging and caching get harder*.
 
 ### Step 3 — Non-breaking additions
 
-```
+```text
 Add a new field to a response → non-breaking (if clients can ignore it)
 Add an *optional* field to a request → non-breaking
 ```
@@ -138,7 +130,7 @@ Standard headers send a *quiet notice* — paired with release notes.
 
 ### Step 5 — Sunset procedure
 
-```
+```text
 1. Ship the new version + start sending Deprecation
 2. Monitor usage (identify clients)
 3. Announce sunset 6-12 months out by email
@@ -172,6 +164,12 @@ Stripe uses *date-based versions* (calver) in headers (`Stripe-Version: 2024-04-
 - Quantify the *internal cost* of multiple versions (code, tests, docs).
 - Sunset only after usage drops — let data decide.
 
+## Verification Signals and Failure Modes
+
+- **Expected output:** After a new version launches, responses from the old version should consistently carry `Deprecation`, `Sunset`, and successor `Link` signals.
+- **First check:** If five recent changes get classified differently by different engineers, the compatibility policy itself is still too vague.
+- **Failure mode:** Announce a sunset date without measuring actual client usage, and the remaining integrations all fail at once when the deadline arrives.
+
 ## Checklist
 
 - [ ] Is the compatibility policy documented?
@@ -190,17 +188,29 @@ Stripe uses *date-based versions* (calver) in headers (`Stripe-Version: 2024-04-
 
 Versioning reconciles *contracts* with *change*. The final episode turns to making all those promises *readable* — writing good API documentation.
 
+## Answering the Opening Questions
+
+- **Distinguishing breaking from non-breaking changes?**
+  - The article treats API Versioning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **URL versioning vs header versioning?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Compatibility policy (semver, calver)?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
-- [REST Basics](./02-rest-basics.md)
-- [Resource Design](./03-resource-design.md)
-- [HTTP Methods and Status Codes](./04-http-methods-and-status.md)
-- [Request and Response Schemas](./05-request-and-response-schema.md)
-- [Pagination and Filtering](./06-pagination-and-filtering.md)
-- [Designing Error Responses](./07-error-response-design.md)
-- [OpenAPI and Swagger](./08-openapi-and-swagger.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
+- [API Design 101 (2/10): REST Basics](./02-rest-basics.md)
+- [API Design 101 (3/10): Resource Design](./03-resource-design.md)
+- [API Design 101 (4/10): HTTP Methods and Status Codes](./04-http-methods-and-status.md)
+- [API Design 101 (5/10): Request and Response Schemas](./05-request-and-response-schema.md)
+- [API Design 101 (6/10): Pagination and Filtering](./06-pagination-and-filtering.md)
+- [API Design 101 (7/10): Designing Error Responses](./07-error-response-design.md)
+- [API Design 101 (8/10): OpenAPI and Swagger](./08-openapi-and-swagger.md)
 - **API Versioning (current)**
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

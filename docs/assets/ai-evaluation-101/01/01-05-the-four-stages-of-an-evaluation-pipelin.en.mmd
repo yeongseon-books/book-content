@@ -1,0 +1,9 @@
+flowchart TD
+    D1["Evaluation dataset"] --> G["1. Generate\nRun prompts and collect responses"]
+    G --> D2["Model output logs"]
+    D2 --> S["2. Score\nUse rules or an LLM judge"]
+    S --> D3["Per-case results"]
+    D3 --> A["3. Aggregate\nSummarize case scores into metrics"]
+    A --> D4["Correctness relevance safety trends"]
+    D4 --> C["4. Compare\nCheck against baseline or candidate"]
+    C --> D5["Release decision"]

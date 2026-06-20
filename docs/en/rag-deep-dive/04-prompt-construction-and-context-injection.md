@@ -1,11 +1,11 @@
 ---
-title: Prompt Construction and Context Injection — Inside PromptTemplate
+title: "RAG Deep Dive (4/6): Prompt Construction and Context Injection — Inside PromptTemplate"
 series: rag-deep-dive
 episode: 4
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,33 +14,29 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: How PromptTemplate and MessagesPlaceholder turn retrieved context into LLM input, traced in code.
 ---
 
-# Prompt Construction and Context Injection — Inside PromptTemplate
+# RAG Deep Dive (4/6): Prompt Construction and Context Injection — Inside PromptTemplate
 
-<!-- a-grade-intro:begin -->
-## Questions this post answers
+PromptTemplate and MessagesPlaceholder turn retrieved context into the exact input contract an LLM will read. This post traces that transformation in code.
 
-- What does `PromptTemplate` validate beyond string interpolation?
-- How does `ChatPromptTemplate.from_messages()` keep inputs structured?
-- When do retrieved `Document` objects collapse into a `{context}` string?
-- What changes once you bind variables with `partial()`?
+This is post 4 in the RAG Deep Dive series.
 
+![String and chat prompt hierarchy](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.en.png)
+*String and chat prompt hierarchy*
 > The prompt layer is where structured retrieval output becomes the exact contract the model will read.
 
-![Questions this post answers](../../assets/rag-deep-dive/04/04-01-questions-this-post-answers.en.png)
+## Questions to Keep in Mind
 
-*Questions this post answers*
-<!-- a-grade-intro:end -->
+- What input contract does a prompt template validate beyond string formatting?
+- Why do missing variables, message order, and roles matter when injecting retrieved context?
+- What debugging problem appears when a RAG prompt does not separate question and evidence?
 
-> RAG Deep Dive series (4/6)
-
-<!-- a-grade-example:begin -->
 ## Minimal runnable example
 
-Example file: `/root/Github/rag-deep-dive/en/04-prompt-construction-and-context-injection/main.py`
+Example file: `en/04-prompt-construction-and-context-injection/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py
@@ -115,10 +111,6 @@ That is why prompt construction is not presentation glue. In RAG, it is the last
 
 At the source level, `PromptTemplate` lives in `langchain_core.prompts.prompt.PromptTemplate`, but most of the important behavior comes from its parent classes. `PromptTemplate` inherits from `StringPromptTemplate`, which itself inherits from `BasePromptTemplate`. That class stack explains why a prompt in LangChain is more than a formatted string. It has declared `input_variables`, optional `partial_variables`, validation logic, a runnable `invoke()` entry point, and a `format_prompt()` method that wraps the final string into a `StringPromptValue` object.
 
-![String and chat prompt hierarchy](../../assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.en.png)
-
-*String and chat prompt hierarchy*
-
 The most common constructor is `PromptTemplate.from_template(template, template_format="f-string", partial_variables=None)`. It calls `get_template_variables(...)`, subtracts any pre-filled partial variables, and stores the remainder in `input_variables`. The validators in `prompt.py` and `base.py` then enforce two guardrails: `stop` cannot be used as a variable name, and `input_variables` cannot overlap with `partial_variables`.
 
 `format()` is the narrowest execution path. `PromptTemplate.format(**kwargs)` first calls `_merge_partial_and_user_variables(**kwargs)`, then applies the selected formatter. With the default `f-string` format this is ordinary placeholder substitution. The source also supports `mustache` and `jinja2`, with an explicit warning that `jinja2` should not be used with untrusted templates.
@@ -159,7 +151,7 @@ The practical lesson is simple: prompt shape is enforced before any model call h
 
 Once you switch from string prompts to chat prompts, the center of gravity moves from one template string to a list of message templates. In `langchain_core.prompts.chat`, LangChain models that list explicitly. `SystemMessagePromptTemplate`, `HumanMessagePromptTemplate`, and `AIMessagePromptTemplate` are thin wrappers around underlying string prompt templates. Each one ultimately formats into a concrete message class such as `SystemMessage`, `HumanMessage`, or `AIMessage`.
 
-![Message templates becoming chat messages](../../assets/rag-deep-dive/04/04-02-chat-prompt-format-messages-flow.en.png)
+![Message templates becoming chat messages](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-02-chat-prompt-format-messages-flow.en.png)
 
 *Message templates becoming chat messages*
 
@@ -212,7 +204,7 @@ The important design choice is that retrieved context and prior conversation are
 
 The retrieval path becomes concrete in `langchain/chains/retrieval_qa/base.py`. Even though `RetrievalQA` is deprecated in favor of `create_retrieval_chain`, it is still one of the cleanest source files for understanding how LangChain assembles a classic RAG answer. The important methods are `_get_docs()` and `_call()`.
 
-![RetrievalQA context assembly path](../../assets/rag-deep-dive/04/04-03-retrieval-qa-context-assembly.en.png)
+![RetrievalQA context assembly path](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-03-retrieval-qa-context-assembly.en.png)
 
 *RetrievalQA context assembly path*
 
@@ -251,7 +243,7 @@ This is also where one of LangChain's sharpest foot-guns sits. Neither `Retrieva
 
 Now that we have seen where `{context}` comes from, the next question is how variables travel through the prompt layer. `BasePromptTemplate` is the key source file here. It defines both partial binding and the runnable `invoke()` path.
 
-![Partial variables meeting invoke inputs](../../assets/rag-deep-dive/04/04-04-partial-variables-and-lcel-flow.en.png)
+![Partial variables meeting invoke inputs](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-04-partial-variables-and-lcel-flow.en.png)
 
 *Partial variables meeting invoke inputs*
 
@@ -312,7 +304,7 @@ The key point is that `partial()` reduces the call-time surface area, while `inv
 
 A good RAG prompt does not merely say “use the context.” It tells the model how to treat evidence, what to do when evidence is missing, and how to cite sources.
 
-![RAG chat prompt with citation rules](../../assets/rag-deep-dive/04/04-05-rag-prompt-construction-example.en.png)
+![RAG chat prompt with citation rules](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-05-rag-prompt-construction-example.en.png)
 
 *RAG chat prompt with citation rules*
 
@@ -392,17 +384,47 @@ if __name__ == "__main__":
 Use a stuff chain when the corpus is modest, the chunks are already clean, and one joined `{context}` string is enough. Switch to custom context assembly when you need budget-aware trimming, citation IDs, metadata-based ordering, deduplication, or section-aware packing.
 
 The broader lesson is the same one that has repeated through this series. Retrieval quality does not end at retrieval. Prompt construction is where evidence is converted from “available in memory” to “visible to the model.”
+
+---
+
+## Answering the Opening Questions
+
+- **What input contract does a prompt template validate beyond string formatting?**
+  Prompt templates validate required variable names, missing inputs, partial variables, and message roles before the model call.
+
+- **Why do missing variables, message order, and roles matter when injecting retrieved context?**
+  If context is missing, ordered incorrectly, or placed under the wrong role, the model can confuse evidence with instructions or user data.
+
+- **What debugging problem appears when a RAG prompt does not separate question and evidence?**
+  When question and evidence are blended together, it becomes hard to tell whether retrieval or prompting failed; log them separately.
+
+<!-- toc:begin -->
+## In this series
+
+- [RAG Deep Dive (1/6): Document Loading and Chunking — Inside LangChain TextSplitter](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): Embeddings and the Vector Index — Inside FAISS IndexFlatL2](./02-embeddings-and-vector-index.md)
+- [RAG Deep Dive (3/6): Retriever Design — VectorStoreRetriever and MMR](./03-retriever-design.md)
+- **RAG Deep Dive (4/6): Prompt Construction and Context Injection — Inside PromptTemplate (current)**
+- RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)
+- RAG Deep Dive (6/6): Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
+
+<!-- toc:end -->
+
 ---
 
 ## References
 
-1. [`langchain_core/prompts/prompt.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/prompt.py)
-2. [`langchain_core/prompts/string.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/string.py)
-3. [`langchain_core/prompts/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/base.py)
-4. [`langchain_core/prompts/chat.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/chat.py)
-5. [`langchain_core/messages/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/base.py)
-6. [`langchain_core/messages/human.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/human.py)
-7. [`langchain_core/messages/system.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/system.py)
-8. [`langchain_core/messages/ai.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/ai.py)
-9. [`langchain/chains/retrieval_qa/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
-10. [`langchain/chains/combine_documents/stuff.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)
+### Official Docs
+
+- [LangChain Prompt Templates concept guide](https://python.langchain.com/docs/concepts/prompt_templates/)
+- [LangChain `PromptTemplate` API reference](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.prompt.PromptTemplate.html)
+- [LangChain `ChatPromptTemplate` API reference](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.chat.ChatPromptTemplate.html)
+- [LangChain `MessagesPlaceholder` API reference](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.chat.MessagesPlaceholder.html)
+
+### Source Code
+
+- [LangChain `prompt.py` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/prompt.py)
+- [LangChain `chat.py` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/chat.py)
+- [LangChain `messages/base.py` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/base.py)
+- [LangChain `RetrievalQA` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
+- [LangChain `StuffDocumentsChain` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)

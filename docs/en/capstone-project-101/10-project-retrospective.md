@@ -1,10 +1,10 @@
 ---
 series: capstone-project-101
 episode: 10
-title: Project Retrospective
-status: content-ready
+title: "Capstone Project 101 (10/10): Project Retrospective"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,27 @@ tags:
   - Reflection
   - Beginner
 seo_description: A beginner-friendly tour of capstone retrospectives using KPT, data, five whys, and concrete next actions.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Project Retrospective
+# Capstone Project 101 (10/10): Project Retrospective
 
-> Capstone Project 101 series (10/10)
+When the project ends, relief arrives before reflection. If the team disperses at that moment, most of the semester's learning stays trapped in individual memory.
 
-<!-- a-grade-intro:begin -->
+A retrospective is valuable because it converts feelings into facts, causes, and next actions. That conversion is what allows the next project to start from a higher baseline.
 
-**Core question**: *How* do you keep a *retrospective* from becoming a *blame meeting*?
+This is the final post in the Capstone Project 101 series. It shows how to combine KPT, data, cause analysis, and next actions into a retrospective that the next project can actually use.
 
-> Record only *facts* and *actions*.
 
-<!-- a-grade-intro:end -->
+![capstone project 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/10/10-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 10 flow overview*
+> A retrospective done well becomes a bridge to the next project. Bad retros feel like filing a report; good ones feel like unpacking lessons.
+
+## Questions to Keep in Mind
+
+- What keeps a retrospective from turning into blame allocation?
+- Why does the KPT format work well for beginner teams?
+- How does data make retrospective discussion more stable?
 
 ## What You Will Learn
 
@@ -42,17 +49,28 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-A *retrospective* shapes the *next project*.
+A simple format such as KPT keeps the conversation grounded. Separating what to keep, what was problematic, and what to try next lowers the chance that the meeting dissolves into vague frustration.
 
-## Concept at a Glance
+Data and next actions strengthen the discussion further. Metrics such as bug counts, review latency, or rehearsal attempts make the team's pain points concrete, while owned actions turn insight into change.
 
-```mermaid
-flowchart LR
-    K[Keep] --> P[Problem]
-    P --> T[Try]
-    T --> A[Action]
-    A --> N[Next Project]
+## Practical artifact: a retrospective action log
+
+Retrospectives lead to change only when next actions are small and explicit enough to survive after the meeting.
+
+```text
+Type | Item | Owner | Due date
+Keep | preserve a written log of requirement changes | team lead | before next project kickoff
+Problem | the team found demo-breaking bugs too late because rehearsal was weak | team | recorded during retro
+Try | reserve a 20-minute rehearsal slot every Friday | QA owner | week 1 of the next project
+Action | add a deployment checklist template to the repository | backend owner | week 1 of the next project
 ```
+
+## What to validate first
+
+- Separate keeps, problems, and tries instead of mixing them.
+- Gather evidence for claims that currently rely on memory alone.
+- Attach an owner and due date to each next action.
+- Store the retro where the next project can reopen it easily.
 
 ## Key Terms
 
@@ -72,33 +90,23 @@ flowchart LR
 
 ### Step 1 — KPT
 
-```python
-kpt = {"keep": [], "problem": [], "try": []}
-```
+The KPT template only needs three columns: `keep`, `problem`, and `try`.
 
 ### Step 2 — Data
 
-```python
-metrics = {"velocity": 12, "bugs": 5, "review_time": 1.5}
-```
+Record retrospective metrics in numbers, such as `velocity=12`, `bugs=5`, and `review_time=1.5`, so the discussion stays tied to facts.
 
 ### Step 3 — Five Whys
 
-```python
-whys = ["bug_at_demo", "missed_test", "no_ci", "no_template", "first_time"]
-```
+Cause tracing becomes easier to read when you write it as a chain such as `bug_at_demo -> missed_test -> no_ci -> no_template -> first_time`.
 
 ### Step 4 — Next actions
 
-```python
-actions = [{"who": "A", "what": "add_ci", "by": "next_sprint"}]
-```
+Write each next action on one line with an owner, an action, and a deadline, such as `who=A`, `what=add_ci`, and `by=next_sprint`.
 
 ### Step 5 — Learning summary
 
-```python
-lessons = ["scope_first", "ci_early", "demo_dryrun"]
-```
+Summarize the learning as short reusable lines such as `scope_first`, `ci_early`, and `demo_dryrun`.
 
 ## What to Notice in This Code
 
@@ -141,24 +149,38 @@ Companies run *sprint retrospectives* and *postmortems*.
 
 ## Wrap-up and Next Steps
 
-This concludes the *Capstone Project 101* series. The next series is *Portfolio Project 101*.
+A retrospective is both the final document of this project and the first document of the next one. When KPT, data, cause analysis, and next actions are captured together, the semester's failures and wins become durable project memory. This concludes the Capstone Project 101 series.
+
+## Answering the Opening Questions
+
+- **What keeps a retrospective from turning into blame allocation?**
+  - The article treats Project Retrospective as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why does the KPT format work well for beginner teams?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How does data make retrospective discussion more stable?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What is a Capstone Project](./01-what-is-capstone.md)
-- [Choosing a Topic](./02-choosing-a-topic.md)
-- [Defining the Problem](./03-defining-the-problem.md)
-- [Organizing Requirements](./04-organizing-requirements.md)
-- [Splitting Team Roles](./05-splitting-team-roles.md)
-- [Designing the MVP](./06-designing-the-mvp.md)
-- [Choosing the Tech Stack](./07-choosing-the-tech-stack.md)
-- [Schedule Management](./08-schedule-management.md)
-- [Building Presentation Materials](./09-presentation-materials.md)
+## In this series
+
+- [Capstone Project 101 (1/10): What is a Capstone Project](./01-what-is-capstone.md)
+- [Capstone Project 101 (2/10): Choosing a Topic](./02-choosing-a-topic.md)
+- [Capstone Project 101 (3/10): Defining the Problem](./03-defining-the-problem.md)
+- [Capstone Project 101 (4/10): Organizing Requirements](./04-organizing-requirements.md)
+- [Capstone Project 101 (5/10): Splitting Team Roles](./05-splitting-team-roles.md)
+- [Capstone Project 101 (6/10): Designing the MVP](./06-designing-the-mvp.md)
+- [Capstone Project 101 (7/10): Choosing the Tech Stack](./07-choosing-the-tech-stack.md)
+- [Capstone Project 101 (8/10): Schedule Management](./08-schedule-management.md)
+- [Capstone Project 101 (9/10): Building Presentation Materials](./09-presentation-materials.md)
 - **Project Retrospective (current)**
+
 <!-- toc:end -->
 
 ## References
 
-- [Agile Retrospectives - Esther Derby](https://pragprog.com/titles/dlret/agile-retrospectives/)
-- [The Five Whys - Toyota Production System](https://en.wikipedia.org/wiki/Five_whys)
-- [Postmortem Culture - Google SRE](https://sre.google/sre-book/postmortem-culture/)
-- [Project Retrospectives - Norman Kerth](https://retrospectives.com/)
+### Official docs and practical guides
+
+- [Agile Retrospectives](https://pragprog.com/titles/dlret/agile-retrospectives/)
+- [The Five Whys](https://en.wikipedia.org/wiki/Five_whys)
+- [Google SRE — Postmortem Culture](https://sre.google/sre-book/postmortem-culture/)
+- [Project Retrospectives](https://retrospectives.com/)

@@ -1,0 +1,5 @@
+flowchart TD
+  A["Start Incremental Scan"] --> B["Check Last Sync Time"]
+  B --> C["Extract Changed Files"]
+  C --> D["Compare Hashes"]
+  D --> E["Apply Changes"]

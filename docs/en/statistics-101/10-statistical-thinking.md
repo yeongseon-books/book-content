@@ -1,10 +1,10 @@
 ---
 series: statistics-101
 episode: 10
-title: Statistical Thinking
+title: "Statistics 101 (10/10): Statistical Thinking"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,25 +20,24 @@ seo_description: A capstone on statistical thinking that ties question, data, di
 last_reviewed: '2026-05-04'
 ---
 
-# Statistical Thinking
+# Statistics 101 (10/10): Statistical Thinking
 
-> Statistics 101 series (10/10)
+When you learn statistics chapter by chapter, means, variances, distributions, hypothesis tests, and p-values can feel like separate tools. In real work, they rarely move separately. A single question leads into data collection, distribution checks, estimation, testing, and finally a decision.
 
-<!-- a-grade-intro:begin -->
+So the last step in the series is not one more formula. It is seeing how the earlier pieces connect into one repeatable flow from question to action.
 
-**Core question**: Is statistics a *toolkit* or a *way of thinking*? What appears when we *fold the whole series* into *one continuous flow*?
+This is the final post in the Statistics 101 series. Here we will rewrite the series as a mindset rather than a list of tools and walk once more through the practical flow from question to decision.
 
-> *Statistics is the language of *handling uncertainty*.*
 
-<!-- a-grade-intro:end -->
+![statistics 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/10/10-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 10 flow overview*
+> Statistical thinking is the *discipline* of turning *questions into data, data into insight, and insight into action*.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *statistical flow* from *question to decision*
-- A *capstone walk-through* of the entire series
-- A *mindset* for *uncertainty* and *context*
-- A 5-step *statistical thinking* exercise
-- Five common mistakes
+- Is statistics a collection of formulas or a way of thinking?
+- How do question, data, distribution, estimation, and testing connect?
+- How should p-value, effect size, and business cost come together in one decision?
 
 ## Why It Matters
 
@@ -47,17 +46,7 @@ Knowing the tools is meaningless without knowing *when and how to use them*. *St
 > *Statistics is the grammar of evidence.*
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Q["Question"] --> D["Data"]
-    D --> Dist["Distribution"]
-    Dist --> Est["Estimate + CI"]
-    Est --> Test["Hypothesis Test"]
-    Test --> Eff["Effect Size"]
-    Eff --> Dec["Decision"]
-```
-
+Throughout this series, you have learned tools for summarizing data, inferring patterns, and testing claims. The real skill is *knowing when to use each tool* and *how to read the result in the context of your business*.
 ## Key Terms
 
 - **Question-first**: *Sharpen the question* before *touching the data*.
@@ -159,22 +148,34 @@ Product experiments, pricing decisions, drug approvals, policy evaluations — *
 
 Statistics is the *language of uncertainty*, and statistical thinking is the *flow from data to decisions*. The next steps are *Probability 101* and *Machine Learning 101*, where this thinking expands into *prediction*.
 
+## Answering the Opening Questions
+
+- **Is statistics a collection of formulas or a way of thinking?**
+  - The article treats Statistical Thinking as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do question, data, distribution, estimation, and testing connect?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should p-value, effect size, and business cost come together in one decision?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
-- [Distributions](./03-distributions.md)
-- [Sample and Population](./04-sample-and-population.md)
-- [Estimation](./05-estimation.md)
-- [Confidence Interval](./06-confidence-interval.md)
-- [Hypothesis Testing](./07-hypothesis-testing.md)
-- [Correlation and Regression](./08-correlation-and-regression.md)
-- [Understanding p-value](./09-understanding-p-value.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): Distributions](./03-distributions.md)
+- [Statistics 101 (4/10): Sample and Population](./04-sample-and-population.md)
+- [Statistics 101 (5/10): Estimation](./05-estimation.md)
+- [Statistics 101 (6/10): Confidence Interval](./06-confidence-interval.md)
+- [Statistics 101 (7/10): Hypothesis Testing](./07-hypothesis-testing.md)
+- [Statistics 101 (8/10): Correlation and Regression](./08-correlation-and-regression.md)
+- [Statistics 101 (9/10): Understanding p-value](./09-understanding-p-value.md)
 - **Statistical Thinking (current)**
+
 <!-- toc:end -->
 
 ## References
 
-- [Nate Silver — The Signal and the Noise](https://en.wikipedia.org/wiki/The_Signal_and_the_Noise)
-- [Hans Rosling — Factfulness](https://en.wikipedia.org/wiki/Factfulness)
+- [OpenIntro Statistics](https://www.openintro.org/book/os/)
+- [NIST/SEMATECH e-Handbook of Statistical Methods](https://www.itl.nist.gov/div898/handbook/)
 - [ASA Statement on p-Values (2016)](https://www.amstat.org/asa/files/pdfs/p-valuestatement.pdf)
-- [Wikipedia — Statistical Thinking](https://en.wikipedia.org/wiki/Statistical_thinking)
+- [Seeing Theory — A Visual Introduction to Probability and Statistics](https://seeing-theory.brown.edu/)

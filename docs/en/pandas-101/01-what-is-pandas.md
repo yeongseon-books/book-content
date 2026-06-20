@@ -1,10 +1,10 @@
 ---
 series: pandas-101
 episode: 1
-title: What Is Pandas?
-status: content-ready
+title: "Pandas 101 (1/10): What Is Pandas?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,33 @@ tags:
   - DataFrame
   - Beginner
 seo_description: A beginner-friendly intro to Pandas — what Series and DataFrame are, why Pandas became the standard tool for tabular data analysis in Python
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is Pandas?
+# Pandas 101 (1/10): What Is Pandas?
 
-> Pandas 101 series (1/10)
+Pandas is easy to misunderstand when you first learn it. On one day it feels like a friendlier spreadsheet library. On another day it looks like the entire foundation of Python data work. If you never settle that ambiguity, filtering, aggregation, joins, and time series features keep feeling like disconnected tricks instead of one coherent toolkit.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Pandas 101 series.
 
-**Core question**: Is *Pandas* just *a fancy spreadsheet*, or *the lingua franca of data analysis*?
+In this post, I want to define Pandas by role rather than by feature list. Pandas is the standard environment for reading, inspecting, reshaping, and summarizing in-memory tabular data with short, expressive code.
 
-> *Pandas is *Python's standard library for tabular data*, and it is the *front door* to data science.*
 
-<!-- a-grade-intro:end -->
+![pandas 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/01/01-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 1 flow overview*
+> *Pandas is the standard language for reading, exploring, reshaping, and summarizing tabular data* within the memory you have. Master this layer first.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *definition* of *Pandas* and where it sits
-- The intuition behind *Series* and *DataFrame*
-- The basic *load → inspect → summarize* workflow
-- A 5-step first hands-on
-- Five common mistakes
+- The *definition* of *Pandas* and where it sits?
+- The intuition behind *Series* and *DataFrame?
+- The basic *load → inspect → summarize* workflow?
 
 ## Why It Matters
 
 CSV, Excel, databases, APIs — *80% of real-world data* is *tabular*. If you cannot drive *Pandas*, you cannot start *data analysis*.
 
 > *If your data fits in memory, Pandas is usually the right answer.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Source["CSV / Excel / DB"] --> DF["DataFrame"]
-    DF --> Ops["filter / group / join"]
-    Ops --> Out["chart / report / model"]
-```
 
 ## Key Terms
 
@@ -97,6 +87,17 @@ df = pd.DataFrame({
 print(df)
 ```
 
+The first thing to check is whether the whole table looks like the shape you expected. A tiny printout tells you whether column names, row counts, and value types already make sense.
+
+**Expected output:**
+
+```text
+    name  age
+0    Ada   36
+1  Linus   54
+2  Grace   85
+```
+
 ### Step 4 — First summary
 
 ```python
@@ -109,6 +110,16 @@ print(df.describe(include="all"))
 
 ```python
 print(df[df["age"] > 40])
+```
+
+A boolean filter is your first proof that Pandas is thinking in terms of whole columns, not manual row loops. If the filtered table shrinks exactly where you expect, the condition is working.
+
+**Expected output:**
+
+```text
+    name  age
+1  Linus   54
+2  Grace   85
 ```
 
 ## What to Notice in This Code
@@ -150,21 +161,33 @@ Data cleaning, report generation, ML preprocessing, dashboard prep — *every da
 2. List *three differences* between a *Series* and a Python *list*.
 3. Compare *describe()* with and without *include="all"* and note what changes.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 Pandas is the *standard language for tabular data*. Next we go deep into the *internal structure* of *Series and DataFrame*.
 
+## Answering the Opening Questions
+
+- **The *definition* of *Pandas* and where it sits?**
+  - The article treats What Is Pandas? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The intuition behind *Series* and *DataFrame?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The basic *load → inspect → summarize* workflow?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Pandas? (current)**
 - Series and DataFrame (upcoming)
 - Reading CSV and Excel (upcoming)
 - Filtering and Selection (upcoming)
 - Handling Missing Values (upcoming)
-- groupby (upcoming)
+- Groupby and Aggregation (upcoming)
 - Merge and Join (upcoming)
 - Time Series (upcoming)
-- apply and Vectorization (upcoming)
-- Real-world Data Analysis (upcoming)
+- Apply and Vectorization (upcoming)
+- Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

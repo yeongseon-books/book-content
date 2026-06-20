@@ -1,11 +1,11 @@
 ---
-title: 'Standard library tour: datetime, pathlib, json, collections, itertools'
+title: "Python 101 (10/10): Standard library tour: datetime, pathlib, json, collections, itertools"
 series: python-101
 episode: 10
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -22,15 +22,21 @@ seo_description: The standard library is a toolbox of routines so you do not wri
   the same thing twice.
 ---
 
-# Standard library tour: datetime, pathlib, json, collections, itertools
+# Python 101 (10/10): Standard library tour: datetime, pathlib, json, collections, itertools
 
-## What you will learn
+The standard library is the toolbox that keeps you from rewriting common routines. Each module stays focused on one domain, which is why `datetime`, `pathlib`, `json`, `collections`, and `itertools` fit so naturally into day-to-day code.
 
-- How to handle dates and times with `datetime`
-- How to treat file paths as objects with `pathlib.Path`
-- How to convert between dicts and JSON strings using `json`
-- What `collections.Counter`, `defaultdict`, and `deque` are for
-- How `itertools.chain`, `groupby`, and `combinations` compress repetitive iteration
+This post is the final article in the Python 101 series. This is the final stop in the series, where you tie the core language to the tools Python already ships with.
+
+
+![Python 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/10/10-01-mental-model.en.png)
+*Python 101 chapter 10 flow overview*
+
+## Questions to Keep in Mind
+
+- How to handle dates and times with `datetime`?
+- How to treat file paths as objects with `pathlib.Path`?
+- How to convert between dicts and JSON strings using `json`?
 
 ## Why it matters
 
@@ -47,9 +53,6 @@ This article does not cover the entire standard library. It picks five modules t
 > The standard library is a toolbox of routines so you do not write the same thing twice. Each module sticks to one domain — time, paths, serialization, aggregation, iteration — and exposes a small focused vocabulary.
 The standard library is organized by purpose. `datetime` covers time, `pathlib` covers file paths, `json` covers serialization, `collections` adds richer data structures, and `itertools` covers iteration patterns.
 
-![Mental model](../../assets/python-101/10/10-01-mental-model.en.png)
-
-*Mental model*
 Each module is designed to solve "one kind of problem" well. The naming is consistent enough that you can usually guess what a module covers from its name alone.
 
 ## Core concepts
@@ -237,14 +240,36 @@ The more familiar you are with the standard library, the shorter your scripts ge
 
 This wraps up the Python 101 series. The functions, modules, classes, and standard-library tools introduced here come up again in later series such as `python-dbapi-101` and `sqlalchemy-101`. The next series picks up from the standard library and gradually moves into external packages.
 
+## Answering the Opening Questions
+
+- **How to handle dates and times with `datetime`?**
+  - The article treats Standard library tour: datetime, pathlib, json, collections, itertools as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to treat file paths as objects with `pathlib.Path`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to convert between dicts and JSON strings using `json`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- [Python 101 (1/10): Why Python, and how to install and use venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): Variables, types, and operators](./02-variables-types-operators.md)
+- [Python 101 (3/10): Strings and formatting](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): Control flow: if, for, while, comprehension](./05-control-flow.md)
+- [Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
+- [Python 101 (7/10): Modules and packages: import, __init__, __name__](./07-modules-and-packages.md)
+- [Python 101 (8/10): File I/O and exception handling](./08-file-io-and-exceptions.md)
+- [Python 101 (9/10): Classes and objects: bundling data with behavior](./09-classes-and-objects.md)
+- **Standard library tour: datetime, pathlib, json, collections, itertools (current)**
+
 <!-- toc:end -->
 
 ## References
 
-- [Python tutorial — Brief tour of the standard library](https://docs.python.org/3/tutorial/stdlib.html)
-- [Python library — datetime](https://docs.python.org/3/library/datetime.html)
-- [Python library — pathlib](https://docs.python.org/3/library/pathlib.html)
-- [Python library — json](https://docs.python.org/3/library/json.html)
-- [Python library — collections](https://docs.python.org/3/library/collections.html)
-- [Python library — itertools](https://docs.python.org/3/library/itertools.html)
+- [Python tutorial — Brief Tour of the Standard Library](https://docs.python.org/3/tutorial/stdlib.html) — Frames the standard library as Python’s default toolbox and motivates when to reach for it first.
+- [Python docs — `datetime`](https://docs.python.org/3/library/datetime.html) — Canonical reference for date/time objects, `timedelta`, and formatting/parsing helpers.
+- [Python docs — `pathlib`](https://docs.python.org/3/library/pathlib.html) — Documents object-oriented path handling and convenience file APIs.
+- [Python docs — `json`](https://docs.python.org/3/library/json.html) — Covers `dump`/`load`/`dumps`/`loads` and the standard encoder/decoder behavior.
+- [Python docs — `collections`](https://docs.python.org/3/library/collections.html) — Primary reference for `Counter`, `defaultdict`, and `deque`.
+- [Python docs — `itertools`](https://docs.python.org/3/library/itertools.html) — Explains the lazy iterator tools highlighted in the chapter.

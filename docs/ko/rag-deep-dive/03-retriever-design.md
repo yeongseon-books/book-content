@@ -1,12 +1,12 @@
 ---
-title: Retriever 설계 — VectorStoreRetriever와 MMR
+title: "RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR"
 series: rag-deep-dive
 episode: 3
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,16 +14,29 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: VectorStoreRetriever와 MMR이 관련성과 다양성을 어떻게 균형잡는지 LangChain 내부 구현으로 살펴봅니다.
 ---
 
-# Retriever 설계 — VectorStoreRetriever와 MMR
+# RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR
 
-<!-- a-grade-example:begin -->
+VectorStoreRetriever와 MMR은 관련성과 다양성 사이 균형점을 retrieval 정책으로 구현합니다. 여기서는 LangChain 내부 구현을 기준으로 그 갈림길을 살펴봅니다.
+
+이 글은 RAG Deep Dive 시리즈의 세 번째 글입니다.
+
+![invoke와 callback이 이어지는 호출 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.ko.png)
+*invoke와 callback이 이어지는 호출 흐름*
+> Retriever는 최근접 이웃 몇 개를 가져오는 도구가 아닙니다. 후보 근거를 최종 컨텍스트로 바꾸는 정책 계층입니다.
+
+## 먼저 던지는 질문
+
+- `BaseRetriever`는 검색 구현마다 무엇을 같은 호출 계약으로 묶어 줄까요?
+- `similarity`, `similarity_score_threshold`, `mmr`는 각각 어떤 검색 실패를 줄이려는 선택일까요?
+- 검색 결과가 이상할 때 callback과 파라미터 로그는 어떤 단서를 줄까요?
+
 ## 최소 실행 예제
 
-예제 파일: `/root/Github/rag-deep-dive/ko/03-retriever-design/main.py`
+예제 파일: `en/03-retriever-design/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py
@@ -112,17 +125,13 @@ Retriever는 바로 그 규칙을 담당합니다. 같은 vector store라도 `si
 
 LangChain 0.2.17에서 retriever의 기준 인터페이스는 `langchain_core.retrievers.BaseRetriever`입니다. 이 클래스는 “문자열 질의를 받아 `Document` 리스트를 돌려준다”는 단순 추상처럼 보이지만, 실제로는 Runnable 체계 위에 올라가 있습니다. 그래서 권장 진입점은 예전의 `get_relevant_documents()`가 아니라 `invoke()`와 `ainvoke()`입니다. 이 차이가 중요한 이유는 retriever 호출이 이제 단순 함수 실행이 아니라, callback과 tracing metadata를 포함한 runnable run으로 취급되기 때문입니다.
 
-![invoke와 callback이 이어지는 호출 흐름](../../assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.ko.png)
-
-*invoke와 callback이 이어지는 호출 흐름*
-
 소스를 보면 `invoke()`는 먼저 `ensure_config(config)`로 실행 설정을 정리하고, 그다음 `CallbackManager.configure(...)`를 호출해 callback manager를 만듭니다. 이때 `config`에 들어온 `callbacks`, `tags`, `metadata`와 retriever 인스턴스가 가진 `self.tags`, `self.metadata`, 그리고 `_get_ls_params()`가 돌려주는 LangSmith용 추적 메타데이터가 함께 합쳐집니다. 이후 `callback_manager.on_retriever_start(...)`가 실행되면서 `run_manager`가 생성되고, 실제 검색 로직은 이 `run_manager`를 받은 `_get_relevant_documents()`로 넘어갑니다. 검색이 성공하면 `run_manager.on_retriever_end(result)`, 실패하면 `run_manager.on_retriever_error(e)`가 호출됩니다. 즉 retriever는 검색 결과만 돌려주는 것이 아니라, 그 검색을 하나의 관측 가능한 run으로 감쌉니다.
 
 여기서 `run_manager`가 왜 중요한지도 분명해집니다. custom retriever를 작성할 때 단순히 검색 함수만 구현하는 것이 아니라, 필요하면 내부 단계별 callback 이벤트를 더 내보낼 수 있기 때문입니다. 0.2.17의 `BaseRetriever.__init_subclass__()`는 자식 클래스의 `_get_relevant_documents()` 시그니처를 검사해서 `run_manager` 인자를 지원하는지 확인하고, 구버전 retriever가 public 메서드인 `get_relevant_documents()`를 직접 구현했더라도 deprecation warning과 함께 내부 메서드로 연결해 줍니다. 하위 호환은 유지하되, 새 기준은 분명히 `_get_relevant_documents()`라는 뜻입니다.
 
-비동기 경로도 같은 원칙으로 읽어야 합니다. `ainvoke()`는 `AsyncCallbackManager.configure(...)`로 async run manager를 만들고, `_aget_relevant_documents()`를 호출합니다. 그런데 모든 retriever가 진짜 async 구현을 갖고 있는 것은 아닙니다. 그래서 `BaseRetriever`는 기본 `_aget_relevant_documents()`를 제공하고, 그 구현은 `run_in_executor(...)`로 동기 `_get_relevant_documents()`를 스레드풀에서 실행합니다. 이 fallback이 필요한 이유는 retriever 인터페이스를 async 체인 안에서도 일관되게 연결하기 위해서입니다. 즉 `_aget_relevant_documents()`가 존재하는 이유는 두 가지입니다. 하나는 네이티브 async I/O를 쓰는 retriever가 직접 최적화된 구현을 제공할 수 있게 하기 위해서이고, 다른 하나는 그런 구현이 없더라도 Runnable async 인터페이스를 유지하기 위해서입니다.
+비동기 경로도 같은 원칙으로 읽어야 합니다. `ainvoke()`는 `AsyncCallbackManager.configure(...)`로 async run manager를 만들고, `_aget_relevant_documents()`를 호출합니다. 그런데 모든 retriever가 진짜 async 구현을 갖고 있는 것은 아닙니다. 그래서 `BaseRetriever`는 기본 `_aget_relevant_documents()`를 제공하고, 그 구현은 `run_in_executor(...)`로 동기 `_get_relevant_documents()`를 스레드풀에서 실행합니다. 이 fallback은 async 체인 안에서도 같은 인터페이스를 유지하려고 들어 있습니다. 다시 말해 `_aget_relevant_documents()`가 존재하는 이유는 두 가지입니다. 하나는 네이티브 async I/O를 쓰는 retriever가 직접 최적화된 구현을 내놓을 수 있게 하기 위해서이고, 다른 하나는 그런 구현이 없어도 Runnable async 인터페이스를 유지하기 위해서입니다.
 
-Public 메서드의 deprecation 의미도 여기서 정리됩니다. `get_relevant_documents()`와 `aget_relevant_documents()`는 0.1.46부터 deprecated이며, 각각 `invoke()`와 `ainvoke()`의 호환성 래퍼로만 남아 있습니다. 소스에는 removal target이 1.0으로 적혀 있습니다. 그래서 0.2.x 사용자가 “아직 동작하는데 왜 deprecated인가”라고 묻는다면 답은 명확합니다. 검색 로직의 중심이 이제 retriever 전용 public 메서드가 아니라 Runnable 표준 진입점으로 옮겨졌기 때문입니다. 앞으로는 retriever도 chain, model, parser와 같은 방식으로 `invoke()`와 `batch()`에 맞춰 조합된다는 뜻입니다.
+Public 메서드의 deprecation 의미도 여기서 정리됩니다. `get_relevant_documents()`와 `aget_relevant_documents()`는 0.1.46부터 deprecated이며, 각각 `invoke()`와 `ainvoke()`의 호환성 래퍼로만 남아 있습니다. 소스에는 removal target이 1.0으로 적혀 있습니다. 그래서 0.2.x 사용자가 “아직 동작하는데 왜 deprecated인가”라고 묻는다면 답은 명확합니다. 검색 로직의 중심이 이제 retriever 전용 public 메서드가 아니라 Runnable 표준 진입점으로 옮겨졌기 때문입니다. 앞으로는 retriever도 chain, model, parser처럼 `invoke()`와 `batch()`를 기준으로 조합됩니다.
 
 아래 예시는 `BaseRetriever` 규약을 가장 작게 드러내는 custom 구현입니다.
 
@@ -169,7 +178,7 @@ if __name__ == "__main__":
 
 `VectorStoreRetriever`는 이름 그대로 vector store 위에 얹힌 기본 retriever입니다. 하지만 구현을 읽어 보면 “vector store를 retriever처럼 보이게 해 주는 어댑터” 이상입니다. 이 클래스는 `search_type`과 `search_kwargs`를 상태로 들고 있고, `_get_relevant_documents()`에서 그 둘을 vector store의 서로 다른 검색 메서드로 분기합니다. 즉 retriever 품질의 첫 번째 조정 손잡이는 vector store 내부가 아니라 바로 이 클래스의 분기점에 있습니다.
 
-![search_type별 분기와 파라미터 전달 경로](../../assets/rag-deep-dive/03/03-02-vectorstore-retriever-dispatch.ko.png)
+![search_type별 분기와 파라미터 전달 경로](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-02-vectorstore-retriever-dispatch.ko.png)
 
 *search_type별 분기와 파라미터 전달 경로*
 
@@ -187,7 +196,7 @@ if __name__ == "__main__":
 
 `fetch_k`는 오직 MMR 계열에서 의미가 있습니다. `VectorStoreRetriever` 자신은 이 값을 해석하지 않고 그대로 vector store로 넘깁니다. FAISS 구현을 기준으로 보면 `max_marginal_relevance_search()`가 질의를 임베딩한 뒤 `max_marginal_relevance_search_by_vector()`로 넘기고, 거기서 다시 `max_marginal_relevance_search_with_score_by_vector()`가 실제 후보 `fetch_k`개를 index search로 가져옵니다. 따라서 `fetch_k`는 retriever 계층의 옵션이지만, 실제 소비 지점은 store의 MMR 구현입니다.
 
-`score_threshold`는 threshold 검색에서만 의미가 있고, 더 정확히는 `similarity_search_with_relevance_scores()` 경로에서 해석됩니다. 여기서 중요한 점은 `VectorStoreRetriever`가 raw FAISS distance를 직접 비교하지 않는다는 것입니다. 먼저 vector store가 raw distance를 relevance score로 변환하고, 그다음 threshold를 적용합니다. 같은 이름의 파라미터라도 raw distance 기준인지, normalized relevance 기준인지가 다를 수 있으므로 이 호출 체인을 분리해서 봐야 합니다.
+`score_threshold`는 threshold 검색에서만 의미가 있고, 더 정확히는 `similarity_search_with_relevance_scores()` 경로에서 해석됩니다. 여기서 중요한 점은 `VectorStoreRetriever`가 raw FAISS distance를 직접 비교하지 않는다는 사실입니다. 먼저 vector store가 raw distance를 relevance score로 변환하고, 그다음 threshold를 적용합니다. 같은 이름의 파라미터라도 raw distance 기준인지, normalized relevance 기준인지가 다를 수 있으므로 이 호출 체인을 분리해서 봐야 합니다.
 
 이 경로를 가장 작은 코드로 보면 아래와 같습니다.
 
@@ -245,7 +254,7 @@ if __name__ == "__main__":
 
 MMR, 즉 Maximal Marginal Relevance는 “질의와의 유사도”만 최대화하면 생기는 편향을 줄이기 위한 고전적 선택 규칙입니다. 운영에서 흔한 실패는 이런 식입니다. 문서가 비슷한 템플릿으로 반복되면 similarity top-k는 사실상 같은 말을 하는 청크 여러 개를 연속으로 가져옵니다. 사용자는 top-k가 늘었는데도 새로운 증거를 얻지 못합니다. MMR은 이 후보 집합 안에서 서로 너무 닮은 항목에 패널티를 주어, 답변 컨텍스트의 폭을 넓히려는 시도입니다.
 
-![후보 확장 뒤 다양성을 고르는 MMR 흐름](../../assets/rag-deep-dive/03/03-03-mmr-selection-flow.ko.png)
+![후보 확장 뒤 다양성을 고르는 MMR 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-03-mmr-selection-flow.ko.png)
 
 *후보 확장 뒤 다양성을 고르는 MMR 흐름*
 
@@ -310,7 +319,7 @@ if __name__ == "__main__":
 
 Threshold 검색은 이름만 보면 단순합니다. 점수가 일정 기준 이상인 문서만 남기면 되기 때문입니다. 하지만 FAISS L2를 쓸 때는 바로 여기서 가장 흔한 오해가 생깁니다. FAISS가 `IndexFlatL2`에서 반환하는 것은 similarity score가 아니라 거리값입니다. 값이 낮을수록 더 가깝습니다. 따라서 threshold를 raw distance에 바로 적용하면, score threshold라고 부르면서 사실은 “거리 상한”을 주는 셈이 됩니다. LangChain은 이 혼란을 줄이기 위해 relevance score 변환 계층을 하나 더 둡니다.
 
-![거리값이 relevance score로 바뀌는 경로](../../assets/rag-deep-dive/03/03-04-threshold-score-conversion.ko.png)
+![거리값이 relevance score로 바뀌는 경로](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-04-threshold-score-conversion.ko.png)
 
 *거리값이 relevance score로 바뀌는 경로*
 
@@ -367,7 +376,7 @@ if __name__ == "__main__":
 
 `VectorStoreRetriever`가 기본 선택으로 충분한 경우는 많습니다. 하지만 검색 범위를 미리 잘라야 하는 도메인에서는 그것만으로 부족합니다. 예를 들어 사용자 질문이 “runbook 안에서만 찾기”인지, “api 문서 안에서만 찾기”인지가 이미 애플리케이션 상태로 정해져 있다면, 전역 인덱스 전체를 검색한 뒤 metadata filter로 후보를 걷어내는 방식은 늦습니다. FAISS 구현을 보면 일반 similarity 경로는 먼저 index search를 하고 나서 파이썬 레이어에서 filter를 적용합니다. MMR 경로는 필터가 있을 때 아예 `fetch_k * 2`로 더 넓게 가져와야 합니다. 즉 filter가 강할수록 “먼저 다 찾고 나중에 버리는” 비용이 커집니다.
 
-![source별 하위 인덱스로 좁혀 가는 검색 흐름](../../assets/rag-deep-dive/03/03-05-custom-source-retriever.ko.png)
+![source별 하위 인덱스로 좁혀 가는 검색 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-05-custom-source-retriever.ko.png)
 
 *source별 하위 인덱스로 좁혀 가는 검색 흐름*
 
@@ -453,21 +462,32 @@ if __name__ == "__main__":
 
 ---
 
-## 이번 화에서 남겨 둘 기준선
+## 정리
 
 이번 화의 기준선은 이렇게 정리할 수 있습니다. `BaseRetriever`는 `invoke()` / `ainvoke()`를 중심으로 callback run과 sync/async 호환을 강제하는 runnable 인터페이스입니다. `get_relevant_documents()` 계열은 0.2.x에서 아직 남아 있지만 이미 호환성 래퍼입니다. `VectorStoreRetriever`는 `similarity`, `mmr`, `similarity_score_threshold` 세 갈래로 검색 의미론을 분기하며, `k`, `fetch_k`, `score_threshold`는 각 경로에서 서로 다른 위치와 의미를 가집니다. MMR은 먼저 넓게 후보를 가져온 뒤 질의 유사도와 중복 패널티를 함께 계산하는 greedy 재선택 단계이고, 그래서 `fetch_k >> k`가 사실상 필수입니다. Threshold 검색은 raw FAISS distance가 아니라 relevance score 변환층을 거친 값에 기대고, 기본 `relevance_score_fn`이 없더라도 `distance_strategy` 기반 fallback이 동작합니다. 마지막으로 custom retriever는 검색 품질을 꾸미기 위한 장식이 아니라, search space를 vector search 이전에 줄여야 할 때 필요한 정책 계층입니다.
 
 이 기준선을 잡아 두면 다음 화가 자연스럽게 이어집니다. retriever가 뽑아 온 문서들은 아직 답변이 아닙니다. 그 문서들을 어떤 순서로 붙이고, 얼마나 압축하고, 어떤 프롬프트 슬롯에 주입하느냐가 다음 실패 지점입니다. 4화에서는 retrieval 이후 단계인 prompt construction과 context injection을 소스와 실제 체인 형태에 맞춰 이어서 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **`BaseRetriever`는 검색 구현마다 무엇을 같은 호출 계약으로 묶어 줄까요?**
+  `BaseRetriever`는 질의 입력을 받아 Document 목록을 반환하는 호출 규약과 callback 경계를 표준화합니다.
+
+- **`similarity`, `similarity_score_threshold`, `mmr`는 각각 어떤 검색 실패를 줄이려는 선택일까요?**
+  `similarity`는 가까운 순위, threshold는 약한 근거 차단, MMR은 비슷한 결과 반복을 줄여 다양성을 확보하는 선택입니다.
+
+- **검색 결과가 이상할 때 callback과 파라미터 로그는 어떤 단서를 줄까요?**
+  callback, search_type, k, score threshold, fetch_k 같은 로그를 보면 검색 전략 문제인지 입력 질의 문제인지 더 빨리 분리할 수 있습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
-- [임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
-- **Retriever 설계 — VectorStoreRetriever와 MMR (현재 글)**
-- 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (예정)
-- RAG Chain 조립 — RetrievalQA vs LCEL (예정)
-- 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
+- [RAG Deep Dive (1/6): 문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
+- **RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR (현재 글)**
+- RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (예정)
+- RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL (예정)
+- RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
 
 <!-- toc:end -->
 
@@ -482,3 +502,5 @@ if __name__ == "__main__":
 - [LangChain core vector store utils copy](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/vectorstores/utils.py)
 - [LangChain community vector store utils with `DistanceStrategy`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/vectorstores/utils.py)
 - [LangChain `VectorStore.as_retriever` API source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/vectorstores/base.py#L937-L1002)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/rag-deep-dive/ko)

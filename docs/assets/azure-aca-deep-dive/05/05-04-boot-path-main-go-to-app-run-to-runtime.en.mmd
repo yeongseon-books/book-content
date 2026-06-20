@@ -1,0 +1,4 @@
+flowchart TD
+  Init["App init"] --> Load["Load Components"]
+  Load --> Start["Start gRPC/HTTP Server"]
+  Start --> Ready["Ready for App Requests"]

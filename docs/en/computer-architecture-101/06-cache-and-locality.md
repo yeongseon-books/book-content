@@ -1,10 +1,10 @@
 ---
 series: computer-architecture-101
 episode: 6
-title: Cache and Locality
+title: "Computer Architecture 101 (6/10): Cache and Locality"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: How CPU caches work, why temporal and spatial locality matter, 
 last_reviewed: '2026-05-04'
 ---
 
-# Cache and Locality
+# Computer Architecture 101 (6/10): Cache and Locality
 
 > Computer Architecture 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Two pieces of code read the same data the same number of times. One takes 1 second, the other takes 30. What makes that difference?
 
 > The speed gap between the CPU and main memory is more than 100x. Caches close that gap, but caches only help if your code respects temporal and spatial locality. This article covers how caches work, the two kinds of locality, and the difference between cache-friendly and cache-hostile code.
 
-<!-- a-grade-intro:end -->
+This is post 6 in the Computer Architecture 101 series.
+
+
+![computer architecture 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/06/06-01-big-picture.en.png)
+*computer architecture 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Cache and Locality?
+- Which signal should the example or diagram make visible for Cache and Locality?
+- What failure should be prevented first when Cache and Locality reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 On a modern CPU, the biggest single performance variable is not clock speed — it is cache miss rate. One main-memory access burns 100–300 cycles; an L1 hit takes around 4. The same algorithm can run 10x faster or slower depending on memory access patterns. Cache awareness is the highest-ROI optimization technique you can learn.
 
 > If the algorithm is fixed, the next question is "is this code cache-friendly?"
-
-## Concept at a Glance
 
 > A cache is a small, fast store that keeps recently and frequently used data close to the CPU. The CPU does not fetch a single byte from main memory — it fetches a 64-byte block called a cache line. Other data in the same line becomes nearly free to read on the next access.
 
@@ -286,17 +292,29 @@ The cache is the largest device that closes the speed gap between CPU and memory
 
 Next we look at another device that speeds up the CPU itself — the pipeline. We will cover how a CPU appears to finish one instruction per cycle, and why branch prediction was invented.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Cache and Locality?**
+  - The article treats Cache and Locality as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Cache and Locality?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Cache and Locality reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Architecture?](./01-what-is-computer-architecture.md)
-- [Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
-- [CPU and Instructions](./03-cpu-and-instructions.md)
-- [Registers and the ALU](./04-registers-and-alu.md)
-- [Memory Organization](./05-memory-organization.md)
+## In this series
+
+- [Computer Architecture 101 (1/10): What Is Computer Architecture?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU and Instructions](./03-cpu-and-instructions.md)
+- [Computer Architecture 101 (4/10): Registers and the ALU](./04-registers-and-alu.md)
+- [Computer Architecture 101 (5/10): Memory Organization](./05-memory-organization.md)
 - **Cache and Locality (current)**
 - Pipelining (upcoming)
 - I/O and Devices (upcoming)
 - Parallelism and Multicore (upcoming)
 - Understanding Performance (upcoming)
+
 <!-- toc:end -->
 
 ## References

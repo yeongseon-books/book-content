@@ -1,0 +1,21 @@
+flowchart LR
+    subgraph A["Operating without evaluation"]
+        A1["User request"] --> A2["LLM service"]
+        A2 --> A3["Response quality varies"]
+        A3 --> A4["Team cannot see the cause"]
+        A3 --> A5["User complaints grow"]
+        A4 --> A6["Regression found too late"]
+        A5 --> A7["Reactive firefighting"]
+    end
+
+    subgraph B["Operating with evaluation"]
+        B1["User request"] --> B2["LLM service"]
+        B2 --> B3["Evaluation dataset"]
+        B3 --> B4["Automated scoring"]
+        B4 --> B5["Quality gate"]
+        B5 --> B6["Block or approve release"]
+        B4 --> B7["Early regression detection"]
+        B7 --> B8["Proactive response"]
+    end
+
+    A2 -. "blind operation" .- B5

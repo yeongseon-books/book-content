@@ -1,0 +1,8 @@
+flowchart LR
+    subgraph E["Machine Learning Interview"]
+        E1["Algorithm Comprehension"] --> E2["Evaluation Metrics"]
+        E2 --> E3["Hyperparameter Tuning"]
+        E3 --> E4{"System Design"}
+        E4 -->|"Offline"| E5["Batch Prediction"]
+        E4 -->|"Online"| E6["Real-time Serving"]
+    end

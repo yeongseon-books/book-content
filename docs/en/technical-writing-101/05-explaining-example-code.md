@@ -1,10 +1,10 @@
 ---
 series: technical-writing-101
 episode: 5
-title: Explaining Example Code
-status: content-ready
+title: "Technical Writing 101 (5/10): Explaining Example Code"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,43 +16,36 @@ tags:
   - Examples
   - Walkthrough
   - Beginner
-seo_description: A beginner-friendly tour of presenting example code with minimal snippets, callouts, and visible output.
-last_reviewed: '2026-05-04'
+seo_description: Walk readers through example code with minimal snippets, callouts, runnable commands, and visible output.
+last_reviewed: '2026-05-15'
 ---
 
-# Explaining Example Code
+# Technical Writing 101 (5/10): Explaining Example Code
 
-> Technical Writing 101 series (5/10)
+Long code samples often look generous, but they are one of the fastest ways to lose a reader. If the post does not show where to focus, what to run, and what success looks like, the example becomes a copy-paste gamble instead of a teaching tool.
 
-<!-- a-grade-intro:begin -->
+Good code walkthroughs are intentionally small. They isolate the interesting lines, pair them with a short callout, and close the loop with an actual command and visible output. That is what turns a snippet into a reusable learning step.
 
-**Core question**: Why does pasting *code* still leave the *reader* lost?
+This is post 5 in the Technical Writing 101 series. It shows how to choose a minimal example, explain it, and prove that it works.
 
-> One *callout line* matters more than the *code* itself.
 
-<!-- a-grade-intro:end -->
+![technical writing 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/05/05-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 5 flow overview*
+> A snippet only teaches when the reader can isolate the interesting lines, understand them, and verify the result with one command.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- A *minimal* example
-- Where to place *comments*
-- Writing a *callout line*
-- Showing the *input and output*
-- Linking the *full code*
+- A *minimal* example?
+- Where to place *comments?
+- Writing a *callout line?
 
 ## Why It Matters
 
 A *runnable* example must reach the reader's *hands* to teach.
 
-## Concept at a Glance
+> Mental model: show the smallest runnable snippet, point at the key line, then prove the output.
 
-```mermaid
-flowchart LR
-    M[Minimal] --> H[Highlight]
-    H --> R[Run]
-    R --> O[Output]
-```
-
+Code walkthroughs are stronger when they isolate the key lines, pair them with a short callout, and close the loop with visible output. That is what turns a copy-paste gamble into a reusable learning step.
 ## Key Terms
 
 - **MWE**: A *Minimal Working Example*.
@@ -67,6 +60,33 @@ flowchart LR
 
 **After**: An 8 line *MWE* with a 2 line *callout*.
 
+## A better walkthrough gives setup, focus, and proof
+
+Here is a slightly more realistic example.
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/add")
+def add(a: int, b: int) -> dict[str, int]:
+    return {"result": a + b}
+```
+
+```bash
+uvicorn main:app --reload
+curl "http://127.0.0.1:8000/add?a=2&b=3"
+```
+
+**Expected output:**
+
+```json
+{"result":5}
+```
+
+The first line many readers need is not the function body. It is the route declaration and the verification command. One shows the entry point. The other proves that the example really works. A code walkthrough is stronger when it exposes both.
+
 ## Hands-on: One Example
 
 ### Step 1 — Minimal code
@@ -78,9 +98,7 @@ def add(a, b):
 
 ### Step 2 — Callout
 
-```python
-# Highlight: take two numbers and return their sum
-```
+Add the callout in prose outside the snippet: this function takes two numbers and returns their sum.
 
 ### Step 3 — Run
 
@@ -96,9 +114,7 @@ python3 -c "from m import add; print(add(2, 3))"
 
 ### Step 5 — Link the full code
 
-```python
-full_code_url = "https://github.com/example/repo/blob/main/m.py"
-```
+Link the full code separately, for example by pointing readers to `https://github.com/example/repo/blob/main/m.py`.
 
 ## What to Notice in This Code
 
@@ -143,17 +159,29 @@ Open source README *Quick Start* sections nearly always follow the *MWE plus out
 
 The next post is *Using Figures and Tables*.
 
+## Answering the Opening Questions
+
+- **A *minimal* example?**
+  - The article treats Explaining Example Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Where to place *comments?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Writing a *callout line?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
-- [Title and Structure](./03-title-and-structure.md)
-- [Explaining Concepts](./04-explaining-concepts.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): Title and Structure](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): Explaining Concepts](./04-explaining-concepts.md)
 - **Explaining Example Code (current)**
 - Using Figures and Tables (upcoming)
 - Writing the README (upcoming)
 - Writing Tutorials (upcoming)
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

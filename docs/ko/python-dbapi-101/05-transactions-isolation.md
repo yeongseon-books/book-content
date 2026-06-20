@@ -1,13 +1,13 @@
 ---
-title: Transaction과 isolation level (sqlite3, PEP 249)
+title: "Python DB-API 101 (5/10): Transaction과 isolation level (sqlite3, PEP 249)"
 series: python-dbapi-101
 episode: 5
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,52 +17,51 @@ tags:
 - Isolation
 - WAL
 - PEP 249
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_title: Transaction과 isolation level
 seo_description: sqlite3 driver는 편의를 위해 implicit BEGIN을 자동으로 거는데, 이 동작을 모르면 위 두 사고가
   동시에 발생하기…
 ---
 
-# Transaction과 isolation level (sqlite3, PEP 249)
+# Python DB-API 101 (5/10): Transaction과 isolation level (sqlite3, PEP 249)
 
-![Transaction과 isolation level (sqlite3, PEP 249)](../../assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.ko.png)
+sqlite3는 편의를 위해 트랜잭션을 암묵적으로 시작합니다. 이 동작을 이해하지 못하면 commit 누락과 lock 대기가 함께 생기므로, 이 글에서는 isolation level과 autocommit 관점을 함께 정리합니다.
+
+이 글은 Python DB-API 101 시리즈의 다섯 번째 글입니다.
+
+![Transaction과 isolation level (sqlite3, PEP 249)](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.ko.png)
 
 *Transaction과 isolation level (sqlite3, PEP 249)*
 
-## 이 글에서 다룰 문제
+![Python DB-API 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.ko.png)
+*Python DB-API 101 5장 흐름 개요*
 
-운영에서 가장 흔한 데이터 사고는 두 가지입니다.
+## 먼저 던지는 질문
 
-1. **`commit()`을 잊어버림** — INSERT는 메모리에만 남고 프로세스 종료 시 사라집니다.
-2. **모르는 사이 `BEGIN IMMEDIATE`가 걸려 다른 connection이 lock을 기다림** — 사용자에게 5초 timeout 오류로 노출됩니다.
-
-sqlite3 driver는 편의를 위해 implicit BEGIN을 자동으로 거는데, 이 동작을 모르면 위 두 사고가 동시에 발생하기 쉽습니다. PEP 249는 driver마다 다른 이 자동 동작을 명시적으로 통제할 수 있도록 `isolation_level` (sqlite3) 또는 `autocommit` 속성을 노출합니다.
-
-이 글에서는 5가지 모드의 동작을 코드와 lock 시나리오로 비교합니다. 한 번 정리해 두면 transaction 관련 운영 이슈의 80%가 사라집니다.
-
----
+- sqlite3는 정확히 언제 암묵적 `BEGIN`을 시작하고 `con.in_transaction`은 그 경계를 어떻게 보여 줄까요?
+- `DEFERRED`, `IMMEDIATE`, `EXCLUSIVE`와 WAL mode를 함께 보면 write 충돌 시점이 어떻게 달라질까요?
+- commit 누락, 장시간 lock 대기, nested 작업은 이 글의 어떤 패턴으로 각각 다뤄야 할까요?
 
 ## Mental Model — connection이 transaction 단위
 
-![Mental Model - connection이 transaction 단위](../../assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.ko.png)
-
-*Mental Model - connection이 transaction 단위*
-```
+```text
 Connection lifecycle (sqlite3 default)
 ─────────────────────────────────────────
   open
     │
-    │  cur.execute('SELECT ...')   ← transaction 없음
-    │  cur.execute('INSERT ...')   ← driver가 implicit BEGIN
-    │  cur.execute('UPDATE ...')   ← 같은 transaction 안
+    │  cur.execute('SELECT ...')   ← no transaction
+    │  cur.execute('INSERT ...')   ← driver issues implicit BEGIN
+    │  cur.execute('UPDATE ...')   ← same transaction
     │
-    │  con.commit()                ← transaction 종료, durable
+    │  con.commit()                ← transaction ends, durable
     │
-    │  cur.execute('INSERT ...')   ← 새 implicit BEGIN
-    │  con.rollback()              ← 변경 폐기
+    │  cur.execute('INSERT ...')   ← new implicit BEGIN
+    │  con.rollback()              ← changes discarded
     │
   close
 ```
+
+> transaction은 `commit()`과 `rollback()`이라는 함수 이름이 아니라, "어디부터 어디까지를 한 덩어리로 묶을 것인가"를 정하는 경계입니다. sqlite3는 그 경계를 자동으로 잡아 주기 때문에, 자동 동작을 모르면 락과 데이터 손실을 함께 맞게 됩니다.
 
 핵심 두 가지:
 
@@ -73,7 +72,7 @@ Connection lifecycle (sqlite3 default)
 
 ## 핵심 개념
 
-![핵심 개념](../../assets/python-dbapi-101/05/05-03-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-03-core-concepts.ko.png)
 
 *핵심 개념*
 ### `isolation_level` 5가지 값
@@ -96,7 +95,7 @@ SQLite는 동시 접근을 4단계 lock으로 제어합니다: UNLOCKED → SHAR
 
 WAL mode가 아닌 default rollback journal에서는 writer 한 명과 reader 다수가 동시 가능, writer는 commit 시점에 잠시 EXCLUSIVE를 잡습니다.
 
-### WAL mode
+### WAL 모드
 
 ```python
 con.execute('PRAGMA journal_mode=WAL')
@@ -107,17 +106,16 @@ WAL(Write-Ahead Logging)은 writer가 별도 `.wal` 파일에 기록하므로 **
 ### Python 3.12 `autocommit` 매개변수
 
 ```python
-con = sqlite3.connect(path, autocommit=False)  # PEP 249 호환
-con = sqlite3.connect(path, autocommit=True)   # 매 statement immediate commit
-con = sqlite3.connect(path, autocommit=sqlite3.LEGACY_TRANSACTION_CONTROL)  # 기존 isolation_level 동작
+con = sqlite3.connect(path, autocommit=False)  # PEP 249 compliant
+con = sqlite3.connect(path, autocommit=True)   # commit after every statement
+con = sqlite3.connect(path, autocommit=sqlite3.LEGACY_TRANSACTION_CONTROL)  # legacy isolation_level behaviour
 ```
 
 3.12 이후로는 `autocommit`이 명시적이고 권장 방법입니다. legacy 코드와의 호환을 위해 `LEGACY_TRANSACTION_CONTROL`이 default입니다.
 
 ---
 
-## Before / After
-
+## 적용 전후 비교
 ### Before — commit 누락
 
 ```python
@@ -126,23 +124,23 @@ import sqlite3
 con = sqlite3.connect('shop.db')
 con.execute('CREATE TABLE IF NOT EXISTS orders(id INTEGER PRIMARY KEY, total INTEGER)')
 con.execute('INSERT INTO orders(total) VALUES (10000)')
-# con.commit()  ← 누락
+# con.commit() ← 잊어버렸습니다
 con.close()
 
-# 새 프로세스에서 확인
+# 새 프로세스에서
 con2 = sqlite3.connect('shop.db')
 print(con2.execute('SELECT COUNT(*) FROM orders').fetchone())
-# → (0,)   ← INSERT가 사라짐
+# → (0,) ← INSERT가 삭제되었습니다.
 ```
 
 `con.close()`는 commit하지 않습니다. 실수로 commit을 빠뜨리면 데이터가 그대로 사라집니다.
 
-### After — context manager
+### 적용 후 — 컨텍스트 매니저
 
 ```python
 with sqlite3.connect('shop.db') as con:
     con.execute('INSERT INTO orders(total) VALUES (10000)')
-# 블록 정상 종료 시 commit, 예외 발생 시 rollback
+# 정상 종료 시 커밋, 예외 시 롤백
 ```
 
 `with con:`은 connection 자체에 대한 컨텍스트 매니저로, **transaction을 종료**합니다. connection을 close하지는 않으므로 별도로 닫아 줘야 합니다.
@@ -151,7 +149,7 @@ with sqlite3.connect('shop.db') as con:
 
 ## 단계별 실습
 
-![단계별 실습](../../assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.ko.png)
+![단계별 실습](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.ko.png)
 
 *단계별 실습*
 ### 단계 1 — 기본 동작 관찰
@@ -162,11 +160,11 @@ import sqlite3
 con = sqlite3.connect(':memory:')
 con.execute('CREATE TABLE t(v INTEGER)')
 
-# SELECT만 하면 transaction이 안 열림
+# SELECT만으로는 트랜잭션이 열리지 않습니다
 con.execute('SELECT * FROM t').fetchall()
 print(con.in_transaction)   # → False
 
-# DML 직전 implicit BEGIN
+# DML 전에 암묵적 BEGIN
 con.execute('INSERT INTO t(v) VALUES (1)')
 print(con.in_transaction)   # → True
 
@@ -175,12 +173,11 @@ print(con.in_transaction)   # → False
 ```
 
 ### 단계 2 — autocommit (`isolation_level=None`)
-
 ```python
 con = sqlite3.connect(':memory:', isolation_level=None)
 con.execute('CREATE TABLE t(v INTEGER)')
 con.execute('INSERT INTO t(v) VALUES (1)')
-# 별도 commit 없이도 즉시 durable
+# 이미 영속 처리됨, commit 불필요
 print(con.in_transaction)   # → False
 ```
 
@@ -206,7 +203,7 @@ with con:
 ```python
 con = sqlite3.connect('shop.db')
 con.execute('PRAGMA journal_mode=WAL')
-con.execute('PRAGMA synchronous=NORMAL')   # WAL에서 안전 + 빠름
+con.execute('PRAGMA synchronous=NORMAL')   # safe + fast under WAL
 ```
 
 `journal_mode`는 데이터베이스 파일 단위로 영구 저장되므로, 한 번만 설정하면 됩니다.
@@ -233,10 +230,10 @@ OUTER transaction은 그대로 유지되고, savepoint 내부만 부분 rollback
 
 ```python
 import sqlite3
-assert sqlite3.sqlite_version_info >= (3, 24)   # SAVEPOINT 안정 동작
+assert sqlite3.sqlite_version_info >= (3, 24)   # SAVEPOINT stable
 
 con = sqlite3.connect('shop.db', autocommit=False)
-con.execute('BEGIN IMMEDIATE')
+print(con.in_transaction)   # → True
 try:
     con.execute('UPDATE accounts SET balance = balance - 1000 WHERE id = 1')
     con.execute('UPDATE accounts SET balance = balance + 1000 WHERE id = 2')
@@ -246,7 +243,7 @@ except Exception:
     raise
 ```
 
-`autocommit=False`로 두면 BEGIN을 명시적으로 작성해야 하며, driver가 자동으로 끼어들지 않습니다.
+`autocommit=False`로 두면 sqlite3가 `connect()`, `commit()`, `rollback()` 뒤에 `BEGIN DEFERRED` 트랜잭션을 암묵적으로 다시 열어 둡니다. 따라서 Python 3.12+의 일반적인 PEP 249 흐름에서는 `autocommit=False`에 수동 `BEGIN`을 덧붙이지 않습니다.
 
 ---
 
@@ -296,7 +293,7 @@ def tx():
     finally:
         con.close()
 
-# 사용
+# Usage
 with tx() as con:
     con.execute('INSERT INTO orders(total) VALUES (?)', (10000,))
 ```
@@ -329,31 +326,67 @@ with dst:
 - [ ] write가 포함된 함수는 `isolation_level='IMMEDIATE'`로 시작한다.
 - [ ] 운영 DB는 WAL mode + `synchronous=NORMAL` + `busy_timeout=5000`을 기본값으로 둔다.
 - [ ] read-only 쿼리는 별도 connection 또는 명시적 `BEGIN`을 쓰지 않는다.
-- [ ] `autocommit=None` (legacy)을 batch insert에 쓰지 않는다.
+- [ ] `sqlite3.LEGACY_TRANSACTION_CONTROL` legacy 모드를 batch insert에 쓰지 않는다.
 - [ ] nested 동작이 필요하면 `SAVEPOINT`를 명시적으로 작성한다.
-- [ ] Python 3.12+ 신규 코드는 `autocommit=False` + 명시적 BEGIN으로 작성한다.
+- [ ] Python 3.12+ 신규 코드는 `autocommit=False`로 PEP 249 의미를 따르고, 중복되는 수동 `BEGIN`을 덧붙이지 않는다.
 
 ---
 
-## 정리·다음 글
+## 심화 앵커: isolation level 비교를 코드로 재현하기
 
+격리 수준은 용어 암기보다 충돌 시점을 재현해 보는 편이 빠릅니다. `IMMEDIATE`는 write 의도를 트랜잭션 시작 시점에 드러내므로 충돌을 늦게 맞지 않습니다.
+
+```python
+import sqlite3
+
+conn = sqlite3.connect("app.db", isolation_level="IMMEDIATE", timeout=1.0)
+conn.execute("BEGIN IMMEDIATE")
+try:
+    conn.execute("UPDATE accounts SET balance = balance - 100 WHERE id = 1")
+    conn.execute("UPDATE accounts SET balance = balance + 100 WHERE id = 2")
+    conn.commit()
+except Exception:
+    conn.rollback()
+    raise
+finally:
+    conn.close()
+```
+
+| 모드 | 충돌 감지 시점 | 권장 |
+| --- | --- | --- |
+| DEFERRED | 첫 write 시점 | read 중심 |
+| IMMEDIATE | BEGIN 시점 | write 포함 기본값 |
+| EXCLUSIVE | BEGIN 시점(전체 차단) | 유지보수 작업 |
+
+운영 규칙은 단순합니다. `OperationalError(BUSY/LOCKED)`는 짧은 백오프 재시도, `IntegrityError`는 즉시 실패, `CORRUPT` 계열은 복구 절차로 전환합니다.
+
+## 정리
 sqlite3의 transaction은 driver가 친절하게 자동 관리해 주지만, 그 자동 동작을 모르면 운영에서 lock과 데이터 유실로 직결됩니다. `isolation_level` 5가지 값과 `BEGIN` 변종, WAL mode를 한 번 정리해 두면 대부분의 transaction 이슈가 진단 가능해집니다.
 
 다음 글에서는 **row factory와 type adapter**를 다룹니다. 기본 tuple 결과를 dict, dataclass, Pydantic 모델로 받는 방법, `detect_types`와 사용자 정의 adapter/converter, 그리고 새 타입(예: `Decimal`, `enum`)을 안전하게 매핑하는 법을 코드로 정리합니다.
 
+## 처음 질문으로 돌아가기
+
+- **sqlite3는 정확히 언제 암묵적 `BEGIN`을 시작하고 `con.in_transaction`은 그 경계를 어떻게 보여 줄까요?**
+  - 본문 실습에서는 `SELECT`만 실행할 때 `con.in_transaction`이 `False`로 남고, 첫 `INSERT` 직후에 `True`로 바뀌는 흐름을 그대로 보여 줬습니다. 즉 sqlite3 기본 모드에서는 첫 DML 직전에 transaction이 열리고, `commit()`이나 `rollback()` 뒤에 다시 닫히는 경계를 `con.in_transaction`으로 바로 확인할 수 있습니다.
+- **`DEFERRED`, `IMMEDIATE`, `EXCLUSIVE`와 WAL mode를 함께 보면 write 충돌 시점이 어떻게 달라질까요?**
+  - 글은 `DEFERRED`가 첫 write 시점까지 충돌을 미루고, `IMMEDIATE`는 `BEGIN` 시점에 RESERVED lock을 잡아 writer 충돌을 앞당기며, `EXCLUSIVE`는 reader까지 막는다고 비교했습니다. 여기에 WAL을 켜면 reader와 writer가 더 오래 공존할 수 있으므로, 운영 기본값은 대개 `IMMEDIATE`와 `WAL`의 조합이 됩니다.
+- **commit 누락, 장시간 lock 대기, nested 작업은 이 글의 어떤 패턴으로 각각 다뤄야 할까요?**
+  - commit 누락은 `with sqlite3.connect(...) as con:` 패턴으로 줄이고, 장시간 lock 대기는 `timeout`, `busy_timeout`, `isolation_level='IMMEDIATE'`, WAL 설정으로 앞에서 흡수하도록 정리했습니다. nested 작업은 PEP 249 기본 기능이 아니라 SQLite `SAVEPOINT` 예제로 부분 rollback을 만드는 방식으로 다뤘습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
-- [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
-- [Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- **Transaction과 isolation level (sqlite3, PEP 249) (현재 글)**
-- Row factory와 type adapter (sqlite3, PEP 249) (예정)
-- PEP 249 예외 계층과 SQLite 에러 처리 (예정)
-- SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
-- aiosqlite로 비동기 SQLite 다루기 (예정)
-- SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
+- [Python DB-API 101 (1/10): 왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- **Python DB-API 101 (5/10): Transaction과 isolation level (sqlite3, PEP 249) (현재 글)**
+- Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249) (예정)
+- Python DB-API 101 (7/10): PEP 249 예외 계층과 SQLite 에러 처리 (예정)
+- Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
+- Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기 (예정)
+- Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
 
 <!-- toc:end -->
 
@@ -367,3 +400,5 @@ sqlite3의 transaction은 driver가 친절하게 자동 관리해 주지만, 그
 - [SQLite — Write-Ahead Logging](https://www.sqlite.org/wal.html)
 - [SQLite — PRAGMA journal_mode](https://www.sqlite.org/pragma.html#pragma_journal_mode)
 - [Python 3.12 sqlite3 autocommit](https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.autocommit)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-dbapi-101/ko)

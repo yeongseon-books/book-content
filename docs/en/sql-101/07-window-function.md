@@ -1,10 +1,10 @@
 ---
 series: sql-101
 episode: 7
-title: Window Function
+title: "SQL 101 (7/10): Window Function"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,37 @@ tags:
   - Database
   - Query
 seo_description: ROW_NUMBER, RANK, LAG/LEAD, running totals — SQL tools for per-group computations without losing the original rows.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Window Function
+# SQL 101 (7/10): Window Function
 
-> SQL 101 series (7/10)
+After GROUP BY, many readers hit the same wall: they can compute one total per group, but they still want to keep the original rows visible. Rankings, previous-value comparisons, running totals, and moving averages all come from that need.
 
-<!-- a-grade-intro:begin -->
+Window functions solve exactly that problem. They let you add group-aware calculations to each row without collapsing the table, which is why they show up constantly in analytical work.
 
-**Core question**: GROUP BY *shrinks rows* to make answers. Is there a way to *add per-group computations* while *keeping the rows*?
+This is post 7 in the SQL 101 series. Here we focus on the row-preserving calculations that make SQL useful for ranking and time-based analysis.
 
-> *A window function *attaches an aggregate result to every row*.*
 
-<!-- a-grade-intro:end -->
+![sql 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.en.png)
+*sql 101 chapter 7 flow overview*
+> Window functions let you compute context (rank, running total, comparison) for each row while keeping all the original rows. It's analytical power without aggregation.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The meaning of `OVER (PARTITION BY ...)`
-- *ROW_NUMBER, RANK, DENSE_RANK*
-- *LAG / LEAD* and *time comparisons*
-- *Running totals*
-- Five common mistakes
+- What does OVER (PARTITION BY ...) really mean?
+- How do ROW_NUMBER, RANK, and DENSE_RANK differ?
+- Why are LAG and LEAD so common in time-series analysis?
 
 ## Why It Matters
 
-Rankings, differences, cumulative sums — essential for *row-level analysis*. GROUP BY alone *discards detail*. Windows give you *detail + aggregate together*. They are core tools for *cohort, funnel, retention*.
+Rankings, differences, cumulative sums, and month-over-month comparisons are all row-level questions. GROUP BY alone cannot answer them cleanly because it removes the detail you still need. Window functions keep that detail while still letting you reason about the group around each row.
 
-> *Windows are what made SQL *an analytics language*.*
+This is one of the places where SQL becomes more than a retrieval language. Once windows become natural, cohort analysis, retention, funnels, and trend reporting stop feeling like special tricks and start looking like combinations of familiar building blocks.
 
-## Concept at a Glance
+## Window calculation flow
 
-```mermaid
-flowchart LR
-    Rows["Source rows"] --> Win["OVER(PARTITION BY ... ORDER BY ...)"]
-    Win --> Func["ROW_NUMBER / SUM / LAG"]
-    Func --> Out["Row + computed column"]
-```
+A window function has three parts: the function (ROW_NUMBER, SUM, LAG, etc.), the PARTITION BY (optional grouping), and ORDER BY (the sequence within each partition). PARTITION BY divides the data; ORDER BY sets the order within each partition.
 
 ## Key Terms
 
@@ -102,6 +96,14 @@ SELECT day, revenue,
     SUM(revenue) OVER (ORDER BY day) AS running_total
 FROM daily_revenue;
 ```
+
+**Expected output:**
+
+| day | revenue | running_total |
+| --- | --- | --- |
+| 2026-04-01 | 100 | 100 |
+| 2026-04-02 | 120 | 220 |
+| 2026-04-03 | 90 | 310 |
 
 ### Step 5 — 7-day moving average
 
@@ -157,17 +159,29 @@ FROM daily_revenue;
 
 Windows are *aggregates that keep the rows*. Next: *INSERT/UPDATE/DELETE*.
 
+## Answering the Opening Questions
+
+- **What does OVER (PARTITION BY ...) really mean?**
+  - The article treats Window Function as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do ROW_NUMBER, RANK, and DENSE_RANK differ?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why are LAG and LEAD so common in time-series analysis?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
-- [WHERE and Conditions](./03-where-and-conditions.md)
-- [JOIN](./04-join.md)
-- [GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
-- [Subquery](./06-subquery.md)
+## In this series
+
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE and Conditions](./03-where-and-conditions.md)
+- [SQL 101 (4/10): JOIN](./04-join.md)
+- [SQL 101 (5/10): GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
+- [SQL 101 (6/10): Subquery](./06-subquery.md)
 - **Window Function (current)**
 - INSERT, UPDATE, DELETE (upcoming)
 - Index and Query Plan (upcoming)
 - Practical Analysis SQL (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -176,3 +190,4 @@ Windows are *aggregates that keep the rows*. Next: *INSERT/UPDATE/DELETE*.
 - [PostgreSQL — Window Function Reference](https://www.postgresql.org/docs/current/functions-window.html)
 - [Mode — Window Functions](https://mode.com/sql-tutorial/sql-window-functions/)
 - [Use The Index, Luke — Top-N](https://use-the-index-luke.com/sql/partial-results/top-n-queries)
+- [PostgreSQL — Value Expressions](https://www.postgresql.org/docs/current/sql-expressions.html)

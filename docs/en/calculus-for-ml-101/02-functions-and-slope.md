@@ -1,10 +1,10 @@
 ---
 series: calculus-for-ml-101
 episode: 2
-title: Functions and Slope
-status: content-ready
+title: "Calculus for ML 101 (2/10): Functions and Slope"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,40 @@ tags:
   - Slope
   - Beginner
 seo_description: A beginner-friendly tour of functions, slope, linear and nonlinear shapes, and the graphical meaning of derivatives for ML
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Functions and Slope
+# Calculus for ML 101 (2/10): Functions and Slope
 
-> Calculus for ML 101 series (2/10)
+An ML model is ultimately a stack of functions. Linear layers are functions, activations are functions, and the final prediction is the output of a long composition. To read training behavior well, you need to see both what a function maps and how sharply it reacts.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Calculus for ML 101 series.
 
-**Core question**: How do the *shape* of a function and its *slope* relate?
+In this post, we'll treat a function as both an input-output contract and a geometric shape. That viewpoint makes it easier to explain why linear and nonlinear functions behave differently during learning, and why activation choice shows up directly in gradient flow.
 
-> A *function* is a *contract* from input to output, and a *slope* is the *direction and speed* of change.
+> A function tells you what output you get. Its slope tells you how sensitive that output is at the point you currently care about.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![calculus for ml 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 2 flow overview*
 
-- The definition of a *function*
-- *Slope* of a *linear* function
-- *Local slope* of a *nonlinear* function
-- The *graphical meaning* of a derivative
-- Intuition for ML *activations*
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Functions and Slope?
+- Which signal should the example or diagram make visible for Functions and Slope?
+- What failure should be prevented first when Functions and Slope reaches a real system?
+
+## Questions this article answers
+
+- Why should a function be understood as an input-output contract rather than just a formula?
+- How does the slope of a linear function differ from the local slope of a nonlinear one?
+- How does the slope difference between ReLU and sigmoid affect learning?
+- Why does the graph-level meaning of a derivative make activation design easier to reason about?
+- How do input scale and function shape affect the way you interpret gradients?
 
 ## Why It Matters
 
 ML models are *function compositions*, and training pushes signals through *each function gradient*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    I[Input] --> F[Function]
-    F --> O[Output]
-    F --> S[Slope]
-    S --> D[Derivative]
-```
 
 ## Key Terms
 
@@ -150,8 +148,19 @@ Picking *activations*, building *graphical intuition*, and diagnosing *vanishing
 
 Next post: *Partial Derivatives*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Functions and Slope?**
+  - The article treats Functions and Slope as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Functions and Slope?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Functions and Slope reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Derivative](./01-what-is-derivative.md)
+## In this series
+
+- [Calculus for ML 101 (1/10): What Is a Derivative](./01-what-is-derivative.md)
 - **Functions and Slope (current)**
 - Partial Derivatives (upcoming)
 - Gradient (upcoming)
@@ -161,6 +170,7 @@ Next post: *Partial Derivatives*.
 - Optimization (upcoming)
 - Backpropagation Intuition (upcoming)
 - Calculus in Deep Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

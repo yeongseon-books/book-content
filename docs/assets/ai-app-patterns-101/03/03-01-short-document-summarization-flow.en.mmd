@@ -1,0 +1,11 @@
+flowchart TD
+  D["Short document\nfull text fits in one prompt"] --> P["Summary prompt\nstyle + length + audience"]
+  P --> L["LLM\nread full document once"]
+  L --> E["Executive summary\nbusiness-focused, short"]
+  L --> V["Developer summary\ntechnical, more detailed"]
+
+  style D fill:#e3f2fd,stroke:#1976d2
+  style P fill:#fff3e0,stroke:#f57c00
+  style L fill:#f3e5f5,stroke:#7b1fa2
+  style E fill:#e8f5e9,stroke:#388e3c
+  style V fill:#fce4ec,stroke:#c2185b

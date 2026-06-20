@@ -1,36 +1,42 @@
 ---
 series: developer-career-101
 episode: 8
-title: Side Projects and Learning
-status: content-ready
+title: "Developer Career 101 (8/10): Side Projects and Learning"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
 language: en
 tags:
-  - Career
-  - SideProject
-  - Learning
-  - Portfolio
-  - Beginner
-seo_description: A beginner-friendly tour of running a side project alongside a full-time job.
-last_reviewed: '2026-05-04'
+- Career
+- SideProject
+- Learning
+- Portfolio
+- Beginner
+seo_description: A beginner-friendly tour of running a side project alongside a full-time
+  job.
+last_reviewed: '2026-05-14'
 ---
 
-# Side Projects and Learning
+# Developer Career 101 (8/10): Side Projects and Learning
 
-> Developer Career 101 series (8/10)
+The hardest part of side projects is usually not finding ideas. It is choosing a scope that can survive real life. A project that competes with your day job, drifts without a finish line, or ignores IP boundaries often becomes a source of fatigue instead of a source of growth.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Developer Career 101 series.
 
-**Core question**: What does a *side project* compatible with a day job look like?
 
-> Small scope, clear purpose, sustainable time.
+![developer career 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/08/08-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 8 flow overview*
+> Side projects are valuable not for the technology stack, but for owning the full responsibility: from gathering requirements to running production.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What makes a side project compatible with a full-time job?
+- Why does a small MVP beat a grand vision for long-term learning?
+- How do time boxes, public releases, and feedback loops keep the work sustainable?
 
 ## What You Will Learn
 
@@ -44,14 +50,7 @@ last_reviewed: '2026-05-04'
 
 A side project leaves both learning and evidence behind.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    P[Pick] --> T[Time-box]
-    T --> S[Ship]
-    S --> F[Feedback]
-```
+Value comes from ownership: building, shipping, supporting, and improving something you control.
 
 ## Key Terms
 
@@ -106,6 +105,33 @@ gh repo create --public
 - IP review with employer
 ```
 
+## A scorecard for choosing side projects
+
+| Criterion | High score looks like | Warning sign |
+| --- | --- | --- |
+| Learning value | Closes a real career gap | Repeats only what you already know |
+| Finishability | MVP fits in four to six weeks | Core scope already has three major features |
+| Publishability | Easy to explain with README and demo | Output stays invisible |
+| Boundary safety | Clean separation from employer assets and IP | Contract language is unclear |
+
+## A scorecard for choosing side projects
+
+| Criterion | High score looks like | Warning sign |
+| --- | --- | --- |
+| Learning value | Closes a real career gap | Repeats only what you already know |
+| Finishability | MVP fits in four to six weeks | Core scope already has three major features |
+| Publishability | Easy to explain with README and demo | Output stays invisible |
+| Boundary safety | Clean separation from employer assets and IP | Contract language is unclear |
+
+## A scorecard for choosing side projects
+
+| Criterion | High score looks like | Warning sign |
+| --- | --- | --- |
+| Learning value | Closes a real career gap | Repeats only what you already know |
+| Finishability | MVP fits in four to six weeks | Core scope already has three major features |
+| Publishability | Easy to explain with README and demo | Output stays invisible |
+| Boundary safety | Clean separation from employer assets and IP | Contract language is unclear |
+
 ## What to Notice in This Code
 
 - A time box is sustainable.
@@ -149,22 +175,34 @@ Companies spell out open source contribution rules in employment contracts.
 
 Next post covers *Mentoring and Networking*.
 
+## Answering the Opening Questions
+
+- **What makes a side project compatible with a full-time job?**
+  - The article treats Side Projects and Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why does a small MVP beat a grand vision for long-term learning?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do time boxes, public releases, and feedback loops keep the work sustainable?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Developer Career](./01-what-is-developer-career.md)
-- [Understanding Roles](./02-understanding-roles.md)
-- [Building a Learning Plan](./03-learning-plan.md)
-- [Resume and Portfolio](./04-resume-and-portfolio.md)
-- [Preparing for Coding Interviews](./05-coding-interview.md)
-- [System Design Interviews](./06-system-design-interview.md)
-- [Settling into the First Job](./07-first-job.md)
+## In this series
+
+- [Developer Career 101 (1/10): What Is a Developer Career](./01-what-is-developer-career.md)
+- [Developer Career 101 (2/10): Understanding Roles](./02-understanding-roles.md)
+- [Developer Career 101 (3/10): Building a Learning Plan](./03-learning-plan.md)
+- [Developer Career 101 (4/10): Resume and Portfolio](./04-resume-and-portfolio.md)
+- [Developer Career 101 (5/10): Preparing for Coding Interviews](./05-coding-interview.md)
+- [Developer Career 101 (6/10): System Design Interviews](./06-system-design-interview.md)
+- [Developer Career 101 (7/10): Settling into the First Job](./07-first-job.md)
 - **Side Projects and Learning (current)**
 - Mentoring and Networking (upcoming)
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Side Project Marketing](https://sideprojectmarketing.com/)
+- [GitHub Docs — Licensing a repository](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository)
+- [Open Source Guides — Legal](https://opensource.guide/legal/)
 - [Indie Hackers](https://www.indiehackers.com/)
-- [Open Source IP policy](https://opensource.guide/legal/)
-- [Time blocking](https://todoist.com/productivity-methods/time-blocking)
+- [Time blocking method](https://todoist.com/productivity-methods/time-blocking)

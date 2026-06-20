@@ -1,11 +1,11 @@
 ---
-title: Completing the document ingestion pipeline
+title: "Document Ingestion 101 (6/6): Completing the document ingestion pipeline"
 series: document-ingestion-101
 episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,40 +14,34 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: A complete ingestion pipeline is not defined by how many stages exist
   but by whether each stage hands off cleanly to the next.
 ---
 
-# Completing the document ingestion pipeline
+# Document Ingestion 101 (6/6): Completing the document ingestion pipeline
 
-## Questions this post answers
+The value of an ingestion pipeline appears only when the handoff between stages is real. It is not enough to understand loading, chunking, and indexing separately if they do not survive an end-to-end run together.
 
-- How do you connect loading, chunking, embedding, and FAISS save-reload in one flow?
-- Which outputs are the minimum proof that the whole pipeline actually worked?
-- How do you keep the retrieval flow reproducible offline?
+This is the final post in the Document Ingestion 101 series. Here, we connect the earlier pieces into one reproducible flow and verify that the index can be saved, reloaded, and queried.
 
+![End-to-end ingestion pipeline flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.en.png)
+*End-to-end ingestion pipeline flow*
 > A complete ingestion pipeline is not defined by how many stages exist but by whether each stage hands off cleanly to the next.
 
-Example code: `/root/Github/document-ingestion-101/en/06-pipeline-completion/main.py`
+## Questions to Keep in Mind
 
-![Questions this post answers](../../assets/document-ingestion-101/06/06-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-The final post assembles the earlier isolated examples into one real flow. At this point the important question is whether the stage boundaries still line up.
-
-This example loads three formats, chunks them, stores embeddings in FAISS, reloads the saved index, and runs a search against it. That is enough to prove an ingestion MVP works end to end.
+- What stage-level verification checkpoints should a complete ingestion pipeline have?
+- How can you quickly tell whether parsing, normalization, chunking, or indexing failed?
+- What artifacts make the pipeline rerunnable in production?
 
 ## End-to-end ingestion pipeline
 
-![End-to-end ingestion pipeline flow](../../assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.en.png)
-
-*End-to-end ingestion pipeline flow*
 The final post is mostly about clean handoffs between stages rather than deeper logic inside any single function.
 
 ## Stage verification checkpoints
 
-![Stage verification checkpoint flow](../../assets/document-ingestion-101/06/06-02-stage-verification-checkpoints.en.png)
+![Stage verification checkpoint flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-02-stage-verification-checkpoints.en.png)
 
 *Stage verification checkpoint flow*
 A small set of stage-level checkpoints is often enough to localize where the pipeline broke.
@@ -105,20 +99,15 @@ def seed_files() -> list[Path]:
     txt_path = DATA_DIR / 'ops.txt'
     md_path = DATA_DIR / 'faq.md'
     create_pdf(pdf_path)
-    txt_path.write_text('TXT source: nightly ingestion runs at 02:00 and retries failed files first.
-', encoding='utf-8')
-    md_path.write_text('# FAQ
-
-MD source: metadata filters reduce the candidate set before answer generation.
-', encoding='utf-8')
+    txt_path.write_text('TXT source: nightly ingestion runs at 02:00 and retries failed files first.\n', encoding='utf-8')
+    md_path.write_text('# FAQ\n\nMD source: metadata filters reduce the candidate set before answer generation.\n', encoding='utf-8')
     return [pdf_path, txt_path, md_path]
 
 def load_file(path: Path) -> list[Document]:
     suffix = path.suffix.lower()
     if suffix == '.pdf':
         reader = PdfReader(str(path))
-        text = '
-'.join((page.extract_text() or '').strip() for page in reader.pages)
+        text = '\n'.join((page.extract_text() or '').strip() for page in reader.pages)
         return [Document(page_content=text, metadata={'source': path.name, 'format': 'pdf'})]
     if suffix == '.txt':
         return [Document(page_content=path.read_text(encoding='utf-8'), metadata={'source': path.name, 'format': 'txt'})]
@@ -130,10 +119,7 @@ def chunk_documents(documents: list[Document]) -> list[Document]:
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=90,
         chunk_overlap=20,
-        separators=['
-
-', '
-', '. ', ' '],
+        separators=['\n\n', '\n', '. ', ' '],
     )
     chunks = splitter.split_documents(documents)
     for index, chunk in enumerate(chunks):
@@ -159,8 +145,7 @@ def main() -> None:
     print(f'chunks: {len(chunks)}')
     print(f'faiss_saved: {INDEX_DIR}')
     for doc in results:
-        preview = doc.page_content.replace('
-', ' ')[:90]
+        preview = doc.page_content.replace('\n', ' ')[:90]
         print(f"result={doc.metadata['source']} chunk_id={doc.metadata['chunk_id']} preview={preview}")
 
 if __name__ == '__main__':
@@ -178,7 +163,7 @@ python main.py
 ```text
 loaded_documents: 3
 chunks: 4
-faiss_saved: /root/Github/document-ingestion-101/en/06-pipeline-completion/faiss_store
+faiss_saved: en/06-pipeline-completion/faiss_store
 result=policy.pdf chunk_id=chunk-00 preview=PDF source: access policy and retention rules.
 result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the original file name and format.
 ```
@@ -187,7 +172,7 @@ result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the o
 
 ### Monitoring and recovery path
 
-![Monitoring and recovery flow](../../assets/document-ingestion-101/06/06-01-monitoring-and-recovery-path.en.png)
+![Monitoring and recovery flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-monitoring-and-recovery-path.en.png)
 
 *Monitoring and recovery flow*
 Production ingestion needs a visible recovery path, not only a happy-path diagram.
@@ -200,7 +185,7 @@ Production ingestion needs a visible recovery path, not only a happy-path diagra
 
 ### Retry and replay control
 
-![Retry and replay control flow](../../assets/document-ingestion-101/06/06-02-retry-and-replay-control.en.png)
+![Retry and replay control flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-02-retry-and-replay-control.en.png)
 
 *Retry and replay control flow*
 Retrying and replaying are different control paths, and collapsing them into one action usually wastes time and compute.
@@ -216,19 +201,37 @@ Retrying and replaying are different control paths, and collapsing them into one
 - [ ] You saved the FAISS index and loaded it back.
 - [ ] You verified retrieval against the reloaded index.
 
+## Answering the Opening Questions
+
+- **What stage-level verification checkpoints should a complete ingestion pipeline have?**
+  Verify file discovery, parse output, normalized fields, chunk lengths, embedding dimensions, index row counts, and sample retrieval results.
+
+- **How can you quickly tell whether parsing, normalization, chunking, or indexing failed?**
+  Log input count, output count, failure list, and sample payload at each stage to locate the broken boundary quickly.
+
+- **What artifacts make the pipeline rerunnable in production?**
+  Persist the input manifest, state file, hashes, chunk manifest, index version, and verification report so the same input can be rerun.
+
 <!-- toc:begin -->
 ## In this series
 
-- [PDF parsing and text extraction](./01-pdf-parsing.md)
-- [Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
-- [Metadata design and filtering](./03-metadata-filtering.md)
-- [Incremental indexing — updating only changed documents](./04-incremental-indexing.md)
-- [Multi-format document pipeline](./05-multi-format-pipeline.md)
-- **Completing the document ingestion pipeline (current)**
+- [Document Ingestion 101 (1/6): PDF parsing and text extraction](./01-pdf-parsing.md)
+- [Document Ingestion 101 (2/6): Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
+- [Document Ingestion 101 (3/6): Metadata design and filtering](./03-metadata-filtering.md)
+- [Document Ingestion 101 (4/6): Incremental indexing — updating only changed documents](./04-incremental-indexing.md)
+- [Document Ingestion 101 (5/6): Multi-format document pipeline](./05-multi-format-pipeline.md)
+- **Document Ingestion 101 (6/6): Completing the document ingestion pipeline (current)**
 
 <!-- toc:end -->
 
 ## References
 
-- https://python.langchain.com/docs/integrations/vectorstores/faiss/
-- https://github.com/facebookresearch/faiss
+### Official docs
+
+- [LangChain FAISS integration guide](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
+- [FAISS documentation](https://faiss.ai/)
+
+### Verification-friendly sources
+
+- [FAISS GitHub repository](https://github.com/facebookresearch/faiss)
+- [LangChain text splitters integration package](https://docs.langchain.com/oss/python/integrations/splitters/index)

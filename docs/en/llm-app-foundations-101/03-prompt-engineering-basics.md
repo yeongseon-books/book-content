@@ -1,11 +1,11 @@
 ---
-title: Prompt engineering basics — system, user, and assistant roles
+title: "LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles"
 series: llm-app-foundations-101
 episode: 3
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,26 +14,17 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-05-01'
-seo_description: 'Example code: github.com/yeongseon-books/llm-app-foundations-101'
+last_reviewed: '2026-05-15'
+seo_description: Learn how to structure LLM prompts effectively by separating system, user, and assistant roles to ensure consistent, controllable model behavior.
 ---
 
-# Prompt engineering basics — system, user, and assistant roles
+# LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles
 
-> LLM App Foundations 101 (3/6)
-
-Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/03-prompt-engineering-basics)
-
-The diagram below shows the basic flow of role-based prompt construction.
-
-![Prompt engineering basics: system, user, and assistant roles](../../assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.en.png)
-
-*Prompt engineering basics: system, user, and assistant roles*
 Prompt engineering is often described as clever wording. In application work, that is too narrow. The real job is to separate instructions by role, decide which rules stay stable across requests, and shape how the model responds. The difference between a weak prompt and a dependable prompt is usually the structure of the `messages` array.
 
 That structure matters early. Without it, tone drifts, output format changes between calls, follow-up questions lose context, and parameter tuning feels random. Many “model reliability” problems are really input-structure problems.
 
-In this post, we will use Groq's `llama-3.1-8b-instant` to build the core mental model for prompt design with chat completions. We will cover seven things:
+This is the third post in the LLM App Foundations 101 series. Here, we use Groq's `llama-3.1-8b-instant` to build the core mental model for prompt design with chat completions. We will cover seven things:
 
 - what `system`, `user`, and `assistant` roles mean
 - how a system message changes overall behavior
@@ -47,13 +38,15 @@ The main idea is simple: **good prompts start as structured message roles, not a
 
 ---
 
-## Questions this chapter answers
+![Prompt engineering basics: system, user, and assistant roles](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.en.png)
+*Prompt engineering basics: system, user, and assistant roles*
+> Prompt engineering starts with role boundaries, not nicer wording.
 
-- How does the model treat `system`, `user`, and `assistant` differently?
-- What single experiment shows how a one-line system message changes the answer?
-- When is hand-writing assistant messages into history the right pattern?
-- How do you decide which constraint belongs in `system` vs `user` vs few-shot examples?
-- Where does the output quality gap between with/without `system` show up most clearly?
+## Questions to Keep in Mind
+
+- What responsibility belongs to `system`, `user`, and `assistant` messages?
+- Why is a system message stronger than just writing one more first sentence?
+- How do temperature, top_p, and few-shot examples affect answer stability?
 
 ## Why prompt engineering is more than wording
 
@@ -71,7 +64,7 @@ Once you think in those layers, prompt design becomes easier to maintain.
 
 ## Understanding the three roles
 
-![Roles merged into one messages array](../../assets/llm-app-foundations-101/03/03-01-understanding-the-three-roles.en.png)
+![Roles merged into one messages array](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-understanding-the-three-roles.en.png)
 
 *Roles merged into one messages array*
 Each role has a different purpose.
@@ -96,7 +89,7 @@ That means multi-turn conversation is not a hidden built-in memory feature. It i
 
 ## How a system message changes the answer
 
-![Same question with and without system](../../assets/llm-app-foundations-101/03/03-02-how-a-system-message-changes-the-answer.en.png)
+![Same question with and without system](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-02-how-a-system-message-changes-the-answer.en.png)
 
 *Same question with and without system*
 It is easier to understand `system` by comparing outputs directly. The script below sends the same user question twice. The first request has no system message. The second adds a system instruction that constrains language, audience, and output structure. The contrast is usually obvious.
@@ -213,7 +206,7 @@ A system message is not a perfect hard lock. It is the strongest steering input,
 
 ## Building multi-turn history with assistant messages
 
-![Assistant reply replay in the next turn](../../assets/llm-app-foundations-101/03/03-03-building-multi-turn-history-with-assista.en.png)
+![Assistant reply replay in the next turn](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-03-building-multi-turn-history-with-assista.en.png)
 
 *Assistant reply replay in the next turn*
 In many application flows, the provider does not remember the full conversation for you. If the next request only includes the latest user message, the model only sees that latest message.
@@ -304,7 +297,7 @@ Post 05 will cover conversation state in more depth. For now, the key takeaway i
 
 ## Temperature and top_p: consistency versus variety
 
-![Low and high sampling control comparison](../../assets/llm-app-foundations-101/03/03-04-temperature-and-top-p-consistency-versus.en.png)
+![Low and high sampling control comparison](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-04-temperature-and-top-p-consistency-versus.en.png)
 
 *Low and high sampling control comparison*
 Prompt wording is only part of output control. Sampling parameters matter too. The first two to learn are `temperature` and `top_p`.
@@ -497,7 +490,7 @@ This can be very effective, but every example consumes tokens. Short, representa
 
 ## Common prompt design mistakes
 
-![Prompt mistakes that destabilize output](../../assets/llm-app-foundations-101/03/03-05-common-prompt-design-mistakes.en.png)
+![Prompt mistakes that destabilize output](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-05-common-prompt-design-mistakes.en.png)
 
 *Prompt mistakes that destabilize output*
 These mistakes show up repeatedly in first-generation LLM apps.
@@ -546,15 +539,26 @@ The next post goes deeper into few-shot prompting and chain-of-thought.
 - [ ] You have a test that synthesizes a multi-turn history with hand-crafted assistant messages
 - [ ] Format requirements (JSON, table, max length) are written into the system message explicitly
 
+## Answering the Opening Questions
+
+- What responsibility belongs to `system`, `user`, and `assistant` messages?
+  - `system` carries shared policy and role, `user` carries the current request, and `assistant` carries replayed prior answers.
+
+- Why is a system message stronger than just writing one more first sentence?
+  - A system message is part of the higher-priority instruction frame for the request, so it is more stable than another sentence inside the user prompt.
+
+- How do temperature, top_p, and few-shot examples affect answer stability?
+  - Temperature and top_p control sampling variance, while few-shot examples stabilize the answer shape by showing the pattern to copy.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LLM API first call — sending your first request](./01-llm-api-first-call.md)
-- [Understanding tokens — cost, limits, and context windows](./02-understanding-tokens.md)
-- **Prompt engineering basics — system, user, and assistant roles (current)**
-- Few-shot and chain-of-thought — steering better answers (upcoming)
-- Managing conversation state — building a multi-turn chatbot (upcoming)
-- Handling streaming responses — real-time output (upcoming)
+- [LLM App Foundations 101 (1/6): LLM API first call — sending your first request](./01-llm-api-first-call.md)
+- [LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows](./02-understanding-tokens.md)
+- **LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles (current)**
+- LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers (upcoming)
+- LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot (upcoming)
+- LLM App Foundations 101 (6/6): Handling streaming responses — real-time output (upcoming)
 
 <!-- toc:end -->
 
@@ -562,7 +566,15 @@ The next post goes deeper into few-shot prompting and chain-of-thought.
 
 ## References
 
-- Groq Docs, "Text chat"
-- Groq Python Library: <https://github.com/groq/groq-python>
-- OpenAI Platform Docs, "Messages and roles": <https://platform.openai.com/docs/guides/text>
-- Anthropic Docs, "Prompt engineering overview": <https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview>
+### Official docs
+
+- [Groq Docs: Text chat](https://console.groq.com/docs/text-chat)
+- [Groq Python SDK](https://github.com/groq/groq-python)
+- [OpenAI Platform Docs: Text generation and messages](https://platform.openai.com/docs/guides/text)
+- [Anthropic Docs: Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)
+
+### Related series
+
+- [Few-shot and chain-of-thought — steering better answers](./04-few-shot-and-cot.md)
+- [Managing conversation state — building a multi-turn chatbot](./05-conversation-state.md)
+- [Tool calling — connecting functions to the model](../llm-api-production-101/02-tool-calling.md)

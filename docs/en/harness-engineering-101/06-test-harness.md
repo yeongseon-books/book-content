@@ -1,11 +1,11 @@
 ---
-title: Test Harness — Turning Completion Criteria into Tests
+title: "Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests"
 series: harness-engineering-101
 episode: 6
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,22 +14,29 @@ tags:
 - Harness
 - Testing
 - Eval
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: When an agent says "done", only tests can confirm whether the work
   is actually done.
 ---
 
-# Test Harness — Turning Completion Criteria into Tests
+# Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests
 
-> Harness Engineering 101 Series (6/10)
+Agent demos usually look fine because the inputs were carefully chosen and the path was obvious to the person who built them. Real users immediately invalidate that comfort by bringing messy requests, partial data, and edge cases you did not rehearse.
 
-When an agent says "done", only tests can confirm whether the work is actually done. The Test Harness pins completion criteria into automated checks the agent must pass.
+That is why “the agent says it is done” is not evidence. Completion must be decided by an external test surface that can run again after every prompt, tool, or model change.
 
----
+This is post 6 in the Harness Engineering 101 series. Here we turn completion criteria into repeatable unit, integration, and eval checks.
 
-![Test harness - turning completion criteria into tests](../../assets/harness-engineering-101/06/06-01-test-harness-turning-completion-criteria.en.png)
-
+![Test harness - turning completion criteria into tests](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-01-test-harness-turning-completion-criteria.en.png)
 *Test harness - turning completion criteria into tests*
+> A Test Harness matters less because the agent passed once, and more because it proves future changes still meet the same criteria.
+
+## Questions to Keep in Mind
+
+- What should a Test Harness turn natural-language completion promises into?
+- What agent failures do unit, trajectory, and end-to-end tests each catch?
+- How should eval datasets and regression checks connect before production?
+
 ## "It Works" Is Not Evidence
 
 Build an agent and demo it — it works. Open it to real users and within a week it breaks. The difference is input diversity. A demo runs on five well-shaped inputs; production faces thousands of unexpected ones.
@@ -42,7 +49,7 @@ This article covers the kinds of tests for agents, building eval datasets, and a
 
 ## Three Tiers of Agent Tests
 
-![Three tiers of agent tests](../../assets/harness-engineering-101/06/06-02-three-tiers-of-agent-tests.en.png)
+![Three tiers of agent tests](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-02-three-tiers-of-agent-tests.en.png)
 
 *Three tiers of agent tests*
 Similar to traditional software testing, with non-determinism added.
@@ -87,7 +94,7 @@ All three are needed. Without unit tests, debugging is impossible. Without eval 
 
 ## Building an Eval Dataset
 
-![Building an eval dataset](../../assets/harness-engineering-101/06/06-03-building-an-eval-dataset.en.png)
+![Building an eval dataset](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-03-building-an-eval-dataset.en.png)
 
 *Building an eval dataset*
 Without an eval dataset, quality is unmeasurable. Datasets come from three sources.
@@ -135,7 +142,7 @@ Three scoring approaches.
 **3. LLM-as-judge**: hand scoring to another LLM. Costly but enables semantic evaluation.
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 @dataclass
 class Rubric:
@@ -179,7 +186,7 @@ LLM-as-judge is powerful but risky. The judge model's bias flows directly into t
 
 ## Automating Regression Prevention
 
-![Automating regression prevention](../../assets/harness-engineering-101/06/06-04-automating-regression-prevention.en.png)
+![Automating regression prevention](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-04-automating-regression-prevention.en.png)
 
 *Automating regression prevention*
 Tests that exist but don't run are worthless. Wire them into CI/CD to run on every change.
@@ -304,25 +311,44 @@ Tests run manually only sometimes soon become tests run never. Auto-run on every
 - Score with exact match, heuristics, and LLM-as-judge in combination, calibrating the judge against humans.
 - Wire all tests into CI for every PR. Manual tests soon become unrun tests.
 
+## Operational checklist
+
+- [ ] Split tests into unit, integration, and eval layers rather than collapsing them into one suite.
+- [ ] Build an initial eval dataset before shipping the first serious task.
+- [ ] Mix production-derived, synthetic, and adversarial cases in the dataset.
+- [ ] Use exact checks, heuristics, and judge models together, then recalibrate judges against humans.
+- [ ] Run the suites automatically in CI and block merges on failed thresholds.
+
+## Answering the Opening Questions
+
+- **What should a Test Harness turn natural-language completion promises into?**
+  - It should turn completion promises into executable assertions, rubrics, snapshots, and eval cases.
+- **What agent failures do unit, trajectory, and end-to-end tests each catch?**
+  - Unit tests catch tools and small functions, trajectory tests catch intermediate paths and tool choices, and end-to-end tests catch user-visible completion.
+- **How should eval datasets and regression checks connect before production?**
+  - Put real failures and representative requests into the eval dataset, then run regression checks automatically for code, prompt, and tool changes.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
-- [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
-- [Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
-- [Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
-- **Test Harness — Turning Completion Criteria into Tests (current)**
-- Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
-- Approval Gates — Designing Where Humans Must Approve (upcoming)
-- Observability — Tracing and Replaying Agent Work (upcoming)
-- Production Harness — Building Operational Environments for Agents (upcoming)
+- [Harness Engineering 101 (1/10): What Is Harness Engineering?](./01-what-is-harness-engineering.md)
+- [Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
+- [Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
+- [Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
+- [Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
+- **Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests (current)**
+- Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
+- Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (upcoming)
+- Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)
 
 <!-- toc:end -->
 
 ---
 
 ## References
+
+### Official docs and references
 
 - [OpenAI Evals Framework](https://github.com/openai/evals)
 - [Anthropic — Evaluating LLMs](https://docs.anthropic.com/en/docs/build-with-claude/develop-tests)

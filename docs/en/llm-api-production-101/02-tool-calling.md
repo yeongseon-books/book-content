@@ -1,7 +1,7 @@
 ---
 episode: 2
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -13,16 +13,12 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
-title: Tool calling — connecting functions to the model
-seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
+  tistory: false
+title: "LLM API Production 101 (2/6): Tool calling — connecting functions to the model"
+seo_description: Implement a secure tool-calling loop that connects LLMs to application functions while maintaining control over execution and permissions.
 ---
 
-# Tool calling — connecting functions to the model
-
-> LLM API Production 101 (2/6)
-
-Example code: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/en/02-tool-calling)
+# LLM API Production 101 (2/6): Tool calling — connecting functions to the model
 
 Once structured output is working, the next request usually arrives quickly: the model should not stop at answering the user, it should connect to application functions. A customer asks about an order, and you want the model to trigger `get_order_status()`. Someone asks about exchange rates, and you want the model to call an internal lookup. A scheduling request should lead to a calendar action instead of a paragraph about calendars.
 
@@ -32,20 +28,19 @@ Tool calling is a cleaner contract. The application publishes an explicit toolbo
 
 In this post, we will build the full loop with Groq's `tools` parameter and the `tool_calls` response field. The model will decide when a tool is needed, the application will parse and execute the requested call, and the tool result will be fed back into the conversation so the model can produce a final answer.
 
+This is the second post in the LLM API Production 101 series. Here we focus on connecting model responses to application functions through a controlled tool-calling loop.
+
 The main idea is straightforward: **tool calling is not model autonomy, it is an execution boundary designed by the application**.
 
-![Tool calling: connecting functions to the model](../../assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.en.png)
-
+![Tool calling: connecting functions to the model](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.en.png)
 *Tool calling: connecting functions to the model*
----
+> Tool calling is not model autonomy; it is an application-owned execution boundary.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- How is tool calling different from function calling, and does the LLM actually run functions?
-- How should you write tool definitions (name, description, parameters) so the model picks the right one?
-- How do you reduce wrong-tool selection when many tools are exposed?
-- How do you build a multi-turn loop that feeds tool results back to the model?
-- How do you recover the response when a tool call fails or times out?
+- Is tool calling model autonomy, or an execution boundary designed by the application?
+- What should you validate in the `tools` definition and the returned `tool_calls`?
+- What guardrails close the function-execution loop safely in production?
 
 ## Runtime setup
 
@@ -64,7 +59,7 @@ This post uses the official `groq` SDK and Pydantic for argument validation.
 
 ## Why string-based dispatch does not scale
 
-![Comparison between string dispatch and tool contracts](../../assets/llm-api-production-101/02/02-01-why-string-based-dispatch-does-not-scale.en.png)
+![Comparison between string dispatch and tool contracts](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-01-why-string-based-dispatch-does-not-scale.en.png)
 
 *Comparison between string dispatch and tool contracts*
 Early implementations often start with something like this:
@@ -92,7 +87,7 @@ That makes the system easier to reason about. The model proposes. The applicatio
 
 ## What goes into the `tools` parameter
 
-![Structure of a tool definition](../../assets/llm-api-production-101/02/02-02-what-goes-into-the-tools-parameter.en.png)
+![Structure of a tool definition](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-02-what-goes-into-the-tools-parameter.en.png)
 
 *Structure of a tool definition*
 With Groq chat completions, tools are typically defined as function descriptors. Each tool includes a name, a description, and an argument schema. Here is a small order-status example.
@@ -126,7 +121,7 @@ This definition matters because it communicates function intent to the model wit
 
 ## Sending the first tool-enabled request
 
-![First tool-enabled request flow](../../assets/llm-api-production-101/02/02-03-sending-the-first-tool-enabled-request.en.png)
+![First tool-enabled request flow](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-03-sending-the-first-tool-enabled-request.en.png)
 
 *First tool-enabled request flow*
 The request itself is still a normal chat completion call. The difference is that the model now receives the `tools` list and may return `tool_calls` instead of a final natural-language answer.
@@ -271,7 +266,7 @@ At this stage, the model has not fully answered the user yet. It has only reques
 
 ## Building the full function-execution loop
 
-![Round-trip tool execution loop](../../assets/llm-api-production-101/02/02-04-building-the-full-function-execution-loo.en.png)
+![Round-trip tool execution loop](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-04-building-the-full-function-execution-loo.en.png)
 
 *Round-trip tool execution loop*
 The normal production pattern looks like this:
@@ -385,7 +380,7 @@ This loop is the important mental model. The model chooses a tool. The applicati
 
 ## What to guard in production
 
-![Operational guardrails before tool execution](../../assets/llm-api-production-101/02/02-05-what-to-guard-in-production.en.png)
+![Operational guardrails before tool execution](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-05-what-to-guard-in-production.en.png)
 
 *Operational guardrails before tool execution*
 Tool calling makes a system more useful, but it also introduces new failure paths. A few controls are worth adding early.
@@ -414,15 +409,26 @@ Structured output gave us a contract for data. Tool calling extends that contrac
 - [ ] Standardized error payloads so the model can explain failures to the user
 - [ ] Added a guard (max call count) against repeated or infinite tool calls
 
+## Answering the Opening Questions
+
+- **Is tool calling model autonomy, or an execution boundary designed by the application?**
+  Tool calling is an application-defined execution boundary: the model can request only the tools and parameters the app exposes.
+
+- **What should you validate in the `tools` definition and the returned `tool_calls`?**
+  Validate tool names, descriptions, and parameter schemas on the input side, then validate the returned name and arguments before routing.
+
+- **What guardrails close the function-execution loop safely in production?**
+  Use allowlists, input validation, timeouts, structured errors, and result reinjection so the loop ends safely.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Structured output — JSON mode and response schemas](./01-structured-output.md)
-- **Tool calling — connecting functions to the model (current)**
-- Streaming in depth — chunk handling and error recovery (upcoming)
-- Caching strategies — reducing cost and latency (upcoming)
-- Retry and error handling — making API calls reliable (upcoming)
-- Rate limit management — patterns for staying within limits (upcoming)
+- [LLM API Production 101 (1/6): Structured output — JSON mode and response schemas](./01-structured-output.md)
+- **LLM API Production 101 (2/6): Tool calling — connecting functions to the model (current)**
+- LLM API Production 101 (3/6): Streaming in depth — chunk handling and error recovery (upcoming)
+- LLM API Production 101 (4/6): Caching strategies — reducing cost and latency (upcoming)
+- LLM API Production 101 (5/6): Retry and error handling — making API calls reliable (upcoming)
+- LLM API Production 101 (6/6): Rate limit management — patterns for staying within limits (upcoming)
 
 <!-- toc:end -->
 
@@ -430,5 +436,16 @@ Structured output gave us a contract for data. Tool calling extends that contrac
 
 ## References
 
-- <https://console.groq.com/docs/tool-use>
-- <https://json-schema.org/understanding-json-schema/>
+### Official Docs
+
+- [Groq tool use guide](https://console.groq.com/docs/tool-use)
+- [JSON Schema fundamentals](https://json-schema.org/understanding-json-schema/)
+
+### Verification-Friendly References
+
+- [Pydantic validation errors](https://docs.pydantic.dev/latest/errors/errors/)
+
+### Related Series
+
+- [Structured output — JSON mode and response schemas](./01-structured-output.md)
+- [Streaming in depth — chunk handling and error recovery](./03-streaming-in-depth.md)

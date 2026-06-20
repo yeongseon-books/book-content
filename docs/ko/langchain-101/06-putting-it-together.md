@@ -1,12 +1,12 @@
 ---
-title: 실전 체인 조립 — 컴포넌트를 하나로 연결하기
+title: "LangChain 101 (6/6): 실전 체인 조립 — 컴포넌트를 하나로 연결하기"
 series: langchain-101
 episode: 6
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,166 +14,565 @@ tags:
 - LCEL
 - Python
 - LLM
-last_reviewed: '2026-05-06'
+last_reviewed: '2026-05-15'
 seo_description: Prompt와 Retriever, Tool, Streaming을 하나의 LCEL 체인으로 묶는 실전 조립 패턴을 정리합니다
 ---
 
-# 실전 체인 조립 — 컴포넌트를 하나로 연결하기
+# LangChain 101 (6/6): 실전 체인 조립 — 컴포넌트를 하나로 연결하기
 
-> LangChain 101 시리즈 (6/6)
+이제까지는 부품을 하나씩 봤습니다. LCEL, 프롬프트, Retriever, Streaming, Tool Calling이 각각 어떤 역할을 하는지는 이해했지만, 실제 애플리케이션은 결국 **이 부품들을 어떻게 끼워 맞추느냐**에서 가치가 나옵니다. 그래서 마지막 글에서는 "새로운 추상화"를 배우기보다, 앞선 다섯 글의 조각이 어떤 순서로 한 파일 안에 모이는지에 집중하겠습니다.
 
-## 이 글에서 다룰 문제
+중요한 관점은 하나입니다. 통합 예제는 복잡해 보여도 본질은 그대로입니다. 인덱싱은 인덱싱대로, 질의 시점 검색은 검색대로, 프롬프트와 모델 호출은 또 따로 분리해서 보면 됩니다. **한 파일 예제라고 해서 모든 책임이 하나의 거대한 함수에 들어가야 하는 것은 아닙니다.**
 
-*개별* *컴포넌트* 만 *익혀서는* *제품* 을 *만들* *수* *없습니다*. *연결 패턴* 을 *알아야* *비즈니스* *요구사항* 에 *맞게* *조립* *가능* 합니다.
+---
 
-## 전체 흐름
-```mermaid
-flowchart LR
-    Q[Question] --> R[Retriever]
-    R --> C[Context]
-    Q --> P[Prompt]
-    C --> P
-    P --> L["LLM with Tools"]
-    L --> T[ToolNode]
-    T --> L
-    L --> S[Streaming Answer]
-```
+![전체 흐름 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-02-the-flow-at-a-glance.ko.png)
+*전체 흐름 한눈에 보기*
+> 통합 체인은 새로운 마법이 아닙니다. 앞에서 보았던 같은 *Runnable*들을, 입력과 출력 순서에 맞춰 나란히 세운 결과입니다.
 
-## Before/After
+## 먼저 던지는 질문
 
-**Before**: "*RAG*, *Tool*, *Streaming* 코드를 *각각* *함수* 로 *작성* 해 *호출* 합니다."
+- 하나의 RAG 체인은 문서 인덱싱과 질의 실행을 어떻게 분리해야 할까요?
+- retrieval 결과가 비었을 때 모델 호출 전에 어떤 가드를 둘 수 있을까요?
+- 스트리밍, 멀티턴 이력, self-contained 앱을 붙여도 구조를 잃지 않으려면 무엇을 기록해야 할까요?
 
-**After**: "*하나* 의 *LCEL 체인* 이 *전체* *흐름* 을 *책임* 집니다."
-
-## 종합 체인 5단계
-
-### 1단계 — Retriever 준비
-
-```python
-from langchain_core.documents import Document
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-
-docs = [
-    Document(page_content="LangChain 101의 RAG는 FAISS를 로컬 벡터 스토어로 사용합니다."),
-    Document(page_content="Tool Calling은 모델이 함수를 직접 호출하게 하는 패턴입니다."),
-    Document(page_content="Streaming은 stream과 astream 메서드로 토큰 단위 출력을 받습니다."),
-]
-embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-retriever = FAISS.from_documents(docs, embeddings).as_retriever(search_kwargs={"k": 2})
-```
-
-### 2단계 — Tool 정의
-
-```python
-from langchain_core.tools import tool
-
-@tool
-def word_count(text: str) -> int:
-    """문자열의 공백 기준 단어 수를 반환합니다."""
-    return len(text.split())
-
-tools = [word_count]
-```
-
-### 3단계 — Prompt와 LLM 바인딩
+## 최소 실행 예제
 
 ```python
 import os
+
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
 from langchain_groq import ChatGroq
 
-os.environ.setdefault("GROQ_API_KEY", "your-key-here")
-llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0).bind_tools(tools)
+vectorstore = FAISS.from_texts(["LCEL connects Runnables with a pipe."], HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2"))
+retriever = vectorstore.as_retriever(search_kwargs={"k": 1})
+chain = ({"context": retriever | (lambda docs: docs[0].page_content), "question": RunnablePassthrough()} | ChatPromptTemplate.from_template("Context: {context}\nQuestion: {question}") | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"]) | StrOutputParser())
 
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "주어진 컨텍스트만 사용해 한국어로 답하고 필요하면 도구를 호출합니다."),
-    ("human", "컨텍스트:\n{context}\n\n질문: {question}"),
-])
+print(chain.invoke("What is LCEL?"))
 ```
 
-### 4단계 — 체인 조립
+이 짧은 예제만 봐도 통합 구조가 보입니다. 검색은 먼저 일어나고, 검색 결과는 프롬프트에 들어가기 전에 문자열로 정리되고, 사용자의 질문은 `RunnablePassthrough()`로 그대로 보존됩니다. **검색 준비와 질의 실행은 서로 다른 시간대에 일어나는 일**이라는 점도 자연스럽게 드러납니다.
+
+## 문서 인덱싱 파이프라인
+
+![문서 청킹부터 인덱스 생성까지의 흐름](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-01-document-indexing-pipeline.ko.png)
+
+*문서 청킹부터 인덱스 생성까지의 흐름*
 
 ```python
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2",
+    model_kwargs={"device": "cpu"},
+    encode_kwargs={"normalize_embeddings": True},
+)
+
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=300,
+    chunk_overlap=30,
+    separators=["\n\n", "\n", ". ", " ", ""],
+)
+
+documents = [
+    """
+Vector search converts text into numeric vectors for meaning-based retrieval.
+Unlike keyword search, it matches content even when phrasing differs.
+Embedding models place semantically similar text close together in vector space.
+""",
+    """
+FAISS is a high-speed vector search library developed at Facebook AI Research.
+It supports both exact and approximate search and can handle billions of vectors.
+IndexFlatIP is an exact inner-product index.
+""",
+    """
+LangChain connects LLM components as a pipeline using LCEL.
+Retriever, Tool, and OutputParser all implement the Runnable interface.
+The pipe operator (|) composes components into a chain.
+""",
+    """
+RAG (Retrieval-Augmented Generation) combines retrieved documents with an LLM prompt.
+The system retrieves relevant chunks for the question and provides them as context.
+Vector search is the core retrieval component in most RAG pipelines.
+""",
+]
+
+chunks = []
+for doc in documents:
+    chunks.extend(splitter.split_text(doc))
+
+vectorstore = FAISS.from_texts(texts=chunks, embedding=embedding_model)
+retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+
+print(f"index vector count: {vectorstore.index.ntotal}")
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    index vector count: 4
+
+<!-- injected-output:end -->
+
+이 단계는 질의 처리 이전에 미리 해 두는 준비 작업입니다. 실전에서는 문서 수집, 청킹, 임베딩, 인덱스 저장이 별도 파이프라인으로 빠지는 경우가 많습니다. 한 파일 예제에서는 함께 보이지만, **비용이 큰 전처리와 요청당 실행되는 경로를 분리해서 생각하는 습관**이 중요합니다.
+
+---
+
+## 모델을 탓하기 전에 retrieval부터 검증하기
+
+RAG 통합 예제에서 가장 흔한 실수는 답이 이상하면 곧바로 프롬프트 문구를 바꾸는 것입니다. 하지만 실제로는 top-k에 어떤 청크가 들어왔는지 먼저 확인해야 원인을 빨리 좁힐 수 있습니다.
+
+```python
+queries = [
+    "Where was FAISS developed?",
+    "How does vector search differ from keyword search?",
+]
+
+for query in queries:
+    print(f"\nquery: {query}")
+    hits = vectorstore.similarity_search_with_score(query, k=2)
+    for idx, (doc, score) in enumerate(hits, start=1):
+        preview = doc.page_content.replace("\n", " ")[:90]
+        print(f"  [{idx}] score={score:.4f} text={preview}...")
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    query: Where was FAISS developed?
+      [1] score=0.7851 text=FAISS is a high-speed vector search library developed at Facebook AI Research....
+      [2] score=1.1062 text=LangChain connects LLM components as a pipeline using LCEL....
+
+    query: How does vector search differ from keyword search?
+      [1] score=0.5128 text=Vector search converts text into numeric vectors for meaning-based retrieval....
+      [2] score=0.7440 text=RAG (Retrieval-Augmented Generation) combines retrieved documents with an LLM prompt....
+
+<!-- injected-output:end -->
+
+이 검증을 먼저 해 두면 문제를 세 갈래로 나눌 수 있습니다. 상위 문서가 틀리면 retrieval 문제이고, 문서는 맞는데 답이 틀리면 prompt나 model 문제이며, 문서 수가 너무 많아 잡음이 섞이면 `k`와 chunking 문제입니다. 통합 예제일수록 이 순서가 중요합니다.
+
+---
+
+## RAG 체인 조립하기
+
+![retriever prompt llm parser 조립 흐름](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-02-assembling-the-rag-chain.ko.png)
+
+*retriever prompt llm parser 조립 흐름*
+
+```python
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
 
-def format_docs(docs):
-    return "\n\n".join(d.page_content for d in docs)
+def format_docs(docs: list) -> str:
+    return "\n\n".join(doc.page_content for doc in docs)
 
-chain = (
-    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=os.environ["GROQ_API_KEY"],
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        "system",
+        "Answer the question using only the provided documents. "
+        "If the answer is not in the documents, say so.\n\n"
+        "Documents:\n{context}",
+    ),
+    ("human", "{question}"),
+])
+
+rag_chain = (
+    {
+        "context": retriever | format_docs,
+        "question": RunnablePassthrough(),
+    }
     | prompt
     | llm
+    | StrOutputParser()
 )
 ```
 
-### 5단계 — Tool 루프 실행
+이 조립식 구조가 중요한 이유는 통합 예제가 길어져도 여전히 작은 조각 단위로 읽을 수 있기 때문입니다. retriever는 context를 만들고, prompt는 질문과 문맥을 메시지로 바꾸고, llm은 응답을 만들고, parser는 그것을 문자열로 바꿉니다.
+
+---
+
+## 빈 컨텍스트와 잡음을 먼저 차단하기
+
+실전에서는 "문서를 못 찾은 경우"와 "문서는 찾았지만 잡음이 너무 많은 경우"를 같은 프롬프트로 넘기지 않는 편이 낫습니다. 최소한 컨텍스트가 비어 있을 때는 조기 종료하고, 너무 긴 문맥은 잘라 내는 지점이 필요합니다.
 
 ```python
-from langchain_core.messages import ToolMessage
+from langchain_core.runnables import RunnableLambda
 
-tools_by_name = {t.name: t for t in tools}
+def format_docs_guarded(docs: list) -> str:
+    if not docs:
+        return "NO_CONTEXT_FOUND"
 
-def run(question: str, max_steps: int = 3) -> str:
-    ai_msg = chain.invoke(question)
-    messages = [ai_msg]
-    for _ in range(max_steps):
-        if not ai_msg.tool_calls:
-            break
-        for call in ai_msg.tool_calls:
-            result = tools_by_name[call["name"]].invoke(call["args"])
-            messages.append(ToolMessage(content=str(result), tool_call_id=call["id"]))
-        ai_msg = llm.invoke(messages)
-        messages.append(ai_msg)
-    return ai_msg.content
+    selected = docs[:2]
+    return "\n\n".join(doc.page_content for doc in selected)
 
-print(run("LangChain 101의 streaming 메서드 두 개의 이름과 글자 수를 알려 주세요."))
+guarded_chain = (
+    {
+        "context": retriever | RunnableLambda(format_docs_guarded),
+        "question": RunnablePassthrough(),
+    }
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+print(guarded_chain.invoke("What does the corpus say about LangSmith?"))
 ```
+
+<!-- injected-output:start -->
+**Output**
+
+    The provided documents do not mention LangSmith, so I cannot answer that from this corpus.
+
+<!-- injected-output:end -->
+
+이 가드는 사소해 보이지만 효과가 큽니다. 근거가 없는 답변을 억지로 만들게 하기보다, "지금 인덱스에는 없는 내용"이라고 빨리 말하게 만드는 편이 운영 품질에 훨씬 유리합니다.
+
+---
+
+## 스트리밍으로 실행하기
+
+![통합 RAG 스트리밍 실행 경로](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-03-running-with-streaming.ko.png)
+
+*통합 RAG 스트리밍 실행 경로*
+
+```python
+questions = [
+    "How is vector search different from keyword search?",
+    "Where was FAISS developed?",
+    "Why does RAG improve LLM accuracy?",
+    "What is LCEL in LangChain?",
+]
+
+for question in questions:
+    print(f"\nquestion: {question}")
+    print("answer: ", end="")
+    for chunk in rag_chain.stream(question):
+        print(chunk, end="", flush=True)
+    print()
+```
+
+여기서 좋은 점은 스트리밍 때문에 체인을 다시 설계할 필요가 없다는 사실입니다. 앞선 글에서 본 대로, 통합 체인도 `stream()`으로 소비하는 것만으로 충분합니다. 즉, **통합 예제가 길어져도 스트리밍은 출력 소비 계층의 문제**라는 사실이 유지됩니다. 또한 같은 질문을 `invoke()`와 `stream()` 둘 다 돌려 보면, retrieval·prompt·generation은 같고 전달 방식만 달라진다는 사실도 직접 확인할 수 있습니다.
+
+---
+
+## 대화 이력이 있는 멀티턴 RAG
+
+![대화 이력이 포함된 멀티턴 RAG 흐름](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-04-multi-turn-rag-with-conversation-history.ko.png)
+
+*대화 이력이 포함된 멀티턴 RAG 흐름*
+
+질문을 매번 독립적으로 처리하는 RAG만으로는 실제 챗 인터페이스를 만들기 어렵습니다. 앞선 질문과 답변을 이어 받아야 할 때는 대화 이력을 별도 입력으로 프롬프트에 넣어야 합니다.
+
+```python
+import os
+
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2",
+    model_kwargs={"device": "cpu"},
+    encode_kwargs={"normalize_embeddings": True},
+)
+
+documents = [
+    "FAISS is a high-speed vector search library developed at Facebook AI Research.",
+    "Embedding models project text into a high-dimensional vector space.",
+    "RAG combines retrieved documents with an LLM prompt.",
+    "LangChain connects LLM components using LCEL.",
+]
+
+vectorstore = FAISS.from_texts(texts=documents, embedding=embedding_model)
+retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
+
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=os.environ["GROQ_API_KEY"],
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        "system",
+        "Answer the question using only the provided documents.\n\nDocuments:\n{context}",
+    ),
+    MessagesPlaceholder("chat_history"),
+    ("human", "{question}"),
+])
+
+rag_chain = (
+    {
+        "context": retriever | (lambda docs: "\n\n".join(d.page_content for d in docs)),
+        "question": RunnablePassthrough(),
+        "chat_history": lambda x: x.get("chat_history", []),
+    }
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+def chat(question: str, history: list) -> tuple[str, list]:
+    result = rag_chain.invoke({"question": question, "chat_history": history})
+    history.append(HumanMessage(content=question))
+    history.append(AIMessage(content=result))
+    return result, history
+
+chat_history: list = []
+
+turn1, chat_history = chat("What is FAISS?", chat_history)
+print(f"[1] {turn1}\n")
+
+turn2, chat_history = chat("What are its main features?", chat_history)
+print(f"[2] {turn2}\n")
+
+turn3, chat_history = chat("How does it connect to LangChain?", chat_history)
+print(f"[3] {turn3}")
+```
+
+여기서 핵심은 `MessagesPlaceholder("chat_history")`입니다. 이 자리가 있어야 기존 대화가 프롬프트 구조를 무너뜨리지 않고 끼어들 수 있습니다. 질문만 있던 입력 스키마가 이제 `question + chat_history`로 바뀌는 셈입니다.
+
+---
+
+## self-contained 애플리케이션
+
+```python
+"""
+langchain_rag_app.py
+
+Run: python langchain_rag_app.py
+Requires: langchain langchain-community langchain-huggingface langchain-groq faiss-cpu sentence-transformers langchain-text-splitters
+"""
+import os
+
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+def build_rag_chain(documents: list[str]):
+    embedding_model = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2",
+        model_kwargs={"device": "cpu"},
+        encode_kwargs={"normalize_embeddings": True},
+    )
+
+    splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=30)
+    chunks = []
+    for doc in documents:
+        chunks.extend(splitter.split_text(doc))
+
+    vectorstore = FAISS.from_texts(texts=chunks, embedding=embedding_model)
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+
+    llm = ChatGroq(
+        model="llama-3.1-8b-instant",
+        api_key=os.environ["GROQ_API_KEY"],
+    )
+
+    prompt = ChatPromptTemplate.from_messages([
+        (
+            "system",
+            "Answer the question using only the provided documents.\n\nDocuments:\n{context}",
+        ),
+        ("human", "{question}"),
+    ])
+
+    return (
+        {
+            "context": retriever | (lambda docs: "\n\n".join(d.page_content for d in docs)),
+            "question": RunnablePassthrough(),
+        }
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+def main() -> None:
+    documents = [
+        "FAISS is a high-speed vector search library developed at Facebook AI Research.",
+        "Embedding models project text into a high-dimensional vector space.",
+        "RAG combines retrieved documents with an LLM prompt.",
+        "LangChain connects LLM components using LCEL.",
+    ]
+
+    chain = build_rag_chain(documents)
+
+    while True:
+        question = input("\nQuestion (q to quit): ").strip()
+        if question.lower() == "q":
+            break
+        if not question:
+            continue
+
+        print("Answer: ", end="")
+        for chunk in chain.stream(question):
+            print(chunk, end="", flush=True)
+        print()
+
+if __name__ == "__main__":
+    main()
+```
+
+이 예제는 길지만, 구조는 여전히 단순합니다. 문서 준비와 인덱싱은 `build_rag_chain()` 안에 있고, 실행 루프는 `main()`에 있습니다. 즉, **통합 예제에서도 작은 책임 단위로 나누는 습관**이 유지됩니다. 이 패턴을 지키면 이후에 FAISS를 다른 VectorStore로 바꾸거나, Groq를 다른 모델 공급자로 교체해도 수정 범위를 좁힐 수 있습니다.
+
+---
+
+## 통합 체인에 Tool Calling 분기 추가하기
+
+실전에서는 "검색으로 답할 질문"과 "계산 도구가 필요한 질문"이 섞여 들어옵니다. 이때는 단일 거대 체인보다 라우팅 분기를 두는 편이 유지보수에 유리합니다.
+
+```python
+from langchain_core.runnables import RunnableLambda
+
+def route_question(question: str) -> str:
+    keywords = ["더하기", "곱하기", "계산", "plus", "times"]
+    return "tool" if any(k in question.lower() for k in keywords) else "rag"
+
+router = RunnableLambda(route_question)
+
+def run_app(question: str) -> str:
+    branch = router.invoke(question)
+    if branch == "tool":
+        return run_with_tools(question)  # 4편 tool loop 재사용
+    return rag_chain.invoke(question)
+```
+
+이렇게 분기하면 검색 파이프라인과 도구 파이프라인의 실패 모드를 따로 다룰 수 있습니다. 통합 앱이 커질수록 이 분리가 중요해집니다.
+
+## 통합 경로 비교표
+
+| 질문 유형 | 경로 | 장점 | 주의점 |
+|---|---|---|---|
+| 지식 질의 | `retriever -> prompt -> llm` | 근거 기반 답변 | 인덱스 품질 의존 |
+| 계산/변환 | `llm(tool-call) -> tool -> llm` | 정확한 연산 | 루프 상한 필요 |
+| 혼합 질의 | 라우터 후 두 경로 결합 | 유연성 | 추적 복잡도 증가 |
+
+표를 보면 통합 전략의 핵심이 드러납니다. 모든 질문을 한 경로로 밀어 넣기보다, 질문 유형에 맞는 실행 경로를 먼저 정하는 것이 안정적입니다.
+
+## LangSmith로 전체 파이프라인 관측하기
+
+통합 앱은 단계가 많아서 로그가 쉽게 흩어집니다. trace 단위로 한 요청을 묶어 보면 원인 분석 속도가 크게 올라갑니다.
+
+```text
+trace_id=trc_06_full_013
+path=rag
+retriever.k=3
+retriever.latency_ms=64
+llm.latency_ms=921
+first_token_ms=355
+output_tokens=143
+status=success
+```
+
+tool 경로라면 아래처럼 run 구성이 달라집니다.
+
+```text
+trace_id=trc_06_full_014
+path=tool
+tool_calls=[add_numbers, multiply_numbers]
+tool_total_ms=3
+llm_rounds=2
+status=success
+```
+
+핵심은 경로별 지표 분리입니다. 검색 경로의 느림과 도구 경로의 느림은 원인이 다르므로, 대시보드도 분리해서 보는 편이 맞습니다.
+
+## 배포 전 최소 검증 시나리오
+
+- `지식 질의 성공`: 코퍼스 내부 질문 5개에서 근거 기반 응답 확인
+- `코퍼스 외 질문`: 근거 없음 응답 정책이 일관되게 동작하는지 확인
+- `도구 질의 성공`: 산술/변환 질문 5개에서 tool call 로그 확인
+- `스트리밍 동작`: 첫 토큰 지연과 완료 이벤트 확인
+- `재시작 안정성`: 인덱스 재로딩 후 동일 질문 품질 비교
+
+이 시나리오를 자동화해 두면, 모델 버전이나 인덱스 버전이 바뀌어도 품질 회귀를 조기에 발견할 수 있습니다.
+
+---
 
 ## 이 코드에서 주목할 점
 
-- *dict 입력 패턴* 은 *Retriever* 와 *Passthrough* 를 *병렬* 로 *실행* 합니다.
-- *Tool 루프* 는 `bind_tools` 가 *반환* 한 *모델* 을 *직접* *호출* 합니다.
-- *상한* `max_steps` 가 *없으면* *무한 루프* 위험이 *있습니다*.
+- 인덱싱 파이프라인과 질의 파이프라인을 분리하면 문서 준비 비용과 요청당 비용을 따로 이해하기 쉬워집니다.
+- `similarity_search_with_score()` 같은 점검 코드를 먼저 돌리면, 문제를 retrieval·prompt·generation 중 어디로 좁혀야 하는지 빨리 판단할 수 있습니다.
+- 통합 체인도 결국 `retriever | format_docs`와 `prompt | llm | parser` 같은 작은 LCEL 조각으로 구성됩니다.
+- 빈 컨텍스트를 조기에 처리하는 guard는 "근거 없는 답변"을 줄이는 가장 싼 안전장치입니다.
+- `MessagesPlaceholder`는 멀티턴 이력이 프롬프트 구조를 무너뜨리지 않고 들어오는 삽입 지점입니다.
+- 전체 애플리케이션이 길어 보여도, 유지보수 가능한 패턴은 여전히 작은 helper 함수로 책임을 나누는 것입니다.
 
-## 자주 하는 실수 5가지
+## 엔지니어가 자주 헷갈리는 지점
 
-1. ***Retriever 와 Tool 혼동*** — *지식 조회* 는 *Retriever*, *행동/계산* 은 *Tool* 로 *분리* 합니다.
-2. ***대화 이력 누락*** — *이전 질문* 컨텍스트가 *사라져* *답변* 이 *튀어* 보입니다.
-3. ***Tool 결과* 를 *파서* 로 *통과*** — *문자열 변환* 이 *깨질* *수* *있습니다*. *AIMessage* 단계에서 *처리* 합니다.
-4. ***streaming 과 Tool Calling 동시 사용*** — *중간* *tool 호출* 단계에서는 *content* 가 *비어* *옵니다*. *분기 처리* 가 *필요* 합니다.
-5. ***로깅 부재*** — *어떤* *문서* 와 *Tool 호출* 이 *최종 답* 을 *만들었는지* *추적* 할 수 *없습니다*.
-
-## 실무에서는 이렇게 쓰입니다
-
-*프로덕션* 에서는 *이* *수준* 의 *체인* 을 *LangGraph* 의 *그래프* 로 *옮겨* *분기* 와 *체크포인트* 를 *명시적* 으로 *관리* 합니다. *2부* 에서 다룹니다.
+- RAG 애플리케이션은 한꺼번에 보면 복잡해 보이지만, 인덱싱과 질의 실행을 나누면 훨씬 단순해집니다.
+- 검색, 프롬프트, 이력 관리는 서로 독립적으로 검증할 수 있는데도 한 번에 같이 디버깅하는 경우가 많습니다.
+- 스트리밍을 추가해도 가장 크게 바뀌는 것은 출력 소비 방식이지, 체인 정의 자체가 아닙니다.
 
 ## 체크리스트
 
-- [ ] *Retriever* 와 *Tool* 의 *역할* *분리*.
-- [ ] *Tool 루프* *상한* *명시*.
-- [ ] *각 단계* *로깅* *추가*.
-- [ ] *streaming* *시점* 을 *최종 응답* 단계로 *한정*.
+- [ ] 이 애플리케이션에서 인덱싱 시점과 질의 시점의 차이를 설명할 수 있다
+- [ ] 최종 체인 안에서 retriever, prompt, llm, parser의 역할을 말할 수 있다
+- [ ] 대화 이력이 프롬프트 구조 어디에 들어가는지 이해했다
 
-## 정리 및 다음 단계
+## 정리
 
-*LangChain 101* 시리즈는 여기서 *마칩니다*. 같은 *문제* 를 *상태 그래프* 로 *명시* *하는* *방법* 은 *LangGraph 101* 시리즈 에서 다룹니다.
+이번 시리즈는 LangChain API를 첫 원리부터 훑었습니다. LCEL과 *Runnable* 인터페이스, 프롬프트 템플릿, Retriever, Streaming, 그리고 통합 RAG 체인까지 모두 같은 인터페이스 위에서 움직인다는 점이 핵심입니다. 그래서 `|`로 자연스럽게 조합할 수 있습니다.
+
+다음 단계에서는 이런 부품들을 실제 애플리케이션 패턴에 적용하게 됩니다. 챗봇, 문서 질의응답, 에이전트, 워크플로 자동화처럼 더 큰 설계 문제는 다음 시리즈에서 이어집니다.
+
+## 처음 질문으로 돌아가기
+
+- **하나의 RAG 체인은 문서 인덱싱과 질의 실행을 어떻게 분리해야 할까요?**
+  인덱싱은 문서를 준비해 VectorStore를 만드는 단계이고, 질의 실행은 사용자 질문으로 검색과 모델 호출을 수행하는 단계입니다. 두 단계의 입력과 실패 조건을 따로 봐야 합니다.
+
+- **retrieval 결과가 비었을 때 모델 호출 전에 어떤 가드를 둘 수 있을까요?**
+  검색 결과가 비었거나 점수가 낮으면 모델을 호출하기 전에 “근거 없음” 경로로 빠지거나 사용자에게 질문을 좁히도록 요청할 수 있습니다.
+
+- **스트리밍, 멀티턴 이력, self-contained 앱을 붙여도 구조를 잃지 않으려면 무엇을 기록해야 할까요?**
+  문서 버전, 검색 설정, top_k 결과, 프롬프트 입력, 스트리밍 상태, 대화 이력 키를 기록해야 기능이 늘어도 디버깅 경계가 유지됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [LangChain 소개 — LCEL과 Runnable 기본](./01-lcel-runnable-basics.md)
-- [Prompt와 LLM Chain — 체인 첫 번째 구성](./02-prompt-llm-chain.md)
-- [Retriever — 문서 검색과 컨텍스트 주입](./03-retriever.md)
-- [Tool Calling — 외부 도구 연결하기](./04-tool-calling.md)
-- [Streaming — 실시간 출력 처리](./05-streaming.md)
-- **실전 체인 조립 — 컴포넌트를 하나로 연결하기 (현재 글)**
+- [LangChain 101 (1/6): LangChain 소개 — LCEL과 Runnable 기본](./01-lcel-runnable-basics.md)
+- [LangChain 101 (2/6): Prompt와 LLM Chain — 체인 첫 번째 구성](./02-prompt-llm-chain.md)
+- [LangChain 101 (3/6): Retriever — 문서 검색과 컨텍스트 주입](./03-retriever.md)
+- [LangChain 101 (4/6): Tool Calling — 외부 도구 연결하기](./04-tool-calling.md)
+- [LangChain 101 (5/6): Streaming — 실시간 출력 처리](./05-streaming.md)
+- **LangChain 101 (6/6): 실전 체인 조립 — 컴포넌트를 하나로 연결하기 (현재 글)**
 
 <!-- toc:end -->
 
+---
+
 ## 참고 자료
 
-- [LCEL cookbook](https://python.langchain.com/docs/how_to/sequence/)
-- [RunnableWithMessageHistory](https://python.langchain.com/docs/how_to/message_history/)
-- [Tool calling with chat models](https://python.langchain.com/docs/how_to/tool_calling/)
-- [LangChain GitHub](https://github.com/langchain-ai/langchain)
+- [LangChain RAG tutorial](https://python.langchain.com/docs/use_cases/question_answering/)
+- [LCEL reference](https://python.langchain.com/docs/expression_language/)
+- [MessagesPlaceholder](https://python.langchain.com/docs/modules/model_io/prompts/quick_start/#messagesplaceholder)
+- [FAISS VectorStore integration](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
+- [RecursiveCharacterTextSplitter](https://python.langchain.com/docs/how_to/recursive_text_splitter/)
+
+### 관련 시리즈
+
+- [LangGraph 101](../langgraph-101/01-graph-basics.md) — 단일 RAG chain을 넘어 분기, 사람 승인, 장기 상태가 필요해질 때 다음 단계로 이어집니다.
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/langchain-101/ko/06-putting-it-together)

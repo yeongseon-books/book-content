@@ -1,10 +1,10 @@
 ---
 series: operating-systems-101
 episode: 10
-title: Containers and the Operating System
-status: content-ready
+title: "Operating Systems 101 (10/10): Containers and the Operating System"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,33 @@ tags:
   - Cgroup
   - Isolation
 seo_description: Namespaces, cgroups, and overlayfs — how containers build isolated environments on a shared kernel and how far that isolation actually goes.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Containers and the Operating System
+# Operating Systems 101 (10/10): Containers and the Operating System
 
-> Operating Systems 101 series (10/10)
+Containers did not invent a new operating system. They recombine existing OS features so one kernel can host many isolated execution environments, which is why container incidents are usually OS incidents wearing a different label.
 
-<!-- a-grade-intro:begin -->
+That is also why this chapter works as the series finale: every concept we covered earlier — processes, memory, file systems, system calls — reappears here in a more operational form.
 
-**Core question**: How do containers differ from virtual machines, and how do they make a shared kernel look like an isolated system?
+This is the final post in the Operating Systems 101 series. It ties namespaces, cgroups, overlayfs, and privilege boundaries back to the OS fundamentals underneath container platforms.
 
-> Containers are not magic. They are a combination of plain Linux features — namespaces, cgroups, and overlayfs. Every concept from this series — processes, memory, file systems, system calls — reappears inside a container. This article closes the series and bridges OS fundamentals to modern infrastructure.
 
-<!-- a-grade-intro:end -->
+![operating systems 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.en.png)
+*operating systems 101 chapter 10 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Containers and the Operating System?
+- Which signal should the example or diagram make visible for Containers and the Operating System?
+- What failure should be prevented first when Containers and the Operating System reaches a real system?
+
+## Questions this article answers
+
+- How do containers and virtual machines differ in the way they provide isolation?
+- How do namespaces split "what is visible" from cgroups limiting "how much can be used"?
+- Why does overlayfs make container images feel lightweight?
+- If you understand the limits of container isolation, what extra protections should you design on top?
 
 ## What You Will Learn
 
@@ -46,9 +59,9 @@ In the container era, knowing the OS means knowing namespaces and cgroups. OOM-k
 
 > A container is not a new OS. It is a tool that slices the same OS more precisely.
 
-## Concept at a Glance
-
 > A VM puts an entire guest OS on top of a hypervisor. A container reuses the host kernel directly, isolates "what is visible" with namespaces, and limits "how much can be used" with cgroups. So containers are light and start fast, but they share kernel vulnerabilities with the host.
+
+### The layers that create container isolation
 
 ```text
 [VM]                          [Container]
@@ -146,6 +159,20 @@ docker run --rm alpine sh -c "
 
 The "root" inside a default container is weaker than the host root. Capabilities and seccomp slice privilege finely.
 
+## First triage: which OS layer failed first?
+
+When a containerized service breaks, asking only "did the app crash?" is too coarse. A faster question is which OS layer failed first.
+
+| Symptom | First check | Underlying OS layer |
+| --- | --- | --- |
+| Container exits suddenly | `docker ps -a`, exit code, OOM evidence | cgroup memory limit |
+| Works inside, not outside | port mapping, network namespace, policy | namespace / network stack |
+| CPU is available but latency jitters | `docker stats`, throttling, CPU quota | cgroup CPU scheduling |
+| Files disappear or feel slow | overlayfs layers, bind mounts, volumes | file system / overlayfs |
+| Root still cannot do something | capabilities, seccomp, rootless mode | privilege model |
+
+This table turns the vague statement "the container is weird" into a sequence of OS-level first checks. In production, that change in framing usually saves more time than any one command.
+
 ## What to Notice in This Code
 
 - Isolation is the sum of namespaces, cgroups, seccomp, and capabilities
@@ -199,17 +226,29 @@ A container is not a new OS but a tool that slices the same Linux OS precisely w
 
 This series ends here. As a next step, follow the same OS concepts outward into networks and distributed systems (Computer Networks 101, Distributed Systems 101), or go deeper into container operations themselves (Docker 101, Kubernetes 101).
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Containers and the Operating System?**
+  - The article treats Containers and the Operating System as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Containers and the Operating System?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Containers and the Operating System reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Operating System?](./01-what-is-an-operating-system.md)
-- [Processes and Threads](./02-processes-and-threads.md)
-- [Scheduling](./03-scheduling.md)
-- [Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
-- [Locks, Mutexes, and Semaphores](./05-locks-mutex-semaphore.md)
-- [Memory Management](./06-memory-management.md)
-- [Virtual Memory](./07-virtual-memory.md)
-- [File Systems](./08-file-systems.md)
-- [System Calls](./09-system-calls.md)
+## In this series
+
+- [Operating Systems 101 (1/10): What Is an Operating System?](./01-what-is-an-operating-system.md)
+- [Operating Systems 101 (2/10): Processes and Threads](./02-processes-and-threads.md)
+- [Operating Systems 101 (3/10): Scheduling](./03-scheduling.md)
+- [Operating Systems 101 (4/10): Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
+- [Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores](./05-locks-mutex-semaphore.md)
+- [Operating Systems 101 (6/10): Memory Management](./06-memory-management.md)
+- [Operating Systems 101 (7/10): Virtual Memory](./07-virtual-memory.md)
+- [Operating Systems 101 (8/10): File Systems](./08-file-systems.md)
+- [Operating Systems 101 (9/10): System Calls](./09-system-calls.md)
 - **Containers and the Operating System (current)**
+
 <!-- toc:end -->
 
 ## References
@@ -218,3 +257,5 @@ This series ends here. As a next step, follow the same OS concepts outward into 
 - [Linux cgroups(7)](https://man7.org/linux/man-pages/man7/cgroups.7.html)
 - [Open Container Initiative](https://opencontainers.org/)
 - [Docker — Overview](https://docs.docker.com/get-started/overview/)
+- [Docker rootless mode](https://docs.docker.com/engine/security/rootless/)
+- [OCI Runtime Specification](https://github.com/opencontainers/runtime-spec)

@@ -1,10 +1,10 @@
 ---
 series: calculus-for-ml-101
 episode: 6
-title: Loss Function
-status: content-ready
+title: "Calculus for ML 101 (6/10): Loss Function"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,40 @@ tags:
   - MSE
   - Beginner
 seo_description: A beginner-friendly tour of loss functions, MSE, cross entropy, gradients, and the training signal intuition for ML
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Loss Function
+# Calculus for ML 101 (6/10): Loss Function
 
-> Calculus for ML 101 series (6/10)
+Producing a prediction is not enough to start learning. You still need a numerical rule that says how wrong that prediction was, and a differentiable way to turn that error into an update signal. That rule is the loss function.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Calculus for ML 101 series.
 
-**Core question**: What *function* should we use to *score* how well an ML model did?
+In this post, we'll use MSE, cross entropy, and gradient-based training signals to show that a loss function is more than a scoreboard. It is the concrete definition of what you want the model to become good at, and its design shapes every update that follows.
 
-> A *loss function* turns the *gap* between *prediction* and *truth* into a *number*, and its *gradient* drives training.
+> A loss function does not merely report error after the fact. It creates the pressure signal that pushes the model toward a different set of parameters.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![calculus for ml 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 6 flow overview*
 
-- The definition of *loss*
-- *MSE* for regression
-- *Cross entropy* for classification
-- The meaning of the *gradient*
-- *Training signal* intuition
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Loss Function?
+- Which signal should the example or diagram make visible for Loss Function?
+- What failure should be prevented first when Loss Function reaches a real system?
+
+## Questions this article answers
+
+- How is a loss function different from a simple evaluation metric?
+- Why is MSE common in regression and cross entropy common in classification?
+- Why is the gradient of a loss function called a training signal?
+- How does the choice between averaging and summing affect optimization scale?
+- How can a numerically unstable loss implementation break training?
 
 ## Why It Matters
 
 The *wrong loss* yields the *wrong model*. *Choosing the loss* is *defining the problem*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Y[y true] --> L[Loss]
-    P[y pred] --> L
-    L --> G[Gradient]
-    G --> U[Update]
-```
 
 ## Key Terms
 
@@ -152,17 +150,29 @@ def signal(y, p):
 
 Next post: *Gradient Descent*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Loss Function?**
+  - The article treats Loss Function as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Loss Function?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Loss Function reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Derivative](./01-what-is-derivative.md)
-- [Functions and Slope](./02-functions-and-slope.md)
-- [Partial Derivatives](./03-partial-derivatives.md)
-- [Gradient](./04-gradient.md)
-- [Chain Rule](./05-chain-rule.md)
+## In this series
+
+- [Calculus for ML 101 (1/10): What Is a Derivative](./01-what-is-derivative.md)
+- [Calculus for ML 101 (2/10): Functions and Slope](./02-functions-and-slope.md)
+- [Calculus for ML 101 (3/10): Partial Derivatives](./03-partial-derivatives.md)
+- [Calculus for ML 101 (4/10): Gradient](./04-gradient.md)
+- [Calculus for ML 101 (5/10): Chain Rule](./05-chain-rule.md)
 - **Loss Function (current)**
 - Gradient Descent (upcoming)
 - Optimization (upcoming)
 - Backpropagation Intuition (upcoming)
 - Calculus in Deep Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

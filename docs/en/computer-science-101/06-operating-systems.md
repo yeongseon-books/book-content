@@ -1,10 +1,10 @@
 ---
 series: computer-science-101
 episode: 6
-title: Operating Systems
-status: content-ready
+title: "Computer Science 101 (6/10): Operating Systems"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,34 @@ tags:
   - Virtual Memory
   - Concurrency
 seo_description: How an operating system manages processes, threads, memory, and system calls — and why your concurrency choices depend on it.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Operating Systems
+# Computer Science 101 (6/10): Operating Systems
 
-> Computer Science 101 series (6/10)
+The moment one machine seems to run many programs at once, you are already living inside an operating-system abstraction. The same perspective explains why a web server stalls, why a memory leak becomes visible, and why threads do not always make Python faster.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Computer Science 101 series.
 
-**Key question**: Why does it look like hundreds of programs run at the same time on a single machine?
+In this article, we'll turn processes, threads, virtual memory, system calls, and concurrency into a practical model you can use while debugging and designing software.
 
-> The operating system sits between hardware and applications. It hands CPU and memory out to many programs and gives them a uniform way to reach files, networks, and other resources. Every line of code we write eventually relies on the OS. This article covers processes, threads, virtual memory, system calls, and the basics of concurrency.
 
-<!-- a-grade-intro:end -->
+![Computer Science 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/06/06-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Operating Systems?
+- Which signal should the example or diagram make visible for Operating Systems?
+- What failure should be prevented first when Operating Systems reaches a real system?
+
+## Questions This Article Answers
+
+- Why does one machine appear to run many programs at once?
+- How do processes and threads differ in memory sharing and isolation?
+- Why is virtual memory such a useful abstraction?
+- What cost appears at the user/kernel boundary when a system call happens?
+- Why do CPU-bound and I/O-bound tasks need different concurrency strategies?
 
 ## What You Will Learn
 
@@ -48,24 +62,7 @@ Why a web server stalls, how a memory leak shows up to the OS, why multithreadin
 
 Without understanding OS abstractions, debugging starts to feel like magic.
 
-## Concept at a Glance
-
 > A process is an isolated execution unit. A thread is a flow of execution that shares memory with other threads inside the same process.
-
-```text
-Process A                       Process B
-┌───────────────────┐           ┌───────────────────┐
-│ Virtual address   │           │ Virtual address   │
-│  ┌─────────────┐  │           │  ┌─────────────┐  │
-│  │ Thread 1    │  │           │  │ Thread 1    │  │
-│  │ Thread 2    │  │           │  │             │  │
-│  └─────────────┘  │           │  └─────────────┘  │
-└─────────┬─────────┘           └─────────┬─────────┘
-          │                               │
-          └───── Operating system ────────┘
-                       │
-                  Hardware (CPU, RAM, disk)
-```
 
 ## Key Terms
 
@@ -101,7 +98,6 @@ import urllib.request
 def fetch(url: str) -> bytes:
     return urllib.request.urlopen(url).read()
 
-
 with ThreadPoolExecutor(max_workers=20) as pool:
     results = list(pool.map(fetch, urls))
 # About 5-10 seconds — other requests progress while one waits
@@ -116,10 +112,8 @@ import os
 import threading
 import multiprocessing
 
-
 def show_id(label: str) -> None:
     print(f"{label}: pid={os.getpid()}, tid={threading.get_ident()}")
-
 
 print("[main]")
 show_id("main")
@@ -142,13 +136,11 @@ p.join()
 import time
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 
-
 def cpu_heavy(n: int) -> int:
     total = 0
     for i in range(n):
         total += i * i
     return total
-
 
 N = 10_000_000
 work = [N] * 4
@@ -167,6 +159,8 @@ with ProcessPoolExecutor(max_workers=4) as pool:
     list(pool.map(cpu_heavy, work))
 print(f"processes x4: {time.perf_counter() - start:.2f}s")  # about 4x faster
 ```
+
+**Expected output:** for CPU-bound work, `threads x4` should stay close to `sequential`, while `processes x4` should finish noticeably faster.
 
 ### Step 3: Look inside a system call
 
@@ -204,18 +198,15 @@ print(f"page faults    : {usage.ru_minflt}")    # page-fault count
 import asyncio
 import time
 
-
 async def task(name: str, sec: float) -> None:
     print(f"{name} starting")
     await asyncio.sleep(sec)        # simulate I/O wait
     print(f"{name} done")
 
-
 async def main() -> None:
     start = time.perf_counter()
     await asyncio.gather(task("A", 1), task("B", 1), task("C", 1))
     print(f"total elapsed: {time.perf_counter() - start:.2f}s")  # about 1s
-
 
 asyncio.run(main())
 ```
@@ -273,17 +264,29 @@ The OS abstracts hardware so that many programs can coexist safely. Processes, t
 
 The next article moves beyond a single machine to how computers exchange data — networks.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Operating Systems?**
+  - The article treats Operating Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Operating Systems?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Operating Systems reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
-- [Computation and Programs](./02-computation-and-programs.md)
-- [Data Representation](./03-data-representation.md)
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
-- [Computer Architecture](./05-computer-architecture.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): Computation and Programs](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): Data Representation](./03-data-representation.md)
+- [Computer Science 101 (4/10): Algorithms and Complexity](./04-algorithms-and-complexity.md)
+- [Computer Science 101 (5/10): Computer Architecture](./05-computer-architecture.md)
 - **Operating Systems (current)**
-- [Networks](./07-networks.md)
-- [Databases](./08-databases.md)
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Networks (upcoming)
+- Databases (upcoming)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -5,7 +5,7 @@ episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -15,7 +15,7 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
-seo_description: '"The app is slow." "There''s an error." "When did this start?"'
+seo_description: Master Azure App Service logging and monitoring. Learn to collect filesystem logs, use Application Insights, and write KQL queries for debugging.
 ---
 
 # Logging and Monitoring Basics
@@ -23,6 +23,8 @@ seo_description: '"The app is slow." "There''s an error." "When did this start?"
 "The app is slow." "There's an error." "When did this start?"
 
 To answer these questions, **logging and monitoring** are essential. In this post, we'll explore how to collect and analyze logs in App Service.
+
+This is the sixth post in the Azure App Service 101 series. It shows how to turn App Service from a black box into a system you can observe, query, and debug under pressure.
 
 ---
 
@@ -38,11 +40,11 @@ To answer these questions, **logging and monitoring** are essential. In this pos
 
 Understanding the log flow in App Service is the first step.
 
-![App logs flowing to files and monitoring](../../assets/azure-app-service-101/06/01-log-flow-architecture.en.png)
+![App logs flowing to files and monitoring](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/06/01-log-flow-architecture.en.png)
 
 *App logs flowing to files and monitoring*
 
-```
+```text
 Flask App (logger.info) → stdout/stderr → App Service Runtime
  ↓
  ┌─────────────────┴─────────────────┐
@@ -57,7 +59,7 @@ Flask App (logger.info) → stdout/stderr → App Service Runtime
 | `/home/LogFiles/Application/` | Max 100MB/7 days | Short-term log archive |
 | Application Insights | 90 days default | Long-term analysis, alerts, KQL |
 
-![Observability stages from logs to tracing](../../assets/azure-app-service-101/06/02-observability-maturity.en.png)
+![Observability stages from logs to tracing](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/06/02-observability-maturity.en.png)
 
 *Observability stages from logs to tracing*
 
@@ -121,7 +123,7 @@ az webapp log tail \
 
 Send a request and logs appear immediately:
 
-```
+```text
 2025-04-07T10:30:15.123Z {"level": "info", "message": "Request processed", "userId": "user-123"}
 2025-04-07T10:30:15.456Z {"level": "error", "message": "Database connection failed", "error": "timeout"}
 ```
@@ -149,17 +151,17 @@ import json
 from datetime import datetime
 
 class JsonFormatter(logging.Formatter):
- def format(self, record):
- log_obj = {
- "timestamp": datetime.utcnow().isoformat() + "Z",
- "level": record.levelname.lower(),
- "message": record.getMessage(),
- "logger": record.name,
- }
- # Merge additional fields
- if hasattr(record, "custom_dimensions"):
- log_obj.update(record.custom_dimensions)
- return json.dumps(log_obj)
+    def format(self, record):
+        log_obj = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "level": record.levelname.lower(),
+            "message": record.getMessage(),
+            "logger": record.name,
+        }
+        # Merge additional fields
+        if hasattr(record, "custom_dimensions"):
+            log_obj.update(record.custom_dimensions)
+        return json.dumps(log_obj)
 
 # Handler setup
 handler = logging.StreamHandler()
@@ -174,9 +176,9 @@ logger.setLevel(logging.INFO)
 
 ```python
 logger.info("Order created", extra={"custom_dimensions": {
- "orderId": "ORD-12345",
- "userId": "user-789",
- "totalAmount": 150.00
+    "orderId": "ORD-12345",
+    "userId": "user-789",
+    "totalAmount": 150.00
 }})
 ```
 
@@ -191,7 +193,7 @@ logger.info("Order created", extra={"custom_dimensions": {
 
 To link all logs from a single request, you need a **Correlation ID**.
 
-![Correlation ID across a single request](../../assets/azure-app-service-101/06/03-correlation-id-flow.en.png)
+![Correlation ID across a single request](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/06/03-correlation-id-flow.en.png)
 
 *Correlation ID across a single request*
 
@@ -374,12 +376,12 @@ az monitor metrics alert create \
 
 ### Access via Kudu
 
-```
+```text
 https://<app-name>.scm.azurewebsites.net
 ```
 
 **Paths:**
-```
+```text
 /home/LogFiles/
 ├── <hostname>_docker.log ← Container stdout
 ├── Application/

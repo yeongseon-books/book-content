@@ -1,10 +1,10 @@
 ---
 series: programming-languages-101
 episode: 3
-title: Type Systems
-status: content-ready
+title: "Programming Languages 101 (3/10): Type Systems"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,44 +18,39 @@ tags:
   - Dynamic
   - Inference
 seo_description: A type system is not just data tagging. It is a proof tool that rejects nonsense programs before they run. Walk through the core ideas and tradeoffs.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Type Systems
+# Programming Languages 101 (3/10): Type Systems
 
-> Programming Languages 101 series (3/10)
+Dynamic languages run perfectly well for a long time. Then the project grows, the team grows, and people start adding type hints, CI checks, and tighter interfaces again. That repeated move is a clue: types solve a practical problem that only becomes more obvious at scale.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Programming Languages 101 series.
 
-**Core question**: Dynamic languages run fine without type annotations, so why do we keep going back and adding them?
+In this post, we will treat a type system not as simple data labeling but as a way to reject nonsensical combinations before they run. We will compare static and dynamic typing, strong and weak typing, and then look at why inference and generics raise productivity instead of just adding ceremony.
 
-> A type system is not just data tagging. It is a tool that **proves, before the program runs, that it does not do nonsensical things**. Static typing buys safety and tooling at the cost of a small amount of expressive freedom; dynamic typing trades the other way. This episode looks at the deal both sides accept.
 
-<!-- a-grade-intro:end -->
+![programming languages 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/03/03-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 3 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The roles a type plays — checking, documentation, tool support
-- The tradeoffs between static and dynamic typing
-- How strong/weak differs from static/dynamic
-- What type inference actually buys you
-- The intuition behind generics and union/intersection types
+- What boundary should you inspect first when applying Type Systems?
+- Which signal should the example or diagram make visible for Type Systems?
+- What failure should be prevented first when Type Systems reaches a real system?
+
+## Questions this article answers
+
+- What role does a type actually play?
+- What do static types and dynamic types check, and when do they check it?
+- Why are strong vs weak typing and static vs dynamic typing different axes?
+- Why do type inference and generics improve productivity?
 
 ## Why It Matters
 
 Most modern languages have some kind of type system, and even Python, JavaScript, and Ruby grew gradual type systems (type hints, TypeScript). To use autocompletion, refactoring tools, and build-stage error messages well, you need to understand types. The later episodes — scope and closures — also operate on top of types.
 
 > A type narrows down, in advance, which inputs are even legal.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    A["Source code"] --> B["Type checker"]
-    B -->|pass| C["Compile / Run"]
-    B -->|fail| D["Error before run"]
-    E["Types as docs"] --> F["IDE: completion, refactor"]
-```
 
 The type checker rules out impossible calls before runtime. Simultaneously, it gives the IDE the basis for autocompletion and safe refactoring.
 
@@ -157,6 +152,33 @@ def total_price(items: list[dict]) -> int:
 
 Trying to write the type accurately tends to expose ambiguity in the data model itself. That ambiguity is usually where the real bug lives.
 
+### Step 6 — Validate at the boundary, then narrow to a precise type
+
+```python
+# 6_boundary.py
+from typing import TypedDict
+
+class LineItem(TypedDict):
+    price: int
+    quantity: int
+
+def parse_line_item(raw: dict[str, object]) -> LineItem:
+    price = raw.get("price")
+    quantity = raw.get("quantity")
+    if not isinstance(price, int) or not isinstance(quantity, int):
+        raise ValueError("price and quantity must be integers")
+    return {"price": price, "quantity": quantity}
+
+def subtotal(item: LineItem) -> int:
+    return item["price"] * item["quantity"]
+
+payload = {"price": 1200, "quantity": 3}
+item = parse_line_item(payload)
+print(subtotal(item))  # 3600
+```
+
+This is the practical boundary pattern. Runtime validation narrows a JSON-like payload first, then the rest of the program benefits from precise types, safer refactoring, and better autocomplete.
+
 ## What to Notice in This Code
 
 - A type is checking, documentation, and tool input all at once.
@@ -204,9 +226,20 @@ Types are a refactoring safety net. When changing the order of a function's argu
 
 A type system gives you safety, documentation, and tooling at the same time. Not every language needs every level of typing, but for large systems with many boundaries it is almost always a win. Next we look at another universal pillar — scope and binding.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Type Systems?**
+  - The article treats Type Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Type Systems?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Type Systems reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
 - **Type Systems (current)**
 - Scope and Binding (upcoming)
 - Functions and Closures (upcoming)
@@ -215,11 +248,14 @@ A type system gives you safety, documentation, and tooling at the same time. Not
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
 - [Types and Programming Languages (Pierce)](https://www.cis.upenn.edu/~bcpierce/tapl/)
+- [Python typing documentation](https://docs.python.org/3/library/typing.html)
 - [mypy documentation](https://mypy.readthedocs.io/)
+- [PEP 589 — TypedDict](https://peps.python.org/pep-0589/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/)
 - [PEP 484 — Type Hints](https://peps.python.org/pep-0484/)

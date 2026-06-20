@@ -1,10 +1,10 @@
 ---
 series: computer-architecture-101
 episode: 9
-title: Parallelism and Multicore
+title: "Computer Architecture 101 (9/10): Parallelism and Multicore"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: Why eight cores rarely give 8x speedup, the difference between 
 last_reviewed: '2026-05-04'
 ---
 
-# Parallelism and Multicore
+# Computer Architecture 101 (9/10): Parallelism and Multicore
 
 > Computer Architecture 101 series (9/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: With eight cores, will a program run exactly 8x faster? If not, what sets the limit?
 
 > Clock speed stopped climbing around 2005, and every gain in performance since has come from adding cores and exploiting parallelism. But adding cores does not automatically make code faster. Some work is inherently sequential, and communication between cores is never free. This article lays out the mental model for using multicore well: concurrency vs parallelism, the cost of synchronization, and Amdahl's law.
 
-<!-- a-grade-intro:end -->
+This is post 9 in the Computer Architecture 101 series.
+
+
+![computer architecture 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/09/09-01-big-picture.en.png)
+*computer architecture 101 chapter 9 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Parallelism and Multicore?
+- Which signal should the example or diagram make visible for Parallelism and Multicore?
+- What failure should be prevented first when Parallelism and Multicore reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 Every server, laptop, and phone is multicore today. Single-core clocks are no longer rising, so squeezing out performance means dividing work across cores. Done badly, this makes things slower. Lock contention, cache ping-pong, and false sharing wait at every corner.
 
 > Parallelism is not free. Always start by asking "is this work worth parallelizing?"
-
-## Concept at a Glance
 
 > Concurrency is the structural ability to deal with many tasks. Parallelism is physically running tasks at the same time. Multicore enables parallelism, but data movement between cores has a cost. Cache coherence keeps data consistent automatically, but contention on the same line crashes performance. Amdahl's law says "if 5% is sequential, no number of cores breaks past 20x speedup."
 
@@ -272,17 +278,29 @@ Parallelism is the heart of the multicore era, but it is not automatic. Distingu
 
 Next is the final article in this series — measuring and analyzing performance. We pull together everything from CPU to memory to I/O to parallelism into a thinking tool that explains why a system is as fast or slow as it is.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Parallelism and Multicore?**
+  - The article treats Parallelism and Multicore as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Parallelism and Multicore?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Parallelism and Multicore reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Architecture?](./01-what-is-computer-architecture.md)
-- [Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
-- [CPU and Instructions](./03-cpu-and-instructions.md)
-- [Registers and the ALU](./04-registers-and-alu.md)
-- [Memory Organization](./05-memory-organization.md)
-- [Cache and Locality](./06-cache-and-locality.md)
-- [Pipelining](./07-pipelining.md)
-- [I/O and Devices](./08-io-and-devices.md)
+## In this series
+
+- [Computer Architecture 101 (1/10): What Is Computer Architecture?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU and Instructions](./03-cpu-and-instructions.md)
+- [Computer Architecture 101 (4/10): Registers and the ALU](./04-registers-and-alu.md)
+- [Computer Architecture 101 (5/10): Memory Organization](./05-memory-organization.md)
+- [Computer Architecture 101 (6/10): Cache and Locality](./06-cache-and-locality.md)
+- [Computer Architecture 101 (7/10): Pipelining](./07-pipelining.md)
+- [Computer Architecture 101 (8/10): I/O and Devices](./08-io-and-devices.md)
 - **Parallelism and Multicore (current)**
 - Understanding Performance (upcoming)
+
 <!-- toc:end -->
 
 ## References

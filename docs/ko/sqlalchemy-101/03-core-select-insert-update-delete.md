@@ -1,13 +1,13 @@
 ---
-title: SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기
+title: "SQLAlchemy 101 (3/10): SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기"
 series: sqlalchemy-101
 episode: 3
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,50 +17,50 @@ tags:
 - SQL Expression
 - Result
 - SQLite
-last_reviewed: '2026-05-03'
-seo_description: 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다.
+last_reviewed: '2026-05-12'
+seo_description: select, insert, update, delete를 SQLAlchemy 2.x Core 스타일로 설명합니다
 ---
 
-# SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기
+# SQLAlchemy 101 (3/10): SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기
 
-> SQLAlchemy 101 시리즈 (3/10)
+SQLAlchemy Core를 쓸 때 진짜 생산성이 나오는 지점은 문자열 SQL을 붙여 넣는 순간이 아니라, 스키마 객체를 바탕으로 쿼리를 조립하기 시작하는 순간입니다. 이 단계부터 컬럼 이름, 조건식, 결과 처리 방식이 더 예측 가능해집니다.
 
----
+이 글은 SQLAlchemy 101 시리즈의 세 번째 글입니다. 여기서는 `select()`, `insert()`, `update()`, `delete()`와 `Result` 객체를 2.x 스타일 기준으로 정리합니다.
 
-2편에서 우리는 `MetaData`와 `Table`로 schema를 Python 객체로 만들었습니다. 이제 그 객체로 실제 SQL을 빌드할 차례입니다. raw `text()`만으로도 SQL을 실행할 수는 있지만, Core SQL expression의 진가는 Python으로 SQL을 조립하면서 컴파일 단계에서 typo와 type 오류를 잡고, dialect 차이에 흔들리지 않게 만드는 데 있습니다.
+2편에서 만든 `MetaData`와 `Table`이 이번 글부터 실제로 움직이기 시작합니다. 이후 ORM을 쓰더라도 복잡한 조회나 서브쿼리를 다룰 때는 결국 같은 Core 표현식으로 내려오기 때문에, 이 감각을 지금 잡아 두는 편이 좋습니다.
 
-이 글은 SQLAlchemy 2.x style의 `select()`, `insert()`, `update()`, `delete()`와 결과를 다루는 `Result`/`Row` 객체를 정리합니다. 1편의 Engine, 2편의 schema가 여기서 합쳐져 한 권의 작은 작업 매뉴얼이 됩니다.
-
-![SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기](../../assets/sqlalchemy-101/03/03-01-sqlalchemy-core-select-insert-update-del.ko.png)
+![SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-01-sqlalchemy-core-select-insert-update-del.ko.png)
 
 *SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기*
-## 핵심 질문
 
-Core의 select·insert·update·delete를 2.x style로 어떻게 다뤄야 안전할까요?
+![SQLAlchemy 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-02-why-this-matters.ko.png)
+*SQLAlchemy 101 3장 흐름 개요*
+> SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-이 글은 그 질문에 답하기 위해 Core CRUD 2.x style의 핵심 결정과 운영 함정을 살펴봅니다.
+## 먼저 던지는 질문
 
-## 이 글에서 다룰 문제
+- `select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요?
+- `insert`, `update`, `delete`를 2.x 트랜잭션 모델과 함께 어떻게 써야 할까요?
+- `JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요?
 
-![핵심 개념](../../assets/sqlalchemy-101/03/03-02-why-this-matters.ko.png)
+## 왜 중요한가
 
-*핵심 개념*
 raw SQL 문자열로만 작업하면 다음 세 가지 비용이 누적됩니다. 첫째, 컬럼 이름 변경이 발생할 때마다 application 전체 grep이 필요합니다. 둘째, 같은 SQL을 여러 곳에서 약간씩 다르게 적게 되어 동작이 미묘하게 달라집니다. 셋째, dialect 차이를 모두 손으로 처리해야 합니다.
 
 Core SQL expression은 schema 객체와 Python 표현식을 조합해 SQL을 구성하므로 첫 두 비용을 거의 0으로 만듭니다. 컬럼 이름 변경은 schema 한 곳만 바꾸면 import 시점에 영향을 받는 모든 expression이 자동으로 따라옵니다. 같은 select 객체를 함수로 캡슐화해 재사용할 수 있고, dialect 별 차이는 SQLAlchemy compiler가 알아서 풀어줍니다.
 
 또한 ORM이 본격적으로 등장하는 4편 이후에도 Core SQL expression은 사라지지 않습니다. ORM의 `select()`는 Core의 `select()`와 같은 객체이고, 복잡한 쿼리에서는 결국 Core 표현식으로 내려와야 합니다. 이 글이 그 토대를 만듭니다.
 
-## Mental Model
+## 멘탈 모델
 
-![Mental model](../../assets/sqlalchemy-101/03/03-03-mental-model.ko.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-03-mental-model.ko.png)
 
-*Mental model*
+*멘탈 모델*
 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다. `select(...)`로 시작해서 `where`, `order_by`, `limit` 같은 메서드를 호출하면 새로운 statement 객체가 반환되고, 마지막에 Connection이 그것을 실행해 `Result`를 돌려줍니다.
 
 > 2.x의 select은 immutable한 statement 객체다. 메서드를 호출할 때마다 원본은 변하지 않고 새로운 statement가 만들어진다. Result는 한 번만 순회 가능한 stream-like 객체이며, 무엇을 꺼낼지(`Row`, scalar, mapping)는 Result에서 결정한다.
 
-```
+```text
 select(users.c.id, users.c.name)        # statement 1
    .where(users.c.email == "a@x.com")   # statement 2
    .order_by(users.c.id)                 # statement 3
@@ -81,7 +81,7 @@ select(users.c.id, users.c.name)        # statement 1
 
 ## 핵심 개념
 
-![핵심 개념](../../assets/sqlalchemy-101/03/03-04-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-04-core-concepts.ko.png)
 
 *핵심 개념*
 ### select 기본형
@@ -243,14 +243,14 @@ def safe_delete(conn, table, condition):
 JOIN은 두 가지 방식으로 적을 수 있습니다.
 
 ```python
-# A: select(...).join(...)
+# A 방식: select(...).join(...)
 stmt = (
     select(users.c.name, posts.c.title)
     .join(posts, posts.c.user_id == users.c.id)
     .order_by(posts.c.created_at.desc())
 )
 
-# B: select(...).select_from(a.join(b, ...))
+# B 방식: select(...).select_from(a.join(b, ...))
 joined = users.join(posts, posts.c.user_id == users.c.id)
 stmt = select(users.c.name, posts.c.title).select_from(joined)
 ```
@@ -293,9 +293,9 @@ stmt = select(users.c.id, func.count(posts.c.id).label("post_count")).join(posts
 
 `label()`로 alias를 주면 `row.post_count`로 접근할 수 있습니다.
 
-## Before-After
+## 이전 방식과 개선 방식
 
-### Before: text 기반 동적 쿼리
+### 이전: text 기반 동적 쿼리
 
 ```python
 def find_users(active=None, email_like=None, limit=10):
@@ -312,7 +312,7 @@ def find_users(active=None, email_like=None, limit=10):
 
 문제: 문자열 조립이 깨지기 쉽고, `LIMIT`처럼 binding되지 않는 부분에서 type 오류·SQL injection 위험이 생깁니다.
 
-### After: select 기반 동적 쿼리
+### 개선 후: select 기반 동적 쿼리
 
 ```python
 from sqlalchemy import select
@@ -333,7 +333,7 @@ def find_users(active=None, email_like=None, limit=10):
 
 ## 단계별 실습
 
-![단계별 실습](../../assets/sqlalchemy-101/03/03-05-step-by-step-practice.ko.png)
+![단계별 실습](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-05-step-by-step-practice.ko.png)
 
 *단계별 실습*
 ### 1단계: 데이터 준비
@@ -439,7 +439,7 @@ stmt = select(users.c.name, cte.c.n).join(cte, cte.c.user_id == users.c.id)
 실무 코드에서 select은 보통 함수로 캡슐화해서 재사용합니다.
 
 ```python
-# repos/user_repo.py
+# repos/user_repo.py 예시
 from sqlalchemy import select, insert, update
 from schema import users
 
@@ -457,7 +457,7 @@ def deactivate_user(conn, user_id: int) -> int:
     ).rowcount
 ```
 
-이 패턴의 핵심은 함수가 `Connection`을 인자로 받는다는 점입니다. transaction 경계는 호출 측이 결정하므로 같은 함수가 한 transaction 안에서 다른 함수와 함께 호출될 수 있습니다. ORM의 Session도 같은 원칙으로 동작합니다(5편에서 다룹니다).
+이 패턴에서 중요한 점은 함수가 `Connection`을 인자로 받는다는 사실입니다. transaction 경계는 호출 측이 결정하므로 같은 함수가 한 transaction 안에서 다른 함수와 함께 호출될 수 있습니다. ORM의 Session도 같은 원칙으로 동작합니다(5편에서 다룹니다).
 
 읽기 함수가 list를 반환할 때는 `.all()`이 아닌 `.scalars().all()`이나 `.mappings().all()`이 더 다루기 쉬울 때가 많습니다. JSON 응답으로 그대로 직렬화하려면 `.mappings().all()`이 가장 자연스럽습니다.
 
@@ -491,19 +491,56 @@ with engine.connect().execution_options(stream_results=True) as conn:
 
 다음 글부터 ORM이 등장합니다. 4편에서는 `DeclarativeBase`와 `mapped_column`으로 Python class를 데이터베이스 row와 매핑하는 방법을 다룹니다. 이 글에서 본 `users.c.name`이 ORM에서는 `User.name`으로 바뀌고, `select(users)`가 `select(User)`로 바뀌는 것이 핵심 차이입니다. Core를 정확히 이해하고 ORM으로 올라가야 ORM의 마법을 디버깅할 수 있습니다.
 
+## 실전 앵커: Core 쿼리와 실행 계획 확인 루틴
+
+Core 표현식이 안전하다는 말은 성능까지 자동으로 보장된다는 뜻이 아닙니다. 실행 SQL과 인덱스 사용 여부는 여전히 확인해야 합니다. SQLite에서는 `EXPLAIN QUERY PLAN`을 붙여 즉시 확인할 수 있습니다.
+
+```python
+stmt = select(users.c.id, users.c.email).where(users.c.email == "alice@example.com")
+compiled = stmt.compile(compile_kwargs={"literal_binds": True})
+
+with engine.connect() as conn:
+    rows = conn.execute(text(f"EXPLAIN QUERY PLAN {compiled}"))
+    for row in rows:
+        print(row)
+```
+
+운영에서는 이 루틴을 쿼리 회귀 테스트에 넣어 두면 좋습니다. 인덱스를 타던 경로가 어느 순간 `SCAN users`로 바뀌면 응답 시간이 갑자기 튀기 시작합니다. Core를 쓰든 ORM을 쓰든, 마지막 실행 계획 검증은 동일합니다.
+
+## 실전 앵커: SQL echo 출력으로 버그 재현하기
+
+다음은 `update` 버그를 재현할 때 실제로 남겨 두는 로그 형태입니다.
+
+```text
+INFO sqlalchemy.engine.Engine UPDATE users SET name=? WHERE users.id = ?
+INFO sqlalchemy.engine.Engine [generated in 0.00009s] ('Alice Liddell', 1)
+INFO sqlalchemy.engine.Engine COMMIT
+```
+
+여기서 `WHERE users.id = ?`가 빠진 로그가 찍히면 전체 UPDATE 사고로 이어질 수 있습니다. 코드 리뷰에서는 Python 코드만 보지 말고, 테스트 로그에서 최종 SQL 형태를 같이 보는 습관이 필요합니다.
+
+## 처음 질문으로 돌아가기
+
+- **`select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요?**
+  - `select(users.c.id, users.c.name).where(...).order_by(...).limit(...)`처럼 절을 체이닝할 때마다 새로운 immutable statement가 만들어지고, 마지막에 `conn.execute(stmt)`가 `Result`를 돌려줍니다. 이후에는 `Row`, `.scalar_one()`, `.scalars().all()`, `.mappings().all()` 가운데 무엇이 필요한지 선택해 읽어야 하며, `Result`가 일회용이라는 점도 함께 기억해야 합니다.
+- **`insert`, `update`, `delete`를 2.x 트랜잭션 모델과 함께 어떻게 써야 할까요?**
+  - 쓰기 작업은 본문 예시처럼 `with engine.begin() as conn:` 안에서 실행하는 것이 기본이고, 필요하면 `insert(...).returning(...)`, `update(...).rowcount`처럼 결과도 바로 확인할 수 있습니다. 특히 WHERE 없는 `delete(users)`가 전체 삭제로 이어진다는 점 때문에, 글에서는 `safe_delete` 헬퍼처럼 애플리케이션 레벨 안전장치까지 같이 제안했습니다.
+- **`JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요?**
+  - Core에서는 `join`, `subquery()`, `cte("recent")`, `func.count(...).label("post_count")`를 조합해 복잡한 SQL도 같은 표현식 체계 안에서 만들 수 있습니다. 예시의 `users`와 `posts` JOIN, `%news%` 서브쿼리, 사용자별 게시글 수 집계가 바로 그 패턴을 보여 줍니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
-- [SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](./02-core-metadata-table-types.md)
-- **SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기 (현재 글)**
-- ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기 (예정)
-- Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (예정)
-- ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
-- 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
-- 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
-- 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
-- production 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
+- [SQLAlchemy 101 (1/10): SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy 101 (2/10): SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](./02-core-metadata-table-types.md)
+- **SQLAlchemy 101 (3/10): SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기 (현재 글)**
+- SQLAlchemy 101 (4/10): ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기 (예정)
+- SQLAlchemy 101 (5/10): Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (예정)
+- SQLAlchemy 101 (6/10): ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
+- SQLAlchemy 101 (7/10): 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
+- SQLAlchemy 101 (8/10): 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
+- SQLAlchemy 101 (9/10): 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
+- SQLAlchemy 101 (10/10): 프로덕션 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
 
 <!-- toc:end -->
 
@@ -514,3 +551,5 @@ with engine.connect().execution_options(stream_results=True) as conn:
 - [SQLAlchemy 2.x - Updating and Deleting Rows](https://docs.sqlalchemy.org/en/20/tutorial/data_update.html)
 - [SQLAlchemy 2.x - Result Set API](https://docs.sqlalchemy.org/en/20/core/connections.html#sqlalchemy.engine.Result)
 - [SQLite RETURNING clause](https://www.sqlite.org/lang_returning.html)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sqlalchemy-101/ko)

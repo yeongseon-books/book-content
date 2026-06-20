@@ -1,10 +1,10 @@
 ---
 series: algorithms-101
 episode: 6
-title: Dynamic Programming
+title: "Algorithms 101 (6/10): Dynamic Programming"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,23 @@ seo_description: The two conditions for dynamic programming, memoization vs tabu
 last_reviewed: '2026-05-04'
 ---
 
-# Dynamic Programming
-
-> Algorithms 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
+# Algorithms 101 (6/10): Dynamic Programming
 
 **Core question**: Why do we keep recomputing the same subproblems, and how can we recognise that pattern in the wild?
 
-> Dynamic programming (DP) applies when (1) the same subproblems repeat and (2) the optimal solutions of subproblems compose into the optimal solution of the whole. The work is to define the state, write a recurrence, and solve it either top-down with memoization or bottom-up with tabulation. DP feels hard not because of the algorithm but because state design is a skill — one that grows by writing classic problems with your own hands.
+Dynamic programming (DP) applies when the same subproblems repeat and the optimal solutions of subproblems compose into the optimal solution of the whole. The work is to define the state, write a recurrence, and solve it either top-down with memoization or bottom-up with tabulation.
 
-<!-- a-grade-intro:end -->
+This is post 6 in the Algorithms 101 series. Here we cover when DP applies, how memoization differs from tabulation, and how to build intuition for state design.
+
+
+![algorithms 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/06/06-01-big-picture.en.png)
+*algorithms 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Dynamic Programming?
+- Which signal should the example or diagram make visible for Dynamic Programming?
+- What failure should be prevented first when Dynamic Programming reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +51,6 @@ last_reviewed: '2026-05-04'
 DP is the backbone of algorithm interviews and shows up in production for optimisation, scheduling, and string comparison. The same way of thinking extends to value functions in reinforcement learning, dynamic-programming-based control, and decoders in sequence-to-sequence models.
 
 > DP starts from one principle: never solve the same subproblem twice.
-
-## Concept at a Glance
 
 > DP defines a recurrence over a state space and solves it. Memoization is recursion plus a cache and feels intuitive. Tabulation fills small states first and tends to be faster and lighter on memory. The hard part — and the one worth practising — is choosing what the state means. That choice is 90% of the solution.
 
@@ -237,17 +241,29 @@ DP starts from "do not solve the same subproblem twice." It applies whenever the
 
 The next article covers greedy algorithms — when greedy actually works (exchange arguments, matroid intuition), classic problems, and cases where what looks greedy actually requires DP.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Dynamic Programming?**
+  - The article treats Dynamic Programming as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Dynamic Programming?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Dynamic Programming reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an Algorithm?](./01-what-is-an-algorithm.md)
-- [Time and Space Complexity](./02-time-and-space-complexity.md)
-- [Search Algorithms](./03-search-algorithms.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
-- [Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
+## In this series
+
+- [Algorithms 101 (1/10): What Is an Algorithm?](./01-what-is-an-algorithm.md)
+- [Algorithms 101 (2/10): Time and Space Complexity](./02-time-and-space-complexity.md)
+- [Algorithms 101 (3/10): Search Algorithms](./03-search-algorithms.md)
+- [Algorithms 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
+- [Algorithms 101 (5/10): Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
 - **Dynamic Programming (current)**
 - Greedy Algorithms (upcoming)
 - Graph Algorithms (upcoming)
 - String Algorithm Basics (upcoming)
 - Algorithm Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

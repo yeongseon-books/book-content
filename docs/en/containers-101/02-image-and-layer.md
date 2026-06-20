@@ -1,57 +1,52 @@
 ---
 series: containers-101
 episode: 2
-title: Image and Layer
-status: content-ready
+title: "Containers 101 (2/10): Image and Layer"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
 language: en
 tags:
-  - Containers
-  - Docker
-  - Image
-  - Layer
-  - DevOps
-seo_description: How container images split into layers, how OverlayFS stacks them, and how layer caching speeds up builds — with docker history examples.
-last_reviewed: '2026-05-04'
+- Containers
+- Docker
+- Image
+- Layer
+- DevOps
+seo_description: How container images split into layers, how OverlayFS stacks them,
+  and how layer caching speeds up builds — with docker history examples.
+last_reviewed: '2026-05-15'
 ---
 
-# Image and Layer
+# Containers 101 (2/10): Image and Layer
 
-> Containers 101 series (2/10)
+An image can look like one opaque artifact until build time starts to hurt. Then layer order, cache reuse, transfer size, and vulnerability surface suddenly become operational concerns instead of implementation detail.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Containers 101 series.
 
-**Core question**: Why are images split into *layers* in the first place?
+In this chapter, we unpack why images are split into layers, how OverlayFS makes the stack look like one filesystem, and why Dockerfile optimization and digest-based reproducibility both depend on that structure.
 
-> *Layered images give you reuse, caching, and small transfers all at once — they are the central design of containers.*
+> Layers are the reason images can be reused, cached, and transferred efficiently at the same time.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![containers 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/02/02-01-concept-at-a-glance.en.png)
+*containers 101 chapter 2 flow overview*
+> An image is not a single file; it is a stack of immutable layer snapshots. Each layer can be reused, cached, and transferred independently — that is why images are efficient.
 
-- The physical structure of an image
-- The job of a layer
-- How OverlayFS stacks them
-- Layer caching for fast builds
-- Five common pitfalls
+## Questions to Keep in Mind
+
+- The physical structure of an image?
+- The job of a layer?
+- How OverlayFS stacks them?
 
 ## Why It Matters
 
 Without layers, you cannot really optimize a Dockerfile. The difference between a 1-minute and a 30-second build comes from understanding this.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Base["base layer (os)"] --> Lib["lib layer"]
-    Lib --> Code["app code"]
-    Code --> Container["container (rw layer)"]
-```
+Layers are read-only change sets. The bottom layers hold the base OS or runtime; upper layers add application dependencies. At runtime, an additional writable container layer is added on top so the base layers stay clean.
 
 ## Key Terms
 
@@ -121,6 +116,25 @@ def diff(a, b):
 - `history` traces the command behind each layer.
 - The digest guarantees content equality.
 
+## Quick verification and failure signals
+
+```bash
+docker pull python:3.12-slim
+docker image inspect python:3.12-slim --format "{{json .RootFS.Layers}}"
+docker history python:3.12-slim
+docker inspect --format "{{index .RepoDigests 0}}" python:3.12-slim
+```
+
+**Expected output:**
+- `RootFS.Layers` prints an ordered array of layer hashes.
+- `docker history` shows the commands and sizes behind the layers.
+- `RepoDigests` gives you the immutable identity after push.
+
+**Check first if it fails:**
+- If layer count grows too quickly, review how the Dockerfile splits `RUN`.
+- If the digest is empty, confirm you are inspecting a pushed image.
+- If the image is too large, inspect build context size and multi-stage usage first.
+
 ## Five Common Mistakes
 
 1. **Splitting commands across many RUN statements — layer explosion.**
@@ -158,8 +172,19 @@ Multi-stage builds split build tools from runtime. `.dockerignore` keeps the bui
 
 You can see how an image is built. Next, look at what runs it. The next post covers Runtime.
 
+## Answering the Opening Questions
+
+- **The physical structure of an image?**
+  - The article treats Image and Layer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The job of a layer?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How OverlayFS stacks them?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Container?](./01-what-is-a-container.md)
+## In this series
+
+- [Containers 101 (1/10): What is a Container?](./01-what-is-a-container.md)
 - **Image and Layer (current)**
 - Runtime (upcoming)
 - Dockerfile (upcoming)
@@ -169,6 +194,7 @@ You can see how an image is built. Next, look at what runs it. The next post cov
 - Container Security (upcoming)
 - Containers vs VMs (upcoming)
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References

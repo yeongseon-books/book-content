@@ -1,11 +1,11 @@
 ---
-title: Variables, types, and operators
+title: "Python 101 (2/10): Variables, types, and operators"
 series: python-101
 episode: 2
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -22,7 +22,11 @@ seo_description: In Python, a variable is not a box that holds a value but a nam
   tag attached to an object.
 ---
 
-# Variables, types, and operators
+# Python 101 (2/10): Variables, types, and operators
+
+In Python, a variable is not a box that holds a value but a name attached to an object. That one model clears up most beginner confusion around assignment, comparison, and copying.
+
+This post is the 2nd article in the Python 101 series. This is the point in the series where Python's name-and-object model starts to matter.
 
 ## What you'll learn
 
@@ -36,14 +40,15 @@ By the end of this chapter you will be able to explain and code the following yo
 
 This chapter targets Python 3.12. Blocks shown as REPL sessions (with the `>>>` prompt) run line by line in an activated venv. Short snippets without the prompt are illustrative excerpts and assume surrounding names are defined.
 
-## Questions this chapter answers
+
+![Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/02/02-01-mental-model.en.png)
+*Python 101 chapter 2 flow overview*
+
+## Questions to Keep in Mind
 
 - Why is a Python variable a name tag attached to an object rather than a box that holds a value?
 - What does each of the five primitive types — `int`, `float`, `str`, `bool`, `None` — actually guarantee?
 - Where does dynamic typing meet type hints, and how do hints make that freedom safer?
-- When do `is` and `==` agree, and when do they disagree?
-- Which floating-point comparisons surprise beginners, and how do you avoid them?
-
 
 ## Why it matters
 
@@ -61,9 +66,6 @@ The common root is one of two confusions: not knowing exactly what a variable po
 > In Python, a variable is not a box that holds a value but a name tag attached to an object. Holding only that picture in your head explains almost every assignment, comparison, and copying trap with the same diagram.
 In Python, a variable is not a box that holds a value. It's a **name tag attached to an object**. One object can have many name tags, and a name tag can be moved to a different object at any time.
 
-![Mental model](../../assets/python-101/02/02-01-mental-model.en.png)
-
-*Mental model*
 In the diagram above, after `a = 42; b = a` both `a` and `b` point at the same integer object `42`. After `a = "hi"`, only `a` moves to a fresh string object; `b` still points at `42`.
 
 Holding this picture in your head makes two behaviors feel natural.
@@ -151,7 +153,7 @@ Open a REPL and type these lines yourself. If a result differs from what's print
 
 ### 1) Same object versus different object
 
-```python
+```text
 >>> a = [1, 2]
 >>> b = [1, 2]
 >>> a == b      # value comparison: True
@@ -167,7 +169,7 @@ In the example above, `a` and `b` hold lists with the same contents but distinct
 
 ### 2) The floating-point trap
 
-```python
+```text
 >>> 0.1 + 0.2
 0.30000000000000004
 >>> 0.1 + 0.2 == 0.3
@@ -181,7 +183,7 @@ For computed float results, use `math.isclose` when tolerance matters, or switch
 
 ### 3) Type conversion
 
-```python
+```text
 >>> int("42")           # 42
 >>> float("3.14")       # 3.14
 >>> str(42)             # '42'
@@ -301,13 +303,36 @@ Before moving to the next chapter, walk through these by hand at least once.
 
 The next chapter dives into strings: f-strings and format specs, the difference between `str` and `bytes`, and a first look at regular expressions.
 
+## Answering the Opening Questions
+
+- **Why is a Python variable a name tag attached to an object rather than a box that holds a value?**
+  - The article treats Variables, types, and operators as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does each of the five primitive types — `int`, `float`, `str`, `bool`, `None` — actually guarantee?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where does dynamic typing meet type hints, and how do hints make that freedom safer?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- [Python 101 (1/10): Why Python, and how to install and use venv](./01-why-python-and-install.md)
+- **Variables, types, and operators (current)**
+- Strings and formatting (upcoming)
+- list, tuple, set, dict (upcoming)
+- Control flow: if, for, while, comprehension (upcoming)
+- Functions and arguments: def, args, kwargs, default, lambda (upcoming)
+- Modules and packages: import, __init__, __name__ (upcoming)
+- File I/O and exception handling (upcoming)
+- Classes and objects: bundling data with behavior (upcoming)
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- Python docs — Built-in Types: https://docs.python.org/3/library/stdtypes.html
-- Python docs — `decimal`: https://docs.python.org/3/library/decimal.html
-- PEP 484 — Type Hints: https://peps.python.org/pep-0484/
-- PEP 8 — Style Guide for Python Code: https://peps.python.org/pep-0008/
-- mypy documentation: https://mypy.readthedocs.io/
+- [Python docs — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — Primary reference for `int`, `float`, `bool`, `None`, truth-value testing, and sequence behavior.
+- [Python docs — Expressions](https://docs.python.org/3/reference/expressions.html) — Defines arithmetic, comparison, identity, and boolean operator semantics and precedence.
+- [Python tutorial — Floating-Point Arithmetic: Issues and Limitations](https://docs.python.org/3/tutorial/floatingpoint.html) — Official explanation for representation error behind examples like `0.1 + 0.2`.
+- [Python docs — `decimal`](https://docs.python.org/3/library/decimal.html) — Covers exact decimal arithmetic, which is the chapter’s recommended alternative for money-like values.
+- [PEP 484 — Type Hints](https://peps.python.org/pep-0484/) — Source for Python’s standard type-hinting model and its static-analysis intent.
+- [Python Data Model](https://docs.python.org/3/reference/datamodel.html) — Reinforces the object model behind identity, mutability, and names bound to objects.

@@ -1,11 +1,11 @@
 ---
-title: Agent and tool pattern — autonomous tool selection
+title: "AI App Patterns 101 (4/6): Agent and tool pattern — autonomous tool selection"
 series: ai-app-patterns-101
 episode: 4
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,46 +14,31 @@ tags:
 - RAG
 - Agent
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: An agent is a controller that lets the model choose tool-call paths
   at runtime instead of hardcoding every step ahead of time.
 ---
 
-# Agent and tool pattern — autonomous tool selection
+# AI App Patterns 101 (4/6): Agent and tool pattern — autonomous tool selection
 
-## Questions this post answers
+Some problems stop fitting a fixed chain the moment the next step depends on what the model discovers during execution. At that point, the real design question is not whether agents are powerful, but how narrowly you can define the tool choices and the control loop around them.
 
-- When does it make sense to use `AgentExecutor` instead of a fixed chain?
-- How should tool descriptions be written so the LLM can choose correctly between a calculator and a search tool?
-- What execution traces matter when debugging a tool-selecting agent?
+This is post 4 in the AI App Patterns 101 series. Here we examine when the agent-and-tool pattern is justified and how to make tool selection observable and debuggable.
 
+![Fixed chain versus dynamic agent](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.en.png)
+*Fixed chain versus dynamic agent*
 > An agent is a controller that lets the model choose tool-call paths at runtime instead of hardcoding every step ahead of time.
 
-![Questions this post answers](../../assets/ai-app-patterns-101/04/04-01-questions-this-post-answers.en.png)
+## Questions to Keep in Mind
 
-*Questions this post answers*
-> AI App Patterns 101 (4/6)
-
-Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/04-agent-tool-pattern)
-
-Every chain built so far has a fixed execution path: input enters, steps run in order, output exits. The agent pattern changes this. The LLM decides which tool to call, inspects the result, and then decides what to do next — including whether to call another tool or produce a final answer.
-
-Topics:
-
-- agent vs chain — what changes and why
-- defining and registering tools
-- building a ReAct agent
-- composing multiple tools
-
----
+- When an agent chooses a tool, how much autonomy does it really have?
+- What risk appears if tool names and arguments are not validated before execution?
+- How can ReAct traces narrow agent failures faster?
 
 ## Agent vs chain
 
 ### Fixed chain versus dynamic agent
 
-![Fixed chain versus dynamic agent](../../assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.en.png)
-
-*Fixed chain versus dynamic agent*
 **Chain**: input → step A → step B → output. The execution path is determined at design time.
 
 **Agent**: input → LLM reasons → selects tool → executes tool → observes result → repeats if needed → final answer. The execution path is determined at runtime.
@@ -66,7 +51,7 @@ Agents use the ReAct (Reason + Act) loop: Thought → Action → Observation, re
 
 ### Tool registry and selection surface
 
-![Tool registry and selection surface](../../assets/ai-app-patterns-101/04/04-02-tool-registry-and-selection-surface.en.png)
+![Tool registry and selection surface](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-02-tool-registry-and-selection-surface.en.png)
 
 *Tool registry and selection surface*
 In LangChain, a tool is a Python function decorated with `@tool`. The docstring becomes the description the LLM reads when deciding which tool to use. Write it precisely — a vague docstring leads to wrong tool selection.
@@ -140,6 +125,23 @@ def unit_convert(value: float, from_unit: str, to_unit: str) -> str:
         return f"unsupported conversion: {from_unit} to {to_unit}"
     result = conversions[key](value)
     return f"{value} {from_unit} = {result:.4f} {to_unit}"
+
+@tool
+def search_policy(query: str) -> str:
+    """
+    Search the internal support policy knowledge base.
+    Use this for refund rules, shipping delays, account recovery, or SLA questions.
+    """
+    kb = {
+        "refund": "Annual plans can be refunded within 14 days if usage stays below 100 API calls.",
+        "shipping": "Orders delayed more than 10 business days qualify for expedited reshipment.",
+        "password": "Account recovery requires email verification and one recent billing detail.",
+    }
+    lowered = query.lower()
+    for keyword, answer in kb.items():
+        if keyword in lowered:
+            return answer
+    return "policy not found"
 ```
 
 ---
@@ -148,7 +150,7 @@ def unit_convert(value: float, from_unit: str, to_unit: str) -> str:
 
 ### Thought action observation loop
 
-![Thought action observation loop](../../assets/ai-app-patterns-101/04/04-03-thought-action-observation-loop.en.png)
+![Thought action observation loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-03-thought-action-observation-loop.en.png)
 
 *Thought action observation loop*
 ```python
@@ -163,7 +165,7 @@ llm = ChatGroq(
     api_key=os.environ["GROQ_API_KEY"],
 )
 
-tools = [calculate, get_current_time, word_count, unit_convert]
+tools = [calculate, get_current_time, word_count, unit_convert, search_policy]
 
 # ReAct prompt — instructs the LLM to follow the Thought/Action/Observation loop
 react_prompt = PromptTemplate.from_template("""
@@ -198,6 +200,7 @@ agent_executor = AgentExecutor(
     verbose=True,
     max_iterations=5,
     handle_parsing_errors=True,
+    return_intermediate_steps=True,
 )
 
 questions = [
@@ -205,6 +208,7 @@ questions = [
     "What time is it now?",
     "How many miles is 100 kilometers?",
     "Count the words in this text, then multiply by 2: 'The quick brown fox jumps over the lazy dog'",
+    "What is the refund policy for annual plans?",
 ]
 
 for question in questions:
@@ -216,16 +220,71 @@ for question in questions:
 
 ---
 
+## Verify which tool the agent actually picked
+
+### Intermediate-step trace for tool selection
+
+![Execution trace and stopping conditions](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-04-execution-trace-and-stopping-conditions.en.png)
+
+*Execution trace and stopping conditions*
+An agent demo is not trustworthy until you can inspect the chosen tool path. `verbose=True` is useful for humans, but structured traces are better when you want regression checks.
+
+```python
+def run_with_trace(question: str) -> dict:
+    result = agent_executor.invoke({"input": question})
+    tool_sequence = [action.tool for action, _ in result["intermediate_steps"]]
+    return {
+        "question": question,
+        "tools": tool_sequence,
+        "answer": result["output"],
+    }
+
+test_cases = [
+    ("What is 2 to the power of 10?", "calculate"),
+    ("What is the refund policy for annual plans?", "search_policy"),
+    ("How many feet is 3 meters?", "unit_convert"),
+]
+
+for question, expected_first_tool in test_cases:
+    traced = run_with_trace(question)
+    print(f"\nquestion: {traced['question']}")
+    print(f"tools used: {traced['tools']}")
+    print(f"expected first tool: {expected_first_tool}")
+    print(f"answer: {traced['answer']}")
+```
+
+**Expected output:**
+
+```text
+question: What is the refund policy for annual plans?
+tools used: ['search_policy']
+expected first tool: search_policy
+answer: Annual plans can be refunded within 14 days if usage stays below 100 API calls.
+```
+
+This is where agent debugging becomes practical. You stop saying “the model was weird” and instead ask whether the wrong tool was chosen, whether the right tool description was missing, or whether the loop continued longer than it should have.
+
+---
+
 ## Observing the agent's reasoning
 
 ### Execution trace and stopping conditions
 
-![Execution trace and stopping conditions](../../assets/ai-app-patterns-101/04/04-04-execution-trace-and-stopping-conditions.en.png)
+![Execution trace and stopping conditions](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-04-execution-trace-and-stopping-conditions.en.png)
 
 *Execution trace and stopping conditions*
 With `verbose=True`, the console prints every Thought, Action, Action Input, and Observation. For a simple question, the agent usually completes in one round. For a two-step question — count words, then multiply — it completes in two rounds, using the output of the first tool as input to the next computation.
 
 `max_iterations` prevents infinite loops. Five to ten iterations cover most practical tasks.
+
+### First checks when the agent picks the wrong tool
+
+When tool choice looks wrong, inspect these in order:
+
+1. **tool description clarity** — does the docstring say when the tool should and should not be used?
+2. **overlapping capability** — are two tools both plausible for the same question?
+3. **trace length** — is the agent looping because the first Observation was too vague?
+4. **stopping criteria** — is `max_iterations` high enough to finish but low enough to fail safely?
 
 ---
 
@@ -233,7 +292,7 @@ With `verbose=True`, the console prints every Thought, Action, Action Input, and
 
 ### Returning tool errors as observations
 
-![Returning tool errors as observations](../../assets/ai-app-patterns-101/04/04-05-returning-tool-errors-as-observations.en.png)
+![Returning tool errors as observations](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-05-returning-tool-errors-as-observations.en.png)
 
 *Returning tool errors as observations*
 If a tool raises an unhandled exception, the agent stops. Catching exceptions inside the tool and returning a descriptive error string keeps the agent running. The error string becomes the Observation, and the LLM can decide to try a different approach or explain the failure.
@@ -251,9 +310,9 @@ def safe_divide(a: float, b: float) -> str:
 
 ## What to notice in this code
 
-- `main.py` splits the `AgentExecutor` demo into a calculator executor and a search executor to show the smallest reliable tool-selection pattern.
-- Each tool uses `@tool(return_direct=True)` so the selected tool result comes back directly.
-- Short prompts and narrow tool descriptions reduce function-calling failure modes.
+- `main.py` keeps the tool surface intentionally narrow: arithmetic, time, word counting, unit conversion, and policy lookup.
+- `return_intermediate_steps=True` makes the chosen tool path visible enough for regression-style verification.
+- Short prompts and narrow tool descriptions reduce tool-selection failure modes.
 
 ---
 
@@ -269,8 +328,8 @@ def safe_divide(a: float, b: float) -> str:
 
 - [ ] Each tool has a clear description and input shape
 - [ ] The AgentExecutor invokes the calculator tool once
-- [ ] The AgentExecutor invokes the search tool once
-- [ ] The selected tool result is returned directly to the caller
+- [ ] The AgentExecutor can choose the policy search tool for a knowledge-base question
+- [ ] Intermediate steps make the chosen tool sequence visible to the caller
 
 ---
 
@@ -280,15 +339,26 @@ The agent pattern extends chain-based LLM apps into systems that can reason acro
 
 The next post covers workflow automation: designing multi-step chains where each stage transforms data and passes it to the next.
 
+## Answering the Opening Questions
+
+- **When an agent chooses a tool, how much autonomy does it really have?**
+  The agent can request a tool only within the list and schema the application exposes. That is bounded autonomy.
+
+- **What risk appears if tool names and arguments are not validated before execution?**
+  Without validation, unknown tool calls, invalid arguments, unauthorized actions, or duplicate execution can reach real functions.
+
+- **How can ReAct traces narrow agent failures faster?**
+  ReAct traces show the thought, selected tool, and arguments, making it easier to separate prompt issues, tool-description issues, and execution errors.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Chatbot pattern — managing conversation history and state](./01-chatbot-pattern.md)
-- [RAG Q&A pattern — document-based question answering](./02-rag-qa-pattern.md)
-- [Document assistant — summarization, extraction, classification](./03-document-assistant.md)
-- **Agent and tool pattern — autonomous tool selection (current)**
-- Workflow automation — designing multi-step chains (upcoming)
-- Human-in-the-loop — designing for human intervention (upcoming)
+- [AI App Patterns 101 (1/6): Chatbot pattern — managing conversation history and state](./01-chatbot-pattern.md)
+- [AI App Patterns 101 (2/6): RAG Q&A pattern — document-based question answering](./02-rag-qa-pattern.md)
+- [AI App Patterns 101 (3/6): Document assistant — summarization, extraction, classification](./03-document-assistant.md)
+- **AI App Patterns 101 (4/6): Agent and tool pattern — autonomous tool selection (current)**
+- AI App Patterns 101 (5/6): Workflow automation — designing multi-step chains (upcoming)
+- AI App Patterns 101 (6/6): Human-in-the-loop — designing for human intervention (upcoming)
 
 <!-- toc:end -->
 

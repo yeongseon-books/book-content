@@ -1,10 +1,10 @@
 ---
 series: web-development-101
 episode: 2
-title: HTML, CSS, and JavaScript
-status: content-ready
+title: "Web Development 101 (2/10): HTML, CSS, and JavaScript"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,24 @@ tags:
   - JavaScript
   - Frontend
 seo_description: The three pillars of every web page — structure, style, and behavior — explained side by side with runnable examples for new web developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# HTML, CSS, and JavaScript
+# Web Development 101 (2/10): HTML, CSS, and JavaScript
 
-> Web Development 101 series (2/10)
+At first glance, splitting one page across three languages can feel like unnecessary ceremony. In practice, though, every production frontend becomes easier to debug once you can answer three separate questions: what is the structure, what controls the visual result, and what changes behavior after the page loads.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Web Development 101 series. Here we separate structure, style, and behavior on purpose so you can see why maintainable frontend code starts with clear responsibility boundaries rather than clever framework tricks.
 
-**Core question**: Why is one web page split into *three* different languages?
 
-> Because separating structure, style, and behavior lets each one change without breaking the others.
+![web development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.en.png)
+*web development 101 chapter 2 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The *structure* HTML draws
-- The *style* CSS applies
-- The *behavior* JavaScript adds
-- How the three work together
-- The flexibility separation creates
+- The *structure* HTML draws?
+- The *style* CSS applies?
+- The *behavior* JavaScript adds?
 
 ## Why It Matters
 
@@ -47,16 +43,17 @@ When all three live in one file, fixing one line breaks another. *Separation* is
 
 > Good web code keeps roles separate.
 
-## Concept at a Glance
+The point of this figure is not that three files are trendy. It is that one visible page is easier to change when structure, visual rules, and runtime behavior can move independently.
 
-```mermaid
-flowchart LR
-    HTML["HTML (structure)"] --> Page["Web page"]
-    CSS["CSS (style)"] --> Page
-    JS["JavaScript (behavior)"] --> Page
-```
+### What to verify yourself
 
-Three pillars build one page.
+- Open an HTML file without CSS or JS and confirm that the structure still exists.
+- Attach the stylesheet and verify that only presentation changes.
+- Attach the JavaScript file and confirm that behavior changes without rewriting the markup.
+
+**Expected output:** HTML defines the page skeleton, CSS changes appearance, and JavaScript changes behavior without needing the other layers to absorb every edit.
+
+**Failure mode to watch for:** If style and behavior are embedded directly into the markup, even a small change becomes harder to review, cache, and debug.
 
 ## Key Terms
 
@@ -186,8 +183,19 @@ Even huge sites reduce to these three languages. React and Vue are tools that ul
 
 Three languages model the principle of *separation of concerns*. Next, we look at how the browser turns HTML into a tree (the DOM).
 
+## Answering the Opening Questions
+
+- **The *structure* HTML draws?**
+  - The article treats HTML, CSS, and JavaScript as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The *style* CSS applies?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The *behavior* JavaScript adds?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
 - **HTML, CSS, and JavaScript (current)**
 - The Browser and the DOM (upcoming)
 - HTTP and APIs (upcoming)
@@ -197,11 +205,16 @@ Three languages model the principle of *separation of concerns*. Next, we look a
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [HTML basics (MDN)](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics)
-- [CSS basics (MDN)](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/CSS_basics)
-- [JavaScript basics (MDN)](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/JavaScript_basics)
+### Official Docs
+- [HTML basics (MDN)](https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Creating_the_content)
+- [CSS basics (MDN)](https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Styling_the_content)
+- [JavaScript basics (MDN)](https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Adding_interactivity)
+
+### Deepen the Model
 - [Semantic HTML (MDN)](https://developer.mozilla.org/en-US/docs/Glossary/Semantics)
+- [The `script` element: `defer` and `async` (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script)

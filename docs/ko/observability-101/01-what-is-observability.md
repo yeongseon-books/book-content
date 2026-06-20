@@ -1,12 +1,12 @@
 ---
 series: observability-101
 episode: 1
-title: Observability란 무엇인가?
-status: content-ready
+title: "Observability 101 (1/10): 관측성이란 무엇인가?"
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -16,41 +16,210 @@ tags:
   - SRE
   - DevOps
   - Metrics
-seo_description: Monitoring과 Observability의 차이, 세 기둥(Metric, Log, Trace) 그리고 운영 가시성의 출발점
-last_reviewed: '2026-05-04'
+seo_description: 관측성과 모니터링의 차이, 세 신호, trace_id가 왜 운영 가시성의 출발점인지 설명합니다
+last_reviewed: '2026-05-15'
 ---
 
-# Observability란 무엇인가?
+# Observability 101 (1/10): 관측성이란 무엇인가?
 
-> Observability 101 시리즈 (1/10)
+운영 시스템은 대개 시끄럽게 무너지지 않습니다. 사용자는 결제가 느리다고 말하고, 알림은 에러율이 조금 올랐다고 말하고, 로그에는 타임아웃 몇 줄만 남습니다. 증상은 보이는데 내부에서 무슨 일이 일어났는지 바로 설명되지 않는 순간이 많습니다.
 
+이때 필요한 것이 관측성입니다. 이미 알고 있던 장애를 감시하는 수준을 넘어, 처음 보는 실패 앞에서도 바깥 신호만으로 안쪽 상태를 추론할 수 있어야 운영이 빨라집니다.
 
-## 이 글에서 다룰 문제
+이 글은 Observability 101 시리즈의 첫 번째 글입니다.
 
-운영 시스템은 *예측 불가능한 방식으로* 무너집니다. 미리 만든 dashboard 만으로는 *처음 보는 장애* 를 설명할 수 없습니다. *Observability* 는 *질문할 수 있는 시스템* 을 만듭니다.
+![Observability 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/01/01-01-concept-at-a-glance.ko.png)
+*Observability 101 1장 흐름 개요*
+> 관측성의 핵심은 도구가 아니라 시스템을 어느 계층에서 어떤 관점으로 볼지 정하는 경계 설계입니다.
 
-> *대시보드는 *답*, observability 는 *질문* 이다.*
+## 먼저 던지는 질문
 
-## 전체 흐름
-```mermaid
-flowchart LR
-    App["애플리케이션"] --> Metric["Metric"]
-    App --> Log["Log"]
-    App --> Trace["Trace"]
-    Metric --> Dashboard["Dashboard / Alert"]
-    Log --> Search["Log search"]
-    Trace --> Flow["Request flow"]
+- 관측성과 모니터링은 무엇이 다를까요?
+- 메트릭, 로그, 트레이스는 각각 어떤 질문에 답할까요?
+- 왜 세 신호를 함께 봐야 할까요?
+
+## 왜 중요한가
+
+대시보드는 미리 준비한 질문에만 답합니다. CPU가 올랐는지, 에러율이 늘었는지, 지연 시간이 얼마나 튀었는지는 금방 보입니다. 그런데 실제 장애는 늘 그다음 질문에서 오래 걸립니다. 왜 결제만 느린지, 어느 서비스가 병목인지, 이번 장애가 이전 장애와 어떻게 다른지까지 이어서 설명해야 하기 때문입니다.
+
+관측성이 필요한 까닭은 분명합니다. 시스템 바깥에서 얻은 신호만으로 내부 상태를 거꾸로 읽을 수 있어야, 처음 보는 장애도 빠르게 좁힐 수 있습니다. 운영에서 말하는 "가시성"은 화면 수가 아니라, 질문을 던지고 답을 찾는 능력입니다.
+
+## 모니터링 vs 관측 가능성
+
+두 개념은 자주 혼동되지만 분명히 다릅니다. 아래 표는 각각의 목적, 질문 방식, 도구, 한계를 정리한 것입니다.
+
+| 구분 | 모니터링 | 관측 가능성 |
+| --- | --- | --- |
+| 목적 | 이미 알고 있는 장애를 감시 | 처음 보는 문제를 파고들기 |
+| 질문 방식 | 미리 정한 질문 (CPU 올랐나? 에러율 높나?) | 즉석 질문 (왜 이번 요청만 느릴까?) |
+| 도구 | 경보, 대시보드, 체크 스크립트 | 메트릭, 로그, 트레이스 + 질의 인터페이스 |
+| 한계 | 새로운 장애 패턴 앞에서 무력 | 질문 설계와 신호 품질이 핵심 |
+
+모니터링은 "이상이 있는가"를 묻고, 관측 가능성은 "왜 이런 일이 생겼는가"를 묻습니다. 둘은 서로를 대체하지 않고 함께 필요합니다.
+
+## 관측 가능성이 필요한 순간
+
+관측 가능성은 추상적인 개념이 아니라 구체적인 운영 상황에서 바로 가치를 발휘합니다.
+
+### 장애 대응
+
+새벽 3시에 경보가 울렸습니다. 결제 API p95 지연이 평소 200ms에서 2초로 튀었습니다. 이때 필요한 것은 "언제부터 느려졌나"가 아니라 "왜 이번 배포 후 특정 결제사 호출만 느려졌는가"입니다. 메트릭은 시점을 알려 주고, 트레이스는 구간을 보여 주고, 로그는 이유를 설명합니다.
+
+### 성능 병목 찾기
+
+평균 응답 시간은 정상인데 사용자 불만이 늘고 있다면, p95나 p99를 봐야 합니다. 느린 일부 요청이 사용자 경험을 망치고 있을 가능성이 큽니다. 관측 가능성이 갖춰진 시스템에서는 느린 요청 몇 건만 골라 트레이스를 열면 병목 서비스와 쿼리를 바로 볼 수 있습니다.
+
+### 배포 검증
+
+새 버전을 배포한 뒤 경보는 울리지 않지만 뭔가 이상합니다. 요청 수가 조금 줄고, 특정 경로의 에러율이 미세하게 올랐습니다. 관측 가능성이 있으면 배포 전후 메트릭을 비교하고, 새 버전의 trace_id를 따라가며 어디에서 다르게 동작하는지 확인할 수 있습니다.
+
+## Python으로 구조화된 로그 남기기
+
+관측 가능성의 출발점은 애플리케이션 코드입니다. 아래는 FastAPI 요청마다 구조화된 로그를 남기는 예제입니다.
+
+```python
+import json
+import time
+import uuid
+from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+def log_event(event: str, **fields):
+    print(json.dumps({
+        "ts": time.time(),
+        "event": event,
+        **fields
+    }))
+
+@app.middleware("http")
+async def logging_middleware(request: Request, call_next):
+    request_id = request.headers.get("x-request-id") or str(uuid.uuid4())
+    start = time.time()
+    
+    log_event("request_start",
+              request_id=request_id,
+              method=request.method,
+              path=request.url.path)
+    
+    response = await call_next(request)
+    duration = time.time() - start
+    
+    log_event("request_end",
+              request_id=request_id,
+              status=response.status_code,
+              duration_ms=round(duration * 1000, 2))
+    
+    return response
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 ```
 
-## Before/After
+이 코드는 요청마다 request_id를 붙이고, 시작과 끝을 JSON 로그로 남깁니다. 나중에 느린 요청을 찾으려면 `duration_ms > 1000` 같은 조건으로 필터링하면 됩니다. 문자열 grep 대신 필드 기반 질의가 가능해집니다.
 
-**Before**: 장애 알림이 와도 *어디서 시작했는지* 모른다. log 를 *grep* 하며 헤맨다.
+## OpenTelemetry로 자동 계측 시작하기
 
-**After**: dashboard 에서 *증상* 을 보고, trace 로 *원인 서비스* 를 찾고, log 로 *맥락* 을 확인한다.
+위 예제는 수동으로 로그를 남기는 방식입니다. 실제 운영에서는 OpenTelemetry SDK를 사용하면 HTTP 요청, DB 쿼리, 외부 호출을 자동으로 계측할 수 있습니다.
 
-## 첫 신호 5단계
+```python
+# requirements.txt
+# opentelemetry-api==1.25.0
+# opentelemetry-sdk==1.25.0
+# opentelemetry-instrumentation-fastapi==0.46b0
+# opentelemetry-exporter-otlp==1.25.0
 
-### 1단계 — 가장 단순한 metric
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.sdk.resources import Resource
+
+# 서비스 이름과 버전을 리소스로 등록합니다.
+resource = Resource.create({
+    "service.name": "checkout-api",
+    "service.version": "1.2.0",
+    "deployment.environment": "production",
+})
+
+# TracerProvider를 설정하고 OTLP 내보내기를 연결합니다.
+provider = TracerProvider(resource=resource)
+exporter = OTLPSpanExporter(endpoint="http://otel-collector:4317")
+provider.add_span_processor(BatchSpanProcessor(exporter))
+trace.set_tracer_provider(provider)
+
+# FastAPI 앱에 자동 계측을 적용합니다.
+app = FastAPI()
+FastAPIInstrumentor.instrument_app(app)
+
+# 이후 모든 HTTP 요청은 자동으로 span이 생성됩니다.
+# 수동 span이 필요한 경우:
+tracer = trace.get_tracer(__name__)
+
+@app.post("/checkout")
+async def checkout(order: dict):
+    with tracer.start_as_current_span("payment.process") as span:
+        span.set_attribute("order.id", order["id"])
+        span.set_attribute("order.amount", order["amount"])
+        result = await process_payment(order)
+        if result.failed:
+            span.set_status(trace.StatusCode.ERROR, result.error)
+        return result
+```
+
+이 코드에서 주목할 점은 세 가지입니다.
+
+첫째, `Resource`로 서비스 이름과 버전을 명시합니다. 나중에 트레이스를 검색할 때 어떤 서비스의 어떤 버전에서 발생한 문제인지 바로 구분할 수 있습니다.
+
+둘째, `FastAPIInstrumentor`가 모든 HTTP 엔드포인트에 자동으로 span을 생성합니다. 별도 코드 없이도 요청 경로, 상태 코드, 소요 시간이 기록됩니다.
+
+셋째, 비즈니스 로직에서 중요한 구간은 수동 span으로 감쌉니다. 결제 처리처럼 외부 의존성을 호출하는 부분은 자동 계측만으로 충분하지 않기 때문입니다. `span.set_attribute`로 주문 ID와 금액을 남기면, 장애 시 특정 주문을 바로 찾을 수 있습니다.
+
+### 자동 계측과 수동 계측의 구분
+
+| 구분 | 자동 계측 | 수동 계측 |
+| --- | --- | --- |
+| 적용 범위 | HTTP, DB, gRPC 등 라이브러리 수준 | 비즈니스 로직, 외부 API 호출 |
+| 설정 방식 | `Instrumentor.instrument_app()` 한 줄 | `tracer.start_as_current_span()` |
+| 얻는 정보 | 경로, 상태 코드, 소요 시간 | 주문 ID, 결제 금액, 실패 사유 |
+| 유지보수 | 라이브러리 업데이트 시 자동 반영 | 코드 변경 시 함께 수정 필요 |
+| 권장 시점 | 프로젝트 초기, 전체 가시성 확보 | 장애 빈도 높은 핵심 경로 |
+
+실무에서는 자동 계측으로 전체 가시성을 먼저 확보한 뒤, 장애가 반복되는 구간에 수동 span을 추가하는 순서가 가장 효율적입니다. 처음부터 모든 함수에 span을 넣으면 노이즈가 늘어나고 비용이 빠르게 증가합니다.
+
+## 한눈에 보는 구조
+
+관측성은 시스템 바깥의 신호로 안쪽 상태를 추론하는 기술입니다. 메트릭은 시간 흐름을 보고, 로그는 사건의 맥락을 남기며, 트레이스는 요청 경로를 연결합니다.
+
+아래 표는 세 신호가 장애 대응 흐름에서 각각 어떤 역할을 맡는지 정리한 것입니다.
+
+| 신호 | 답하는 질문 | 저장 형태 | 대표 도구 |
+| --- | --- | --- | --- |
+| 메트릭 | 언제부터 이상한가? 얼마나 심한가? | 시계열 숫자 | Prometheus, Datadog |
+| 로그 | 그 순간 실제로 무슨 일이 있었는가? | 구조화된 이벤트 | Loki, Elasticsearch |
+| 트레이스 | 요청이 어디를 거쳤고 어디서 멈췄는가? | span 트리 | Jaeger, Tempo |
+
+세 신호는 서로 다른 해상도에서 같은 시스템을 비추는 렌즈입니다. 메트릭은 넓게, 트레이스는 깊게, 로그는 세밀하게 봅니다.
+
+## 핵심 용어
+
+- 메트릭: 시간에 따라 바뀌는 숫자입니다. 초당 요청 수, 에러율, 지연 시간처럼 추세를 보는 데 적합합니다.
+- 로그: 사건을 기록한 한 줄 또는 구조화된 이벤트입니다. 특정 요청에서 실제로 무슨 일이 있었는지 남깁니다.
+- 트레이스: 하나의 요청이 여러 서비스와 저장소를 지나가는 전체 경로입니다.
+- 카디널리티: 라벨 조합이 얼마나 많이 생기는지를 뜻합니다. 높아질수록 비용이 빠르게 늘어납니다.
+- 서비스 수준 목표: 서비스가 지켜야 할 신뢰성 목표입니다. 나중 글에서 수치로 다룹니다.
+
+## 바꾸기 전과 후
+
+바꾸기 전에는 경보가 울리면 로그부터 뒤집니다. 어느 시점부터 느려졌는지, 어느 서비스가 원인인지 바로 보이지 않아 여기저기 검색하며 추측합니다.
+
+바꾼 뒤에는 흐름이 달라집니다. 먼저 메트릭으로 증상이 시작된 시점을 보고, 트레이스로 느린 구간을 좁히고, 로그로 해당 구간의 맥락을 확인합니다. 증상, 위치, 이유가 한 줄로 이어지기 시작합니다.
+
+## 실습: 첫 신호를 붙이는 다섯 단계
+
+### 1단계 — 가장 단순한 메트릭
 
 ```python
 import time
@@ -62,7 +231,9 @@ def handle_request():
     return f"requests_total {counter}"
 ```
 
-### 2단계 — 구조화된 log
+가장 작은 시작은 숫자 하나입니다. 요청이 들어올 때마다 값을 올리고 외부에 노출하면, 적어도 "지금 요청이 들어오는가"라는 질문에는 답할 수 있습니다. 처음부터 거대한 플랫폼을 붙이기보다, 질문 하나를 답할 수 있게 만드는 편이 훨씬 낫습니다.
+
+### 2단계 — 구조화된 로그
 
 ```python
 import json, time
@@ -73,7 +244,9 @@ def log_event(event, **fields):
 log_event("request_received", path="/health", status=200)
 ```
 
-### 3단계 — 단순 trace 흉내
+메트릭만으로는 이유를 설명하기 어렵습니다. 요청이 들어왔다는 사실은 알 수 있어도 어떤 경로였는지, 어떤 상태 코드였는지, 어떤 사건이 이어졌는지는 로그가 알려 줍니다. 여기서 중요한 점은 사람이 읽기 좋은 문장보다 기계가 질의하기 좋은 형식을 먼저 택하는 것입니다.
+
+### 3단계 — 단순한 트레이스 연결 고리
 
 ```python
 import uuid
@@ -85,63 +258,160 @@ def handle(req):
     log_event("response_sent", trace_id=trace_id)
 ```
 
-### 4단계 — 세 신호 함께 보기
+분산 시스템에서는 요청 하나가 여러 서비스로 흩어집니다. 이때 trace_id가 없으면 조각난 로그를 다시 한 요청으로 묶기 어렵습니다. trace_id는 단순한 문자열이 아니라, 관측성 전체를 잇는 실입니다.
+
+### 4단계 — 세 신호를 함께 읽기
 
 ```bash
-# metric: 1분간 요청 수
-# log: trace_id 기준 검색
+# metric: requests in the last minute
+# log: search by trace_id
 grep '"trace_id": "abc-123"' app.log
 ```
 
-### 5단계 — 한 가지 질문에 답하기
+실전에서는 메트릭, 로그, 트레이스를 따로 보지 않습니다. 지연 시간이 오른 순간을 보고, 같은 시점의 로그를 열고, 특정 요청의 트레이스를 따라가며 하나의 이야기로 합칩니다. 관측성은 신호의 종류보다 신호를 함께 읽는 습관에 가깝습니다.
+
+### 5단계 — 질문 하나에 답하기
 
 ```text
-"왜 결제가 느려졌는가?"
-1. metric: latency 그래프 상승
-2. trace: payment 서비스 구간이 길다
+"Why did checkout get slow?"
+1. metric: latency curve rises
+2. trace: payment span is long
 3. log: db connection timeout
 ```
 
-## 이 코드에서 주목할 점
+이 단계가 핵심입니다. 메트릭은 느려졌다고 알려 주고, 트레이스는 어디가 느린지 보여 주고, 로그는 왜 느려졌는지 설명합니다. 세 신호를 함께 쓰면 장애가 사건 목록이 아니라 인과 관계로 보이기 시작합니다.
 
-- 세 신호는 *서로 보완* 한다. 하나만으로는 *부족*.
-- *trace_id* 가 metric, log, trace 를 *연결* 한다.
-- 구조화된 log 는 *기계가 읽는 데이터* 다.
+## 장애를 이렇게 좁힙니다
 
-## 자주 하는 실수 5가지
+결제 API가 갑자기 느려졌다고 가정해 보겠습니다. 첫 질문은 "정말 전체 장애인가, 특정 경로 문제인가"입니다. 이때는 세 신호를 아래 순서로 이어 보는 편이 가장 빠릅니다.
 
-1. **Monitoring 과 Observability 를 *동의어* 로 본다.** 전자는 *답*, 후자는 *질문 능력*.
-2. **Metric 만 모은다.** *왜* 를 답하지 못한다.
-3. **Log 에 *비구조 텍스트* 만 쓴다.** 검색이 *지옥*.
-4. **trace_id 를 *서비스 간에 전달하지 않는다*.** trace 가 *끊긴다*.
-5. **모든 신호를 *영원히 보관*.** 비용이 *폭발*.
+```text
+1) metric  → checkout p95가 180ms에서 1.8s로 상승
+2) trace   → payment span 하나가 전체 지연의 대부분 차지
+3) log     → db_pool_timeout, retry=3, trace_id=9f3c...
+```
 
-## 실무에서는 이렇게 쓰입니다
+이 순서가 중요한 이유는 증상, 위치, 이유가 섞이지 않기 때문입니다. 메트릭은 증상이 시작된 시점을 보여 주고, 트레이스는 병목 구간을 가리키고, 로그는 그 구간의 실제 실패 이유를 남깁니다.
 
-대부분의 SRE 팀은 *세 기둥* 을 *최소 신호* 로 본 뒤, *SLO* 를 기준으로 *경보* 를 설계합니다.
+```text
+Expected output:
+- 메트릭 그래프에서 checkout 관련 지연 상승이 먼저 보입니다.
+- 같은 시점의 트레이스에서 payment span이 가장 깁니다.
+- 같은 trace_id 로그에서 연결 풀 타임아웃이나 외부 결제사 지연 같은 원인이 확인됩니다.
+```
+
+## 이 코드에서 먼저 봐야 할 점
+
+- 세 신호는 서로 대체재가 아니라 보완재입니다.
+- trace_id가 있어야 로그와 트레이스를 한 요청으로 엮을 수 있습니다.
+- 구조화된 로그는 문장이 아니라 데이터라고 생각하는 편이 맞습니다.
+
+## 자주 하는 실수 다섯 가지
+
+1. 모니터링과 관측성을 같은 말로 취급합니다. 하나는 이미 정해 둔 질문을 감시하는 일이고, 다른 하나는 모르는 문제를 파고드는 능력입니다.
+2. 메트릭만 모읍니다. 추세는 보이지만 이유를 설명하지 못합니다.
+3. 로그를 자유 형식 텍스트로만 남깁니다. 검색은 가능해도 질의와 집계가 금방 막힙니다.
+4. 서비스 사이에 trace_id를 전달하지 않습니다. 요청 흐름이 중간에서 끊깁니다.
+5. 모든 신호를 무기한 보관합니다. 답을 더 얻기도 전에 비용이 먼저 폭증합니다.
+
+## 실무에서는 이렇게 생각한다
+
+운영이 성숙한 팀일수록 "무엇을 더 수집할까"보다 "어떤 질문에 답하려고 이 신호를 남길까"를 먼저 묻습니다. 대시보드는 답이어야 하고, 로그는 검색 가능해야 하고, 트레이스는 요청 흐름을 끊김 없이 보여 줘야 합니다. 결국 좋은 관측성은 도구보다 질문 설계에서 시작합니다.
+
+또 하나 중요한 감각은 블랙박스를 줄이는 일입니다. 시스템이 복잡해질수록, 내부를 완전히 아는 사람 한 명에게 의존하는 구조는 오래 버티지 못합니다. 팀 누구나 외부 신호만 보고 내부 상태를 추론할 수 있어야 운영 속도가 붙습니다.
 
 ## 체크리스트
 
-- [ ] *Monitoring* 과 *Observability* 의 차이를 설명할 수 있다.
-- [ ] *세 기둥* 을 나열할 수 있다.
-- [ ] 구조화된 log 한 줄을 작성할 수 있다.
-- [ ] *trace_id* 의 역할을 안다.
+- [ ] 모니터링과 관측성의 차이를 설명할 수 있습니다.
+- [ ] 메트릭, 로그, 트레이스의 역할을 각각 말할 수 있습니다.
+- [ ] 구조화된 로그 한 줄을 직접 만들 수 있습니다.
+- [ ] trace_id가 왜 필요한지 설명할 수 있습니다.
+- [ ] OpenTelemetry SDK로 자동 계측을 설정할 수 있습니다.
+- [ ] 자동 계측과 수동 계측의 차이를 설명할 수 있습니다.
 
-## 정리 및 다음 단계
+## 연습 문제
 
-Observability 는 *외부에서 내부를 묻는* 기술입니다. 다음 글에서는 *세 기둥* 을 더 깊이 봅니다.
+1. 최근 겪은 장애 하나를 메트릭, 로그, 트레이스로 나눠 보세요.
+2. 자유 형식 로그 한 줄을 JSON 로그로 바꿔 보세요.
+3. 이미 알고 있던 장애와 처음 보는 장애의 예를 각각 두 개씩 적어 보세요.
+
+## 모니터링과 관측 가능성 비교표
+
+운영 현장에서 두 용어가 섞여 쓰이면서 의사결정이 흐려지는 경우가 많습니다. 아래 표는 장애 대응 흐름 관점에서 두 개념의 차이를 다시 정리한 것입니다.
+
+| 관점 | 모니터링 | 관측 가능성 |
+| --- | --- | --- |
+| 출발점 | 알려진 실패 시나리오 | 알려지지 않은 실패 시나리오 |
+| 질문 형태 | "임계값을 넘었는가" | "왜 지금 이 요청만 실패했는가" |
+| 주요 도구 | 알림 규칙, 정적 대시보드 | 동적 질의, 상관관계 탐색 |
+| 탐색 경로 | 경보 확인 -> 체크리스트 실행 | 메트릭 -> 트레이스 -> 로그로 원인 압축 |
+| 실패 시 한계 | 새 패턴에서 경보 미탐 | 신호 품질이 나쁘면 추론 실패 |
+| 팀 역량 요구 | 규칙 유지보수 | 질문 설계, 데이터 모델링, 계층 이해 |
+
+실무에서는 둘 중 하나를 고르는 것이 아니라 역할을 분리합니다. 모니터링은 "놓치지 않기"를 담당하고, 관측 가능성은 "빨리 이해하기"를 담당합니다. 새벽 호출이 잦은 팀일수록 이 분리가 더욱 중요합니다. 경보는 빠르지만 이유가 얕고, 탐색은 느릴 수 있지만 원인을 깊게 설명합니다. 운영 체계는 두 축이 함께 돌아갈 때 안정됩니다.
+
+## 세 신호를 하나의 모델로 읽기
+
+세 신호를 "세 가지 도구"로만 이해하면 실제 장애 대응에서 신호를 따로 보게 됩니다. 더 유용한 방식은 요청 생애주기 모델로 묶는 것입니다.
+
+```text
+요청 진입 -> 애플리케이션 처리 -> 외부 의존성 호출 -> 응답 반환
+   |             |                    |                    |
+ metric        trace/span          trace/span            metric
+                + log               + log                 + log
+```
+
+이 모델에서 메트릭은 구간별 압력 변화를, 트레이스는 구간 경로와 소요 시간을, 로그는 구간별 사건 맥락을 남깁니다. 같은 요청을 세 관점으로 동시에 기록해야 "언제", "어디", "왜"가 끊기지 않습니다. 특히 외부 결제사, 메시지 큐, 데이터베이스처럼 장애 경계가 명확한 지점은 span 이름과 로그 이벤트 이름을 일관되게 맞추는 편이 좋습니다.
+
+다음 규칙을 팀 표준으로 두면 탐색 속도가 빨라집니다.
+
+1. 모든 요청에 `trace_id`, `request_id`를 붙입니다.
+2. span 이름은 동사+대상(`payment.charge`, `db.order.insert`) 형태로 통일합니다.
+3. 로그 이벤트는 상태 전이 중심(`request_start`, `payment_timeout`, `request_end`)으로 제한합니다.
+4. 메트릭 라벨은 유한 집합만 허용하고 식별자 라벨을 금지합니다.
+
+## 장애 분석 타임라인 예시
+
+아래는 checkout 지연 장애를 실제 분석 순서로 압축한 예시입니다.
+
+```text
+00:00  alert: checkout p95 latency > 1.5s for 10m
+00:01  metric: /checkout 경로만 req/s 정상, latency 급증
+00:03  trace: payment.call span p99 2.3s 확인
+00:05  log: payment_timeout + retry=3 + upstream=502 확인
+00:07  조치: 결제사 A 비활성화, 결제사 B로 라우팅
+00:10  metric: latency 정상 범위 회복
+```
+
+이 흐름에서 핵심은 도구 이동 순서가 아니라 질문 압축입니다. 전체 서비스 장애인지 특정 경로 장애인지 먼저 갈라야 하고, 병목 구간이 내부 코드인지 외부 의존성인지 다음으로 갈라야 합니다. 마지막에 실패 이유를 로그로 확인해 재현 가능한 원인 가설을 만듭니다. 이 과정을 문서화하면 다음 장애 때 대응 시간이 눈에 띄게 줄어듭니다.
+
+## 정리
+
+관측성은 시스템 바깥에서 안쪽을 묻는 운영 기술입니다. 메트릭은 추세를, 로그는 맥락을, 트레이스는 경로를 보여 줍니다. 세 신호를 함께 읽을 수 있을 때, 처음 보는 장애도 훨씬 빨리 좁힐 수 있습니다. 다음 글에서는 이 세 신호가 각각 어떤 질문에 답하는지 더 자세히 보겠습니다.
+
+## 처음 질문으로 돌아가기
+
+- **관측성과 모니터링은 무엇이 다를까요?**
+  - 모니터링은 이미 정한 질문(CPU 올랐나? 에러 없나?)에 경보를 다는 일입니다. 관측성은 처음 보는 장애 앞에서도 외부 신호만으로 내부를 추론할 수 있는 능력입니다.
+- **메트릭, 로그, 트레이스는 각각 어떤 질문에 답할까요?**
+  - 메트릭은 추세를, 로그는 구체적인 사건의 맥락을, 트레이스는 요청이 거친 경로 전체를 보여줍니다. 각각 다른 질문을 답합니다.
+- **왜 세 신호를 함께 봐야 할까요?**
+  - 한 신호로는 불완전하기 때문입니다. 메트릭만으로는 이유를 찾을 수 없고, 로그만으로는 전체 그림을 볼 수 없으며, 트레이스 없으면 분산 시스템에서 경로를 끊길 수 없습니다.
 
 <!-- toc:begin -->
-- **Observability란 무엇인가? (현재 글)**
-- Metric, Log, Trace (예정)
-- Metric 수집과 시각화 (예정)
+## 시리즈 목차
+
+- **관측성이란 무엇인가? (현재 글)**
+- 메트릭, 로그, 트레이스 (예정)
+- 메트릭 수집과 시각화 (예정)
 - 구조화된 로깅 (예정)
 - 분산 트레이싱 기초 (예정)
-- Dashboard 설계 (예정)
-- Alert와 On-Call (예정)
-- SLI와 SLO 기초 (예정)
-- Cost와 Cardinality (예정)
-- 운영 가능한 Observability 스택 (예정)
+- 대시보드 설계 (예정)
+- 경보와 온콜 (예정)
+- 서비스 수준 지표와 목표 기초 (예정)
+- 비용과 카디널리티 (예정)
+- 운영 가능한 관측성 스택 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -150,3 +420,5 @@ Observability 는 *외부에서 내부를 묻는* 기술입니다. 다음 글에
 - [Google SRE Book — Monitoring](https://sre.google/sre-book/monitoring-distributed-systems/)
 - [Three Pillars of Observability](https://www.cncf.io/blog/2022/05/24/observability-cloud-native/)
 - [Observability vs Monitoring](https://www.honeycomb.io/blog/observability-101)
+- [OpenTelemetry Python SDK](https://opentelemetry.io/docs/languages/python/)
+- [예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/observability-101/ko)

@@ -1,10 +1,10 @@
 ---
 series: machine-learning-101
 episode: 5
-title: Logistic Regression
-status: content-ready
+title: "Machine Learning 101 (5/10): Logistic Regression"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,28 @@ tags:
   - scikit-learn
   - Beginner
 seo_description: How logistic regression turns linear scores into probabilities, why thresholds matter, and how precision and recall guide classification decisions
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Logistic Regression
+# Machine Learning 101 (5/10): Logistic Regression
 
-> Machine Learning 101 series (5/10)
+Beginner confusion around logistic regression is healthy because the name really is misleading at first glance. It predicts classes in practice, but it does that by assigning probabilities first. The probability layer is where the useful operational decisions live.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Machine Learning 101 series. Here we will treat logistic regression as a probability engine, then connect thresholds, precision, recall, and class imbalance back to the decisions a production system has to make.
 
-**Core question**: It predicts 0 or 1, so why is it called regression?
 
-> *Logistic regression predicts a continuous probability and uses a threshold to commit to a class.*
+![machine learning 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 5 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The sigmoid function and its probabilistic output
-- The trap of always using 0.5 as a threshold
-- The meaning of precision, recall, and F1
-- How to extend to the multinomial case
-- Five common pitfalls
+- If the output is 0 or 1, why is the model called regression?
+- How does the sigmoid turn a linear score into a probability?
+- Why is `0.5` only a default threshold, not a law?
 
 ## Why It Matters
 
 Logistic regression is the standard classification baseline. It is interpretable, fast, and stays competitive on imbalanced data when you tune the threshold.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    X["X"] --> Lin["z = X w + b"]
-    Lin --> Sig["sigmoid(z)"]
-    Sig --> P["P(y=1|X)"]
-    P --> Cls["class = P > 0.5"]
-```
 
 ## Key Terms
 
@@ -110,11 +96,19 @@ for t in [0.3, 0.5, 0.7]:
     print(t, (pred == yte).mean())
 ```
 
+**Expected output:** `classification_report` prints class-wise precision and recall, while the threshold loop shows that a different cutoff changes the downstream behavior even when the model weights stay the same. That is the core lesson: thresholding is part of modeling, not a display choice.
+
 ## What to Notice in This Code
 
 - `predict_proba` returns probabilities, not just labels.
 - The threshold is a precision-recall trade-off knob.
 - `StandardScaler` helps the optimizer converge.
+
+## Read the first failure signal this way
+
+- If accuracy looks high but the expensive positive cases are still missed, inspect recall and the threshold before changing models.
+- If probabilities look overconfident, test calibration instead of assuming `predict_proba` is production-ready.
+- If coefficients drift wildly, verify scaling and class balance before arguing about solver choice.
 
 ## Five Common Mistakes
 
@@ -153,17 +147,29 @@ Spam filtering, fraud detection, and churn modeling all rely on probability outp
 
 Logistic regression is the foundation of classification. Next, we cover decision trees and random forests for nonlinear modeling.
 
+## Answering the Opening Questions
+
+- **If the output is 0 or 1, why is the model called regression?**
+  - The article treats Logistic Regression as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How does the sigmoid turn a linear score into a probability?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is `0.5` only a default threshold, not a law?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
-- [Linear Regression](./04-linear-regression.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
+- [Machine Learning 101 (4/10): Linear Regression](./04-linear-regression.md)
 - **Logistic Regression (current)**
 - Decision Tree and Random Forest (upcoming)
 - Clustering (upcoming)
 - Overfitting and Regularization (upcoming)
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,10 +1,10 @@
 ---
 series: sre-101
 episode: 2
-title: Reliability
+title: "SRE 101 (2/10): Reliability"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,34 @@ tags:
   - Latency
   - Quality
 seo_description: A beginner-friendly guide to reliability covering availability, latency, correctness, durability, and the design principles behind each
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
-# Reliability
+# SRE 101 (2/10): Reliability
 
-> SRE 101 series (2/10)
+Many teams say a service feels stable until an outage or a slow release proves otherwise. That kind of language works in hallway conversation, but it does not help product, platform, and support teams make the same decision from the same evidence.
 
-<!-- a-grade-intro:begin -->
+Reliability gets clearer when you stop treating it like mood and start treating it like a bundle of measurable promises. A service can be up and still feel broken if it is too slow, returns wrong results, or loses data.
 
-**Core question**: Is *reliability* a *feeling* or a *measurable* number?
+This is post 2 in the SRE 101 series. Here we break reliability into measurable dimensions so later topics like SLOs, error budgets, and monitoring rest on something more concrete than “it seems okay.”
 
-> *Reliability* is the discipline of *proving* a *customer promise* with *numbers*.
 
-<!-- a-grade-intro:end -->
+![sre 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/02/02-01-concept-at-a-glance.en.png)
+*sre 101 chapter 2 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *definition* of *reliability*
-- The *four measurable dimensions*
-- The difference between *availability* and *latency*
-- *Durability* and *correctness*
-- The core *design principles*
+- What does it mean to describe reliability as a measurable property instead of a general sense of stability?
+- Why are availability and latency related but not interchangeable?
+- When do correctness and durability matter more than raw uptime?
 
-## Why It Matters
+## Why this topic matters
 
-Without numbers, every *conversation* and *decision* becomes *subjective*.
+Without numbers, every conversation and decision becomes subjective. One team thinks the service is fine, another thinks it is risky, and neither side can show where the disagreement comes from.
 
-## Concept at a Glance
+Once the dimensions are explicit, reliability becomes easier to discuss as product quality. A payment flow, search API, and analytics pipeline can all be reliable, but they rarely need the same emphasis.
 
-```mermaid
-flowchart LR
-    Avail["availability"] --> R["reliability"]
-    Lat["latency"] --> R
-    Corr["correctness"] --> R
-    Dur["durability"] --> R
-```
+> Reliability is the work of proving a customer promise with numbers.
 
 ## Key Terms
 
@@ -153,8 +145,19 @@ A *payment service* prioritizes *correctness*. A *streaming service* prioritizes
 
 Next, we cover the difference between *SLI*, *SLO*, and *SLA*.
 
+## Answering the Opening Questions
+
+- **What does it mean to describe reliability as a measurable property instead of a general sense of stability?**
+  - The article treats Reliability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why are availability and latency related but not interchangeable?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When do correctness and durability matter more than raw uptime?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is SRE?](./01-what-is-sre.md)
+## In this series
+
+- [SRE 101 (1/10): What is SRE?](./01-what-is-sre.md)
 - **Reliability (current)**
 - SLI, SLO, SLA (upcoming)
 - Error Budget (upcoming)
@@ -164,6 +167,7 @@ Next, we cover the difference between *SLI*, *SLO*, and *SLA*.
 - Reducing Toil (upcoming)
 - Capacity Planning (upcoming)
 - Building Operable Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

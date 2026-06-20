@@ -1,11 +1,11 @@
 ---
-title: Context Harness — Designing What the Agent Should Know and Not Know
+title: "Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know"
 series: harness-engineering-101
 episode: 3
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,22 +14,29 @@ tags:
 - Harness
 - Context
 - RAG
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: The context an agent receives shapes its output. Too little and it
   guesses. Too much and it loses focus.
 ---
 
-# Context Harness — Designing What the Agent Should Know and Not Know
+# Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know
 
-> Harness Engineering 101 Series (3/10)
+Teams often assume context is free: add more chat history, more retrieved documents, more tool schemas, and quality should improve. In production, the opposite is common. Bigger context often means slower, noisier, and harder-to-reproduce behavior.
 
-The context an agent receives shapes its output. Too little and it guesses. Too much and it loses focus. The Context Harness is about deciding what to give the agent and what to withhold.
+An agent does not see one abstract “window.” It sees a contested budget shared by system prompts, task specs, conversation history, retrieved documents, tool schemas, and recent tool outputs.
 
----
+This is post 3 in the Harness Engineering 101 series. Here we treat context as an allocation problem instead of a dumping ground.
 
-![Context harness - designing what the agent should know and not know](../../assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.en.png)
-
+![Context harness - designing what the agent should know and not know](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.en.png)
 *Context harness - designing what the agent should know and not know*
+> The goal of a Context Harness is not more information; it is showing the agent only the information needed for the current decision.
+
+## Questions to Keep in Mind
+
+- Why is a Context Harness a budget-allocation problem rather than infinite memory?
+- By what rule should you decide what the agent sees and what stays hidden?
+- As retrieved context grows, how do you preserve precision?
+
 ## Context Is a Resource
 
 An agent's context window is not infinite. GPT-4o has 128k tokens, Claude Sonnet 4 has 200k, Gemini 2.5 Pro has 1M. Big numbers, but in practice never enough. System prompt, conversation history, retrieved documents, tool schemas, and recent tool outputs all compete for the same space.
@@ -42,7 +49,7 @@ Context Harness is the explicit design of what information the agent receives, w
 
 ## The Five Components of Context
 
-![The five components of context](../../assets/harness-engineering-101/03/03-02-the-five-components-of-context.en.png)
+![The five components of context](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-02-the-five-components-of-context.en.png)
 
 *The five components of context*
 The context an agent sees in a single inference splits into five parts.
@@ -152,7 +159,7 @@ The right strategy depends on the task. Short conversations need only sliding. L
 
 ## Precision in Retrieved Context
 
-![Precision in retrieved context](../../assets/harness-engineering-101/03/03-03-precision-in-retrieved-context.en.png)
+![Precision in retrieved context](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-03-precision-in-retrieved-context.en.png)
 
 *Precision in retrieved context*
 RAG-retrieved documents take up a large fraction of context. The precision of what you retrieve matters more than the volume.
@@ -239,7 +246,7 @@ Hiding is as much a design decision as showing.
 
 ## Context Snapshots for Reproducibility
 
-![Context snapshots for reproducibility](../../assets/harness-engineering-101/03/03-04-context-snapshots-for-reproducibility.en.png)
+![Context snapshots for reproducibility](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-04-context-snapshots-for-reproducibility.en.png)
 
 *Context snapshots for reproducibility*
 A production agent must produce the same output for the same input. But context is assembled through many stages, which makes reproduction hard. Context snapshots solve this.
@@ -312,19 +319,36 @@ API keys, PII, and medical data placed straight into context leak via logs and o
 - Context Harness designs what to hide as carefully as what to show. Deliberately remove secrets, irrelevant tools, and stale outputs.
 - Context snapshots are the foundation of reproducibility and debugging in production agents.
 
+## Operational checklist
+
+- [ ] Assign explicit token budgets to prompt, task, history, retrieval, tool schemas, and response buffer.
+- [ ] Choose a history-compaction strategy before the first long-running task ships.
+- [ ] Add reranking and compression after retrieval instead of pasting raw documents into prompts.
+- [ ] Strip secrets, irrelevant tools, contradictory instructions, and stale tool outputs from context assembly.
+- [ ] Capture inference-time context snapshots so incidents can be replayed later.
+
+## Answering the Opening Questions
+
+- **Why is a Context Harness a budget-allocation problem rather than infinite memory?**
+  - The context window, token budget, attention, and security boundary are all limited. Mixing useful evidence with irrelevant text makes decisions worse.
+- **By what rule should you decide what the agent sees and what stays hidden?**
+  - Show evidence, rules, and state needed for the current task. Hide sensitive data, stale noise, and documents unrelated to the decision.
+- **As retrieved context grows, how do you preserve precision?**
+  - Prefer source quality, freshness, task relevance, and deduplication over raw volume, and keep context snapshots for reproducibility.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
-- [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- **Context Harness — Designing What the Agent Should Know and Not Know (current)**
-- Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)
-- Tool Harness — Designing Safe Tools for Agents (upcoming)
-- Test Harness — Turning Completion Criteria into Tests (upcoming)
-- Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
-- Approval Gates — Designing Where Humans Must Approve (upcoming)
-- Observability — Tracing and Replaying Agent Work (upcoming)
-- Production Harness — Building Operational Environments for Agents (upcoming)
+- [Harness Engineering 101 (1/10): What Is Harness Engineering?](./01-what-is-harness-engineering.md)
+- [Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
+- **Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know (current)**
+- Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)
+- Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents (upcoming)
+- Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests (upcoming)
+- Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
+- Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (upcoming)
+- Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)
 
 <!-- toc:end -->
 
@@ -332,7 +356,9 @@ API keys, PII, and medical data placed straight into context leak via logs and o
 
 ## References
 
+### Official docs and research
+
 - [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
 - [Liu et al. — Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/abs/2307.03172)
 - [LangChain — Contextual Compression Retriever](https://python.langchain.com/docs/how_to/contextual_compression/)
-- [OpenAI — Retrieval-Augmented Generation Best Practices](https://cookbook.openai.com/examples/question_answering_using_embeddings)
+- [OpenAI Cookbook — Question Answering Using Embeddings](https://cookbook.openai.com/examples/question_answering_using_embeddings)

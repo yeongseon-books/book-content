@@ -1,7 +1,7 @@
 ---
 episode: 6
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -13,16 +13,12 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
-title: Rate limit management — patterns for staying within limits
-seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
+  tistory: false
+title: "LLM API Production 101 (6/6): Rate limit management — patterns for staying within limits"
+seo_description: Manage LLM API traffic effectively using token-bucket and sliding-window patterns to prevent 429 errors and optimize throughput.
 ---
 
-# Rate limit management — patterns for staying within limits
-
-> LLM API Production 101 (6/6)
-
-Example code: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/en/06-rate-limit-management)
+# LLM API Production 101 (6/6): Rate limit management — patterns for staying within limits
 
 Any team that runs APIs long enough eventually sees the same scene. A path that usually works fine starts failing at a busy moment, and the logs begin to fill with 429s or rate-limit warnings. LLM APIs are not different. In some ways they are harsher, because each request can be large in token volume and expensive in downstream compute. When traffic spikes, the pain shows up quickly.
 
@@ -30,20 +26,17 @@ Systems usually fail here in one of two directions. The first is doing nothing a
 
 This post implements two simple local limiters for that job: a token bucket and a sliding-window limiter. The goal is not to model every provider policy in abstract detail. It is to build the smallest application-side control layer that can shape request flow before the provider has to reject it.
 
-The main idea is simple: **rate-limit handling is not apologizing after a 429, it is controlling request flow before the 429 happens**.
+This is the last post in the LLM API Production 101 series. Here we focus on token-bucket and sliding-window patterns that keep request flow inside rate limits.
 
-![Rate limit management: patterns for staying within limits](../../assets/llm-api-production-101/06/06-01-rate-limit-management-patterns-for-stayi.en.png)
-
+![Rate limit management: patterns for staying within limits](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-01-rate-limit-management-patterns-for-stayi.en.png)
 *Rate limit management: patterns for staying within limits*
----
+> Rate limiting is flow control before rejection, not apology after rejection.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- What do RPM, TPM, and concurrency limits each mean, and where do they conflict?
-- How should the `Retry-After` header on 429 responses combine with your own backoff?
-- When does pooling across multiple models or accounts actually help?
-- Should you reach for token bucket or leaky bucket for LLM API limits?
-- Which metrics let you detect approaching limits and queue before failure?
+- Is rate limit management something you do after a 429, or before traffic reaches the provider?
+- When does a token bucket fit better than a sliding window?
+- What should the app still do after receiving a provider 429?
 
 ## Runtime setup
 
@@ -60,7 +53,7 @@ export GROQ_API_KEY="your-issued-key"
 
 ## Why the application needs its own limiter
 
-![Local limiter controlling flow before the provider](../../assets/llm-api-production-101/06/06-01-why-the-application-needs-its-own-limite.en.png)
+![Local limiter controlling flow before the provider](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-01-why-the-application-needs-its-own-limite.en.png)
 
 *Local limiter controlling flow before the provider*
 Retries and backoff are necessary, but they are still reactive once you have already exceeded the provider’s allowance. A local limiter is useful for three reasons:
@@ -75,7 +68,7 @@ Imagine twenty web requests arriving at the same moment, all triggering the same
 
 ## Where a token bucket fits best
 
-![Refill and consume cycle of a token bucket](../../assets/llm-api-production-101/06/06-02-where-a-token-bucket-fits-best.en.png)
+![Refill and consume cycle of a token bucket](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-02-where-a-token-bucket-fits-best.en.png)
 
 *Refill and consume cycle of a token bucket*
 A token bucket refills at a steady rate. Each request consumes one or more tokens. That gives you a useful balance: short bursts are allowed up to the bucket size, but the long-term average stays bounded.
@@ -184,7 +177,7 @@ This keeps only recent events inside the active window and rejects requests once
 
 ## Putting a limiter in front of Groq calls
 
-![Execution path from local gate to provider call](../../assets/llm-api-production-101/06/06-03-putting-a-limiter-in-front-of-groq-calls.en.png)
+![Execution path from local gate to provider call](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-03-putting-a-limiter-in-front-of-groq-calls.en.png)
 
 *Execution path from local gate to provider call*
 Here is a small end-to-end example using a token bucket as a gate before the provider call.
@@ -294,7 +287,7 @@ The important detail is ordering: the application acquires local permission befo
 
 ## What to do after a 429 anyway
 
-![Recovery path after a provider 429](../../assets/llm-api-production-101/06/06-04-what-to-do-after-a-429-anyway.en.png)
+![Recovery path after a provider 429](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-04-what-to-do-after-a-429-anyway.en.png)
 
 *Recovery path after a provider 429*
 Even with a local limiter, you may still receive a 429. Multiple workers may be competing. The provider may enforce token-based limits that your simple request counter does not see. That is why 429 handling still matters.
@@ -374,7 +367,7 @@ def limited_completion_with_429(prompt: str) -> str:
 
 ## Choosing token bucket versus sliding window
 
-![Comparison for choosing a limiter](../../assets/llm-api-production-101/06/06-05-choosing-token-bucket-versus-sliding-win.en.png)
+![Comparison for choosing a limiter](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-05-choosing-token-bucket-versus-sliding-win.en.png)
 
 *Comparison for choosing a limiter*
 Both are valid. The better choice depends on the traffic pattern.
@@ -421,15 +414,26 @@ That closes the series. Structured output fixed the response contract. Tool call
 - [ ] Defined routing rules and failure isolation when pooling keys/accounts
 - [ ] Set alarm thresholds for token usage and limit-proximity events
 
+## Answering the Opening Questions
+
+- **Is rate limit management something you do after a 429, or before traffic reaches the provider?**
+  Good rate limit management controls flow before 429s, instead of only reacting after the provider rejects a request.
+
+- **When does a token bucket fit better than a sliding window?**
+  Token buckets fit bursty traffic with refill behavior; sliding windows fit fair limits over a fixed recent interval.
+
+- **What should the app still do after receiving a provider 429?**
+  Read provider signals such as Retry-After, back off, queue or reject safely, inform users, and record metrics for the next control decision.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Structured output — JSON mode and response schemas](./01-structured-output.md)
-- [Tool calling — connecting functions to the model](./02-tool-calling.md)
-- [Streaming in depth — chunk handling and error recovery](./03-streaming-in-depth.md)
-- [Caching strategies — reducing cost and latency](./04-caching-strategies.md)
-- [Retry and error handling — making API calls reliable](./05-retry-and-error-handling.md)
-- **Rate limit management — patterns for staying within limits (current)**
+- [LLM API Production 101 (1/6): Structured output — JSON mode and response schemas](./01-structured-output.md)
+- [LLM API Production 101 (2/6): Tool calling — connecting functions to the model](./02-tool-calling.md)
+- [LLM API Production 101 (3/6): Streaming in depth — chunk handling and error recovery](./03-streaming-in-depth.md)
+- [LLM API Production 101 (4/6): Caching strategies — reducing cost and latency](./04-caching-strategies.md)
+- [LLM API Production 101 (5/6): Retry and error handling — making API calls reliable](./05-retry-and-error-handling.md)
+- **LLM API Production 101 (6/6): Rate limit management — patterns for staying within limits (current)**
 
 <!-- toc:end -->
 
@@ -437,6 +441,17 @@ That closes the series. Structured output fixed the response contract. Tool call
 
 ## References
 
-- <https://console.groq.com/docs/errors>
-- <https://en.wikipedia.org/wiki/Token_bucket>
-- <https://konghq.com/blog/engineering/how-to-design-a-scalable-rate-limiting-algorithm>
+### Official Docs
+
+- [Groq errors guide](https://console.groq.com/docs/errors)
+- [Wikipedia: Token bucket](https://en.wikipedia.org/wiki/Token_bucket)
+- [Kong Engineering: scalable rate limiting algorithm](https://konghq.com/blog/engineering/how-to-design-a-scalable-rate-limiting-algorithm)
+
+### Verification-Friendly References
+
+- [HTTP Semantics — Retry-After](https://www.rfc-editor.org/rfc/rfc9110.html#field.retry-after)
+
+### Related Series
+
+- [Retry and error handling — making API calls reliable](./05-retry-and-error-handling.md)
+- [LLM API Production 101 series](../)

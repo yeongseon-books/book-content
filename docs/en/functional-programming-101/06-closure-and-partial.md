@@ -1,10 +1,10 @@
 ---
 series: functional-programming-101
 episode: 6
-title: Closures and Partial Application
+title: "Functional Programming 101 (6/10): Closures and Partial Application"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,23 @@ seo_description: Learn how closures capture variables and how functools.partial 
 last_reviewed: '2026-05-04'
 ---
 
-# Closures and Partial Application
+# Functional Programming 101 (6/10): Closures and Partial Application
 
-> Functional Programming 101 Series (6/10)
+Closures start to feel practical the moment you need a callback, decorator, or handler to carry a little bit of context. The function itself may be small, but once it has to remember which tenant it belongs to, how many retries are left, or which logger prefix to use, a plain parameter list stops being the whole story.
 
-<!-- a-grade-intro:begin -->
+`functools.partial` solves a nearby problem from a different angle. Instead of remembering mutable context, it pre-fills stable arguments of an existing function. That distinction matters in production code because it tells you whether you are carrying state or simply specializing configuration.
 
-**Key Question**: If a function remembers variables from the scope where it was defined, what patterns become possible?
+This is post 6 in the Functional Programming 101 series.
 
-> A closure is an inner function that remembers variables from its enclosing scope. `functools.partial` fixes some arguments of an existing function to create a new one. This article covers how closures work and practical patterns with partial application.
 
-<!-- a-grade-intro:end -->
+![Functional Programming 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.en.png)
+*Functional Programming 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Closures and Partial Application?
+- Which signal should the example or diagram make visible for Closures and Partial Application?
+- What failure should be prevented first when Closures and Partial Application reaches a real system?
 
 ## What You Will Learn
 
@@ -51,7 +57,7 @@ Closures encapsulate state without using classes — a lightweight pattern. Deco
 
 > Structure of a Closure
 
-```
+```text
 outer_func(x)
   |
   +-- local variable x (becomes a free variable)
@@ -59,8 +65,10 @@ outer_func(x)
   +-- inner_func(y)
        |
        +-- x + y  <- remembers outer x
-           (closure)
+            (closure)
 ```
+
+## Closure vs partial decision flow
 
 ## Key Concepts
 
@@ -119,7 +127,6 @@ def make_counter(start: int = 0):
 
     return counter
 
-
 c1 = make_counter()
 print(c1())  # 1
 print(c1())  # 2
@@ -141,7 +148,6 @@ def make_greeter(greeting: str):
         return f"{greeting}, {name}!"
     return greet
 
-
 hello = make_greeter("Hello")
 bye = make_greeter("Goodbye")
 
@@ -159,7 +165,6 @@ print(bye.__closure__[0].cell_contents)    # Goodbye
 ```python
 from functools import partial
 
-
 # basic usage: fix arguments
 def power(base: int, exponent: int) -> int:
     return base ** exponent
@@ -169,7 +174,6 @@ cube = partial(power, exponent=3)
 
 print(square(5))  # 25
 print(cube(5))    # 125
-
 
 # practical example: API client configuration
 def send_request(method: str, url: str, headers: dict) -> str:
@@ -189,13 +193,11 @@ print(api_post("/orders"))
 ```python
 from functools import partial
 
-
 # approach 1: closure
 def make_tax_calculator_closure(rate: float):
     def calculate(amount: float) -> float:
         return round(amount * rate, 2)
     return calculate
-
 
 # approach 2: partial
 def calculate_tax(amount: float, rate: float) -> float:
@@ -203,14 +205,12 @@ def calculate_tax(amount: float, rate: float) -> float:
 
 make_tax_calculator_partial = lambda rate: partial(calculate_tax, rate=rate)
 
-
 # usage is identical
 tax_10 = make_tax_calculator_closure(0.1)
 tax_10_p = make_tax_calculator_partial(0.1)
 
 print(tax_10(50000))    # 5000.0
 print(tax_10_p(50000))  # 5000.0
-
 
 # selection criteria
 # - closure: when state mutation (nonlocal) is needed
@@ -221,8 +221,7 @@ print(tax_10_p(50000))  # 5000.0
 
 ```python
 from functools import partial
-from typing import Callable
-
+from collections.abc import Callable
 
 # event system
 class EventBus:
@@ -236,7 +235,6 @@ class EventBus:
         for handler in self._handlers.get(event, []):
             handler(**data)
 
-
 # closure to create a handler with context
 def make_logger_handler(prefix: str):
     def handler(**data) -> None:
@@ -247,7 +245,6 @@ def make_logger_handler(prefix: str):
 def log_event(level: str, **data) -> None:
     print(f"[{level}] {data}")
 
-
 bus = EventBus()
 bus.on("user.created", make_logger_handler("UserService"))
 bus.on("user.created", partial(log_event, "INFO"))
@@ -256,6 +253,49 @@ bus.emit("user.created", name="Alice", email="alice@example.com")
 # [UserService] {'name': 'Alice', 'email': 'alice@example.com'}
 # [INFO] {'name': 'Alice', 'email': 'alice@example.com'}
 ```
+
+### Step 6: Production-shaped example — tenant-aware webhook handlers
+
+```python
+from dataclasses import dataclass
+from functools import partial
+
+@dataclass(frozen=True)
+class TenantPolicy:
+    tenant: str
+    retry_limit: int
+    audit_channel: str
+
+def make_retry_decider(policy: TenantPolicy):
+    attempts = 0
+
+    def should_retry(status: str) -> bool:
+        nonlocal attempts
+        attempts += 1
+        return status == "temporary-failure" and attempts < policy.retry_limit
+
+    return should_retry
+
+def publish_audit(channel: str, event_name: str, payload: dict) -> None:
+    print(f"[{channel}] {event_name}: {payload}")
+
+policy = TenantPolicy(
+    tenant="store-kr",
+    retry_limit=3,
+    audit_channel="orders.webhook",
+)
+
+should_retry = make_retry_decider(policy)
+record_audit = partial(publish_audit, policy.audit_channel)
+
+event = {"order_id": "A-1024", "status": "temporary-failure"}
+record_audit("webhook.received", {"tenant": policy.tenant, **event})
+
+if should_retry(event["status"]):
+    record_audit("webhook.retry_scheduled", {"order_id": event["order_id"], "attempt": 1})
+```
+
+This is closer to the kind of code you meet in production. The closure keeps retry state for one tenant policy, while `partial` binds a shared audit channel once so every handler does not have to pass it around again.
 
 ## What to Notice in This Code
 
@@ -306,17 +346,29 @@ Closures are "lightweight objects." When state is simple and there is only one m
 
 Closures let functions remember the environment where they were defined, and `partial` fixes arguments of existing functions. Use closures when state is needed; use partial when only fixing arguments. The next article covers a core functional programming technique: **recursion and tail calls**.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Closures and Partial Application?**
+  - The article treats Closures and Partial Application as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Closures and Partial Application?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Closures and Partial Application reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Functional Programming?](./01-what-is-fp.md)
-- [Pure Functions and Side Effects](./02-pure-functions.md)
-- [Immutable Data](./03-immutable-data.md)
-- [Higher-Order Functions](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
+## In this series
+
+- [Functional Programming 101 (1/10): What Is Functional Programming?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): Pure Functions and Side Effects](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): Immutable Data](./03-immutable-data.md)
+- [Functional Programming 101 (4/10): Higher-Order Functions](./04-higher-order-functions.md)
+- [Functional Programming 101 (5/10): map, filter, reduce](./05-map-filter-reduce.md)
 - **Closures and Partial Application (current)**
-- [Recursion and Tail Calls](./07-recursion.md)
-- [Lazy Evaluation and Generators](./08-lazy-evaluation.md)
-- [Function Composition and Pipelines](./09-function-composition.md)
-- [Balancing OOP and Functional Programming](./10-oop-and-fp-balance.md)
+- Recursion and Tail Calls (upcoming)
+- Lazy Evaluation and Generators (upcoming)
+- Function Composition and Pipelines (upcoming)
+- Balancing OOP and Functional Programming (upcoming)
+
 <!-- toc:end -->
 
 ## References

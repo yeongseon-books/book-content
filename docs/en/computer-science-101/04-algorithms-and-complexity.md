@@ -1,10 +1,10 @@
 ---
 series: computer-science-101
 episode: 4
-title: Algorithms and Complexity
-status: content-ready
+title: "Computer Science 101 (4/10): Algorithms and Complexity"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,34 @@ tags:
   - Data Structures
   - Performance
 seo_description: An introductory tour of algorithms, time and space complexity, and Big-O notation for engineers picking data structures.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Algorithms and Complexity
+# Computer Science 101 (4/10): Algorithms and Complexity
 
-> Computer Science 101 series (4/10)
+Code that feels fine on 100 records can collapse in production once the data grows by three orders of magnitude. At that point, the first explanation is rarely “the machine is slow.” It is usually that the algorithmic cost was hidden while the input stayed small.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Computer Science 101 series.
 
-**Key question**: Given two pieces of code that solve the same problem, how do you know which one is faster?
+In this article, we'll define algorithms, read time and space complexity, and show how data-structure choice changes performance long before micro-optimization matters.
 
-> An algorithm is a clear procedure for solving a problem. Complexity is the language we use to measure how that procedure scales with input size. Two sorting algorithms can produce the same output, but on a million items one might take one second and the other one hour. This article covers the definition of an algorithm, Big-O notation, and the criteria for choosing data structures.
 
-<!-- a-grade-intro:end -->
+![Computer Science 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/04/04-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Algorithms and Complexity?
+- Which signal should the example or diagram make visible for Algorithms and Complexity?
+- What failure should be prevented first when Algorithms and Complexity reaches a real system?
+
+## Questions This Article Answers
+
+- How can you compare two solutions before you benchmark them?
+- What do time complexity and space complexity each measure?
+- Why does Big-O help you predict behavior as input grows?
+- How can `list`, `set`, and `dict` choices change the order of the whole solution?
+- Why does code that looks acceptable on small inputs fail at scale?
 
 ## What You Will Learn
 
@@ -48,19 +62,7 @@ Code that runs fine on 100 items may stall on 1,000,000. If you cannot predict h
 
 Reading complexity is one of the clearest dividing lines between senior and junior engineers.
 
-## Concept at a Glance
-
 > Two algorithms that produce the same result can diverge by thousands of times once the input grows.
-
-```text
-Input size n          n=10    n=1,000     n=1,000,000
-─────────────────────────────────────────────────────
-O(1)    constant       1        1              1
-O(log n) log            3       10             20
-O(n)    linear         10     1,000      1,000,000
-O(n log n) linearithmic 33    10,000     20,000,000
-O(n^2)  quadratic     100  1,000,000   10^12 (impossible)
-```
 
 ## Key Terms
 
@@ -111,7 +113,6 @@ def linear_search(arr: list[int], target: int) -> int:
             return i
     return -1
 
-
 def binary_search(arr: list[int], target: int) -> int:
     """Search a sorted list for target — O(log n)."""
     lo, hi = 0, len(arr) - 1
@@ -124,7 +125,6 @@ def binary_search(arr: list[int], target: int) -> int:
         else:
             hi = mid - 1
     return -1
-
 
 data = sorted(range(1_000_000))
 print(linear_search(data, 999_999))   # 999999 — about 1,000,000 comparisons
@@ -147,6 +147,8 @@ start = time.perf_counter()
 binary_search(big, target)
 print(f"binary : {time.perf_counter() - start:.6f}s")
 ```
+
+**Expected output:** on sorted input, `binary` should be much faster than `linear`, and the comparison gap becomes dramatic at large sizes.
 
 ### Step 3: Data-structure choice changes complexity
 
@@ -181,7 +183,6 @@ def bubble_sort(arr: list[int]) -> list[int]:
                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
     return arr
 
-
 small = [random.randint(0, 100) for _ in range(2000)]
 
 start = time.perf_counter()
@@ -202,7 +203,6 @@ def complexity_table(sizes: list[int]) -> None:
         import math
         log_n = math.log2(n)
         print(f"{n:>10} {log_n:>12.1f} {n:>12} {n * log_n:>14.0f} {n * n:>16,}")
-
 
 complexity_table([10, 100, 1_000, 10_000, 100_000])
 ```
@@ -260,17 +260,29 @@ An algorithm is a procedure for solving a problem. Complexity is its cost. Big-O
 
 The next article opens up the machine that actually runs these algorithms — CPU, memory, and the cache hierarchy.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Algorithms and Complexity?**
+  - The article treats Algorithms and Complexity as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Algorithms and Complexity?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Algorithms and Complexity reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
-- [Computation and Programs](./02-computation-and-programs.md)
-- [Data Representation](./03-data-representation.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): Computation and Programs](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): Data Representation](./03-data-representation.md)
 - **Algorithms and Complexity (current)**
-- [Computer Architecture](./05-computer-architecture.md)
-- [Operating Systems](./06-operating-systems.md)
-- [Networks](./07-networks.md)
-- [Databases](./08-databases.md)
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Computer Architecture (upcoming)
+- Operating Systems (upcoming)
+- Networks (upcoming)
+- Databases (upcoming)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References

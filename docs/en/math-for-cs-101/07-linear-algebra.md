@@ -1,10 +1,10 @@
 ---
 series: math-for-cs-101
 episode: 7
-title: Linear Algebra
-status: content-ready
+title: "Math for CS 101 (7/10): Linear Algebra"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,40 +20,40 @@ seo_description: A beginner-friendly tour of vectors, matrices, dot products, ma
 last_reviewed: '2026-05-04'
 ---
 
-# Linear Algebra
+# Math for CS 101 (7/10): Linear Algebra
 
-> Math for CS 101 series (7/10)
+Linear algebra often feels intimidating to beginners because the notation becomes dense fast. In practice, though, the topic is less about ceremonial symbols and more about one useful idea: representing data and transformations in a compact, reusable form.
 
-<!-- a-grade-intro:begin -->
+Embeddings, dimensionality reduction, camera transforms, and neural network forward passes all become easier to understand once vectors and matrices stop looking like mysterious tables and start looking like data plus movement rules.
 
-**Core question**: What *language* lets us handle *data* and *transforms* efficiently?
+This is post 7 in the Math for CS 101 series.
 
-> *Linear algebra* is the *common language* of data and transforms behind *ML*, *graphics*, and *simulation*.
+Here we use linear algebra as a practical language for data, similarity, and transformation.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![math for cs 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/07/07-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 7 flow overview*
+> Vectors and matrices structure data transformations and form the foundation of machine learning, recommender systems, and optimization.
 
-- What a *vector* means
-- What a *matrix* means
-- *Dot product* and *angle*
-- *Matrix multiplication* and *transpose*
-- Intuition for *basis*
+## Questions to Keep in Mind
+
+- How do vectors and matrices represent data in a useful way?
+- Why is the dot product so central to similarity and scoring?
+- What is the difference between a matrix as a table and a matrix as a transform?
 
 ## Why It Matters
 
-*Embeddings*, *PCA*, *recommenders*, and *3D transforms* all run on linear algebra.
+Embedding search, recommenders, PCA, 3D graphics, and neural nets all depend on linear algebra. The common theme is not just computation speed. It is that vectors and matrices give you a way to describe meaning, similarity, and transformation in one framework.
 
-## Concept at a Glance
+That shift matters in engineering work because many bugs are not arithmetic mistakes. They are interpretation mistakes: using the wrong axis, misunderstanding the shape, or forgetting what a column actually means.
 
-```mermaid
-flowchart LR
-    V[Vector] --> D[Dot Product]
-    V --> M[Matrix]
-    M --> T[Transpose]
-    M --> X[Matmul]
-    M --> B[Basis]
-```
+Linear algebra studies *vectors* (direction and magnitude), *matrices* (transformations), and *eigenvalues* (intrinsic properties). It is the language of scale and symmetry.
+
+## Before/After
+
+**Before**: "Matrices are just tables of numbers."
+
+**After**: "A matrix is a linear transformation; multiplication composes transformations.
 
 ## Key Terms
 
@@ -148,19 +148,33 @@ def matmul(A, B):
 
 ## Wrap-up and Next Steps
 
-Next post: *Calculus*.
+Linear algebra gives you a compact way to talk about direction, similarity, and transformation. Once those concepts feel natural, modern data and ML systems look much less like black boxes.
+
+Next, we move into calculus, where the focus becomes change, direction, and optimization.
+
+## Answering the Opening Questions
+
+- **How do vectors and matrices represent data in a useful way?**
+  - The article treats Linear Algebra as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is the dot product so central to similarity and scoring?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What is the difference between a matrix as a table and a matrix as a transform?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
-- [Logic and Proofs](./02-logic-and-proofs.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Graphs](./04-graphs.md)
-- [Combinatorics](./05-combinatorics.md)
-- [Probability](./06-probability.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
+- [Math for CS 101 (2/10): Logic and Proofs](./02-logic-and-proofs.md)
+- [Math for CS 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Math for CS 101 (4/10): Graphs](./04-graphs.md)
+- [Math for CS 101 (5/10): Combinatorics](./05-combinatorics.md)
+- [Math for CS 101 (6/10): Probability](./06-probability.md)
 - **Linear Algebra (current)**
 - Calculus (upcoming)
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -169,3 +183,4 @@ Next post: *Calculus*.
 - [Linear Algebra - Khan Academy](https://www.khanacademy.org/math/linear-algebra)
 - [Introduction to Linear Algebra - Strang](https://math.mit.edu/~gs/linearalgebra/)
 - [NumPy Linear Algebra Documentation](https://numpy.org/doc/stable/reference/routines.linalg.html)
+- [NumPy GitHub repository](https://github.com/numpy/numpy)

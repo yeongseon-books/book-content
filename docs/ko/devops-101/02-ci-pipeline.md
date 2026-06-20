@@ -1,12 +1,12 @@
 ---
 series: devops-101
 episode: 2
-title: CI 파이프라인
-status: content-ready
+title: "DevOps 101 (2/10): CI 파이프라인"
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -16,41 +16,187 @@ tags:
   - GitHub Actions
   - Automation
   - Pipeline
-seo_description: 빌드, 테스트, 린트, 보안 검사를 자동화하는 CI 파이프라인 설계와 구현법.
-last_reviewed: '2026-05-04'
+seo_description: 모든 PR에 같은 검사를 적용하는 CI 파이프라인 설계 원칙을 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
-# CI 파이프라인
+# DevOps 101 (2/10): CI 파이프라인
 
-> DevOps 101 시리즈 (2/10)
+이 글은 DevOps 101 시리즈의 두 번째 글입니다.
 
+![DevOps 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/02/02-01-diagram.ko.png)
+*DevOps 101 2장 흐름 개요*
+> CI의 핵심은 무엇을 검증하고, 어떤 순서로, 언제까지 기다릴지를 결정하는 것입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-테스트만으로는 부족합니다. *린트, 타입, 보안 스캔* 까지 *한 흐름* 으로 묶어야 *주관* 이 끼어들지 않습니다.
+- CI 파이프라인은 단순한 테스트 자동화와 어떻게 다를까요?
+- build, test, lint, scan 단계를 왜 한 흐름으로 묶어야 할까요?
+- 빠른 피드백을 주는 파이프라인은 어떤 순서로 설계해야 할까요?
 
-> CI 없는 PR은 *희망회로* 입니다.
+## 왜 중요한가
 
-## 전체 흐름
-```mermaid
-flowchart LR
-    Push["push/PR"] --> Lint["lint"]
-    Lint --> Build["build"]
-    Build --> Test["test"]
-    Test --> Scan["security scan"]
-    Scan --> Pass["green check"]
+테스트만 자동화한다고 품질이 보장되지는 않습니다. 린트, 타입 검사, 보안 스캔까지 하나의 흐름으로 묶여 있어야 팀의 취향이 아니라 시스템 기준으로 코드를 통과시킬 수 있습니다.
+
+운영 관점에서도 CI는 매우 중요합니다. 빌드가 깨진 상태의 코드를 main에 넣는 순간부터 배포와 장애 대응 비용이 급격히 커지기 때문입니다. CI는 뒤쪽 운영 비용을 앞단의 자동 검증으로 바꾸는 장치입니다.
+
+> CI 없는 PR은 아직 검증되지 않은 가정에 가깝습니다.
+
+## 한눈에 보는 개념
+
+좋은 CI 파이프라인은 단순히 단계를 많이 붙이는 것이 아니라, 빠르게 실패시키고 명확하게 통과시키는 순서를 가집니다. 가장 싼 검사를 앞에 두고, 더 무거운 검사는 뒤로 보내는 이유가 여기에 있습니다.
+
+## 핵심 용어
+
+- **Pipeline**: 여러 검증 단계를 순서대로 묶은 자동화 흐름입니다.
+- **Stage**: build, test, lint처럼 파이프라인 안의 논리적 단계입니다.
+- **Job**: 실제로 실행되는 작업 단위입니다. 필요하면 병렬화할 수 있습니다.
+- **Artifact**: 단계 사이에서 전달되는 파일 산출물입니다.
+- **Status check**: PR 머지 가능 여부를 결정하는 최종 신호입니다.
+
+실무에서 이 용어들이 중요한 이유는 역할을 분리하기 쉽기 때문입니다. 예를 들어 빌드 실패와 테스트 실패를 구분해 보여 주면 원인 파악 속도가 크게 빨라집니다.
+
+## 지속적 통합 도구 비교
+
+CI를 처음 시작할 때 가장 먼저 부딕히는 질문이 "GitHub Actions를 써야 하나, Jenkins를 써야 하나?"입니다. 아래 표는 세 가지 대표 도구를 비교하여 각 팀 환경에 적합한 선택지를 보여 줍니다.
+
+| 도구 | 특징 | 적합 규모 | 비용 |
+|---|---|---|---|
+| GitHub Actions | YAML 기반, GitHub 내장, 서버 관리 불필요 | 소규모 ~ 중규모 팀 | 공개 저장소 무료, 프라이빗 유료 (GitHub 요금제) |
+| Jenkins | 높은 확장성, 플러그인 생태계, 자체 호스팅 | 중규모 ~ 대규모 팀, 보안 요구사항 높은 조직 | 서버 비용, 운영 비용 발생 |
+| GitLab CI | GitLab 통합, YAML 기반, 러너 등록 필요 | 모든 규모 | GitLab 요금제에 포함, 자체 호스팅도 가능 |
+
+이 표를 보고 절대 정답을 고르려고 하면 안 됩니다. 중요한 것은 팔의 기술 스택과 보안 정책, 초기 설정 비용이 어떻게 맞는지입니다. 적합 규모와 비용 두 가지는 텀이 나중에 바꿀 수 있다는 점도 고려해야 합니다.
+
+## 야믈 파이프라인 예시
+
+CI 파이프라인의 실제는 문법보다 순서와 병렬화 설계에 있습니다. 아래는 lint → test → build 세 단계를 효율적으로 구성한 예시입니다.
+
+```yaml
+# .github/workflows/ci.yml
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install linters
+        run: |
+          pip install ruff mypy
+      
+      - name: Run ruff
+        run: ruff check .
+      
+      - name: Run mypy
+        run: mypy src/
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+      
+      - name: Run tests with coverage
+        run: pytest --cov=src --cov-report=xml
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        if: matrix.python-version == '3.12'
+        with:
+          file: ./coverage.xml
+
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Build distribution
+        run: |
+          pip install build
+          python -m build
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
 ```
 
-## Before/After
+이 파이프라인은 lint가 통과해야 test가 돌고, test가 통과해야 build가 동작합니다. test는 두 가지 Python 버전에서 병렬로 동작해 피드백 속도를 높입니다. 이것이 좋은 CI의 기본 패턴입니다.
+
+## 지속적 통합 안티패턴
+
+CI 파이프라인을 붙였다고 모든 문제가 해결되지는 않습니다. 실무에서 자주 보는 CI 안티패턴을 몇 가지 정리하면 다음과 같습니다.
+
+### 느린 빌드 (Slow Build)
+
+테스트나 빌드가 10분 이상 걸리면 팔원들은 PR 피드백을 기다리지 않고 다음 일을 시작합니다. 그러면 CI는 형식적인 절차로 전락합니다.
+
+**해결 방법:**
+
+- 테스트를 shard로 나누어 병렬화합니다.
+- 캠시 레이어를 적극 활용합니다.
+- 임팩트 분석으로 변경된 모듈만 검증합니다.
+
+### 플레이키 테스트 (Flaky Test)
+
+같은 코드를 두 번 돌렸는데 한 번은 통과하고 한 번은 실패하면, 팔은 그 테스트를 신뢰하지 않게 됩니다.
+
+**해결 방법:**
+
+- 비결정적 실행 순서를 고정합니다.
+- 네트워크 호출은 mock으로 바꿉니다.
+- 시간 의존적 테스트는 freezegun 같은 도구로 제어합니다.
+- 플레이키 테스트가 발견되면 즉시 수정하거나 quarantine 합니다.
+
+플레이키 테스트를 방치하면 팔 전체가 CI 결과를 무시하게 되고, 결국 CI의 가치가 사라집니다.
+## 전환 전후
 
 **Before (수동 검증)**
 
 ```text
-- 리뷰어가 *체크아웃 후 직접 빌드*
-- 누가 빠뜨리면 *빨간 코드* 가 main에 진입
+- Reviewers *check out and build manually*
+- If anyone forgets, *red code* lands on main
 ```
 
-**After (CI 파이프라인)**
+이 구조에서는 리뷰어마다 기준이 달라지고, 누군가 놓친 검사가 그대로 main에 들어갑니다. 결국 문제는 나중 배포나 운영 단계에서 더 비싸게 드러납니다.
+
+**After (CI pipeline)**
 
 ```yaml
 on: [pull_request]
@@ -68,22 +214,30 @@ jobs:
       - run: pytest
 ```
 
-## 파이프라인 5단계
+PR가 열릴 때마다 같은 파이프라인이 자동으로 돌면, 코드 품질은 특정 리뷰어의 성실성보다 팀 시스템의 일관성에 더 의존하게 됩니다.
 
-### 1단계 — Lint (가장 빠름, 먼저)
+## 실전으로 보는 파이프라인 5단계
+
+### 1단계 - Lint (가장 빠르고 가장 먼저)
+
+가장 빨리 끝나는 검사를 먼저 둬야 불필요한 빌드 시간을 줄일 수 있습니다. 공백 하나 때문에 30분짜리 테스트를 돌리는 구조는 좋은 CI가 아닙니다.
 
 ```yaml
 - run: ruff check .
 - run: ruff format --check .
 ```
 
-### 2단계 — Type check
+### 2단계 - 타입 검사
+
+테스트는 통과해도 타입 수준의 결함은 숨어 있을 수 있습니다. 특히 Python처럼 런타임 오류가 늦게 드러나기 쉬운 언어에서는 타입 검사가 빠른 안전망 역할을 합니다.
 
 ```yaml
 - run: mypy src/
 ```
 
-### 3단계 — Build
+### 3단계 - 빌드
+
+실행 가능한 산출물을 실제로 만들어 보는 단계입니다. 코드가 컴파일되거나 패키징되는지 확인해야 이후 배포 단계에서 놀라지 않습니다.
 
 ```yaml
 - run: python -m build
@@ -91,7 +245,9 @@ jobs:
   with: { name: dist, path: dist/ }
 ```
 
-### 4단계 — Test (병렬)
+### 4단계 - 테스트 (병렬)
+
+테스트는 보통 가장 오래 걸립니다. 그래서 shard를 나누거나 job을 병렬화해서 피드백 시간을 줄이는 설계가 중요합니다.
 
 ```yaml
 strategy:
@@ -101,44 +257,187 @@ steps:
   - run: pytest --shard ${{ matrix.shard }}/4
 ```
 
-### 5단계 — Security scan
+### 5단계 - 보안 스캔
+
+빌드와 테스트만 통과했다고 끝이 아닙니다. 의존성 취약점이나 이미지 내부 위험 요소를 마지막 게이트로 점검해야 합니다.
 
 ```yaml
 - uses: aquasecurity/trivy-action@master
   with: { scan-type: fs, severity: HIGH,CRITICAL }
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- *빠른 단계* 가 *먼저* 와야 *빠른 실패* 가 가능합니다.
-- 단계 간 *artifact* 로 *재빌드 비용* 을 줄입니다.
-- 보안 스캔은 *마지막 게이트* 로 둡니다.
+- 빠른 단계가 먼저 와야 빠른 실패가 가능합니다.
+- 아티팩트를 단계 사이에 넘기면 재빌드 비용을 줄일 수 있습니다.
+- 보안 스캔은 선택 사항이 아니라 마지막 품질 게이트입니다.
+
+CI 파이프라인의 목적은 많은 검사를 보여 주는 것이 아니라, 문제를 가장 싼 순간에 드러내는 것입니다. 그래서 단계 순서와 병렬화 전략이 품질 못지않게 중요합니다.
 
 ## 자주 하는 실수 5가지
 
-1. **모든 단계를 *직렬* 로.** 병렬화로 *50%* 까지 단축 가능합니다.
-2. **린트를 *마지막* 에 둠.** 30분 빌드 후 *공백 1줄* 으로 빨간색.
-3. **CI에서만 *동작하는 환경*.** 로컬 재현이 어려워 *디버깅 지옥*.
-4. **Required check 미설정.** 빨간 PR이 *그냥 머지* 됩니다.
-5. **로그가 *너무 길어* 원인 못 찾음.** *요약 단계* 를 추가하세요.
+1. **모든 단계를 직렬로 실행하는 실수**입니다. 병렬화만으로도 전체 시간이 크게 줄어듭니다.
+2. **린트를 마지막에 두는 실수**입니다. 사소한 형식 문제를 가장 비싼 시점에 발견하게 됩니다.
+3. **CI에서만 동작하는 환경을 만드는 실수**입니다. 로컬 재현이 안 되면 실패 원인을 잡는 데 시간이 폭증합니다.
+4. **Required check를 걸지 않는 실수**입니다. 빨간 PR이 그대로 머지되면 파이프라인의 권위가 무너집니다.
+5. **로그를 과하게 장황하게 만드는 실수**입니다. 실패 원인을 한눈에 못 찾으면 팀은 CI를 신뢰하지 않게 됩니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 이어집니다
 
-큰 모노레포는 *변경된 패키지만* 빌드/테스트하는 *영향 분석* 을 적용합니다. Bazel, Nx, Turbo 등이 대표적입니다.
+규모가 큰 모노레포는 변경된 패키지만 빌드하고 테스트하는 영향 분석을 붙입니다. Bazel, Nx, Turbo 같은 도구를 쓰는 이유도 모든 변경에 전체 검사를 매번 돌리는 비용을 줄이기 위해서입니다.
+
+하지만 작은 팀이라면 먼저 5분 안에 피드백을 주는 파이프라인을 만드는 편이 더 중요합니다. 속도와 재현성, Required check 세 가지가 먼저 갖춰져야 합니다.
+
+## 시니어 엔지니어는 이렇게 봅니다
+
+- PR 피드백은 5분 안에 돌아와야 합니다.
+- 앞 단계가 실패하면 다음 단계는 과감히 건너뛰어야 합니다.
+- CI는 항상 재현 가능해야 합니다.
+- 시크릿은 환경별로 분리되어야 합니다.
+- 파이프라인 자체도 코드 리뷰 대상입니다.
 
 ## 체크리스트
 
-- [ ] *Lint, type, test, scan* 이 모두 있다.
-- [ ] *Required check* 가 설정되어 있다.
-- [ ] *피드백 5분* 이내.
-- [ ] *artifact* 로 단계가 연결된다.
+- [ ] lint, type, test, scan 단계가 모두 있습니다.
+- [ ] Required check가 설정되어 있습니다.
+- [ ] 피드백 시간이 5분 이내로 관리됩니다.
+- [ ] 단계 사이가 아티팩트로 연결됩니다.
+
+## 연습 문제
+
+1. 현재 프로젝트 CI를 네 단계 이상으로 나눠 보세요.
+2. 병렬화 전후의 실행 시간을 측정하고 비교해 보세요.
+3. PR 머지 조건에 Required check를 추가해 보세요.
 
 ## 정리 및 다음 단계
 
-CI 파이프라인은 *합격선의 코드화* 입니다. 다음 글에서는 *통과한 코드* 를 어떻게 *안전하게 배포* 할지 다룹니다.
+CI 파이프라인은 팀의 합격선을 코드로 고정하는 장치입니다. 다음 글에서는 통과한 코드를 어떻게 안전하게 배포할지 CD와 배포 전략을 다룹니다.
+
+## 지속적 통합 설계를 실무 수준으로 끌어올리는 기준
+
+CI는 "테스트를 자동으로 돌린다"에서 끝나지 않습니다. 실제로는 변경 위험을 단계적으로 줄이는 품질 게이트 체계입니다. 따라서 좋은 CI는 단계 개수보다 실패를 빠르게 드러내는 순서, 캐시 전략, 병렬화, 실패 로그 가독성으로 평가해야 합니다.
+
+### Git 브랜치 전략 비교
+
+| 전략 | 특징 | 장점 | 주의점 | 추천 상황 |
+| --- | --- | --- | --- | --- |
+| Trunk-based | 짧은 브랜치, 빠른 병합 | 충돌 최소화, 빠른 릴리스 | 높은 테스트 신뢰성 필요 | 고빈도 배포 팀 |
+| GitFlow | develop/release/hotfix 분리 | 역할 구분 명확 | 브랜치 복잡도 증가 | 배포 주기 긴 조직 |
+| GitHub Flow | main + PR 중심 | 단순하고 학습 쉬움 | 환경 분리 규칙 별도 필요 | 스타트업/소규모 팀 |
+
+CI 관점에서는 Trunk-based 또는 GitHub Flow가 유리합니다. 브랜치 수가 많을수록 파이프라인 조합이 늘고, 테스트 표면적이 커져 운영 부담이 증가하기 때문입니다.
+
+### GitHub Actions 워크플로 예시
+
+```yaml
+name: ci
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: pytest -q
+```
+
+여기서 `needs: lint`는 단순 문법이 아니라 비용 제어 장치입니다. 가장 값싼 단계가 먼저 실패하도록 설계하면 빌드 자원 낭비를 줄일 수 있습니다.
+
+### CI 모범사례 체크 표
+
+| 항목 | 권장 기준 | 안티패턴 |
+| --- | --- | --- |
+| 피드백 시간 | PR 기준 5분 내 1차 결과 | 20분 이상 대기 |
+| 단계 분리 | lint/type/test/scan 분리 | 거대한 단일 스크립트 |
+| 재현성 | 로컬과 CI 명령 동일 | CI 전용 셸 스크립트 |
+| 실패 로그 | 원인 줄을 즉시 식별 가능 | 과도한 잡음 로그 |
+| 머지 정책 | Required checks 강제 | 수동 예외 남발 |
+
+### 캐시와 병렬화 전략
+
+파이프라인 시간이 길어지면 개발자는 CI를 우회하려고 합니다. 따라서 속도 최적화는 문화 이슈이기도 합니다.
+
+```yaml
+- uses: actions/cache@v4
+  with:
+    path: ~/.cache/pip
+    key: pip-${{ runner.os }}-${{ hashFiles('requirements-dev.txt') }}
+
+strategy:
+  matrix:
+    shard: [1, 2, 3, 4]
+```
+
+캐시는 의존성 설치 시간을 줄이고, 매트릭스 병렬화는 테스트 체감 대기 시간을 줄입니다. 단, flaky test가 많으면 병렬화는 오히려 디버깅 비용을 높일 수 있으므로 안정화가 선행돼야 합니다.
+
+### 운영 연결 포인트
+
+CI 품질은 배포 안정성과 직결됩니다. PR 통과 기준이 약하면 CD는 항상 위험해집니다. 반대로 CI에서 경고 수준을 명확히 분리하고 실패 기준을 일관되게 유지하면 배포 판단이 훨씬 단순해집니다. 결국 CI는 개발 편의 기능이 아니라 운영 위험 제어 계층입니다.
+
+```text
+## 0-5분
+1. SEV 판정 (SEV1/SEV2)
+2. incident 채널 개설
+3. 최근 배포 커밋 확인
+
+## 5-10분
+1. canary/최근 릴리스 롤백 시도
+2. 에러율, p95, DB 연결수 확인
+3. 고객 영향 범위 요약 공지
+
+## 10-20분
+1. 임시 완화 조치 적용
+2. 영구 수정 owner 지정
+3. postmortem 일정 예약
+```
+
+운영에서는 "잘 아는 사람"보다 "같은 순서를 따르는 팀"이 더 빠르게 복구합니다. 그래서 runbook은 설명 문서가 아니라 실행 문서여야 하며, 경보에서 한 번에 열 수 있어야 합니다.
+
+### 운영 메모
+
+운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
+
+### 운영 메모
+
+운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
+
+### 운영 메모
+
+운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
+
+### 운영 메모
+
+운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
+
+## 처음 질문으로 돌아가기
+
+- **CI 파이프라인은 단순한 테스트 자동화와 어떻게 다를까요?**
+  - 이 글의 CI는 테스트만 돌리는 자동화가 아니라 lint, mypy, pytest, Trivy 같은 여러 검증을 하나의 merge 게이트로 묶는 흐름입니다. `Status check`와 아티팩트 개념까지 포함해 PR이 팀 기준을 통과했는지 시스템이 일관되게 판정한다는 점이 핵심입니다.
+- **build, test, lint, scan 단계를 왜 한 흐름으로 묶어야 할까요?**
+  - 본문 예시처럼 lint가 통과해야 test가, test가 통과해야 build가 실행되도록 묶어야 문제를 가장 싼 시점에 잡을 수 있습니다. 이렇게 해야 리뷰어의 기억이 아니라 Required check와 단계 의존성이 main 브랜치의 품질선을 지켜 줍니다.
+- **빠른 피드백을 주는 파이프라인은 어떤 순서로 설계해야 할까요?**
+  - 이 글은 가장 빠른 검사인 lint와 format check를 앞에 두고, 그다음 타입 검사와 빌드, 마지막에 오래 걸리는 병렬 테스트와 보안 스캔을 배치하라고 설명합니다. `matrix`, shard, cache 예시를 함께 보면 빠른 실패와 짧은 대기 시간이 좋은 CI 설계의 기준임을 알 수 있습니다.
 
 <!-- toc:begin -->
-- [DevOps란 무엇인가?](./01-what-is-devops.md)
+## 시리즈 목차
+
+- [DevOps 101 (1/10): DevOps란 무엇인가?](./01-what-is-devops.md)
 - **CI 파이프라인 (현재 글)**
 - CD와 배포 전략 (예정)
 - 환경 분리와 설정 관리 (예정)
@@ -148,6 +447,7 @@ CI 파이프라인은 *합격선의 코드화* 입니다. 다음 글에서는 *�
 - 로그 수집과 분석 (예정)
 - 장애 대응과 on-call (예정)
 - 운영 가능한 DevOps 흐름 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -156,3 +456,5 @@ CI 파이프라인은 *합격선의 코드화* 입니다. 다음 글에서는 *�
 - [Martin Fowler — Continuous Integration](https://martinfowler.com/articles/continuousIntegration.html)
 - [Trivy](https://trivy.dev/)
 - [Bazel](https://bazel.build/)
+
+- [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/devops-101/ko)

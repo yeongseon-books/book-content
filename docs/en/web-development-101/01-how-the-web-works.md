@@ -1,10 +1,10 @@
 ---
 series: web-development-101
 episode: 1
-title: How the Web Works
-status: content-ready
+title: "Web Development 101 (1/10): How the Web Works"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,24 @@ tags:
   - Browser
   - Frontend
 seo_description: What really happens when you type a URL and hit Enter — DNS, HTTP, server, and browser rendering explained as five steps for new web developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# How the Web Works
+# Web Development 101 (1/10): How the Web Works
 
-> Web Development 101 series (1/10)
+When a page loads slowly or fails entirely, the hardest part for a new developer is often not the bug itself but knowing which layer to inspect first. A mistyped domain, a TLS problem, a slow application server, and a browser rendering stall can all feel like the same symptom: “the site does not load.”
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Web Development 101 series. Here we build the full URL-to-pixels mental model so later topics like HTML, APIs, authentication, deployment, and caching all fit into one continuous request path.
 
-**Core question**: When you type `https://example.com` and hit Enter, what *exactly* happens?
 
-> DNS lookup, then TCP/TLS connect, then HTTP request, then server response, then browser rendering. Five steps in concert.
+![web development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/01/01-01-concept-at-a-glance.en.png)
+*web development 101 chapter 1 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The full path from URL to pixels on the screen
-- The role of DNS, HTTP, and the browser renderer
-- Where the client ends and the server begins
-- How to observe a real network request
-- A map of this whole series
+- The full path from URL to pixels on the screen?
+- The role of DNS, HTTP, and the browser renderer?
+- Where the client ends and the server begins?
 
 ## Why It Matters
 
@@ -47,19 +43,17 @@ Web developers must see the *whole picture*. Knowing one layer well lets you bui
 
 > The web runs on *agreed protocols*, not magic.
 
-## Concept at a Glance
+Read this figure from left to right: a user action becomes a browser task, DNS resolves the host, the server responds over HTTP, and only then does the browser render what you can see. Later chapters simply zoom into one part of this same end-to-end path.
 
-```mermaid
-flowchart LR
-    User["User"] --> Browser["Browser"]
-    Browser --> DNS["DNS"]
-    DNS --> Browser
-    Browser -->|"HTTP request"| Server["Web server"]
-    Server -->|"HTML/CSS/JS"| Browser
-    Browser --> Render["Render to screen"]
-```
+### What to verify yourself
 
-Five beats: DNS, connect, request, response, render.
+- Run `socket.gethostbyname("example.com")` and confirm that the domain resolves to a real IP address.
+- Reload a page in the DevTools Network tab and check that the main document request is followed by CSS, JavaScript, and image requests.
+- Use `curl -I https://example.com` to inspect the first response line and headers without the full body.
+
+**Expected output:** DNS resolution prints an IP, and the Network tab shows the document request followed by additional resource fetches.
+
+**Failure mode to watch for:** If DNS fails, the HTTP request never starts. If the HTML returns 200 but the page still looks broken, the problem is more likely in rendering than on the server.
 
 ## Key Terms
 
@@ -188,7 +182,18 @@ When something breaks, the first question is *which step*: DNS, TLS, server, or 
 
 The web is a *concert of protocols*. Next, we look at the three things the browser actually downloads — HTML, CSS, and JavaScript.
 
+## Answering the Opening Questions
+
+- **The full path from URL to pixels on the screen?**
+  - The article treats How the Web Works as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The role of DNS, HTTP, and the browser renderer?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where the client ends and the server begins?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **How the Web Works (current)**
 - HTML, CSS, and JavaScript (upcoming)
 - The Browser and the DOM (upcoming)
@@ -199,11 +204,16 @@ The web is a *concert of protocols*. Next, we look at the three things the brows
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [How the Web works (MDN)](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/How_the_Web_works)
-- [What is DNS? (Cloudflare Learning)](https://www.cloudflare.com/learning/dns/what-is-dns/)
-- [HTTP overview (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview)
-- [Chrome DevTools Network](https://developer.chrome.com/docs/devtools/network/)
+### Official Docs
+- [How the Web works (MDN)](https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Web_standards/How_the_web_works)
+- [HTTP overview (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview)
+- [Chrome DevTools Network features](https://developer.chrome.com/docs/devtools/network/)
+
+### Deepen the Model
+- [What is DNS? (Cloudflare Learning Center)](https://www.cloudflare.com/learning/dns/what-is-dns/)
+- [URI Generic Syntax (RFC 3986)](https://www.rfc-editor.org/rfc/rfc3986)

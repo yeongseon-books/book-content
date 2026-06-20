@@ -1,13 +1,13 @@
 ---
-title: '표준 라이브러리 투어: datetime, pathlib, json, collections, itertools'
+title: "Python 101 (10/10): 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools"
 series: python-101
 episode: 10
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,32 +17,33 @@ tags:
 - json-module
 - collections-module
 - itertools-module
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: 표준 라이브러리는 "자주 쓰는 일을 두 번 짜지 않게 하는 도구함"이며, 각 모듈은 한 가지 도메인(시간·경로·직렬화·집계·반복)에
   한정해…
 ---
 
-# 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools
+# Python 101 (10/10): 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools
+
+표준 라이브러리는 자주 쓰는 일을 두 번 짜지 않게 해 주는 도구함입니다. 각 모듈은 시간, 경로, 직렬화, 집계, 반복처럼 한 가지 도메인에 집중합니다.
+
+이 글은 Python 101 시리즈의 마지막 글입니다.
 
 
-## 이 글에서 다룰 문제
+![Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/10/10-01-mental-model.ko.png)
+*Python 101 10장 흐름 개요*
+> 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-Python을 두고 흔히 "batteries included"라고 부릅니다. 표준 라이브러리에 자주 쓰는 도구들이 처음부터 들어 있다는 뜻입니다. 표준 라이브러리에 익숙해지면 다음과 같은 점이 달라집니다.
+## 먼저 던지는 질문
 
-- **외부 의존성을 줄일 수 있습니다.** 작은 스크립트에 패키지를 추가하기 전에 표준 라이브러리부터 살펴보면, requirements 파일을 더 가볍게 유지할 수 있습니다.
-- **코드가 짧고 익숙해집니다.** 다른 Python 개발자도 같은 도구를 알고 있으므로 리뷰가 빨라집니다.
-- **버전 관리가 단순합니다.** Python 인터프리터 버전만 맞추면 동일한 동작을 기대할 수 있습니다.
+- 외부 의존성을 줄일 수 있습니다.** 작은 스크립트에 패키지를 추가하기 전에 표준 라이브러리부터 살펴보면, requirements 파일을 더 가볍게 유지할 수 있습니다?
+- 코드가 짧고 익숙해집니다.** 다른 Python 개발자도 같은 도구를 알고 있으므로 리뷰가 빨라집니다?
+- 버전 관리가 단순합니다.** Python 인터프리터 버전만 맞추면 동일한 동작을 기대할 수 있습니다?
 
-이 글은 표준 라이브러리 전부를 다루지 않습니다. 작은 스크립트와 데이터 처리에서 자주 등장하는 다섯 개 모듈을 골라 입문 수준에서 훑어봅니다.
-
-## Mental Model
+## 멘탈 모델
 
 > 표준 라이브러리는 "자주 쓰는 일을 두 번 짜지 않게 하는 도구함"이며, 각 모듈은 한 가지 도메인(시간·경로·직렬화·집계·반복)에 한정해 작은 어휘 세트를 제공합니다.
 표준 라이브러리는 용도별로 나뉘어 있습니다. 시간과 날짜는 `datetime`, 파일 경로는 `pathlib`, 데이터 직렬화는 `json`, 더 풍부한 자료 구조는 `collections`, 반복 패턴은 `itertools`가 담당합니다.
 
-![Mental Model](../../assets/python-101/10/10-01-mental-model.ko.png)
-
-*Mental Model*
 각 모듈은 "특정 종류의 문제 한 가지"를 잘 풀도록 설계돼 있습니다. 모듈 이름만 봐도 어떤 문제를 다룰지 짐작할 수 있도록 명명돼 있는 점이 표준 라이브러리의 일관된 특징입니다.
 
 ## 핵심 개념
@@ -55,7 +56,7 @@ Python을 두고 흔히 "batteries included"라고 부릅니다. 표준 라이�
 - **`deque`**: 양쪽 끝에서 `O(1)`로 추가·제거가 가능한 자료 구조입니다.
 - **`itertools`**: 반복 가능한 객체(iterable)를 변환·결합·잘라 주는 함수 모음입니다. 결과는 lazy한 이터레이터로 돌아옵니다.
 
-## Before-After
+## 전후 비교
 
 다음은 단어 빈도를 세는 코드입니다.
 
@@ -198,7 +199,7 @@ Counter({'a': 3, 'n': 2, 'b': 1})
 - **`groupby`에 정렬 안 된 입력을 그대로 넘기기** — 인접한 값만 묶이므로 같은 키가 여러 그룹으로 쪼개집니다.
 - **`itertools` 결과를 두 번 순회하기** — 이터레이터는 한 번 소비되면 비어 버립니다. 두 번 보고 싶다면 `list(...)`로 먼저 모아 두세요.
 
-## 실무
+## 실무에서는 이렇게 생각합니다
 
 표준 라이브러리는 작은 도우미가 많아 자주 쓰이는 자리도 함께 알아 두면 좋습니다.
 
@@ -229,14 +230,221 @@ Counter({'a': 3, 'n': 2, 'b': 1})
 
 이번 글로 Python 101 시리즈가 마무리됩니다. 여기서 다룬 함수, 모듈, 클래스, 표준 라이브러리는 이후 다른 시리즈(예: `python-dbapi-101`, `sqlalchemy-101`)에서 그대로 다시 쓰입니다. 다음 시리즈에서는 표준 라이브러리에서 시작해, 외부 패키지로 자연스럽게 영역을 넓혀 갑니다.
 
+## 실전 앵커: 표준 라이브러리 조합으로 작은 도구 만들기
+
+표준 라이브러리의 진짜 가치는 "각 모듈을 아는 것"보다 "여러 모듈을 묶어 문제를 끝내는 것"입니다. 여기서는 로그 파일 요약 도구를 예시로 모듈 조합을 보겠습니다.
+
+```python
+from pathlib import Path
+from collections import Counter
+import csv
+import json
+
+root = Path('logs')
+counter = Counter()
+
+for file in root.glob('*.csv'):
+    with file.open(encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            counter[row['level']] += 1
+
+summary = {'total': sum(counter.values()), 'by_level': dict(counter)}
+Path('summary.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding='utf-8')
+```
+
+`pathlib + csv + collections + json`만으로도 운영에 바로 쓸 수 있는 수준의 유틸리티가 나옵니다.
+
+날짜/시간은 `datetime`과 `zoneinfo`를 같이 쓰는 습관을 들이는 편이 좋습니다.
+
+```python
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+now = datetime.now(ZoneInfo('Asia/Seoul'))
+print(now.isoformat())
+```
+
+타임존 없는 naive datetime을 남기면 로그 상관 분석이 매우 어려워집니다.
+
+정규식은 최소한의 안전장치를 붙여 사용합니다.
+
+```python
+import re
+
+pat = re.compile(r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$')
+print(bool(pat.match('dev@example.com')))
+```
+
+`subprocess`를 쓸 때는 쉘 문자열 결합보다 리스트 인자 전달을 기본으로 둡니다.
+
+```python
+import subprocess
+
+result = subprocess.run(['python', '--version'], capture_output=True, text=True, check=True)
+print(result.stdout.strip())
+```
+
+보안과 이식성 모두에서 더 안전합니다.
+
+벤치마크 예시도 하나 넣겠습니다.
+
+```python
+import timeit
+
+sort_t = timeit.timeit('sorted(data)', setup='import random; data=[random.randint(1,1000000) for _ in range(10000)]', number=300)
+heap_t = timeit.timeit('import heapq; h=data[:]; heapq.heapify(h); [heapq.heappop(h) for _ in range(10000)]', setup='import random; data=[random.randint(1,1000000) for _ in range(10000)]', number=300)
+print(sort_t, heap_t)
+```
+
+전체 정렬이 필요한지, 상위 K개만 필요한지에 따라 선택이 달라진다는 사실을 체감할 수 있습니다.
+
+패키징 관점의 마무리 예시로 `argparse` 기반 CLI 스켈레톤을 보면 표준 라이브러리만으로 배포 가능한 도구를 만들 수 있습니다.
+
+```python
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', required=True)
+    args = parser.parse_args()
+    print('input:', args.input)
+
+if __name__ == '__main__':
+    main()
+```
+
+`pyproject.toml`에 console script 엔트리를 추가하면 팀 내부 유틸리티를 일관된 방식으로 실행할 수 있습니다.
+
+```toml
+[project.scripts]
+log-summary = "myapp.cli:main"
+```
+
+표준 라이브러리 학습은 "외부 라이브러리 없이 어디까지 가능한가"를 체험하는 과정입니다. 이 감각을 가져가면 의존성 선택도 훨씬 보수적이고 안정적으로 할 수 있습니다.
+
+### 추가 실습: 표준 라이브러리만으로 만드는 진단 CLI
+
+외부 의존성 없이도 진단 도구를 충분히 만들 수 있습니다. 예를 들어 디렉터리의 파일 수와 총 바이트를 계산하는 CLI는 `argparse`와 `pathlib`만으로 구현됩니다.
+
+```python
+from pathlib import Path
+import argparse
+
+def scan(root: Path):
+    files = [p for p in root.rglob('*') if p.is_file()]
+    total = sum(p.stat().st_size for p in files)
+    return len(files), total
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('root')
+    args = parser.parse_args()
+    count, total = scan(Path(args.root))
+    print(f'files={count} bytes={total}')
+
+if __name__ == '__main__':
+    main()
+```
+
+출력 예시:
+
+```text
+files=128 bytes=4092312
+```
+
+운영 자동화에서는 `shutil`, `zipfile`, `tempfile`도 자주 같이 사용됩니다.
+
+- `shutil.copytree`: 디렉터리 복사
+- `zipfile.ZipFile`: 압축/해제
+- `tempfile.TemporaryDirectory`: 임시 작업공간 관리
+
+이 조합은 배포 아티팩트 정리, 로그 번들링, 백업 스크립트 작성에서 바로 활용할 수 있습니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
+### 보강 메모: 실수 줄이는 운영 습관
+
+학습 단계에서 만든 코드를 실제 프로젝트에 옮길 때는 세 가지를 같이 점검하는 편이 좋습니다. 첫째, 입력 검증 경계가 함수 시작 지점에 있는지 확인합니다. 둘째, 실패 시 사용자에게 보여 줄 메시지와 로그 메시지를 분리합니다. 셋째, 성능 판단은 추측이 아니라 `timeit` 또는 샘플 벤치마크로 남깁니다.
+
+간단한 템플릿은 다음과 같습니다.
+
+```python
+def safe_run(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        # 학습 단계에서는 원인 관찰을 우선
+        raise RuntimeError(f'실행 실패: {fn.__name__}') from e
+```
+
+또한 표준 라이브러리 문서를 읽을 때는 "모듈 개요 -> 대표 함수 3개 -> 예외 종류" 순서로 훑는 습관을 들이면 기억이 오래갑니다. 기능을 전부 외우는 것보다, 어떤 상황에서 어떤 모듈을 열어봐야 하는지 아는 것이 더 중요합니다.
+
+표준 라이브러리 학습의 마지막 기준은 간단합니다. 새로운 의존성을 추가하기 전에, 먼저 표준 라이브러리로 문제를 해결할 수 있는지 확인합니다. 이 습관이 프로젝트의 장기 유지보수 비용을 크게 낮춥니다.
+
+추가 팁: 팀 내 스크립트는 표준 라이브러리 우선 원칙을 두고, 외부 패키지는 명확한 필요가 생길 때만 도입하면 배포·보안·업그레이드 부담을 크게 낮출 수 있습니다.
+
+## 처음 질문으로 돌아가기
+
+- **외부 의존성을 줄일 수 있습니다.** 작은 스크립트에 패키지를 추가하기 전에 표준 라이브러리부터 살펴보면, requirements 파일을 더 가볍게 유지할 수 있습니다?**
+  - 먼저 문제를 시간, 경로, 직렬화, 집계, 반복 중 어느 도메인으로 나눌 수 있는지 봐야 합니다. 이 글의 로그 요약 도구처럼 `pathlib`으로 `logs/*.csv`를 순회하고 `Counter`로 레벨별 건수를 세고 `json.dumps(..., ensure_ascii=False, indent=2)`로 결과를 남길 수 있다면, 외부 패키지 없이도 요구를 충분히 해결할 수 있습니다.
+- **코드가 짧고 익숙해집니다.** 다른 Python 개발자도 같은 도구를 알고 있으므로 리뷰가 빨라집니다?**
+  - 검증해야 할 신호는 표준 도구가 직접 만들어 주는 구체적인 결과입니다. `Counter("banana")`가 `Counter({'a': 3, 'n': 2, 'b': 1})`를 주고, `Path("docs") / "intro.md"`가 `PosixPath('docs/intro.md')`로 이어지며, `json.loads(s) == data`가 `True`가 되는 출력은 코드가 짧아져도 의미가 유지된다는 증거입니다.
+- **버전 관리가 단순합니다.** Python 인터프리터 버전만 맞추면 동일한 동작을 기대할 수 있습니다?**
+  - 그렇다고 아무 경우에나 자동으로 동일 동작이 보장되는 것은 아니므로, 먼저 naive `datetime.now()`와 타임존 있는 `ZoneInfo('Asia/Seoul')` 사용을 섞는 실수, `groupby`에 정렬 안 된 입력을 넣는 실수, 이터레이터를 두 번 순회하려는 실수를 막아야 합니다. 표준 라이브러리 우선 원칙은 의존성 관리를 단순하게 만들지만, 각 도구의 전제 조건까지 함께 지켜야 같은 결과를 안정적으로 재현할 수 있습니다.
+
 <!-- toc:begin -->
+## 시리즈 목차
+
+- [Python 101 (1/10): 왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- [Python 101 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): 제어 흐름: if, for, while, comprehension](./05-control-flow.md)
+- [Python 101 (6/10): 함수와 인자: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
+- [Python 101 (7/10): 모듈과 패키지: import, __init__, __name__](./07-modules-and-packages.md)
+- [Python 101 (8/10): 파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
+- [Python 101 (9/10): 클래스와 객체: 데이터와 동작을 함께 묶기](./09-classes-and-objects.md)
+- **표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료
 
-- [Python tutorial — Brief tour of the standard library](https://docs.python.org/3/tutorial/stdlib.html)
-- [Python library — datetime](https://docs.python.org/3/library/datetime.html)
-- [Python library — pathlib](https://docs.python.org/3/library/pathlib.html)
-- [Python library — json](https://docs.python.org/3/library/json.html)
-- [Python library — collections](https://docs.python.org/3/library/collections.html)
-- [Python library — itertools](https://docs.python.org/3/library/itertools.html)
+- [Python 튜토리얼 — Brief Tour of the Standard Library](https://docs.python.org/3/tutorial/stdlib.html) — 표준 라이브러리의 “batteries included” 철학과 모듈 선택 감각을 잡게 해 줍니다.
+- [Python 공식 문서 — `datetime`](https://docs.python.org/3/library/datetime.html) — 날짜·시간 객체, `timedelta`, `strftime`/`strptime` 사용의 기준 문서입니다.
+- [Python 공식 문서 — `pathlib`](https://docs.python.org/3/library/pathlib.html) — 경로를 문자열 대신 객체로 다루는 API와 파일 조작 메서드를 설명합니다.
+- [Python 공식 문서 — `json`](https://docs.python.org/3/library/json.html) — `dump`/`load`/`dumps`/`loads`와 JSON 인코딩 제약을 다룹니다.
+- [Python 공식 문서 — `collections`](https://docs.python.org/3/library/collections.html) — `Counter`, `defaultdict`, `deque` 같은 보강 자료구조의 핵심 동작을 확인할 수 있습니다.
+- [Python 공식 문서 — `itertools`](https://docs.python.org/3/library/itertools.html) — lazy iterator 도구들의 의도와 조합 방식을 설명합니다.
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)

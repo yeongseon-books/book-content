@@ -1,11 +1,11 @@
 ---
-title: 'Online and offline modes: previewing DDL with --sql and handling SQLite batch'
+title: "Alembic 101 (7/10): Online and offline modes: previewing DDL with --sql and handling SQLite batch"
 series: alembic-101
 episode: 7
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,26 @@ tags:
 - offline
 - batch
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: Alembic runs in two modes. Online connects to the database and runs
   SQL directly.
 ---
 
-# Online and offline modes: previewing DDL with --sql and handling SQLite batch
+# Alembic 101 (7/10): Online and offline modes: previewing DDL with --sql and handling SQLite batch
 
-## What you will learn
+Before a production deploy, there are times when you need to see the exact SQL a migration will emit. Add SQLite's DDL limits to the mix, and you need to understand offline mode and batch mode together.
 
-- The two execution modes alembic offers — online and offline
-- How to preview the actual SQL with `--sql`
-- A workflow for producing SQL scripts that a DBA can review
-- The limits of `ALTER TABLE` on SQLite and what `batch_alter_table` does internally
-- Patterns to avoid when running in offline mode
+This is post 7 in the Alembic 101 series. Here we will connect online execution, offline SQL preview, and SQLite batch handling into one workflow.
+
+
+![alembic 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.en.png)
+*alembic 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
+
+- The two execution modes alembic offers — online and offline?
+- How to preview the actual SQL with `--sql`?
+- A workflow for producing SQL scripts that a DBA can review?
 
 ## Why it matters
 
@@ -43,6 +49,8 @@ SQLite also has very restricted `ALTER TABLE` support, so every alembic user eve
 > Alembic runs in two modes. **Online connects to the database and runs SQL directly. Offline emits the SQL text to standard output without a database connection.** Offline is for dry-run, review, and scripting. Online is for actual application.
 
 Turning on `render_as_batch` makes calls like `op.alter_column` expand internally — for SQLite — into "create a temporary table, INSERT SELECT, swap names." Batch mode is alembic's safety net for SQLite.
+
+### Diagram: how online, offline, and batch mode divide responsibilities
 
 ## Core concepts
 
@@ -199,6 +207,19 @@ Or split data migrations into separate revisions and only preview the schema-onl
 
 This single line effectively prints the SQL on every PR.
 
+## Verification routine
+
+```bash
+alembic upgrade current:head --sql > preview.sql
+python3 - <<'PY'
+from pathlib import Path
+text = Path('preview.sql').read_text()
+print('BEGIN;' in text, 'INSERT INTO alembic_version' in text)
+PY
+```
+
+**Expected output:** the preview includes transaction boundaries and the `alembic_version` update SQL, so the review artifact matches the real deploy unit.
+
 ## Common mistakes
 
 - **Running `--sql head` and being surprised that everything from the start prints out.** Learn the `<from>:<to>` form.
@@ -235,12 +256,35 @@ Online for application, offline for review. The division of labor between the tw
 
 The next post is downgrade strategy: when to seriously write a downgrade and when to deliberately forbid it.
 
-## References
+## Answering the Opening Questions
 
-- Alembic: Generating SQL Scripts (Offline Mode) — https://alembic.sqlalchemy.org/en/latest/offline.html
-- Alembic: Running Batch Migrations for SQLite and Other Databases — https://alembic.sqlalchemy.org/en/latest/batch.html
-- SQLite: ALTER TABLE — https://www.sqlite.org/lang_altertable.html
-- Alembic: Operation Reference — https://alembic.sqlalchemy.org/en/latest/ops.html
+- **The two execution modes alembic offers — online and offline?**
+  - The article treats Online and offline modes: previewing DDL with --sql and handling SQLite batch as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to preview the actual SQL with `--sql`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **A workflow for producing SQL scripts that a DBA can review?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
+## In this series
+
+- [Alembic 101 (1/10): Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [Alembic 101 (2/10): env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Alembic 101 (3/10): Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- [Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
+- [Alembic 101 (5/10): branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
+- [Alembic 101 (6/10): Data migrations: separating schema changes from data changes](./06-data-migrations.md)
+- **Online and offline modes: previewing DDL with --sql and handling SQLite batch (current)**
+- Downgrade strategy: when to write it for real and when to forbid it (upcoming)
+- Deploy ordering and blue/green: synchronizing schema and application code safely (upcoming)
+- Production and team workflow: PR, CI, monitoring, and incident response (upcoming)
+
 <!-- toc:end -->
+
+## References
+
+- [sqlalchemy/alembic GitHub repository](https://github.com/sqlalchemy/alembic)
+- [Alembic: Generating SQL Scripts (Offline Mode)](https://alembic.sqlalchemy.org/en/latest/offline.html)
+- [Alembic: Running Batch Migrations for SQLite and Other Databases](https://alembic.sqlalchemy.org/en/latest/batch.html)
+- [SQLite: ALTER TABLE](https://www.sqlite.org/lang_altertable.html)
+- [Alembic: Operation Reference](https://alembic.sqlalchemy.org/en/latest/ops.html)

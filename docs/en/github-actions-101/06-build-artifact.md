@@ -1,10 +1,10 @@
 ---
 series: github-actions-101
 episode: 6
-title: Build Artifacts
+title: "GitHub Actions 101 (6/10): Build Artifacts"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,26 @@ tags:
   - Release
   - CICD
 seo_description: From upload-artifact and download-artifact to Releases. Safely store and pass build outputs across jobs and to users.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Build Artifacts
+# GitHub Actions 101 (6/10): Build Artifacts
 
-> GitHub Actions 101 series (6/10)
+If a CI run finishes the build and then throws the output away, the pipeline is only half done. The logs say “success,” but no one can later confirm which wheel, archive, or report actually passed validation, and deploy often ends up rebuilding work it should have reused.
 
-<!-- a-grade-intro:begin -->
+That is why artifacts matter more than they first appear to. They preserve the exact output a workflow produced and give later jobs, release tooling, and humans a traceable handoff point.
 
-**Core question**: How do you *pass build outputs* to the *next job* or to *external users*?
+This is post 6 in the GitHub Actions 101 series. In this post, we will use artifacts to keep build outputs, move them across jobs, and carry them into GitHub Releases when the workflow becomes an external delivery channel.
 
-> *Artifacts* are the *bridge* between *build and deploy*.
 
-<!-- a-grade-intro:end -->
+![github actions 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/06/06-01-concept-at-a-glance.en.png)
+*github actions 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Build Artifacts?
+- Which signal should the example or diagram make visible for Build Artifacts?
+- What failure should be prevented first when Build Artifacts reaches a real system?
 
 ## What You Will Learn
 
@@ -45,16 +51,6 @@ last_reviewed: '2026-05-04'
 A workflow that *throws build outputs away* offers *no reuse, no trace*. Artifacts are *evidence and assets*.
 
 > *Every merge* should leave a *traceable build*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Build["build job"] --> Up["upload-artifact"]
-    Up --> Store["GitHub storage"]
-    Store --> Down["download-artifact"]
-    Down --> Deploy["deploy job"]
-```
 
 ## Key Terms
 
@@ -76,7 +72,7 @@ flowchart LR
 
 ```yaml
 - run: python -m build
-- uses: actions/upload-artifact@v4
+- uses: actions/upload-artifact@v7
   with:
     name: dist
     path: dist/*
@@ -90,7 +86,7 @@ deploy:
   needs: build
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v8
       with:
         name: dist
         path: dist/
@@ -100,7 +96,7 @@ deploy:
 ### Step 3 — Bundle by patterns
 
 ```yaml
-- uses: actions/upload-artifact@v4
+- uses: actions/upload-artifact@v7
   with:
     name: reports
     path: |
@@ -122,7 +118,7 @@ deploy:
 ### Step 5 — Retention policy
 
 ```yaml
-- uses: actions/upload-artifact@v4
+- uses: actions/upload-artifact@v7
   with:
     name: nightly-build
     path: dist/
@@ -157,7 +153,7 @@ Mature teams emit *checksum + SBOM* with every build and *sign* releases (e.g., 
 
 ## Checklist
 
-- [ ] Use *upload-artifact@v4*.
+- [ ] Use *upload-artifact@v7*.
 - [ ] *retention-days* is set.
 - [ ] *Releases* are auto-published on *tag push*.
 - [ ] *Checksums* or *signatures* are attached.
@@ -172,17 +168,29 @@ Mature teams emit *checksum + SBOM* with every build and *sign* releases (e.g., 
 
 Artifacts are the *receipts of your build*. Next: *Docker build*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Build Artifacts?**
+  - The article treats Build Artifacts as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Build Artifacts?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Build Artifacts reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is GitHub Actions?](./01-what-is-github-actions.md)
-- [Workflows and Jobs](./02-workflow-and-job.md)
-- [Understanding Triggers](./03-triggers.md)
-- [Python Test Automation](./04-python-test-automation.md)
-- [Lint and Type Check](./05-lint-and-typecheck.md)
+## In this series
+
+- [GitHub Actions 101 (1/10): What Is GitHub Actions?](./01-what-is-github-actions.md)
+- [GitHub Actions 101 (2/10): Workflows and Jobs](./02-workflow-and-job.md)
+- [GitHub Actions 101 (3/10): Understanding Triggers](./03-triggers.md)
+- [GitHub Actions 101 (4/10): Python Test Automation](./04-python-test-automation.md)
+- [GitHub Actions 101 (5/10): Lint and Type Check](./05-lint-and-typecheck.md)
 - **Build Artifacts (current)**
 - Docker Build (upcoming)
 - Deployment Automation (upcoming)
 - Secret Management (upcoming)
 - A Real-World CI/CD Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

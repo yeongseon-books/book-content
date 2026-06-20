@@ -1,10 +1,10 @@
 ---
 series: kubernetes-101
 episode: 3
-title: Deployment
-status: content-ready
+title: "Kubernetes 101 (3/10): Deployment"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,32 @@ tags:
   - RollingUpdate
   - DevOps
 seo_description: A beginner guide to Kubernetes Deployments — ReplicaSet management, rolling updates, rollback, and strategy options with kubectl examples
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Deployment
+# Kubernetes 101 (3/10): Deployment
 
-> Kubernetes 101 series (3/10)
+A Pod can run your application, but it does not promise that the right number of copies stays alive or that a version change will happen safely. The minute you care about self-healing and controlled rollout, you need a controller that owns those guarantees.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Kubernetes 101 series.
 
-**Core question**: When a *Pod dies*, *who* brings one back?
+Here, we will treat Deployment as the default stateless workload controller that keeps replica count stable, rolls new versions gradually, and gives you a rollback path when a release goes wrong.
 
-> A *Deployment* keeps the *desired number* of *Pods* alive and owns *zero-downtime rollout* and *rollback*.
+> Deployment matters because Kubernetes self-healing is really a controller story, not a bare-Pod story.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![kubernetes 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/03/03-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 3 flow overview*
 
-- *Deployment* and *ReplicaSet* relationship
-- The meaning of *replicas*
-- The *RollingUpdate* strategy
-- The *rollout* command
-- The *rollback* flow
+## Questions to Keep in Mind
+
+- Deployment* and *ReplicaSet* relationship?
+- The meaning of *replicas?
+- The *RollingUpdate* strategy?
 
 ## Why It Matters
 
 *Zero-downtime deploy* and *self-healing* are the *biggest reasons* to adopt *Kubernetes*. The object that owns them is the *Deployment*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Dep["deployment"] --> RS["replicaset"]
-    RS --> P1["pod"]
-    RS --> P2["pod"]
-    RS --> P3["pod"]
-```
 
 ## Key Terms
 
@@ -129,6 +119,22 @@ def rollback(dep):
     )
 ```
 
+## Verification workflow
+
+```bash
+kubectl get deploy,rs,pods -l app=web
+kubectl rollout status deployment/web
+kubectl rollout history deployment/web
+```
+
+**Expected output:** the Deployment, ReplicaSet, and Pod counts should line up, `rollout status` should wait until the new revision is actually ready, and `rollout history` should show revision entries that make rollback decisions tractable under pressure.
+
+**Failure modes to check first:**
+
+- A Deployment with zero Pods often means selector and template labels do not match.
+- A rollout that stalls is more often a readiness failure than a pure image-change failure.
+- If revision history is too thin, the release process itself is the rollback risk.
+
 ## What to Notice in This Code
 
 - *selector* and *labels* must *match exactly*.
@@ -172,9 +178,20 @@ def rollback(dep):
 
 Even with *Pods* up, *external access* needs an *address*. The next post covers the *Service*.
 
+## Answering the Opening Questions
+
+- **Deployment* and *ReplicaSet* relationship?**
+  - The article treats Deployment as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The meaning of *replicas?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The *RollingUpdate* strategy?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
 - **Deployment (current)**
 - Service (upcoming)
 - Ingress (upcoming)
@@ -183,6 +200,7 @@ Even with *Pods* up, *external access* needs an *address*. The next post covers 
 - HPA (upcoming)
 - Helm (upcoming)
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -191,3 +209,4 @@ Even with *Pods* up, *external access* needs an *address*. The next post covers 
 - [ReplicaSet](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/)
 - [Rolling update strategy](https://kubernetes.io/docs/tutorials/kubernetes-basics/update/update-intro/)
 - [kubectl rollout](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#rollout)
+- [Updating a Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#updating-a-deployment)

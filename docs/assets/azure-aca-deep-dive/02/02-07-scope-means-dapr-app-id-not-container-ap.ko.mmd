@@ -1,0 +1,19 @@
+flowchart TD
+    subgraph Comp["Dapr 컴포넌트 (비밀 저장소)"]
+        Scope["스코프: app-a, app-b"]
+    end
+    AppA["Dapr App ID: app-a"] -. "허용됨" .-> Comp
+    AppB["Dapr App ID: app-b"] -. "허용됨" .-> Comp
+    AppC["Dapr App ID: app-c"] -. "거부됨" .-x Comp
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

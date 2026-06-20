@@ -1,12 +1,12 @@
 ---
-title: 데이터셋 준비와 전처리
+title: "LLM Fine-tuning 101 (2/6): 데이터셋 준비와 전처리"
 series: llm-finetuning-101
 episode: 2
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -16,88 +16,95 @@ tags:
 - Tokenizer
 - HuggingFace
 - Python
-last_reviewed: '2026-05-01'
-seo_description: 데이터셋은 세 층으로 분리해서 다룹니다.
+last_reviewed: '2026-05-12'
+seo_description: 파인튜닝 데이터셋의 실패 원인인 형식 문제를 분석하고 원본, 템플릿, 텐서라는 세 층으로 나누어 전처리하는 실무 방법을 정리합니다.
 ---
 
-# 데이터셋 준비와 전처리
+# LLM Fine-tuning 101 (2/6): 데이터셋 준비와 전처리
 
-## 핵심 질문
+파인튜닝 데이터셋은 대개 크기보다 모양 때문에 더 자주 실패합니다. 이 글은 LLM Finetuning 101 시리즈의 두 번째 글입니다. 여기서는 원본 샘플, 템플릿이 적용된 텍스트, 토큰화된 텐서라는 세 층으로 문제를 나눠서, 학습 전에 무엇을 확인해야 하는지 차근차근 정리하겠습니다.
 
-파인튜닝 데이터셋을 어떻게 준비해야 학습이 의도대로 진행될까요?
+같은 1,000개 샘플이어도 형식이 일관되면 LoRA `r=8`로 충분할 수 있고, 형식이 섞이면 더 큰 랭크와 더 많은 데이터로도 수렴이 흔들릴 수 있습니다. 2편의 목표는 데이터 양을 늘리는 방법이 아니라, 모델이 정확히 무엇을 모방해야 하는지 분명하게 만드는 것입니다.
 
-이 글은 그 질문에 답하기 위해 데이터셋 준비의 핵심 결정과 운영 함정을 살펴봅니다.
+![LLM Fine-tuning 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.ko.png)
+*LLM Fine-tuning 101 2장 흐름 개요*
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-데이터셋 단계에서 가장 중요한 것은 양보다 **형식의 일관성**입니다. 모델이 무엇을 입력으로 보고, 어디까지를 응답으로 학습해야 하는지 애매하면 학습 손실이 내려가도 결과는 흐릿합니다. 같은 1,000개 샘플이라도 prompt 형식이 일관되면 LoRA r=8로 충분하고, 형식이 섞이면 r=64에 데이터를 5배 늘려도 수렴이 잘 되지 않습니다.
+- `instruction / input / output` 세 필드를 어떤 형태로 잡아야 할까요?
+- Hugging Face `datasets`로 작은 JSONL 파일을 어떻게 바로 읽을 수 있을까요?
+- 전처리 단계에서 반드시 확인해야 할 최소 검증 포인트는 무엇일까요?
 
-2편에서 형식을 정확히 잡아 두면 4편의 학습 루프, 5편의 평가, 6편의 서빙에서 같은 템플릿을 그대로 재사용할 수 있습니다. 반대로 2편을 대충 넘기면 4편에서 손실은 떨어지는데 5편에서 답변 품질이 이상하다는 모순적인 상황이 자주 생깁니다.
+## 왜 이 글이 중요한가
 
-## Mental Model
+데이터셋 단계에서 가장 중요한 것은 양이 아니라 **형식 일관성**입니다. 무엇이 입력인지, 어디부터가 모델이 학습해야 할 응답인지 애매하면 손실은 내려가도 실제 답변은 흐릿하게 남습니다. 작은 LoRA 실험일수록 이 경계가 더 중요합니다.
 
-데이터셋은 세 층으로 분리해서 다룹니다.
+2편에서 템플릿을 확실히 잡아 두면 4편의 학습 루프, 5편의 평가, 6편의 서빙까지 같은 구조가 끊기지 않고 이어집니다. 반대로 여기서 대충 넘어가면 4편에서는 손실이 내려가는데 5편에서는 답변 품질이 이상한, 가장 해석하기 어려운 상황을 만나게 됩니다.
 
+## 멘탈 모델
+
+데이터셋은 세 층으로 나눠서 봐야 합니다.
+
+```text
+┌───────────────────────────────┐
+│ Layer 1: Raw samples (JSONL)  │  ← humans read and review here
+├───────────────────────────────┤
+│ Layer 2: Templated text       │  ← prompt + response as one string
+├───────────────────────────────┤
+│ Layer 3: Tokenized tensors    │  ← input_ids, attention_mask, labels
+└───────────────────────────────┘
 ```
-┌─────────────────────────────┐
-│ Layer 1: 원본 샘플 (JSONL)   │  ← 사람이 읽고 검수하는 곳
-├─────────────────────────────┤
-│ Layer 2: 템플릿 적용 텍스트  │  ← prompt + response 한 문자열
-├─────────────────────────────┤
-│ Layer 3: 토큰화된 텐서       │  ← input_ids, attention_mask, labels
-└─────────────────────────────┘
-```
 
-- **Layer 1**은 사람이 추가/수정/검수하는 영역입니다. 필드 이름, 줄바꿈, 줄 끝 공백까지 일관되어야 합니다.
-- **Layer 2**는 모델별 chat template이 적용되어 한 문자열이 됩니다. Llama-3와 Qwen은 다른 special token을 씁니다.
-- **Layer 3**은 학습 직전에 만들어집니다. `labels`에서 prompt 부분은 -100으로 마스킹해 loss 계산에서 빼야 합니다.
+- **Layer 1**은 사람이 추가하고 수정하고 검수하는 층입니다. 필드 이름, 줄바꿈, 공백까지 일관돼야 합니다.
+- **Layer 2**는 모델별 템플릿이 적용된 하나의 문자열입니다. Llama-3와 Qwen은 같은 텍스트라도 다른 특수 토큰을 사용합니다.
+- **Layer 3**은 학습 직전에 만드는 텐서입니다. `labels`에서 프롬프트 구간은 `-100`으로 마스킹해 손실 계산에서 제외해야 합니다.
 
-세 층을 분리해야 "필터링 문제"와 "토큰 길이 문제"와 "마스킹 문제"를 따로 진단할 수 있습니다.
+이 세 층을 분리하면 필터링 문제, 토큰 길이 문제, 마스킹 문제를 한꺼번에 뒤섞지 않고 따로 진단할 수 있습니다.
 
 ## 핵심 개념
 
 | 용어 | 의미 |
 | --- | --- |
-| Instruction format | `{instruction, input?, output}` 구조. Alpaca 계열이 표준 |
-| Chat format | `[{role, content}, ...]` 구조. 멀티턴 대화에 적합 |
-| Completion format | 단순 prefix → continuation. base model 학습에 가까움 |
-| Label masking | prompt 부분을 -100으로 두어 loss에서 제외 |
-| EOS token | 응답 종료 신호. 빠뜨리면 모델이 멈추는 법을 배우지 못함 |
+| Instruction format | `{instruction, input?, output}` 구조입니다. Alpaca 스타일이 대표적입니다. |
+| Chat format | `[{role, content}, ...]` 구조입니다. 멀티턴 대화에 적합합니다. |
+| Completion format | 단순한 prefix 뒤에 continuation이 붙는 형태입니다. 베이스 모델의 사전학습 형식과 더 가깝습니다. |
+| Label masking | 프롬프트 토큰을 `-100`으로 두어 손실 계산에서 제외하는 방식입니다. |
+| EOS token | 응답 종료를 알리는 토큰입니다. 이것이 없으면 모델은 멈추는 법을 배우지 못합니다. |
 
-## Before vs. After
+## 적용 전후 비교
 
-**Before** — 데이터를 모았는데 어떤 행은 `prompt/response`, 어떤 행은 `q/a`, 어떤 행은 한 칼럼에 모두 들어 있습니다. 학습은 돌아가지만 평가에서 답변이 갑자기 끝나거나 같은 말을 반복합니다.
+**Before**
 
-**After** — 모든 샘플이 동일한 instruction 템플릿을 거쳐 다음과 같은 한 문자열이 됩니다.
+데이터를 모아 보니 어떤 행은 `prompt/response`, 어떤 행은 `q/a`, 어떤 행은 한 칼럼에 모든 내용이 들어 있습니다. 학습은 돌아가지만, 평가에서는 응답이 중간에 끊기거나 같은 표현을 반복합니다.
 
-```
+**After**
+
+모든 샘플이 같은 템플릿을 거치면 각 샘플은 아래 같은 문자열이 됩니다.
+
+```text
 ### Instruction:
-파이썬 리스트를 뒤집는 두 가지 방법을 설명하세요.
+Explain two ways to reverse a Python list.
 
 ### Input:
-예제 코드 한 줄을 함께 보여주세요.
+Include a one-line example.
 
 ### Response:
-lst[::-1]과 lst.reverse()를 쓸 수 있습니다.<eos>
+You can use lst[::-1] or lst.reverse().<eos>
 ```
 
-prompt 끝(`### Response:` 직전까지)은 -100으로 마스킹되고, 뒤쪽 응답에만 loss가 걸립니다. EOS가 명시적으로 붙어 있어 추론 시 멈추는 법도 배웁니다.
+`### Response:` 직전까지는 `-100`으로 마스킹되고, 응답 구간에만 손실이 걸립니다. `<eos>`도 명시되어 있으므로 모델은 어디에서 멈춰야 하는지도 함께 배웁니다.
 
-## 데이터셋에서 먼저 고정할 것
+## 데이터셋에서 먼저 고칠 것
 
-![데이터셋 세 층과 경계 관리 구조](../../assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.ko.png)
+파인튜닝 데이터는 보통 **원본 샘플**, **템플릿이 적용된 텍스트**, **토큰화된 텐서**라는 세 층으로 나뉩니다. 이 분리를 유지해야 필터링 문제와 토큰 길이 문제를 분리해서 볼 수 있습니다.
 
-*데이터셋 세 층과 경계 관리 구조*
+![데이터셋에서 먼저 고칠 것](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.ko.png)
 
-파인튜닝 데이터는 보통 세 층으로 나뉩니다. **원본 샘플**, **프롬프트 템플릿을 적용한 텍스트**, **토크나이즈된 텐서**입니다. 이 세 층을 분리해서 생각해야 필터링 문제와 토큰 길이 문제를 따로 잡을 수 있습니다.
+*데이터셋에서 먼저 고칠 것*
 
-![데이터셋에서 먼저 고정할 것](../../assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.ko.png)
+## 단계별 설명
 
-*데이터셋에서 먼저 고정할 것*
-
-## 단계별 실습
-
-### 1단계 — JSONL 원본 작성
+### 1단계 — JSONL 원본을 작성합니다
 
 ```python
 import json
@@ -108,13 +115,13 @@ DATA_PATH = ROOT / "toy.jsonl"
 
 with DATA_PATH.open("w", encoding="utf-8") as file:
     file.write(json.dumps({
-        "instruction": "파이썬 리스트를 뒤집는 두 가지 방법을 설명하세요.",
-        "input": "예제 코드 한 줄을 함께 보여주세요.",
-        "output": "lst[::-1]과 lst.reverse()를 쓸 수 있습니다.",
+        "instruction": "Explain two ways to reverse a Python list.",
+        "input": "Include a one-line example.",
+        "output": "You can use lst[::-1] or lst.reverse().",
     }, ensure_ascii=False) + "\n")
 ```
 
-### 2단계 — datasets로 로드
+### 2단계 — `datasets`로 파일을 읽습니다
 
 ```python
 from datasets import load_dataset
@@ -124,9 +131,9 @@ print(dataset.column_names)   # ['instruction', 'input', 'output']
 print(len(dataset))           # 1
 ```
 
-`load_dataset()`은 캐시도 만들어 주므로, 같은 JSONL을 두 번째 로드할 때는 ms 단위로 끝납니다.
+`load_dataset()`은 캐시를 만들어 두므로 같은 JSONL을 다시 읽을 때는 훨씬 빨라집니다.
 
-### 3단계 — 템플릿 적용
+### 3단계 — 템플릿을 적용합니다
 
 ```python
 TEMPLATE = (
@@ -142,7 +149,7 @@ dataset = dataset.map(render)
 print(dataset[0]["text"][:120])
 ```
 
-### 4단계 — 토크나이즈
+### 4단계 — 토큰화합니다
 
 ```python
 from transformers import AutoTokenizer
@@ -163,69 +170,332 @@ print(tokenized.column_names)
 print(len(tokenized[0]["input_ids"]))   # 64
 ```
 
-`padding="max_length"`와 `max_length=64`는 학습용 설정이 아니라 **길이 통계를 빨리 보기 위한** 실습용입니다. 실제 학습에서는 dynamic padding(데이터 콜레이터)로 대체합니다.
+여기서 `padding="max_length"`와 `max_length=64`는 학습용 최적값이 아니라, 작은 실습에서도 길이 통계를 빨리 확인하기 위한 설정입니다. 실제 학습에서는 데이터 콜레이터를 통해 동적 패딩을 쓰는 편이 보통 더 낫습니다.
 
 ## 이 코드에서 봐야 할 것
 
-![포맷 검증과 토큰 길이 확인 순서 흐름](../../assets/llm-finetuning-101/02/02-03-what-to-notice-in-this-code.ko.png)
+![형식 점검과 길이 검증 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-03-what-to-notice-in-this-code.ko.png)
 
-*포맷 검증과 토큰 길이 확인 순서 흐름*
+*형식 점검과 길이 검증 흐름*
 
-- `datasets.load_dataset()`을 쓰면 실전에서 받는 JSONL 구조를 그대로 흉내 낼 수 있습니다.
-- 템플릿 적용과 토크나이즈를 분리하면 나중에 모델별 chat template으로 교체하기 쉽습니다.
-- 예제는 `padding="max_length"`, `max_length=64`로 고정해 아주 작은 실습에서도 길이 통계를 바로 볼 수 있게 했습니다.
-- 토크나이저에 `pad_token`이 없으면 학습이 죽습니다. GPT-2 계열은 `eos_token`을 그대로 재사용하는 것이 표준입니다.
+- `datasets.load_dataset()`은 실전에서 흔히 받는 JSONL 구조를 그대로 다뤄 보게 해 줍니다.
+- 템플릿 적용과 토큰화를 분리해 두면 나중에 모델별 채팅 템플릿으로 바꾸기 쉽습니다.
+- 예제는 `padding="max_length"`, `max_length=64`를 고정해 작은 샘플에서도 길이 분포를 바로 드러내게 합니다.
+- `pad_token`이 없는 토크나이저는 학습을 바로 깨뜨립니다. GPT-2 계열은 `eos_token`을 `pad_token`으로 재사용하는 방식이 흔합니다.
 
 ## 자주 하는 실수
 
-![중복 제거와 학습 분할 판단 흐름](../../assets/llm-finetuning-101/02/02-04-where-engineers-get-confused.ko.png)
+![중복 제거와 분할 결정 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-04-where-engineers-get-confused.ko.png)
 
-*중복 제거와 학습 분할 판단 흐름*
+*중복 제거와 분할 결정 흐름*
 
-- **데이터가 많을수록 좋다고 가정** — 중복 답변이 많거나 형식이 섞이면 작은 모델은 더 빨리 망가집니다. 5,000개의 노이즈 데이터보다 500개의 일관된 데이터가 LoRA에는 거의 항상 더 낫습니다.
-- **`labels`를 데이터셋 단계에서 만들지 않음** — 정상입니다. 4편에서 데이터 콜레이터가 prompt를 -100으로 마스킹하면서 만듭니다.
-- **EOS 토큰 누락** — 응답 끝에 `<eos>`가 없으면 모델이 멈추는 법을 배우지 못합니다. 추론에서 답변이 무한히 이어지면 가장 먼저 의심해야 할 지점입니다.
-- **`max_length`를 너무 짧게** — `max_length=64`로 학습하고 추론 시 256짜리 응답을 기대하면 잘립니다. 학습 데이터의 95퍼센타일을 보고 결정합니다.
-- **train/eval split을 하지 않음** — 같은 데이터로 평가하면 5편에서 모델이 외운 답을 채점하게 됩니다. 최소 90/10 split을 두세요.
+- **데이터가 많을수록 무조건 좋다고 생각하는 실수**: 중복과 형식 혼합은 작은 모델을 더 빨리 망가뜨립니다. LoRA에서는 5,000개의 시끄러운 샘플보다 500개의 일관된 샘플이 더 나은 경우가 많습니다.
+- **데이터셋 단계에서 `labels`를 꼭 만들어야 한다고 생각하는 실수**: 지금 당장 만들지 않아도 됩니다. 4편의 데이터 콜레이터가 프롬프트를 `-100`으로 마스킹하면서 생성할 수 있습니다.
+- **EOS를 빼먹는 실수**: 응답 뒤에 `<eos>`가 없으면 모델은 멈추는 규칙을 배우지 못합니다. 추론에서 답이 끝없이 이어지면 가장 먼저 여기부터 의심해야 합니다.
+- **`max_length`를 지나치게 짧게 잡는 실수**: 학습을 64 토큰으로 해 놓고 256 토큰 답변을 기대할 수는 없습니다. 데이터 길이의 95퍼센타일을 보고 정해야 합니다.
+- **train/eval 분할을 생략하는 실수**: 같은 데이터를 평가에 다시 쓰면 5편에서 외운 답을 채점하게 됩니다. 최소한 90/10 분할은 두는 편이 좋습니다.
 
-## 실무 적용
+## 실무 메모
 
-- **샘플 50개부터 시작**: 작은 세트로 토크나이즈 길이 분포, prompt 누락, EOS 유무를 점검한 뒤 본 데이터셋을 만듭니다.
-- **golden set 따로 보관**: 평가에 절대 학습으로 쓰지 않을 100~200개의 황금 세트를 분리해 보관합니다. 5편에서 이 세트가 결정적입니다.
-- **데이터셋 버전 관리**: `dataset_v2025-04-30.jsonl`처럼 날짜를 파일명에 박고, 모델 가중치 메타에 함께 기록합니다.
-- **PII/중복 제거 자동화**: regex 기반 PII 마스킹과 MinHash 중복 제거 정도는 첫 실험부터 깔아 둡니다. 나중에 도입하면 모든 실험을 다시 돌려야 합니다.
-- **샘플 길이 분포 시각화**: `tokenized.with_format("pandas")["input_ids"].apply(len).describe()`만 한 번 찍어 보면 `max_length` 결정이 즉시 끝납니다.
-
-## 실무에서는 이렇게 생각한다
-
-데이터셋 준비를 가볍게 여기고 모델 학습으로 바로 넘어가는 팀이 많습니다. 하지만 경험이 쌓일수록 "데이터 30분, 학습 5분"이 아니라 "데이터 3일, 학습 30분"이 현실에 가깝다는 것을 깨닫게 됩니다. 형식이 흔들리면 LoRA rank를 아무리 올려도 수렴이 불안정하고, 형식이 일관되면 rank 8로도 충분한 경우가 대부분입니다.
-
-팀 단위로 일할 때는 데이터셋 스키마를 문서화하고 버전을 관리하는 것이 모델 실험 속도를 결정합니다. 스키마가 바뀔 때마다 이전 실험 결과와의 비교가 무의미해지기 때문입니다. 처음부터 PII 마스킹과 중복 제거 파이프라인을 깔아 두면, 나중에 데이터를 10배 늘려도 같은 품질 기준을 유지할 수 있습니다.
+- **50개 샘플부터 시작합니다**: 길이 분포, 누락 필드, EOS 유무를 작은 세트에서 먼저 검증합니다.
+- **골든 세트를 따로 빼 둡니다**: 100~200개 정도의 평가 전용 샘플은 5편에서 큰 역할을 합니다.
+- **데이터셋 버전을 남깁니다**: `dataset_v2025-04-30.jsonl`처럼 버전이 드러나게 이름을 붙이고, 모델 메타데이터에도 같이 기록합니다.
+- **PII 마스킹과 중복 제거를 초기에 자동화합니다**: 뒤늦게 도입하면 기존 실험을 모두 다시 돌려야 합니다.
+- **길이 분포를 숫자로 확인합니다**: `tokenized.with_format("pandas")["input_ids"].apply(len).describe()` 같은 한 줄이면 `max_length` 논쟁이 빠르게 정리됩니다.
 
 ## 체크리스트
 
-- [ ] JSONL 원본 샘플이 instruction, input, output 구조로 정리되었다.
-- [ ] `datasets.load_dataset()`으로 실제 파일을 읽어 왔다.
-- [ ] 토크나이저 전처리 후 컬럼과 길이를 확인했다.
-- [ ] `pad_token`이 설정되어 있고, 응답 끝에 EOS가 붙도록 했다.
-- [ ] train/eval split이 분리되어 있다.
-- [ ] 다음 글에서 어떤 모듈에 LoRA를 꽂을지 데이터 길이와 함께 생각해 봤다.
+- [ ] JSONL 원본 샘플이 `instruction / input / output` 구조를 따릅니다.
+- [ ] `datasets.load_dataset()`으로 실제 파일을 읽어 봤습니다.
+- [ ] 토큰화 후 컬럼과 길이를 확인했습니다.
+- [ ] `pad_token`이 설정되어 있고, 응답 뒤에 EOS가 붙습니다.
+- [ ] train/eval 분할이 준비되어 있습니다.
+- [ ] 3편에서 어떤 모듈에 LoRA를 붙일지와 데이터 길이 분포를 함께 생각할 수 있습니다.
+
+## 연습 문제
+
+1. 예제에 지시문 다섯 개를 더 추가하고 평균 길이와 95퍼센타일 길이를 출력해 보세요. `max_length`를 얼마로 잡겠습니까?
+2. `input`이 빈 샘플 하나를 추가하고, 템플릿이 깨지지 않도록 `render()`를 보강해 보세요.
+3. 같은 데이터에 Llama-3 채팅 템플릿을 적용해 다시 토큰화해 보세요. 왜 텍스트는 같은데 토큰 수가 달라지는지 설명해 보세요.
 
 ## 정리 · 다음 글
 
-데이터셋 준비의 핵심은 모델이 배워야 할 입출력 경계를 분명히 만드는 것입니다. 작은 샘플로 먼저 구조를 맞춰 두면 이후 학습 루프를 디버깅할 때 훨씬 덜 흔들립니다.
+데이터셋 준비의 핵심은 모델이 배워야 할 입력과 출력의 경계를 분명하게 만드는 일입니다. 작은 샘플에서 구조를 먼저 고정해 두면, 나중에 학습 루프를 디버깅할 때 훨씬 덜 흔들립니다.
 
-다음 글(3편)에서는 LoRA 어댑터 구성으로 넘어갑니다. `LoraConfig`의 `r`, `alpha`, `target_modules`, `dropout`이 학습 결과에 어떻게 작용하는지 한 줄씩 파헤칩니다.
+다음 글인 3편에서는 LoRA 어댑터 구성을 다룹니다. `LoraConfig`의 `r`, `alpha`, `target_modules`, `dropout`이 실제 학습 동작에 어떻게 나타나는지 한 줄씩 뜯어 보겠습니다.
+
+## 실전 데이터 포맷: instruction, chat, completion을 같은 기준으로 비교하기
+
+형식 선택은 취향 문제가 아니라 실패 비용 문제입니다. 한 번 잘못 고르면 이후 학습 로그가 모두 왜곡됩니다.
+
+| 형식 | 예시 구조 | 강점 | 취약점 | 추천 상황 |
+| --- | --- | --- | --- | --- |
+| instruction | `instruction/input/output` | 구현 단순, 검수 쉬움 | 멀티턴 표현 약함 | 단일 질의응답, 형식 교정 |
+| chat | `[{role, content}]` | 실제 대화 흐름과 유사 | 템플릿 의존도 큼 | 챗봇, 상담형 UX |
+| completion | `prefix + continuation` | 사전학습 형식과 유사 | 지시 구분이 모호 | 코드 자동완성, 문장 이어쓰기 |
+
+초기에는 instruction 형식으로 시작하고, 실제 제품이 멀티턴이면 chat 형식으로 옮기는 순서가 운영상 안정적입니다.
+
+## 데이터 품질 게이트: 학습 전에 실패를 막는 자동 점검
+
+아래 검사는 작은 JSONL에도 바로 적용할 수 있습니다.
+
+```python
+import json
+from pathlib import Path
+
+def validate_jsonl(path: Path) -> dict:
+    total = 0
+    missing = 0
+    empty_output = 0
+    long_samples = 0
+
+    with path.open("r", encoding="utf-8") as f:
+        for line in f:
+            total += 1
+            row = json.loads(line)
+            if "instruction" not in row or "output" not in row:
+                missing += 1
+                continue
+            if not row["output"].strip():
+                empty_output += 1
+            if len((row.get("instruction", "") + row.get("output", ""))) > 2000:
+                long_samples += 1
+
+    return {
+        "total": total,
+        "missing": missing,
+        "empty_output": empty_output,
+        "long_samples": long_samples,
+    }
+```
+
+이 검사를 CI에 두면 "학습은 끝났는데 결과가 이상하다"는 뒤늦은 사고를 많이 줄일 수 있습니다.
+
+## 라벨 마스킹 예시: 응답 구간에만 손실을 거는 방식
+
+전처리에서 가장 중요한 기술 포인트는 `labels` 마스킹입니다.
+
+```python
+def build_labels(input_ids, response_start_idx):
+    labels = input_ids.copy()
+    for i in range(response_start_idx):
+        labels[i] = -100
+    return labels
+```
+
+`-100`은 손실 계산에서 제외를 뜻합니다. 이 처리가 없으면 모델은 응답뿐 아니라 지시문 자체를 복제하는 데 손실을 소비하고, 실제 생성 품질이 흐릿해질 수 있습니다.
+
+## 길이 분포와 VRAM의 연결: max_length를 감으로 정하지 않기
+
+입력 길이는 곧 비용입니다. 아래처럼 분포를 숫자로 뽑아 두면 `max_length`를 합리적으로 고를 수 있습니다.
+
+| 지표 | 값(예시) | 해석 |
+| --- | --- | --- |
+| 평균 토큰 길이 | 148 | 작은 배치에서는 여유 |
+| p95 | 356 | `max_length=384` 후보 |
+| p99 | 612 | 긴 샘플 별도 처리 고려 |
+| 최대 길이 | 1304 | 통째 절단 시 정보 손실 큼 |
+
+실무에서는 p95를 기본 길이로 잡고, 극단적으로 긴 샘플은 분할하거나 별도 태스크로 분리하는 편이 안정적입니다.
+
+## 전처리 출력 샘플: 학습 전에 반드시 사람 눈으로 확인할 것
+
+```text
+### Instruction:
+사용자 이메일 검증 API를 FastAPI로 작성해 주세요.
+
+### Input:
+정규식 검증 실패 시 400을 반환해 주세요.
+
+### Response:
+@app.post("/validate-email")
+def validate_email(req: EmailRequest):
+    if not EMAIL_RE.match(req.email):
+        raise HTTPException(status_code=400, detail="invalid email")
+    return {"ok": True}<eos>
+```
+
+템플릿이 이렇게 일관되게 보이면 그다음 단계에서 발생하는 실패를 모델/학습 문제로 좁혀 볼 수 있습니다.
+
+## 하이퍼파라미터 테이블: 데이터셋 크기별 안전한 출발선
+
+| 샘플 수 | `max_length` | 배치 전략 | 학습률 | 메모 |
+| --- | --- | --- | --- | --- |
+| 100~500 | 256~384 | 작은 고정 배치 | `5e-4` | 파이프라인 검증 우선 |
+| 500~5k | 384~512 | 누적 배치 사용 | `2e-4`~`5e-4` | 과적합 관찰 필요 |
+| 5k+ | 512+ | 동적 패딩 권장 | `1e-4`~`3e-4` | 평가 세트 분리 필수 |
+
+데이터셋이 커질수록 먼저 바꿔야 할 것은 랭크가 아니라 길이/배치 정책입니다. 이 순서를 지켜야 원인 분석이 가능합니다.
+
+## 실전 패턴 추가: 데이터 준비, LoRA 설정, 학습 입력 검증을 한 흐름으로 점검하기
+
+파인튜닝 품질은 모델 아키텍처보다 입력 계약에서 먼저 결정됩니다. 데이터셋 템플릿, LoRA 설정, 길이 통계를 따로 보지 말고 같은 파이프라인에서 검증해야 디버깅 비용이 줄어듭니다.
+
+```python
+from dataclasses import dataclass
+from typing import Iterable
+
+from peft import LoraConfig
+
+@dataclass
+class Sample:
+    instruction: str
+    input: str
+    output: str
+
+def render(sample: Sample) -> str:
+    return (
+        "### Instruction:
+" + sample.instruction + "
+
+"
+        "### Input:
+" + sample.input + "
+
+"
+        "### Response:
+" + sample.output
+    )
+
+def build_lora_config() -> LoraConfig:
+    return LoraConfig(
+        r=16,
+        lora_alpha=32,
+        lora_dropout=0.05,
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        bias="none",
+        task_type="CAUSAL_LM",
+    )
+
+def length_stats(lengths: Iterable[int]) -> tuple[int, float, int]:
+    data = sorted(lengths)
+    if not data:
+        return 0, 0.0, 0
+    avg = sum(data) / len(data)
+    p95 = data[int(len(data) * 0.95) - 1]
+    return min(data), avg, p95
+```
+
+운영 관점에서는 `target_modules`와 데이터 템플릿이 함께 관리되어야 합니다. 템플릿이 바뀌면 토큰 길이 분포가 바뀌고, 이는 배치 크기와 학습 안정성에 바로 영향을 줍니다. 따라서 데이터 버전, LoRA 설정 버전, 평가 지표를 같은 실험 단위로 묶어 기록하는 것이 필수입니다. 이렇게 해야 특정 품질 변화가 데이터 문제인지, 어댑터 설정 문제인지 빠르게 분리할 수 있습니다.
+
+## 데이터셋 버전 운영: 파일 하나가 아니라 실험 단위로 관리하기
+
+현업에서는 `train.jsonl` 파일 하나만 관리하면 곧바로 재현성이 깨집니다. 최소한 아래 세 파일을 함께 버전으로 묶는 편이 좋습니다.
+
+| 파일 | 역할 | 예시 |
+| --- | --- | --- |
+| `dataset.train.jsonl` | 학습 샘플 | instruction/input/output 원본 |
+| `dataset.eval.jsonl` | 평가 샘플 | hold-out 골든 후보 |
+| `dataset.meta.yaml` | 생성 규칙/정책 | 필드 규약, 마스킹 정책, 생성 날짜 |
+
+`dataset.meta.yaml`에 "응답 끝에 `<eos>`를 강제한다" 같은 규칙을 적어 두면, 팀원이 바뀌어도 전처리 결과가 같은 방향으로 유지됩니다.
+
+추가로 `book-examples` 저장소에는 데이터 생성 스크립트와 검증 스크립트를 함께 두는 편이 좋습니다. 원본 JSONL만 남기면 변경 의도가 사라지지만, 스크립트까지 남기면 왜 특정 샘플이 제거됐는지 추적할 수 있습니다.
+
+또한 샘플 단위 변경 이력은 PR 설명에 반드시 남겨 두는 편이 좋습니다. 데이터셋 품질 이슈는 코드와 달리 diff만으로 의미를 읽기 어렵기 때문입니다.
+
+실무에서는 데이터셋 변경 PR에 샘플 5개 전후 비교를 함께 첨부하면 리뷰 품질이 크게 올라갑니다.
+
+## 전처리 파이프라인 예시: 필터 -> 템플릿 -> 토큰화 -> 검증
+
+```python
+def preprocess_pipeline(dataset, tokenizer, max_length=384):
+    def filter_invalid(example):
+        return bool(example.get("instruction")) and bool(example.get("output"))
+
+    filtered = dataset.filter(filter_invalid)
+
+    def render(example):
+        input_text = example.get("input", "").strip()
+        return {
+            "text": (
+                "### Instruction:\n" + example["instruction"].strip() + "\n\n"
+                + "### Input:\n" + input_text + "\n\n"
+                + "### Response:\n" + example["output"].strip() + "<eos>"
+            )
+        }
+
+    rendered = filtered.map(render)
+
+    def tokenize(example):
+        return tokenizer(
+            example["text"],
+            truncation=True,
+            max_length=max_length,
+            padding=False,
+        )
+
+    tokenized = rendered.map(tokenize)
+    return tokenized
+```
+
+이 파이프라인은 단순하지만, 각 단계의 출력이 분리되어 있어 문제 지점을 빠르게 찾을 수 있습니다.
+
+## 손실 곡선으로 역추적하는 데이터 문제
+
+데이터셋 이슈는 학습 시작 후 손실 곡선에도 신호를 남깁니다.
+
+- 초반부터 손실이 거의 수평: 템플릿/마스킹 문제 또는 어댑터 연결 문제
+- 초반 급락 후 폭발적 진동: 중복 데이터 과다, 길이 분포 불균형
+- 학습 손실은 하강하지만 평가 지표 정체: 포맷 과적합, 의미 품질 부족
+
+이 패턴을 기록해 두면 데이터 정제 우선순위를 빠르게 결정할 수 있습니다.
+
+## 데이터 예시 확장: 나쁜 샘플과 좋은 샘플 비교
+
+```text
+[나쁜 샘플]
+instruction: "파이썬"
+output: "네"
+
+[좋은 샘플]
+instruction: "파이썬에서 리스트를 역순으로 순회하는 방법을 두 가지 설명해 주세요."
+input: "for 문 예시를 포함해 주세요."
+output: "1) reversed(lst)를 사용하면 원본을 유지한 채 역순 순회가 가능합니다..."
+```
+
+좋은 샘플은 길이가 긴 것이 아니라, 모델이 학습할 패턴이 명확한 샘플입니다.
+
+## 운영 체크용 통계 출력 예시
+
+```python
+def summarize_token_lengths(tokenized):
+    lengths = [len(x["input_ids"]) for x in tokenized]
+    lengths = sorted(lengths)
+    n = len(lengths)
+    p95 = lengths[int(n * 0.95) - 1]
+    p99 = lengths[int(n * 0.99) - 1]
+    return {
+        "count": n,
+        "min": lengths[0],
+        "mean": sum(lengths) / n,
+        "p95": p95,
+        "p99": p99,
+        "max": lengths[-1],
+    }
+```
+
+이 출력은 4편의 배치 전략 결정과 6편의 서빙 `max_new_tokens` 정책까지 연결됩니다.
+
+## 처음 질문으로 돌아가기
+
+- **`instruction / input / output` 세 필드를 어떤 형태로 잡아야 할까요?**
+  - 사람이 검수하기 쉬운 원본 구조를 유지하되, 모델이 배워야 할 응답 경계가 분명하도록 잡아야 합니다. 이 글에서는 `instruction`, 선택적 `input`, 그리고 학습 대상인 `output`을 분리하고, 최종 텍스트에서는 `### Response:` 뒤만 모델이 모방할 구간이 되도록 정리했습니다. 여기에 EOS까지 붙여야 모델이 어디에서 멈춰야 하는지도 함께 배웁니다.
+- **Hugging Face `datasets`로 작은 JSONL 파일을 어떻게 바로 읽을 수 있을까요?**
+  - 작은 실습이라도 JSONL 파일을 직접 만들고 `load_dataset("json", data_files=..., split="train")`로 읽으면 됩니다. 이렇게 읽어 두면 컬럼 이름, 샘플 수, 이후 `map()`으로 템플릿 적용과 토큰화를 붙이는 흐름이 한 번에 이어집니다. 즉 중요한 것은 파일을 읽는 기술 자체보다 원본 샘플 → 템플릿 텍스트 → 토큰 텐서의 세 층을 분리해 보는 습관입니다.
+- **전처리 단계에서 반드시 확인해야 할 최소 검증 포인트는 무엇일까요?**
+  - 필수 필드 누락 여부, 빈 `output`, EOS 존재, `pad_token` 설정, 길이 분포, train/eval 분할은 최소한 확인해야 합니다. 이 중 하나라도 빠지면 4편에서는 손실이 애매하게 흔들리고, 5편에서는 평가 결과를 해석하기 어려워집니다. 그래서 글에서도 JSONL 검증, 길이 통계, 라벨 마스킹을 전처리 단계의 기본 게이트로 다뤘습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [LLM 파인튜닝 입문](./01-intro.md)
-- **데이터셋 준비와 전처리 (현재 글)**
-- LoRA 어댑터 구성 (예정)
-- 학습 루프와 하이퍼파라미터 (예정)
-- 모델 평가 (예정)
-- 모델 서빙 (예정)
+- [LLM Fine-tuning 101 (1/6): LLM 파인튜닝 입문](./01-intro.md)
+- **LLM Fine-tuning 101 (2/6): 데이터셋 준비와 전처리 (현재 글)**
+- LLM Fine-tuning 101 (3/6): LoRA 어댑터 구성 (예정)
+- LLM Fine-tuning 101 (4/6): 학습 루프와 하이퍼파라미터 (예정)
+- LLM Fine-tuning 101 (5/6): 모델 평가 (예정)
+- LLM Fine-tuning 101 (6/6): 모델 서빙 (예정)
 
 <!-- toc:end -->
 
@@ -237,3 +507,5 @@ print(len(tokenized[0]["input_ids"]))   # 64
 - [Instruction tuning overview](https://arxiv.org/abs/2203.02155)
 - [Alpaca dataset format](https://github.com/tatsu-lab/stanford_alpaca#data-release)
 - [Llama 3 chat template](https://huggingface.co/docs/transformers/main/en/chat_templating)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-finetuning-101/ko/02-dataset)

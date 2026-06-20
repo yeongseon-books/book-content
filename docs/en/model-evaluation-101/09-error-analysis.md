@@ -1,10 +1,10 @@
 ---
 series: model-evaluation-101
 episode: 9
-title: Error Analysis
-status: content-ready
+title: "Model Evaluation 101 (9/10): Error Analysis"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,30 @@ tags:
   - Debugging
   - scikit-learn
 seo_description: Error analysis breaks accuracy into slices, error types, and confidence buckets to expose model weaknesses, with runnable code examples
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Error Analysis
+# Model Evaluation 101 (9/10): Error Analysis
 
-> Model Evaluation 101 series (9/10)
+Aggregate scores tell you roughly how good a model is, but they rarely tell you how to fix it. A 92% accuracy number can sound reassuring while still hiding the user segment, feature range, or error type that is doing the real damage.
 
-<!-- a-grade-intro:begin -->
+That is why improvement work often begins not with a better metric, but with a better decomposition of the failures you already have. Error analysis turns one average into a map of weak slices, expensive mistakes, and ambiguous examples.
 
-**Core question**: Two models with the same overall score — how do you find where they fail differently?
+This is post 9 in the Model Evaluation 101 series. In this post, we break the score apart by slice, confidence, and error type so the next experiment has a concrete target.
 
-> *Error analysis breaks the aggregate average into subgroups to reveal patterns of weakness.*
 
-<!-- a-grade-intro:end -->
+![model evaluation 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 9 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Decomposing performance by slice
-- Classifying error types (FP, FN, class confusion)
-- Analyzing accuracy by confidence
-- Telling data problems from model problems
-- Five common pitfalls
+- Decomposing performance by slice?
+- Classifying error types (FP, FN, class confusion)?
+- Analyzing accuracy by confidence?
 
 ## Why It Matters
 
 92% accuracy overall can hide 60% accuracy on a specific user segment, which is a fairness issue.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    All["all errors"] --> Slice["slice by feature"]
-    All --> Conf["slice by confidence"]
-    All --> Conf2["confusion pairs"]
-    Slice --> Weak["weakest segment"]
-    Conf --> Calib["calibration gap"]
-```
 
 ## Key Terms
 
@@ -120,6 +107,8 @@ order = np.argsort(np.abs(proba - 0.5))[:10]
 print("ambiguous indices:", order.tolist())
 ```
 
+**Expected output:** You should identify at least one weak slice, see whether false positives or false negatives dominate, and produce a short list of ambiguous samples that are worth a label audit before you change the model.
+
 ## What to Notice in This Code
 
 - Slice scores are the starting point of fairness work.
@@ -163,17 +152,29 @@ Reliability and fairness audits sometimes require per-segment reports by law.
 
 Error analysis answers "why does it fail?" Next, the evaluation report ties everything into one document.
 
+## Answering the Opening Questions
+
+- **Decomposing performance by slice?**
+  - The article treats Error Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Classifying error types (FP, FN, class confusion)?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Analyzing accuracy by confidence?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
-- [Train, Validation, and Test](./02-train-val-test.md)
-- [The Limits of Accuracy](./03-limits-of-accuracy.md)
-- [Precision and Recall](./04-precision-and-recall.md)
-- [F1 Score](./05-f1-score.md)
-- [ROC and AUC](./06-roc-and-auc.md)
-- [Calibration](./07-calibration.md)
-- [Cross Validation](./08-cross-validation.md)
+## In this series
+
+- [Model Evaluation 101 (1/10): Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): Train, Validation, and Test](./02-train-val-test.md)
+- [Model Evaluation 101 (3/10): The Limits of Accuracy](./03-limits-of-accuracy.md)
+- [Model Evaluation 101 (4/10): Precision and Recall](./04-precision-and-recall.md)
+- [Model Evaluation 101 (5/10): F1 Score](./05-f1-score.md)
+- [Model Evaluation 101 (6/10): ROC and AUC](./06-roc-and-auc.md)
+- [Model Evaluation 101 (7/10): Calibration](./07-calibration.md)
+- [Model Evaluation 101 (8/10): Cross Validation](./08-cross-validation.md)
 - **Error Analysis (current)**
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References

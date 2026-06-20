@@ -1,0 +1,10 @@
+flowchart TD
+    A["field"] --> B["inferText 누적"]
+    A --> C["inferConfidence 누적"]
+    A --> D["lineBreak 검사"]
+    D --> E["줄 단위로 묶기"]
+    C --> F["줄별 최소 confidence 보존"]
+    E --> G["의미 단위 텍스트 생성"]
+    F --> H["재검토 우선순위 생성"]
+    G --> I["raw payload 경로와 함께 저장"]
+    H --> I

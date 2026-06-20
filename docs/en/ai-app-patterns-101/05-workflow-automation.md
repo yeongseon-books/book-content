@@ -1,11 +1,11 @@
 ---
-title: Workflow automation — designing multi-step chains
+title: "AI App Patterns 101 (5/6): Workflow automation — designing multi-step chains"
 series: ai-app-patterns-101
 episode: 5
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,49 +14,34 @@ tags:
 - RAG
 - Agent
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: Workflow automation removes model choice and replaces it with a pipeline
   that follows human-defined stages and data contracts.
 ---
 
-# Workflow automation — designing multi-step chains
+# AI App Patterns 101 (5/6): Workflow automation — designing multi-step chains
 
-## Questions this post answers
+When a task has predictable stages, giving the model more freedom usually makes the system harder to trust. A workflow earns its keep by fixing the handoff points, the intermediate data shape, and the places where failures must be surfaced.
 
-- How should intermediate outputs be structured when several LLM stages are chained together?
-- Where should a summary → classification → tagging workflow detect and surface failure?
-- In what situations is a fixed workflow better than an agent?
+This is post 5 in the AI App Patterns 101 series. Here we cover how to design multi-step LLM workflows with explicit stages and clean data contracts.
 
+![Sequential handoff across stages](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.en.png)
+*Sequential handoff across stages*
 > Workflow automation removes model choice and replaces it with a pipeline that follows human-defined stages and data contracts.
 
-![Questions this post answers](../../assets/ai-app-patterns-101/05/05-01-questions-this-post-answers.en.png)
+## Questions to Keep in Mind
 
-*Questions this post answers*
-> AI App Patterns 101 (5/6)
-
-Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/05-workflow-automation)
-
-Some tasks resist a single LLM call. Receiving a customer inquiry, classifying it, applying category-specific logic, then generating a response is one example. Workflow automation connects these stages into a coherent pipeline using LangChain LCEL.
-
-Topics:
-
-- building sequential chains
-- routing — branching based on intermediate output
-- a practical multi-stage code review pipeline
-- passing each stage's output cleanly to the next
-
----
+- When is a multi-step chain just a sequence, and when does it need routing?
+- What breaks downstream when intermediate result types are not fixed?
+- Where should workflow automation log failures so they are not hidden by the final output?
 
 ## Sequential chains
 
 ### Sequential handoff across stages
 
-![Sequential handoff across stages](../../assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.en.png)
-
-*Sequential handoff across stages*
 ### DAG style branching with parallel work
 
-![DAG style branching with parallel work](../../assets/ai-app-patterns-101/05/05-02-dag-style-branching-with-parallel-work.en.png)
+![DAG style branching with parallel work](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-02-dag-style-branching-with-parallel-work.en.png)
 
 *DAG style branching with parallel work*
 LCEL's `|` operator connects stages: the left stage's output becomes the right stage's input.
@@ -137,12 +122,12 @@ print(f"title: {step3}")
 
 ### Classification driven routing
 
-![Classification driven routing](../../assets/ai-app-patterns-101/05/05-03-classification-driven-routing.en.png)
+![Classification driven routing](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-03-classification-driven-routing.en.png)
 
 *Classification driven routing*
 ### Approval gate and retry recovery
 
-![Approval gate and retry recovery](../../assets/ai-app-patterns-101/05/05-04-approval-gate-and-retry-recovery.en.png)
+![Approval gate and retry recovery](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-04-approval-gate-and-retry-recovery.en.png)
 
 *Approval gate and retry recovery*
 Classify the input first, then route it to the appropriate chain. The classifier's output is the only dependency between the two stages.
@@ -237,7 +222,7 @@ for inquiry in test_inquiries:
 
 ### Code review artifact contract
 
-![Code review artifact contract](../../assets/ai-app-patterns-101/05/05-05-code-review-artifact-contract.en.png)
+![Code review artifact contract](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-05-code-review-artifact-contract.en.png)
 
 *Code review artifact contract*
 Each stage transforms the previous stage's output. The code review pipeline below shows three chained transformations: analysis → suggestions → report.
@@ -324,8 +309,8 @@ print(f"\n=== final report ===\n{result['report']}")
 
 ## What to notice in this code
 
-- `main.py` breaks the same support ticket into three sequential stages: summarization, category classification, and tag suggestion.
-- Every stage returns a `dict`, which makes intermediate outputs easy to log, inspect, or persist.
+- `code_review_pipeline()` shows three explicit handoffs: JSON analysis, free-form suggestions, and a final condensed report.
+- The intermediate `analysis` object acts as a contract, which makes logging and validation much easier than passing only raw strings.
 - This structure is friendly to operational controls such as approval, routing, and retry policies.
 
 ---
@@ -353,15 +338,26 @@ Keep each stage focused on one responsibility. A stage that does too much is har
 
 The final post covers human-in-the-loop design: inserting human review and approval gates into otherwise automated pipelines.
 
+## Answering the Opening Questions
+
+- **When is a multi-step chain just a sequence, and when does it need routing?**
+  A sequence is enough when every input follows the same steps; routing is needed when different input types require different paths or handlers.
+
+- **What breaks downstream when intermediate result types are not fixed?**
+  If intermediate types are not fixed, the next step may miss fields or confuse strings with JSON and fail quietly.
+
+- **Where should workflow automation log failures so they are not hidden by the final output?**
+  Log each step input, output, routing decision, and exception separately so the final output does not hide the actual failure point.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Chatbot pattern — managing conversation history and state](./01-chatbot-pattern.md)
-- [RAG Q&A pattern — document-based question answering](./02-rag-qa-pattern.md)
-- [Document assistant — summarization, extraction, classification](./03-document-assistant.md)
-- [Agent and tool pattern — autonomous tool selection](./04-agent-tool-pattern.md)
-- **Workflow automation — designing multi-step chains (current)**
-- Human-in-the-loop — designing for human intervention (upcoming)
+- [AI App Patterns 101 (1/6): Chatbot pattern — managing conversation history and state](./01-chatbot-pattern.md)
+- [AI App Patterns 101 (2/6): RAG Q&A pattern — document-based question answering](./02-rag-qa-pattern.md)
+- [AI App Patterns 101 (3/6): Document assistant — summarization, extraction, classification](./03-document-assistant.md)
+- [AI App Patterns 101 (4/6): Agent and tool pattern — autonomous tool selection](./04-agent-tool-pattern.md)
+- **AI App Patterns 101 (5/6): Workflow automation — designing multi-step chains (current)**
+- AI App Patterns 101 (6/6): Human-in-the-loop — designing for human intervention (upcoming)
 
 <!-- toc:end -->
 

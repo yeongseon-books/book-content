@@ -1,0 +1,10 @@
+flowchart TD
+    subgraph VNet["Virtual Network"]
+        subgraph Env["ACA Environment"]
+            InternalLB["Internal Load Balancer"] --> Envoy["Envoy Proxy"]
+            Envoy --> App["Container App"]
+        end
+    end
+    ExternalClient["Internet Client"] --> ExternalLB["External Load Balancer"]
+    ExternalLB --> Envoy
+    InternalClient["VNet Client"] --> InternalLB

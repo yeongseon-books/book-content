@@ -1,10 +1,10 @@
 ---
 series: operating-systems-101
 episode: 8
-title: File Systems
-status: content-ready
+title: "Operating Systems 101 (8/10): File Systems"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,33 @@ tags:
   - Fsync
   - Journaling
 seo_description: Inodes, the directory tree, the page cache, fsync, and journaling — how the file system makes sure your data survives a crash.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# File Systems
+# Operating Systems 101 (8/10): File Systems
 
-> Operating Systems 101 series (8/10)
+Calling `write()` does not mean your data is safe yet. Between the page cache, the journal, the disk cache, and the storage device itself, there are several layers where a crash can still turn "saved" into "partially written" or "gone."
 
-<!-- a-grade-intro:begin -->
+That is why storage bugs are rarely about syntax. They are about knowing exactly which guarantee the file system is making at each step.
 
-**Core question**: If the power dies right after you write a file, what promises must the OS and disk keep so the data still survives?
+This is post 8 in the Operating Systems 101 series. It explains inode lookup, page cache behavior, fsync, journaling, and the atomic rename pattern used in real systems.
 
-> "I called write, so I am done" is a lie. The file system has to keep promises across the page cache, the journal, fsync, and even the disk's own cache before data is truly safe. Without that mental model you will never find the real cause of "I clearly saved it but it disappeared."
 
-<!-- a-grade-intro:end -->
+![operating systems 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.en.png)
+*operating systems 101 chapter 8 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying File Systems?
+- Which signal should the example or diagram make visible for File Systems?
+- What failure should be prevented first when File Systems reaches a real system?
+
+## Questions this article answers
+
+- How do inodes and directory entries represent a file?
+- What do the page cache and `fsync` each guarantee?
+- What kinds of recovery does journaling make possible after a crash?
+- Why is the atomic rename pattern so common when saving configuration files?
 
 ## What You Will Learn
 
@@ -46,9 +59,9 @@ Half of all data-loss incidents trace back to "we did not call fsync" or "we ass
 
 > The file system is a spectrum from "slow but safe" to "fast but risky," and choosing where to sit is a developer's decision.
 
-## Concept at a Glance
-
 > A file is a combination of an inode (metadata) and data blocks. A directory is just a mapping from name to inode number. write() typically lands in the page cache, and the data hits disk later. fsync is the call that asks the OS to push it to disk now.
+
+### The path from write to durable storage
 
 ```text
 path: /var/log/app.log
@@ -214,17 +227,29 @@ A file system is not "write and you are done." Page cache, fsync, and atomic ren
 
 The next article moves on to the way your code actually invokes everything we have seen so far — system calls.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying File Systems?**
+  - The article treats File Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for File Systems?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when File Systems reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Operating System?](./01-what-is-an-operating-system.md)
-- [Processes and Threads](./02-processes-and-threads.md)
-- [Scheduling](./03-scheduling.md)
-- [Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
-- [Locks, Mutexes, and Semaphores](./05-locks-mutex-semaphore.md)
-- [Memory Management](./06-memory-management.md)
-- [Virtual Memory](./07-virtual-memory.md)
+## In this series
+
+- [Operating Systems 101 (1/10): What Is an Operating System?](./01-what-is-an-operating-system.md)
+- [Operating Systems 101 (2/10): Processes and Threads](./02-processes-and-threads.md)
+- [Operating Systems 101 (3/10): Scheduling](./03-scheduling.md)
+- [Operating Systems 101 (4/10): Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
+- [Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores](./05-locks-mutex-semaphore.md)
+- [Operating Systems 101 (6/10): Memory Management](./06-memory-management.md)
+- [Operating Systems 101 (7/10): Virtual Memory](./07-virtual-memory.md)
 - **File Systems (current)**
 - System Calls (upcoming)
 - Containers and the Operating System (upcoming)
+
 <!-- toc:end -->
 
 ## References

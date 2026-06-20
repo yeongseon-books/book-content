@@ -1,10 +1,10 @@
 ---
 series: compilers-101
 episode: 1
-title: What Is a Compiler?
+title: "Compilers 101 (1/10): What Is a Compiler?"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: A compiler translates one language into another. Trace one expr
 last_reviewed: '2026-05-04'
 ---
 
-# What Is a Compiler?
+# Compilers 101 (1/10): What Is a Compiler?
+
+This is the first post in the Compilers 101 series.
 
 > Compilers 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: How many stages sit between writing `2 + 3 * 4` and getting the result `14`?
 
 > A compiler is a program that translates a program written in one language into another (usually less abstract). The translation does not happen in one step — it runs as a **pipeline**: lexer, parser, semantic analyzer, IR, optimizer, code generator. Once you can draw this pipeline in your head, every compiler, interpreter, and transpiler looks like a variation of the same picture.
 
-<!-- a-grade-intro:end -->
+
+![compilers 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/01/01-01-big-picture.en.png)
+*compilers 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is a Compiler??
+- Which signal should the example or diagram make visible for What Is a Compiler??
+- What failure should be prevented first when What Is a Compiler? reaches a real system?
 
 ## What You Will Learn
 
@@ -46,8 +54,6 @@ last_reviewed: '2026-05-04'
 The meaning of error messages ("is this syntax or semantic?"), why builds are slow ("optimization is expensive"), how new languages get built — all of it is about which stage of the pipeline you are in. Knowing the stages makes the tools usable.
 
 > Knowing compilers means being able to answer "how far did this line get translated, and where did it stop?"
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -242,17 +248,29 @@ The same pipeline lives inside GCC, Clang, V8, CPython, Babel, and TypeScript. L
 
 A compiler is a system that only makes sense once you decompose it into stages. Next we look at the very first stage in detail — lexical analysis, where text becomes tokens.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is a Compiler??**
+  - The article treats What Is a Compiler? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is a Compiler??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is a Compiler? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Compiler? (current)**
-- Lexical Analysis (upcoming)
-- Parsing and the AST (upcoming)
-- Semantic Analysis (upcoming)
-- Symbol Tables and Scope (upcoming)
-- Intermediate Representation (upcoming)
-- Optimization Basics (upcoming)
-- Code Generation (upcoming)
+- lexical analysis (upcoming)
+- parsing and AST (upcoming)
+- semantic analysis (upcoming)
+- symbol table and scope (upcoming)
+- intermediate representation (upcoming)
+- optimization basics (upcoming)
+- code generation (upcoming)
 - JIT vs AOT (upcoming)
-- Build a Tiny Interpreter (upcoming)
+- Building a Tiny Interpreter (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,0 +1,30 @@
+flowchart TB
+    프롬프트["사용자가 프롬프트 제출"] --> 서버["애플리케이션 서버"]
+    서버 --> 모델호출["LLM 호출"]
+
+    모델호출 --> 비스트리밍["비스트리밍\n전체 답변이 끝날 때까지 대기"]
+    비스트리밍 --> 최종페이로드["최종 payload 1개"]
+    최종페이로드 --> 침묵UX["사용자는 완료 전까지\n빈 대기 상태를 봄"]
+
+    모델호출 --> 스트리밍["스트리밍\n첫 chunk가 준비되면 즉시 전달"]
+    스트리밍 --> 청크1["chunk 1"]
+    청크1 --> 청크2["chunk 2"]
+    청크2 --> 마지막청크["final chunk\nclose + metadata"]
+    청크1 --> 실시간UI["UI가 일찍 렌더링 시작"]
+    청크2 --> 실시간UI
+    마지막청크 --> 실시간UI
+    침묵UX --> 비교["총 일은 비슷하지만\n체감 지연은 다름"]
+    실시간UI --> 비교
+
+    style 프롬프트 fill:#e3f2fd,stroke:#1976d2
+    style 서버 fill:#f3e5f5,stroke:#7b1fa2
+    style 모델호출 fill:#fff3e0,stroke:#f57c00
+    style 비스트리밍 fill:#ffebee,stroke:#c62828
+    style 최종페이로드 fill:#ffebee,stroke:#c62828
+    style 침묵UX fill:#ffebee,stroke:#c62828
+    style 스트리밍 fill:#e8f5e9,stroke:#388e3c
+    style 청크1 fill:#ede7f6,stroke:#5e35b1
+    style 청크2 fill:#ede7f6,stroke:#5e35b1
+    style 마지막청크 fill:#ede7f6,stroke:#5e35b1
+    style 실시간UI fill:#fff8e1,stroke:#f9a825
+    style 비교 fill:#e0f7fa,stroke:#00838f

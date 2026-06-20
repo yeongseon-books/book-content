@@ -1,12 +1,11 @@
 ---
-title: Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across
-  Plans
+title: "Azure Functions Deep Dive (5/6): Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans"
 series: azure-functions-deep-dive
 episode: 5
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -20,9 +19,13 @@ seo_description: All code citations in this post are based on Azure/azure-functi
   @ 5e59423.
 ---
 
-# Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans
+# Azure Functions Deep Dive (5/6): Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans
 
 > Azure Functions Deep Dive series (5/6)
+
+Everything in the previous parts happened inside one instance. The harder operational question begins when that instance is no longer enough: who decides to add more instances, what signals feed that decision, and which parts of the story still belong to the host itself?
+
+This is the fifth post in the Azure Functions Deep Dive series. Here, we separate external scale-out decisions from in-instance worker concurrency and compare how that boundary changes across hosting plans.
 
 ## Source Version
 
@@ -44,23 +47,19 @@ This installment has three goals:
 
 > All code citations are pinned to [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).
 
----
+![azure functions deep dive chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.en.png)
+*azure functions deep dive chapter 5 flow overview*
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Do the Consumption, Premium, and Dedicated plan scalers share the same decision tree?
 - What signal makes the Scale Controller decide to add another instance?
 - Where does scale-out latency pile up most in burst traffic?
-- How do concurrency throttling and scaling cooperate, and how do they collide?
-- On scale-in, how are in-flight invocations protected?
 
-## The big picture — where scaling decisions are made
+## Where scaling decisions are made
 
 Before we touch any code, here's the whole thing in one diagram.
 
-![Scale-out and worker expansion boundaries](../../assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.en.png)
-
-*Scale-out and worker expansion boundaries*
 The key insight is that two different decisions are made in two different places.
 
 | Decision | Decided by | Signal | Result |
@@ -179,7 +178,7 @@ If the health ping is the host's answer to "can you take more right now?", then 
 
 The code for these lives in the SDK, but the way they flow from the host's perspective is clear.
 
-![Trigger metrics flowing into scale decisions](../../assets/azure-functions-deep-dive/05/05-02-scalemonitor-and-targetscaler-the-signal.en.png)
+![Trigger metrics flowing into scale decisions](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-02-scalemonitor-and-targetscaler-the-signal.en.png)
 
 *Trigger metrics flowing into scale decisions*
 There are two modes, introduced at different points in time.
@@ -206,9 +205,12 @@ The supported triggers are a fixed set:
 | Storage Queue | `extensions.queues.batchSize` | 16 |
 | Service Bus (single dispatch, v5+) | `extensions.serviceBus.maxConcurrentCalls` | 16 |
 | Service Bus (batch, v5+) | `extensions.serviceBus.maxMessageBatchSize` | 1000 |
-| Event Hubs (v5+) | `extensions.eventHubs.maxEventBatchSize` | 100 |
+| Event Hubs (v5.x) | `extensions.eventHubs.maxEventBatchSize` | 10 |
+| Event Hubs (v6+) | `extensions.eventHubs.maxEventBatchSize` | 100 |
 | Cosmos DB | `MaxItemsPerInvocation` (function attribute) | 100 |
 | Apache Kafka | `LagThreshold` (function attribute) | 1000 |
+
+For Event Hubs specifically, do not read `100` as a generic default for every `v5+` extension build. Microsoft documents that `maxEventBatchSize` changed from `10` to `100` in `Microsoft.Azure.WebJobs.Extensions.EventHubs` v6.0.0.
 
 Target-based scaling is enabled by default on **Functions runtime 4.19.0 and above**, and you can disable it with `TARGET_BASED_SCALING_ENABLED=0` to fall back to incremental.
 
@@ -252,7 +254,7 @@ Putting these two side by side:
 
 The host code is identical wherever it runs. The `HostPerformanceManager.cs` we just looked at, the `TableStorageScaleMetricsRepository.cs`, the `WorkerConcurrencyManager.cs` — all one codebase. What differs is **who is making decisions outside this code**.
 
-![Plan-specific scaling decision differences](../../assets/azure-functions-deep-dive/05/05-03-plan-by-plan-same-code-different-behavio.en.png)
+![Plan-specific scaling decision differences](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-03-plan-by-plan-same-code-different-behavio.en.png)
 
 *Plan-specific scaling decision differences*
 Plan by plan, in a sentence each:
@@ -280,7 +282,8 @@ Flex Consumption is the successor to Consumption and, in practice, a different p
 > Source: [Flex Consumption per-function scaling](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan#per-function-scaling)
 
 - **Always ready instances**: you can set a non-zero floor, configurable per group or per function. This is the main lever for cutting cold starts.
-- **Default quota of up to 1000 instances / 250 cores per region.**
+- **Default per-app maximum of 100 instances**, configurable up to 1000.
+- **Regional subscription quota remains separate**: the default regional quota is 250 cores, so you can hit that limit before the app-level ceiling.
 - **Selectable instance memory**: 512 / 2048 / 4096 MB. A larger instance can absorb more concurrency within the same function group.
 - VNet integration and Azure Files mounts are supported.
 
@@ -306,7 +309,7 @@ Flex Consumption is the successor to Consumption and, in practice, a different p
 | Plan | Scale decided by | Scale to zero | Max instances | Per-function | Always ready | VNet |
 |---|---|---|---|---|---|---|
 | Consumption | Scale Controller | Yes | 200 | No | No | No |
-| Flex Consumption | Scale Controller (new) | Yes | 1000 | Yes | Yes | Yes |
+| Flex Consumption | Scale Controller (new) | Yes | 100 default; configurable to 1000 | Yes | Yes | Yes |
 | Premium | Scale Controller (+ option) | No (min 1) | Varies by SKU/region | No | pre-warmed | Yes |
 | Dedicated | App Service Auto-Scale | No | Depends on plan | No | Always On available | Yes |
 
@@ -343,15 +346,24 @@ The model in this post stops at the boundary where an external component has alr
 - [ ] Verified graceful-shutdown behaviour on scale-in
 - [ ] Decided Premium-plan minimum instances and cold-start protection strategy
 
+## Answering the Opening Questions
+
+- **Do the Consumption, Premium, and Dedicated plan scalers share the same decision tree?**
+  - The article treats Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What signal makes the Scale Controller decide to add another instance?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where does scale-out latency pile up most in burst traffic?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
-- [Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
-- [The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
-- [Dispatcher and Invocation — How a Function Call Reaches the Worker](./04-dispatcher-and-invocation.md)
-- **Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (current)**
-- Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
+- [Azure Functions Deep Dive (1/6): Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
+- [Azure Functions Deep Dive (2/6): Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
+- [Azure Functions Deep Dive (3/6): The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
+- [Azure Functions Deep Dive (4/6): Dispatcher and Invocation — How a Function Call Reaches the Worker](./04-dispatcher-and-invocation.md)
+- **Azure Functions Deep Dive (5/6): Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (current)**
+- Azure Functions Deep Dive (6/6): Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
 
 <!-- toc:end -->
 

@@ -1,0 +1,4 @@
+flowchart TD
+  Source["Event Source"] --> KEDA["KEDA Metrics Adapter"]
+  KEDA --> API["Kubernetes Metrics API"]
+  API --> HPA["HPA reads metrics"]

@@ -1,10 +1,10 @@
 ---
 series: observability-101
 episode: 7
-title: Alerts and On-Call
-status: content-ready
+title: "Observability 101 (7/10): Alerts and On-Call"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,28 +17,35 @@ tags:
   - OnCall
   - Monitoring
 seo_description: What makes an alert worth a 3am page, how to avoid alert fatigue, and the first steps of running on-call sustainably.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Alerts and On-Call
+# Observability 101 (7/10): Alerts and On-Call
 
-> Observability 101 series (7/10)
+More alerts do not make a system safer by default. Once the team stops trusting the pager, even the alert that matters most arrives already discounted.
 
-<!-- a-grade-intro:begin -->
+That is why alerting design is partly a technical problem and partly a human one. It spends sleep, focus, and trust, so it must be tied to user impact and clear action.
 
-**Core question**: What separates an alert that is *worth waking you at 3am* from one that is *not*?
+This is post 7 in the Observability 101 series.
 
-> *Good alerts are *actionable* and reflect *user impact*. Anything else just leaves *fatigue*.*
 
-<!-- a-grade-intro:end -->
+![observability 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/07/07-01-concept-at-a-glance.en.png)
+*observability 101 chapter 7 flow overview*
+> Alerts and On-Call is about the boundary decision, not the tool choice.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The three conditions of a *good alert*
-- The cost of *alert fatigue*
-- *Symptom* vs *cause* alerts
-- The basics of *on-call*
-- Five common pitfalls
+- What boundary should you inspect first when applying Alerts and On-Call?
+- Which signal should the example or diagram make visible for Alerts and On-Call?
+- What failure should be prevented first when Alerts and On-Call reaches a real system?
+
+## Questions this article answers
+
+- What makes an alert worth waking someone up at 3 a.m.?
+- Why does alert fatigue happen, and how do you reduce it?
+- What is the difference between symptom alerts and cause alerts?
+- Why does severity separation matter?
+- What role should a runbook play in on-call operations?
 
 ## Why It Matters
 
@@ -46,15 +53,7 @@ Too many alerts *bury* the real signal. On-call *buys sleep* and *spends willpow
 
 > *Alerts have a *wake-up cost*. If you do not know it, you go *bankrupt*.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    M["metric"] --> Rule["alert rule"]
-    Rule --> AM["alertmanager"]
-    AM --> Page["pager"]
-    AM --> Slack["chat"]
-```
+Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms
 
@@ -121,6 +120,24 @@ Every alert MUST have a runbook URL.
 The runbook covers: meaning, first 3 actions, escalation, related dashboards.
 ```
 
+## How to Check Alert Quality
+
+Before adding a new page-level alert, replay it against recent data and verify that a human should actually receive it.
+
+```text
+1) Replay the rule against the last 30 days.
+2) Confirm that the `for` clause filters short spikes.
+3) Verify every `severity=page` rule has a runbook and owner.
+4) Trigger a test event and confirm routing to PagerDuty or chat.
+```
+
+```text
+Expected output:
+- Page-level alerts stay rare enough that responders still trust them.
+- Ticket-level alerts land in business-hours channels only.
+- Every alert message includes summary, owner, and runbook context.
+```
+
 ## What to Notice in This Code
 
 - `for: 10m` enforces a *duration condition*.
@@ -164,17 +181,29 @@ Most teams put *symptom-based alerts (SLO breaches)* first and *cause-based aler
 
 Good alerts *protect sleep*. Next: *SLI and SLO basics*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Alerts and On-Call?**
+  - The article treats Alerts and On-Call as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Alerts and On-Call?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Alerts and On-Call reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
-- [Metrics, Logs, and Traces](./02-metric-log-trace.md)
-- [Collecting and Visualizing Metrics](./03-metric-collection.md)
-- [Structured Logging](./04-structured-logging.md)
-- [Distributed Tracing Basics](./05-distributed-tracing.md)
-- [Dashboard Design](./06-dashboard-design.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
+- [Observability 101 (2/10): Metrics, Logs, and Traces](./02-metric-log-trace.md)
+- [Observability 101 (3/10): Collecting and Visualizing Metrics](./03-metric-collection.md)
+- [Observability 101 (4/10): Structured Logging](./04-structured-logging.md)
+- [Observability 101 (5/10): Distributed Tracing Basics](./05-distributed-tracing.md)
+- [Observability 101 (6/10): Dashboard Design](./06-dashboard-design.md)
 - **Alerts and On-Call (current)**
 - SLI and SLO Basics (upcoming)
 - Cost and Cardinality (upcoming)
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,0 +1,5 @@
+flowchart TD
+  A["Image-based Document"] --> B["Check Text Layer"]
+  B -->|None| C["Run OCR Engine"]
+  C --> D["Restore Text"]
+  B -->|Exists| E["Extract Directly"]

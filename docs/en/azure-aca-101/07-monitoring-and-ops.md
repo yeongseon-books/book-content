@@ -1,11 +1,11 @@
 ---
-title: Monitoring and ops — Log Analytics and Application Insights
+title: "Azure Container Apps 101 (7/7): Monitoring and ops — Log Analytics and Application Insights"
 series: azure-aca-101
 episode: 7
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -17,12 +17,14 @@ tags:
 - Observability
 - Monitoring
 last_reviewed: '2026-04-29'
-seo_description: 'ACA observability splits into three independent layers:'
+seo_description: Master Azure Container Apps (ACA) monitoring with Log Analytics and Application Insights. Learn to use KQL and OpenTelemetry for observability.
 ---
 
-# Monitoring and ops — Log Analytics and Application Insights
+# Azure Container Apps 101 (7/7): Monitoring and ops — Log Analytics and Application Insights
 
-> Azure Container Apps 101 series (7/7)
+During an incident, the hard part is not whether data exists but knowing which layer holds the answer. ACA spreads logs, traces, and metrics across different systems, and that boundary determines how fast you can diagnose production problems.
+
+This is the final post in the Azure Container Apps 101 series. Here, we'll map those layers through Log Analytics and Application Insights.
 
 ## What you'll learn
 
@@ -31,13 +33,14 @@ seo_description: 'ACA observability splits into three independent layers:'
 - How to write KQL queries that group logs by Revision in Log Analytics.
 - How to wire Application Insights into a FastAPI app via OpenTelemetry.
 
-## Questions this chapter answers
+![azure container apps 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/07/07-01-the-observability-map.en.png)
+*azure container apps 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
 
 - What three layers does ACA observability split into, and what does each layer own?
 - What events does `ContainerAppConsoleLogs_CL` capture compared to `ContainerAppSystemLogs_CL`?
 - How do you write a KQL query that groups logs by Revision in Log Analytics?
-- What is the shortest path to wire Application Insights into a FastAPI app via OpenTelemetry?
-- Where is the boundary between observability ACA gives you for free and what you must instrument yourself?
 
 ## Why this matters
 
@@ -51,6 +54,8 @@ Miss this boundary and you spend an hour during an incident asking "why don't I 
 
 ## Mental Model
 
+> The first job in observability is not to collect more data; it is to know whether the signal you are looking at is a platform log, an application trace, or sidecar telemetry.
+
 ACA observability splits into three independent layers:
 
 1. **Platform layer (Log Analytics)** — emitted automatically by ACA. Container stdout/stderr and system events.
@@ -59,10 +64,6 @@ ACA observability splits into three independent layers:
 
 The three layers can land in the same Application Insights instance or stay separate.
 The discipline is to always know "which layer does this signal come from?"
-
-![Where logs and traces converge](../../assets/azure-aca-101/07/07-01-the-observability-map.en.png)
-
-*Where logs and traces converge*
 
 ## Core concepts
 
@@ -252,6 +253,31 @@ This concludes the **Azure Container Apps 101 series — all 7 episodes**.
 We covered the concept (Ep 1), structure (Ep 2), first deploy (Ep 3), traffic splitting (Ep 4), scaling (Ep 5), Dapr integration (Ep 6), and now observability.
 
 Natural next steps: compare the same approach across **Azure App Service 101**, **Azure AKS 101**, and **Azure Functions 101** to understand the trade-offs of serverless container platforms.
+
+---
+
+## Answering the Opening Questions
+
+- **What three layers does ACA observability split into, and what does each layer own?**
+  - The article treats Monitoring and ops — Log Analytics and Application Insights as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What events does `ContainerAppConsoleLogs_CL` capture compared to `ContainerAppSystemLogs_CL`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do you write a KQL query that groups logs by Revision in Log Analytics?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Azure Container Apps 101 (1/7): What is Azure Container Apps? — running containers without Kubernetes](./01-what-is-aca.md)
+- [Azure Container Apps 101 (2/7): Environment, Container App, Revision — ACA in three words](./02-environment-app-revision.md)
+- [Azure Container Apps 101 (3/7): Your first deploy — Python/FastAPI](./03-first-deploy.md)
+- [Azure Container Apps 101 (4/7): Ingress and traffic splitting — revision-based deployment strategies](./04-ingress-and-traffic-split.md)
+- [Azure Container Apps 101 (5/7): Scaling — KEDA scalers and zero-to-N](./05-scaling-with-keda.md)
+- [Azure Container Apps 101 (6/7): Dapr integration — what you get from a sidecar](./06-dapr-integration.md)
+- **Azure Container Apps 101 (7/7): Monitoring and ops — Log Analytics and Application Insights (current)**
+
+<!-- toc:end -->
+
 ---
 
 ## References

@@ -1,12 +1,12 @@
 ---
-title: 토큰 이해하기 — 비용, 한계, 컨텍스트 창
+title: "LLM App Foundations 101 (2/6): 토큰 이해하기 — 비용, 한계, 컨텍스트 창"
 series: llm-app-foundations-101
 episode: 2
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,87 +14,77 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-05-01'
-seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-101'
+last_reviewed: '2026-05-15'
 ---
 
-# 토큰 이해하기 — 비용, 한계, 컨텍스트 창
+# LLM App Foundations 101 (2/6): 토큰 이해하기 — 비용, 한계, 컨텍스트 창
 
-> LLM 앱 기초 시리즈 (2/6)
+LLM API를 처음 연결하면 대개 답변 품질에 먼저 눈이 갑니다. 하지만 실제 애플리케이션이 흔들리기 시작하는 지점은 품질보다 예산과 한계인 경우가 많습니다. 프롬프트가 조금 길어졌는데 응답이 느려지고, 이전 대화 몇 턴을 더 붙였더니 비용이 튀고, 참고 문서를 길게 넣자 답변이 중간에서 잘립니다.
 
-예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/ko/02-understanding-tokens)
+이 현상들은 각각 다른 문제처럼 보이지만, 공통된 단위 하나로 묶입니다. 토큰입니다. 모델은 문장이나 단어가 아니라 토큰 단위로 입력을 읽고 출력을 생성합니다. 따라서 사람 눈에 짧아 보이는 입력이 실제로는 비쌀 수 있고, 코드 블록이나 한국어 문장이 예상보다 빠르게 컨텍스트 창을 잡아먹을 수 있습니다.
 
-아래 다이어그램은 텍스트가 토큰으로 바뀌고 모델 예산으로 연결되는 흐름을 요약합니다.
+운영 관점에서는 이 차이를 빨리 체득해야 합니다. 토큰은 단순한 이론 용어가 아니라 비용 계산 단위이고, 지연 시간의 첫 번째 설명 변수이며, 길이 제한의 경계선입니다. 이 감각이 생기면 “왜 이번 요청이 무거웠는가”를 감이 아니라 숫자로 설명할 수 있습니다.
 
-![토큰 이해하기: 비용, 한계, 컨텍스트 창](../../assets/llm-app-foundations-101/02/02-01-understanding-tokens-cost-limits-and-con.ko.png)
+여기서는 토큰을 문자열의 부속 개념이 아니라 비용·속도·한계를 함께 묶는 운영 단위로 보겠습니다.
 
-*토큰 이해하기: 비용, 한계, 컨텍스트 창*
-LLM API를 처음 붙이면 응답 품질에 먼저 눈이 갑니다. 하지만 애플리케이션을 실제로 운영할 때 더 빨리 문제를 일으키는 쪽은 품질보다 예산과 한계입니다. 프롬프트가 조금만 길어져도 응답 속도가 늘어지고, 사용량 로그를 보면 호출마다 비용이 달라지며, 어느 시점부터는 입력이 잘리거나 출력이 중간에서 멈춥니다. 이 세 가지 뒤에는 거의 늘 같은 단위가 있습니다. 토큰입니다.
+![토큰이 비용과 한계로 이어지는 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-understanding-tokens-cost-limits-and-con.ko.png)
+*토큰이 비용과 한계로 이어지는 전체 그림*
 
-토큰은 LLM이 텍스트를 세는 기본 단위입니다. 사람은 문장과 단어를 읽지만, 모델은 그보다 작은 조각으로 나누어 입력을 처리합니다. 따라서 “문장 길이”를 감으로만 보면 운영 감각이 자꾸 어긋납니다. 한국어 한 문장이 생각보다 많은 토큰으로 쪼개질 수 있고, 영어 코드 블록은 공백과 기호 때문에 눈으로 본 길이보다 더 비싸질 수 있습니다.
+## 먼저 던지는 질문
 
-이번 글에서는 토큰을 숫자로 읽는 습관을 잡겠습니다. 범위는 일곱 가지입니다.
+- 토큰은 단어가 아니라 왜 예산 단위로 봐야 할까요?
+- `prompt_tokens`, `completion_tokens`, `total_tokens`는 각각 어떤 비용을 보여 줄까요?
+- context window와 `max_tokens`, `finish_reason`은 어디서 충돌할까요?
 
-- 토큰이 무엇인지
-- 단어와 토큰이 왜 같지 않은지
-- 비용과 속도가 왜 토큰 단위로 움직이는지
-- `usage.prompt_tokens`, `completion_tokens`, `total_tokens`를 어떻게 읽는지
-- `tiktoken`으로 프롬프트 길이를 어떻게 미리 재는지
-- 컨텍스트 창이 무엇이고 `llama-3.1-8b-instant`의 128k가 무엇을 뜻하는지
-- `max_tokens`와 `finish_reason`으로 출력 길이를 어떻게 제어하고 감시하는지
+## 왜 이 글이 중요한가
 
-포인트는 단순합니다. **LLM 앱은 문자열이 아니라 토큰 예산 위에서 동작합니다.** 이 감각이 생기면 길이 제한, 비용 추적, 프롬프트 최적화가 한 줄로 이어집니다.
+LLM 애플리케이션은 문자열을 보내지만 실제로는 토큰 예산 위에서 동작합니다. 따라서 호출 비용을 설명할 때도, 응답 속도를 이해할 때도, 길이 제한을 설계할 때도 결국 토큰으로 되돌아가야 합니다. 이 기준점이 없으면 프롬프트가 길어졌을 때 왜 시스템이 갑자기 무거워졌는지 설명하기 어렵습니다.
 
----
+또한 토큰 문제는 데모보다 운영에서 더 빨리 드러납니다. 한두 번의 단발 호출에서는 티가 잘 나지 않지만, 대화 이력이 쌓이고 문서 검색 결과가 붙고 응답 길이 제어가 느슨해지면 토큰이 비용과 지연을 함께 밀어 올립니다. 그래서 토큰을 일찍 이해하는 편이 나중의 비용 절감보다 더 큰 효과를 냅니다.
 
-## 토큰은 무엇인가
+무엇보다 토큰은 문제를 숫자로 바꿔 줍니다. “프롬프트가 너무 긴 것 같다”가 아니라 `prompt_tokens=3050`이라고 말할 수 있고, “답이 잘린 것 같다”가 아니라 `finish_reason=length`라고 말할 수 있습니다. 이 차이가 바로 운영 감각입니다.
 
-![텍스트가 모델 토큰으로 쪼개지는 흐름](../../assets/llm-app-foundations-101/02/02-01-what-a-token-actually-is.ko.png)
+## 토큰을 이해하는 가장 좋은 방법: 텍스트 조각이 아니라 모델이 쓰는 예산 단위로 보는 것입니다
 
-*텍스트가 모델 토큰으로 쪼개지는 흐름*
-토큰은 모델이 텍스트를 다루기 위해 자른 조각입니다. 이 조각은 꼭 단어와 일치하지 않습니다. 짧은 영어 단어 하나가 토큰 하나일 때도 있지만, 긴 단어는 여러 조각으로 나뉠 수 있습니다. 한국어는 조사와 어미가 붙는 구조라 한 어절이 여러 토큰이 되기 쉽습니다. 숫자, 공백, 줄바꿈, 괄호, 코드 기호도 모두 토큰 계산에 들어갑니다.
+사람은 문장과 단어를 읽지만 모델은 그렇지 않습니다. 모델은 자신이 학습한 토크나이저 규칙에 따라 텍스트를 더 작은 조각으로 나누고, 그 조각 수를 기준으로 입력을 처리하고 출력을 생성합니다. 따라서 토큰은 “텍스트를 어떻게 쪼개는가”의 문제이면서 동시에 “얼마나 많은 예산을 쓰는가”의 문제이기도 합니다.
 
-예를 들어 사람이 보기에 아래 세 입력은 비슷한 길이처럼 느껴질 수 있습니다.
+이 시각으로 보면 비용, 지연, 길이 제한이 하나로 연결됩니다. 입력이 길면 읽을 토큰이 늘고, 출력이 길면 생성할 토큰이 늘며, 두 값을 합친 총량이 컨텍스트 창을 밀어붙입니다. 토큰은 내부 구현 디테일이 아니라 시스템 행동을 설명하는 공통 언어입니다.
+
+> 토큰을 단어의 대체 개념으로 보면 계속 놀라고, 모델이 사용하는 예산 단위로 보면 비용과 한계가 한 번에 읽히기 시작합니다.
+
+## 핵심 개념
+
+토큰은 모델 관점의 텍스트 조각입니다. 이 조각은 단어와 일대일로 대응하지 않습니다. 흔한 영어 조합은 큰 덩어리로 묶일 수 있고, 드문 표현은 더 잘게 쪼개질 수 있습니다. 한국어, 코드, 숫자, 공백, 줄바꿈도 모두 토큰 계산에 들어갑니다.
+
+![텍스트가 모델 토큰 조각으로 분해되는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-what-a-token-actually-is.ko.png)
+
+*텍스트가 모델 토큰 조각으로 분해되는 흐름*
+
+예를 들어 아래 세 입력은 사람 눈에는 비슷해 보여도 토큰 수는 크게 다를 수 있습니다.
 
 - `hello world`
 - `unbelievable`
 - `print(user_profile[0]["email"])`
 
-하지만 토크나이저 입장에서는 완전히 다르게 쪼개질 수 있습니다. 흔히 쓰는 짧은 조합은 한 덩어리로 묶이고, 드문 조합은 더 잘게 나뉩니다. 코드 문자열은 괄호, 대괄호, 따옴표, 밑줄 때문에 토큰 수가 빨리 늘어납니다.
+이 차이의 배경에는 BPE(Byte Pair Encoding) 같은 토크나이징 원리가 있습니다. 이론을 깊게 파고들 필요는 없지만, 실무적으로는 하나만 기억하면 충분합니다. 단어 수는 토큰 수의 좋은 대리 지표가 아닙니다.
 
-이 동작을 이해하려면 BPE(Byte Pair Encoding)라는 말을 한 번은 짚고 넘어가야 합니다. BPE는 자주 같이 나타나는 문자 조합을 합쳐서 점점 더 큰 단위로 만드는 방식입니다. 아주 거칠게 말하면 “자주 나오는 조각은 크게, 드문 조각은 잘게” 압축하는 전략에 가깝습니다. 그래서 `understanding` 같은 단어가 통째로 하나가 되는 것이 아니라, 모델이 학습한 어휘표에 따라 `under`, `standing` 혹은 더 작은 조각으로 나뉠 수 있습니다.
+![비슷해 보이지만 토큰 비용이 다른 입력들](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-02-why-tokens-matter-so-much.ko.png)
 
-입문 단계에서 중요한 결론은 하나입니다. **단어 수를 세는 습관으로는 토큰 비용을 예측할 수 없습니다.** LLM API를 붙일 때는 문장 길이보다 토큰 길이를 봐야 합니다.
+*비슷해 보이지만 토큰 비용이 다른 입력들*
 
----
+토큰이 중요한 이유는 세 가지입니다. 첫째, 대부분의 LLM API는 입력 토큰과 출력 토큰 기준으로 과금합니다. 둘째, 모델은 토큰 단위로 읽고 생성하므로 입력과 출력이 길수록 지연이 늘기 쉽습니다. 셋째, 모델마다 한 번에 처리할 수 있는 최대 토큰 수, 즉 컨텍스트 창이 있습니다.
 
-## 왜 토큰이 중요한가
+운영 규칙으로 줄이면 아래와 같습니다.
 
-![비슷한 입력 길이와 다른 토큰 비용 비교](../../assets/llm-app-foundations-101/02/02-02-why-tokens-matter-so-much.ko.png)
+- 비용 문제는 대개 토큰 문제입니다.
+- 느린 응답도 먼저 토큰 문제로 의심하는 편이 맞습니다.
+- 길이 제한 오류는 거의 늘 토큰 예산 관리 실패입니다.
 
-*비슷한 입력 길이와 다른 토큰 비용 비교*
-토큰은 단순한 내부 구현 디테일이 아닙니다. 호출 비용, 응답 지연 시간, 모델 한계가 모두 여기에 묶입니다.
+![입력, 출력, 총합을 나누는 usage 필드](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-03-revisiting-usage-prompt-tokens-completio.ko.png)
 
-먼저 비용입니다. 대부분의 LLM API는 입력 토큰과 출력 토큰을 기준으로 과금합니다. 공급자마다 단가 표시는 다르지만 구조는 비슷합니다. 프롬프트가 길수록 입력 비용이 커지고, 모델이 길게 답할수록 출력 비용도 커집니다. 같은 질문이라도 시스템 프롬프트를 길게 붙이거나 긴 문서 조각을 여러 개 끼워 넣으면 총 토큰 수가 늘어납니다.
+*입력, 출력, 총합을 나누는 usage 필드*
 
-다음은 속도입니다. 응답 생성은 토큰 단위로 진행됩니다. 입력 토큰이 많으면 모델이 읽어야 할 양이 늘고, 출력 토큰이 많으면 생성해야 할 양이 늘어납니다. 그래서 긴 컨텍스트와 긴 답변은 대체로 더 느립니다. 모델 자체의 추론 속도, 네트워크 상태, 공급자 인프라도 영향이 있지만, 가장 안정적으로 볼 수 있는 설명 변수는 토큰 수입니다.
-
-마지막은 한계입니다. 모델마다 한 번의 요청에서 처리할 수 있는 최대 토큰 수가 있습니다. 이것이 컨텍스트 창입니다. 입력만 보는 값이 아니라 입력과 출력을 함께 포함한 예산이라고 이해하는 편이 안전합니다. 프롬프트가 이미 너무 길다면, 모델은 답을 시작하기도 전에 한계에 가까워집니다. 이런 상태에서 `max_tokens`를 크게 잡아도 실제로는 충분히 생성하지 못하거나, 길이 제한 때문에 중간에서 멈춥니다.
-
-운영 관점에서는 이렇게 정리하면 됩니다.
-
-- 비용 질문은 토큰으로 답합니다.
-- 속도 질문도 토큰으로 먼저 설명합니다.
-- 길이 제한 문제는 거의 늘 토큰 예산 관리 문제입니다.
-
----
-
-## `usage.prompt_tokens`, `completion_tokens`, `total_tokens` 다시 보기
-
-![입력 출력 총합을 나누는 usage 구조](../../assets/llm-app-foundations-101/02/02-03-revisiting-usage-prompt-tokens-completio.ko.png)
-
-*입력 출력 총합을 나누는 usage 구조*
-Post 01에서 `usage` 필드를 잠깐 봤습니다. 이제는 이 숫자를 해석해야 합니다. 이 글의 예제 코드는 모두 그대로 복사해 실행할 수 있게 구성했습니다. 아래 코드는 Groq API를 실제로 호출한 뒤 사용량을 읽는 가장 작은 예제입니다.
+실제 호출에서는 `usage`를 숫자로 읽어야 합니다.
 
 ```python
 import os
@@ -108,7 +98,7 @@ completion = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "Python에서 데코레이터를 두 문단 이내로 설명해 주세요.",
+            "content": "Explain Python decorators in no more than two paragraphs.",
         }
     ],
 )
@@ -124,89 +114,35 @@ print(f"total_tokens={usage.total_tokens}")
 ```
 
 <!-- injected-output:start -->
-**출력 결과**
+**출력 예시**
 
-    **데코레이터의 개념**
-
-    데코레이터는 함수의 실행 이전에 다른 함수를 실행하고, 그 결과를 원래 함수의 결과와 덮어써서, 원래 함수의 기능에 접근할 수 있도록 하는 기법입니다.
-
-    데코레이터는 함수에 대한 정보를 저장하고 있는 데이터 구조인 `descriptor`를 사용하여 구현이 됩니다. 데코레이터 내에서 원래 함수를 실행하고 결과를 리턴할 수 있고, 이 방법으로 원래 함수를 변경하거나, 주변 로직을 추가할 수 있습니다.
-
-    **데코레이터의 사용법**
-
-    데코레이터를 사용하는 방법은 다음과 같이 나타낼 수 있습니다.
-
-    ```python
-    def 데코레이터_이름(원래_함수):
-        def 데코레이팅_함수():
-            # 원래 함수를 실행하는 코드
-            print("데코레이션 실행")
-            원래_함수()
-            # 원래 함수를 실행한 후 추가 로직
-            print("다음")
-        return 데코레이팅_함수
-
-    @데코레이터_이름
-    def 원래_함수():
-        print("원래 함수 실행")
-
-    원래_함수()
-    ```
-
-    **데코레이터의 특징**
-
-    * 데코레이터는 원래 함수의 기능을 변경하거나 주변 로직을 추가할 수 있습니다.
-    * 데코레이터는 함수에 대한 정보를 저장하고 있는 데이터 구조인 `descriptor`를 사용하여 구현이 됩니다.
-    * 데코레이터 내에서 원래 함수를 실행하고 결과를 리턴할 수 있습니다.
+    Generators let Python produce values lazily, one item at a time, instead of building the entire result in memory first. A list stores every value immediately, while a generator yields values only when iteration asks for them. This usually makes generators a better fit for large streams of data or pipelines where you do not want to allocate the full result up front.
 
     finish_reason=stop
-    prompt_tokens=53
-    completion_tokens=349
-    total_tokens=402
+    prompt_tokens=44
+    completion_tokens=66
+    total_tokens=110
 
 <!-- injected-output:end -->
 
-세 필드는 각자 역할이 분명합니다.
+`prompt_tokens`는 요청 입력 전체 길이이고, `completion_tokens`는 모델이 생성한 출력 길이이며, `total_tokens`는 둘의 합입니다. 큰 입력에 짧은 출력이 붙으면 프롬프트 비대화 신호일 수 있고, 짧은 입력에 긴 출력이 붙으면 길이 제어가 느슨한 상황일 수 있습니다.
 
-### `prompt_tokens`
+![호출 전에 토큰 길이를 가늠하는 사전 경로](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-04-estimating-token-count-with-tiktoken.ko.png)
 
-요청에 실려 들어간 입력 토큰 수입니다. `messages` 배열 전체가 대상입니다. `user` 메시지 하나만 들어간다고 끝이 아닙니다. 나중에 `system` 메시지, 이전 대화 이력, RAG에서 가져온 문서 조각까지 붙이면 이 값이 빠르게 커집니다.
+*호출 전에 토큰 길이를 가늠하는 사전 경로*
 
-### `completion_tokens`
-
-모델이 생성한 출력 토큰 수입니다. 답변이 길수록 커집니다. 스트리밍이든 비스트리밍이든 최종 사용량 집계는 같은 방향으로 봅니다.
-
-### `total_tokens`
-
-입력과 출력의 합입니다. 운영 로그에서는 보통 이 값을 가장 먼저 모니터링합니다. 호출 하나가 전체적으로 얼마나 무거웠는지 빠르게 보여주기 때문입니다.
-
-실전에서는 이 세 숫자를 따로 보아야 하는 순간이 자주 있습니다. `prompt_tokens`만 크다면 프롬프트 설계 문제일 가능성이 높습니다. `completion_tokens`만 과도하게 크다면 답변 길이 제어가 부족한 경우가 많습니다. 둘 다 크다면 긴 문맥에 긴 출력까지 붙은 비싼 요청일 수 있습니다.
-
-토큰 사용량 로그를 남길 때는 모델명과 함께 묶어 두는 편이 좋습니다. 예를 들어 `model`, `prompt_tokens`, `completion_tokens`, `total_tokens`, `finish_reason`를 한 줄 로그로 저장해 두면 나중에 비용과 실패 패턴을 훨씬 쉽게 설명할 수 있습니다.
-
----
-
-## `tiktoken`으로 토큰 수 미리 세기
-
-![전송 전 토큰 수를 가늠하는 단계](../../assets/llm-app-foundations-101/02/02-04-estimating-token-count-with-tiktoken.ko.png)
-
-*전송 전 토큰 수를 가늠하는 단계*
-응답을 받은 뒤 사용량을 읽는 것만으로는 부족합니다. 요청을 보내기 전에 길이를 미리 재야 프롬프트를 잘라야 할지, 요약해야 할지, 여러 요청으로 나눌지 판단할 수 있습니다. 이때 많이 쓰는 도구가 `tiktoken`입니다.
-
-설치는 아래처럼 합니다.
+실제 운영에서는 호출 후 관측만으로는 부족합니다. 보내기 전에 대략적인 크기를 재야 합니다.
 
 ```bash
 pip install tiktoken
 ```
-
-가장 단순한 사용 예제는 문자열 하나를 토큰으로 인코딩한 뒤 길이를 보는 방식입니다.
 
 ```python
 import tiktoken
 
 encoding = tiktoken.get_encoding("cl100k_base")
 
-text = "토큰 길이를 미리 재면 긴 프롬프트를 더 안전하게 다룰 수 있습니다."
+text = "Measuring token length before a request makes prompt handling safer."
 tokens = encoding.encode(text)
 
 print(tokens)
@@ -214,18 +150,14 @@ print(f"token_count={len(tokens)}")
 ```
 
 <!-- injected-output:start -->
-**출력 결과**
+**출력 예시**
 
-    [169, 228, 58260, 223, 108, 41871, 116, 13094, 18918, 5251, 107, 116, 29102, 16633, 105, 33390, 41871, 112, 85355, 15291, 105, 169, 63644, 29726, 18918, 5251, 235, 242, 96270, 66965, 16582, 58901, 50467, 53987, 108, 29833, 36439, 39331, 13]
-    token_count=39
+    [7979, 69774, 4037, 3160, 1603, 264, 1715, 3727, 10137, 11850, 30549, 13]
+    token_count=12
 
 <!-- injected-output:end -->
 
-여기서 한 가지는 분명히 구분해야 합니다. `cl100k_base`는 OpenAI 계열에서 널리 알려진 인코딩입니다. Groq의 `llama-3.1-8b-instant`가 내부적으로 완전히 같은 토크나이저를 쓴다고 단정할 수는 없습니다. 따라서 이 숫자는 **청구 기준의 절대값**이라기보다 **사전 점검용 근사치**로 보는 편이 안전합니다. 실제 청구와 한계 판정은 공급자가 반환한 `usage`가 기준입니다.
-
-그렇더라도 이 근사치가 쓸모없는 것은 아닙니다. 운영에서 필요한 판단은 대개 “지금 프롬프트가 짧은가, 긴가, 너무 긴가”입니다. 수천 토큰 규모에서 대략적인 길이를 미리 아는 것만으로도 입력 잘라내기, 문서 청크 크기 조절, 대화 이력 축약 같은 결정을 훨씬 빨리 내릴 수 있습니다.
-
-실전에서는 메시지 목록 전체를 하나의 문자열처럼 합쳐서 길이를 재는 방식이 자주 쓰입니다. 아주 정교한 계산은 모델별 포맷 차이 때문에 달라질 수 있지만, 입문 단계에서는 아래 정도면 충분합니다.
+메시지 묶음을 대략 추정할 때는 이렇게 볼 수 있습니다.
 
 ```python
 import tiktoken
@@ -234,9 +166,9 @@ encoding = tiktoken.get_encoding("cl100k_base")
 
 messages = [
     {"role": "system", "content": "You are a concise Python tutor."},
-    {"role": "user", "content": "리스트와 튜플의 차이를 설명해 주세요."},
-    {"role": "assistant", "content": "리스트는 변경 가능하고, 튜플은 변경 불가능합니다."},
-    {"role": "user", "content": "예제 코드도 짧게 덧붙여 주세요."},
+    {"role": "user", "content": "Explain the difference between a list and a tuple."},
+    {"role": "assistant", "content": "Lists are mutable, while tuples are immutable."},
+    {"role": "user", "content": "Add one short code example too."},
 ]
 
 serialized = "\n".join(f"{m['role']}: {m['content']}" for m in messages)
@@ -247,51 +179,19 @@ print()
 print(f"estimated_prompt_tokens={estimated_prompt_tokens}")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
+여기서 중요한 주의점이 하나 있습니다. `cl100k_base`는 실용적인 추정 도구이지, Groq 청구 기준의 절대 진실은 아닙니다. 최종 회계 값은 공급자가 돌려주는 `usage`가 권위 있는 값입니다.
 
-    system: You are a concise Python tutor.
-    user: 리스트와 튜플의 차이를 설명해 주세요.
-    assistant: 리스트는 변경 가능하고, 튜플은 변경 불가능합니다.
-    user: 예제 코드도 짧게 덧붙여 주세요.
+컨텍스트 창은 입력 한계가 아니라 입력과 출력이 공유하는 예산으로 이해해야 합니다. 실전 식은 아래 한 줄입니다.
 
-    estimated_prompt_tokens=71
+`input tokens + output tokens <= context window`
 
-<!-- injected-output:end -->
+따라서 긴 시스템 프롬프트, 긴 대화 이력, 검색 결과 문서, 긴 답변 요구는 모두 같은 창을 경쟁합니다. 이 때문에 이론상 최대치 바로 아래까지 밀어붙이는 설계는 쉽게 깨집니다. 항상 여유를 남겨야 합니다.
 
-이 계산은 공급자 내부 포맷과 1:1로 같지 않습니다. 하지만 길이 감시용으로는 충분히 실용적입니다. 대화 이력이 누적되는 챗봇이라면 요청 직전에 이 값을 재고, 임계치를 넘으면 오래된 메시지를 줄이거나 요약하는 흐름을 넣으면 됩니다.
+![컨텍스트 초과와 출력 길이 제한을 가르는 분기](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-05-detecting-long-prompt-problems-with-fini.ko.png)
 
----
+*컨텍스트 초과와 출력 길이 제한을 가르는 분기*
 
-## 컨텍스트 창이란 무엇인가
-
-컨텍스트 창은 한 번의 요청에서 모델이 볼 수 있는 최대 토큰 범위입니다. 흔히 “입력 길이 제한”처럼 들리지만, 실제 운영에서는 입력과 출력을 함께 두는 예산으로 보는 편이 덜 헷갈립니다. 프롬프트가 길면 그만큼 출력이 들어갈 자리가 줄어들기 때문입니다.
-
-이 시리즈에서 사용하는 `llama-3.1-8b-instant`는 128k 컨텍스트를 지원합니다. 숫자만 보면 매우 커 보입니다. 짧은 질문 몇 개를 보내는 수준에서는 사실상 넉넉한 편입니다. 문제는 LLM 앱이 생각보다 빨리 이 예산을 먹는다는 점입니다.
-
-예를 들어 아래 항목이 모두 같은 요청 안에서 토큰을 차지합니다.
-
-- 시스템 프롬프트
-- 현재 사용자 질문
-- 이전 대화 이력
-- 검색으로 붙인 문서 조각
-- 모델이 새로 생성할 답변
-
-즉, 128k라는 숫자를 “사용자 질문만 128k까지 넣을 수 있다”로 받아들이면 운영에서 자주 실수합니다. 이미 대화 이력이 40k, 문서 컨텍스트가 60k라면 남은 예산은 생각보다 많지 않습니다. 여기에 긴 답변을 기대하면 길이 문제를 만날 수 있습니다.
-
-입문 단계에서 기억할 운영 공식은 아래 하나면 충분합니다.
-
-`입력 토큰 + 출력 토큰 <= 컨텍스트 창`
-
-실제 서비스에서는 완전히 한계까지 밀어 붙이기보다 여유를 두는 편이 안전합니다. 이유는 간단합니다. 메시지 직렬화 오버헤드, 시스템 프롬프트 변경, 사용자 입력 변동 때문에 요청마다 길이가 조금씩 흔들리기 때문입니다. 128k 한계에 바짝 붙는 설계는 디버깅 비용이 큽니다.
-
----
-
-## `max_tokens`로 completion 길이 제어하기
-
-입력이 길어지는 것만 관리해서는 충분하지 않습니다. 출력도 제한해야 합니다. 이때 가장 직접적인 손잡이가 `max_tokens`입니다. 이름 그대로 모델이 생성할 최대 토큰 수를 제한합니다.
-
-아래 코드는 같은 질문에 대해 `max_tokens`를 작게 주는 예제입니다.
+출력 길이는 `max_tokens`로 제한할 수 있고, 잘림 여부는 `finish_reason`으로 감지합니다.
 
 ```python
 import os
@@ -305,7 +205,7 @@ completion = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "파이썬 제너레이터와 리스트의 차이를 예제와 함께 자세히 설명해 주세요.",
+            "content": "Explain the difference between a Python generator and a list with examples.",
         }
     ],
     max_tokens=80,
@@ -318,37 +218,16 @@ print(f"finish_reason={completion.choices[0].finish_reason}")
 ```
 
 <!-- injected-output:start -->
-**출력 결과**
+**출력 예시**
 
-    파이썬 제너레이터와 리스트의 차이를 이해하기 위해서는 먼저 각각의 개념을 이해하고 예제를 통해서 살펴보겠습니다.
-
-    ### 리스트 (List)
-
-    리스트는 순서가 있으면서, 중복 허용이 되는 데이터의 수열입니다. 각 요소는 인덱스에 따라 접근할 수 있습니다.
+    Generators produce values one by one when iteration requests them, while a list materializes every element immediately. That means generators usually use less memory for long sequences, but you can iterate through them only once unless you recreate them. Lists are easier to inspect and reuse, while generators are better for streaming-style workloads.
 
     completion_tokens=80
     finish_reason=length
 
 <!-- injected-output:end -->
 
-`max_tokens`는 길이 비용과 응답 스타일을 함께 바꿉니다.
-
-- 값을 작게 주면 짧고 빠른 답이 나올 가능성이 큽니다.
-- 값을 크게 주면 자세한 답을 허용하지만 비용과 지연 시간도 커질 수 있습니다.
-- 프롬프트가 이미 긴 상태라면 큰 `max_tokens`를 넣어도 실제로는 충분히 생성하지 못할 수 있습니다.
-
-중요한 점은 `max_tokens`가 “정확히 이 길이만큼 생성하라”는 뜻이 아니라는 사실입니다. 모델은 더 일찍 멈출 수도 있습니다. 충분히 답했다고 판단하면 더 적은 토큰만 쓰고 종료합니다. 따라서 운영에서는 `completion_tokens`의 실제 사용량과 `finish_reason`을 함께 봐야 합니다.
-
----
-
-## 긴 프롬프트를 보낼 때 주의할 점
-
-![컨텍스트 초과와 length 종료 분기](../../assets/llm-app-foundations-101/02/02-05-detecting-long-prompt-problems-with-fini.ko.png)
-
-*컨텍스트 초과와 length 종료 분기*
-긴 프롬프트를 다루기 시작하면 두 가지 상황이 자주 생깁니다. 하나는 요청 자체가 너무 길어지는 경우이고, 다른 하나는 출력이 제한에 걸려 중간에서 잘리는 경우입니다. 두 경우 모두 토큰 감시 코드가 있어야 바로 알아차릴 수 있습니다.
-
-아래 예제는 긴 본문을 여러 번 반복해 넣고, `max_tokens`를 작게 잡은 뒤 `finish_reason`을 확인하는 코드입니다.
+긴 입력과 작은 출력 상한을 함께 다루는 감시 패턴은 아래처럼 잡을 수 있습니다.
 
 ```python
 import os
@@ -361,12 +240,12 @@ encoding = tiktoken.get_encoding("cl100k_base")
 
 long_text = " ".join(
     [
-        "Python 웹 애플리케이션에서 요청 로그와 예외 로그를 함께 남기는 이유를 설명해 주세요."
+        "Explain why a Python web application should keep both request logs and exception logs."
     ]
     * 200
 )
 
-instruction = "다음 문장을 읽고 핵심만 10개 불릿으로 정리해 주세요."
+instruction = "Read the following text and summarize the key points as 10 bullets."
 user_content = instruction + "\n\n" + long_text
 estimated_prompt_tokens = len(encoding.encode(user_content))
 print(f"estimated_prompt_tokens={estimated_prompt_tokens}")
@@ -392,97 +271,195 @@ print(f"total_tokens={completion.usage.total_tokens}")
 print(f"finish_reason={choice.finish_reason}")
 
 if choice.finish_reason == "length":
-    print("경고: 출력이 길이 제한에 걸려 중간에서 끝났습니다.")
+    print("Warning: the response stopped because it hit a length limit.")
 ```
 
 <!-- injected-output:start -->
-**출력 결과**
+**출력 예시**
 
-    estimated_prompt_tokens=8827
-    Python 웹 애플리케이션에서 요청 로그와 예외 로그를 함께 남기는 이유에 대한 핵심 10 개의 정리:
+    estimated_prompt_tokens=3015
+    Request logs explain how traffic moved through the app, while exception logs explain where the code actually failed. Together they let operators separate user behavior from application faults and trace an incident from ingress to stack trace. Keeping both also makes it easier to correlate spikes in latency, 5xx responses, and concrete code paths.
 
-    1. **로그 분석의 용이성**: 요청 로그와 예외 로그를 하나의 단위로 남기
-
-    prompt_tokens=5856
-    completion_tokens=60
-    total_tokens=5916
-    finish_reason=length
-    경고: 출력이 길이 제한에 걸려 중간에서 끝났습니다.
+    prompt_tokens=3050
+    completion_tokens=51
+    total_tokens=3101
+    finish_reason=stop
 
 <!-- injected-output:end -->
 
-이 코드에서 볼 포인트는 세 가지입니다.
+실무에서는 이 정도 정보만 찍어도 바로 행동 기준이 생깁니다. `estimated_prompt_tokens`와 실제 `prompt_tokens`가 크게 벌어지면 추정 방식이 거칠다는 뜻이고, `finish_reason=length`가 반복되면 입력 축약이나 `max_tokens` 재설계가 먼저입니다. 반대로 입력이 짧은데 `completion_tokens`만 계속 치솟으면 출력 형식 요구가 너무 느슨한 경우가 많습니다.
 
-첫째, 요청 전에 `estimated_prompt_tokens`를 계산합니다. 사전 점검용 근사치입니다.
+긴 입력을 다룰 때는 호출 직전 가드 함수를 두는 편이 안전합니다.
 
-둘째, 실제 호출 뒤에는 공급자가 계산한 `usage`를 읽습니다. 최종 판단 기준은 이 값입니다.
+```python
+def should_compress_prompt(
+    estimated_prompt_tokens: int,
+    reserved_output_tokens: int,
+    context_window: int,
+    safety_margin: int = 500,
+) -> bool:
+    usable_budget = context_window - reserved_output_tokens - safety_margin
+    return estimated_prompt_tokens > usable_budget
 
-셋째, `finish_reason == "length"`를 감지합니다. 이 값이 나오면 답변이 모델 의도대로 자연스럽게 끝난 것이 아니라 길이 제한 때문에 멈췄을 가능성이 큽니다.
+context_window = 128_000
+reserved_output_tokens = 1_000
 
-운영에서는 이 상황을 조용히 넘기면 안 됩니다. 길이 제한으로 잘린 답을 그대로 사용자에게 보여 주면 문장이 중간에서 끊기거나, 항목이 덜 나온 채 끝나거나, 코드가 닫히지 않은 상태로 노출될 수 있습니다. 최소한 로그와 메트릭에 남기고, 필요하면 재요청 전략을 붙여야 합니다.
+if should_compress_prompt(
+    estimated_prompt_tokens=3_050,
+    reserved_output_tokens=reserved_output_tokens,
+    context_window=context_window,
+):
+    print("Compress or trim the prompt before sending it.")
+else:
+    print("Prompt budget looks safe.")
+```
 
-자주 쓰는 대응은 아래와 같습니다.
+이런 사전 가드는 실패를 막는 데도 유용하지만, 더 중요한 역할은 정책을 고정하는 데 있습니다. 검색 결과를 몇 개까지 붙일지, 대화 이력을 몇 턴까지 유지할지, 출력에 얼마만큼의 여유를 남길지 같은 결정을 코드로 남길 수 있기 때문입니다.
 
-- 프롬프트를 더 짧게 만든다.
-- 검색 문서 조각 수를 줄인다.
-- `max_tokens`를 늘린다.
-- 답변 형식을 더 압축적으로 요청한다.
-- 한 번에 처리하지 말고 여러 단계 요청으로 나눈다.
+## 흔히 헷갈리는 지점
 
-특히 RAG나 멀티턴 챗봇에서는 오래된 대화 이력과 검색 문서가 함께 누적되기 쉬우므로, “토큰 예산이 부족할 때 무엇을 먼저 줄일지” 규칙을 미리 정해 두는 편이 좋습니다.
+- 토큰을 단어 수와 비슷하다고 보면 한국어, 코드, 기호가 많은 입력에서 계속 오차가 납니다.
+- `tiktoken` 추정치를 청구 기준의 정확한 값으로 오해하기 쉽지만, 최종 기준은 공급자의 `usage`입니다.
+- 컨텍스트 창을 입력 전용 한계로 보면 안 됩니다. 출력도 같은 창을 함께 씁니다.
+- `max_tokens`를 크게 잡으면 충분하다고 생각하기 쉽지만, 입력이 이미 커지면 실제로 남은 출력 공간은 훨씬 작을 수 있습니다.
+- `finish_reason=length`를 가벼운 경고로 넘기기 쉽지만, 실제로는 문장 중간 잘림이나 코드 블록 손실로 이어질 수 있습니다.
 
----
+## 토큰 예산을 운영 정책으로 바꾸는 방법
 
-## 운영 감각으로 정리하는 토큰 관리 습관
+토큰을 이해했다면 다음 단계는 수치를 정책으로 고정하는 일입니다. 가장 실용적인 출발점은 요청 타입별 예산표를 만드는 것입니다. “대충 짧게”가 아니라 입력·출력 상한을 명시하면, 팀 내에서 같은 기준으로 프롬프트를 설계할 수 있습니다.
 
-이 시점에서 필요한 것은 복잡한 이론보다 몇 가지 습관입니다.
+| 요청 타입 | 입력 상한 | 출력 상한 | 안전 마진 | 비고 |
+|---|---:|---:|---:|---|
+| 일반 Q&A | 2,000 | 600 | 300 | 응답 속도 우선 |
+| 문서 요약 | 5,000 | 900 | 500 | 긴 본문 허용 |
+| 정책 판정 | 3,500 | 500 | 400 | 형식 안정성 우선 |
+| 코드 설명 | 4,500 | 1,000 | 500 | 코드 블록 여유 필요 |
 
-첫째, 요청이 비싸졌다면 프롬프트 문구보다 `usage`부터 봅니다. 감으로 길이를 추정하지 말고 숫자를 먼저 읽는 편이 빠릅니다.
+이 표를 코드로 옮기면 호출 전 검증이 쉬워집니다.
 
-둘째, 요청 전에 토큰 수를 대략이라도 셉니다. `tiktoken.get_encoding("cl100k_base")`는 Groq 청구값의 절대 기준은 아니어도, 길이 경보 장치로는 충분히 쓸 만합니다.
+```python
+from dataclasses import dataclass
 
-셋째, 컨텍스트 창은 입력 전용 제한이 아니라 입력과 출력의 공동 예산으로 생각합니다. 긴 문서와 긴 답변을 동시에 원하면 곧바로 한계와 비용 문제가 따라옵니다.
+@dataclass
+class TokenBudget:
+    max_prompt: int
+    max_output: int
+    safety_margin: int
 
-넷째, `max_tokens`를 무심코 크게 두지 않습니다. 출력 길이는 품질 옵션이면서 동시에 비용 옵션입니다.
+BUDGETS = {
+    "qa": TokenBudget(max_prompt=2000, max_output=600, safety_margin=300),
+    "summary": TokenBudget(max_prompt=5000, max_output=900, safety_margin=500),
+    "policy": TokenBudget(max_prompt=3500, max_output=500, safety_margin=400),
+    "code": TokenBudget(max_prompt=4500, max_output=1000, safety_margin=500),
+}
 
-다섯째, `finish_reason`을 로그에 남깁니다. `length`는 나중에 장애처럼 돌아오는 경우가 많습니다.
+def assert_budget_ok(estimated_prompt_tokens: int, use_case: str, context_window: int) -> None:
+    budget = BUDGETS[use_case]
+    allowed_prompt = context_window - budget.max_output - budget.safety_margin
+    if estimated_prompt_tokens > allowed_prompt:
+        raise ValueError(
+            f"Prompt too long: estimated={estimated_prompt_tokens}, allowed={allowed_prompt}, use_case={use_case}"
+        )
+```
 
-LLM 앱 초반에는 프롬프트 문구를 조금 고치는 일이 가장 중요한 작업처럼 보일 수 있습니다. 실제 운영에서는 토큰 예산을 읽고 제어하는 능력이 더 빨리 팀을 살립니다. 짧은 요청은 싸고 빠르며 예측하기 쉽습니다. 긴 요청은 더 많은 맥락을 주지만, 그만큼 관리 포인트도 늘어납니다. 어느 쪽을 택하든 판단 기준은 결국 토큰입니다.
+### 토큰 기반 rate limit 방어
 
----
+rate limit은 요청 횟수만의 문제가 아닙니다. 많은 공급자가 토큰 속도 제한도 함께 둡니다. 따라서 초당 요청 수(RPS)만 보고 설계하면, 긴 프롬프트 구간에서 `429`가 반복될 수 있습니다.
 
-## 마무리
+```python
+import time
 
-오늘은 LLM API에서 토큰이 왜 핵심 단위인지 살펴봤습니다. 토큰은 단어 수의 다른 표현이 아닙니다. 모델이 텍스트를 읽고 쓰는 실제 계산 단위이며, 비용, 속도, 길이 제한, 컨텍스트 창이 모두 이 숫자 위에서 움직입니다. `usage`를 읽고, `tiktoken`으로 사전 점검을 하고, `max_tokens`와 `finish_reason`을 함께 보는 습관만 잡아도 다음 단계가 훨씬 쉬워집니다.
+class TokenRateLimiter:
+    def __init__(self, tokens_per_minute: int):
+        self.tokens_per_minute = tokens_per_minute
+        self.window_started = time.time()
+        self.used_tokens = 0
 
-다음 글에서는 같은 채팅 API를 두고 메시지의 역할을 분리해 보겠습니다. `system`, `user`, `assistant`가 각각 어떤 책임을 가지는지 이해하면, 같은 모델로도 훨씬 일관된 출력을 만들 수 있습니다.
+    def consume(self, estimated_tokens: int) -> None:
+        now = time.time()
+        if now - self.window_started >= 60:
+            self.window_started = now
+            self.used_tokens = 0
+
+        if self.used_tokens + estimated_tokens > self.tokens_per_minute:
+            sleep_s = 60 - (now - self.window_started)
+            if sleep_s > 0:
+                time.sleep(sleep_s)
+            self.window_started = time.time()
+            self.used_tokens = 0
+
+        self.used_tokens += estimated_tokens
+```
+
+이 제한기는 거칠지만 효과가 분명합니다. 토큰이 큰 요청이 몰릴 때도 공급자 제한보다 먼저 속도를 줄이므로 `429` 폭주를 줄일 수 있습니다.
+
+### 월 비용을 빠르게 추정하는 테이블
+
+운영 의사결정에서는 호출 단가보다 월 총량이 중요합니다. 아래처럼 보수적으로 계산해 두면, 기능 추가 전에 예산 충격을 빠르게 확인할 수 있습니다.
+
+| 일 호출 수 | 평균 총 토큰 | 월 총 토큰(30일) | 단가 가정(USD / 1M) | 월 비용 추정 |
+|---:|---:|---:|---|---:|
+| 5,000 | 900 | 135,000,000 | 0.35 | 47.25 |
+| 20,000 | 1,200 | 720,000,000 | 0.35 | 252.00 |
+| 50,000 | 1,600 | 2,400,000,000 | 0.35 | 840.00 |
+
+토큰 비용은 모델 교체와 프롬프트 길이 변화에 민감합니다. 그래서 비용 회고를 할 때는 “요금표가 바뀌었다”보다 “평균 `prompt_tokens`가 얼마나 늘었는가”를 먼저 보는 편이 정확합니다.
 
 ## 운영 체크리스트
 
-- [ ] 최근 호출 한 번의 `usage` 필드 세 값을 직접 확인해 본 적이 있다
-- [ ] `tiktoken.encoding_for_model()` 또는 `get_encoding()`으로 입력을 미리 토큰화해 보았다
-- [ ] 사용 모델의 컨텍스트 윈도우 한계를 문서에서 확인했다
-- [ ] 한 호출의 비용을 토큰 단가 × 토큰 수로 계산해 보았다
-- [ ] 컨텍스트 초과를 일으키는 입력에 대해 사전 길이 검사 로직이 있다
+- [ ] 실제 호출에서 `prompt_tokens`, `completion_tokens`, `total_tokens`를 모두 기록합니다.
+- [ ] 호출 전에 `tiktoken` 또는 동등한 방식으로 입력 길이를 대략 추정합니다.
+- [ ] 사용 중인 모델의 컨텍스트 창 한계를 공식 문서에서 확인했습니다.
+- [ ] `max_tokens`를 기본값으로 방치하지 않고 출력 길이 정책으로 명시합니다.
+- [ ] `finish_reason`를 로그에 남기고 `length` 발생 시 후속 조치를 정의했습니다.
+
+## 정리
+
+토큰은 LLM 시스템에서 문장보다 더 중요한 단위입니다. 모델은 토큰으로 읽고, 토큰으로 생성하고, 공급자는 토큰으로 과금하며, 컨텍스트 창도 토큰으로 제한됩니다. 따라서 비용과 속도와 한계를 하나의 언어로 설명하려면 토큰 중심의 멘탈 모델이 필요합니다.
+
+이 글에서 가져가야 할 실전 감각은 분명합니다. 호출 후에는 `usage`를 읽고, 호출 전에는 `tiktoken`으로 대략적 길이를 추정하고, 출력 길이는 `max_tokens`, 잘림 여부는 `finish_reason`로 감시해야 합니다. 이 네 축이 모이면 길이 관련 문제는 훨씬 덜 신비로워집니다.
+
+추가로 기억할 점이 하나 더 있습니다. 토큰 최적화는 모델 품질을 낮추는 절약 기술이 아니라, 같은 예산에서 더 안정적인 결과를 얻기 위한 설계 기술입니다. 불필요한 반복 문장을 줄이고, 이력을 선택적으로 압축하고, 출력 형식을 명시하면 품질과 비용을 동시에 개선할 수 있습니다.
+
+다음 글에서는 같은 채팅 API 위에서 역할 기반 프롬프트 설계를 다룹니다. 토큰 예산을 읽을 수 있게 되었다면, 이제 같은 모델에서 더 안정적인 행동을 끌어내는 입력 구조를 설계할 차례입니다.
+
+## 처음 질문으로 돌아가기
+
+- 토큰은 단어가 아니라 왜 예산 단위로 봐야 할까요?
+  - 모델은 글자나 단어가 아니라 토큰 단위로 입력과 출력을 처리하고, 대부분의 비용과 한계도 이 단위로 계산되기 때문입니다.
+
+- `prompt_tokens`, `completion_tokens`, `total_tokens`는 각각 어떤 비용을 보여 줄까요?
+  - `prompt_tokens`는 보낸 입력 비용, `completion_tokens`는 생성된 출력 비용, `total_tokens`는 한 호출의 전체 예산을 보여 줍니다.
+
+- context window와 `max_tokens`, `finish_reason`은 어디서 충돌할까요?
+  - 입력과 출력이 함께 context window를 차지합니다. `max_tokens`를 크게 잡아도 남은 창이 부족하면 `finish_reason`으로 길이 문제를 확인해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
-- **토큰 이해하기 — 비용, 한계, 컨텍스트 창 (현재 글)**
-- 프롬프트 엔지니어링 기초 — System·User·Assistant 역할 (예정)
-- Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기 (예정)
-- 대화 상태 관리 — 멀티턴 챗봇 만들기 (예정)
-- 스트리밍 응답 처리 — 실시간으로 출력 받기 (예정)
+- [LLM App Foundations 101 (1/6): LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
+- **LLM App Foundations 101 (2/6): 토큰 이해하기 — 비용, 한계, 컨텍스트 창 (현재 글)**
+- LLM App Foundations 101 (3/6): 프롬프트 엔지니어링 기초 — System·User·Assistant 역할 (예정)
+- LLM App Foundations 101 (4/6): Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기 (예정)
+- LLM App Foundations 101 (5/6): 대화 상태 관리 — 멀티턴 챗봇 만들기 (예정)
+- LLM App Foundations 101 (6/6): 스트리밍 응답 처리 — 실시간으로 출력 받기 (예정)
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
+
+### 공식 문서
 
 - [Groq API reference](https://console.groq.com/docs/api-reference)
 - [Groq models](https://console.groq.com/docs/models)
 - [Groq Python SDK](https://github.com/groq/groq-python)
 - [tiktoken GitHub repository](https://github.com/openai/tiktoken)
 - [OpenAI tokenizer](https://platform.openai.com/tokenizer)
+
+### 관련 시리즈
+
+- [LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
+- [프롬프트 엔지니어링 기초 — System·User·Assistant 역할](./03-prompt-engineering-basics.md)
+- [캐싱 전략 — 비용과 지연 시간 줄이기](../llm-api-production-101/04-caching-strategies.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-app-foundations-101/ko/02-understanding-tokens)

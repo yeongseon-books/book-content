@@ -1,11 +1,11 @@
 ---
-title: list, tuple, set, dict
+title: "Python 101 (4/10): list, tuple, set, dict"
 series: python-101
 episode: 4
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -22,22 +22,21 @@ seo_description: 'The four collections differ along four axes: mutability, order
   duplicates allowed, and hashability.'
 ---
 
-# list, tuple, set, dict
+# Python 101 (4/10): list, tuple, set, dict
 
-## What you will learn
+These four collections diverge along four axes: mutability, order, duplicates, and hashability. Picking the right one is really about choosing which trade-offs matter for the job.
 
-By the end of this chapter you will be able to explain and code the following:
+This post is the 4th article in the Python 101 series. This is the stage in the series where collection trade-offs become concrete.
 
-- How to tell list, tuple, set, and dict apart along the axes of mutability, order, duplicates, and hashability
-- A first-cut decision rule for which collection to reach for
-- Core methods like slicing, `append`/`extend`, `pop`, `update`
-- One-line data transformations through list, set, and dict comprehensions
-- What "hashable" means and why dict keys and set members must be hashable
-- The aliasing accidents that come from confusing assignment with copying
-- The mutable-default-argument trap and how to avoid it
-- How `dict.get`, `setdefault`, and `collections.defaultdict` keep missing keys safe
 
-Code blocks marked with `>>>` are REPL transcripts you can paste directly. Blocks without `>>>` are illustrative excerpts that assume the surrounding variables already exist.
+![Python 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/04/04-01-mental-model.en.png)
+*Python 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
+
+- How to tell list, tuple, set, and dict apart along the axes of mutability, order, duplicates, and hashability?
+- A first-cut decision rule for which collection to reach for?
+- Core methods like slicing, `append`/`extend`, `pop`, `update`?
 
 ## Why this matters
 
@@ -57,9 +56,6 @@ This chapter consolidates the four collections onto a single page so the next ch
 > The four collections differ along four axes: mutability, order, duplicates allowed, and hashability. Choosing a collection is choosing which guarantees on those four axes you accept and which you give up.
 Group the four collections along three axes — mutability, order, and hashability — and they sit cleanly in memory.
 
-![Mental model](../../assets/python-101/04/04-01-mental-model.en.png)
-
-*Mental model*
 Three rules carry most of the weight.
 
 1. **Mutable (list, dict, set)** can be changed in place after creation; **immutable (tuple, str, int)** cannot.
@@ -70,7 +66,7 @@ Three rules carry most of the weight.
 
 ### 1) list — ordered and mutable
 
-```python
+```text
 >>> nums = [3, 1, 4, 1, 5]
 >>> nums.append(9)
 >>> nums
@@ -92,7 +88,7 @@ Three rules carry most of the weight.
 
 `append` versus `extend` is another classic confusion.
 
-```python
+```text
 >>> a = [1, 2]
 >>> a.append([3, 4])
 >>> a
@@ -105,7 +101,7 @@ Three rules carry most of the weight.
 
 ### 2) tuple — ordered and immutable
 
-```python
+```text
 >>> point = (3, 4)
 >>> x, y = point          # unpacking
 >>> x, y
@@ -120,7 +116,7 @@ Tuples express identity for a small bundle of values: a coordinate `(x, y)`, an 
 
 A single-element tuple needs the trailing comma. `(1)` is just an integer.
 
-```python
+```text
 >>> type((1))
 <class 'int'>
 >>> type((1,))
@@ -131,7 +127,7 @@ A single-element tuple needs the trailing comma. `(1)` is just an integer.
 
 Sets shine at membership checks and deduplication.
 
-```python
+```text
 >>> seen = {1, 2, 3}
 >>> seen.add(2)             # already present; ignored
 >>> seen
@@ -148,7 +144,7 @@ True
 
 The empty set is `set()`, not `{}`. `{}` is an empty dict.
 
-```python
+```text
 >>> type({})
 <class 'dict'>
 >>> type(set())
@@ -161,7 +157,7 @@ A set's iteration order is not guaranteed. When tests compare output, sort first
 
 `dict` is the workhorse. From Python 3.7 onward it preserves insertion order.
 
-```python
+```text
 >>> user = {"name": "ada", "age": 30}
 >>> user["name"]
 'ada'
@@ -188,7 +184,7 @@ Dict keys and set members must be **hashable** — once created their value cann
 - Hashable: `int`, `float`, `str`, `bool`, `bytes`, and a `tuple` whose elements are all hashable.
 - Not hashable: `list`, `set`, `dict` — being mutable, their hash could change underneath the container.
 
-```python
+```text
 >>> {(1, 2), (3, 4)}                    # tuples are hashable
 {(1, 2), (3, 4)}
 >>> {[1, 2], [3, 4]}
@@ -203,7 +199,7 @@ To put a set inside a set, use `frozenset`.
 
 list, set, and dict each support comprehension syntax.
 
-```python
+```text
 >>> [n * n for n in range(5)]
 [0, 1, 4, 9, 16]
 >>> [n for n in range(10) if n % 2 == 0]
@@ -374,13 +370,36 @@ If you already know `Counter`, steps 2 and 3 collapse into a single line. After 
 
 The next chapter covers control flow — `if`, `for`, `while` — and shows how `enumerate`, `zip`, `range`, and comprehensions combine into loops that read well.
 
+## Answering the Opening Questions
+
+- **How to tell list, tuple, set, and dict apart along the axes of mutability, order, duplicates, and hashability?**
+  - The article treats list, tuple, set, dict as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **A first-cut decision rule for which collection to reach for?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Core methods like slicing, `append`/`extend`, `pop`, `update`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- [Python 101 (1/10): Why Python, and how to install and use venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): Variables, types, and operators](./02-variables-types-operators.md)
+- [Python 101 (3/10): Strings and formatting](./03-strings-and-formatting.md)
+- **list, tuple, set, dict (current)**
+- Control flow: if, for, while, comprehension (upcoming)
+- Functions and arguments: def, args, kwargs, default, lambda (upcoming)
+- Modules and packages: import, __init__, __name__ (upcoming)
+- File I/O and exception handling (upcoming)
+- Classes and objects: bundling data with behavior (upcoming)
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- Python docs — Built-in Types: https://docs.python.org/3/library/stdtypes.html
-- Python docs — `collections` module: https://docs.python.org/3/library/collections.html
-- Python docs — Data Structures tutorial: https://docs.python.org/3/tutorial/datastructures.html
-- PEP 274 — Dict Comprehensions: https://peps.python.org/pep-0274/
-- TimeComplexity (CPython collection complexity): https://wiki.python.org/moin/TimeComplexity
+- [Python docs — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — Official behavior reference for list, tuple, set, dict, and hashability constraints.
+- [Python tutorial — Data Structures](https://docs.python.org/3/tutorial/datastructures.html) — Walks through list methods, tuples, sets, dictionaries, and comprehensions with beginner-friendly examples.
+- [PEP 274 — Dict Comprehensions](https://peps.python.org/pep-0274/) — Primary source for the dict-comprehension syntax discussed in the chapter.
+- [Python Wiki — TimeComplexity](https://wiki.python.org/moin/TimeComplexity) — Useful for the chapter’s performance comparison between linear list membership and average O(1) dict/set lookups.
+- [Python docs — `collections`](https://docs.python.org/3/library/collections.html) — Introduces supporting containers such as `namedtuple` and `deque` that refine data-structure choices.
+- [Python docs — Data Model](https://docs.python.org/3/reference/datamodel.html) — Adds formal background on mutable versus immutable objects.

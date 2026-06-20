@@ -1,10 +1,10 @@
 ---
 series: data-warehouse-101
 episode: 7
-title: BI and Dashboard
-status: content-ready
+title: "Data Warehouse 101 (7/10): BI and Dashboard"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,35 @@ tags:
   - Visualization
   - Analytics
 seo_description: The role of BI tools and dashboards, what makes a good dashboard, and the visualization principles that turn numbers into decisions.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# BI and Dashboard
+# Data Warehouse 101 (7/10): BI and Dashboard
 
-> Data Warehouse 101 series (7/10)
+Warehouses do not create decisions by themselves. Teams still need a screen that turns a broad question into one number, one comparison, and one obvious next drill-down. When that layer is noisy, even clean data models feel useless.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Data Warehouse 101 series.
 
-**Core question**: What does it take for a *number* to become a *decision*? Why do *dashboards* get *ignored* so often?
+In this post, we move from storage to consumption. The focus is on how metric definitions, dashboard layout, and drill-down order determine whether a chart becomes an operating tool or just another report no one trusts.
 
-> *A dashboard answers a question. It is not a place to show off your data.*
 
-<!-- a-grade-intro:end -->
+![data warehouse 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/07/07-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 7 flow overview*
+> BI is the process of turning data into decisions; a dashboard is one medium for that communication. Good dashboards start with the right question, not the available data.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying BI and Dashboard?
+- Which signal should the example or diagram make visible for BI and Dashboard?
+- What failure should be prevented first when BI and Dashboard reaches a real system?
+
+## Questions this article answers
+
+- Why do different teams reach different conclusions even when they look at the same number?
+- What role should BI tools play, and what role should dashboards play?
+- What question structure does a good dashboard need?
+- In what order should KPI, trend, and drill-down appear on the screen?
+- When a dashboard keeps failing, is the problem often the design rather than the data?
 
 ## What You Will Learn
 
@@ -46,15 +61,7 @@ BI is the *last centimeter* of a warehouse. You can model *billions of rows* per
 
 > *A dashboard's success is measured in *decisions made*, not in *opens*.*
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    DW["Warehouse / Mart"] --> Semantic["Semantic Layer"]
-    Semantic --> BI["BI Tool"]
-    BI --> Dashboard["Dashboard"]
-    Dashboard --> Decision["Decision"]
-```
+This picture shows how BI connects warehouse data to business action. The key is not to memorize dashboard tool features, but to understand which metrics matter and why.
 
 ## Key Terms
 
@@ -162,17 +169,29 @@ Quarterly review slides start with a *dashboard screenshot*. *Looker / Tableau* 
 
 BI is the *face of the warehouse*. Next we cover *data marts* — analytics scoped to a domain.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying BI and Dashboard?**
+  - The article treats BI and Dashboard as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for BI and Dashboard?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when BI and Dashboard reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
-- [OLTP and OLAP](./02-oltp-and-olap.md)
-- [Fact and Dimension](./03-fact-and-dimension.md)
-- [Star Schema](./04-star-schema.md)
-- [Partition and Clustering](./05-partition-and-clustering.md)
-- [ETL and ELT](./06-etl-and-elt.md)
+## In this series
+
+- [Data Warehouse 101 (1/10): What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
+- [Data Warehouse 101 (2/10): OLTP and OLAP](./02-oltp-and-olap.md)
+- [Data Warehouse 101 (3/10): Fact and Dimension](./03-fact-and-dimension.md)
+- [Data Warehouse 101 (4/10): Star Schema](./04-star-schema.md)
+- [Data Warehouse 101 (5/10): Partition and Clustering](./05-partition-and-clustering.md)
+- [Data Warehouse 101 (6/10): ETL and ELT](./06-etl-and-elt.md)
 - **BI and Dashboard (current)**
 - Data Mart (upcoming)
 - Performance Optimization (upcoming)
 - Warehouse Design Example (upcoming)
+
 <!-- toc:end -->
 
 ## References

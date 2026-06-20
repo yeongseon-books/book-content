@@ -1,0 +1,7 @@
+flowchart TD
+  Events["External Events"] --> Adapter["KEDA Metrics Adapter"]
+  HTTP["HTTP Traffic"] --> Envoy["Envoy Proxy Metrics"]
+  Envoy --> Adapter
+  Adapter --> API["Metrics API"]
+  API --> HPA["HPA"]
+  HPA --> Replicas["App Replicas (0 to N)"]

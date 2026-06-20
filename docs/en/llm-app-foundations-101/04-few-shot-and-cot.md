@@ -1,11 +1,11 @@
 ---
-title: Few-shot and chain-of-thought — steering better answers
+title: "LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers"
 series: llm-app-foundations-101
 episode: 4
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,26 +14,17 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-05-01'
-seo_description: 'Example code: github.com/yeongseon-books/llm-app-foundations-101'
+last_reviewed: '2026-05-15'
+seo_description: Improve LLM performance on complex tasks using few-shot prompting for style consistency and chain-of-thought reasoning for logical accuracy.
 ---
 
-# Few-shot and chain-of-thought — steering better answers
+# LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers
 
-> LLM App Foundations 101 (4/6)
-
-Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/04-few-shot-and-cot)
-
-The diagram below shows how examples and stepwise reasoning steer one request.
-
-![Few-shot and chain-of-thought: steering better answers](../../assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.en.png)
-
-*Few-shot and chain-of-thought: steering better answers*
 Post 03 established the basic shape of prompt design: split policy into `system`, put the current request in `user`, and replay earlier answers as `assistant` when you need conversation state. Once that foundation is in place, the next practical question shows up immediately. Why does the same model sometimes follow the format you want very closely, while other times it gives something that feels almost right but not dependable enough to automate?
 
 In application work, two of the first steering tools you reach for are few-shot prompting and chain-of-thought prompting. Few-shot means showing the model one or more examples of the behavior you want. Chain-of-thought means nudging the model to solve the task in intermediate steps instead of jumping straight to the final answer. Neither technique retrains the model. Both are ways to make an already capable model behave more predictably on the request in front of it.
 
-This post uses Groq's `llama-3.1-8b-instant` to cover both patterns in runnable Python. We will look at seven things:
+This is the fourth post in the LLM App Foundations 101 series. Here, we use Groq's `llama-3.1-8b-instant` to cover both patterns in runnable Python. We will look at seven things:
 
 - what few-shot prompting is in message-array form
 - how zero-shot and few-shot differ on the same task
@@ -47,17 +38,19 @@ The operating idea is simple: better prompts are often less about clever wording
 
 ---
 
-## Questions this chapter answers
+![Few-shot and chain-of-thought: steering better answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.en.png)
+*Few-shot and chain-of-thought: steering better answers*
+> Few-shot stabilizes the answer shape; chain-of-thought stabilizes the path.
 
-- How does few-shot prompting actually "teach" inside a single chat call?
-- When does adding more examples improve output, and when does it just burn tokens?
-- How does chain-of-thought differ from "explain your answer" prompting?
-- When do zero-shot CoT and few-shot CoT each fit best?
-- When do these techniques stop helping, and what should you reach for instead?
+## Questions to Keep in Mind
+
+- What does few-shot teach, and what does chain-of-thought teach?
+- When should you choose zero-shot, few-shot, or CoT?
+- Why can weak examples make the answer worse?
 
 ## Few-shot prompting teaches by example inside the messages array
 
-![Example pairs steering the final answer](../../assets/llm-app-foundations-101/04/04-01-few-shot-prompting-teaches-by-example-in.en.png)
+![Example pairs steering the final answer](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-prompting-teaches-by-example-in.en.png)
 
 *Example pairs steering the final answer*
 Few-shot prompting is the practice of placing one or more worked examples before the real question. In chat APIs, those examples are not stored in a separate training field. They live in the same `messages` array as everything else, usually as paired `user` and `assistant` turns.
@@ -137,7 +130,7 @@ Three things matter here. First, few-shot is just message-array design. Second, 
 
 ## Zero-shot versus few-shot on the same request
 
-![Zero-shot and few-shot stability comparison](../../assets/llm-app-foundations-101/04/04-02-zero-shot-versus-few-shot-on-the-same-re.en.png)
+![Zero-shot and few-shot stability comparison](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-02-zero-shot-versus-few-shot-on-the-same-re.en.png)
 
 *Zero-shot and few-shot stability comparison*
 Zero-shot means you ask for the task directly with no examples. You rely on the model's general training and instruction-following ability. That often works surprisingly well, especially for simple classification or summarization tasks. The weakness is consistency. The model may understand the task but still vary the label wording, the answer structure, or the level of explanation.
@@ -227,7 +220,7 @@ That difference matters because applications care less about one impressive answ
 
 ## Example quality can help or hurt
 
-![Weak and strong example comparison](../../assets/llm-app-foundations-101/04/04-03-example-quality-can-help-or-hurt.en.png)
+![Weak and strong example comparison](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-03-example-quality-can-help-or-hurt.en.png)
 
 *Weak and strong example comparison*
 Few-shot prompting is only as good as the examples you provide. That sounds obvious, but it is one of the most common failure modes in early LLM applications. Developers add examples expecting an automatic boost, and the outputs become less consistent instead of more consistent.
@@ -348,7 +341,7 @@ In practice, good few-shot examples are usually:
 
 ## Chain-of-thought helps the model decompose the task
 
-![Stepwise reasoning path to final_answer](../../assets/llm-app-foundations-101/04/04-04-chain-of-thought-helps-the-model-decompo.en.png)
+![Stepwise reasoning path to final_answer](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-04-chain-of-thought-helps-the-model-decompo.en.png)
 
 *Stepwise reasoning path to final_answer*
 If few-shot is about answer patterns, chain-of-thought is about solution process. The familiar version is a phrase such as “Let's think step by step.” The reason this often works is not mystical. Multi-step tasks become easier when the model is nudged to compute or check intermediate states instead of leaping directly to the conclusion.
@@ -582,7 +575,7 @@ This pattern is useful because it improves more than answer quality. It improves
 
 ## Where these techniques stop helping
 
-![When prompting should yield to other tools](../../assets/llm-app-foundations-101/04/04-05-where-these-techniques-stop-helping.en.png)
+![When prompting should yield to other tools](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-05-where-these-techniques-stop-helping.en.png)
 
 *When prompting should yield to other tools*
 Few-shot and CoT are powerful, but they are not universal fixes.
@@ -625,15 +618,26 @@ The next post moves from static prompt design to dynamic conversation state. Few
 - [ ] Multi-step reasoning tasks include an explicit "think step by step" instruction
 - [ ] Combined few-shot + CoT calls fit inside the model's context window
 
+## Answering the Opening Questions
+
+- What does few-shot teach, and what does chain-of-thought teach?
+  - Few-shot teaches the output pattern through examples; chain-of-thought teaches a stepwise path toward the answer.
+
+- When should you choose zero-shot, few-shot, or CoT?
+  - Start with zero-shot, add few-shot when the answer shape drifts, and consider CoT when the task needs decomposition.
+
+- Why can weak examples make the answer worse?
+  - The model imitates example quality, so weak or unrepresentative examples can inject the wrong format and the wrong decision rule.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LLM API first call — sending your first request](./01-llm-api-first-call.md)
-- [Understanding tokens — cost, limits, and context windows](./02-understanding-tokens.md)
-- [Prompt engineering basics — system, user, and assistant roles](./03-prompt-engineering-basics.md)
-- **Few-shot and chain-of-thought — steering better answers (current)**
-- Managing conversation state — building a multi-turn chatbot (upcoming)
-- Handling streaming responses — real-time output (upcoming)
+- [LLM App Foundations 101 (1/6): LLM API first call — sending your first request](./01-llm-api-first-call.md)
+- [LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows](./02-understanding-tokens.md)
+- [LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles](./03-prompt-engineering-basics.md)
+- **LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers (current)**
+- LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot (upcoming)
+- LLM App Foundations 101 (6/6): Handling streaming responses — real-time output (upcoming)
 
 <!-- toc:end -->
 
@@ -641,8 +645,19 @@ The next post moves from static prompt design to dynamic conversation state. Few
 
 ## References
 
-- Groq Docs, "Text chat": <https://console.groq.com/docs/text-chat>
-- Groq Python Library: <https://github.com/groq/groq-python>
-- OpenAI, "Prompt engineering": <https://platform.openai.com/docs/guides/prompt-engineering>
-- Anthropic Docs, "Prompt engineering overview": <https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview>
-- Jason Wei et al., "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models": <https://arxiv.org/abs/2201.11903>
+### Official docs
+
+- [Groq Docs: Text chat](https://console.groq.com/docs/text-chat)
+- [Groq Python SDK](https://github.com/groq/groq-python)
+- [OpenAI Platform Docs: Prompt engineering](https://platform.openai.com/docs/guides/prompt-engineering)
+- [Anthropic Docs: Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)
+
+### Research
+
+- [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
+
+### Related series
+
+- [Managing conversation state — building a multi-turn chatbot](./05-conversation-state.md)
+- [Prompt engineering basics — system, user, and assistant roles](./03-prompt-engineering-basics.md)
+- [Tool calling — connecting functions to the model](../llm-api-production-101/02-tool-calling.md)

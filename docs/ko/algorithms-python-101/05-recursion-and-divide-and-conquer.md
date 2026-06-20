@@ -1,48 +1,60 @@
 ---
 series: algorithms-python-101
 episode: 5
-title: 재귀와 분할 정복
-status: content-ready
+title: "Algorithms with Python 101 (5/10): 재귀와 분할 정복"
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
 tags:
   - Python
-  - 알고리즘
-  - 재귀
-  - 분할 정복
-  - 하노이 탑
-seo_description: Python으로 재귀와 분할 정복 패턴을 이해하고 실전 문제에 적용합니다.
-last_reviewed: '2026-05-04'
+  - Algorithms
+  - Recursion
+  - Divide and Conquer
+  - Tower of Hanoi
+seo_description: 재귀 함수의 동작 원리와 기저 조건의 중요성을 호출 스택 시각화로 이해합니다. 문제를 쪼개어 해결하는 분할 정복 전략을 파이썬 예제로 배웁니다.
+last_reviewed: '2026-05-12'
 ---
 
-# 재귀와 분할 정복
+# Algorithms with Python 101 (5/10): 재귀와 분할 정복
 
-> Algorithms with Python 101 시리즈 (5/10)
+재귀는 겉으로 보면 단순한데, 실제로 구현할 때는 갑자기 어렵게 느껴지는 개념입니다. 하지만 한 번 감이 잡히면 많은 알고리즘 패턴이 훨씬 일관되게 보이기 시작합니다.
 
+이 글은 Algorithms with Python 101 시리즈의 다섯 번째 글입니다. 여기서는 먼저 재귀를 구체적으로 이해하고, 그다음 분할 정복으로 문제를 푸는 감각을 만들어 보겠습니다.
 
-## 이 글에서 다룰 문제
+분할 정복은 그 패턴 가운데에서도 특히 중요합니다. 이진 탐색, 병합 정렬, 퀵 정렬처럼 이미 본 알고리즘들이 모두 이 아이디어 위에 서 있습니다.
 
-재귀는 트리 탐색, 그래프 탐색, 정렬, 동적 계획법 등 거의 모든 고급 알고리즘의 기반입니다. 재귀를 이해하지 못하면 이후 알고리즘을 배우기 어렵습니다.
+![Algorithms with Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/05/05-01-big-picture.ko.png)
+*Algorithms with Python 101 5장 흐름 개요*
 
-> 분할 정복 = 문제를 작은 부분으로 나누고(Divide), 각각 해결한 뒤(Conquer), 결과를 합치는(Combine) 전략
+## 먼저 던지는 질문
 
-분할 정복은 병합 정렬, 퀵 정렬, 이진 탐색의 공통 패턴입니다. 이 패턴을 인식하면 새로운 문제도 체계적으로 풀 수 있습니다.
+- 재귀 함수는 어떻게 동작하고 호출 스택은 어떤 모양일까요?
+- 기저 조건은 왜 그렇게 중요할까요?
+- 분할 정복의 세 단계는 어떻게 구분할 수 있을까요?
 
-## 핵심 개념 잡기
+## 왜 중요한가
 
-> 재귀 = 함수가 자기 자신을 호출하여 반복 작업을 수행하는 기법
+재귀는 트리 순회, 그래프 순회, 정렬, 동적 계획법의 기반입니다. 재귀를 이해하지 못하면 이후 알고리즘 주제들이 갑자기 훨씬 불투명해집니다.
 
-```
-factorial(4) 호출 과정:
+> 분할 정복은 문제를 더 작은 조각으로 나누고(Divide), 각 조각을 해결하고(Conquer), 결과를 합치는(Combine) 전략입니다.
+
+병합 정렬, 퀵 정렬, 이진 탐색을 하나의 패턴으로 묶어 이해할 수 있다는 점이 중요합니다. 새로운 문제를 봐도 "쪼개서 풀 수 있는가"를 먼저 떠올릴 수 있게 됩니다.
+
+## 개념 한눈에 보기
+
+> 재귀 = 함수가 자기 자신을 다시 호출해 반복 작업을 처리하는 방식
+
+```text
+factorial(4) call trace:
 factorial(4) → 4 × factorial(3)
                → 3 × factorial(2)
                     → 2 × factorial(1)
-                         → 1 (기저 조건)
+                         → 1 (base case)
                     ← 2 × 1 = 2
                ← 3 × 2 = 6
           ← 4 × 6 = 24
@@ -52,18 +64,17 @@ factorial(4) → 4 × factorial(3)
 
 | 용어 | 설명 |
 |------|------|
-| 재귀(recursion) | 함수가 자기 자신을 호출하는 프로그래밍 기법입니다 |
-| 기저 조건(base case) | 재귀 호출을 멈추는 종료 조건입니다 |
-| 호출 스택(call stack) | 재귀 호출마다 쌓이는 함수 실행 컨텍스트입니다 |
-| 분할 정복(divide and conquer) | 문제를 분할 → 정복 → 결합하는 알고리즘 설계 전략입니다 |
-| 꼬리 재귀(tail recursion) | 재귀 호출이 함수의 마지막 연산인 형태입니다 |
+| Recursion | 함수가 자기 자신을 호출하는 프로그래밍 기법입니다 |
+| Base case | 재귀 호출을 멈추게 하는 종료 조건입니다 |
+| Call stack | 재귀 호출이 쌓이는 실행 문맥의 스택입니다 |
+| Divide and conquer | 문제를 나누고, 풀고, 합치는 전략입니다 |
+| Tail recursion | 마지막 연산이 재귀 호출인 형태입니다 |
 
-## Before / After
-
-리스트의 합을 구하는 두 가지 방법을 비교합니다.
+## 적용 전후 비교
+리스트 합계를 구하는 두 가지 방법입니다.
 
 ```python
-# before: 반복문
+# before: iterative
 def sum_list(data):
     total = 0
     for x in data:
@@ -72,7 +83,7 @@ def sum_list(data):
 ```
 
 ```python
-# after: 재귀
+# after: recursive
 def sum_list(data):
     if not data:
         return 0
@@ -81,38 +92,39 @@ def sum_list(data):
 
 ## 단계별 실습
 
-### Step 1: 기본 재귀 — 팩토리얼과 피보나치
+### 단계 1: 기본 재귀 — 팩토리얼과 피보나치
 
 ```python
 def factorial(n: int) -> int:
-    """팩토리얼 — O(n)"""
-    if n <= 1:  # 기저 조건
+    """Factorial — O(n)."""
+    if n <= 1:  # base case
         return 1
     return n * factorial(n - 1)
 
 print(factorial(5))   # 120
 print(factorial(10))  # 3628800
 
-
 def fibonacci(n: int) -> int:
-    """피보나치 — O(2^n), 비효율적"""
-    if n <= 1:  # 기저 조건
+    """Fibonacci — O(2^n), inefficient."""
+    if n <= 1:  # base case
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)
 
 print(fibonacci(10))  # 55
 ```
 
-### Step 2: 재귀 시각화 — 호출 스택 추적
+팩토리얼은 재귀의 기본 구조를 보여 주고, 피보나치는 재귀만으로는 중복 계산이 얼마나 쉽게 폭증하는지를 보여 줍니다.
+
+### 단계 2: 호출 스택 시각화
 
 ```python
 def factorial_trace(n: int, depth: int = 0) -> int:
-    """호출 스택을 시각적으로 보여주는 팩토리얼"""
+    """Factorial with call stack visualization."""
     indent = "  " * depth
-    print(f"{indent}factorial({n}) 호출")
+    print(f"{indent}factorial({n}) called")
 
     if n <= 1:
-        print(f"{indent}기저 조건: 1 반환")
+        print(f"{indent}base case: return 1")
         return 1
 
     result = n * factorial_trace(n - 1, depth + 1)
@@ -120,21 +132,23 @@ def factorial_trace(n: int, depth: int = 0) -> int:
     return result
 
 factorial_trace(4)
-# factorial(4) 호출
-#   factorial(3) 호출
-#     factorial(2) 호출
-#       factorial(1) 호출
-#       기저 조건: 1 반환
+# factorial(4) called
+#   factorial(3) called
+#     factorial(2) called
+#       factorial(1) called
+#       base case: 1 반환
 #     factorial(2) = 2
 #   factorial(3) = 6
 # factorial(4) = 24
 ```
 
-### Step 3: 분할 정복 — 거듭제곱 계산
+재귀가 어렵게 느껴지는 이유는 호출이 내려가는 과정과 결과가 올라오는 과정을 동시에 머릿속에 그려야 하기 때문입니다. 호출 스택을 출력해 보면 그 흐름이 훨씬 선명해집니다.
+
+### 단계 3: 분할 정복 — 빠른 거듭제곱
 
 ```python
 def power(base: int, exp: int) -> int:
-    """분할 정복 거듭제곱 — O(log n)"""
+    """Divide-and-conquer exponentiation — O(log n)."""
     if exp == 0:
         return 1
     if exp % 2 == 0:
@@ -145,18 +159,19 @@ def power(base: int, exp: int) -> int:
 print(power(2, 10))   # 1024
 print(power(3, 5))    # 243
 
-# 비교: 단순 반복은 O(n), 분할 정복은 O(log n)
-# 2^1000을 구할 때 1000번 vs ~10번 곱셈
+# 비교: naive approach는 O(n), D&C는 O(log n)
+# 2^1000 계산은 곱셈이 약 1000회 vs 약 10회 필요
 ```
 
-### Step 4: 분할 정복 — 최대값 찾기와 하노이 탑
+문제를 반씩 줄이면 반복 횟수가 크게 줄어든다는 점을 잘 보여 주는 예시입니다. 분할 정복이 단순한 설명이 아니라 실제 성능 개선으로 이어진다는 사실이 중요합니다.
+
+### 단계 4: 분할 정복 — 최댓값 찾기와 하노이 탑
 
 ```python
 def find_max(data: list[int], left: int, right: int) -> int:
-    """분할 정복으로 최대값 찾기"""
+    """Find maximum using divide and conquer."""
     if left == right:
         return data[left]
-
     mid = (left + right) // 2
     left_max = find_max(data, left, mid)
     right_max = find_max(data, mid + 1, right)
@@ -165,30 +180,31 @@ def find_max(data: list[int], left: int, right: int) -> int:
 data = [3, 7, 2, 9, 1, 8, 4]
 print(find_max(data, 0, len(data) - 1))  # 9
 
-
 def hanoi(n: int, source: str, target: str, auxiliary: str):
-    """하노이 탑 — O(2^n)"""
+    """Tower of Hanoi — O(2^n)."""
     if n == 1:
-        print(f"원반 1: {source} → {target}")
+        print(f"Disk 1: {source} -> {target}")
         return
     hanoi(n - 1, source, auxiliary, target)
-    print(f"원반 {n}: {source} → {target}")
+    print(f"Disk {n}: {source} -> {target}")
     hanoi(n - 1, auxiliary, target, source)
 
 hanoi(3, "A", "C", "B")
-# 원반 1: A → C
-# 원반 2: A → B
-# 원반 1: C → B
-# 원반 3: A → C
-# 원반 1: B → A
-# 원반 2: B → C
-# 원반 1: A → C
+# 원판 1: A -> C
+# 원판 2: A -> B
+# 원판 1: C -> B
+# 원판 3: A -> C
+# 원판 1: B -> A
+# 원판 2: B -> C
+# 원판 1: A -> C
 ```
 
-### Step 5: 재귀 → 반복 변환
+하노이 탑은 재귀 구조를 이해하기에 아주 좋은 문제입니다. 작은 문제를 먼저 해결해야 큰 문제를 풀 수 있다는 분할 정복 감각도 분명하게 드러납니다.
+
+### 단계 5: 재귀를 반복으로 변환하기
 
 ```python
-# 재귀 팩토리얼 → 반복 팩토리얼
+# 재귀 factorial → 반복 factorial
 def factorial_iter(n: int) -> int:
     result = 1
     for i in range(2, n + 1):
@@ -197,83 +213,219 @@ def factorial_iter(n: int) -> int:
 
 print(factorial_iter(10))  # 3628800
 
-
-# 재귀 피보나치 → 메모이제이션
+# 재귀 fibonacci → memoized fibonacci
 from functools import lru_cache
 
 @lru_cache(maxsize=None)
 def fibonacci_memo(n: int) -> int:
-    """메모이제이션 피보나치 — O(n)"""
+    """Memoized Fibonacci — O(n)."""
     if n <= 1:
         return n
     return fibonacci_memo(n - 1) + fibonacci_memo(n - 2)
 
 print(fibonacci_memo(50))  # 12586269025
 
-# Python 재귀 깊이 제한 확인
+# Python recursion depth 제한
 import sys
-print(f"최대 재귀 깊이: {sys.getrecursionlimit()}")  # 기본 1000
+print(f"Max recursion depth: {sys.getrecursionlimit()}")  # default 1000
 ```
 
-## 이 코드에서 주목할 점
+재귀가 항상 최선은 아닙니다. 스택 깊이 제한이나 중복 계산 때문에 반복문이나 메모이제이션으로 바꾸는 편이 더 나은 경우가 많습니다.
 
-- 기저 조건이 없는 재귀는 RecursionError를 일으킵니다. 항상 기저 조건을 먼저 작성합니다
-- 분할 정복 거듭제곱은 곱셈 횟수를 O(n)에서 O(log n)으로 줄입니다
-- 단순 재귀 피보나치는 O(2^n)이지만, 메모이제이션을 추가하면 O(n)이 됩니다
-- Python의 기본 재귀 깊이 제한은 1000입니다. 깊은 재귀는 반복으로 변환하는 것이 안전합니다
+## 이 코드에서 먼저 봐야 할 점
 
-## 흔한 실수 5가지
+- 기저 조건이 없는 재귀 함수는 `RecursionError`를 일으킵니다. 항상 기저 조건부터 먼저 써야 합니다.
+- 분할 정복 거듭제곱은 곱셈 횟수를 `O(n)`에서 `O(log n)`으로 줄입니다.
+- 순진한 재귀 피보나치는 `O(2^n)`이지만, 메모이제이션을 추가하면 `O(n)`이 됩니다.
+- Python의 기본 재귀 깊이 제한은 1000입니다. 깊은 재귀는 반복문으로 바꾸는 편이 안전합니다.
+
+## 자주 하는 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
-|------|------------|----------|
-| 기저 조건 누락 | 무한 재귀로 RecursionError가 발생합니다 | 기저 조건을 항상 먼저 작성합니다 |
-| 재귀 깊이 초과 | Python 기본 제한 1000을 넘깁니다 | 반복문으로 변환하거나 sys.setrecursionlimit을 조정합니다 |
-| 중복 계산 | 같은 값을 반복 계산하여 지수 시간이 됩니다 | 메모이제이션이나 DP를 적용합니다 |
-| 슬라이싱으로 매번 새 리스트 생성 | 메모리와 시간을 낭비합니다 | 인덱스를 전달합니다 |
-| 분할 정복에서 결합 단계 누락 | 부분 결과가 합쳐지지 않습니다 | 분할, 정복, 결합 세 단계를 모두 확인합니다 |
+|------|-------------|-----------|
+| 기저 조건 누락 | 무한 재귀로 `RecursionError`가 납니다 | 기저 조건을 먼저 작성합니다 |
+| 재귀 깊이 초과 | Python 기본 제한에 걸립니다 | 반복문으로 바꾸거나 `sys.setrecursionlimit`를 검토합니다 |
+| 중복 계산 방치 | 같은 값을 반복 계산해 지수 시간이 됩니다 | 메모이제이션이나 DP를 사용합니다 |
+| 슬라이싱으로 새 리스트 남발 | 메모리와 시간이 추가로 듭니다 | 가능하면 인덱스를 전달합니다 |
+| Combine 단계를 잊음 | 부분 결과를 최종 답으로 합치지 못합니다 | Divide, Conquer, Combine 세 단계를 모두 점검합니다 |
 
-## 실무에서 이렇게 쓰입니다
+## 실무에서는 이렇게 연결됩니다
 
-- 파일 시스템 탐색에서 디렉터리 트리를 재귀적으로 순회합니다
-- JSON/XML 같은 중첩 구조를 재귀로 파싱합니다
-- 분할 정복으로 대규모 데이터를 병렬 처리합니다 (MapReduce)
-- 컴파일러가 AST(추상 구문 트리)를 재귀적으로 평가합니다
-- 프랙탈 그래픽이 재귀적 패턴으로 생성됩니다
+- 파일 시스템 탐색기는 디렉터리 트리를 재귀적으로 순회합니다.
+- 파서는 JSON, XML 같은 중첩 구조를 재귀적으로 처리합니다.
+- MapReduce는 큰 데이터를 나누어 병렬 처리하는 분할 정복 사고를 활용합니다.
+- 컴파일러는 AST를 재귀적으로 평가합니다.
+- 프랙털 그래픽은 재귀 패턴으로 생성됩니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 현업에서는 이렇게 생각합니다
 
-재귀는 코드를 간결하게 만들지만, 성능과 스택 깊이에 주의해야 합니다. 트리 탐색처럼 구조 자체가 재귀적인 문제에서는 재귀가 자연스럽지만, 단순 반복은 for 루프가 낫습니다.
+재귀는 코드를 간결하게 만들지만, 성능과 스택 깊이를 항상 함께 봐야 합니다. 트리처럼 본질적으로 재귀적인 구조에는 자연스럽지만, 단순 반복에는 `for` 루프가 더 나은 경우가 많습니다.
 
-분할 정복 패턴을 인식하는 능력이 중요합니다. "이 문제를 반으로 나눌 수 있는가?"라는 질문을 습관적으로 하면 효율적인 해법에 더 빨리 도달합니다.
+더 중요한 가치는 분할 정복 패턴을 알아보는 눈입니다. "이 문제를 반으로 나눌 수 있을까?"라는 질문을 습관처럼 던지면 효율적인 풀이에 더 빨리 도달할 수 있습니다.
 
 ## 체크리스트
 
-- [ ] 재귀 함수에서 기저 조건의 역할을 설명할 수 있다
-- [ ] 호출 스택의 동작 과정을 그려볼 수 있다
-- [ ] 분할 정복의 세 단계를 구분할 수 있다
-- [ ] 재귀와 반복의 장단점을 비교할 수 있다
-- [ ] 메모이제이션으로 중복 계산을 제거할 수 있다
+- [ ] 재귀 함수에서 기저 조건의 역할을 설명할 수 있습니다
+- [ ] 간단한 재귀 함수의 호출 스택을 추적할 수 있습니다
+- [ ] 분할 정복의 세 단계를 구분할 수 있습니다
+- [ ] 재귀와 반복문의 장단점을 비교할 수 있습니다
+- [ ] 메모이제이션으로 중복 계산을 제거할 수 있습니다
 
-## 정리 및 다음 글 안내
+## 연습 문제
 
-재귀는 함수가 자기 자신을 호출하는 기법이고, 분할 정복은 재귀를 활용해 문제를 체계적으로 쪼개는 전략입니다. 다음 글에서는 재귀의 중복 계산 문제를 해결하는 동적 계획법을 다룹니다.
+1. 리스트를 재귀적으로 뒤집는 함수를 작성해 보세요.
+2. 리스트의 합을 분할 정복 방식으로 구하는 함수를 작성해 보세요.
+3. 디스크 4개짜리 하노이 탑의 최소 이동 횟수와 전체 이동 순서를 출력해 보세요.
+
+## 정리와 다음 글
+
+재귀는 함수가 자기 자신을 호출하는 기법이고, 분할 정복은 그 재귀를 이용해 문제를 체계적으로 쪼개는 전략입니다. 다음 글에서는 중복 계산을 본격적으로 줄이는 도구인 동적 계획법을 다룹니다.
+
+## 심화 실전 노트: 재귀를 설계할 때 먼저 고정할 세 가지
+
+### 구현 앵커: 재귀 템플릿(기저/진행/결합)
+
+```python
+def divide_template(data: list[int]) -> int:
+    # 1) base case
+    if len(data) == 1:
+        return data[0]
+
+    # 2) progress
+    mid = len(data) // 2
+    left = divide_template(data[:mid])
+    right = divide_template(data[mid:])
+
+    # 3) combine
+    return max(left, right)
+```
+
+재귀 함수는 이 세 줄기 중 하나라도 흐리면 디버깅 난이도가 급격히 올라갑니다.
+
+### 호출 스택 추적 예시
+
+```text
+divide_template([5,1,9,3])
+ -> left [5,1]
+   -> left [5] return 5
+   -> right[1] return 1
+   -> combine max(5,1)=5
+ -> right[9,3]
+   -> left [9] return 9
+   -> right[3] return 3
+   -> combine max(9,3)=9
+ -> combine max(5,9)=9
+```
+
+### 복잡도 비교표
+
+| 문제 | 단순 접근 | 분할 정복 접근 | 복잡도 차이 |
+|------|-----------|---------------|-------------|
+| 거듭제곱 `a^n` | `n`번 곱셈 | 지수 절반 분할 | `O(n)` -> `O(log n)` |
+| 최댓값 찾기 | 선형 순회 | 분할 후 결합 | 둘 다 `O(n)` |
+| 정렬 | 버블 정렬 | 병합 정렬 | `O(n^2)` -> `O(n log n)` |
+
+### 인터뷰형 분해 질문
+
+- 기저 조건이 정확히 무엇인가
+- 각 호출에서 입력이 반드시 줄어드는가
+- 결합 단계에서 정보가 손실되지 않는가
+- 재귀 깊이 상한이 어느 정도인가
+
+### 증명 스케치: 빠른 거듭제곱
+
+짝수 지수 `n`에서는 `a^n=(a^(n/2))^2`를 이용해 문제 크기를 절반으로 줄입니다. 홀수 지수에서는 `a * a^(n-1)`로 변환한 뒤 다시 절반 분할 단계로 들어갑니다. 호출 깊이는 `log n`에 비례하므로 복잡도는 `O(log n)`입니다.
+
+### 실수-수정 페어
+
+| 실수 | 증상 | 수정 |
+|------|------|------|
+| 입력 크기가 줄지 않는 재귀 호출 | 무한 재귀 | 진행 규칙에서 감소 보장 |
+| 슬라이싱 과다 사용 | 메모리 증가 | 인덱스 범위 전달 |
+| 결합 단계 누락 | 부분 정답만 반환 | 결합 식을 별도 함수로 분리 |
+
+## 실전 검증 부록: 성능 측정과 반례 설계
+
+알고리즘 학습에서 구현 자체보다 오래 남는 자산은 검증 습관입니다. 아래 체크는 주제와 무관하게 거의 모든 문제에서 공통으로 적용됩니다.
+
+### 1) 마이크로 벤치마크 규칙
+
+```python
+import time
+
+def benchmark(func, *args, repeat: int = 5) -> float:
+    best = float("inf")
+    for _ in range(repeat):
+        start = time.perf_counter()
+        func(*args)
+        best = min(best, time.perf_counter() - start)
+    return best
+```
+
+- 단일 실행 시간은 노이즈가 큽니다.
+- 최소/중앙값 기준으로 비교하는 편이 안정적입니다.
+- 입력 크기를 여러 단계로 늘려 증가 추세를 기록해야 합니다.
+
+### 2) 반례 세트 템플릿
+
+```text
+A. 최소 입력: 빈 배열, 원소 1개
+B. 중복 입력: 같은 값 다수
+C. 정렬/역정렬 입력: 경계 인덱스 오류 탐지
+D. 음수/0 포함 입력: 비교식 방향 오류 탐지
+E. 해답 없음 케이스: 종료 조건 검증
+```
+
+테스트를 통과했는지보다, 어떤 종류의 실패를 막았는지 기록하는 편이 품질에 더 직접적입니다.
+
+### 3) 복잡도-메모리 트레이드오프 표
+
+| 개선 전략 | 시간 영향 | 공간 영향 | 적용 판단 |
+|-----------|-----------|-----------|-----------|
+| 캐시/메모이제이션 | 감소 | 증가 | 중복 계산이 명확할 때 |
+| 정렬 후 탐색 | 대체로 감소 | 동일/약간 증가 | 질의가 여러 번일 때 |
+| 해시 사용 | 평균 감소 | 증가 | 순서보다 조회가 중요할 때 |
+| 힙 사용 | 상위/최소 유지에 유리 | 증가 | 우선순위 선택이 핵심일 때 |
+
+### 4) 인터뷰 답변 스크립트
+
+- "먼저 입력 제약을 보고 가능한 복잡도 상한을 정하겠습니다."
+- "현재 접근의 시간/공간 복잡도를 계산해 보겠습니다."
+- "경계 입력 다섯 가지로 검증 계획을 먼저 제시하겠습니다."
+- "필요하면 정답 유지 조건을 짧게 증명하겠습니다."
+
+이 스크립트를 반복하면 설명의 밀도가 올라가고, 구현 중 길을 잃는 빈도가 줄어듭니다.
+
+## 처음 질문으로 돌아가기
+
+- **재귀 함수는 어떻게 동작하고 호출 스택은 어떤 모양일까요?**
+  - 재귀 함수는 자기 자신을 더 작은 입력으로 다시 호출하고, 기저 조건에 도달한 뒤 결과가 위로 올라오면서 계산을 마칩니다. `factorial_trace()` 출력처럼 호출은 아래로 쌓이고 결과는 위로 돌아오므로, 호출 스택을 따라가면 실행 흐름이 눈에 보입니다.
+- **기저 조건은 왜 그렇게 중요할까요?**
+  - 기저 조건이 없으면 입력이 줄어들어도 재귀가 멈추지 않아 `RecursionError`로 끝나기 때문입니다. `factorial()`의 `n <= 1`, `hanoi()`의 `n == 1`, `power()`의 `exp == 0`처럼 가장 작은 문제를 먼저 고정해야 전체 재귀 구조가 안전해집니다.
+- **분할 정복의 세 단계는 어떻게 구분할 수 있을까요?**
+  - 분할 정복은 문제를 나누는 Divide, 각 조각을 푸는 Conquer, 부분 답을 합치는 Combine으로 구분하면 됩니다. 빠른 거듭제곱은 지수를 절반으로 나누고, `find_max()`는 좌우 최댓값을 구해 `max()`로 합치며, 병합 정렬과 연결되는 같은 패턴을 보여 주었습니다.
 
 <!-- toc:begin -->
-- [알고리즘이란 무엇인가?](./01-what-are-algorithms.md)
-- [시간 복잡도와 Big-O](./02-time-complexity-and-big-o.md)
-- [선형 탐색과 이진 탐색](./03-linear-and-binary-search.md)
-- [정렬 알고리즘](./04-sorting-algorithms.md)
+## 시리즈 목차
+
+- [Algorithms with Python 101 (1/10): 알고리즘이란 무엇인가?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): 시간 복잡도와 Big-O](./02-time-complexity-and-big-o.md)
+- [Algorithms with Python 101 (3/10): 선형 탐색과 이진 탐색](./03-linear-and-binary-search.md)
+- [Algorithms with Python 101 (4/10): 정렬 알고리즘](./04-sorting-algorithms.md)
 - **재귀와 분할 정복 (현재 글)**
 - 동적 계획법 기초 (예정)
 - 그래프 탐색 — BFS와 DFS (예정)
 - 최단 경로 기초 (예정)
 - 그리디 알고리즘 (예정)
 - 코딩 테스트 문제 접근법 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
-- [Python 공식 문서 — functools.lru_cache](https://docs.python.org/3/library/functools.html#functools.lru_cache)
+- [Python Documentation — functools.lru_cache](https://docs.python.org/3/library/functools.html#functools.lru_cache)
 - [Wikipedia — Divide-and-Conquer Algorithm](https://en.wikipedia.org/wiki/Divide-and-conquer_algorithm)
 - [Real Python — Thinking Recursively in Python](https://realpython.com/python-thinking-recursively/)
 - [GeeksforGeeks — Divide and Conquer](https://www.geeksforgeeks.org/divide-and-conquer/)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/algorithms-python-101/ko/05-recursion-and-divide-and-conquer)

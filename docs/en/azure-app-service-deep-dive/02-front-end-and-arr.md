@@ -1,11 +1,11 @@
 ---
-title: Front-End and ARR — how a request reaches a worker
+title: "Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker"
 series: azure-app-service-deep-dive
 episode: 2
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,12 +14,15 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-04-29'
-seo_description: Microsoft doesn't publicly document the full implementation details
-  of the App Service Front-End, Worker, and File Server layers.
+last_reviewed: '2026-05-15'
+seo_description: Learn how App Service Front-End routing, ARR Affinity, slots, and custom domains decide which worker serves a request.
 ---
 
-# Front-End and ARR — how a request reaches a worker
+# Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker
+
+Many App Service incidents start before your code runs. If you cannot explain how the Front-End resolves a host name, keeps affinity, and picks a worker, partial outages keep looking random.
+
+This is the second post in the Azure App Service Deep Dive series.
 
 ## Source Version
 
@@ -44,21 +47,17 @@ you understand when ARR Affinity should be turned off,
 why only some users keep hitting a bad instance,
 and why App Service keeps pushing you toward stateless design.
 
----
+![azure app service deep dive chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-01-the-routing-path-in-three-stages.en.png)
+*azure app service deep dive chapter 2 flow overview*
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What does a Front-End node actually do, and where does ARR (Application Request Routing) sit inside it?
 - Is the ARR Affinity cookie just a sticky session, or more than that?
 - How do TLS termination and SNI handling flow through the Front End?
-- How do custom domains and hostname bindings change Front-End routing?
-- From the user's perspective, how does a Front-End failure look different from a Worker failure?
 
 ## The routing path in three stages
 
-![Three-stage path from ingress to worker](../../assets/azure-app-service-deep-dive/02/02-01-the-routing-path-in-three-stages.en.png)
-
-*Three-stage path from ingress to worker*
 At the public-documentation level, this is the safe mental model.
 
 1. The request enters the Front-End.
@@ -82,7 +81,7 @@ These decisions happen before your code runs:
 - which workers are eligible to receive traffic
 - whether an affinity cookie should keep the client on the same worker
 
-![Front-End filtering workers by host, slot, affinity](../../assets/azure-app-service-deep-dive/02/02-02-what-the-front-end-decides-first.en.png)
+![Front-End filtering workers by host, slot, affinity](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-02-what-the-front-end-decides-first.en.png)
 
 *Front-End filtering workers by host, slot, affinity*
 This post avoids inventing undocumented selection algorithms.
@@ -114,7 +113,7 @@ They are not the same thing.
 
 ## Request flow with ARR Affinity enabled
 
-![Affinity cookie keeping a client on one worker](../../assets/azure-app-service-deep-dive/02/02-03-request-flow-with-arr-affinity-enabled.en.png)
+![Affinity cookie keeping a client on one worker](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-03-request-flow-with-arr-affinity-enabled.en.png)
 
 *Affinity cookie keeping a client on one worker*
 This is not inherently bad.
@@ -130,7 +129,7 @@ The problem is that this convenience fights App Service's horizontal scaling mod
 
 ## Request flow with ARR Affinity disabled
 
-![Requests spreading across workers without affinity](../../assets/azure-app-service-deep-dive/02/02-04-request-flow-with-arr-affinity-disabled.en.png)
+![Requests spreading across workers without affinity](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-04-request-flow-with-arr-affinity-disabled.en.png)
 
 *Requests spreading across workers without affinity*
 With affinity disabled,
@@ -183,7 +182,7 @@ but a subset of users keep seeing latency or errors.”
 
 ARR Affinity is a strong suspect in that situation.
 
-![ARR stickiness creating a partial outage](../../assets/azure-app-service-deep-dive/02/02-05-why-only-some-users-fail-sometimes.en.png)
+![ARR stickiness creating a partial outage](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-05-why-only-some-users-fail-sometimes.en.png)
 
 *ARR stickiness creating a partial outage*
 If Worker 2 is degraded because of memory pressure,
@@ -223,7 +222,7 @@ Slots share the same plan capacity.
 The Front-End resolves host and slot context,
 then routes into the correct slot on that shared plan.
 
-![Slot routing inside one shared plan](../../assets/azure-app-service-deep-dive/02/02-01-slots-are-also-part-of-request-routing.en.png)
+![Slot routing inside one shared plan](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-01-slots-are-also-part-of-request-routing.en.png)
 
 *Slot routing inside one shared plan*
 The Learn slot-swap flow is more precise than “swap the workers.”
@@ -295,6 +294,38 @@ az webapp config hostname list -n my-app -g my-rg -o table
 az webapp config ssl list -g my-rg -o table
 ```
 
+### A tiny diagnostic endpoint makes affinity visible
+
+The fastest way to prove ARR stickiness is to return the worker identity to the caller. A minimal endpoint like this lets you compare cookie-preserving requests with fresh-session requests.
+
+```python
+from flask import Flask, jsonify
+import os
+import socket
+
+app = Flask(__name__)
+
+@app.get("/diag/worker")
+def diag_worker():
+    return jsonify(
+        hostname=socket.gethostname(),
+        instance_id=os.environ.get("WEBSITE_INSTANCE_ID", "unknown"),
+        slot=os.environ.get("WEBSITE_SLOT_NAME", "production"),
+    )
+```
+
+```bash
+# Same browser-like session twice
+curl -s -c cookies.txt -b cookies.txt https://my-app.azurewebsites.net/diag/worker
+curl -s -c cookies.txt -b cookies.txt https://my-app.azurewebsites.net/diag/worker
+
+# Fresh session requests
+curl -s https://my-app.azurewebsites.net/diag/worker
+curl -s https://my-app.azurewebsites.net/diag/worker
+```
+
+**Expected output:** with ARR Affinity enabled, the cookie-preserving calls usually repeat the same `instance_id`. Without the cookie jar, the response is more likely to move across workers. That gives you a concrete test for partial-outage suspicion instead of arguing from symptoms alone.
+
 ## Operational checklist
 
 - [ ] Documented whether ARR Affinity is on and what failure patterns that creates
@@ -303,15 +334,24 @@ az webapp config ssl list -g my-rg -o table
 - [ ] Catalogued routing priority and redirect rules per custom domain
 - [ ] Separated paths that require client-cert auth from those that do not
 
+## Answering the Opening Questions
+
+- **What does a Front-End node actually do, and where does ARR (Application Request Routing) sit inside it?**
+  - The article treats Front-End and ARR — how a request reaches a worker as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Is the ARR Affinity cookie just a sticky session, or more than that?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do TLS termination and SNI handling flow through the Front End?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
-- **Front-End and ARR — how a request reaches a worker (current)**
-- Workers and the sandbox — where user code actually runs (upcoming)
-- Deployment and Kudu — build, sync, release from the inside (upcoming)
-- Scaling internals — how Scale Out decisions become new workers (upcoming)
-- Cold start and warmup — why the first request is expensive (upcoming)
+- [Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
+- **Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker (current)**
+- Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs (upcoming)
+- Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside (upcoming)
+- Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers (upcoming)
+- Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive (upcoming)
 
 <!-- toc:end -->
 

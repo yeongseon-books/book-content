@@ -1,12 +1,12 @@
 ---
 series: pytest-101
 episode: 7
-title: 파일, 환경변수, 시간 테스트하기
-status: content-ready
+title: "pytest 101 (7/10): 파일, 환경변수, 시간 테스트하기"
+status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -16,50 +16,59 @@ tags:
   - tmp_path
   - freezegun
   - 시스템 리소스 테스트
-seo_description: 파일, 환경변수, 시간 의존 코드를 pytest로 테스트하는 패턴을 실습합니다.
-last_reviewed: '2026-05-04'
+seo_description: tmp_path, monkeypatch, freezegun으로 파일·환경변수·시간 의존 코드를 테스트하는 방법을 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
-# 파일, 환경변수, 시간 테스트하기
+# pytest 101 (7/10): 파일, 환경변수, 시간 테스트하기
 
-> pytest 101 시리즈 (7/10)
+이 글은 pytest 101 시리즈의 일곱 번째 글입니다. 파일 I/O, 환경변수, 현재 시간은 테스트를 불안정하게 만드는 대표적인 외부 의존성입니다. 이 글에서는 `tmp_path`, `monkeypatch`, `freezegun`을 이용해 시스템 리소스를 테스트 범위 안에서 통제하는 방법을 설명합니다.
 
+이 영역이 어려운 이유는 코드 자체보다 실행 환경이 결과를 바꿔 버리기 때문입니다. 같은 코드인데도 오늘은 통과하고 내일은 실패하는 테스트가 생긴다면, 대개 파일 경로 충돌, 전역 환경변수 오염, 현재 시각 의존성이 원인입니다.
 
-## 이 글에서 다룰 문제
+![pytest 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/07/07-01-big-picture.ko.png)
+*pytest 101 7장 흐름 개요*
 
-파일 I/O, 환경변수, 현재 시간은 테스트에서 가장 까다로운 외부 의존성입니다. 임시 디렉터리 없이 파일을 테스트하면 테스트 간 충돌이 발생하고, 시간에 의존하는 테스트는 자정이나 월말에 실패합니다.
+## 먼저 던지는 질문
 
-> 시스템 리소스에 의존하는 테스트는 "오늘은 통과하고 내일은 실패하는" 유령 테스트(flaky test)의 주범입니다.
+- 파일 테스트에서 왜 실제 경로 대신 `tmp_path`를 써야 할까요?
+- 환경변수는 왜 테스트마다 격리해야 할까요?
+- 현재 시간을 기준으로 동작하는 로직은 어떻게 안정적으로 검증할 수 있을까요?
 
-이 세 가지 패턴을 익히면 대부분의 시스템 의존성을 격리할 수 있습니다.
+## 왜 이 글이 중요한가
+
+파일, 환경변수, 시간은 애플리케이션 밖의 세계와 직접 연결됩니다. 이 세계를 통제하지 않으면 테스트 결과가 코드가 아니라 환경에 의해 결정됩니다.
+
+> 시스템 리소스에 의존하는 테스트는 “오늘은 통과하고 내일은 실패하는” flaky test의 가장 흔한 원인입니다.
+
+이 세 가지를 제대로 다루기 시작하면, 파일 저장·설정 로딩·만료일 계산·배치 스케줄링처럼 실무에서 자주 만나는 코드를 훨씬 더 안정적으로 검증할 수 있습니다.
 
 ## 핵심 개념 잡기
 
-> 시스템 리소스 격리 = 파일, 환경변수, 시간을 테스트 범위 안에서 통제
+> system resource isolation = 파일, 환경변수, 시간을 테스트 범위 안에서 통제하는 것
 
-```
-[격리 전]                      [격리 후]
-파일 → 실제 경로 충돌          tmp_path → 자동 정리
-환경변수 → 전역 오염           monkeypatch → 테스트 종료 시 복원
-시간 → 실행 시점마다 다름      freezegun → 고정된 시간
+```text
+[Before Isolation]                [After Isolation]
+files → real path collisions      tmp_path → auto-cleanup
+env vars → global pollution       monkeypatch → restored after test
+time → varies per execution       freezegun → fixed time
 ```
 
 ## 핵심 개념
 
 | 용어 | 설명 |
 |------|------|
-| tmp_path | pytest 내장 fixture로 테스트별 임시 디렉터리를 제공합니다 |
-| tmp_path_factory | session scope로 여러 테스트가 공유하는 임시 디렉터리를 생성합니다 |
-| monkeypatch.setenv | 테스트 범위 내에서 환경변수를 설정합니다 |
-| freezegun | `datetime.now()`를 고정된 시간으로 대체하는 라이브러리입니다 |
-| flaky test | 동일한 코드에서 때때로 실패하는 불안정한 테스트입니다 |
+| tmp_path | 테스트별 임시 디렉터리를 제공하는 pytest 내장 fixture입니다 |
+| tmp_path_factory | 여러 테스트가 공유할 임시 디렉터리를 만드는 session-scope fixture입니다 |
+| monkeypatch.setenv | 테스트 범위 안에서 환경변수를 설정합니다 |
+| freezegun | `datetime.now()`를 고정된 시각으로 대체하는 라이브러리입니다 |
+| flaky test | 같은 코드에서도 간헐적으로 실패하는 테스트입니다 |
 
-## Before / After
-
-실제 파일 시스템을 사용하는 테스트와 tmp_path로 격리한 테스트를 비교합니다.
+## 적용 전후 비교
+실제 경로를 쓰는 테스트와 `tmp_path` 기반 테스트를 비교해 보겠습니다.
 
 ```python
-# before: 실제 경로 사용 — 테스트 간 충돌 위험
+# 기존: 실제 경로 사용 — 테스트 간 충돌 위험
 import os
 
 def test_write_file():
@@ -67,21 +76,21 @@ def test_write_file():
         f.write("hello")
     with open("/tmp/test_output.txt") as f:
         assert f.read() == "hello"
-    os.remove("/tmp/test_output.txt")  # 정리 누락 시 오염
+    os.remove("/tmp/test_output.txt")  # leaked if forgotten
 ```
 
 ```python
-# after: tmp_path 사용 — 자동 격리, 자동 정리
+# 개선: tmp_path — 자동 격리와 정리
 def test_write_file(tmp_path):
     filepath = tmp_path / "test_output.txt"
     filepath.write_text("hello")
     assert filepath.read_text() == "hello"
-    # 정리 불필요 — pytest가 자동 처리
+    # cleanup 불필요 — pytest가 처리
 ```
 
 ## 단계별 실습
 
-### Step 1: tmp_path로 파일 테스트
+### 단계 1: tmp_path로 파일 테스트하기
 
 ```python
 # file_processor.py
@@ -93,7 +102,7 @@ def save_config(config: dict, filepath: Path) -> None:
 
 def load_config(filepath: Path) -> dict:
     if not filepath.exists():
-        raise FileNotFoundError(f"{filepath}이(가) 존재하지 않습니다")
+        raise FileNotFoundError(f"{filepath} does not exist")
     return json.loads(filepath.read_text())
 ```
 
@@ -125,8 +134,7 @@ def test_nested_directory(tmp_path):
     assert filepath.read_text() == "deep content"
 ```
 
-### Step 2: 여러 파일 처리 테스트
-
+### 단계 2: 다중 파일 처리 테스트
 ```python
 # csv_processor.py
 from pathlib import Path
@@ -154,7 +162,6 @@ def merge_csv_files(input_dir: Path, output_file: Path) -> int:
 from csv_processor import merge_csv_files
 
 def test_merge_csv(tmp_path):
-    # 입력 파일 생성
     (tmp_path / "a.csv").write_text("name,age\nAlice,30\n")
     (tmp_path / "b.csv").write_text("name,age\nBob,25\n")
 
@@ -163,7 +170,7 @@ def test_merge_csv(tmp_path):
 
     assert count == 2
     lines = output.read_text().strip().split("\n")
-    assert len(lines) == 3  # 헤더 + 2행
+    assert len(lines) == 3  # header + 2 rows
 
 def test_merge_empty_dir(tmp_path):
     output = tmp_path / "merged.csv"
@@ -171,8 +178,7 @@ def test_merge_empty_dir(tmp_path):
     assert count == 0
 ```
 
-### Step 3: 환경변수 테스트
-
+### 단계 3: 환경 변수 테스트
 ```python
 # app_config.py
 import os
@@ -215,8 +221,7 @@ def test_debug_mode(monkeypatch):
     assert config["debug"] is True
 ```
 
-### Step 4: 시간 고정 테스트
-
+### 단계 4: 시간 고정
 ```python
 # billing.py
 from datetime import datetime
@@ -256,18 +261,9 @@ def test_days_until_expiry():
     with patch("billing.datetime") as mock_dt:
         mock_dt.now.return_value = now
         assert days_until_expiry(expiry) == 10
-
-def test_format_timestamp():
-    fixed_time = datetime(2025, 3, 15, 14, 30, 0)
-    with patch("billing.datetime") as mock_dt:
-        mock_dt.now.return_value = fixed_time
-        mock_dt.now.return_value.strftime = fixed_time.strftime
-        result = format_timestamp()
-    assert result == "2025-03-15 14:30:00"
 ```
 
-### Step 5: freezegun 활용
-
+### 단계 5: freezegun 사용
 ```bash
 pip install freezegun
 ```
@@ -292,58 +288,342 @@ def test_not_billing_day():
 
 ## 이 코드에서 주목할 점
 
-- `tmp_path`는 `pathlib.Path` 객체이므로 `/` 연산자로 경로를 조합합니다
-- `monkeypatch.delenv`로 환경변수가 없는 상황을 명시적으로 테스트합니다
-- `freeze_time`은 데코레이터 하나로 시간을 고정하여 mock보다 간결합니다
-- 각 테스트가 독립적으로 실행되므로 환경 오염이 없습니다
+- `tmp_path`는 `pathlib.Path` 객체를 반환하므로 `/` 연산자로 경로를 조합합니다.
+- `monkeypatch.delenv`는 “환경변수가 없는 상황”을 명시적으로 검증하게 해 줍니다.
+- `freeze_time`은 수동 patch보다 간결하게 시간을 고정합니다.
+- 각 테스트가 독립적으로 자원을 갖기 때문에 상태 오염이 줄어듭니다.
 
-## 흔한 실수 5가지
+## 흔한 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| 절대 경로로 파일을 생성 | 다른 환경에서 실패하고 테스트 간 충돌합니다 | `tmp_path`를 항상 사용합니다 |
-| 환경변수를 `os.environ`에 직접 설정 | 테스트 종료 후 복원하지 않으면 다른 테스트에 영향을 줍니다 | `monkeypatch.setenv`를 사용합니다 |
-| `datetime.now()`를 직접 비교 | 실행 시점에 따라 결과가 달라집니다 | 시간을 주입하거나 freezegun을 사용합니다 |
-| tmp_path 내용을 수동으로 정리 | pytest가 자동으로 정리하므로 불필요합니다 | 정리 코드를 제거합니다 |
-| 시간대(timezone) 미고려 | UTC와 로컬 시간 차이로 테스트가 실패합니다 | 항상 UTC를 명시하거나 timezone-aware datetime을 사용합니다 |
+| 절대 경로에 파일을 만듦 | 환경마다 실패하거나 테스트끼리 충돌합니다 | 항상 `tmp_path`를 사용합니다 |
+| `os.environ`을 직접 수정함 | 원복하지 않으면 다른 테스트에 영향을 줍니다 | `monkeypatch.setenv/delenv`를 사용합니다 |
+| `datetime.now()`를 그대로 비교함 | 실행 시점에 따라 결과가 달라집니다 | 시간을 주입하거나 `freezegun`을 사용합니다 |
+| tmp_path를 수동 정리함 | pytest가 이미 정리합니다 | 불필요한 cleanup 코드를 제거합니다 |
+| timezone을 무시함 | UTC와 로컬 시간 차이로 실패할 수 있습니다 | 시간대 정책을 명확히 정합니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- 로그 파일을 `tmp_path`에 생성하여 로그 포맷을 검증합니다
-- 12개월 환경변수 조합을 parametrize와 monkeypatch로 일괄 테스트합니다
-- 만료일 검증 로직을 freezegun으로 과거, 현재, 미래 시점에서 테스트합니다
-- CI 환경에서 `tmp_path`를 사용하여 파일 권한 차이를 회피합니다
-- 배치 잡의 스케줄 로직을 고정 시간으로 테스트합니다
+- 로그 파일을 `tmp_path`에 만들고 포맷을 검증합니다.
+- 여러 환경변수 조합을 parametrize와 `monkeypatch`로 한꺼번에 검증합니다.
+- 만료일, 과금일, 배치 스케줄링 로직을 고정된 시간으로 테스트합니다.
+- CI 환경에서 파일 권한 차이를 줄이기 위해 임시 디렉터리를 표준화합니다.
+- 시스템 자원 테스트를 순수 함수 테스트와 분리해 디버깅을 단순화합니다.
 
 ## 현업 개발자는 이렇게 생각합니다
 
-파일, 환경변수, 시간은 "코드 바깥의 세계"입니다. 테스트에서 이 세계를 통제하지 않으면, 테스트 결과가 코드가 아닌 환경에 의해 결정됩니다.
+파일, 환경변수, 시간은 “코드 바깥의 세계”입니다. 테스트가 이 세계를 통제하지 못하면 테스트는 코드 검증이 아니라 환경 관찰에 가까워집니다.
 
-tmp_path는 pytest의 가장 유용한 내장 fixture 중 하나입니다. 모든 파일 I/O 테스트의 출발점으로 삼으면 됩니다.
+특히 `tmp_path`는 pytest에서 가장 실용적인 내장 fixture 중 하나입니다. 파일 I/O 테스트를 시작할 때 가장 먼저 떠올릴 기본 도구라고 생각해도 좋습니다.
 
 ## 체크리스트
 
-- [ ] `tmp_path`로 임시 파일을 생성하고 테스트에 사용했다
+- [ ] `tmp_path`로 임시 파일을 만들고 테스트했다
 - [ ] `monkeypatch.setenv/delenv`로 환경변수를 격리했다
-- [ ] `unittest.mock.patch` 또는 `freezegun`으로 시간을 고정했다
-- [ ] 파일이 없는 경우의 에러 처리를 테스트했다
-- [ ] 테스트 간 상태 오염이 없는지 확인했다
+- [ ] `patch` 또는 `freezegun`으로 시간을 고정했다
+- [ ] 누락 파일 같은 오류 경로를 테스트했다
+- [ ] 테스트 사이에 상태 오염이 없는지 확인했다
+
+## 연습 문제
+
+1. `tmp_path`에 YAML 설정 파일을 만들고 이를 파싱하는 테스트를 작성해 보세요.
+2. `LOG_FORMAT` 환경변수에 따라 JSON 또는 텍스트 로그를 출력하는 함수를 테스트해 보세요.
+3. `freeze_time`과 parametrize를 조합해 매달 1일, 15일, 말일 로직을 검증해 보세요.
 
 ## 정리 및 다음 글 안내
 
-tmp_path, monkeypatch, freezegun으로 시스템 리소스를 격리하면 안정적이고 재현 가능한 테스트를 작성할 수 있습니다. 다음 글에서는 coverage를 측정하고 테스트 품질을 평가하는 방법을 배웁니다.
+`tmp_path`, `monkeypatch`, `freezegun`을 익히면 시스템 리소스에 의존하는 코드도 충분히 안정적으로 테스트할 수 있습니다. 다음 글에서는 이제 테스트가 실제로 어디까지 코드를 실행하는지, coverage를 통해 객관적으로 확인해 보겠습니다.
+
+## 파일/환경/시간 테스트 통합 시나리오
+
+아래 코드는 보고서 파일 생성 시각과 실행 모드를 함께 기록합니다.
+
+```python
+# reporter.py
+from datetime import datetime
+from pathlib import Path
+import os
+
+def write_report(path: Path, message: str) -> None:
+    mode = os.getenv("APP_MODE", "dev")
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    path.write_text(f"[{mode}] {now} {message}\n", encoding="utf-8")
+```
+
+```python
+# test_reporter.py
+from datetime import datetime
+from unittest.mock import patch
+from reporter import write_report
+
+def test_write_report(tmp_path, monkeypatch):
+    monkeypatch.setenv("APP_MODE", "prod")
+    out = tmp_path / "report.log"
+
+    with patch("reporter.datetime") as mock_dt:
+        mock_dt.now.return_value = datetime(2025, 5, 1, 9, 30, 0)
+        write_report(out, "job-start")
+
+    text = out.read_text(encoding="utf-8")
+    assert "[prod]" in text
+    assert "2025-05-01 09:30:00" in text
+    assert "job-start" in text
+```
+
+## freezegun 버전
+
+```python
+from freezegun import freeze_time
+from reporter import write_report
+
+@freeze_time("2025-05-01 09:30:00")
+def test_write_report_with_freezegun(tmp_path, monkeypatch):
+    monkeypatch.setenv("APP_MODE", "prod")
+    out = tmp_path / "report.log"
+    write_report(out, "job-start")
+    assert "2025-05-01 09:30:00" in out.read_text(encoding="utf-8")
+```
+
+## CLI 출력 예시
+
+```bash
+pytest test_reporter.py -v
+```
+
+```text
+test_reporter.py::test_write_report PASSED
+test_reporter.py::test_write_report_with_freezegun PASSED
+========================= 2 passed =========================
+```
+
+## 실수와 수정
+
+| 실수 | 증상 | 수정 |
+|---|---|---|
+| 고정 경로 `/tmp/report.log` 사용 | 테스트 충돌, 권한 실패 | `tmp_path` 사용 |
+| `os.environ[...] = ...` 직접 수정 | 다른 테스트 오염 | `monkeypatch.setenv/delenv` |
+| `datetime.now()` 직접 비교 | 날짜 바뀌면 실패 | patch 또는 freezegun |
+| 로컬 타임존 가정 | CI에서 불일치 | UTC 또는 명시 정책 |
+
+## 적용 전과 후: 리팩터링
+
+```python
+# before
+
+def is_expired(expiry_str: str) -> bool:
+    from datetime import datetime
+    expiry = datetime.fromisoformat(expiry_str)
+    return datetime.now() > expiry
+```
+
+```python
+# after
+
+def is_expired(expiry_str: str, now_fn):
+    from datetime import datetime
+    expiry = datetime.fromisoformat(expiry_str)
+    return now_fn() > expiry
+```
+
+두 번째 방식은 테스트가 더 단순합니다.
+
+```python
+from datetime import datetime
+
+def test_is_expired():
+    now = lambda: datetime(2025, 1, 10, 0, 0, 0)
+    assert is_expired("2025-01-09T00:00:00", now) is True
+```
+
+## 시간대와 경계값 테스트
+
+시간 의존 로직은 날짜 경계에서 자주 실패합니다.
+
+```python
+# scheduler.py
+from datetime import datetime
+
+def is_month_end(now: datetime) -> bool:
+    next_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    from datetime import timedelta
+    tomorrow = next_day + timedelta(days=1)
+    return tomorrow.month != now.month
+```
+
+```python
+from datetime import datetime
+import pytest
+from scheduler import is_month_end
+
+@pytest.mark.parametrize(
+    "now,expected",
+    [
+        (datetime(2025, 1, 31, 23, 0, 0), True),
+        (datetime(2025, 1, 30, 23, 0, 0), False),
+        (datetime(2024, 2, 29, 10, 0, 0), True),
+    ],
+)
+def test_is_month_end(now, expected):
+    assert is_month_end(now) is expected
+```
+
+## 환경 분기 통합 테스트
+
+```python
+# feature_flag.py
+import os
+
+def use_new_checkout() -> bool:
+    return os.getenv("FEATURE_NEW_CHECKOUT", "off") == "on"
+```
+
+```python
+from feature_flag import use_new_checkout
+
+def test_feature_off(monkeypatch):
+    monkeypatch.setenv("FEATURE_NEW_CHECKOUT", "off")
+    assert use_new_checkout() is False
+
+def test_feature_on(monkeypatch):
+    monkeypatch.setenv("FEATURE_NEW_CHECKOUT", "on")
+    assert use_new_checkout() is True
+```
+
+## 파일 테스트 안정성 체크
+
+- 인코딩(`utf-8`)을 명시했는가
+- 줄바꿈 차이를 고려했는가
+- 테스트 간 파일명 충돌이 없는가
+- 임시 디렉터리 정리를 수동으로 하지 않는가
+
+## 터미널 옵션 조합
+
+| 명령 | 목적 |
+|---|---|
+| `pytest -q` | 빠른 성공/실패 확인 |
+| `pytest -v` | 케이스별 통과/실패 확인 |
+| `pytest -x` | 첫 실패에서 즉시 중단 |
+| `pytest -k "keyword"` | 특정 범위만 선택 실행 |
+| `pytest --maxfail=3` | 최대 실패 수 제한 |
+
+## 운영 회귀 테스트 템플릿
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+이 템플릿은 버그 이슈를 테스트 코드로 영구 보존하는 가장 단순한 형태입니다.
+
+## 품질 체크 질문
+
+- 실패 메시지만 보고 원인을 추론할 수 있는가
+- 테스트가 실행 순서에 의존하지 않는가
+- 경계값 입력이 포함되어 있는가
+- 정상/오류 경로를 모두 검증하는가
+- 테스트 추가가 함수 복사 대신 데이터 추가로 끝나는가
+
+## 추가 케이스 스터디: PR 리뷰에서 자주 보는 개선 포인트
+
+### 코드 예시
+
+```python
+# app/discount.py
+
+def discount_price(price: int, rate: float) -> int:
+    if price < 0:
+        raise ValueError("price must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(price * (1 - rate))
+```
+
+```python
+# tests/test_discount.py
+import pytest
+from app.discount import discount_price
+
+@pytest.mark.parametrize(
+    "price,rate,expected",
+    [
+        (10000, 0.0, 10000),
+        (10000, 0.1, 9000),
+        (10000, 1.0, 0),
+    ],
+)
+def test_discount_price(price, rate, expected):
+    assert discount_price(price, rate) == expected
+
+@pytest.mark.parametrize("price,rate", [(-1, 0.1), (1000, -0.1), (1000, 1.1)])
+def test_discount_price_invalid(price, rate):
+    with pytest.raises(ValueError):
+        discount_price(price, rate)
+```
+
+### 출력 예시
+
+```bash
+pytest tests/test_discount.py -v
+```
+
+```text
+tests/test_discount.py::test_discount_price[10000-0.0-10000] PASSED
+tests/test_discount.py::test_discount_price[10000-0.1-9000] PASSED
+tests/test_discount.py::test_discount_price[10000-1.0-0] PASSED
+tests/test_discount.py::test_discount_price_invalid[-1-0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000--0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
+========================= 6 passed =========================
+```
+
+### 리뷰 포인트
+
+- 경계값(`0`, `1.0`)이 포함되어 있는가
+- 예외 타입이 구체적인가
+- 실패 시 메시지로 원인을 알 수 있는가
+- 데이터 추가만으로 케이스 확장이 가능한 구조인가
+
+## 미니 점검표
+
+- 실패 케이스를 최소 3개 이상 유지합니다.
+- 경계값(최소/최대/빈값)을 포함합니다.
+- 실패 메시지가 의미 있는지 확인합니다.
+- CI에서 동일 명령으로 재현 가능한지 확인합니다.
+
+## 처음 질문으로 돌아가기
+
+- **파일 테스트에서 왜 실제 경로 대신 `tmp_path`를 써야 할까요?**
+  - `tmp_path`는 테스트마다 독립된 디렉터리를 주고 실행 후 자동 정리까지 해 주므로, `/tmp/report.log` 같은 고정 경로 충돌과 정리 누락을 막아 줍니다. `config.json`, `merged.csv`, `report.log`를 각각 안전하게 만들고 읽는 예시처럼 파일 I/O 자체에만 집중할 수 있게 해 주는 점이 핵심입니다.
+- **환경변수는 왜 테스트마다 격리해야 할까요?**
+  - 환경변수는 전역 상태라서 한 테스트가 값을 바꾸면 다음 테스트 결과까지 흔들 수 있으므로 `monkeypatch.setenv`와 `delenv`로 매번 명시적으로 고정해야 합니다. `DEBUG`, `DATABASE_URL`, `FEATURE_NEW_CHECKOUT` 예시처럼 기본값 분기와 켜짐/꺼짐 분기를 분리하면 로컬과 CI에서 같은 결과를 재현하기 쉬워집니다.
+- **현재 시간을 기준으로 동작하는 로직은 어떻게 안정적으로 검증할 수 있을까요?**
+  - `billing.datetime`을 patch하거나 `@freeze_time("2025-05-01 09:30:00")`를 써서 시간을 멈추면, 과금일 판단과 타임스탬프 포맷을 날짜가 바뀌어도 같은 방식으로 검증할 수 있습니다. 더 나아가 `is_expired(expiry_str, now_fn)`처럼 현재 시각 공급 함수를 주입하면 시간 의존성이 테스트 바깥으로 밀려 나가 구조도 단순해집니다.
 
 <!-- toc:begin -->
-- [왜 테스트를 작성해야 할까?](./01-why-write-tests.md)
-- [첫 번째 pytest 테스트 작성하기](./02-first-pytest-test.md)
-- [assert와 예외 테스트](./03-assert-and-exceptions.md)
-- [fixture 이해하기](./04-fixtures.md)
-- [parametrization으로 테스트 케이스 늘리기](./05-parametrization.md)
-- [mock과 monkeypatch](./06-mock-and-monkeypatch.md)
+## 시리즈 목차
+
+- [pytest 101 (1/10): 왜 테스트를 작성해야 할까?](./01-why-write-tests.md)
+- [pytest 101 (2/10): 첫 번째 pytest 테스트 작성하기](./02-first-pytest-test.md)
+- [pytest 101 (3/10): assert와 예외 테스트](./03-assert-and-exceptions.md)
+- [pytest 101 (4/10): fixture 이해하기](./04-fixtures.md)
+- [pytest 101 (5/10): parametrization으로 테스트 케이스 늘리기](./05-parametrization.md)
+- [pytest 101 (6/10): mock과 monkeypatch](./06-mock-and-monkeypatch.md)
 - **파일, 환경변수, 시간 테스트하기 (현재 글)**
 - coverage와 테스트 품질 보기 (예정)
 - GitHub Actions에서 테스트 자동화하기 (예정)
 - 테스트하기 쉬운 코드 구조 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -352,3 +632,5 @@ tmp_path, monkeypatch, freezegun으로 시스템 리소스를 격리하면 안�
 - [pytest — monkeypatch](https://docs.pytest.org/en/stable/how-to/monkeypatch.html)
 - [freezegun — GitHub](https://github.com/spulec/freezegun)
 - [Real Python — Testing with tmp_path](https://realpython.com/pytest-python-testing/#tmp-path)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/pytest-101/ko)

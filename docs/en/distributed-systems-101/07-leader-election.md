@@ -1,10 +1,10 @@
 ---
 series: distributed-systems-101
 episode: 7
-title: Leader Election
-status: content-ready
+title: "Distributed Systems 101 (7/10): Leader Election"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,44 +18,32 @@ tags:
   - Coordination
   - Liveness
 seo_description: We cover how distributed systems pick and keep a leader using lease, fencing, and split-brain prevention - patterns from etcd and ZooKeeper.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Leader Election
+# Distributed Systems 101 (7/10): Leader Election
 
-> Distributed Systems 101 series (7/10)
+The dangerous moment in leader election is not the happy path where one node wins. It is the messy moment where the old leader wakes up late, still thinks it owns the world, and tries to write after a new leader has already taken over.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Distributed Systems 101 series.
 
-**Core question**: What happens when a leader you thought was dead comes back to life?
+Here we treat leader election as an operational safety problem: leases decide who is allowed to lead, and fencing tokens decide whose writes are still valid.
 
-> Leader election is not just about deciding "who is the leader" — it is about safely cutting off the influence of the previous one.
 
-<!-- a-grade-intro:end -->
+![distributed systems 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/07/07-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 7 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Why leader election is needed and what its safety conditions are
-- The roles of lease and heartbeat
-- How to use a fencing token to block an old leader
-- Split-brain scenarios and how to prevent them
-- Practical patterns for electing a leader with etcd or ZooKeeper
+- Why leader election is needed and what its safety conditions are?
+- The roles of lease and heartbeat?
+- How to use a fencing token to block an old leader?
 
 ## Why It Matters
 
 Many distributed-system bugs happen the moment "there are two leaders." When two leaders write to the same resource at the same time, data breaks. A correct election guarantees that only one leader holds authority at any point in time.
 
 > A good election is the promise that "there is no moment with two leaders."
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    C1["candidate 1"] -->|request lease| L["lock service (etcd)"]
-    C2["candidate 2"] -->|request lease| L
-    L -->|grant lease| C1
-    C1 -->|heartbeat| L
-```
 
 Multiple candidates request a lease from a lock service. Only one becomes leader and renews the lease with heartbeats.
 
@@ -151,6 +139,19 @@ This single line stops an old leader from writing.
 
 In a design without tokens, A's write would land and corrupt the data.
 
+## Operational walkthrough: lease expiry under a GC pause
+
+The failure mode worth rehearsing is not "a node cleanly dies" but "a node stalls long enough to miss renewals." A practical sequence looks like this:
+
+1. Leader A acquires lease `ttl=5s` and gets fencing token `41`.
+2. A long GC pause or CPU starvation freezes A for 8 seconds.
+3. The lock service sees no heartbeat, expires the lease, and elects leader B.
+4. B receives fencing token `42` and starts handling writes.
+5. A wakes up and tries to write with token `41`.
+6. The resource server rejects A because `41 < 42`.
+
+That last comparison is the real safety boundary. The lease service decides who may lead, but the resource server decides which writes are still legal. If you only log leadership changes and never validate tokens at the write target, you have observability but not protection.
+
 ## What to Notice in This Code
 
 - A lease expires automatically — it handles network partitions naturally.
@@ -196,17 +197,29 @@ Kubernetes' `kube-controller-manager` and `kube-scheduler` use etcd leases for l
 
 Leader election is the work of keeping the promise of "one leader at a time" with leases and fencing. In the next post we look at tools that distribute work without a leader at all — message queues and event sourcing.
 
+## Answering the Opening Questions
+
+- **Why leader election is needed and what its safety conditions are?**
+  - The article treats Leader Election as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The roles of lease and heartbeat?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to use a fencing token to block an old leader?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Distributed System?](./01-what-is-a-distributed-system.md)
-- [Failure Models](./02-failure-model.md)
-- [RPC and Message Passing](./03-rpc-and-message-passing.md)
-- [Consistency and CAP](./04-consistency-and-cap.md)
-- [Replication](./05-replication.md)
-- [Consensus and Raft](./06-consensus-and-raft.md)
+## In this series
+
+- [Distributed Systems 101 (1/10): What Is a Distributed System?](./01-what-is-a-distributed-system.md)
+- [Distributed Systems 101 (2/10): Failure Models](./02-failure-model.md)
+- [Distributed Systems 101 (3/10): RPC and Message Passing](./03-rpc-and-message-passing.md)
+- [Distributed Systems 101 (4/10): Consistency and CAP](./04-consistency-and-cap.md)
+- [Distributed Systems 101 (5/10): Replication](./05-replication.md)
+- [Distributed Systems 101 (6/10): Consensus and Raft](./06-consensus-and-raft.md)
 - **Leader Election (current)**
-- message queues and event sourcing (upcoming)
-- distributed transactions (upcoming)
-- patterns for operable distributed systems (upcoming)
+- Message Queues and Event Sourcing (upcoming)
+- Distributed Transactions (upcoming)
+- Patterns for Operable Distributed Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -215,3 +228,4 @@ Leader election is the work of keeping the promise of "one leader at a time" wit
 - [How to do distributed locking — Martin Kleppmann](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html)
 - [etcd lease and leader election](https://etcd.io/docs/v3.5/learning/lock/)
 - [Kubernetes leader election library](https://pkg.go.dev/k8s.io/client-go/tools/leaderelection)
+- [ZooKeeper recipes and solutions — Leader Election](https://zookeeper.apache.org/doc/current/recipes.html#sc_leaderElection)

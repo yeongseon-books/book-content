@@ -1,10 +1,10 @@
 ---
 series: software-engineering-101
 episode: 6
-title: Version Control and Release
+title: "Software Engineering 101 (6/10): Version Control and Release"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,26 @@ tags:
   - Release
   - SemVer
 seo_description: Git branching strategies, semantic versioning, changelog automation, and a safe release pipeline you can copy.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Version Control and Release
+# Software Engineering 101 (6/10): Version Control and Release
 
-> Software Engineering 101 series (6/10)
+You can write solid code and pass every test, then still lose user trust at release time. Users only see the deployed version. They do not care how careful the earlier work was if the release is confusing, hard to roll back, or impossible to explain. That makes version control and release management less of a final ceremony and more of a trust interface.
 
-<!-- a-grade-intro:begin -->
+Teams get into trouble when they think of release as a single event: bump a version, write notes, deploy, done. Resilient teams treat release as a recoverable process. They ship smaller changes more often, verify on narrow traffic first, and assume rollback must work under pressure, not only in theory.
 
-**Core question**: When you ship version 1.4.2, what exactly are you promising the user?
+This is post 6 in the Software Engineering 101 series. In this chapter, we connect commit conventions, semantic versioning, changelogs, canary rollout, and rollback drills into one release flow you can reason about end to end.
 
-> Semantic versioning is the notation for that promise. Break it and trust collapses.
 
-<!-- a-grade-intro:end -->
+![software engineering 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/06/06-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Version Control and Release?
+- Which signal should the example or diagram make visible for Version Control and Release?
+- What failure should be prevented first when Version Control and Release reaches a real system?
 
 ## What You Will Learn
 
@@ -46,16 +52,6 @@ last_reviewed: '2026-05-04'
 A release is the only moment your code meets the user. If something fails here, every prior effort is forgotten.
 
 > Safe releases build trust faster than fast releases.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    F["feature branch"] --> M["main"]
-    M --> S["staging"]
-    S --> C["canary"]
-    C --> P["production"]
-```
 
 Each stage shrinks the cost of recovery.
 
@@ -139,6 +135,28 @@ kubectl rollout undo deployment/api
 
 Rollback should complete inside one minute.
 
+## A release-readiness check
+
+Release quality becomes visible when you trace one deploy from commit intent to rollback path. Pick a recent release and check whether every step in the flow leaves evidence behind.
+
+### Verification steps
+
+1. Open one recent release note and the commits behind it.
+2. Check whether the SemVer bump matches the real compatibility impact.
+3. Verify that canary expansion rules and rollback commands are both written down.
+
+**Expected output:**
+
+- Commit conventions map cleanly into changelog and version automation.
+- User-facing release notes explain impact instead of internal implementation details.
+- Teams that rehearse rollback can afford to ship more often.
+
+### Failure modes to watch
+
+- Version numbers are chosen by feel instead of change type.
+- New code reaches 100% of traffic without a narrow validation stage.
+- Rollback commands exist on paper, but no one knows when they were last exercised.
+
 ## What to Notice in This Code
 
 - Commit conventions feed automation.
@@ -184,17 +202,29 @@ Mature teams combine trunk-based + feature flags + auto SemVer + canary + instan
 
 Releases are the interface of trust. Next we capture that trust in writing — documentation.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Version Control and Release?**
+  - The article treats Version Control and Release as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Version Control and Release?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Version Control and Release reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Software Engineering?](./01-what-is-software-engineering.md)
-- [Understanding Requirements](./02-understanding-requirements.md)
-- [Design vs Implementation](./03-design-vs-implementation.md)
-- [Code Review](./04-code-review.md)
-- [Testing Strategy](./05-testing-strategy.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): Understanding Requirements](./02-understanding-requirements.md)
+- [Software Engineering 101 (3/10): Design vs Implementation](./03-design-vs-implementation.md)
+- [Software Engineering 101 (4/10): Code Review](./04-code-review.md)
+- [Software Engineering 101 (5/10): Testing Strategy](./05-testing-strategy.md)
 - **Version Control and Release (current)**
 - Documentation (upcoming)
 - Collaboration Process (upcoming)
 - Maintenance and Tech Debt (upcoming)
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

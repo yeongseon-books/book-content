@@ -76,6 +76,10 @@ A beginner-friendly guide to multimodal AI covering text + image + audio + video
 
 Korean embeddings, OCR, and domestic LLM APIs in 6 parts.
 
+## [AI Web Development 101](ai-web-dev-101/)
+
+7-part guide for junior developers — from AI API basics to deployment.
+
 ## [Computer Science 101](computer-science-101/)
 
 An introductory series showing how major computer science subjects connect to each other.

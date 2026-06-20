@@ -1,9 +1,9 @@
 ---
 episode: 6
 language: en
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 series: ai-data-preparation-101
-status: content-ready
+status: publish-ready
 tags:
 - Quality Filtering
 - Heuristic Rules
@@ -15,17 +15,28 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
-title: Quality Filtering - Heuristics and Classifiers
+  tistory: false
+title: "AI Data Preparation 101 (6/10): Quality Filtering - Heuristics and Classifiers"
 seo_description: A raw corpus is almost always more than half garbage. Ads, auto-generated
   spam, broken encodings, and meaningless boilerplate are mixed in.
 ---
 
-# Quality Filtering - Heuristics and Classifiers
+# AI Data Preparation 101 (6/10): Quality Filtering - Heuristics and Classifiers
 
-> AI Data Preparation 101 series (6/10)
+Collected data is rarely clean enough to become training data as-is. The real question is how quickly you can separate usable samples from ads, spam, encoding breakage, and boilerplate before they distort learning.
 
----
+This is post 6 in the AI Data Preparation 101 series. Here we cover how heuristic rules and classifier-based filters work together to keep low-value samples out of the corpus.
+
+
+![AI data preparation chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/06/06-01-big-picture.en.png)
+*AI data preparation chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- Which low-cost heuristics catch obvious junk before you spend model calls on it?
+- What does language detection remove that simple length or symbol checks cannot?
+- How should perplexity and classifier scores sit behind the heuristic layer?
+
 ## "Collected does not mean trainable."
 
 A raw corpus is almost always more than half garbage. Ads, auto-generated spam, broken encodings, and meaningless boilerplate are mixed in. Training on it directly wrecks model perplexity and inflates hallucination rates.
@@ -218,6 +229,42 @@ Ordering matters. Heuristics run first because they are fastest. Perplexity and 
 - A fastText classifier handles tens of thousands of samples per second on CPU - the GPT-3 approach.
 - Order the pipeline cheap -> expensive to minimize cost.
 - Episode 7 covers synthetic data generation.
+
+---
+
+## Operational checklist
+
+- [ ] Keep heuristic thresholds tied to observed distributions rather than frozen constants
+- [ ] Run language detection, perplexity, and classifiers in cheap-to-expensive order
+- [ ] Compare source, language, and token-length distributions before and after filtering
+- [ ] Document the positive and negative corpora used to train the quality classifier
+- [ ] Track drop reasons by stage so threshold changes stay explainable
+
+## Answering the Opening Questions
+
+- **Which low-cost heuristics catch obvious junk before you spend model calls on it?**
+  - The article treats Quality Filtering - Heuristics and Classifiers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does language detection remove that simple length or symbol checks cannot?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should perplexity and classifier scores sit behind the heuristic layer?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
+- [AI Data Preparation 101 (2/10): Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
+- [AI Data Preparation 101 (3/10): Cleaning and Deduplication](./03-cleaning-deduplication.md)
+- [AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data](./04-pii-detection-anonymization.md)
+- [AI Data Preparation 101 (5/10): Tokenization and Chunking Strategies](./05-tokenization-chunking.md)
+- **Quality Filtering - Heuristics and Classifiers (current)**
+- Synthetic Data Generation - From Self-Instruct to Distillation (upcoming)
+- Data Augmentation - From EDA to Back-Translation (upcoming)
+- Train/Eval/Test Splitting and Contamination Control (upcoming)
+- Building a Production Data Pipeline (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [CCNet: Extracting High Quality Monolingual Datasets from Web Crawl Data (Wenzek et al., 2020)](https://arxiv.org/abs/1911.00359)

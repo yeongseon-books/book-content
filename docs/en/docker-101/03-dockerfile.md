@@ -1,10 +1,10 @@
 ---
 series: docker-101
 episode: 3
-title: Writing a Dockerfile
-status: content-ready
+title: "Docker 101 (3/10): Writing a Dockerfile"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,32 @@ tags:
   - Layer
   - Cache
 seo_description: FROM, RUN, COPY, and CMD plus layer-cache friendly ordering for fast, reproducible image builds with non-root execution.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Writing a Dockerfile
+# Docker 101 (3/10): Writing a Dockerfile
 
-> Docker 101 series (3/10)
+A Dockerfile is easy to underestimate because it looks like a short text file with a few instructions. In practice, it decides whether your team gets fast, repeatable builds or slow, noisy rebuilds that waste CI time and hide security mistakes inside oversized images.
 
-<!-- a-grade-intro:begin -->
+The difference is often not the choice of commands but the order of commands. What you copy first, what you install before code changes, and what you exclude from the build context determine whether Docker can reuse expensive layers or has to recalculate everything.
 
-**Core question**: To make images *reproducible*, *which commands* go in *what order*?
+This is post 3 in the Docker 101 series. It explains the role of the core Dockerfile instructions, then turns that syntax into build strategy through cache-aware ordering, `.dockerignore`, and non-root execution.
 
-> *A Dockerfile is both a *build recipe* and *documentation*. The *order of instructions* drives both *cache efficiency* and *debugging difficulty*.*
 
-<!-- a-grade-intro:end -->
+![docker 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/03/03-01-concept-at-a-glance.en.png)
+*docker 101 chapter 3 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- What *FROM / RUN / COPY / CMD* mean
-- An *ordering strategy* for the *layer cache*
-- The importance of *.dockerignore*
-- Running as a *non-root user*
-- Five common pitfalls
+- What *FROM / RUN / COPY / CMD* mean?
+- An *ordering strategy* for the *layer cache?
+- The importance of *.dockerignore?
 
 ## Why It Matters
 
 *One ordering choice* turns a build from *5 minutes into 30 seconds*. A good Dockerfile *visibly* changes team productivity.
 
 > *Slow builds are a *quiet cost*. At 50 builds a day, you lose *hundreds of hours per year*.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Base["FROM python:3.12-slim"] --> Deps["COPY requirements + RUN pip install"]
-    Deps --> Code["COPY ."]
-    Code --> Cmd["CMD"]
-```
 
 ## Key Terms
 
@@ -123,6 +112,16 @@ docker run --rm myapp:1.0
 docker history myapp:1.0
 ```
 
+### Verify right after you run it
+
+- Rebuild after changing only application code. The dependency install step should be cached and complete quickly.
+- `docker history myapp:1.0` should make the dependency layer and the application layer clearly separate.
+
+### If it does not work, check this first
+
+- If cache misses happen on every build, make sure `COPY . .` is not placed above the requirements copy step.
+- If `.env` or `.git` appears inside the image, review `.dockerignore` and the build-context path before anything else.
+
 ## What to Notice in This Code
 
 - *Requirements copied first* -> the *deps layer caches*.
@@ -166,9 +165,20 @@ Mature teams use *multi-stage builds* and *BuildKit cache mounts* to cut build t
 
 A good Dockerfile *saves your team time every day*. Next, *volumes and networks* for data and communication.
 
+## Answering the Opening Questions
+
+- **What *FROM / RUN / COPY / CMD* mean?**
+  - The article treats Writing a Dockerfile as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **An *ordering strategy* for the *layer cache?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The importance of *.dockerignore?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
-- [Images and Containers](./02-image-and-container.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Images and Containers](./02-image-and-container.md)
 - **Writing a Dockerfile (current)**
 - Volumes and Networks (upcoming)
 - Docker Compose (upcoming)
@@ -177,11 +187,18 @@ A good Dockerfile *saves your team time every day*. Next, *volumes and networks*
 - Running with a Database (upcoming)
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References
+
+### Official docs
 
 - [Dockerfile reference](https://docs.docker.com/engine/reference/builder/)
 - [Best practices for writing Dockerfiles](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
 - [Use a .dockerignore file](https://docs.docker.com/engine/reference/builder/#dockerignore-file)
 - [BuildKit](https://docs.docker.com/build/buildkit/)
+
+### Verification and troubleshooting
+
+- [docker build reference](https://docs.docker.com/engine/reference/commandline/build/)

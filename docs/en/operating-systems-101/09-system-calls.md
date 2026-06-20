@@ -1,10 +1,10 @@
 ---
 series: operating-systems-101
 episode: 9
-title: System Calls
-status: content-ready
+title: "Operating Systems 101 (9/10): System Calls"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,33 @@ tags:
   - Kernel
   - User Space
 seo_description: read, write, open, fork — how user code asks the kernel to do work through system calls, and what each call actually costs.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# System Calls
+# Operating Systems 101 (9/10): System Calls
 
-> Operating Systems 101 series (9/10)
+User code cannot touch the disk controller or network card directly. Every request goes through a narrow kernel entry point, and the cost of crossing that boundary explains why two equivalent programs can differ in runtime by orders of magnitude.
 
-<!-- a-grade-intro:begin -->
+System calls are also where performance, debugging, and security meet. Once you can see them, many OS-level mysteries stop being mysterious.
 
-**Core question**: What route does user code take to use kernel resources (files, network, processes), and what is the cost of that route?
+This is post 9 in the Operating Systems 101 series. It explains the user/kernel boundary, syscall cost, how to inspect real calls, and how batching and vDSO reduce overhead.
 
-> User code never touches the disk or the network card directly. Every request flows through a narrow door called a system call into the kernel. The door is safe but expensive. Once you understand what a system call is and why it costs, you can predict which of two equivalent programs will be faster.
 
-<!-- a-grade-intro:end -->
+![operating systems 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.en.png)
+*operating systems 101 chapter 9 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying System Calls?
+- Which signal should the example or diagram make visible for System Calls?
+- What failure should be prevented first when System Calls reaches a real system?
+
+## Questions this article answers
+
+- What is the real difference between user space and kernel space?
+- What transition cost is paid for each system call?
+- Why is `strace` often the fastest tool for understanding OS-level problems?
+- How do buffering, batching, and `vDSO` reduce syscall overhead?
 
 ## What You Will Learn
 
@@ -46,9 +59,9 @@ Two programs processing the same 100MB of data can be many times faster or slowe
 
 > A system call is the only contract between user code and the kernel, and the count and cost of those calls largely set the system's performance.
 
-## Concept at a Glance
-
 > User space is where ordinary programs run; kernel space is where the OS core runs. There is a privilege boundary between them, and user code can only enter the kernel through the narrow entry of a system call. Each entry pays for context switching and security checks, which is why it costs.
+
+### The privilege boundary a syscall crosses
 
 ```text
 [user space]
@@ -208,17 +221,29 @@ System calls are the only contract between user code and the kernel, and count i
 
 The next article looks at how all of these fundamentals are reassembled inside a container.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying System Calls?**
+  - The article treats System Calls as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for System Calls?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when System Calls reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Operating System?](./01-what-is-an-operating-system.md)
-- [Processes and Threads](./02-processes-and-threads.md)
-- [Scheduling](./03-scheduling.md)
-- [Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
-- [Locks, Mutexes, and Semaphores](./05-locks-mutex-semaphore.md)
-- [Memory Management](./06-memory-management.md)
-- [Virtual Memory](./07-virtual-memory.md)
-- [File Systems](./08-file-systems.md)
+## In this series
+
+- [Operating Systems 101 (1/10): What Is an Operating System?](./01-what-is-an-operating-system.md)
+- [Operating Systems 101 (2/10): Processes and Threads](./02-processes-and-threads.md)
+- [Operating Systems 101 (3/10): Scheduling](./03-scheduling.md)
+- [Operating Systems 101 (4/10): Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
+- [Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores](./05-locks-mutex-semaphore.md)
+- [Operating Systems 101 (6/10): Memory Management](./06-memory-management.md)
+- [Operating Systems 101 (7/10): Virtual Memory](./07-virtual-memory.md)
+- [Operating Systems 101 (8/10): File Systems](./08-file-systems.md)
 - **System Calls (current)**
 - Containers and the Operating System (upcoming)
+
 <!-- toc:end -->
 
 ## References

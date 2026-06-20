@@ -1,11 +1,11 @@
 ---
-title: Evaluating RAG Systems
+title: "AI Evaluation 101 (6/10): Evaluating RAG Systems"
 series: ai-evaluation-101
 episode: 6
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,29 +14,36 @@ tags:
 - RAG
 - Faithfulness
 - Retrieval
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: RAG requires evaluating both retrieval and generation stages. This
   post covers RAG-specific metrics like retrieval recall, context precision…
 ---
 
-# Evaluating RAG Systems
+# AI Evaluation 101 (6/10): Evaluating RAG Systems
 
-> AI Evaluation 101 Series (6/10)
+RAG requires evaluating both retrieval and generation stages.
 
-RAG requires evaluating both retrieval and generation stages. This post covers RAG-specific metrics like retrieval recall, context precision, faithfulness, and answer relevance.
+This is post 6 in the AI Evaluation 101 series. Here we cover RAG-specific metrics like retrieval recall, context precision, faithfulness, and answer relevance.
 
----
-![Evaluating RAG systems](../../assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.en.png)
 
+![Evaluating RAG systems](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.en.png)
 *Evaluating RAG systems*
+> RAG evaluation must separate whether the system found good evidence from whether it used that evidence faithfully.
+
+## Questions to Keep in Mind
+
+- Why should RAG evaluation separate retrieval and generation instead of judging only the final answer?
+- What do context precision, context recall, faithfulness, and answer relevance each diagnose?
+- How do you narrow whether retrieval or generation is the broken part?
+
 ## RAG Is a Pipeline, Not a Single Model
 
-![RAG is a Pipeline, not a single model](../../assets/ai-evaluation-101/06/06-02-rag-is-a-pipeline-not-a-single-model.en.png)
+![RAG is a Pipeline, not a single model](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-02-rag-is-a-pipeline-not-a-single-model.en.png)
 
 *RAG is a Pipeline, not a single model*
 A RAG (Retrieval-Augmented Generation) system runs in two stages.
 
-```
+```text
 question → [1. Retriever]  → top-K documents → [2. Generator (LLM)] → answer
             (vector DB)                          (uses context)
 ```
@@ -52,7 +59,7 @@ So RAG evaluation must measure **each stage separately**. A single number like "
 
 ## The Four Core RAG Metrics
 
-![The four core RAG metrics](../../assets/ai-evaluation-101/06/06-03-the-four-core-rag-metrics.en.png)
+![The four core RAG metrics](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-03-the-four-core-rag-metrics.en.png)
 
 *The four core RAG metrics*
 The industry standard, used by RAGAS and TruLens:
@@ -70,7 +77,7 @@ Let's look at each.
 
 ## Evaluating Retrieval
 
-![Evaluating retrieval](../../assets/ai-evaluation-101/06/06-04-evaluating-retrieval.en.png)
+![Evaluating retrieval](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-04-evaluating-retrieval.en.png)
 
 *Evaluating retrieval*
 ### Context Recall — Did we retrieve what we need
@@ -157,7 +164,7 @@ def context_precision(question: str, chunks: list[str]) -> float:
 
 ## Evaluating Generation
 
-![Evaluating generation](../../assets/ai-evaluation-101/06/06-05-evaluating-generation.en.png)
+![Evaluating generation](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-05-evaluating-generation.en.png)
 
 *Evaluating generation*
 ### Faithfulness — Hallucination Detection
@@ -316,9 +323,49 @@ Context Recall requires reference answers. Without them you cannot compute it. *
 - Use [RAGAS](https://docs.ragas.io/) to start fast; build custom metrics for domain-specific quality.
 
 The next post moves from single responses to evaluating **agent trajectories**.
+
+---
+
+## Operational checklist
+
+- [ ] Measure retrieval and generation separately instead of relying on one answer score.
+- [ ] Treat low faithfulness as a production-severity issue, not a cosmetic quality drop.
+- [ ] Tune top-K only while watching both context precision and answer quality.
+- [ ] Keep reference answers in the eval set so recall remains measurable.
+- [ ] Use the four-metric diagnosis table to decide which subsystem to change first.
+
+## Answering the Opening Questions
+
+- **Why should RAG evaluation separate retrieval and generation instead of judging only the final answer?**
+  - The final answer alone cannot tell whether retrieval failed, context was incomplete, or the model ignored the evidence.
+- **What do context precision, context recall, faithfulness, and answer relevance each diagnose?**
+  - Precision checks relevance of retrieved context, recall checks whether needed evidence was found, faithfulness checks grounding, and answer relevance checks whether the question was answered.
+- **How do you narrow whether retrieval or generation is the broken part?**
+  - Store retrieved documents, selected context, and generated answers together, then compare metrics by stage to find the first broken boundary.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
+- [AI Evaluation 101 (5/10): Designing Rubric-Based Scoring](./05-rubric-based-scoring.md)
+- **AI Evaluation 101 (6/10): Evaluating RAG Systems (current)**
+- AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (upcoming)
+- AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)
+- AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
+### Official docs
+
+- [RAGAS documentation](https://docs.ragas.io/)
+- [TruLens — RAG Triad and evaluation docs](https://www.trulens.org/getting_started/core_concepts/rag_triad/)
+- [LangSmith — Evaluate a RAG application](https://docs.smith.langchain.com/evaluation/tutorials/rag)
+
+### Papers and background
+
 - [RAGAS — Reference-Free Evaluation of RAG Pipelines (Es et al., 2023)](https://arxiv.org/abs/2309.15217)
-- [RAGAS Documentation](https://docs.ragas.io/)
-- [TruLens — Evaluation and Tracking for LLM Apps](https://www.trulens.org/)
-- [LangChain — RAG Evaluation Guide](https://docs.smith.langchain.com/evaluation/tutorials/rag)

@@ -1,10 +1,10 @@
 ---
 series: docker-101
 episode: 1
-title: What Is Docker?
-status: content-ready
+title: "Docker 101 (1/10): What Is Docker?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,43 +17,32 @@ tags:
   - Linux
   - Virtualization
 seo_description: Containers vs virtual machines and what Docker actually does, in a five-minute introduction with a runnable first container.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is Docker?
+# Docker 101 (1/10): What Is Docker?
 
-> Docker 101 series (1/10)
+Docker usually gets introduced as a convenience tool for developers. That framing is not wrong, but it is too small. What teams actually buy with Docker is reproducibility: the ability to move one runnable artifact across a laptop, CI, staging, and production without rewriting the environment story each time.
 
-<!-- a-grade-intro:begin -->
+When that reproducibility is missing, debugging turns vague very quickly. You stop asking whether the code is wrong and start asking whether Python, OpenSSL, libc, or a forgotten package version changed under your feet. Docker is valuable because it makes that ambiguity much smaller.
 
-**Core question**: What does Docker do to *eliminate* "*it works on my machine*"?
+This is the first post in the Docker 101 series. It sets the mental model for the rest of the series by clarifying what Docker is, how containers differ from virtual machines, and what you should verify when you run your first container.
 
-> *Docker bundles your *application + dependencies + runtime* into *one unit* so it runs *the same everywhere*.*
 
-<!-- a-grade-intro:end -->
+![docker 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/01/01-01-concept-at-a-glance.en.png)
+*docker 101 chapter 1 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The difference between *containers* and *virtual machines*
-- The *environment-drift* problem Docker solves
-- The big picture of *image / container / registry*
-- Run your first container
-- Five common pitfalls
+- The difference between *containers* and *virtual machines?
+- The *environment-drift* problem Docker solves?
+- The big picture of *image / container / registry?
 
 ## Why It Matters
 
 *Environment differences* are the most demoralizing thing for newcomers. *One Docker line* gives the *whole team the same environment*, cutting half of the debugging time.
 
 > *Environment problems are not a *skill issue*; they are a *design issue*.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Code["my code"] --> Image["Docker image"]
-    Image --> Container["container run"]
-    Container --> Anywhere["local / CI / server"]
-```
 
 ## Key Terms
 
@@ -107,6 +96,16 @@ docker pull redis:7-alpine
 docker images
 ```
 
+### Verify right after you run it
+
+- After `docker run hello-world`, Docker should print the standard success message explaining that it pulled the image and ran the test container.
+- `curl http://localhost:8080` should return the default nginx page. If the connection is refused, start with the port mapping.
+
+### If it does not work, check this first
+
+- Confirm that Docker Desktop or the Docker daemon is actually running; installation alone is not enough.
+- If the container is running but unreachable, verify that `-p 8080:80` maps host port to container port in the intended order.
+
 ## What to Notice in This Code
 
 - An *image* is a *snapshot just before run*; a *container* is a *live process*.
@@ -150,7 +149,18 @@ Most organizations operate on the assumption that *a service equals a container*
 
 Docker is the fastest way to kill *environment drift*. Next we look deeper into *images and containers*.
 
+## Answering the Opening Questions
+
+- **The difference between *containers* and *virtual machines?**
+  - The article treats What Is Docker? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The *environment-drift* problem Docker solves?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The big picture of *image / container / registry?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Docker? (current)**
 - Images and Containers (upcoming)
 - Writing a Dockerfile (upcoming)
@@ -161,11 +171,18 @@ Docker is the fastest way to kill *environment drift*. Next we look deeper into 
 - Running with a Database (upcoming)
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References
+
+### Official docs
 
 - [Docker overview](https://docs.docker.com/get-started/overview/)
 - [Get Docker](https://docs.docker.com/get-docker/)
 - [Docker Hub](https://hub.docker.com/)
 - [What is a container?](https://www.docker.com/resources/what-container/)
+
+### Verification and troubleshooting
+
+- [docker run reference](https://docs.docker.com/engine/reference/run/)

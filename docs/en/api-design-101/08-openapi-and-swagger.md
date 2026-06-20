@@ -1,10 +1,10 @@
 ---
 series: api-design-101
 episode: 8
-title: OpenAPI and Swagger
-status: content-ready
+title: "API Design 101 (8/10): OpenAPI and Swagger"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,27 @@ tags:
   - Documentation
   - Backend
 seo_description: A practical introduction to OpenAPI 3 and Swagger UI, comparing code-first and schema-first approaches for backend juniors.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# OpenAPI and Swagger
+# API Design 101 (8/10): OpenAPI and Swagger
 
-> API Design 101 series (8/10)
+Once documentation starts lagging behind the code, teams quietly stop trusting it. They probe the API directly, SDKs fall out of sync, and review conversations move away from the contract that callers are supposed to rely on.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the API Design 101 series.
 
-**Core question**: If you could capture *every promise* of an API in a single file, what would happen?
+Here, we treat OpenAPI and Swagger as contract automation, not just documentation tooling. A single spec needs to drive validation, examples, SDK generation, and mock behavior if it is going to be the source of truth in practice.
 
-> Documentation, validation, client SDKs, and mock servers all *follow automatically*.
 
-<!-- a-grade-intro:end -->
+![api design 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/08/08-01-concept-at-a-glance.en.png)
+*api design 101 chapter 8 flow overview*
+> OpenAPI is not a documentation tool — it is a single source of truth that prevents documentation and code from drifting apart.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The structure of the OpenAPI 3 spec
-- Swagger UI and Redoc
-- Code-first vs schema-first
-- Generating client SDKs
-- Preventing spec drift
+- The structure of the OpenAPI 3 spec?
+- Swagger UI and Redoc?
+- Code-first vs schema-first?
 
 ## Why It Matters
 
@@ -47,15 +46,7 @@ A single spec file produces *docs + validation + client code + mock server*. Han
 
 > Keep one *single source of truth*.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Spec["openapi.yaml"] --> Docs["Swagger UI / Redoc"]
-    Spec --> Validate["request validation"]
-    Spec --> Client["client SDK generation"]
-    Spec --> Mock["mock server"]
-```
+The real shift is organizational: the spec stops being a secondary artifact and becomes the contract that PRs review. That is what keeps one changed request field from silently diverging across docs, code, and generated clients.
 
 ## Key Terms
 
@@ -69,7 +60,7 @@ flowchart LR
 
 **Before (hand-written docs)**
 
-```
+```text
 README.md "GET /users/{id} returns user. id is integer."
 ```
 
@@ -142,7 +133,7 @@ def user(uid: int) -> User: return User(id=uid, name="Y")
 
 ### Step 4 — Swagger UI / Redoc
 
-```
+```http
 GET /docs        # Swagger UI (try it)
 GET /redoc       # Redoc (read it)
 GET /openapi.json
@@ -186,6 +177,12 @@ GitHub publishes its OpenAPI spec at `api.github.com/openapi`. Internally, havin
 - Document 4xx and 5xx in the spec, not just 200.
 - Separate *public* and *internal* specs.
 
+## Verification Signals and Failure Modes
+
+- **Expected output:** `/openapi.json` and `/docs` should describe the same endpoints, schemas, and examples, and CI should fail if they drift.
+- **First check:** If the code changes with no spec diff, or the spec changes with no code review, contract drift has already started.
+- **Failure mode:** Document only 200 responses and the try-it surface stops teaching users how failure paths actually behave.
+
 ## Checklist
 
 - [ ] Is the spec kept in sync with the code (checked in CI)?
@@ -204,17 +201,29 @@ GitHub publishes its OpenAPI spec at `api.github.com/openapi`. Internally, havin
 
 OpenAPI is the API's *protocol, documentation, and code* in one. The next episode looks at the discipline of *changing* a contract — versioning.
 
+## Answering the Opening Questions
+
+- **The structure of the OpenAPI 3 spec?**
+  - The article treats OpenAPI and Swagger as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Swagger UI and Redoc?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Code-first vs schema-first?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
-- [REST Basics](./02-rest-basics.md)
-- [Resource Design](./03-resource-design.md)
-- [HTTP Methods and Status Codes](./04-http-methods-and-status.md)
-- [Request and Response Schemas](./05-request-and-response-schema.md)
-- [Pagination and Filtering](./06-pagination-and-filtering.md)
-- [Designing Error Responses](./07-error-response-design.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
+- [API Design 101 (2/10): REST Basics](./02-rest-basics.md)
+- [API Design 101 (3/10): Resource Design](./03-resource-design.md)
+- [API Design 101 (4/10): HTTP Methods and Status Codes](./04-http-methods-and-status.md)
+- [API Design 101 (5/10): Request and Response Schemas](./05-request-and-response-schema.md)
+- [API Design 101 (6/10): Pagination and Filtering](./06-pagination-and-filtering.md)
+- [API Design 101 (7/10): Designing Error Responses](./07-error-response-design.md)
 - **OpenAPI and Swagger (current)**
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

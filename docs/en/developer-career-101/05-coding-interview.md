@@ -1,36 +1,42 @@
 ---
 series: developer-career-101
 episode: 5
-title: Preparing for Coding Interviews
-status: content-ready
+title: "Developer Career 101 (5/10): Preparing for Coding Interviews"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
 language: en
 tags:
-  - Career
-  - Interview
-  - Algorithms
-  - Practice
-  - Beginner
-seo_description: A beginner-friendly tour of patterns, mock interviews, and time management for coding interviews.
-last_reviewed: '2026-05-04'
+- Career
+- Interview
+- Algorithms
+- Practice
+- Beginner
+seo_description: A beginner-friendly tour of patterns, mock interviews, and time management
+  for coding interviews.
+last_reviewed: '2026-05-14'
 ---
 
-# Preparing for Coding Interviews
+# Developer Career 101 (5/10): Preparing for Coding Interviews
 
-> Developer Career 101 series (5/10)
+Solving lots of problems does not automatically translate into strong interview performance. In a live coding interview, you are also being scored on how you narrow ambiguity, explain your plan, recover from mistakes, and manage the clock while still producing correct code.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Developer Career 101 series.
 
-**Core question**: Is *practice problems* alone enough to be ready for the interview?
 
-> Patterns, communication, and time management must move together.
+![developer career 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/05/05-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 5 flow overview*
+> The substance of coding interviews is not the answer alone, but how you ask clarifying questions, communicate tradeoffs, and adapt when blocked.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- Why is raw problem count alone a weak preparation strategy?
+- How do recurring patterns reduce wasted time in unfamiliar questions?
+- Why do communication, complexity analysis, and time management change the score so much?
 
 ## What You Will Learn
 
@@ -44,15 +50,7 @@ last_reviewed: '2026-05-04'
 
 Without patterns, you waste time.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    P[Pattern] --> S[Solve]
-    S --> C[Communicate]
-    C --> M[Mock]
-    M --> F[Feedback]
-```
+Code interviews measure problem-solving under constraints. The process matters more than the syntax.
 
 ## Key Terms
 
@@ -110,6 +108,33 @@ def two_sum(nums, target):
 - next week: 5 dp problems + voice recording
 ```
 
+## Practice against the rubric, not just the problem set
+
+| Evaluation axis | Signal interviewers notice | Training habit |
+| --- | --- | --- |
+| Problem framing | You clarify constraints and edge cases early | Force yourself to ask two questions before coding |
+| Pattern choice | You can justify why this approach fits | Keep a notes page pairing pattern, trigger, and alternative |
+| Implementation stability | You recover from mistakes and re-read the code | Reserve the final three minutes for review |
+| Communication | You narrate decisions instead of coding silently | Record yourself explaining one solution each week |
+
+## Practice against the rubric, not just the problem set
+
+| Evaluation axis | Signal interviewers notice | Training habit |
+| --- | --- | --- |
+| Problem framing | You clarify constraints and edge cases early | Force yourself to ask two questions before coding |
+| Pattern choice | You can justify why this approach fits | Keep a notes page pairing pattern, trigger, and alternative |
+| Implementation stability | You recover from mistakes and re-read the code | Reserve the final three minutes for review |
+| Communication | You narrate decisions instead of coding silently | Record yourself explaining one solution each week |
+
+## Practice against the rubric, not just the problem set
+
+| Evaluation axis | Signal interviewers notice | Training habit |
+| --- | --- | --- |
+| Problem framing | You clarify constraints and edge cases early | Force yourself to ask two questions before coding |
+| Pattern choice | You can justify why this approach fits | Keep a notes page pairing pattern, trigger, and alternative |
+| Implementation stability | You recover from mistakes and re-read the code | Reserve the final three minutes for review |
+| Communication | You narrate decisions instead of coding silently | Record yourself explaining one solution each week |
+
 ## What to Notice in This Code
 
 - Patterns are shortcuts.
@@ -153,22 +178,34 @@ Companies run periodic coding assessments for internal leveling too.
 
 Next post covers *System Design Interviews*.
 
+## Answering the Opening Questions
+
+- **Why is raw problem count alone a weak preparation strategy?**
+  - The article treats Preparing for Coding Interviews as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do recurring patterns reduce wasted time in unfamiliar questions?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do communication, complexity analysis, and time management change the score so much?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Developer Career](./01-what-is-developer-career.md)
-- [Understanding Roles](./02-understanding-roles.md)
-- [Building a Learning Plan](./03-learning-plan.md)
-- [Resume and Portfolio](./04-resume-and-portfolio.md)
+## In this series
+
+- [Developer Career 101 (1/10): What Is a Developer Career](./01-what-is-developer-career.md)
+- [Developer Career 101 (2/10): Understanding Roles](./02-understanding-roles.md)
+- [Developer Career 101 (3/10): Building a Learning Plan](./03-learning-plan.md)
+- [Developer Career 101 (4/10): Resume and Portfolio](./04-resume-and-portfolio.md)
 - **Preparing for Coding Interviews (current)**
 - System Design Interviews (upcoming)
 - Settling into the First Job (upcoming)
 - Side Projects and Learning (upcoming)
 - Mentoring and Networking (upcoming)
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+- [LeetCode problem patterns](https://seanprashad.com/leetcode-patterns/)
 - [Cracking the Coding Interview](http://www.crackingthecodinginterview.com/)
-- [LeetCode patterns](https://seanprashad.com/leetcode-patterns/)
-- [Pramp](https://www.pramp.com/)
-- [Interviewing.io](https://interviewing.io/)
+- [Pramp mock interviews](https://www.pramp.com/)
+- [Interviewing.io engineering interview practice](https://interviewing.io/)

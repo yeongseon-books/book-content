@@ -1,10 +1,10 @@
 ---
 series: kubernetes-101
 episode: 6
-title: ConfigMap and Secret
-status: content-ready
+title: "Kubernetes 101 (6/10): ConfigMap and Secret"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,32 @@ tags:
   - Configuration
   - DevOps
 seo_description: A beginner guide to Kubernetes ConfigMap and Secret — splitting config from secrets and injecting them via env vars or file mounts
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# ConfigMap and Secret
+# Kubernetes 101 (6/10): ConfigMap and Secret
 
-> Kubernetes 101 series (6/10)
+It is easy to hardcode configuration and passwords when an application has only one environment. That shortcut becomes expensive as soon as you want the same image to move through dev, staging, and production without carrying secrets inside the artifact.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Kubernetes 101 series.
 
-**Core question**: How do you *inject* settings and *passwords* without *baking them into the image*?
+Here, we will use ConfigMap and Secret to split environment-specific values from the image and connect that split to injection methods, restart behavior, and external secret managers.
 
-> *ConfigMap* delivers *non-secret config*; *Secret* delivers *sensitive values* — both safely into a *Pod*.
+> Configuration becomes operationally useful only when the image can stay the same while the environment-specific values change outside it.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![kubernetes 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 6 flow overview*
 
-- Splitting *ConfigMap* and *Secret*
-- *Env vars* vs *file mounts*
-- The *base64* fact and the *encryption gap*
-- Integrating an *external secret manager*
-- *Restart on change*
+## Questions to Keep in Mind
+
+- Splitting *ConfigMap* and *Secret?
+- Env vars* vs *file mounts?
+- The *base64* fact and the *encryption gap?
 
 ## Why It Matters
 
 Pulling *environment differences* out of the image is what makes things *reproducible*. *Secrets* must be tracked *separately*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    CM["configmap"] --> Pod["pod"]
-    Sec["secret"] --> Pod
-    Pod --> Env["env"]
-    Pod --> File["mounted file"]
-```
 
 ## Key Terms
 
@@ -135,6 +125,22 @@ def restart(dep):
     )
 ```
 
+## Verification workflow
+
+```bash
+kubectl get configmap app-config -o yaml
+kubectl get secret app-secret -o yaml
+kubectl exec deploy/web -- env | grep 'LOG_LEVEL\|DB_PASSWORD'
+```
+
+**Expected output:** ConfigMap data should remain readable, Secret data should appear base64-encoded, and the `exec` check should confirm that the injected values reached the running process environment inside the container.
+
+**Failure modes to check first:**
+
+- If Secret data looks plain, revisit `stringData` vs `data` and how the manifest was rendered.
+- If the object changed but the app still sees the old value, check whether a rollout restart was skipped.
+- If the app expects files rather than env vars, the mount path matters more than `envFrom`.
+
 ## What to Notice in This Code
 
 - *stringData* handles *base64 encoding for you*.
@@ -178,17 +184,29 @@ The *External Secrets Operator* keeps *Vault / AWS Secrets Manager* as the *sour
 
 Config is solved. The next post covers persisting *state data* with *Volumes*.
 
+## Answering the Opening Questions
+
+- **Splitting *ConfigMap* and *Secret?**
+  - The article treats ConfigMap and Secret as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Env vars* vs *file mounts?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The *base64* fact and the *encryption gap?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
-- [Ingress](./05-ingress.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
 - **ConfigMap and Secret (current)**
 - Volume (upcoming)
 - HPA (upcoming)
 - Helm (upcoming)
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -197,3 +215,4 @@ Config is solved. The next post covers persisting *state data* with *Volumes*.
 - [Secret](https://kubernetes.io/docs/concepts/configuration/secret/)
 - [External Secrets Operator](https://external-secrets.io/)
 - [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
+- [Distribute credentials securely using Secrets](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/)

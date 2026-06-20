@@ -1,10 +1,10 @@
 ---
 series: distributed-systems-101
 episode: 9
-title: Distributed Transactions
-status: content-ready
+title: "Distributed Systems 101 (9/10): Distributed Transactions"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,46 +18,32 @@ tags:
   - Saga
   - Idempotency
 seo_description: We cover the difficulty of distributed transactions and the practical answers - 2PC, Saga, outbox, and idempotent operations - in short code.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Distributed Transactions
+# Distributed Systems 101 (9/10): Distributed Transactions
 
-> Distributed Systems 101 series (9/10)
+The painful part of a distributed transaction is not the success path where every service behaves. It is the partial-failure path where one side committed, another side timed out, and the business still expects a single answer.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Distributed Systems 101 series.
 
-**Core question**: What does it take to make two databases either both succeed or both fail?
+Here we compare the heavyweight answer of 2PC with the more common production answers: Saga, outbox relay, and idempotent recovery.
 
-> A distributed transaction is not the work of imitating ACID; it is the work of designing for an eventually agreed-upon outcome.
 
-<!-- a-grade-intro:end -->
+![distributed systems 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/09/09-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 9 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The difference between a single-node and a distributed transaction
-- How 2-phase commit works and where it falls short
-- The core of Saga — compensating transactions
-- Why idempotency is the foundation of distributed transactions
-- The outbox pattern you will see in real systems
+- The difference between a single-node and a distributed transaction?
+- How 2-phase commit works and where it falls short?
+- The core of Saga — compensating transactions?
 
 ## Why It Matters
 
 As microservices and multi-store architectures grow, "two systems in one transaction" appears more often. Single-DB ACID is far more expensive — sometimes impossible — across multiple nodes. Distributed transactions are essentially design under explicit tradeoffs.
 
 > A distributed transaction is the design of "recoverable inconsistency," not an imitation of ACID.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    C["coordinator"] -->|prepare| A["service A (DB)"]
-    C -->|prepare| B["service B (DB)"]
-    A -->|yes| C
-    B -->|yes| C
-    C -->|commit| A
-    C -->|commit| B
-```
 
 The coordinator sends prepare to both, and only commits when both answer yes. That is 2PC.
 
@@ -163,6 +149,18 @@ def apply(event):
 
 The last safety net for distributed transactions. Even if the same message arrives twice, the result happens once.
 
+## Operational walkthrough: order write succeeds, relay fails
+
+One of the most common real incidents is not a broken database transaction but a broken handoff after the transaction commits.
+
+1. The service writes `orders` and `outbox` rows in one local transaction.
+2. The API returns `201 Created` to the caller.
+3. The outbox relay crashes before publishing the message to Kafka.
+4. On restart, the relay scans the outbox table, finds the unpublished row, and publishes it.
+5. Downstream consumers may see the message twice if the relay crashed after publish but before marking the row as sent.
+
+That is why the operational contract is "at-least-once publish plus idempotent consume," not "relay never fails." Outbox reduces the dual-write problem to a recoverable backlog problem, which is a much more survivable failure mode.
+
 ## What to Notice in This Code
 
 - 2PC is strong but holds locks long and is fragile to coordinator failure.
@@ -208,17 +206,29 @@ XA/2PC still appears in RDBMS clusters and some brokers. Saga is the standard pa
 
 Distributed transactions are not about imitating ACID — they are about designing for "eventual agreement." In the final post we tie all the tools together into patterns for operable distributed systems.
 
+## Answering the Opening Questions
+
+- **The difference between a single-node and a distributed transaction?**
+  - The article treats Distributed Transactions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How 2-phase commit works and where it falls short?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The core of Saga — compensating transactions?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Distributed System?](./01-what-is-a-distributed-system.md)
-- [Failure Models](./02-failure-model.md)
-- [RPC and Message Passing](./03-rpc-and-message-passing.md)
-- [Consistency and CAP](./04-consistency-and-cap.md)
-- [Replication](./05-replication.md)
-- [Consensus and Raft](./06-consensus-and-raft.md)
-- [Leader Election](./07-leader-election.md)
-- [Message Queues and Event Sourcing](./08-message-queue-and-event-sourcing.md)
+## In this series
+
+- [Distributed Systems 101 (1/10): What Is a Distributed System?](./01-what-is-a-distributed-system.md)
+- [Distributed Systems 101 (2/10): Failure Models](./02-failure-model.md)
+- [Distributed Systems 101 (3/10): RPC and Message Passing](./03-rpc-and-message-passing.md)
+- [Distributed Systems 101 (4/10): Consistency and CAP](./04-consistency-and-cap.md)
+- [Distributed Systems 101 (5/10): Replication](./05-replication.md)
+- [Distributed Systems 101 (6/10): Consensus and Raft](./06-consensus-and-raft.md)
+- [Distributed Systems 101 (7/10): Leader Election](./07-leader-election.md)
+- [Distributed Systems 101 (8/10): Message Queues and Event Sourcing](./08-message-queue-and-event-sourcing.md)
 - **Distributed Transactions (current)**
-- patterns for operable distributed systems (upcoming)
+- Patterns for Operable Distributed Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -227,3 +237,4 @@ Distributed transactions are not about imitating ACID — they are about designi
 - [Saga pattern — microservices.io](https://microservices.io/patterns/data/saga.html)
 - [Transactional Outbox — microservices.io](https://microservices.io/patterns/data/transactional-outbox.html)
 - [Designing Data-Intensive Applications — chapter 9](https://dataintensive.net/)
+- [Life of a Cloud Spanner read-write transaction](https://cloud.google.com/spanner/docs/transactions)

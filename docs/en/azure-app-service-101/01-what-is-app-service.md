@@ -5,7 +5,7 @@ episode: 1
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -24,6 +24,8 @@ seo_description: The most important concept for understanding App Service is the
 When deploying a web application to Azure, **Azure App Service** is often the first service you encounter. It's a PaaS (Platform as a Service) where you just deploy your code without managing VMs. To use this service effectively, understanding its internals is crucial.
 
 In this post, we'll explore how the platform works, focusing on the **3-Plane Architecture**.
+
+This is the first post in the Azure App Service 101 series. It sets up the platform mental model you need before deployment, configuration, and troubleshooting start to feel real.
 
 ---
 
@@ -67,7 +69,7 @@ Each Plane has **independent APIs and failure modes**. For example:
 - Changing App Settings in the Management Plane → May restart the Runtime Plane
 - SCM (Kudu) site being inaccessible → App itself may still work fine
 
-![Three planes and their roles](../../assets/azure-app-service-101/01/01-three-plane-architecture.en.png)
+![Three planes and their roles](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/01/01-three-plane-architecture.en.png)
 
 *Three planes and their roles*
 
@@ -112,11 +114,11 @@ The Runtime Plane is where actual user requests are handled.
 
 ### Request Flow
 
-![Request flow through frontend and worker](../../assets/azure-app-service-101/01/02-request-flow.en.png)
+![Request flow through frontend and worker](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/01/02-request-flow.en.png)
 
 *Request flow through frontend and worker*
 
-```
+```text
 Client → App Service Frontend → Worker Instance → App Process
 ```
 
@@ -197,7 +199,7 @@ app.run(host="0.0.0.0", port=port)
 
 Understanding storage behavior is key to preventing production issues.
 
-![Ephemeral and persistent storage paths](../../assets/azure-app-service-101/01/03-file-system-layout.en.png)
+![Ephemeral and persistent storage paths](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/01/03-file-system-layout.en.png)
 
 *Ephemeral and persistent storage paths*
 

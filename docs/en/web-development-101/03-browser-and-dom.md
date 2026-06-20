@@ -1,10 +1,10 @@
 ---
 series: web-development-101
 episode: 3
-title: The Browser and the DOM
-status: content-ready
+title: "Web Development 101 (3/10): The Browser and the DOM"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,24 @@ tags:
   - JavaScript
   - Frontend
 seo_description: How the browser turns HTML into a moving page — DOM tree, the rendering pipeline, and the event loop explained for new web developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# The Browser and the DOM
+# Web Development 101 (3/10): The Browser and the DOM
 
-> Web Development 101 series (3/10)
+A browser does much more than print HTML on the screen. It parses text into a tree, calculates styles, decides layout, paints pixels, and keeps the page interactive through the event loop. If that pipeline feels vague, performance bugs and UI glitches are hard to reason about.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Web Development 101 series. Here we turn the browser into a concrete execution model so DOM updates, rendering costs, and event timing stop feeling magical and start feeling measurable.
 
-**Core question**: How does the browser turn HTML text into a *living screen* you can click?
 
-> It builds a *tree (the DOM)*, computes styles, runs layout and paint, and then handles *behavior* through the event loop.
+![web development 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/03/03-01-concept-at-a-glance.en.png)
+*web development 101 chapter 3 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- What the DOM is and how it gets built
-- The stages of the rendering pipeline
-- How JavaScript manipulates the DOM
-- The basics of events and the event loop
-- Patterns that ruin performance
+- What the DOM is and how it gets built?
+- The stages of the rendering pipeline?
+- How JavaScript manipulates the DOM?
 
 ## Why It Matters
 
@@ -47,20 +43,17 @@ Without a mental model of the DOM, you will never understand *why your page is s
 
 > The browser is *a machine for drawing the DOM*.
 
-## Concept at a Glance
+The browser does not jump from HTML text straight to pixels. It builds internal structures first, and DOM updates can force part of that pipeline to run again, which is why UI work and performance are tightly connected.
 
-```mermaid
-flowchart LR
-    HTML["HTML"] --> Parse["Parse"]
-    Parse --> DOM["DOM tree"]
-    CSS["CSS"] --> Style["Style calc"]
-    DOM --> Layout["Layout"]
-    Style --> Layout
-    Layout --> Paint["Paint"]
-    Paint --> Pixels["Pixels"]
-```
+### What to verify yourself
 
-Five stages: Parse, Style, Layout, Paint, Composite.
+- Inspect the DOM tree in the Elements tab and confirm it matches the input HTML structure.
+- Record a short interaction in the Performance tab and look for layout or paint work after a DOM mutation.
+- Run the `setTimeout(..., 0)` example and compare synchronous log order with callback order.
+
+**Expected output:** DOM changes trigger visible rendering work, and the timeout callback runs after the synchronous logs complete.
+
+**Failure mode to watch for:** Repeated DOM updates inside loops multiply layout cost. Injecting user content through `innerHTML` creates security problems before performance tuning even starts.
 
 ## Key Terms
 
@@ -183,9 +176,20 @@ React and Vue use a *Virtual DOM* to batch real DOM calls into one update. Infin
 
 The browser is *a machine for drawing the DOM*. Next, we look at the bridge between client and server: HTTP and APIs.
 
+## Answering the Opening Questions
+
+- **What the DOM is and how it gets built?**
+  - The article treats The Browser and the DOM as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The stages of the rendering pipeline?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How JavaScript manipulates the DOM?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
 - **The Browser and the DOM (current)**
 - HTTP and APIs (upcoming)
 - Frontend and Backend (upcoming)
@@ -194,11 +198,16 @@ The browser is *a machine for drawing the DOM*. Next, we look at the bridge betw
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [DOM (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model)
-- [Critical rendering path (MDN)](https://developer.mozilla.org/en-US/docs/Web/Performance/Critical_rendering_path)
-- [Event delegation (MDN)](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#event_delegation)
+### Official Docs
+- [Introduction to the DOM (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction)
+- [Critical rendering path (MDN)](https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/Critical_rendering_path)
 - [Event loop (MDN)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop)
+
+### Practical Tools
+- [Event bubbling and delegation (MDN)](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Event_bubbling)
+- [Performance panel overview (Chrome DevTools)](https://developer.chrome.com/docs/devtools/performance)

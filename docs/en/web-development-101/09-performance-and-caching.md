@@ -1,10 +1,10 @@
 ---
 series: web-development-101
 episode: 9
-title: Performance and Caching
-status: content-ready
+title: "Web Development 101 (9/10): Performance and Caching"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,24 @@ tags:
   - CDN
   - Optimization
 seo_description: HTTP cache, CDNs, lazy loading, and DB indexes — four tools to make a slow web app fast, explained for new web developers with examples.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Performance and Caching
+# Web Development 101 (9/10): Performance and Caching
 
-> Web Development 101 series (9/10)
+When a page feels slow, the biggest risk is fixing the wrong layer first. The bottleneck might be the browser, the network, a missing cache, or an expensive database query. Without a measurement-first model, “optimization” easily becomes random code movement.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Web Development 101 series. Here we connect performance measurement, HTTP caching, CDNs, lazy loading, and database indexing into one workflow for narrowing down slowness instead of guessing at it.
 
-**Core question**: When a page is slow, *where* should you start fixing it?
 
-> Measure, cache, reduce, defer. Make the same work happen *less often* and *closer* to the user.
+![web development 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/09/09-01-concept-at-a-glance.en.png)
+*web development 101 chapter 9 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- Basic performance measurement (browser and server)
-- HTTP cache headers (Cache-Control, ETag)
-- The role of a CDN
-- Lazy loading and code splitting
-- DB indexes and the N+1 problem
+- Basic performance measurement (browser and server)?
+- HTTP cache headers (Cache-Control, ETag)?
+- The role of a CDN?
 
 ## Why It Matters
 
@@ -47,17 +43,17 @@ A fast site is *money* — conversion, search rank, and user satisfaction all sc
 
 > Performance starts with *measuring*.
 
-## Concept at a Glance
+Performance work gets easier once you see each cache as a separate distance-reduction tool. The browser, CDN, application cache, and database are not interchangeable; they remove different kinds of repeated work.
 
-```mermaid
-flowchart LR
-    User["User"] --> CDN["CDN cache"]
-    CDN --> Server["App server"]
-    Server --> AppCache["App cache (Redis)"]
-    AppCache --> DB[("Database")]
-```
+### What to verify yourself
 
-The closest cache that has the answer is the *fastest*.
+- Capture a baseline with Lighthouse or the Performance tab before changing anything.
+- Add `Cache-Control` headers to static assets and compare request cost on the second load.
+- Compare query time before and after an index or a join-based fix for an N+1 pattern.
+
+**Expected output:** Cached static assets become cheaper to reload, and database improvements produce measurable latency reductions rather than vague “it feels faster” impressions.
+
+**Failure mode to watch for:** Caching dynamic per-user responses at the wrong layer can leak data. Optimizing before measuring often targets the wrong bottleneck entirely.
 
 ## Key Terms
 
@@ -191,22 +187,38 @@ Browser → CDN → app cache (Redis) → DB — this *four-layer cache* underpi
 
 Performance starts with *measurement*. In the final post we tie everything together and build a small web app.
 
+## Answering the Opening Questions
+
+- **Basic performance measurement (browser and server)?**
+  - The article treats Performance and Caching as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **HTTP cache headers (Cache-Control, ETag)?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The role of a CDN?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
-- [The Browser and the DOM](./03-browser-and-dom.md)
-- [HTTP and APIs](./04-http-and-api.md)
-- [Frontend and Backend](./05-frontend-and-backend.md)
-- [Authentication and Sessions](./06-auth-and-sessions.md)
-- [Connecting to a Database](./07-connecting-to-database.md)
-- [Deployment](./08-deployment.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): The Browser and the DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP and APIs](./04-http-and-api.md)
+- [Web Development 101 (5/10): Frontend and Backend](./05-frontend-and-backend.md)
+- [Web Development 101 (6/10): Authentication and Sessions](./06-auth-and-sessions.md)
+- [Web Development 101 (7/10): Connecting to a Database](./07-connecting-to-database.md)
+- [Web Development 101 (8/10): Deployment](./08-deployment.md)
 - **Performance and Caching (current)**
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+### Official Docs
 - [HTTP caching (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching)
 - [Lazy loading (MDN)](https://developer.mozilla.org/en-US/docs/Web/Performance/Lazy_loading)
-- [Lighthouse overview](https://developer.chrome.com/docs/lighthouse/overview/)
-- [Database indexes (Use The Index, Luke!)](https://use-the-index-luke.com/)
+- [Lighthouse overview (Chrome)](https://developer.chrome.com/docs/lighthouse/overview)
+
+### Verification Resources
+- [Web performance metrics (web.dev)](https://web.dev/explore/metrics)
+- [Use The Index, Luke!](https://use-the-index-luke.com/)

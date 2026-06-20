@@ -1,10 +1,10 @@
 ---
 series: statistics-101
 episode: 8
-title: Correlation and Regression
+title: "Statistics 101 (8/10): Correlation and Regression"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,25 +20,24 @@ seo_description: A side-by-side look at correlation coefficients and simple line
 last_reviewed: '2026-05-04'
 ---
 
-# Correlation and Regression
+# Statistics 101 (8/10): Correlation and Regression
 
-> Statistics 101 series (8/10)
+When two variables move together, people immediately want an explanation. Does more ad spend increase revenue? Does more study time improve the score? Does a lower price increase demand? Those are natural questions, but the first pattern you see is not automatically a proof of causation.
 
-<!-- a-grade-intro:begin -->
+Correlation describes direction and strength. Regression writes the relationship as an equation you can inspect and use for prediction. They are closely related, but they do not answer the same question.
 
-**Core question**: When two variables *move together*, what does that *prove*? *How strongly* and *in what way* do they move?
+This is post 8 in the Statistics 101 series. Here we will compare correlation coefficients with simple linear regression, explain why R² and residuals matter, and draw a clear boundary between relationship and causation.
 
-> *Correlation is companionship; regression is predictable companionship.*
 
-<!-- a-grade-intro:end -->
+![statistics 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 8 flow overview*
+> Correlation shows *co-movement*; regression shows *prediction*. *Neither* proves *causation*.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The meaning of the *Pearson correlation coefficient*
-- *Simple linear regression*
-- The meaning of *R²*
-- A 5-step regression exercise
-- Five common mistakes
+- What does a correlation coefficient tell us, and what does it not tell us?
+- What extra information does a regression equation provide?
+- How should we interpret R²?
 
 ## Why It Matters
 
@@ -47,15 +46,7 @@ last_reviewed: '2026-05-04'
 > *Correlation is not causation.*
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    XY["X, Y"] --> Corr["Pearson r"]
-    Corr --> Line["Regression Line"]
-    Line --> R2["R^2"]
-    R2 --> Predict["Predict y from x"]
-```
-
+Correlation measures how tightly two variables move together. Regression builds a *line* (or *model*) to predict one variable from another. Both are powerful—and both are easily misused.
 ## Key Terms
 
 - **Pearson r**: strength of *linear correlation* (-1 to +1).
@@ -86,6 +77,8 @@ sales = np.array([1300, 1280, 1320, 1360, 1410, 1450])
 print("r:", np.corrcoef(ads, sales)[0, 1])
 ```
 
+**Expected output:** something close to `r: 0.9...`, indicating a strong positive linear relationship in this toy dataset.
+
 ### Step 3 — Fit a regression
 
 ```python
@@ -95,11 +88,15 @@ model = LinearRegression().fit(X, sales)
 print("β1:", model.coef_[0], "β0:", model.intercept_)
 ```
 
+**Expected output:** `β1` tells you how much sales move per one-unit increase in ad spend, while `β0` gives the fitted intercept.
+
 ### Step 4 — R²
 
 ```python
 print("R^2:", model.score(X, sales))
 ```
+
+**Expected output:** often something like `R^2: 0.8...` on this simple example. That is high explanatory power, but it is still not a substitute for residual checks.
 
 ### Step 5 — Residuals
 
@@ -152,17 +149,29 @@ Revenue forecasting, price ~ demand, ads ~ conversion, usage ~ churn — used ev
 
 Correlation and regression are the most basic tools for *expressing relationships as numbers*. The next episode goes deep into the *true meaning of the p-value*.
 
+## Answering the Opening Questions
+
+- **What does a correlation coefficient tell us, and what does it not tell us?**
+  - The article treats Correlation and Regression as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What extra information does a regression equation provide?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should we interpret R²?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
-- [Distributions](./03-distributions.md)
-- [Sample and Population](./04-sample-and-population.md)
-- [Estimation](./05-estimation.md)
-- [Confidence Interval](./06-confidence-interval.md)
-- [Hypothesis Testing](./07-hypothesis-testing.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): Distributions](./03-distributions.md)
+- [Statistics 101 (4/10): Sample and Population](./04-sample-and-population.md)
+- [Statistics 101 (5/10): Estimation](./05-estimation.md)
+- [Statistics 101 (6/10): Confidence Interval](./06-confidence-interval.md)
+- [Statistics 101 (7/10): Hypothesis Testing](./07-hypothesis-testing.md)
 - **Correlation and Regression (current)**
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

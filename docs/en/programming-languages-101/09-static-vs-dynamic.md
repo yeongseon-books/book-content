@@ -1,10 +1,10 @@
 ---
 series: programming-languages-101
 episode: 9
-title: Static vs Dynamic Languages
-status: content-ready
+title: "Programming Languages 101 (9/10): Static vs Dynamic Languages"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,45 +18,39 @@ tags:
   - Tradeoffs
   - Safety
 seo_description: Static vs dynamic is not better vs worse. It is a choice about when checking happens. See the same function in both forms and weigh the tradeoffs.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Static vs Dynamic Languages
+# Programming Languages 101 (9/10): Static vs Dynamic Languages
 
-> Programming Languages 101 series (9/10)
+People often say static typing is safer, but the moment you ask what that safety really covers, the answer gets fuzzy. The same thing happens on the other side: dynamic languages are called faster, when the real question is faster in what sense and for which stage of work.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Programming Languages 101 series.
 
-**Core question**: Is static typing really "safer" than dynamic typing — and what does that safety actually cover?
+In this post, we will compare static and dynamic languages as a choice about when type promises are checked, not as a contest between good and bad. Side by side, the same function will show which errors move earlier, which ones stay at runtime, and why gradual typing became the compromise many teams adopted.
 
-> Static and dynamic are not good and bad. They are a choice between **checking at compile time or at run time**. Both catch the same kinds of errors, but at different moments and at different costs. Neither stops every bug.
 
-<!-- a-grade-intro:end -->
+![programming languages 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/09/09-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 9 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- A one-line definition of static vs dynamic
-- The difference shown by the same function with and without hints
-- What mypy/pyright catches and what it cannot
-- What gradual typing makes possible
-- The limits of the "static is safe, dynamic is fast" myth
+- What boundary should you inspect first when applying Static vs Dynamic Languages?
+- Which signal should the example or diagram make visible for Static vs Dynamic Languages?
+- What failure should be prevented first when Static vs Dynamic Languages reaches a real system?
+
+## Questions this article answers
+
+- What is the shortest definition of static vs dynamic?
+- How is the same code validated differently under the two models?
+- What can mypy or pyright catch, and what can they not catch?
+- What kind of compromise does gradual typing make possible?
 
 ## Why It Matters
 
 Every team debates "should we add more types?" Holding that conversation well requires a one-line answer for what static typing guarantees and what it does not.
 
 > A type is a promise about the shape of data. Where that promise is checked is what static vs dynamic comes down to.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    A["source"] --> B{"when is type checked?"}
-    B -->|compile time| C["static: errors blocked before run"]
-    B -->|run time| D["dynamic: only known when hit"]
-    C --> E["TypeError breaks the build"]
-    D --> F["TypeError fires in production"]
-```
 
 The same kind of bug — caught by static at build time, by dynamic at run time.
 
@@ -176,6 +170,29 @@ call_all(ops, 3, 4)
 
 Metaprogramming and plugin patterns are possible in static typing too, but usually with more boilerplate. Dynamic expressiveness shows up here.
 
+### Step 6 — Combine boundary validation with static checking
+
+```python
+# 6_boundary_validation.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Item:
+    price: int
+
+def parse_item(raw: dict[str, object]) -> Item:
+    price = raw.get("price")
+    if not isinstance(price, int):
+        raise ValueError("price must be int")
+    return Item(price=price)
+
+payload = {"price": 10}
+item = parse_item(payload)
+print(item.price + 5)  # 15
+```
+
+This is the common production pattern. Runtime validation narrows uncertain external input first, then static typing takes over inside the codebase and gives you stronger refactoring support.
+
 ## What to Notice in This Code
 
 - Static typing's guarantee ends where external input begins.
@@ -223,22 +240,36 @@ A common design pattern is now "validate strongly at the boundary, type precisel
 
 Static and dynamic are not better and worse — they are tradeoffs. In the final episode we put all these choices together and ask what makes a good language design.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Static vs Dynamic Languages?**
+  - The article treats Static vs Dynamic Languages as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Static vs Dynamic Languages?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Static vs Dynamic Languages reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
-- [Type Systems](./03-type-system.md)
-- [Scope and Binding](./04-scope-and-binding.md)
-- [Functions and Closures](./05-functions-and-closures.md)
-- [Objects and Prototypes](./06-objects-and-prototypes.md)
-- [Memory Management](./07-memory-management.md)
-- [Interpreters and Compilers](./08-interpreter-and-compiler.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
+- [Programming Languages 101 (3/10): Type Systems](./03-type-system.md)
+- [Programming Languages 101 (4/10): Scope and Binding](./04-scope-and-binding.md)
+- [Programming Languages 101 (5/10): Functions and Closures](./05-functions-and-closures.md)
+- [Programming Languages 101 (6/10): Objects and Prototypes](./06-objects-and-prototypes.md)
+- [Programming Languages 101 (7/10): Memory Management](./07-memory-management.md)
+- [Programming Languages 101 (8/10): Interpreters and Compilers](./08-interpreter-and-compiler.md)
 - **Static vs Dynamic Languages (current)**
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
 - [PEP 484 — Type Hints](https://peps.python.org/pep-0484/)
 - [mypy documentation](https://mypy.readthedocs.io/)
+- [Python typing documentation](https://docs.python.org/3/library/typing.html)
+- [Pyright documentation](https://microsoft.github.io/pyright/)
 - [TypeScript Handbook — Basic Types](https://www.typescriptlang.org/docs/handbook/2/basic-types.html)
-- [Gradual typing (Wikipedia)](https://en.wikipedia.org/wiki/Gradual_typing)
+- [PEP 589 — TypedDict](https://peps.python.org/pep-0589/)

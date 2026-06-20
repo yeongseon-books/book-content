@@ -1,10 +1,10 @@
 ---
 series: model-evaluation-101
 episode: 1
-title: Why Model Evaluation Is Hard
-status: content-ready
+title: "Model Evaluation 101 (1/10): Why Model Evaluation Is Hard"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,30 @@ tags:
   - Foundations
   - Beginner
 seo_description: Why a single accuracy number is the wrong evaluation, and how data distribution, business cost, and thresholds change the answer
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Why Model Evaluation Is Hard
+# Model Evaluation 101 (1/10): Why Model Evaluation Is Hard
 
-> Model Evaluation 101 series (1/10)
+Model evaluation tends to feel easier in a notebook than it does in production. A single score can look clean, yet the decision behind it is rarely clean. The same 95% accuracy means very different things depending on the data distribution, the cost of mistakes, and the threshold that turns scores into action.
 
-<!-- a-grade-intro:begin -->
+When evaluation gets shaky, model selection gets shaky with it. The real danger is not one bad number, but a whole team optimizing toward the wrong number. That is why evaluation is less about metric calculation and more about decision design.
 
-**Core question**: Is a model with 99% accuracy actually a good model?
+This is the first post in the Model Evaluation 101 series. In this post, we build the mental model you need before train/validation/test splits, class-specific metrics, and reporting start to matter.
 
-> *Evaluation is not one number. It is the intersection of data distribution, cost structure, and the decision the model supports.*
 
-<!-- a-grade-intro:end -->
+![model evaluation 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 1 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- Four reasons evaluation is hard
-- Why metrics are not business value
-- The threat of distribution drift
-- How thresholds drive decisions
-- Five common pitfalls
+- Four reasons evaluation is hard?
+- Why metrics are not business value?
+- The threat of distribution drift?
 
 ## Why It Matters
 
 Evaluation is the language of model selection. When the language is wrong, the entire team aims at the wrong target.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Data["data"] --> Pred["predictions"]
-    Pred --> Metric["metric(s)"]
-    Cost["business cost"] --> Metric
-    Metric --> Decide["decision"]
-```
 
 ## Key Terms
 
@@ -111,6 +99,8 @@ def cost(tp, fp, fn, c_fp=1, c_fn=10):
 print("cost:", cost(tp=5, fp=10, fn=2))
 ```
 
+**Expected output:** You should see that the dummy model can look strong on accuracy while still collapsing on recall, and that the "best" threshold changes once you price false positives and false negatives differently.
+
 ## What to Notice in This Code
 
 - 95% accuracy can be completely useless.
@@ -154,7 +144,18 @@ A/B experiments, MLOps gates, and compliance reviews all hinge on the evaluation
 
 Evaluation is the language of model selection. Next, we cover the roles of train, validation, and test sets.
 
+## Answering the Opening Questions
+
+- **Four reasons evaluation is hard?**
+  - The article treats Why Model Evaluation Is Hard as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why metrics are not business value?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The threat of distribution drift?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **Why Model Evaluation Is Hard (current)**
 - Train, Validation, and Test (upcoming)
 - The Limits of Accuracy (upcoming)
@@ -165,6 +166,7 @@ Evaluation is the language of model selection. Next, we cover the roles of train
 - Cross Validation (upcoming)
 - Error Analysis (upcoming)
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References

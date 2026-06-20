@@ -1,13 +1,13 @@
 ---
-title: list, tuple, set, dict
+title: "Python 101 (4/10): list, tuple, set, dict"
 series: python-101
 episode: 4
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 tags:
@@ -17,50 +17,38 @@ tags:
 - mutability
 - comprehensions
 - hashable
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: 네 자료구조는 "가변성, 순서, 중복 허용, 해시 가능성"이라는 네 축의 조합으로 구분되며, 자료구조를 고른다는 것은
   이 네 축에서 어떤…
 ---
 
-# list, tuple, set, dict
+# Python 101 (4/10): list, tuple, set, dict
+
+list, tuple, set, dict는 비슷해 보여도 가변성, 순서, 중복 허용, 해시 가능성이라는 네 축에서 역할이 갈립니다. 자료구조 선택은 결국 이 네 축에서 무엇을 우선할지 정하는 일입니다.
+
+이 글은 Python 101 시리즈의 네 번째 글입니다.
 
 
-## 이 글에서 다룰 문제
+![Python 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/04/04-01-mental-model.ko.png)
+*Python 101 4장 흐름 개요*
+> list, tuple, set, dict의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
-자료구조 선택은 코드의 성능과 의미를 동시에 결정합니다. list로 충분한 자리에 dict를 쓰면 코드가 무거워지고, set으로 처리할 일을 list로 처리하면 한 번의 멤버십 검사가 O(n)이 되어 데이터가 커질수록 느려집니다. 반대로 tuple로 표현해야 할 "변하지 않는 한 묶음"을 list로 두면, 누군가 실수로 원소를 바꿔도 타입 시스템이 막아 주지 않습니다.
+## 먼저 던지는 질문
 
-실제 현장에서 자주 마주치는 사고는 다음과 같습니다.
+- list를 `=`으로 "복사"한 뒤 한쪽을 바꿨는데 양쪽이 함께 바뀌는 alias 사고?
+- 함수의 기본 인자로 `def f(items=[]):`를 썼다가, 호출이 누적될수록 리스트가 자라는 문제?
+- dict에서 없는 키를 `d[key]`로 꺼내다가 `KeyError`로 멈추는 일?
 
-- list를 `=`으로 "복사"한 뒤 한쪽을 바꿨는데 양쪽이 함께 바뀌는 alias 사고
-- 함수의 기본 인자로 `def f(items=[]):`를 썼다가, 호출이 누적될수록 리스트가 자라는 문제
-- dict에서 없는 키를 `d[key]`로 꺼내다가 `KeyError`로 멈추는 일
-- set에 dict이나 list를 넣으려다가 `TypeError: unhashable type`을 만나는 일
-
-이 글은 네 자료구조의 차이를 한 장에 정리해, 다음 글의 제어 흐름과 함수에서 자료구조를 의식적으로 고르도록 돕습니다.
-
-## Mental Model
+## 멘탈 모델
 
 > 네 자료구조는 "가변성, 순서, 중복 허용, 해시 가능성"이라는 네 축의 조합으로 구분되며, 자료구조를 고른다는 것은 이 네 축에서 어떤 보장을 받고 어떤 보장을 포기할지를 결정하는 일입니다.
 네 자료구조를 가변성·순서·해시 가능성으로 묶으면 머릿속에 잘 박힙니다.
 
-![Mental Model](../../assets/python-101/04/04-01-mental-model.ko.png)
-
-*Mental Model*
 세 가지 핵심 규칙입니다.
 
 1. **가변(list, dict, set)** 은 만든 뒤에 내용을 바꿀 수 있고, **불변(tuple, str, int)** 은 바꿀 수 없습니다.
 2. **dict의 키와 set의 원소는 hashable해야** 합니다. tuple은 안에 들어 있는 값이 모두 hashable이면 자기도 hashable입니다.
 3. **dict와 set은 평균 O(1)** 으로 키 검색이 끝나지만, list는 O(n)입니다. "이 값이 있나?"를 자주 묻는 자료라면 set이나 dict를 씁니다.
-
-```mermaid
-flowchart TB
-    Q1{"키-값 매핑인가?"} -->|예| Dict["dict"]
-    Q1 -->|아니오| Q2{"중복을 허용하나?"}
-    Q2 -->|아니오| Set["set / frozenset"]
-    Q2 -->|예| Q3{"만든 뒤 바뀌나?"}
-    Q3 -->|예| List["list"]
-    Q3 -->|아니오| Tuple["tuple"]
-```
 
 *자료구조 결정 트리: 위에서 아래로 네 질문을 따라가면 자연스럽게 하나가 남습니다.*
 
@@ -68,7 +56,7 @@ flowchart TB
 
 ### 1) list — 순서가 있고 가변
 
-```python
+```text
 >>> nums = [3, 1, 4, 1, 5]
 >>> nums.append(9)
 >>> nums
@@ -81,7 +69,7 @@ flowchart TB
 [1, 4, 1]
 >>> sorted(nums)
 [1, 1, 3, 4, 5, 9]
->>> nums.sort()      # 제자리 정렬, None 반환
+>>> nums.sort()      # in place; returns None
 >>> nums
 [1, 1, 3, 4, 5, 9]
 ```
@@ -90,22 +78,22 @@ flowchart TB
 
 `append`와 `extend`도 헷갈리기 쉽습니다.
 
-```python
+```text
 >>> a = [1, 2]
 >>> a.append([3, 4])
 >>> a
-[1, 2, [3, 4]]            # 리스트가 통째로 들어감
+[1, 2, [3, 4]]            # the whole list is added as one element
 >>> a = [1, 2]
 >>> a.extend([3, 4])
 >>> a
-[1, 2, 3, 4]              # 원소를 하나씩 추가
+[1, 2, 3, 4]              # elements are added one by one
 ```
 
 ### 2) tuple — 순서가 있고 불변
 
-```python
+```text
 >>> point = (3, 4)
->>> x, y = point          # 언패킹
+>>> x, y = point          # unpacking
 >>> x, y
 (3, 4)
 >>> point[0] = 10
@@ -118,7 +106,7 @@ tuple은 "묶음의 정체성"을 표현할 때 좋습니다. 좌표 `(x, y)`, R
 
 요소가 하나인 튜플은 콤마가 필수입니다. `(1)`은 그냥 정수입니다.
 
-```python
+```text
 >>> type((1))
 <class 'int'>
 >>> type((1,))
@@ -129,24 +117,24 @@ tuple은 "묶음의 정체성"을 표현할 때 좋습니다. 좌표 `(x, y)`, R
 
 set은 멤버십 검사와 중복 제거에 강합니다.
 
-```python
+```text
 >>> seen = {1, 2, 3}
->>> seen.add(2)             # 이미 있으므로 무시
+>>> seen.add(2)             # already present; ignored
 >>> seen
 {1, 2, 3}
 >>> 2 in seen
 True
->>> {1, 2, 3} & {2, 3, 4}   # 교집합
+>>> {1, 2, 3} & {2, 3, 4}   # intersection
 {2, 3}
->>> {1, 2, 3} | {2, 3, 4}   # 합집합
+>>> {1, 2, 3} | {2, 3, 4}   # union
 {1, 2, 3, 4}
->>> {1, 2, 3} - {2}         # 차집합
+>>> {1, 2, 3} - {2}         # difference
 {1, 3}
 ```
 
 빈 set은 `set()`이지 `{}`이 아닙니다. `{}`은 빈 dict입니다.
 
-```python
+```text
 >>> type({})
 <class 'dict'>
 >>> type(set())
@@ -159,7 +147,7 @@ set의 반복 순서는 보장되지 않습니다. 출력을 비교하는 테스
 
 dict는 가장 자주 쓰는 자료구조입니다. Python 3.7부터 삽입 순서를 보존합니다.
 
-```python
+```text
 >>> user = {"name": "ada", "age": 30}
 >>> user["name"]
 'ada'
@@ -168,7 +156,7 @@ dict는 가장 자주 쓰는 자료구조입니다. Python 3.7부터 삽입 순�
 {'name': 'ada', 'age': 30, 'email': 'ada@example.com'}
 >>> "age" in user
 True
->>> user.get("phone")          # 없으면 None
+>>> user.get("phone")          # missing → None
 >>> user.get("phone", "N/A")
 'N/A'
 >>> list(user.keys())
@@ -186,8 +174,8 @@ dict의 키와 set의 원소는 **hashable**해야 합니다. 즉 한 번 만들
 - hashable: `int`, `float`, `str`, `bool`, `bytes`, 모든 원소가 hashable인 `tuple`
 - not hashable: `list`, `set`, `dict` (가변이라 hash 결과가 도중에 바뀔 수 있어서)
 
-```python
->>> {(1, 2), (3, 4)}                    # tuple은 hashable
+```text
+>>> {(1, 2), (3, 4)}                    # tuples are hashable
 {(1, 2), (3, 4)}
 >>> {[1, 2], [3, 4]}
 Traceback (most recent call last):
@@ -201,7 +189,7 @@ set 안에 set을 넣고 싶다면 `frozenset`을 씁니다.
 
 list, set, dict 모두 comprehension 문법을 갖고 있습니다.
 
-```python
+```text
 >>> [n * n for n in range(5)]
 [0, 1, 4, 9, 16]
 >>> [n for n in range(10) if n % 2 == 0]
@@ -214,21 +202,21 @@ list, set, dict 모두 comprehension 문법을 갖고 있습니다.
 
 comprehension은 짧지만, 조건이 두 개 이상으로 늘어나거나 중첩이 깊어지면 가독성이 떨어집니다. 그럴 때는 일반 `for` 루프로 풀어쓰는 편이 낫습니다.
 
-## Before-After
+## 전후 비교
 
 같은 일을 어색한 방식과 자료구조를 잘 고른 방식으로 비교해 봅니다.
 
 ```python
-# Before: list로 멤버십 검사 (O(n))
+# 이전: 리스트 멤버십 검사는 O(n)
 seen = []
 duplicates = []
 for x in stream:
-    if x in seen:                # 매번 list 전체를 훑음
+    if x in seen:                # scans the whole list every time
         duplicates.append(x)
     else:
         seen.append(x)
 
-# After: set으로 멤버십 검사 (O(1) 평균)
+# 이후: 집합 멤버십 검사는 평균 O(1)
 seen = set()
 duplicates = []
 for x in stream:
@@ -241,7 +229,7 @@ for x in stream:
 dict의 누락 키 처리도 줄일 수 있습니다.
 
 ```python
-# Before: 매번 키 존재 검사
+# 이전: 매번 명시적으로 존재 여부를 확인합니다.
 counts = {}
 for word in words:
     if word in counts:
@@ -249,12 +237,12 @@ for word in words:
     else:
         counts[word] = 1
 
-# After: dict.get 또는 defaultdict
+# 이후: dict.get 또는 defaultdict
 counts = {}
 for word in words:
     counts[word] = counts.get(word, 0) + 1
 
-# After (더 짧게): collections.Counter
+# 이후(최단): collections.Counter
 from collections import Counter
 counts = Counter(words)
 ```
@@ -337,7 +325,7 @@ counts = Counter(words)
 6. **`dict.keys()`, `dict.values()`를 list로 가정한다.**
    둘 다 view 객체입니다. dict가 바뀌면 view도 같이 바뀝니다. 고정된 스냅샷이 필요하면 `list(d.keys())`처럼 명시적으로 변환합니다.
 
-## 실무
+## 실무에서는 이렇게 생각합니다
 
 - **카운팅·그루핑.** `Counter`, `defaultdict(list)`는 직접 짜는 dict 누락 키 패턴을 줄여 줍니다. 본인이 짠 코드에 `if key not in d: d[key] = []`이 반복된다면 `defaultdict`로 바꿉니다.
 - **순서 있는 dict.** Python 3.7+에서는 dict 자체가 삽입 순서를 보존합니다. `OrderedDict`는 끝에서 꺼내거나 다시 정렬하는 등의 dict에는 없는 기능을 위한 용도로 남겨 둡니다.
@@ -366,13 +354,218 @@ counts = Counter(words)
 
 다음 글에서는 제어 흐름을 다룹니다. `if`/`for`/`while`을 정리하고, comprehension과 `enumerate`/`zip`/`range`를 함께 이어 읽기 좋은 루프를 짜는 법을 짚습니다.
 
+## 실전 앵커: 자료구조 선택을 감이 아니라 근거로 결정하기
+
+리스트, 튜플, 셋, 딕셔너리는 모두 자주 쓰이지만 목적이 다릅니다. 아래 표를 실무 의사결정의 기본 템플릿으로 기억해 두면 좋습니다.
+
+| 구조 | 순서 보장 | 중복 허용 | 변경 가능 | 주 사용 목적 |
+|---|---|---|---|---|
+| `list` | 예 | 예 | 예 | 순차 데이터, 인덱싱 |
+| `tuple` | 예 | 예 | 아니오 | 불변 레코드, 해시 키 구성 요소 |
+| `set` | 아니오 | 아니오 | 예 | 빠른 포함 검사, 집합 연산 |
+| `dict` | 예(삽입 순서) | 키 중복 불가 | 예 | 키-값 매핑, 인덱스 |
+
+입문자가 가장 자주 묻는 질문은 "왜 이 경우 리스트가 아니라 셋인가요"입니다. 답은 포함 검사 비용입니다.
+
+```python
+import timeit
+
+list_t = timeit.timeit('99999 in data', setup='data=list(range(100000))', number=10000)
+set_t = timeit.timeit('99999 in data', setup='data=set(range(100000))', number=10000)
+print(list_t, set_t)
+```
+
+예시 출력:
+
+```text
+7.889102
+0.002614
+```
+
+데이터 구조 선택이 알고리즘 복잡도를 바꾼다는 사실이 숫자로 드러납니다. 이 한 번의 체험이 이후 코드를 크게 바꿉니다.
+
+공유 참조 함정도 반드시 짚어야 합니다. 다음 코드는 2차원 배열 초기화에서 반복적으로 나타나는 버그입니다.
+
+```python
+matrix = [[0] * 3] * 2
+matrix[0][1] = 9
+print(matrix)
+```
+
+출력:
+
+```text
+[[0, 9, 0], [0, 9, 0]]
+```
+
+내부 리스트가 같은 객체를 가리키기 때문입니다. 안전한 방식은 컴프리헨션입니다.
+
+```python
+matrix = [[0] * 3 for _ in range(2)]
+```
+
+딕셔너리는 `get`, `setdefault`, `defaultdict`를 상황별로 나눠서 쓰는 감각이 중요합니다.
+
+```python
+from collections import defaultdict
+
+words = ['py', 'py', 'code']
+counter = defaultdict(int)
+for w in words:
+    counter[w] += 1
+print(counter)
+```
+
+가독성과 안정성을 동시에 챙기려면, 누적/그룹화는 `defaultdict`를 기본 후보에 두는 편이 좋습니다.
+
+튜플은 불변이라 안전하다는 장점이 있지만 내부에 가변 객체가 들어가면 완전 불변이 아닙니다.
+
+```pycon
+>>> t = (1, [2, 3])
+>>> t[1].append(4)
+>>> t
+(1, [2, 3, 4])
+```
+
+이 사례는 "튜플이면 다 안전하다"는 오해를 바로잡아 줍니다.
+
+디버깅은 `pdb`에서 객체 id를 확인하면 빠릅니다.
+
+```python
+import pdb
+
+a = [1, 2]
+b = a
+pdb.set_trace()
+```
+
+`p id(a)`, `p id(b)`, `p a is b`를 순서대로 찍으면 얕은 복사/참조 공유 여부를 즉시 확인할 수 있습니다.
+
+표준 라이브러리 예시도 함께 묶어 보겠습니다.
+
+- `collections.deque`: 양쪽 끝 삽입/삭제가 많은 큐
+- `heapq`: 우선순위 큐
+- `bisect`: 정렬 리스트에 이진 탐색 삽입
+
+자료구조 파트에서 이 세 모듈을 같이 기억하면 문제 풀이에서 실무 코드로 넘어갈 때 훨씬 자연스럽습니다.
+
+### 추가 실습: 자료구조 선택 실수 사례 복기
+
+실무에서 자주 보는 실수는 "순서가 중요하지 않은데 리스트를 기본값으로 쓰는 것"입니다. 중복 제거가 필요하다면 처음부터 셋으로 모으는 편이 간단하고 빠릅니다.
+
+```python
+emails = ['a@x.com', 'b@x.com', 'a@x.com']
+unique = set(emails)
+print(unique)
+```
+
+딕셔너리 병합 문법도 알아두면 코드가 많이 짧아집니다.
+
+```python
+a = {'host': 'localhost', 'port': 5432}
+b = {'port': 5433, 'debug': True}
+merged = a | b
+print(merged)
+```
+
+출력:
+
+```text
+{'host': 'localhost', 'port': 5433, 'debug': True}
+```
+
+튜플은 언패킹과 함께 쓰면 가독성이 좋아집니다.
+
+```python
+point = (10, 20)
+x, y = point
+print(x, y)
+```
+
+그리고 정렬이 필요한 딕셔너리 뷰는 `sorted(d.items(), key=...)` 패턴을 익혀 두면 분석용 코드 작성 속도가 빨라집니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
+### 보강 메모: 실수 줄이는 운영 습관
+
+학습 단계에서 만든 코드를 실제 프로젝트에 옮길 때는 세 가지를 같이 점검하는 편이 좋습니다. 첫째, 입력 검증 경계가 함수 시작 지점에 있는지 확인합니다. 둘째, 실패 시 사용자에게 보여 줄 메시지와 로그 메시지를 분리합니다. 셋째, 성능 판단은 추측이 아니라 `timeit` 또는 샘플 벤치마크로 남깁니다.
+
+간단한 템플릿은 다음과 같습니다.
+
+```python
+def safe_run(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        # 학습 단계에서는 원인 관찰을 우선
+        raise RuntimeError(f'실행 실패: {fn.__name__}') from e
+```
+
+또한 표준 라이브러리 문서를 읽을 때는 "모듈 개요 -> 대표 함수 3개 -> 예외 종류" 순서로 훑는 습관을 들이면 기억이 오래갑니다. 기능을 전부 외우는 것보다, 어떤 상황에서 어떤 모듈을 열어봐야 하는지 아는 것이 더 중요합니다.
+
+실무에서는 "먼저 올바른 자료구조를 고르고, 그다음 구현을 단순화한다"는 순서가 중요합니다. 자료구조 선택이 맞으면 코드 길이와 버그 수가 동시에 줄어듭니다.
+
+## 처음 질문으로 돌아가기
+
+- **list를 `=`으로 "복사"한 뒤 한쪽을 바꿨는데 양쪽이 함께 바뀌는 alias 사고?**
+  - `b = a`는 새 리스트를 만드는 게 아니라 같은 객체를 두 이름으로 가리키는 것뿐입니다. 본문에서 본 것처럼 진짜 복사가 필요하면 `b = a.copy()`나 `b = a[:]`로 얕은 복사를, 중첩 구조라면 `copy.deepcopy(a)`로 깊은 복사를 명시해야 합니다.
+- **함수의 기본 인자로 `def f(items=[]):`를 썼다가, 호출이 누적될수록 리스트가 자라는 문제?**
+  - 기본 인자는 함수 정의 시점에 한 번만 평가되고 호출 간에 공유됩니다. 본문에서 강조했듯이 `def f(items=None): items = items if items is not None else []` 패턴으로, 매 호출마다 새 컨테이너를 만드는 방식이 정석입니다.
+- **dict에서 없는 키를 `d[key]`로 꺼내다가 `KeyError`로 멈추는 일?**
+  - 본문 예시처럼 키 존재가 불확실한 조회에는 `d.get(key, default)`로 기본값을 두거나, 누락 시 자동 초기화가 필요하면 `collections.defaultdict`를 쓰면 됩니다. 키 존재 여부 자체가 비즈니스 의미를 가지면 `if key in d:`로 먼저 분기하는 편이 의도가 명확합니다.
+
 <!-- toc:begin -->
+## 시리즈 목차
+
+- [Python 101 (1/10): 왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- [Python 101 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- **list, tuple, set, dict (현재 글)**
+- 제어 흐름: if, for, while, comprehension (예정)
+- 함수와 인자: def, args, kwargs, default, lambda (예정)
+- 모듈과 패키지: import, __init__, __name__ (예정)
+- 파일 I/O와 예외 처리 (예정)
+- 클래스와 객체: 데이터와 동작을 함께 묶기 (예정)
+- 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
-- Python 공식 문서 — Built-in Types: https://docs.python.org/3/library/stdtypes.html
-- Python 공식 문서 — `collections` 모듈: https://docs.python.org/3/library/collections.html
-- Python 공식 문서 — Data Structures 튜토리얼: https://docs.python.org/3/tutorial/datastructures.html
-- PEP 274 — Dict Comprehensions: https://peps.python.org/pep-0274/
-- TimeComplexity (CPython 자료구조 시간 복잡도): https://wiki.python.org/moin/TimeComplexity
+- [Python 공식 문서 — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — list, tuple, set, dict의 공식 동작과 해시 가능성 제약을 한곳에서 확인할 수 있습니다.
+- [Python 튜토리얼 — Data Structures](https://docs.python.org/3/tutorial/datastructures.html) — list 메서드, tuple, set, dict, comprehension을 입문 수준 예제로 설명합니다.
+- [PEP 274 — Dict Comprehensions](https://peps.python.org/pep-0274/) — dict comprehension 문법과 의도를 직접 확인할 수 있습니다.
+- [Python Wiki — TimeComplexity](https://wiki.python.org/moin/TimeComplexity) — list의 선형 탐색과 dict/set의 평균 O(1) 조회를 비교할 때 참고할 수 있습니다.
+- [Python 공식 문서 — `collections`](https://docs.python.org/3/library/collections.html) — `namedtuple`, `deque` 같은 표준 보조 자료구조를 소개해 자료구조 선택 기준을 넓혀 줍니다.
+- [Python 공식 문서 — Data Model](https://docs.python.org/3/reference/datamodel.html) — 변경 가능 객체와 불변 객체의 차이를 언어 모델 차원에서 보강합니다.
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)

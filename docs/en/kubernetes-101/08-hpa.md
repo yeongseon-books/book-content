@@ -1,10 +1,10 @@
 ---
 series: kubernetes-101
 episode: 8
-title: HPA
-status: content-ready
+title: "Kubernetes 101 (8/10): HPA"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,32 @@ tags:
   - Metrics
   - DevOps
 seo_description: A beginner tour of Kubernetes HPA covering CPU and memory targets, metrics-server, custom metrics, and pairing with Cluster Autoscaler.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# HPA
+# Kubernetes 101 (8/10): HPA
 
-> Kubernetes 101 series (8/10)
+Traffic rarely stays flat. If humans resize replicas by hand, they react too late during spikes and waste money during quiet periods. Autoscaling helps, but only if the metrics and resource requests underneath it are trustworthy.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Kubernetes 101 series.
 
-**Core question**: should a *human* resize *Pod count* every time *traffic* shifts?
+Here, we will treat HPA as a control loop that adjusts Deployment replica count from metrics, then connect that loop to requests, metrics-server, and node-level capacity limits.
 
-> *HorizontalPodAutoscaler* watches *metrics* and scales *Pods* in and out *automatically*.
+> HPA is only as good as the metrics it can trust and the cluster capacity that can satisfy the scaling decision.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![kubernetes 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/08/08-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 8 flow overview*
 
-- where *HPA* fits
-- why *metrics-server* matters
-- *CPU/memory* targets
-- *custom metrics*
-- relationship with *VPA / Cluster Autoscaler*
+## Questions to Keep in Mind
+
+- where *HPA* fits?
+- why *metrics-server* matters?
+- CPU/memory* targets?
 
 ## Why It Matters
 
 *Manual scaling* causes *lag* and *over-provisioning*. *Autoscaling* protects both *cost* and *availability*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Metrics["metrics-server"] --> HPA["hpa"]
-    HPA --> Dep["deployment"]
-    Dep --> Pods["pods"]
-```
 
 ## Key Terms
 
@@ -137,6 +128,22 @@ def hpa_status(name):
     return res.stdout
 ```
 
+## Verification workflow
+
+```bash
+kubectl top pods
+kubectl get hpa web -w
+kubectl describe hpa web
+```
+
+**Expected output:** `kubectl top pods` must return CPU and memory numbers, `get hpa -w` should show current/target metrics and replica changes under load, and `describe hpa` should reveal recent scaling events and controller conditions.
+
+**Failure modes to check first:**
+
+- If `top pods` fails, fix metrics-server before tuning the HPA manifest.
+- If HPA wants more replicas but Pods do not appear, the bottleneck is often node capacity rather than HPA logic.
+- If scaling thrashes, revisit requests sizing and traffic shape before only changing the target percentage.
+
 ## What to Notice in This Code
 
 - *HPA* does *nothing* without *resource requests*.
@@ -180,17 +187,29 @@ The common pairing is *HPA + Cluster Autoscaler* so that *Pod growth* drives *no
 
 With autoscaling in place, you need a *repeatable deploy unit*. The next post is *Helm*.
 
+## Answering the Opening Questions
+
+- **where *HPA* fits?**
+  - The article treats HPA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **why *metrics-server* matters?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **CPU/memory* targets?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
-- [Ingress](./05-ingress.md)
-- [ConfigMap and Secret](./06-configmap-and-secret.md)
-- [Volume](./07-volume.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap and Secret](./06-configmap-and-secret.md)
+- [Kubernetes 101 (7/10): Volume](./07-volume.md)
 - **HPA (current)**
 - Helm (upcoming)
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -199,3 +218,4 @@ With autoscaling in place, you need a *repeatable deploy unit*. The next post is
 - [metrics-server](https://github.com/kubernetes-sigs/metrics-server)
 - [Cluster Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler)
 - [VPA](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler)
+- [Horizontal Pod Autoscaler walkthrough](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/)

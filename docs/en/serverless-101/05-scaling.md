@@ -1,10 +1,10 @@
 ---
 series: serverless-101
 episode: 5
-title: Scaling
+title: "Serverless 101 (5/10): Scaling"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,23 @@ seo_description: A beginner-friendly tour of serverless scaling covering concurr
 last_reviewed: '2026-05-04'
 ---
 
-# Scaling
+# Serverless 101 (5/10): Scaling
 
-> Serverless 101 series (5/10)
+Serverless often gets introduced with a seductive sentence: “it scales automatically.” That is directionally true, but in production it is also one of the most dangerous half-truths. Functions may scale quickly while the database, queue consumers, and third-party APIs behind them remain finite.
 
-<!-- a-grade-intro:begin -->
+That means scaling is not just a story about how far the platform can stretch. It is a story about how much downstream pressure your system can survive without turning a traffic spike into a reliability incident.
 
-**Core question**: *how fast* and *how many* can *functions* scale to?
+This is post 5 in the Serverless 101 series.
 
-> *Serverless* defaults to *horizontal scale*, but *limits* and *burst rules* still apply.
 
-<!-- a-grade-intro:end -->
+![serverless 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/05/05-01-concept-at-a-glance.en.png)
+*serverless 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Scaling?
+- Which signal should the example or diagram make visible for Scaling?
+- What failure should be prevented first when Scaling reaches a real system?
 
 ## What You Will Learn
 
@@ -42,16 +48,11 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-Scale looks *infinite* until your *DB* and *external APIs* — which are *finite* — buckle under it. *Scaling* itself can *cause incidents*.
+Serverless is strong at horizontal expansion, but that strength becomes a liability if you measure only function throughput. A rapid increase in concurrency can exhaust database connections, hit third-party API limits, or starve peer functions that share the same account-level budget.
 
-## Concept at a Glance
+That is why experienced operators treat concurrency like a budget. The point is not to remove every limit. The point is to place limits deliberately so that the whole system stays healthy.
 
-```mermaid
-flowchart LR
-    Burst["request burst"] --> Func["function instances"]
-    Func --> DB["downstream db"]
-    Func --> API["external api"]
-```
+The most important part of this diagram is what happens *after* the functions scale out. Good serverless scaling is not about making the left side infinitely elastic. It is about making sure the right side can absorb the parallelism safely.
 
 ## Key Terms
 
@@ -115,6 +116,19 @@ def backoff(attempt):
     return min(2 ** attempt, 30)
 ```
 
+## Failure-mode Walkthrough
+
+The usual scaling failure is not “the platform refused to scale.” It is “the platform scaled faster than the downstream system could handle.” A simple first-pass check looks like this:
+
+| Signal | What to inspect first | Typical mitigation |
+| --- | --- | --- |
+| Database timeouts | connection pool saturation | reserved concurrency, queue buffering |
+| 429 from external API | vendor rate limit | backoff, token bucket, async buffering |
+| Peer function slowdown | shared account concurrency | reserved concurrency per critical path |
+| Queue age growing | workers too slow for arrival rate | more worker budget, smaller batch, faster handler |
+
+The pattern is consistent: front-door elasticity is only useful when you also control the rate at which work reaches fragile dependencies.
+
 ## What to Notice in This Code
 
 - *Reserved concurrency* protects the *DB*.
@@ -158,22 +172,41 @@ A *queue* absorbs the *spike* and *functions* with *reserved concurrency* drain 
 
 Next, we cover *State Management*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Scaling?**
+  - The article treats Scaling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Scaling?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Scaling reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
-- [Function as a Service](./02-function-as-a-service.md)
-- [Trigger and Event](./03-trigger-and-event.md)
-- [Cold Start](./04-cold-start.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
+- [Serverless 101 (2/10): Function as a Service](./02-function-as-a-service.md)
+- [Serverless 101 (3/10): Trigger and Event](./03-trigger-and-event.md)
+- [Serverless 101 (4/10): Cold Start](./04-cold-start.md)
 - **Scaling (current)**
 - State Management (upcoming)
 - Queue and Event-driven Architecture (upcoming)
 - Observability (upcoming)
 - Cost (upcoming)
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Lambda concurrency](https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html)
-- [Reserved/Provisioned concurrency](https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html)
-- [SQS buffering pattern](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)
-- [Throttling guide](https://docs.aws.amazon.com/lambda/latest/dg/invocation-scaling.html)
+### Official Docs
+
+- [AWS Lambda concurrency](https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html)
+- [AWS Lambda reserved and provisioned concurrency](https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html)
+- [Amazon SQS developer guide](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)
+- [AWS Lambda scaling behavior](https://docs.aws.amazon.com/lambda/latest/dg/invocation-scaling.html)
+
+### Patterns and Code
+
+- [AWS Lambda power tuning (GitHub)](https://github.com/alexcasalboni/aws-lambda-power-tuning)
+- [Serverless patterns collection](https://serverlessland.com/patterns)

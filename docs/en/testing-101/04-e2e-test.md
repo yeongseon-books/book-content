@@ -1,10 +1,10 @@
 ---
 series: testing-101
 episode: 4
-title: E2E Test
+title: "Testing 101 (4/10): E2E Test"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,17 +20,26 @@ seo_description: Definition of end-to-end tests that verify user scenarios in a 
 last_reviewed: '2026-05-04'
 ---
 
-# E2E Test
+# Testing 101 (4/10): E2E Test
 
-> Testing 101 series (4/10)
+It is entirely possible for the UI team to say the page renders, the backend team to say the API returns 200, and the database team to say persistence is healthy—while users still cannot log in. End-to-end tests exist for that exact gap between local confidence and real user success.
 
-<!-- a-grade-intro:begin -->
+They are expensive because they run through the most surface area: browser, frontend, backend, and storage. That cost is precisely why they need to be selective and operationally disciplined.
 
-**Core question**: How do we automatically confirm that signup works *on the screen the user actually sees*?
+This is post 4 in the Testing 101 series. Here we walk through the role of E2E tests, build a first Playwright scenario, and focus on the maintenance habits that keep browser tests from turning flaky and slow.
 
-> An E2E test *spins up a browser* and *clicks and types* like a user. It is the most expensive verification, and the *closest to reality*.
+> E2E is the user’s final contract with your system. Treat it as a scarce but high-value signal.
 
-<!-- a-grade-intro:end -->
+
+![testing 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/04/04-01-concept-at-a-glance.en.png)
+*testing 101 chapter 4 flow overview*
+> E2E tests prove that the user can actually complete the flow, not just that the code says the flow should work.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying E2E Test?
+- Which signal should the example or diagram make visible for E2E Test?
+- What failure should be prevented first when E2E Test reaches a real system?
 
 ## What You Will Learn
 
@@ -47,14 +56,7 @@ A passing E2E test means *frontend, backend, and DB work together*. It is the *m
 > E2E is the *user's point of view*.
 
 ## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Browser["Browser"] --> FE["Frontend"]
-    FE --> API["Backend API"]
-    API --> DB[("DB")]
-```
-
+An E2E test navigates a real browser through a complete user scenario—signing up, logging in, making a payment, or searching—and confirms that every screen, navigation path, and API interaction works end-to-end from the user's perspective.
 ## Key Terms
 
 - **E2E (end-to-end)**: the full flow from *user start to result*.
@@ -154,6 +156,20 @@ def test_login_with_page_object(page):
 4. **Using *CSS class* selectors.** They *break with every UI change*.
 5. **Scenarios *depending on each other*.** Isolation is what enables *re-runs*.
 
+## Verification Points
+
+1. Run the same login scenario three times in a row. A scenario that passes once but fails on repeat is already telling you something about selector or wait instability.
+2. Compare a `sleep`-based version with a `wait_for_url` or locator-based wait. The flakiness difference usually shows up immediately.
+3. Confirm the scenario still makes sense with staging or sandbox credentials. If it depends on live production data, it is not safely repeatable.
+
+**Expected output:** the core scenario should behave the same across repeated runs, and failures should tell you exactly which screen condition was never reached.
+
+## Failure Signals and First Checks
+
+- If CSS-class selectors break often, switch to role-based locators or `data-testid`.
+- If scenarios share login state, reruns and parallel execution will become fragile fast.
+- If PR feedback is too slow, keep only critical paths in the default E2E tier and move the heavier flows elsewhere.
+
 ## How This Shows Up in Production
 
 Most teams keep only *5\~20 critical scenarios* as E2E. *Playwright/Cypress* are standard, and some add *visual regression* tests.
@@ -183,10 +199,21 @@ Most teams keep only *5\~20 critical scenarios* as E2E. *Playwright/Cypress* are
 
 E2E is the *most realistic* signal. From the next post we cover *test doubles* for handling external dependencies.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying E2E Test?**
+  - The article treats E2E Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for E2E Test?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when E2E Test reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
-- [Integration Test](./03-integration-test.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
+- [Testing 101 (3/10): Integration Test](./03-integration-test.md)
 - **E2E Test (current)**
 - Test Double (upcoming)
 - Mock and Stub (upcoming)
@@ -194,11 +221,16 @@ E2E is the *most realistic* signal. From the next post we cover *test doubles* f
 - Regression Test (upcoming)
 - Running Tests in CI (upcoming)
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Playwright docs](https://playwright.dev/python/)
-- [Cypress docs](https://docs.cypress.io/)
+### Official Docs
+- [Playwright for Python](https://playwright.dev/python/)
+- [Playwright locators guide](https://playwright.dev/python/docs/locators)
+- [Playwright auto-waiting](https://playwright.dev/python/docs/actionability)
+
+### Practical Reading
 - [Martin Fowler — Test Pyramid](https://martinfowler.com/bliki/TestPyramid.html)
 - [Google Testing Blog — Flaky Tests](https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html)

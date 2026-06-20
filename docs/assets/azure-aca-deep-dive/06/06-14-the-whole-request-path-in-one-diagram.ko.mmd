@@ -1,0 +1,7 @@
+flowchart TD
+  Client["클라이언트"] --> LB["Azure 로드 밸런서"]
+  LB --> TLS["TLS 종료"]
+  TLS --> Route["Envoy 라우팅 및 가중치"]
+  Route --> Svc["K8s 서비스"]
+  Svc --> Dapr["Dapr 사이드카"]
+  Dapr --> App["앱 컨테이너"]

@@ -1,5 +1,5 @@
 ---
-title: Building a Production Multimodal Application
+title: "Multimodal AI 101 (10/10): Building a Production Multimodal Application"
 series: multimodal-ai-101
 episode: 10
 language: en
@@ -22,7 +22,9 @@ seo_description: The first nine episodes covered image encoders, VLM architectur
   captioning, multimodal RAG, audio, diffusion, embeddings, and video.
 ---
 
-# Building a Production Multimodal Application
+# Multimodal AI 101 (10/10): Building a Production Multimodal Application
+
+This is the final post in the Multimodal AI 101 series.
 
 > Multimodal AI 101 series (10/10)
 
@@ -31,6 +33,16 @@ seo_description: The first nine episodes covered image encoders, VLM architectur
 The first nine episodes covered image encoders, VLM architecture, captioning, multimodal RAG, audio, diffusion, embeddings, and video. This finale ties all the pieces into one production system. The point is not the model but the system: with the same model, how you serve, cache, and bill it decides the user experience.
 
 This episode covers a FastAPI-based multimodal API design, step-by-step inference pipeline optimization, caching strategy, cost control, and rollout pitfalls.
+
+
+![Multimodal AI 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/10/10-01-big-picture.en.png)
+*Multimodal AI 101 chapter 10 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Building a Production Multimodal Application?
+- Which signal should the example or diagram make visible for Building a Production Multimodal Application?
+- What failure should be prevented first when Building a Production Multimodal Application reaches a real system?
 
 ## 1. End-to-End System Overview
 
@@ -41,7 +53,7 @@ We will assume a multimodal Q&A service:
 - Multimodal RAG fetches relevant documents
 - The final answer streams back
 
-```
+```text
 client ──► API gateway ──► FastAPI app
                                 │
                 ┌───────────────┼─────────────────┐
@@ -248,6 +260,34 @@ Multimodal APIs routinely receive personal data the user did not intend to share
 - Roll out via shadow → canary → full, and prepare for multimodal-specific pitfalls (EXIF, streaming disconnect, PII).
 
 Across ten episodes we covered the models, data, and systems behind multimodal AI. Build a multimodal app of your own, and let's go deeper in the next series.
+
+---
+
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Building a Production Multimodal Application?**
+  - The article treats Building a Production Multimodal Application as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Building a Production Multimodal Application?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Building a Production Multimodal Application reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Multimodal AI 101 (1/10): Why Multimodal AI Matters](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
+- [Multimodal AI 101 (3/10): Vision-Language Model Architecture](./03-vlm-architecture.md)
+- [Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines](./04-captioning-ocr-pipelines.md)
+- [Multimodal AI 101 (5/10): Multimodal RAG: Searching Images and Text Together](./05-multimodal-rag.md)
+- [Multimodal AI 101 (6/10): Audio Processing and Whisper STT](./06-audio-whisper.md)
+- [Multimodal AI 101 (7/10): Text-to-Image with Diffusion](./07-text-to-image-diffusion.md)
+- [Multimodal AI 101 (8/10): Multimodal Embeddings and Cross-modal Search](./08-multimodal-embeddings.md)
+- [Multimodal AI 101 (9/10): Video Understanding - From Frame Sampling to Video-LLaVA](./09-video-understanding.md)
+- **Building a Production Multimodal Application (current)**
+
+<!-- toc:end -->
+
 ## References
 
 - [vLLM Documentation - Multimodal Inputs](https://docs.vllm.ai/en/latest/models/vlm.html)

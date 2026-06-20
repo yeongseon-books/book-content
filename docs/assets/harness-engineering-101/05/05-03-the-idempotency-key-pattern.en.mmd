@@ -1,0 +1,16 @@
+flowchart LR
+    Call["Agent calls create_charge()"] --> Key["Attach idempotency_key\nunique per task step"]
+    Key --> Check["IdempotencyStore lookup"]
+    Check -->|cache miss| Execute["Run the real charge once"]
+    Execute --> Save["Save result under the key"]
+    Save --> Return1["Return charge result"]
+
+    Check -->|cache hit| Cached["Return cached result\nno second side effect"]
+    Cached --> Return2["Same output for the retry"]
+
+    Return1 --> Safe["Retries stay safe\nnetwork errors do not create duplicate charges"]
+    Return2 --> Safe
+
+    style Key fill:#e3f2fd,stroke:#1976d2
+    style Check fill:#f3e5f5,stroke:#7b1fa2
+    style Safe fill:#fff8e1,stroke:#f9a825

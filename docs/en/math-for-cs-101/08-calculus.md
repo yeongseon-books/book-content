@@ -1,10 +1,10 @@
 ---
 series: math-for-cs-101
 episode: 8
-title: Calculus
-status: content-ready
+title: "Math for CS 101 (8/10): Calculus"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,39 +20,40 @@ seo_description: A beginner-friendly tour of limits, derivatives, gradients, the
 last_reviewed: '2026-05-04'
 ---
 
-# Calculus
+# Math for CS 101 (8/10): Calculus
 
-> Math for CS 101 series (8/10)
+When a model trains by reducing a loss, when a numerical method searches for a better answer, or when a simulation tracks how a system evolves over time, the core question is the same: from the current position, which way should we move?
 
-<!-- a-grade-intro:begin -->
+Calculus gives you that directional sense. You do not need to understand an entire curve at once to learn something useful. Often it is enough to understand how the value wants to change right here, right now, at a single point.
 
-**Core question**: How do we *quantify change* and find *optimal values*?
+This is post 8 in the Math for CS 101 series.
 
-> *Calculus* is the *language of change* and the foundation of *optimization* and *learning*.
+Here we connect limits, derivatives, gradients, the chain rule, and gradient descent into one practical story about change and optimization.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![math for cs 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/08/08-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 8 flow overview*
+> Calculus is the mathematics of continuous change; it underpins optimization, machine learning, and any system where rates of change matter.
 
-- Intuition for *limits*
-- *Derivatives*
-- *Gradients*
-- *Chain rule*
-- *Gradient descent* intuition
+## Questions to Keep in Mind
+
+- Why can local slope tell you so much about a global optimization process?
+- How are limits and derivatives connected?
+- What changes when one variable becomes many variables?
 
 ## Why It Matters
 
-*ML training*, *numerical optimization*, *physics simulation*, and *A/B test curves* all run on calculus.
+Machine learning training, numerical optimization, physical simulation, and many control problems rely on calculus because they all need a way to reason about change. The point is not to understand every detail of a function globally before you act. The point is to know enough local structure to take the next useful step.
 
-## Concept at a Glance
+That local information becomes operational in optimization. A derivative gives the slope at one point. A gradient gives the direction of fastest increase in many dimensions. Gradient descent then uses that information to keep moving in the opposite direction.
 
-```mermaid
-flowchart LR
-    L[Limit] --> D[Derivative]
-    D --> G[Gradient]
-    G --> C[Chain Rule]
-    G --> X[Gradient Descent]
-```
+Calculus deals with *continuous change*: derivatives measure *rates of change*; integrals measure *accumulated quantity*; optimization finds *extrema*.
+
+## Before/After
+
+**Before**: Approximate change with finite differences.
+
+**After**: Model change precisely with derivatives and predict long-term behavior.
 
 ## Key Terms
 
@@ -150,19 +151,33 @@ def descend(f, x, lr=0.1, steps=100):
 
 ## Wrap-up and Next Steps
 
-Next post: *Information Theory*.
+Calculus gives you a language for change that scales from one slope to full optimization loops. Once you connect derivatives, gradients, and the chain rule, many ML and numerical methods stop feeling like magic.
+
+Next, we move into information theory, where uncertainty gets measured in bits instead of slopes.
+
+## Answering the Opening Questions
+
+- **Why can local slope tell you so much about a global optimization process?**
+  - The article treats Calculus as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How are limits and derivatives connected?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What changes when one variable becomes many variables?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
-- [Logic and Proofs](./02-logic-and-proofs.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Graphs](./04-graphs.md)
-- [Combinatorics](./05-combinatorics.md)
-- [Probability](./06-probability.md)
-- [Linear Algebra](./07-linear-algebra.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
+- [Math for CS 101 (2/10): Logic and Proofs](./02-logic-and-proofs.md)
+- [Math for CS 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Math for CS 101 (4/10): Graphs](./04-graphs.md)
+- [Math for CS 101 (5/10): Combinatorics](./05-combinatorics.md)
+- [Math for CS 101 (6/10): Probability](./06-probability.md)
+- [Math for CS 101 (7/10): Linear Algebra](./07-linear-algebra.md)
 - **Calculus (current)**
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -171,3 +186,4 @@ Next post: *Information Theory*.
 - [Essence of Calculus - 3Blue1Brown](https://www.3blue1brown.com/topics/calculus)
 - [Gradient Descent - Deep Learning Book](https://www.deeplearningbook.org/contents/numerical.html)
 - [SymPy Calculus Documentation](https://docs.sympy.org/latest/modules/calculus/index.html)
+- [SymPy GitHub repository](https://github.com/sympy/sympy)

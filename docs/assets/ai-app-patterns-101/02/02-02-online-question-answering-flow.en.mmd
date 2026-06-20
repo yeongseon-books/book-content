@@ -1,0 +1,13 @@
+flowchart TD
+  Q["User question\nAsk about the document set"] --> QE["Query embedding\nencode the question"]
+  QE --> FS["FAISS similarity search\nretrieve top-k chunks"]
+  FS --> P["Prompt assembly\nquestion + retrieved context + fail-closed rule"]
+  P --> L["LLM generation\nanswer only from provided documents"]
+  L --> A["Application output\nanswer or \"I cannot find this\""]
+
+  style Q fill:#e3f2fd,stroke:#1976d2
+  style QE fill:#fff3e0,stroke:#f57c00
+  style FS fill:#e8f5e9,stroke:#388e3c
+  style P fill:#fffde7,stroke:#f9a825
+  style L fill:#f3e5f5,stroke:#7b1fa2
+  style A fill:#fce4ec,stroke:#c2185b

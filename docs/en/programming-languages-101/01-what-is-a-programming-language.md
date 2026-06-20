@@ -1,10 +1,10 @@
 ---
 series: programming-languages-101
 episode: 1
-title: What Is a Programming Language?
-status: content-ready
+title: "Programming Languages 101 (1/10): What Is a Programming Language?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,43 +18,39 @@ tags:
   - Abstraction
   - Expressiveness
 seo_description: A programming language is not just a way to talk to a machine. It frames how we think. Walk through the abstraction layers and four core paradigms.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is a Programming Language?
+# Programming Languages 101 (1/10): What Is a Programming Language?
 
-> Programming Languages 101 series (1/10)
+When you write Python every day, it is easy to treat the language as nothing more than a convenient tool. But solving the same problem in assembly changes more than line count. It changes how you break the problem apart, how you name things, and how you manage state.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Programming Languages 101 series.
 
-**Core question**: Why do we use Python instead of assembly, and why do we keep inventing new languages even when Python already works?
+In this post, we will treat a programming language not as a bag of syntax rules but as the frame a developer uses to express a problem. By solving one computation in multiple paradigms, we can see what a language hides, what it exposes, and why new languages keep appearing even when older ones still work.
 
-> A programming language is not just "syntax for telling a machine what to do." It is a frame that shapes **how we decompose a problem and how we express it**. The fact that the same problem can be solved imperatively, with objects, functionally, or declaratively shows how a language both constrains and expands our thinking. This first episode lays that foundation.
 
-<!-- a-grade-intro:end -->
+![programming languages 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/01/01-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 1 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The abstraction layers from machine code up to high-level languages
-- What a programming language fundamentally does (translation and expression)
-- The four paradigms — imperative, object-oriented, functional, declarative
-- What "a good language" actually means
+- What boundary should you inspect first when applying What Is a Programming Language??
+- Which signal should the example or diagram make visible for What Is a Programming Language??
+- What failure should be prevented first when What Is a Programming Language? reaches a real system?
+
+## Questions this article answers
+
+- Why do we use high-level languages instead of machine code?
+- What abstractions does a programming language actually provide?
+- What changes when you solve the same problem in imperative, object-oriented, functional, and declarative styles?
+- What does it really mean to evaluate whether a language is good?
 
 ## Why It Matters
 
 If you treat a language as just a tool, every new language feels like starting over. But once you see the structure every language shares — variables, expressions, control flow, functions, types — a new language becomes the question of **how it expresses ideas you already know**. Through this series we will pull that shared structure apart, piece by piece.
 
 > "Learning a language" really means learning the way of thinking that language emphasizes.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    A["High-level (Python, Java)"] --> B["Bytecode / IR"]
-    B --> C["Assembly"]
-    C --> D["Machine code (CPU)"]
-    E["Source code"] --> A
-```
 
 The higher up, the easier for humans to read; the lower down, the closer to what the CPU executes directly. A programming language picks a layer and decides what abstractions to offer there. One line of Python can correspond to dozens of lines of assembly.
 
@@ -204,7 +200,18 @@ When you join a team and meet a language you do not know, the first week's job i
 
 A programming language is at once a way to instruct a machine and a frame that constrains how we think. The same problem expressed under different paradigms produces very different code, and that difference shapes the system. Next we will look at the two axes every language is built on — syntax and semantics — and see what each one really means.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is a Programming Language??**
+  - The article treats What Is a Programming Language? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is a Programming Language??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is a Programming Language? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Programming Language? (current)**
 - Syntax and Semantics (upcoming)
 - Type Systems (upcoming)
@@ -215,6 +222,7 @@ A programming language is at once a way to instruct a machine and a frame that c
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

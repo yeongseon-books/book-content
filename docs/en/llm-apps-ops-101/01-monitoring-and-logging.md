@@ -1,11 +1,11 @@
 ---
-title: Monitoring and logging for LLM apps
+title: "LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps"
 series: llm-apps-ops-101
 episode: 1
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -19,28 +19,31 @@ seo_description: Treat one log line as the operating contract for one LLM call, 
   cost, latency, and debugging questions stop fragmenting across separate systems.
 ---
 
-# Monitoring and logging for LLM apps
+# LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps
 
-## Questions this post answers
+Once an LLM app moves beyond a demo, the first real operations problem is not the outage itself. It is the inability to reconstruct what happened for one request across latency, token usage, and debugging context.
+
+This is the first post in the LLM Apps Ops 101 series. Here, we will define the logging and monitoring baseline that makes each model call traceable after the fact.
+
+![Monitoring and logging component layout](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-01-big-picture.en.png)
+*Monitoring and logging component layout*
+> Treat one log line as the operating contract for one LLM call, and cost, latency, and debugging questions stop fragmenting.
+
+## Questions to Keep in Mind
+
 - Which fields belong in every LLM request log?
 - How do you tie latency, token usage, and response preview into one record?
 - What log shape survives a later move to Datadog, BigQuery, or Elasticsearch?
 
-> Treat one log line as the operating contract for one LLM call, and cost, latency, and debugging questions stop fragmenting across separate systems.
-
-## Big picture
-![Monitoring and logging component layout](../../assets/llm-apps-ops-101/01/01-01-big-picture.en.png)
-
-*Monitoring and logging component layout*
 ## Why this layer matters
-![Request and response logs per call](../../assets/llm-apps-ops-101/01/01-01-why-this-layer-matters.en.png)
+![Request and response logs per call](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-01-why-this-layer-matters.en.png)
 
 *Request and response logs per call*
 Observability starts with a log record that can fully explain one call after the fact.
 
 A normal API can often get away with status code and response time. An LLM app cannot. Two calls may both succeed with HTTP 200 while one burns far more tokens or returns a suspiciously short answer.
 
-Example file: `/root/Github/llm-apps-ops-101/en/01-monitoring-and-logging/main.py`
+Example file: `en/01-monitoring-and-logging/main.py`
 
 ## Minimal runnable example
 ```python
@@ -140,7 +143,7 @@ if __name__ == "__main__":
 ```
 
 ## What to notice in this code
-![Shared log schema for operating questions](../../assets/llm-apps-ops-101/01/01-02-what-to-notice-in-this-code.en.png)
+![Shared log schema for operating questions](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-02-what-to-notice-in-this-code.en.png)
 
 *Shared log schema for operating questions*
 - `JsonFormatter` keeps every event in one schema, so downstream ingestion stays simple.
@@ -148,7 +151,7 @@ if __name__ == "__main__":
 - Logging a short preview instead of the full answer reduces both data leakage risk and log volume.
 
 ## Where engineers get confused
-![Metrics and logs narrow failures together](../../assets/llm-apps-ops-101/01/01-03-where-engineers-get-confused.en.png)
+![Metrics and logs narrow failures together](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-03-where-engineers-get-confused.en.png)
 
 *Metrics and logs narrow failures together*
 - Structured logs do not replace metrics. Metrics show trends; logs explain individual failures.
@@ -164,15 +167,24 @@ if __name__ == "__main__":
 ## Summary
 The goal is not pretty logs. The goal is one record shape that can answer later questions about incidents, cost spikes, and model behavior.
 
+## Answering the Opening Questions
+
+- **Which fields belong in every LLM request log?**
+  - At minimum, keep request_id, model, prompt and completion tokens, latency, status, error, response preview, and user or tenant keys.
+- **How do you tie latency, token usage, and response preview into one record?**
+  - Use one request_id for start and completion events, then record provider usage and measured latency in the same JSON record or joinable events.
+- **What log shape survives a later move to Datadog, BigQuery, or Elasticsearch?**
+  - A stable typed JSON schema survives best. If field names and request_id stay consistent, the backend can change without losing analysis.
+
 <!-- toc:begin -->
 ## In this series
 
-- **Monitoring and logging for LLM apps (current)**
-- LLM cost tracking and optimization (upcoming)
-- Evaluating LLM output quality (upcoming)
-- LLM app security (upcoming)
-- LLM app deployment strategies (upcoming)
-- Completing the LLM ops pipeline (upcoming)
+- **LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps (current)**
+- LLM Apps Ops 101 (2/6): LLM cost tracking and optimization (upcoming)
+- LLM Apps Ops 101 (3/6): Evaluating LLM output quality (upcoming)
+- LLM Apps Ops 101 (4/6): LLM app security (upcoming)
+- LLM Apps Ops 101 (5/6): LLM app deployment strategies (upcoming)
+- LLM Apps Ops 101 (6/6): Completing the LLM ops pipeline (upcoming)
 
 <!-- toc:end -->
 
@@ -183,3 +195,7 @@ The goal is not pretty logs. The goal is one record shape that can answer later 
 - [Groq API Reference](https://console.groq.com/docs/api-reference)
 - [Python logging cookbook](https://docs.python.org/3/howto/logging-cookbook.html)
 - [OpenTelemetry Python](https://opentelemetry.io/docs/instrumentation/python/)
+
+### Related Series
+
+- [AI Evaluation 101](../ai-evaluation-101/01-why-evaluate-llm-apps.md) — covers how to measure the "LLM quality" this series monitors at runtime, but earlier in the lifecycle. Useful when an ops metric wobbles and you need an evaluation method to confirm whether it counts as a regression.

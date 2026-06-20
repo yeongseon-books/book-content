@@ -1,0 +1,20 @@
+flowchart LR
+    subgraph A["Local-Only"]
+        A1["Works on My Machine"] --> A2["Unknown Deployment"]
+        A1 --> A5["No Infra Knowledge"]
+        A2 --> A3["Lack of Ops Experience"]
+        A5 --> A3
+        A3 --> A4["Delay in Work Readiness"]
+        A3 --> A6["Collaboration Limits"]
+    end
+
+    subgraph B["Deployed Project"]
+        B1["Cloud Infrastructure"] --> B2["CI/CD Pipeline"]
+        B1 --> B5["Server Setup"]
+        B2 --> B3["Monitoring / Logging"]
+        B5 --> B3
+        B3 --> B4["Continuous Operations"]
+        B3 --> B6["Ready for Real Work"]
+    end
+
+    A1 -. "Readiness for Work" .- B1

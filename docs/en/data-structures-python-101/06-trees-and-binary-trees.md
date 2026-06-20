@@ -1,10 +1,10 @@
 ---
 series: data-structures-python-101
 episode: 6
-title: Trees and Binary Trees
+title: "Data Structures with Python 101 (6/10): Trees and Binary Trees"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,20 +17,28 @@ tags:
   - Binary Tree
   - BST
 seo_description: Implement binary trees and binary search trees in Python and practice traversal algorithms.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Trees and Binary Trees
+# Data Structures with Python 101 (6/10): Trees and Binary Trees
 
 > Data Structures with Python 101 Series (6/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: Why do file systems, org charts, and the DOM all use tree structures?
 
 > Trees naturally represent hierarchical relationships. Binary search trees (BSTs) enable O(log n) lookups on sorted data. This article covers tree concepts, binary tree implementation, traversal algorithms, and binary search trees.
 
-<!-- a-grade-intro:end -->
+This is post 6 in the Data Structures with Python 101 series.
+
+
+![Data Structures with Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.en.png)
+*Data Structures with Python 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Trees and Binary Trees?
+- Which signal should the example or diagram make visible for Trees and Binary Trees?
+- What failure should be prevented first when Trees and Binary Trees reaches a real system?
 
 ## What You Will Learn
 
@@ -51,7 +59,7 @@ Binary search trees maintain sorted data while performing insertion, deletion, a
 
 > Tree = a hierarchical structure that branches from a root to child nodes
 
-```
+```text
         [root]
        /      \
     [child]  [child]
@@ -65,6 +73,8 @@ Binary Search Tree (BST):
     /   \      \
   [1]   [6]   [14]
 ```
+
+## Tree Shape at a Glance
 
 ## Key Concepts
 
@@ -246,6 +256,10 @@ print(f"node count: {count_nodes(bst.root)}")   # 6
 - Level-order traversal uses a queue (deque) — this is the BFS pattern
 - BST search discards half the tree at each step, achieving O(log n)
 
+That O(log n) story holds only while the tree stays reasonably balanced. Insert already-sorted data into a naive BST and it degenerates into a linked-list-shaped structure, pushing search and insert back toward O(n). Production systems avoid that failure mode with self-balancing trees or B-Tree variants.
+
+There is also a Python-specific constraint: recursion depth. Recursive traversal is elegant, but very deep trees can trigger RecursionError and large node graphs can add heavy object overhead. In production, the right question is not just "is a tree correct?" but also "how deep can it get, and who maintains balance?"
+
 ## 5 Common Mistakes
 
 | Mistake | Why It Is a Problem | Fix |
@@ -288,22 +302,34 @@ There is no better data structure than trees for practicing recursive thinking. 
 
 Trees represent hierarchical structures, and BSTs search sorted data in O(log n). Tree traversals are naturally implemented with recursion. The next article covers heaps and priority queues — a specialized form of trees.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Trees and Binary Trees?**
+  - The article treats Trees and Binary Trees as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Trees and Binary Trees?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Trees and Binary Trees reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Lists](./02-arrays-and-lists.md)
-- [Stacks and Queues](./03-stacks-and-queues.md)
-- [Hash Tables and dict](./04-hash-tables-and-dict.md)
-- [Linked Lists](./05-linked-lists.md)
+## In this series
+
+- [Data Structures with Python 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures with Python 101 (2/10): Arrays and Lists](./02-arrays-and-lists.md)
+- [Data Structures with Python 101 (3/10): Stacks and Queues](./03-stacks-and-queues.md)
+- [Data Structures with Python 101 (4/10): Hash Tables and dict](./04-hash-tables-and-dict.md)
+- [Data Structures with Python 101 (5/10): Linked Lists](./05-linked-lists.md)
 - **Trees and Binary Trees (current)**
 - Heaps and Priority Queues (upcoming)
 - Graph Representations (upcoming)
 - Sets and Set Operations (upcoming)
 - Choosing the Right Data Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
+- [Runestone Academy — Trees](https://runestone.academy/ns/books/published/pythonds3/Trees/toctree.html)
+- [Python Docs — bisect](https://docs.python.org/3/library/bisect.html)
+- [SQLite File Format — B-Tree Pages](https://www.sqlite.org/fileformat.html#b_tree_pages)
 - [Real Python — Binary Trees in Python](https://realpython.com/binary-search-python/)
-- [GeeksforGeeks — Binary Search Tree](https://www.geeksforgeeks.org/binary-search-tree-data-structure/)
-- [Visualgo — Binary Search Tree Visualization](https://visualgo.net/en/bst)
-- [Problem Solving with Algorithms — Trees](https://runestone.academy/ns/books/published/pythonds3/Trees/toctree.html)

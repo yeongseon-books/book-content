@@ -1,11 +1,11 @@
 ---
-title: Source Data Collection and Cataloging
+title: "AI Data Preparation 101 (2/10): Source Data Collection and Cataloging"
 series: ai-data-preparation-101
 episode: 2
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,16 +14,27 @@ tags:
 - Data Collection
 - Cataloging
 - Provenance
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: 'A request lands: re-train the model from three months ago. You open
   the directory and find files like dataset_v2_final_real.csv with no record of…'
 ---
 
-# Source Data Collection and Cataloging
+# AI Data Preparation 101 (2/10): Source Data Collection and Cataloging
 
-> AI Data Preparation 101 series (2/10)
+The painful moment usually comes months later: you need to retrain a model, but all that remains is a directory full of vaguely named files. Once the source, license, and collection context are gone, reproducibility is already broken.
 
----
+This is post 2 in the AI Data Preparation 101 series. Here we cover how to collect source data in a way that preserves cataloging and provenance from day one.
+
+
+![AI data preparation chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/02/02-01-big-picture.en.png)
+*AI data preparation chapter 2 flow overview*
+
+## Questions to Keep in Mind
+
+- What metadata must exist the moment a dataset lands on disk?
+- How do public datasets, web scraping, and vendor feeds differ in operational risk?
+- Why should collection and dataset-card creation happen in one transaction?
+
 ## "I Don't Remember Where This Data Came From"
 
 A request lands: re-train the model from three months ago. You open the directory and find files like `dataset_v2_final_real.csv` with no record of where they originated. This common scene breaks reproducibility and seeds future license disputes.
@@ -256,6 +267,42 @@ Start with SQLite under 50 datasets and migrate when your search needs grow. Pre
 - Record a TransformRecord with input/output sha256 and code commit at every transformation step.
 - Use SQLite for catalogs under 50 datasets; scale to DataHub or MLflow beyond that.
 - Episode 3 covers cleaning and deduplication.
+
+---
+
+## Operational checklist
+
+- [ ] Create the dataset card in the same function that writes the raw data
+- [ ] Store source URL, license, snapshot date, sha256, schema, and owner for every dataset version
+- [ ] Treat scraping as policy-sensitive work with robots.txt, throttling, and a clear User-Agent
+- [ ] Record transform lineage with input/output hashes and code commit for every stage
+- [ ] Decide in advance when the catalog should move from flat files to SQLite or a metadata platform
+
+## Answering the Opening Questions
+
+- **What metadata must exist the moment a dataset lands on disk?**
+  - The article treats Source Data Collection and Cataloging as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do public datasets, web scraping, and vendor feeds differ in operational risk?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why should collection and dataset-card creation happen in one transaction?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
+- **Source Data Collection and Cataloging (current)**
+- Cleaning and Deduplication (upcoming)
+- PII Detection and Anonymization for Training Data (upcoming)
+- Tokenization and Chunking Strategies (upcoming)
+- Quality Filtering - Heuristics and Classifiers (upcoming)
+- Synthetic Data Generation - From Self-Instruct to Distillation (upcoming)
+- Data Augmentation - From EDA to Back-Translation (upcoming)
+- Train/Eval/Test Splitting and Contamination Control (upcoming)
+- Building a Production Data Pipeline (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [Datasheets for Datasets (Gebru et al., 2018)](https://arxiv.org/abs/1803.09010)

@@ -6,7 +6,7 @@ language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,636 +14,841 @@ tags:
 - App Service
 - Cloud
 - Web Apps
-last_reviewed: '2026-04-29'
-seo_description: 앞선 글에서 App Service가 어떤 플랫폼인지, 어떤 플랜을 골라야 하는지 감을 잡았다면 이제 남은 건 하나입니다.
+last_reviewed: '2026-05-12'
+seo_description: Flask 앱을 로컬에서 검증하고 Azure App Service에 첫 배포한 뒤 상태와 로그까지 확인하는 흐름을 정리합니다.
 ---
 
 # 첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)
 
-이론은 여기까지입니다. **이제 진짜로 배포해 봅시다.**
+이제 시리즈를 실제 배포로 연결할 차례입니다. 로컬에서 잘 돌던 Flask 앱을 App Service에 올리고, 런타임 경로가 제대로 열렸는지 직접 확인해 보겠습니다.
 
-앞선 글에서 App Service가 어떤 플랫폼인지, 어떤 플랜을 골라야 하는지 감을 잡았다면 이제 남은 건 하나입니다. 로컬에서 잘 돌던 Flask 앱을 Azure App Service에 올리고, 브라우저에서 직접 열어보는 것. 이 순간부터 App Service는 더 이상 개념이 아니라, **내 앱을 띄우는 실제 운영 환경**이 됩니다.
-
-이번 글은 따라 치면 끝나는 데모가 아니라, **왜 이 설정이 필요한지까지 이해하는 배포 튜토리얼**로 구성했습니다. 그래서 중간중간 “여기서 502가 뜨면 뭘 의심해야 하는지”, “왜 Flask 개발 서버가 아니라 Gunicorn으로 확인해야 하는지”도 같이 함께 확인합니다.
+여기서는 로컬 개발 환경 준비부터 Azure 리소스 생성, 첫 배포, 상태 검증, 로그 확인까지 한 번에 따라가겠습니다. 목표는 “배포가 됐다”에서 끝나지 않고, 왜 이 설정이 필요한지까지 이해하는 것입니다.
 
 ---
 
-## 이번 글에서 만들 결과
+## 이 글에서 다룰 문제
 
-이 글을 끝내면 다음을 직접 해보게 됩니다.
+- 첫 번째 App Service 배포 전에 반드시 확정해 두어야 할 파라미터는 무엇일까요?
+- run-from-package 방식은 content deploy 방식과 무엇이 다를까요?
+- dev/stage/prod 환경에서 deployment slot 전략은 어디서부터 시작하는 것이 좋을까요?
+- 첫 배포 직후 health check가 자동으로 돌게 하려면 무엇을 켜 두어야 할까요?
+- 첫 배포에서 가장 자주 부딪히는 인증(auth)·권한(permission) 실패는 어떤 것들일까요?
 
-- 로컬에서 Flask 앱을 개발 모드와 프로덕션 모드로 각각 실행하기
-- Azure에서 Resource Group, App Service Plan, Web App의 관계 이해하기
-- `az webapp up`으로 첫 배포 끝내기
-- 로그와 상태 확인으로 “진짜로 살아 있는 앱”인지 검증하기
-- 502/기동 실패가 났을 때 어디부터 봐야 하는지 감 잡기
+## Goals
+
+이 글을 마치면 Flask 앱을 로컬에서 실행하고, Azure App Service에 배포하고, 로그와 health endpoint로 배포가 정상인지 반복 가능하게 검증할 수 있습니다.
+
+![From local development to Azure deployment](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/04/01-deployment-pipeline.ko.png)
+
+*로컬 개발에서 Azure 배포까지 이어지는 흐름*
+
+> 첫 배포의 핵심은 “코드를 올리는 것”이 아니라 “로컬에서 확인한 실행 계약을 Azure에서도 그대로 재현하는 것”입니다.
 
 ---
 
-## 사전 준비
+## Prerequisites
 
-| 항목 | 권장 사항 |
-|---|---|
-| Python | 3.11 이상 |
-| Azure CLI | 최신 버전 |
-| Azure 구독 | 활성 상태 |
-| 운영체제 | macOS / Linux 기준 설명 (Windows 대안은 같이 표기) |
-
-먼저 Azure CLI가 준비되어 있는지 확인합니다.
+| Item | Version/Requirement |
+|------|---------------------|
+| Python | 3.11 or higher |
+| Azure CLI | Latest version, logged in |
+| Azure Subscription | Active subscription |
 
 ```bash
+# Check Azure CLI version and login
 az --version
 az login
 ```
 
-왜 이 단계가 필요할까요?
-
-- `az webapp up`은 **리소스 생성 + 배포**를 같이 수행하므로 Azure 인증이 꼭 필요합니다.
-- CLI 버전이 너무 오래되면 런타임 이름이나 옵션이 달라서 같은 명령이 실패할 수 있습니다.
-
-로그인 후 구독이 여러 개라면, 실수로 다른 구독에 배포하지 않도록 현재 컨텍스트도 확인해 두세요.
-
-```bash
-az account show --output table
-```
-
 ---
 
-## 전체 흐름 먼저 보기
+## Step 1: Prepare Project Structure
 
-배포는 아래 순서로 진행됩니다.
-
-![로컬 개발부터 Azure 배포까지의 전체 흐름](../../assets/azure-app-service-101/04/01-deployment-pipeline.ko.png)
-
-*로컬 개발부터 Azure 배포까지의 전체 흐름*
-
-여기서 봐야 할 점은 하나입니다.
-
-1. 로컬에서 앱이 뜬다고 끝이 아닙니다.
-2. **App Service가 실제로 앱을 실행하는 방식에 가깝게** Gunicorn으로 먼저 검증해야 합니다.
-3. 그 다음 Azure에 올리고, 빌드/기동/응답을 차례로 확인해야 배포가 끝납니다.
-
----
-
-## Step 1. 가장 작은 Flask 앱부터 준비하기
-
-첫 배포에서는 앱 로직보다 **배포 경로가 단순한 구조**가 중요합니다. 그래서 일부러 기능을 최소화한 앱으로 시작하겠습니다.
-
-프로젝트 구조는 이렇게 갑니다.
+### Minimal Flask App Structure
 
 ```text
 my-flask-app/
 ├── src/
-│   └── app.py
-└── requirements.txt
+│ └── app.py
+├── requirements.txt
+└── README.md
 ```
 
-### `src/app.py`
+### app.py
 
 ```python
+# src/app.py
 import os
 from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route('/')
 def home():
-    return jsonify(
-        {
-            "message": "Hello from Azure App Service!",
-            "environment": os.environ.get("APP_ENV", "development"),
-        }
-    )
+ return jsonify({
+ "message": "Hello from Azure App Service!",
+ "environment": os.environ.get("APP_ENV", "development")
+ })
 
-@app.route("/health")
+@app.route('/health')
 def health():
-    return jsonify({"status": "healthy"}), 200
+ return jsonify({"status": "healthy"}), 200
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    app.run(host="0.0.0.0", port=port)
+if __name__ == '__main__':
+ port = int(os.environ.get("PORT", 8000))
+ app.run(host="0.0.0.0", port=port)
 ```
 
-### `requirements.txt`
+### requirements.txt
 
 ```text
 Flask==3.1.3
 gunicorn==25.3.0
 ```
 
-여기서 중요한 포인트가 두 개 있습니다.
-
-### 왜 `/health` 엔드포인트를 따로 만들까?
-
-첫 배포에서는 “페이지가 떠 보인다”보다 **프로세스가 정상 기동했고 요청을 처리할 수 있다**를 빠르게 확인하는 게 더 중요합니다. `/health`는 그 확인용입니다.
-
-### 왜 `gunicorn`을 미리 의존성에 넣을까?
-
-Flask 내장 서버는 개발용입니다. 편하지만, 운영 환경에서 프로세스 관리나 동시 요청 처리 전제를 갖고 있지 않습니다. App Service의 Linux Python 앱은 기본적으로 Gunicorn 계열 실행 방식을 사용하므로, **로컬에서도 같은 축으로 확인하는 게 배포 실패를 가장 많이 줄여 줍니다.**
-
 ---
 
-## Step 2. 로컬 개발 모드에서 먼저 확인하기
+## Step 2: Run Locally (Development Mode)
 
-먼저 개발 모드로 실행해 봅니다. 지금은 “코드가 맞는지” 확인하는 단계입니다.
+### Create and Activate Virtual Environment
 
 ```bash
-mkdir my-flask-app
 cd my-flask-app
-python3 -m venv .venv
-source .venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate # Windows: .venv\Scripts\activate
 ```
 
-> Windows PowerShell에서는 `python -m venv .venv` 후 `.venv\Scripts\Activate.ps1` 를 사용하면 됩니다.
-
-의존성을 설치합니다.
+### Install Dependencies
 
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-개발 서버를 띄웁니다.
+### Run Flask Development Server
 
 ```bash
 export FLASK_APP=src.app:app
 export FLASK_DEBUG=1
-flask run --host 0.0.0.0 --port 8000
+flask run --port 8000
 ```
 
-다른 터미널에서 응답을 확인합니다.
+### Test
 
 ```bash
-curl http://127.0.0.1:8000/
-curl http://127.0.0.1:8000/health
+curl http://localhost:8000/
+curl http://localhost:8000/health
 ```
 
-예상 응답 예시는 아래와 비슷합니다.
-
+**Expected output:**
 ```json
-{"environment":"development","message":"Hello from Azure App Service!"}
+{"message": "Hello from Azure App Service!", "environment": "development"}
+{"status": "healthy"}
 ```
-
-```json
-{"status":"healthy"}
-```
-
-왜 개발 모드부터 확인할까요?
-
-- 문법 에러, import 에러, 라우팅 오타 같은 **가장 싼 실패**를 여기서 잡을 수 있기 때문입니다.
-- App Service 문제인지, 애플리케이션 문제인지 나중에 구분하기 쉬워집니다.
-
-여기서 실패하면 Azure로 가지 말고 먼저 고치세요. 배포는 디버깅을 더 어렵게 만들 뿐입니다.
 
 ---
 
-## Step 3. Gunicorn으로 프로덕션처럼 한 번 더 실행하기
+## Step 3: Run Locally (Production Mode)
 
-이제 중요한 확인입니다. **개발 서버가 아니라 Gunicorn으로 띄워봅니다.**
+Azure App Service는 Python 앱을 **Gunicorn**으로 실행합니다. 배포 전에 같은 구성을 로컬에서도 확인해야 합니다.
 
 ```bash
 export PORT=8000
 gunicorn --bind=0.0.0.0:$PORT src.app:app
 ```
 
-다른 터미널에서 다시 확인합니다.
-
-```bash
-curl http://127.0.0.1:8000/health
-```
-
-필요하면 워커 옵션도 한 번 넣어볼 수 있습니다.
+### Test with Workers and Timeout Settings
 
 ```bash
 gunicorn --bind=0.0.0.0:$PORT --workers 2 --timeout 120 src.app:app
 ```
 
-### 왜 이 단계가 진짜 중요할까?
+```bash
+curl http://localhost:8000/health
+```
 
-배포 직후 가장 흔한 상황이 이것입니다.
-
-> “로컬에서는 됐는데 Azure에서는 안 떠요.”
-
-대부분 원인은 App Service 자체가 아니라 **실행 방식 차이**입니다.
-
-- Flask 개발 서버로만 확인함
-- Gunicorn이 찾을 모듈 경로를 잘못 적음
-- `PORT` 바인딩을 안 맞춤
-- startup command가 실제 코드 구조와 안 맞음
-
-즉, 이 단계는 단순 예행연습이 아니라 **배포 실패를 미리 재현하는 안전장치**입니다.
-
-만약 여기서 `ModuleNotFoundError`가 난다면, Azure에서도 거의 같은 문제를 다시 볼 가능성이 큽니다. 지금 고치는 편이 훨씬 쉽습니다.
+**Why is this important?**
+- Flask dev server and Gunicorn behave differently
+- Concurrency varies with timeout and worker count
+- Prevents "works locally but not in Azure" issues
 
 ---
 
-## Step 4. Azure에서 어떤 리소스가 생기는지 이해하기
+## Step 4: Create Azure Resources
 
-이제 Azure 쪽입니다. 배포 전에 리소스 관계를 먼저 한 번 머릿속에 그려두면 CLI 명령이 훨씬 덜 헷갈립니다.
+![Azure resource hierarchy from subscription to web app](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/04/02-resource-hierarchy.ko.png)
 
-![구독부터 웹앱까지 이어지는 Azure 리소스 계층](../../assets/azure-app-service-101/04/02-resource-hierarchy.ko.png)
+*구독에서 web app까지 이어지는 Azure 리소스 계층*
 
-*구독부터 웹앱까지 이어지는 Azure 리소스 계층*
-
-핵심만 추리면 이렇습니다.
-
-- **Subscription**: 비용과 권한의 최상위 경계
-- **Resource Group**: 관련 리소스를 함께 묶는 관리 단위
-- **App Service Plan**: CPU/메모리 같은 **컴퓨팅 리소스 풀**
-- **Web App**: 실제 내 애플리케이션이 올라가는 논리적 앱 리소스
-
-특히 많이 헷갈리는 포인트 하나:
-
-> Web App이 곧 서버가 아닙니다. 실제 컴퓨팅 비용과 용량은 App Service Plan이 결정합니다.
-
-앞선 03편에서 플랜을 골랐다면, 이제 그 플랜 위에 첫 앱을 올리는 단계라고 생각하면 됩니다.
-
----
-
-## Step 5. 배포에 쓸 변수 정리하기
-
-명령을 길게 하드코딩하기보다 변수로 잡아두면 실수가 줄어듭니다.
+### Set Variables
 
 ```bash
-RG="rg-appservice101-demo"
-PLAN="plan-appservice101-demo"
-APP_NAME="appservice101-$RANDOM"
+RG="rg-flask-tutorial"
+APP_NAME="app-flask-demo-$(openssl rand -hex 4)" # Unique name
+PLAN_NAME="plan-flask-tutorial"
 LOCATION="koreacentral"
-RUNTIME="PYTHON:3.11"
+
+echo "App Name: $APP_NAME"
 ```
 
-이름이 잘 잡혔는지 확인해 둡니다.
-
-```bash
-printf "RG=%s\nPLAN=%s\nAPP_NAME=%s\nLOCATION=%s\n" "$RG" "$PLAN" "$APP_NAME" "$LOCATION"
-```
-
-왜 앱 이름을 랜덤하게 잡을까요?
-
-App Service의 기본 호스트명은 `<app-name>.azurewebsites.net`이고, 이 이름은 **전역적으로 유일**해야 합니다. 이미 누가 쓰고 있는 이름이면 그대로 실패합니다.
-
----
-
-## Step 6. App Service가 빌드와 실행을 제대로 하도록 설정하기
-
-이번 예제는 `app.py`가 루트가 아니라 `src/app.py` 안에 있습니다. 즉, 플랫폼이 알아서 추론해 주길 기대하기보다 **우리가 명시적으로 실행 방법을 알려주는 편이 안전**합니다.
-
-### 먼저 리소스만 생성하기
+### Create Resource Group
 
 ```bash
 az group create \
-  --name $RG \
-  --location $LOCATION
-
-az appservice plan create \
-  --name $PLAN \
-  --resource-group $RG \
-  --location $LOCATION \
-  --sku B1 \
-  --is-linux
-
-az webapp create \
-  --name $APP_NAME \
-  --resource-group $RG \
-  --plan $PLAN \
-  --runtime "PYTHON|3.11"
+ --name $RG \
+ --location $LOCATION
 ```
 
-이렇게 나눠서 만드는 이유는 단순합니다.
+### Create App Service Plan
 
-- 리소스 구조를 눈으로 이해하기 쉽고
-- Plan과 App을 명시적으로 통제할 수 있고
-- 나중에 같은 Plan에 앱을 더 붙이는 그림도 자연스럽게 이어지기 때문입니다
+```bash
+az appservice plan create \
+ --resource-group $RG \
+ --name $PLAN_NAME \
+ --is-linux \
+ --sku B1
+```
 
-### Oryx 빌드 자동화 켜기
+### Create Web App
+
+```bash
+az webapp create \
+ --resource-group $RG \
+ --plan $PLAN_NAME \
+ --name $APP_NAME \
+ --runtime "PYTHON|3.11"
+```
+
+---
+
+## Step 5: Configure Deployment
+
+### Enable Oryx Build
+
+App Service의 Oryx build 시스템을 켜서 `requirements.txt`를 감지하고 의존성을 자동으로 설치하게 합니다.
 
 ```bash
 az webapp config appsettings set \
-  --resource-group $RG \
-  --name $APP_NAME \
-  --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
+ --resource-group $RG \
+ --name $APP_NAME \
+ --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
 ```
 
-이 설정은 왜 중요할까요?
-
-App Service의 Python 배포에서는 Oryx가 루트의 `requirements.txt`를 보고 의존성을 설치합니다. 이 설정이 빠지면 ZIP 배포 후에도 패키지 설치가 안 되어, 앱은 올라갔는데 시작하자마자 import 에러가 나는 상황이 생길 수 있습니다.
-
-### Startup command 지정하기
+### Set Startup Command
 
 ```bash
 az webapp config set \
-  --resource-group $RG \
-  --name $APP_NAME \
-  --startup-file "gunicorn --bind=0.0.0.0:\$PORT src.app:app"
+ --resource-group $RG \
+ --name $APP_NAME \
+ --startup-file "gunicorn --bind=0.0.0.0:\$PORT src.app:app"
 ```
 
-여기서 `\$PORT`가 핵심입니다.
-
-- App Service가 실행 시점에 `PORT`를 주입합니다.
-- 우리가 임의로 8000이나 5000에 고정하면 플랫폼이 기대하는 포트와 어긋날 수 있습니다.
-
-즉, **운영 환경에서는 플랫폼이 준 포트에 바인딩해야 합니다.**
-
-> 만약 여기서 502가 뜬다면, 거의 항상 `startup command` 또는 `PORT` 바인딩을 먼저 의심하면 됩니다.
+> `$PORT`는 App Service가 자동으로 주입하는 환경 변수입니다. 백슬래시로 escape해야 합니다.
 
 ---
 
-## Step 7. 코드 배포하기
+## Step 6: Deploy Source Code
 
-이제 진짜 배포입니다. 프로젝트 루트에서 실행하세요.
-
-먼저 현재 디렉터리를 ZIP으로 묶습니다.
+### Using az webapp up (Simplest Method)
 
 ```bash
-zip -r app.zip . -x ".venv/*" "__pycache__/*" "*.pyc"
+az webapp up \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --runtime "PYTHON|3.11"
 ```
 
-그다음 App Service에 업로드합니다.
+이 명령은 다음을 수행합니다.
+
+1. 현재 디렉터리를 ZIP으로 패키징
+2. App Service에 업로드
+3. Oryx가 build 실행 (`pip install`)
+4. 앱 재시작
+
+### Verify Deployment Completion
 
 ```bash
-az webapp deploy \
-  --resource-group $RG \
-  --name $APP_NAME \
-  --src-path app.zip \
-  --type zip
+az webapp show \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --query "state" \
+ --output tsv
 ```
 
-이 흐름이 하는 일은 다음과 같습니다.
-
-1. ZIP 파일을 App Service에 업로드하고
-2. Oryx가 `requirements.txt`를 보고 의존성을 설치하고
-3. startup command에 따라 앱을 재시작합니다
-
-즉, **업로드 → 빌드 → 기동**이 순서대로 이어집니다.
-
-배포 후 바로 실패하면 아래부터 의심하세요.
-
-- 현재 디렉터리가 프로젝트 루트가 맞는가?
-- `requirements.txt`가 루트에 있는가?
-- `SCM_DO_BUILD_DURING_DEPLOYMENT=true`가 설정되어 있는가?
-- Azure 구독/리소스 그룹 컨텍스트가 맞는가?
+**Output:** `Running`
 
 ---
 
-## Step 8. 배포가 끝났다고 바로 믿지 말고 검증하기
+## Step 7: Verify Deployment
 
-배포 성공 메시지는 출발점이지, 끝이 아닙니다. **실제 HTTP 응답이 와야 성공**입니다.
-
-앱 URL을 가져옵니다.
+### Get App URL
 
 ```bash
 APP_URL="https://$(az webapp show \
-  --resource-group $RG \
-  --name $APP_NAME \
-  --query defaultHostName \
-  --output tsv)"
+ --resource-group $RG \
+ --name $APP_NAME \
+ --query defaultHostName \
+ --output tsv)"
 
-printf "%s\n" "$APP_URL"
+echo "App URL: $APP_URL"
 ```
 
-먼저 health endpoint부터 확인합니다.
+### Health Check
 
 ```bash
-curl "$APP_URL/health"
+curl $APP_URL/health
 ```
 
-그다음 메인 엔드포인트도 봅니다.
+**Expected output:**
+```json
+{"status": "healthy"}
+```
+
+### Check Main Page
 
 ```bash
-curl "$APP_URL/"
+curl $APP_URL/
 ```
 
-예상 응답 예시:
-
+**Expected output:**
 ```json
-{"status":"healthy"}
+{"message": "Hello from Azure App Service!", "environment": "development"}
 ```
-
-```json
-{"environment":"development","message":"Hello from Azure App Service!"}
-```
-
-여기서 `environment` 값이 아직 `development`인 건 이상한 일이 아닙니다. 아직 `APP_ENV`를 Azure App Settings로 주입하지 않았기 때문입니다. 즉, 배포가 끝났더라도 환경별 설정 주입이 분리되지 않으면 앱은 여전히 로컬 기본값으로 동작할 수 있습니다.
-
-### 첫 접속이 조금 느릴 수도 있습니다
-
-특히 낮은 티어에서는 첫 기동 직후 응답이 느릴 수 있습니다. 한두 번 새로고침하거나 몇 초 뒤 다시 `curl` 해보세요.
-
-하지만 계속 실패한다면, 이제는 추측하지 말고 로그를 봐야 합니다.
 
 ---
 
-## Step 9. 로그를 켜고, 살아 있는지 확인하기
+## Step 8: Check Logs
 
-운영에서 “배포가 안 된다”를 푸는 가장 빠른 방법은 감이 아니라 로그입니다.
-
-먼저 앱 로그를 파일 시스템으로 보낼 수 있게 설정합니다.
+### Enable Logging
 
 ```bash
 az webapp log config \
-  --resource-group $RG \
-  --name $APP_NAME \
-  --docker-container-logging filesystem
+ --resource-group $RG \
+ --name $APP_NAME \
+ --docker-container-logging filesystem
 ```
 
-그다음 실시간 로그를 봅니다.
+### Real-time Log Stream
 
 ```bash
 az webapp log tail \
-  --resource-group $RG \
-  --name $APP_NAME
+ --resource-group $RG \
+ --name $APP_NAME
 ```
 
-이 상태에서 다른 터미널에서 요청을 보내 보세요.
-
-```bash
-curl "$APP_URL/health"
-```
-
-### 로그에서 뭘 보면 될까?
-
-- Gunicorn이 정상 기동했는지
-- import 에러가 있는지
-- startup command가 실행되었는지
-- 요청이 들어왔을 때 200 응답이 나는지
-
-만약 로그가 거의 안 나오면, startup command가 아예 실행되지 않았거나 앱이 너무 빨리 죽는 상황일 수 있습니다.
+요청을 보내면 로그가 실시간으로 보입니다.
 
 ---
 
-## Step 10. 502가 나오면 이렇게 좁혀가기
-
-첫 배포에서 가장 자주 만나는 에러는 `502 Bad Gateway`입니다. 겁먹을 필요는 없습니다. 대부분 원인이 몇 가지로 좁혀집니다.
-
-![502 원인을 단계별로 좁혀 가는 흐름](../../assets/azure-app-service-101/04/03-troubleshooting-502.ko.png)
-
-*502 원인을 단계별로 좁혀 가는 흐름*
-
-아래 순서로 보면 거의 항상 실마리가 잡힙니다.
-
-### 1) `PORT` 바인딩이 맞는가?
-
-startup command에서 반드시 플랫폼이 준 포트를 써야 합니다.
-
-```bash
-gunicorn --bind=0.0.0.0:$PORT src.app:app
-```
-
-여기서 `$PORT` 대신 `8000` 같은 하드코딩을 넣으면, 컨테이너는 살아 있어도 플랫폼이 트래픽을 연결하지 못할 수 있습니다.
-
-### 2) startup command가 코드 구조와 맞는가?
-
-이번 예제의 앱 객체는 `src/app.py` 안의 `app`입니다. 그래서 `src.app:app`이어야 합니다.
-
-아래처럼 잘못 쓰면 Gunicorn이 앱을 못 찾습니다.
-
-```bash
-gunicorn --bind=0.0.0.0:$PORT app:app
-```
-
-루트에 `app.py`가 없으니 당연히 실패합니다.
-
-### 3) 의존성이 실제로 설치되었는가?
-
-배포는 됐는데 `ModuleNotFoundError`가 보이면 거의 여기입니다.
-
-확인 포인트:
-
-- `requirements.txt`가 프로젝트 루트에 있는가?
-- `SCM_DO_BUILD_DURING_DEPLOYMENT=true`가 설정되어 있는가?
-- 배포 로그에 `pip install` 실패가 있었는가?
-
-배포 관련 로그 목록은 아래처럼 볼 수 있습니다.
-
-```bash
-az webapp log deployment list \
-  --resource-group $RG \
-  --name $APP_NAME \
-  --output table
-```
-
-### 4) SSH로 앱 컨테이너 안을 직접 볼 수 있는가?
-
-로그만으로 애매하면 SSH가 빠릅니다.
-
-```bash
-az webapp ssh \
-  --resource-group $RG \
-  --name $APP_NAME
-```
-
-연결되면 이런 것들을 확인해 볼 수 있습니다.
-
-- 내 파일이 실제로 배포되었는지
-- 로그 파일이 있는지
-- startup command 기준으로 경로가 맞는지
-
-App Service의 Python/Oryx 배포는 실행 시점 파일 경로와 빌드 시점 파일 경로가 다를 수 있으니, **절대 경로 가정**보다 상대 경로와 앱 구조 확인이 더 중요합니다.
-
----
-
-## Step 11. Azure Portal에서 눈으로도 확인하기
-
-CLI가 익숙해도, 첫 배포에서는 Portal 화면을 한 번 보는 게 좋습니다.
+## Step 9: Verify in Azure Portal
 
 ### Deployment Center
 
-여기서는 최근 배포 이력과 실패 여부를 확인할 수 있습니다.
+배포 이력과 상태를 확인합니다.
 
-- App Service → Deployment Center
+**Path:** App Service → Deployment Center
 
-배포는 성공했다고 했는데 앱이 안 뜬다면, 여기서 먼저 “배포 자체는 끝났는가?”를 확인하세요.
+### Kudu (SCM) Site
 
-### Log stream
-
-실시간 로그를 Portal에서도 볼 수 있습니다.
-
-- App Service → Log stream
-
-CLI 로그 tail과 같은 맥락이지만, Portal만 열어 둔 상태에서 빠르게 확인하기 좋습니다.
-
-### Kudu/Advanced Tools
-
-고급 진단이 필요하면 Kudu가 유용합니다.
+고급 진단과 파일 브라우저는 여기서 봅니다.
 
 ```text
 https://<app-name>.scm.azurewebsites.net
 ```
 
-여기서 할 수 있는 일:
-
-- 파일 브라우저 확인
-- 환경 정보 확인
-- 진단 로그 접근
-
-초보자에게는 조금 낯설 수 있지만, “내 파일이 실제로 어디까지 갔는지” 확인하는 데는 매우 강력합니다.
+**Key features:**
+- File browser: Check `/home/site/wwwroot`
+- Bash console: Run commands inside container
+- Environment variables
 
 ---
 
-## 여기까지 왔다면: 축하합니다, 앱이 라이브입니다
+## Troubleshooting
 
-브라우저에서 `https://<app-name>.azurewebsites.net`가 열리고, `/health`가 200을 반환하고, 로그에서 요청이 보인다면 끝입니다.
+### 502 Bad Gateway
 
-**정말로 배포한 겁니다.**
+![Stepwise path to isolate 502 causes](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/04/03-troubleshooting-502.ko.png)
 
-이 순간이 중요한 이유는 단순히 Flask 예제를 올렸기 때문이 아닙니다. 앞으로 Django든 FastAPI든, 혹은 더 큰 서비스든 간에 App Service 배포를 바라보는 기본 프레임이 생겼기 때문입니다.
+*502 원인을 단계별로 좁혀 가는 흐름*
 
-이제 머릿속에는 최소한 이 연결이 남아 있어야 합니다.
+| Cause | Solution |
+|-------|----------|
+| Port binding error | Verify `$PORT` environment variable usage |
+| Startup command error | Check path and module name |
+| Dependency install failed | Check deployment logs for pip errors |
 
-- 앱은 코드만 있으면 끝나지 않는다
-- 플랫폼이 기대하는 방식으로 실행되어야 한다
-- 배포 성공 메시지보다 실제 응답과 로그가 더 중요하다
+### Check Logs
 
-첫 배포에서 이 감을 잡으면, 이후 운영 문제를 훨씬 덜 무섭게 다룰 수 있습니다.
+```bash
+# Deployment logs
+az webapp log deployment list \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --output table
+
+# App logs
+az webapp log tail --resource-group $RG --name $APP_NAME
+```
+
+### Direct Check via Kudu SSH
+
+```bash
+az webapp ssh --resource-group $RG --name $APP_NAME
+# Inside container:
+ls /home/site/wwwroot
+cat /home/LogFiles/*docker*.log
+```
+
+### 배포 방식별 검증 포인트를 분리해 두면 복구 속도가 빨라집니다
+
+첫 배포 이후에는 ZIP 기반 배포와 컨테이너 배포를 혼용하는 경우가 많습니다. 이때 "배포가 실패했다"는 같은 증상이라도 확인해야 할 로그 경로가 다릅니다.
+
+| 배포 방식 | 우선 확인 | 대표 실패 신호 | 1차 대응 |
+| --- | --- | --- | --- |
+| ZIP + Oryx | Deployment logs, Oryx build output | `pip install` 실패, 모듈 import 오류 | `requirements.txt`와 Python 버전 재확인 |
+| Container(ACR) | Container startup logs, image pull 상태 | image pull 인증 실패, startup command 실패 | Managed Identity/ACR 권한과 태그 확인 |
+
+아래 명령을 배포 직후 체크리스트에 넣어 두면 어떤 레이어에서 실패했는지 빠르게 좁힐 수 있습니다.
+
+```bash
+# 최근 배포 이력 확인
+az webapp log deployment list \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --output table
+
+# 앱 설정에서 startup command, build 플래그 확인
+az webapp config show \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --query "{linuxFxVersion:linuxFxVersion, appCommandLine:appCommandLine}" \
+  --output json
+
+az webapp config appsettings list \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --query "[?name=='SCM_DO_BUILD_DURING_DEPLOYMENT' || name=='WEBSITE_RUN_FROM_PACKAGE'].[name,value]" \
+  --output table
+```
+
+### 첫 배포부터 slot 기반 검증 루틴을 준비하면 이후 운영이 쉬워집니다
+
+초기에는 단일 슬롯으로 시작해도 되지만, staging 슬롯을 일찍 도입하면 배포 검증과 롤백이 단순해집니다. 특히 트래픽이 생기기 시작한 시점부터는 slot swap 전략이 장애 시간을 크게 줄여 줍니다.
+
+```bash
+# staging 슬롯 생성
+az webapp deployment slot create \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --slot staging
+
+# staging에만 환경변수 주입
+az webapp config appsettings set \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --slot staging \
+  --settings APP_ENV=staging
+
+# 슬롯 URL 확인 후 health 체크
+STAGING_URL="https://$(az webapp show \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --slot staging \
+  --query defaultHostName \
+  --output tsv)"
+
+curl "$STAGING_URL/health"
+```
+
+staging에서 헬스체크와 기본 API smoke test를 통과한 뒤 swap하면, 프로덕션 슬롯에서 바로 실패를 발견하는 위험을 줄일 수 있습니다. 첫 배포 단계에서 이 루틴을 습관화해 두면 이후 CI/CD로 확장할 때도 구조를 거의 그대로 재사용할 수 있습니다.
 
 ---
 
-## 리소스 정리 (선택)
+## Clean Up (Optional)
 
-실습이 끝났고 더 이상 유지할 필요가 없다면 리소스를 삭제해 비용을 아낄 수 있습니다.
+---
+
+## 배포 직후 15분 검증 시나리오
+
+첫 배포는 성공 메시지보다 검증 루틴이 중요합니다. 아래 시나리오는 배포 직후 15분 안에 실행하는 최소 점검입니다.
+
+### 1) 상태 확인
+
+```bash
+az webapp show \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --query "{state:state, host:defaultHostName, enabledHostNames:enabledHostNames}" \
+  --output json
+```
+
+**예상 결과:** `state`가 `Running`이고 기본 호스트가 노출됩니다.
+
+### 2) 헬스 엔드포인트 확인
+
+```bash
+curl -i "$APP_URL/health"
+```
+
+**예상 결과:** `HTTP/1.1 200 OK`와 JSON body가 반환됩니다.
+
+### 3) 앱 설정 확인
+
+```bash
+az webapp config appsettings list \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --query "[?name=='SCM_DO_BUILD_DURING_DEPLOYMENT' || name=='APP_ENV'].[name,value]" \
+  --output table
+```
+
+**예상 결과:** `SCM_DO_BUILD_DURING_DEPLOYMENT`가 `true`인지 확인합니다.
+
+---
+
+## Portal 단계별 확인 포인트
+
+Portal에서 무엇을 봐야 하는지 모르면 배포 상태를 오해하기 쉽습니다.
+
+1. **Overview**: Running 상태, URL, 최근 5xx
+2. **Deployment Center**: 마지막 배포 결과와 시간
+3. **Configuration**: startup command, 앱 설정
+4. **Log stream**: 요청 시 로그 유입 여부
+5. **Diagnose and solve problems**: 플랫폼 감지 이슈
+
+### 흔한 오해
+
+- Deployment Center가 성공이어도 앱이 정상 기동하지 않을 수 있습니다.
+- 앱이 Running이어도 `/health`가 실패하면 트래픽 처리 준비가 끝난 상태가 아닙니다.
+
+---
+
+## Mermaid 배포 흐름(오류 분기 포함)
+
+```mermaid
+flowchart LR
+    A["Local Test"] --> B["ZIP Upload"]
+    B --> C["Oryx Build"]
+    C --> D["Startup"]
+    D --> E["Health Check"]
+    E --> F["Ready"]
+
+    C -. "pip install fail" .-> X1["Build Failed"]
+    D -. "Port mismatch" .-> X2["502/503"]
+    E -. "Probe fail" .-> X3["Unhealthy"]
+```
+
+이 다이어그램의 핵심은 배포 실패와 런타임 실패를 분리하는 것입니다. 업로드 성공은 시작점일 뿐입니다.
+
+---
+
+## 실제 오류 메시지와 해석
+
+```text
+ERROR: Could not find a version that satisfies the requirement flask==99.0.0
+
+ModuleNotFoundError: No module named 'src.app'
+
+Container didn't respond to HTTP pings on port: 8000, failing site start.
+```
+
+| 메시지 | 의미 | 우선 조치 |
+|---|---|---|
+| `Could not find a version ...` | requirements.txt 버전 문제 | 의존성 버전 수정 후 재배포 |
+| `ModuleNotFoundError` | startup command 경로/모듈 오타 | `src.app:app` 경로 재검증 |
+| `didn't respond to HTTP pings` | 포트 바인딩/시작 지연 | `PORT` 사용, startup time 점검 |
+
+---
+
+## 배포 직후 응답 계약 확인 예시
+
+```text
+GET /health -> 200 + {"status":"healthy"}
+GET / -> 200 + JSON 본문
+GET /not-found -> 404
+```
+
+세 응답을 함께 확인하면 기본 라우팅, 앱 기동, 오류 처리 경로를 한 번에 검증할 수 있습니다.
+
+---
+
+## 구성 파일 예시: GitHub Actions 기반 배포
+
+`az webapp up`는 첫 배포에 좋지만, 팀 운영 단계에서는 CI/CD가 필요합니다.
+
+```yaml
+name: deploy-flask-appservice
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: my-flask-app-prod
+          package: .
+```
+
+이 워크플로는 배포 재현성을 높이고, 누가 언제 무엇을 배포했는지 이력을 남깁니다.
+
+---
+
+## Before/After: 수동 배포에서 운영 가능한 배포로
+
+### Before
+
+- 개발자 로컬에서 직접 `az webapp up`만 실행합니다.
+- 배포 성공 기준이 "명령 종료"에 머뭅니다.
+- 실패 시 누구도 같은 조건으로 재현하기 어렵습니다.
+
+### After
+
+- 배포 파라미터(`RG`, `PLAN`, `RUNTIME`, `STARTUP`)를 명시적으로 고정합니다.
+- 배포 후 `/health`, 로그, 설정 검증을 체크리스트로 강제합니다.
+- CI/CD로 승격해 배포 기록과 롤백 기준을 표준화합니다.
+
+---
+
+## run-from-package와 content deploy 비교
+
+첫 배포 이후 안정성을 높이려면 아티팩트 불변성 관점에서 배포 방식을 다시 선택해야 합니다.
+
+| 항목 | run-from-package | content deploy |
+|---|---|---|
+| 배포 단위 | ZIP 아티팩트 단일 파일 | 파일 단위 복사 |
+| 런타임 파일 변경 | 읽기 전용에 가까움 | 런타임 중 일부 변경 가능 |
+| 재현성 | 높음 | 상대적으로 낮음 |
+| 롤백 | 이전 패키지 URL로 빠르게 복구 | 파일 상태에 따라 편차 큼 |
+
+```bash
+# run-from-package 활성화
+az webapp config appsettings set \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --settings WEBSITE_RUN_FROM_PACKAGE=1
+```
+
+운영에서 배포 실패 복구 시간이 중요하다면 run-from-package를 우선 검토하는 편이 안전합니다.
+
+## ARM 템플릿으로 첫 배포 리소스 정의
+
+수동 명령을 반복하기보다 템플릿을 두면 신규 환경 생성이 쉬워집니다.
+
+```json
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2023-12-01",
+      "name": "plan-flask-tutorial",
+      "location": "koreacentral",
+      "sku": { "name": "S1", "tier": "Standard", "capacity": 2 },
+      "properties": { "reserved": true }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2023-12-01",
+      "name": "app-flask-demo-prod",
+      "location": "koreacentral",
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', 'plan-flask-tutorial')]",
+        "siteConfig": {
+          "linuxFxVersion": "PYTHON|3.11",
+          "appCommandLine": "gunicorn --bind=0.0.0.0:$PORT src.app:app"
+        }
+      }
+    }
+  ]
+}
+```
+
+## 배포 로그에서 자주 보는 실패-복구 페어
+
+```text
+ERROR: Could not build wheels for psycopg2
+```
+
+```text
+조치: psycopg2-binary 버전 점검 또는 시스템 의존성이 포함된 이미지 전략으로 전환
+```
+
+```text
+ModuleNotFoundError: No module named 'src.app'
+```
+
+```text
+조치: startup command의 모듈 경로 재검증 (src.app:app)
+```
+
+```text
+Container didn't respond to HTTP pings on port: 8000
+```
+
+```text
+조치: PORT 바인딩 코드 확인, startup time 최적화, health endpoint 경량화
+```
+
+---
+
+## 처음 질문으로 돌아가기
+
+- 첫 배포 전에 확정할 파라미터는? -> 리전, Plan SKU, 런타임, startup command, health path입니다.
+- run-from-package와 content deploy 차이는? -> 배포 아티팩트 불변성과 롤백 단위가 다릅니다.
+- dev/stage/prod slot 전략 시작점은? -> staging 슬롯 1개부터 시작해 swap 검증 루틴을 고정합니다.
+- 첫 배포 직후 health check 자동화는? -> `/health` 구현과 플랫폼 헬스 설정을 동시에 맞춥니다.
+- 자주 부딪히는 auth/permission 실패는? -> ACR pull 권한, managed identity, 배포 자격 증명 설정에서 발생합니다.
+
+---
+
+## 첫 배포 체크 스크립트(반복 실행용)
+
+아래 스크립트는 배포 직후 핵심 점검을 자동으로 수행하는 예시입니다.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+RG=${RG:?}
+APP_NAME=${APP_NAME:?}
+
+HOST=$(az webapp show --resource-group "$RG" --name "$APP_NAME" --query defaultHostName --output tsv)
+URL="https://$HOST"
+
+echo "[1] state"
+az webapp show --resource-group "$RG" --name "$APP_NAME" --query state --output tsv
+
+echo "[2] health"
+curl -fsS "$URL/health"
+
+echo "[3] startup command"
+az webapp config show --resource-group "$RG" --name "$APP_NAME" --query appCommandLine --output tsv
+
+echo "[4] deployment history"
+az webapp log deployment list --resource-group "$RG" --name "$APP_NAME" --output table
+```
+
+이 스크립트를 CI 파이프라인 후반에 붙이면 "배포 성공"의 기준이 명확해집니다.
+
+---
+
+## 포털 기준 실패 분기표
+
+| 증상 | 먼저 보는 메뉴 | 해석 |
+|---|---|---|
+| URL 접속 불가 | Overview, Metrics | 앱 중지/플랫폼 오류/네트워크 제한 |
+| 배포 성공인데 502 | Deployment Center + Log stream | startup 실패, 포트/모듈 경로 오류 |
+| 간헐적 timeout | Metrics + App Insights | 의존성 지연, queue 적체 |
+
+포털 기준 분기표를 미리 정해 두면 온콜 시 점검 순서가 흔들리지 않습니다.
+
+---
+
+## 배포 전후 비교표: 무엇이 바뀌었는지 추적하기
+
+배포 실패를 줄이려면 변경량을 눈으로 확인해야 합니다.
+
+| 구간 | 배포 전 | 배포 후 |
+|---|---|---|
+| App Settings | 기준값 스냅샷 | 변경 키 목록 |
+| Startup Command | 이전 값 기록 | 신규 값 검증 |
+| Deployment Log | 이전 성공 패턴 | 이번 실행 로그 비교 |
+| Health Endpoint | 응답 샘플 저장 | 응답 형태 동일성 확인 |
+
+```bash
+# startup command 확인
+az webapp config show \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --query "{appCommandLine:appCommandLine, linuxFxVersion:linuxFxVersion}" \
+  --output json
+```
+
+---
+
+## 첫 배포에서 자주 빠뜨리는 항목
+
+1. `requirements.txt` 고정 버전 누락
+2. health endpoint 미구현
+3. slot 없는 직접 배포
+4. 로그 활성화 누락
+5. 운영용 환경 변수 기준 미정
+
+위 다섯 항목만 체크해도 초기 장애의 상당수를 예방할 수 있습니다.
+
+---
+
+## 배포 검증 리포트 예시
+
+팀 단위 운영에서는 "배포 완료" 메시지보다 검증 리포트가 더 중요합니다. 아래 형식으로 남기면 다음 배포 품질이 안정됩니다.
+
+```text
+Deployment Report
+- timestamp: 2026-05-21T10:15:00Z
+- app: app-flask-demo
+- commit: abc1234
+- runtime: PYTHON|3.11
+- startup: gunicorn --bind=0.0.0.0:$PORT src.app:app
+
+Checks
+- state: Running
+- health: 200 OK
+- homepage: 200 OK
+- deployment log: success
+- errors in log tail (5m): 0
+```
+
+### 리포트 자동화 포인트
+
+- 상태값(`Running`)은 CLI 결과를 그대로 저장
+- health 응답코드와 응답시간을 함께 기록
+- 배포 로그 마지막 항목 상태를 표준화
+
+이 리포트를 PR 코멘트나 배포 채널에 남기면, 온콜 인수인계가 훨씬 명확해집니다.
+
+추가로, 리포트에 `배포 전후 응답시간(p50/p95)`을 남기면 성능 회귀를 조기에 발견할 수 있습니다.
+
+이 지표는 다음 배포 승인 기준으로 바로 재사용할 수 있습니다.
+
+테스트 후 비용을 줄이려면 리소스를 삭제합니다.
 
 ```bash
 az group delete --name $RG --yes --no-wait
 ```
 
-Resource Group을 지우면 안에 있는 Plan, Web App도 함께 삭제됩니다.
+---
+
+## 운영 체크리스트
+
+- [ ] region, SKU, runtime version을 처음부터 확정했다
+- [ ] deploy method(zip, ACR, GitHub Actions)를 명시적으로 골랐다
+- [ ] Managed Identity와 Key Vault 접근을 구성했다
+- [ ] health-check 경로와 timeout 기준을 정했다
+- [ ] 운영 전 slot-swap rollback을 한 번 연습했다
 
 ---
 
 ## 정리
 
-이번 글에서 한 일은 단순히 “배포 명령 한 번 실행”이 아니었습니다.
+이 튜토리얼에서 가져가야 할 핵심은 네 가지입니다.
 
-1. Flask 앱을 최소 구조로 준비하고
-2. 개발 서버와 Gunicorn을 각각 확인해 실행 차이를 이해하고
-3. Azure의 리소스 관계를 파악한 뒤
-4. Oryx 빌드와 startup command를 명시적으로 설정하고
-5. `az webapp up`으로 배포한 다음
-6. health check, 로그, SSH로 검증까지 마쳤습니다
+1. **Local Development**: Flask와 Gunicorn으로 production parity를 미리 확인합니다.
+2. **Azure Resources**: Resource Group → Plan → Web App 순서로 리소스를 만듭니다.
+3. **Deployment**: `az webapp up`으로 가장 단순한 첫 배포를 수행합니다.
+4. **Verification**: Health endpoint와 로그로 실제 실행 상태를 검증합니다.
 
-즉, 이제 여러분은 **App Service에 앱을 올리는 가장 기본적인 실전 루프**를 한 번 끝까지 돌아본 상태입니다.
-
-배포가 끝나면 곧바로 이런 질문이 남습니다.
-
-> “그럼 `APP_ENV`, DB 연결 문자열, API 키 같은 값은 어디에 넣고 어떻게 환경별로 관리하지?”
-
-실무에서는 이 질문에 답하는 순간부터 배포가 운영 절차로 바뀝니다. 오늘 올린 앱이 진짜 운영 앱처럼 보이기 시작하는 지점도 바로 여기입니다.
-
----
-
-## 이 시리즈에서의 위치
-
-이번 글은 App Service 101의 개념 편을 지나 실제 배포 루프를 처음 끝까지 돌려 보는 단계입니다. 여기서 남겨 둔 환경 변수, 연결 문자열, Key Vault 같은 설정 관리 주제가 곧바로 운영 안정성과 보안의 기준이 됩니다.
-
----
-
-## 운영 체크리스트
-
-- [ ] 리전, SKU, 런타임 버전을 사전에 고정했다
-- [ ] 배포 방식(zip, ACR, GitHub Actions)을 명시적으로 선택했다
-- [ ] Managed Identity와 Key Vault 접근 권한을 구성했다
-- [ ] Health check 경로와 시간 임계값을 설정했다
-- [ ] 롤백 슬롯 swap 시나리오를 한 번 연습했다
+첫 배포는 성공 메시지보다 검증 루틴이 더 중요합니다. 상태 확인과 로그 확인까지 습관으로 만들면 다음 배포부터 훨씬 안정적으로 움직일 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -663,12 +868,13 @@ Resource Group을 지우면 안에 있는 Plan, Web App도 함께 삭제됩니�
 ## 참고 자료
 
 ### 공식 문서
-- [Quickstart: Deploy a Python web app to Azure App Service (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/quickstart-python)
-- [Configure Linux Python apps for Azure App Service (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/configure-language-python)
-- [Azure CLI `az webapp up` reference](https://learn.microsoft.com/cli/azure/webapp#az-webapp-up)
-- [Kudu service overview for App Service](https://learn.microsoft.com/azure/app-service/resources-kudu)
+- [Quickstart: Deploy a Python web app (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/quickstart-python)
+- [Configure a Linux Python app (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/configure-language-python)
+- [Kudu service overview (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/resources-kudu)
 
 ### 관련 시리즈
 - [Azure Functions 101](../azure-functions-101/)
 
 ---
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-101/ko/04-first-deploy)

@@ -1,10 +1,10 @@
 ---
 series: technical-writing-101
 episode: 3
-title: Title and Structure
-status: content-ready
+title: "Technical Writing 101 (3/10): Title and Structure"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,43 +16,36 @@ tags:
   - Structure
   - Outline
   - Beginner
-seo_description: A beginner-friendly tour of writing search-friendly titles and readable structures for technical posts.
-last_reviewed: '2026-05-04'
+seo_description: Design technical titles and post structure together so the title promise matches the reader's path through the article.
+last_reviewed: '2026-05-15'
 ---
 
-# Title and Structure
+# Technical Writing 101 (3/10): Title and Structure
 
-> Technical Writing 101 series (3/10)
+Some posts earn the click and lose the reader two scrolls later. Others contain useful material but hide it behind a vague title, so the right reader never opens them in the first place. Those failures look different, but they come from the same source: the title promised one thing while the structure delivered another.
 
-<!-- a-grade-intro:begin -->
+A strong title is not just marketing copy. It compresses the reader action and the payoff. The structure is the route that gets the reader there with the least friction. That is why these two pieces should be designed together, not fixed separately at the end.
 
-**Core question**: Why must a *good title* and a *good structure* travel *together*?
+This is post 3 in the Technical Writing 101 series. It focuses on shaping titles, outlines, headings, and summaries as one system.
 
-> The *title* is a *promise*, and the *structure* is the *delivery*.
 
-<!-- a-grade-intro:end -->
+![technical writing 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/03/03-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 3 flow overview*
+> A title makes the promise, and the section headings prove you can deliver it.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- *SEO* titles
-- *H heading* hierarchy
-- *Intro, body, summary* shape
-- Building an *outline*
-- Handling *paragraphs*
+- SEO* titles?
+- H heading* hierarchy?
+- Intro, body, summary* shape?
 
 ## Why It Matters
 
 The *title* earns the *click*, and the *structure* earns the *time*.
 
-## Concept at a Glance
+> Mental model: the title makes the promise, and the section order delivers it.
 
-```mermaid
-flowchart LR
-    T[Title] --> O[Outline]
-    O --> B[Body]
-    B --> S[Summary]
-```
-
+A strong outline does more than organize sections. It exposes the reader's journey. If someone reads only the title and H2 headings and can still predict the next action, the structure is working.
 ## Key Terms
 
 - **SEO title**: A *search-friendly title*.
@@ -67,13 +60,36 @@ flowchart LR
 
 **After**: "*Ship your first FastAPI endpoint in five minutes*".
 
+## Run a quick scannability test on the outline
+
+Compare these two skeletons.
+
+```markdown
+# FastAPI notes
+
+## Overview
+## Part 1
+## Part 2
+## Summary
+```
+
+```markdown
+# Ship your first FastAPI endpoint in five minutes
+
+## Why this matters
+## Install
+## Write the code
+## Run and verify
+## Common blockers
+```
+
+The second outline is stronger because the headings expose the route. The title promise continues into the H2s, the verification point is visible, and the likely blocker is named early. A simple test works well here: if a reader can skim only the title and H2s and still predict the next action, the structure is probably doing its job.
+
 ## Hands-on: A Skeleton for One Post
 
 ### Step 1 — Title
 
-```python
-title = "Ship your first FastAPI endpoint in five minutes"
-```
+The title should make a specific promise, such as *Ship your first FastAPI endpoint in five minutes*.
 
 ### Step 2 — Outline
 
@@ -83,9 +99,7 @@ outline = ["Install", "Code", "Run", "Verify", "Next step"]
 
 ### Step 3 — First paragraph
 
-```python
-lede = "Hello World in five minutes"
-```
+The opening paragraph should immediately set the pace, for example by promising a Hello World result in five minutes.
 
 ### Step 4 — Body headings
 
@@ -97,9 +111,7 @@ lede = "Hello World in five minutes"
 
 ### Step 5 — Summary
 
-```python
-summary = "Now you can ship your own endpoint"
-```
+The summary should hand the reader back an action, such as: now you can ship your own endpoint.
 
 ## What to Notice in This Code
 
@@ -144,9 +156,20 @@ News articles use the *inverted pyramid*, and technical blogs ask for *conclusio
 
 The next post is *Explaining Concepts*.
 
+## Answering the Opening Questions
+
+- **SEO* titles?**
+  - The article treats Title and Structure as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **H heading* hierarchy?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Intro, body, summary* shape?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
 - **Title and Structure (current)**
 - Explaining Concepts (upcoming)
 - Explaining Example Code (upcoming)
@@ -155,6 +178,7 @@ The next post is *Explaining Concepts*.
 - Writing Tutorials (upcoming)
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

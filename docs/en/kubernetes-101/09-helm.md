@@ -1,10 +1,10 @@
 ---
 series: kubernetes-101
 episode: 9
-title: Helm
-status: content-ready
+title: "Kubernetes 101 (9/10): Helm"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,32 @@ tags:
   - PackageManager
   - DevOps
 seo_description: A beginner-friendly tour of Helm covering chart layout, values, install/upgrade/rollback, repos, and dependency management for Kubernetes deployments.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Helm
+# Kubernetes 101 (9/10): Helm
 
-> Kubernetes 101 series (9/10)
+Kubernetes YAML usually starts tidy and then multiplies across environments. Before long, the real problem is no longer writing manifests but keeping the right differences in the right places without copying entire files forever.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Kubernetes 101 series.
 
-**Core question**: should you *copy/paste* dozens of *manifests* across *environments*?
+Here, we will frame Helm as a repeatable deployment unit that separates shared structure from environment-specific values and gives you install, upgrade, and rollback workflows that are easier to reason about.
 
-> *Helm* separates *templates* from *values* through a unit called a *chart*.
+> Helm becomes valuable when the chart expresses the common contract and the values file is the only place where environments diverge.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![kubernetes 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/09/09-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 9 flow overview*
 
-- the layout of a *Chart*
-- how *values.yaml* works
-- *install / upgrade / rollback*
-- *repositories* and *dependencies*
-- the role of *helm template*
+## Questions to Keep in Mind
+
+- the layout of a *Chart?
+- how *values.yaml* works?
+- install / upgrade / rollback?
 
 ## Why It Matters
 
 *Per-environment copies* create *drift*. *Helm* lets you reuse the *same template* and only swap *values*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Values["values.yaml"] --> Tmpl["templates/*.yaml"]
-    Tmpl --> Render["rendered manifests"]
-    Render --> API["kubernetes api"]
-```
 
 ## Key Terms
 
@@ -122,6 +113,22 @@ def rollback(release, revision):
     )
 ```
 
+## Verification workflow
+
+```bash
+helm template web ./chart -f values.yaml
+helm lint ./chart
+helm history web
+```
+
+**Expected output:** `helm template` should show the exact manifests you are about to apply, `helm lint` should catch structural issues in the chart early, and `helm history` should prove that a release has revision history available for rollback.
+
+**Failure modes to check first:**
+
+- If the rendered YAML is already wrong, the problem is chart/value separation rather than the cluster.
+- A chart that lints clean can still be operationally unsafe if secrets remain as plain values.
+- If rollback is missing, inspect release-history behavior in the install/upgrade workflow before the next incident.
+
 ## What to Notice in This Code
 
 - *--atomic* triggers an *automatic rollback* on failure.
@@ -165,17 +172,29 @@ Combined with *GitOps*, a *values change* alone drives *PR-based* deploys.
 
 With a deploy unit in hand, the final piece is the *operations view*. Next post is *Kubernetes in Operation*.
 
+## Answering the Opening Questions
+
+- **the layout of a *Chart?**
+  - The article treats Helm as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **how *values.yaml* works?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **install / upgrade / rollback?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
-- [Ingress](./05-ingress.md)
-- [ConfigMap and Secret](./06-configmap-and-secret.md)
-- [Volume](./07-volume.md)
-- [HPA](./08-hpa.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap and Secret](./06-configmap-and-secret.md)
+- [Kubernetes 101 (7/10): Volume](./07-volume.md)
+- [Kubernetes 101 (8/10): HPA](./08-hpa.md)
 - **Helm (current)**
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -184,3 +203,4 @@ With a deploy unit in hand, the final piece is the *operations view*. Next post 
 - [Chart structure](https://helm.sh/docs/topics/charts/)
 - [Helm best practices](https://helm.sh/docs/chart_best_practices/)
 - [Artifact Hub](https://artifacthub.io/)
+- [helm lint](https://helm.sh/docs/helm/helm_lint/)

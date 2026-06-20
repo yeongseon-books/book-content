@@ -1,10 +1,10 @@
 ---
 series: machine-learning-101
 episode: 3
-title: Train/Test Split
-status: content-ready
+title: "Machine Learning 101 (3/10): Train/Test Split"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,41 +17,28 @@ tags:
   - CrossValidation
   - scikit-learn
 seo_description: Why train and test splits measure generalization, plus leakage, seeds, stratification, and K-fold cross-validation in scikit-learn
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Train/Test Split
+# Machine Learning 101 (3/10): Train/Test Split
 
-> Machine Learning 101 series (3/10)
+A model can brag about 99% training accuracy and still be useless the moment it sees live traffic. That gap is not a minor detail. It is the core reason ML teams separate fitting from evaluation and guard the test set so aggressively.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Machine Learning 101 series. Here we will use train/test splits, stratification, seeds, and cross-validation to turn “the model seems good” into an experiment that measures generalization.
 
-**Core question**: A model with 99% training accuracy can still fail in production. Why?
 
-> *A train/test split is the minimum apparatus for measuring how a model behaves on data it has never seen.*
+![machine learning 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 3 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
 
-## What You Will Learn
-
-- The roles of train, validation, and test sets
-- Why `random_state` matters for reproducibility
-- How `stratify` handles imbalanced classes
-- The intuition behind K-fold cross-validation
-- Five common pitfalls
+- What do the train, validation, and test sets each protect?
+- Why should `random_state` be fixed even in small experiments?
+- How does `stratify` help on imbalanced classes?
 
 ## Why It Matters
 
 Without measuring generalization, you cannot select or compare models. Training scores are scores you cannot ship.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    All["all data"] --> Tr["train (fit)"]
-    All --> Va["valid (tune)"]
-    All --> Te["test (final)"]
-```
 
 ## Key Terms
 
@@ -106,11 +93,19 @@ from sklearn.model_selection import cross_val_score
 print(cross_val_score(model, X, y, cv=5).mean())
 ```
 
+**Expected output:** the training score should usually come out a bit higher than the test score, and the cross-validation mean should land in the same neighborhood rather than wildly disagree. If those numbers diverge sharply, your split strategy deserves suspicion before the model does.
+
 ## What to Notice in This Code
 
 - `stratify=y` preserves class ratios in both splits.
 - A fixed `random_state` makes results reproducible.
 - `cross_val_score` repeats train and evaluate K times.
+
+## Read the first failure signal this way
+
+- If the test score jumps around every run, check whether the sample is too small or the seed was left floating.
+- If train and test both look suspiciously perfect, inspect preprocessing leakage before celebrating.
+- If the problem is time-series or user-grouped data, random splitting is often the bug, not the metric.
 
 ## Five Common Mistakes
 
@@ -149,9 +144,20 @@ A/B experiments, model comparison, and MLOps gating all hinge on a sound split s
 
 A correct split is the prerequisite for every measurement that follows. Next, we cover linear regression as the foundation of supervised learning.
 
+## Answering the Opening Questions
+
+- **What do the train, validation, and test sets each protect?**
+  - The article treats Train/Test Split as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should `random_state` be fixed even in small experiments?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How does `stratify` help on imbalanced classes?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
 - **Train/Test Split (current)**
 - Linear Regression (upcoming)
 - Logistic Regression (upcoming)
@@ -160,6 +166,7 @@ A correct split is the prerequisite for every measurement that follows. Next, we
 - Overfitting and Regularization (upcoming)
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

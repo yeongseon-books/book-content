@@ -1,10 +1,10 @@
 ---
 series: calculus-for-ml-101
 episode: 3
-title: Partial Derivatives
-status: content-ready
+title: "Calculus for ML 101 (3/10): Partial Derivatives"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,40 @@ tags:
   - MultiVariable
   - Beginner
 seo_description: A beginner-friendly tour of partial derivatives, multivariable functions, holding variables, per-variable slopes, and ML weights
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Partial Derivatives
+# Calculus for ML 101 (3/10): Partial Derivatives
 
-> Calculus for ML 101 series (3/10)
+Real ML losses are not single-input functions. They depend on many weights, biases, activations, and inputs at once. If you want to know which parameter is responsible for a change in loss, you need a way to isolate one variable without pretending the others disappeared.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Calculus for ML 101 series.
 
-**Core question**: When a function takes *many inputs*, how do we measure the effect of *one* alone?
+In this post, we'll use multivariable functions, fixed variables, and per-parameter responsibility to build intuition for partial derivatives. That is the conceptual step that turns "a derivative" into "a gradient for every trainable weight."
 
-> A *partial derivative* is the agreement to *hold the others fixed* and vary *only one*.
+> A partial derivative is the rule that lets you ask one focused question at a time: if only this variable moved, how would the loss respond?
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![calculus for ml 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/03/03-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 3 flow overview*
 
-- *Multivariable* functions
-- The definition of a *partial derivative*
-- The intuition of *holding variables*
-- *Per-variable* slopes
-- The meaning of ML *weights*
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Partial Derivatives?
+- Which signal should the example or diagram make visible for Partial Derivatives?
+- What failure should be prevented first when Partial Derivatives reaches a real system?
+
+## Questions this article answers
+
+- Why do you need to look at slopes one variable at a time in a function with multiple inputs?
+- In a partial derivative, what does it really mean to "hold the other variables fixed"?
+- Why can the same function produce different derivative values depending on which variable you differentiate with respect to?
+- Why do you need a clear variable order before you can build a gradient vector?
+- How do partial derivatives divide responsibility across weights in ML?
 
 ## Why It Matters
 
 Every ML *weight* receives its *share of responsibility* through a *partial derivative*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    F[f x y] --> A[Hold y]
-    A --> X[Partial dx]
-    F --> B[Hold x]
-    B --> Y[Partial dy]
-```
 
 ## Key Terms
 
@@ -150,9 +148,20 @@ g1, g2 = partials(loss, 0.0, 0.0)  # responsibility per weight
 
 Next post: *Gradient*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Partial Derivatives?**
+  - The article treats Partial Derivatives as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Partial Derivatives?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Partial Derivatives reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Derivative](./01-what-is-derivative.md)
-- [Functions and Slope](./02-functions-and-slope.md)
+## In this series
+
+- [Calculus for ML 101 (1/10): What Is a Derivative](./01-what-is-derivative.md)
+- [Calculus for ML 101 (2/10): Functions and Slope](./02-functions-and-slope.md)
 - **Partial Derivatives (current)**
 - Gradient (upcoming)
 - Chain Rule (upcoming)
@@ -161,6 +170,7 @@ Next post: *Gradient*.
 - Optimization (upcoming)
 - Backpropagation Intuition (upcoming)
 - Calculus in Deep Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

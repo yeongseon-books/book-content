@@ -1,10 +1,10 @@
 ---
 series: api-design-101
 episode: 1
-title: What Is an API?
-status: content-ready
+title: "API Design 101 (1/10): What Is an API?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,27 @@ tags:
   - Backend
   - WebDevelopment
 seo_description: The definition of an API, what role it plays, and the conditions for a good one — the first step of the API Design 101 series for backend juniors.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is an API?
+# API Design 101 (1/10): What Is an API?
 
-> API Design 101 series (1/10)
+Teams rarely get into trouble because the server code is impossible to change. They get into trouble because clients and servers are guessing at the contract in different ways, and a small backend tweak turns into a visible outage.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the API Design 101 series.
 
-**Core question**: The word *API* is everywhere — what does it actually mean?
+Here, we frame an API as a long-lived external contract rather than a bag of functions or URLs. That mental model is what makes the later topics—REST, resources, status codes, schemas, and documentation—fit together instead of feeling like isolated rules.
 
-> A *call contract* between two systems. A good API makes that contract *easy to read* and *easy to change*.
 
-<!-- a-grade-intro:end -->
+![api design 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/01/01-01-concept-at-a-glance.en.png)
+*api design 101 chapter 1 flow overview*
+> An API is not code you call — it is a contract you commit to maintaining.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The definition and kinds of APIs
-- Five conditions for a "good API"
-- Library API vs web API
-- The contract between client and server
-- A map of the whole series
+- The definition and kinds of APIs?
+- Five conditions for a "good API"?
+- Library API vs web API?
 
 ## Why It Matters
 
@@ -47,17 +46,7 @@ An API is the *face* of a system. The internals can change freely as long as the
 
 > An API should look more like a *promise that does not change*.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Client["Client"] -->|"request"| API["API contract"]
-    API --> Server["Server (impl)"]
-    Server -->|"response"| API
-    API --> Client
-```
-
-The client only needs to know the *contract*.
+That is the whole point of an API boundary. The server can change storage, frameworks, or deployment shape underneath, but the public request and response contract must stay stable enough that clients do not need to care.
 
 ## Key Terms
 
@@ -175,6 +164,12 @@ GitHub's REST API, Stripe's API, Google Maps API — all *documented contracts*.
 - Errors deserve a *shape* too.
 - Documentation grows with the code (auto-generated OpenAPI).
 
+## Verification Signals and Failure Modes
+
+- **Expected output:** `GET /health` should return both `200` and `{"status": "ok"}`. That is the smallest possible proof that the contract exists and works.
+- **First check:** If client examples mention private file paths, ORM models, or internal function names, the contract boundary is already leaking.
+- **Failure mode:** Once clients branch on undocumented response shapes instead of documented status + body contracts, later changes become accidental breaking changes.
+
 ## Checklist
 
 - [ ] Does this API have *public documentation*?
@@ -193,7 +188,18 @@ GitHub's REST API, Stripe's API, Google Maps API — all *documented contracts*.
 
 An API is a *contract*. The next post moves to its most common shape — REST basics.
 
+## Answering the Opening Questions
+
+- **The definition and kinds of APIs?**
+  - The article treats What Is an API? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Five conditions for a "good API"?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Library API vs web API?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is an API? (current)**
 - REST Basics (upcoming)
 - Resource Design (upcoming)
@@ -204,6 +210,7 @@ An API is a *contract*. The next post moves to its most common shape — REST ba
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

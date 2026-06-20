@@ -1,11 +1,11 @@
 ---
-title: Retriever Design — VectorStoreRetriever and MMR
+title: "RAG Deep Dive (3/6): Retriever Design — VectorStoreRetriever and MMR"
 series: rag-deep-dive
 episode: 3
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,33 +14,29 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: How VectorStoreRetriever and MMR balance relevance and diversity, walked through LangChain internals.
 ---
 
-# Retriever Design — VectorStoreRetriever and MMR
+# RAG Deep Dive (3/6): Retriever Design — VectorStoreRetriever and MMR
 
-<!-- a-grade-intro:begin -->
-## Questions this post answers
+VectorStoreRetriever and MMR define how a retriever trades off relevance against coverage. This post walks that policy layer through LangChain internals.
 
-- What contract does `BaseRetriever` enforce beyond returning documents?
-- Where does `VectorStoreRetriever` branch into `similarity`, `mmr`, and threshold mode?
-- Why does `fetch_k` need to be wider than `k` for MMR to matter?
-- How does `lambda_mult` change redundancy versus coverage?
+This is post 3 in the RAG Deep Dive series.
 
+![Invoke path into retriever callbacks](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.en.png)
+*Invoke path into retriever callbacks*
 > A retriever is not just a nearest-neighbor fetcher. It is the policy layer that decides how candidate evidence becomes final context.
 
-![Questions this post answers](../../assets/rag-deep-dive/03/03-01-questions-this-post-answers.en.png)
+## Questions to Keep in Mind
 
-*Questions this post answers*
-<!-- a-grade-intro:end -->
+- What call contract does `BaseRetriever` standardize across retrieval implementations?
+- Which retrieval failure does `similarity`, `similarity_score_threshold`, or `mmr` try to reduce?
+- What clues do callbacks and parameter logs give when retrieval results look wrong?
 
-> RAG Deep Dive series (3/6)
-
-<!-- a-grade-example:begin -->
 ## Minimal runnable example
 
-Example file: `/root/Github/rag-deep-dive/en/03-retriever-design/main.py`
+Example file: `en/03-retriever-design/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py
@@ -127,10 +123,6 @@ That policy lives in several places at once. `BaseRetriever` wraps retrieval in 
 
 In LangChain 0.2.17, the foundational retriever interface is `langchain_core.retrievers.BaseRetriever`. At first glance it looks simple: take a string query, return a list of `Document` objects. In source, though, it is already part of the Runnable system. That design choice is the reason the recommended entry points are `invoke()` and `ainvoke()` rather than the older `get_relevant_documents()` methods.
 
-![Invoke path into retriever callbacks](../../assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.en.png)
-
-*Invoke path into retriever callbacks*
-
 `invoke()` is worth reading line by line. It starts with `ensure_config(config)`, then builds a `CallbackManager` through `CallbackManager.configure(...)`. At that stage LangChain merges together several sources of execution metadata: callbacks from the run config, retriever-level tags and metadata, config-level tags and metadata, and the tracing payload from `_get_ls_params()`. After that, `callback_manager.on_retriever_start(...)` creates a `run_manager`. Only then does the retriever call the implementation hook that actually performs retrieval.
 
 That implementation hook is `_get_relevant_documents()`. If the subclass supports the newer signature, `invoke()` passes in `run_manager`. Success triggers `run_manager.on_retriever_end(result)`, and failure triggers `run_manager.on_retriever_error(e)`. So retrieval is executed as a traced run, not as an unstructured helper call.
@@ -185,7 +177,7 @@ The baseline here is straightforward: `BaseRetriever` is not merely a semantic c
 
 `VectorStoreRetriever` is the default adapter that turns a vector store into a retriever. Its implementation is short, but the shortness is deceptive. The class stores two policy fields, `search_type` and `search_kwargs`, and its `_get_relevant_documents()` method dispatches to different vector-store methods based on those settings. Retrieval quality is therefore shaped at this adapter boundary before it reaches FAISS or any other backend.
 
-![Search type dispatch and parameters](../../assets/rag-deep-dive/03/03-02-vectorstore-retriever-dispatch.en.png)
+![Search type dispatch and parameters](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-02-vectorstore-retriever-dispatch.en.png)
 
 *Search type dispatch and parameters*
 
@@ -258,7 +250,7 @@ So `VectorStoreRetriever` is simple in code size but not trivial in effect. It i
 
 MMR exists to counter one of the most common retrieval failure modes: a top-k list that is locally accurate and globally repetitive. If a corpus contains many near-duplicate chunks, plain similarity search happily returns them because each chunk is individually close to the query. The user then gets redundancy instead of coverage. MMR addresses that by selecting documents that are both query-relevant and mutually less redundant.
 
-![MMR candidate expansion and selection](../../assets/rag-deep-dive/03/03-03-mmr-selection-flow.en.png)
+![MMR candidate expansion and selection](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-03-mmr-selection-flow.en.png)
 
 *MMR candidate expansion and selection*
 
@@ -325,7 +317,7 @@ MMR is therefore best understood as a second-stage selector over an expanded can
 
 Threshold retrieval sounds simple until you ask what the threshold is actually applied to. In FAISS `IndexFlatL2`, the backend returns L2 distance values, not similarity scores. Lower is better. If you apply a “score threshold” directly to those raw numbers, you are really applying a distance ceiling. LangChain adds an intermediate relevance-score layer precisely to make threshold retrieval more backend-independent.
 
-![Distance values becoming relevance scores](../../assets/rag-deep-dive/03/03-04-threshold-score-conversion.en.png)
+![Distance values becoming relevance scores](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-04-threshold-score-conversion.en.png)
 
 *Distance values becoming relevance scores*
 
@@ -382,7 +374,7 @@ So the lesson is not just that L2 is a distance. It is that threshold retrieval 
 
 `VectorStoreRetriever` is a solid default, but it is not always the right boundary for retrieval policy. Sometimes the real requirement is to narrow the search space before vector search begins. A common example is source scoping. If the application already knows the user should only search documents from one source, tenant, or repository, then searching a global index and discarding cross-source results afterward is structurally wasteful.
 
-![Source-filtered routing before vector search](../../assets/rag-deep-dive/03/03-05-custom-source-retriever.en.png)
+![Source-filtered routing before vector search](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-05-custom-source-retriever.en.png)
 
 *Source-filtered routing before vector search*
 
@@ -476,15 +468,26 @@ This episode established the retriever layer as a policy boundary rather than a 
 
 That baseline leads directly into episode 4. Retrieval output is still not final context. The next failure point is how those documents are packed and injected into the prompt.
 
+## Answering the Opening Questions
+
+- **What call contract does `BaseRetriever` standardize across retrieval implementations?**
+  `BaseRetriever` standardizes the call shape: take a query, return Documents, and expose callback boundaries around retrieval.
+
+- **Which retrieval failure does `similarity`, `similarity_score_threshold`, or `mmr` try to reduce?**
+  `similarity` prioritizes nearest matches, thresholds block weak evidence, and MMR reduces repeated near-duplicates by adding diversity.
+
+- **What clues do callbacks and parameter logs give when retrieval results look wrong?**
+  Logs for callbacks, search_type, k, score threshold, and fetch_k help separate strategy problems from query problems.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Document Loading and Chunking — Inside LangChain TextSplitter](./01-document-loading-and-chunking.md)
-- [Embeddings and the Vector Index — Inside FAISS IndexFlatL2](./02-embeddings-and-vector-index.md)
-- **Retriever Design — VectorStoreRetriever and MMR (current)**
-- Prompt Construction and Context Injection — Inside PromptTemplate (upcoming)
-- Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)
-- Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
+- [RAG Deep Dive (1/6): Document Loading and Chunking — Inside LangChain TextSplitter](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): Embeddings and the Vector Index — Inside FAISS IndexFlatL2](./02-embeddings-and-vector-index.md)
+- **RAG Deep Dive (3/6): Retriever Design — VectorStoreRetriever and MMR (current)**
+- RAG Deep Dive (4/6): Prompt Construction and Context Injection — Inside PromptTemplate (upcoming)
+- RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)
+- RAG Deep Dive (6/6): Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
 
 <!-- toc:end -->
 

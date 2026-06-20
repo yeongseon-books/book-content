@@ -1,10 +1,10 @@
 ---
 series: software-design-101
 episode: 6
-title: Layered Architecture
+title: "Software Design 101 (6/10): Layered Architecture"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,28 @@ tags:
   - Layers
   - Architecture
 seo_description: How layered architecture is structured, what dependency directions are allowed, and where the anti-corruption layer fits.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Layered Architecture
+# Software Design 101 (6/10): Layered Architecture
 
-> Software Design 101 series (6/10)
+Layering is useful only when it protects different rates of change from colliding. If the router still knows the database, the folder names are not helping you.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Software Design 101 series.
 
-**Core question**: Why bother with layers, and what do you split them on?
+In this post, we use layered architecture to separate presentation, application flow, domain rules, and infrastructure details. The important question is not how many layers to draw, but which changes you want to stop from leaking inward.
 
-> So that code with different reasons and rates of change does not sit in the same box.
+> Put code that changes for the same reason in the same layer, and keep unrelated churn out of the core.
 
-<!-- a-grade-intro:end -->
+
+![software design 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.en.png)
+*software design 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Layered Architecture?
+- Which signal should the example or diagram make visible for Layered Architecture?
+- What failure should be prevented first when Layered Architecture reaches a real system?
 
 ## What You Will Learn
 
@@ -46,16 +54,6 @@ last_reviewed: '2026-05-04'
 Layers separate units of change. The UI, the domain, and the infrastructure all change at different rates.
 
 > Group together what changes for the same reason.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    UI["Presentation"] --> APP["Application"]
-    APP --> DOM["Domain"]
-    APP --> INF["Infrastructure"]
-    INF --> DOM
-```
 
 The domain is the stable core that nothing points away from.
 
@@ -153,6 +151,31 @@ def to_domain_user(external_json):
 
 The external schema cannot pollute the domain.
 
+## Quick Verification
+
+Open one router and count how many lines belong to HTTP handling, use-case orchestration, domain rules, and repository access. Collapsed layers usually show all four in one function.
+
+```text
+router lines: input parsing, status code, JSON response
+use-case lines: orchestration, transaction boundary
+domain lines: validation, policy, invariant
+infra lines: ORM call, SQL, SDK
+```
+
+**Expected output:** the separation target becomes clear — presentation should keep the HTTP mechanics, while domain code should keep the rules.
+
+In a very small project you do not need four formal layers. You do need to avoid stacking unrelated rates of change into the same function.
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| The router is long and hard to test | Check whether use-case flow is still trapped in presentation |
+| The domain model is full of ORM details | Check whether infrastructure leaked inward |
+| Third-party field names appear all over the domain | Check whether you need an anti-corruption layer |
+
+Layers are not for pretty folder trees. They exist to prevent outside churn from shaking the inside rules directly.
+
 ## What to Notice in This Code
 
 - Dependencies always point toward the domain.
@@ -197,17 +220,29 @@ Most backends are essentially layered already. A common split is router → serv
 
 Layers absorb the shock of change. Next up we look at the data that moves between them — how to design the flow.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Layered Architecture?**
+  - The article treats Layered Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Layered Architecture?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Layered Architecture reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
-- [Separation of Concerns](./02-separation-of-concerns.md)
-- [Modules and Boundaries](./03-modules-and-boundaries.md)
-- [Dependency Direction](./04-dependency-direction.md)
-- [Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): Separation of Concerns](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): Modules and Boundaries](./03-modules-and-boundaries.md)
+- [Software Design 101 (4/10): Dependency Direction](./04-dependency-direction.md)
+- [Software Design 101 (5/10): Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
 - **Layered Architecture (current)**
 - Data Flow Design (upcoming)
 - Reducing Change Impact (upcoming)
 - Design Principles (upcoming)
-- Small Design Practice (upcoming)
+- Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -216,3 +251,8 @@ Layers absorb the shock of change. Next up we look at the data that moves betwee
 - [Domain-Driven Design — Layered Architecture](https://martinfowler.com/bliki/DomainDrivenDesign.html)
 - [Patterns of Enterprise Application Architecture](https://martinfowler.com/eaaCatalog/)
 - [Anti-Corruption Layer Pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer)
+
+### Practical Docs
+
+- [Flask Quickstart](https://flask.palletsprojects.com/en/stable/quickstart/)
+- [dataclasses — Data Classes](https://docs.python.org/3/library/dataclasses.html)

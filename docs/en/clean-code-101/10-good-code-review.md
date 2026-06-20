@@ -1,10 +1,10 @@
 ---
 series: clean-code-101
 episode: 10
-title: Good Code Review Standards
-status: content-ready
+title: "Clean Code 101 (10/10): Good Code Review Standards"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,44 +18,43 @@ tags:
   - Quality
   - Collaboration
 seo_description: A clean-code checklist for pull requests, actionable review comments, and collaboration principles that scale.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Good Code Review Standards
+# Clean Code 101 (10/10): Good Code Review Standards
 
-> Clean Code 101 series (10/10)
+A code review slows down when the reviewer must rediscover the author’s intent, rerun basic style checks by eye, and guess which comments are mandatory. Good reviews depend on design, but they also depend on process.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Clean Code 101 series.
 
-**Core question**: What should a good code review actually look at?
+Here we will convert the themes from the series into a practical review checklist, then connect them to CI, PR sizing, comment labels, and measurable team feedback loops.
 
-> Everything this series taught — names, functions, branches, duplication, errors, tests, refactoring — checked at one moment.
 
-<!-- a-grade-intro:end -->
+![clean code 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/10/10-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 10 flow overview*
+> Automation handles chores. People review intent and structure.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- PR size and reviewability
-- A clean-code review checklist
-- The shape of a good review comment
-- Roles of the reviewer and the author
-- What to push into automation
+- What boundary should you inspect first when applying Good Code Review Standards?
+- Which signal should the example or diagram make visible for Good Code Review Standards?
+- What failure should be prevented first when Good Code Review Standards reaches a real system?
+
+## Questions this article answers
+
+- What size makes a PR realistically reviewable?
+- What belongs on a clean-code review checklist?
+- What does a strong review comment actually look like?
+- What responsibilities belong to the reviewer, and which belong to the author?
+- What should be pushed into automation, and what still needs human judgment?
+
+> A good review is not just time spent catching defects. It is the moment the team turns intent and structure into a better answer than automation can produce alone.
 
 ## Why It Matters
 
 Review is the last quality gate and the largest learning channel a team has.
 
 > Review is not where defects are caught. It is where the team finds a better answer together.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    A["Author: small PR"] --> B["Automated checks"]
-    B --> C["Reviewer: intent/structure"]
-    C --> D["Fast feedback"]
-    D --> E["Merge"]
-```
 
 Automation handles chores. Humans look at intent.
 
@@ -146,6 +145,24 @@ Labels make priority explicit.
 
 Refactor the review process itself.
 
+## How to Verify This in a Real Codebase
+
+```bash
+ruff check .
+python -m pytest -q
+GIT_PAGER=cat git diff --stat HEAD~1..HEAD
+```
+
+**Expected output**
+
+- Automation should clear style and test failures before review starts.
+- Diff size and verification notes should match the PR description.
+
+## Failure Modes to Watch
+
+- Comments do not distinguish preference from merge-blocking issues.
+- Repeated feedback never graduates into lint rules or templates.
+
 ## What to Notice in This Code
 
 - What automation finishes is not re-checked by humans.
@@ -190,17 +207,29 @@ Strong teams measure average PR size, time to first response, and merge lead tim
 
 A good review is a mirror of clean code. Names, functions, branches, duplication, errors, comments, tests, refactoring, and reviews — every topic in this series points to one thing: code that the next person can change more easily. The next series scales these principles to a larger unit — software design.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Good Code Review Standards?**
+  - The article treats Good Code Review Standards as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Good Code Review Standards?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Good Code Review Standards reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
-- [Naming](./02-naming.md)
-- [Small Functions](./03-small-functions.md)
-- [Simplifying Conditionals](./04-simplifying-conditionals.md)
-- [Removing Duplication](./05-removing-duplication.md)
-- [Error Handling](./06-error-handling.md)
-- [Comments and Documentation](./07-comments-and-docs.md)
-- [Testable Code](./08-testable-code.md)
-- [Refactoring Basics](./09-refactoring-basics.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
+- [Clean Code 101 (2/10): Naming](./02-naming.md)
+- [Clean Code 101 (3/10): Small Functions](./03-small-functions.md)
+- [Clean Code 101 (4/10): Simplifying Conditionals](./04-simplifying-conditionals.md)
+- [Clean Code 101 (5/10): Removing Duplication](./05-removing-duplication.md)
+- [Clean Code 101 (6/10): Error Handling](./06-error-handling.md)
+- [Clean Code 101 (7/10): Comments and Documentation](./07-comments-and-docs.md)
+- [Clean Code 101 (8/10): Testable Code](./08-testable-code.md)
+- [Clean Code 101 (9/10): Refactoring Basics](./09-refactoring-basics.md)
 - **Good Code Review Standards (current)**
+
 <!-- toc:end -->
 
 ## References
@@ -209,3 +238,4 @@ A good review is a mirror of clean code. Names, functions, branches, duplication
 - [Conventional Comments](https://conventionalcomments.org/)
 - [Best Kept Secrets of Peer Code Review (Smart Bear)](https://smartbear.com/resources/ebooks/best-kept-secrets-of-peer-code-review/)
 - [Microsoft Engineering Fundamentals — Code Review](https://microsoft.github.io/code-with-engineering-playbook/code-reviews/)
+- [Google engineering practices — code review](https://google.github.io/eng-practices/review/)

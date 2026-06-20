@@ -1,10 +1,10 @@
 ---
 series: frontend-development-101
 episode: 2
-title: HTML and CSS Basics
+title: "Frontend Development 101 (2/10): HTML and CSS Basics"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,23 +20,28 @@ seo_description: Semantic HTML, the box model, Flexbox and Grid — the long-liv
 last_reviewed: '2026-05-04'
 ---
 
-# HTML and CSS Basics
+# Frontend Development 101 (2/10): HTML and CSS Basics
 
-> Frontend Development 101 series (2/10)
+One lesson shows up quickly when you study frontend work: building a screen fast and building a screen that survives real product growth are not the same thing. You can ship something quickly with random tags and one-off styles, but maintenance gets expensive as soon as the layout changes, accessibility matters, or another teammate joins the codebase.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Frontend Development 101 series. Here we treat HTML as the page skeleton and CSS as the rule system layered on top of that skeleton. Keeping meaning in HTML and appearance in CSS is what makes layout, accessibility, and SEO improve together instead of fighting each other later.
 
-**Core question**: How do you keep the *skeleton* and the *clothes* of a page cleanly apart?
 
-> HTML carries *meaning*. CSS carries *appearance*. Future-you will *thank you* for keeping that line clear.
+![frontend development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/02/02-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 2 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying HTML and CSS Basics?
+- Which signal should the example or diagram make visible for HTML and CSS Basics?
+- What failure should be prevented first when HTML and CSS Basics reaches a real system?
 
 ## What You Will Learn
 
 - Building *meaningful structure* with semantic HTML
 - The CSS box model
 - *Where Flexbox shines and where Grid shines*
+
 - A *minimal pattern* for responsive design
 - The *starting point* for accessibility
 
@@ -45,16 +50,6 @@ last_reviewed: '2026-05-04'
 HTML and CSS are *long-lived skills*. Frameworks rotate every five years, but *semantic tags and the box model* stay. Time spent here is the *highest-yield investment* in your frontend career.
 
 > Semantic HTML is code that *search engines and screen readers can read together*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    HTML["Semantic HTML"] --> Box["Box model"]
-    Box --> Layout["Flexbox/Grid"]
-    Layout --> Resp["Responsive"]
-    Resp --> A11y["Accessibility"]
-```
 
 ## Key Terms
 
@@ -136,6 +131,16 @@ main {
 }
 ```
 
+## Verification
+
+- Resize the browser under 600px and verify that the card layout collapses to a single column.
+- Inspect the DOM in DevTools Elements to confirm that semantic tags such as `<main>` and `<article>` describe the page structure you intended.
+
+## If It Fails, Check This First
+
+- If the layout does not change, verify that the media query condition and selector names match the actual HTML.
+- If spacing feels wrong, inspect `gap`, `padding`, and `margin` in the box model instead of guessing from the visual result.
+
 ## What to Notice in This Code
 
 - Use *role-based class names* like `card`, not `red`.
@@ -180,8 +185,19 @@ Most companies adopt a *design system* (Tailwind, Material UI, custom tokens) fo
 
 HTML is *the skeleton*; CSS is *the clothes*. With the two clearly separated, behavior — JavaScript — slots in cleanly. We tackle JavaScript fundamentals next.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying HTML and CSS Basics?**
+  - The article treats HTML and CSS Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for HTML and CSS Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when HTML and CSS Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
 - **HTML and CSS Basics (current)**
 - JavaScript Basics (upcoming)
 - Components and State (upcoming)
@@ -191,11 +207,17 @@ HTML is *the skeleton*; CSS is *the clothes*. With the two clearly separated, be
 - Styling and Design Systems (upcoming)
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [MDN HTML elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Element)
-- [CSS Tricks Flexbox guide](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
-- [CSS Tricks Grid guide](https://css-tricks.com/snippets/css/complete-guide-grid/)
-- [WAI ARIA basics](https://developer.mozilla.org/en-US/docs/Learn/Accessibility/WAI-ARIA_basics)
+### Official Docs
+- [MDN: HTML elements reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element)
+- [MDN: CSS box model](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/The_box_model)
+- [MDN: Basic concepts of flexbox](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Basic_concepts_of_flexbox)
+- [MDN: CSS grid layout](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout)
+
+### Verification and Further Reading
+- [web.dev: Responsive web design basics](https://web.dev/articles/responsive-web-design-basics)
+- [WAI: Images and alt decisions](https://www.w3.org/WAI/tutorials/images/)

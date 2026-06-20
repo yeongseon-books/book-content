@@ -1,11 +1,11 @@
 ---
-title: The gRPC Event Stream — What Do the Host and Worker Actually Exchange?
+title: "Azure Functions Deep Dive (3/6): The gRPC Event Stream — What Do the Host and Worker Actually Exchange?"
 series: azure-functions-deep-dive
 episode: 3
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -19,9 +19,13 @@ seo_description: All code citations in this post are based on Azure/azure-functi
   @ 5e59423.
 ---
 
-# The gRPC Event Stream — What Do the Host and Worker Actually Exchange?
+# Azure Functions Deep Dive (3/6): The gRPC Event Stream — What Do the Host and Worker Actually Exchange?
 
 > Azure Functions Deep Dive series (3/6)
+
+Spawning a worker process is only the beginning. The real system boundary appears when the host and that worker need to exchange lifecycle messages, function metadata, invocations, logs, and health signals over one concrete transport.
+
+This is the third post in the Azure Functions Deep Dive series. Here, we trace the bidirectional gRPC stream that carries the Azure Functions host-worker protocol.
 
 ## Source Version
 
@@ -35,17 +39,16 @@ That channel is a single **bidirectional gRPC stream**. In this post, we'll walk
 > - Host: [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7)
 > - Protocol: [`Azure/azure-functions-language-worker-protobuf`](https://github.com/Azure/azure-functions-language-worker-protobuf) — the protocol lives in a separate repo.
 
----
+![azure functions deep dive chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.en.png)
+*azure functions deep dive chapter 3 flow overview*
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What kinds of messages does the host-to-worker gRPC stream carry, and how?
 - When the stream drops, what does the host assume, and what does the worker assume?
 - How do large payloads flow over the stream, and where are the hard limits?
-- Where does backpressure in the gRPC flow become visible?
-- Is this channel debuggable, or effectively a black box?
 
-## The big picture — one single stream
+## One host-worker event stream
 
 Let's start with the punchline. Host-worker communication in Azure Functions is **one gRPC service, one RPC**.
 
@@ -206,9 +209,6 @@ The host sends one of these per function, or batches them in a single `FunctionL
 
 ### All on one screen
 
-![Common worker protocol lifecycle flow](../../assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.en.png)
-
-*Common worker protocol lifecycle flow*
 This sequence is **the life of every worker**. The Node worker, the Python worker, the Java worker — all the same. The implementation details on the worker side differ per language, but **the protocol is uniform**.
 
 ---
@@ -265,7 +265,7 @@ This part is easier to reason about if you stay close to the code. The main invo
 
 That makes `FunctionRpcService` the pump between the real gRPC stream and the host-side per-worker queues.
 
-![Per-worker channel pairs and gRPC pump](../../assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.en.png)
+![Per-worker channel pairs and gRPC pump](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.en.png)
 
 *Per-worker channel pairs and gRPC pump*
 `IScriptEventManager` still exists here, but mainly as keyed storage for those channels. `InboundGrpcEvent` and `OutboundGrpcEvent` are real wrapper types, and other components can observe them around the edges. But for function invocation traffic, the mental model that matches the source is **per-worker queues plus a gRPC pump**, not “everything goes through one generic in-process event bus.”
@@ -310,15 +310,24 @@ This is part 3 of the Azure Functions Deep Dive series. Part 2 stopped at proces
 - [ ] Reviewed idempotency guarantees against external dependencies on stream drop
 - [ ] Set a trace correlation-ID propagation policy for debuggability
 
+## Answering the Opening Questions
+
+- **What kinds of messages does the host-to-worker gRPC stream carry, and how?**
+  - The article treats The gRPC Event Stream — What Do the Host and Worker Actually Exchange? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When the stream drops, what does the host assume, and what does the worker assume?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do large payloads flow over the stream, and where are the hard limits?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
-- [Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
-- **The gRPC Event Stream — What Do the Host and Worker Actually Exchange? (current)**
-- Dispatcher and Invocation — How a Function Call Reaches the Worker (upcoming)
-- Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (upcoming)
-- Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
+- [Azure Functions Deep Dive (1/6): Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
+- [Azure Functions Deep Dive (2/6): Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
+- **Azure Functions Deep Dive (3/6): The gRPC Event Stream — What Do the Host and Worker Actually Exchange? (current)**
+- Azure Functions Deep Dive (4/6): Dispatcher and Invocation — How a Function Call Reaches the Worker (upcoming)
+- Azure Functions Deep Dive (5/6): Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (upcoming)
+- Azure Functions Deep Dive (6/6): Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
 
 <!-- toc:end -->
 

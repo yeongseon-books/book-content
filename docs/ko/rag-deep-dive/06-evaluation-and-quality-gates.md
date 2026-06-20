@@ -1,12 +1,12 @@
 ---
-title: 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
+title: "RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness"
 series: rag-deep-dive
 episode: 6
 language: ko
 status: publish-ready
 targets:
   tistory: true
-  medium: true
+  medium: false
   mkdocs: true
   ebook: true
 tags:
@@ -14,16 +14,29 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: RAGAS의 faithfulness와 answer_relevancy 메트릭으로 RAG 답변 품질을 자동 평가하는 방법을 정리합니다.
 ---
 
-# 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
+# RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
 
-<!-- a-grade-example:begin -->
+RAGAS의 faithfulness와 answer_relevancy는 RAG 답변 품질을 사람이 매번 읽지 않고도 점검하게 해 주는 기준입니다. 여기서는 이 메트릭을 품질 게이트로 연결하는 방법을 정리합니다.
+
+이 글은 RAG Deep Dive 시리즈의 마지막 글입니다.
+
+![평가 샘플이 메트릭 입력을 결정하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.ko.png)
+*평가 샘플이 메트릭 입력을 결정하는 구조*
+> 평가는 RAG 답 하나를 질문, 근거, 답변, 기준 진실의 관계로 다시 펼친 뒤, 그 관계를 점수로 바꾸는 과정입니다.
+
+## 먼저 던지는 질문
+
+- RAGAS 평가는 왜 데이터셋 열 설계가 곧 평가 가능 범위를 결정할까요?
+- Faithfulness는 답변이 그럴듯한지가 아니라 무엇을 근거와 대조할까요?
+- 품질 게이트를 CI나 운영에 넣을 때 어떤 실패를 차단해야 할까요?
+
 ## 최소 실행 예제
 
-예제 파일: `/root/Github/rag-deep-dive/ko/06-evaluation-and-quality-gates/main.py`
+예제 파일: `en/06-evaluation-and-quality-gates/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py
@@ -118,10 +131,6 @@ RAGAS를 처음 볼 때 가장 중요한 오해 하나를 먼저 걷어내야 �
 
 이 네 열이 사실상 평가의 중심축입니다. `question`은 사용자 질문, `contexts`는 retriever가 돌려준 컨텍스트 조각 목록, `answer`는 모델 답변, `ground_truth`는 사람이 준비한 기준 답입니다. 질문이 없으면 answer relevancy처럼 “원래 질문과 얼마나 맞닿아 있는가”를 계산할 수 없고, `contexts`가 없으면 faithfulness처럼 “이 답이 근거에 기대고 있는가”를 따질 수 없으며, `ground_truth`가 없으면 context precision이나 answer correctness처럼 기준 답을 축으로 삼는 메트릭은 설 자리가 줄어듭니다.
 
-![평가 샘플이 메트릭 입력을 결정하는 구조](../../assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.ko.png)
-
-*평가 샘플이 메트릭 입력을 결정하는 구조*
-
 이 점이 중요한 이유는 평가 스키마가 곧 실패 분류 체계이기 때문입니다. 답이 질문과 동떨어졌다면 answer relevancy 문제이고, 근거 문맥에 없는 사실을 섞었다면 faithfulness 문제이며, 유용한 chunk가 뒤로 밀렸다면 context precision 문제입니다. 스키마가 넓을수록 “어디서 망가졌는가”를 더 선명하게 분리할 수 있습니다.
 
 메트릭별 입력 요구도 여기서 바로 갈립니다. faithfulness는 `question`, `answer`, `contexts`가 필요합니다. answer relevancy도 `evaluation_mode = qac`이므로 `question`, `answer`, `contexts`를 모두 요구합니다. 실제로 `_create_question_gen_prompt()`는 `row["answer"]`와 `row["contexts"]`를 함께 읽어 역질문 프롬프트를 만들기 때문에, `contexts`가 빠지면 `evaluate()` 검증 단계에서 실패합니다. context precision은 `question`, `contexts`, `ground_truth` 축이 있어야 각 chunk의 유용성을 판정할 수 있습니다.
@@ -176,11 +185,11 @@ print(column_map)
 
 RAGAS에서 RAG다운 메트릭을 하나만 꼽으라면 많은 팀이 faithfulness를 먼저 봅니다. 이유는 단순합니다. RAG 시스템의 가장 전형적인 실패는 “그럴듯하지만 근거에 없는 말”이기 때문입니다. `ragas/metrics/_faithfulness.py`를 읽으면 이 메트릭이 그 실패를 어떻게 연산으로 바꾸는지 꽤 명확하게 드러납니다.
 
-핵심은 2단계입니다. 첫 단계에서 RAGAS는 답변 전체를 그대로 판단하지 않습니다. 먼저 LLM을 써서 답변을 더 단순한 statement 목록으로 분해합니다. `LONG_FORM_ANSWER_PROMPT`를 보면 문장별 복잡도를 분석하고, 대명사를 없애고, 완전히 이해 가능한 더 작은 statement로 쪼개라고 지시합니다. 예를 들어 “그 작업자는 세 번 재시도한 뒤 포기하고 dead-letter queue로 보낸다”라는 한 문장은 `재시도 횟수는 세 번이다`와 `마지막 재시도 뒤 payload가 dead-letter queue로 이동한다` 같은 원자적 주장 둘로 나뉠 수 있습니다.
+faithfulness 계산은 2단계로 움직입니다. 첫 단계에서 RAGAS는 답변 전체를 그대로 판단하지 않습니다. 먼저 LLM을 써서 답변을 더 단순한 statement 목록으로 분해합니다. `LONG_FORM_ANSWER_PROMPT`를 보면 문장별 복잡도를 분석하고, 대명사를 없애고, 더 작은 statement로 쪼개라고 지시합니다. 예를 들어 “그 작업자는 세 번 재시도한 뒤 포기하고 dead-letter queue로 보낸다”라는 한 문장은 `재시도 횟수는 세 번이다`와 `마지막 재시도 뒤 payload가 dead-letter queue로 이동한다`라는 두 개의 원자적 주장으로 나눌 수 있습니다.
 
 둘째 단계에서는 이렇게 분해된 각 statement를 retrieved context 목록에 대조합니다. `NLI_STATEMENTS_MESSAGE`는 문맥만 보고 각 statement가 직접 추론 가능한지 `verdict` 0 또는 1로 돌려달라고 요구합니다. 구현에서 `_create_nli_prompt()`는 `row["contexts"]`를 줄바꿈으로 합쳐 하나의 premise처럼 만들고, statement 목록을 JSON 문자열로 전달합니다. 그리고 `_compute_score()`는 아주 단순한 비율을 계산합니다.
 
-![답변 주장 분해와 근거 검증 흐름](../../assets/rag-deep-dive/06/06-02-faithfulness-claim-decomposition-and-verification.ko.png)
+![답변 주장 분해와 근거 검증 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-02-faithfulness-claim-decomposition-and-verification.ko.png)
 
 *답변 주장 분해와 근거 검증 흐름*
 
@@ -190,7 +199,7 @@ RAGAS에서 RAG다운 메트릭을 하나만 꼽으라면 많은 팀이 faithful
 faithfulness\_score = \frac{|supported\_claims|}{|total\_claims|}
 \]
 
-즉 지원된 주장 수를 전체 주장 수로 나눈 값입니다. 소스에서 `faithful_statements / num_statements`로 바로 구현되어 있고, statement가 하나도 생성되지 않으면 `NaN`으로 떨어집니다. 중요한 것은 이 점수가 “답변 전체가 마음에 드는가”를 묻지 않는다는 점입니다. 문장이 매끄러운지, 표현이 간결한지, 질문에 친절히 답했는지는 관심사가 아닙니다. 오직 **답변이 자기 근거로 제공된 `contexts` 안에서 지지되는 주장들로만 이루어져 있는가**만 봅니다.
+즉 지원된 주장 수를 전체 주장 수로 나눈 값입니다. 소스에서 `faithful_statements / num_statements`로 바로 구현되어 있고, statement가 하나도 생성되지 않으면 `NaN`으로 떨어집니다. 중요한 것은 이 점수가 “답변 전체가 마음에 드는가”를 묻지 않는다는 사실입니다. 문장이 매끄러운지, 표현이 간결한지, 질문에 친절히 답했는지는 관심사가 아닙니다. 오직 **답변이 자기 근거로 제공된 `contexts` 안에서 지지되는 주장들로만 이루어져 있는가**만 봅니다.
 
 이때 hallucination도 운영적으로 다시 정의됩니다. 보통 사람은 hallucination을 “거짓말”로 받아들이지만, faithfulness는 더 좁고 더 실무적인 정의를 씁니다. `contexts`로 직접 지지되지 않는 statement는 점수를 깎습니다. 그 statement가 세상 전체 기준으로 사실일 수도 있습니다. 하지만 현재 RAG 호출의 근거 묶음 안에 없으면, 이 메트릭에서는 faithfulness 위반입니다. 이 정의가 중요한 이유는 RAG의 계약이 “모델이 세상에서 맞는 말을 하라”가 아니라 “이번에 검색된 근거 위에서 답하라”이기 때문입니다.
 
@@ -227,17 +236,17 @@ print(faithfulness_score(verdicts))
 
 ## 3. Answer Relevancy: 역질문 생성은 정확도가 아니라 초점도를 잰다
 
-faithfulness가 “근거 안에서만 말했는가”를 본다면, answer relevancy는 다른 질문을 합니다. **이 답변이 원래 질문을 곧장 겨냥하고 있는가**입니다. 여기서 중요한 것은 이 메트릭이 사실 정확성을 직접 채점하지 않는다는 점입니다. `ragas/metrics/_answer_relevance.py`를 보면 그 이유가 구현에 그대로 들어 있습니다.
+faithfulness가 “근거 안에서만 말했는가”를 본다면, answer relevancy는 다른 질문을 합니다. **이 답변이 원래 질문을 곧장 겨냥하고 있는가**입니다. 여기서 중요한 것은 이 메트릭이 사실 정확성을 직접 채점하지 않는다는 사실입니다. `ragas/metrics/_answer_relevance.py`를 보면 그 이유가 구현에 그대로 들어 있습니다.
 
 RAGAS는 먼저 답변을 보고 “이 답변이 어떤 질문의 답처럼 보이는가?”를 거꾸로 생성합니다. `QUESTION_GEN` 프롬프트는 `answer`와 `context`를 함께 입력으로 받아 질문 하나와 `noncommittal` 플래그를 JSON으로 내놓게 만듭니다. `strictness` 기본값이 3이므로, 보통은 한 답변에 대해 역질문을 여러 개 생성합니다. 그런 다음 `_calculate_score()`는 원래 질문 `row["question"]`의 임베딩과 생성된 질문들 임베딩 사이의 코사인 유사도를 계산해 평균을 냅니다.
 
-![역질문 생성으로 응답 초점을 재는 흐름](../../assets/rag-deep-dive/06/06-03-answer-relevancy-reverse-question-flow.ko.png)
+![역질문 생성으로 응답 초점을 재는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-03-answer-relevancy-reverse-question-flow.ko.png)
 
 *역질문 생성으로 응답 초점을 재는 흐름*
 
 여기서 포인트는 방향입니다. 메트릭은 답변을 직접 사실 검증하지 않습니다. 대신 “이 답을 읽고 역으로 추정한 질문이 원래 사용자 질문과 얼마나 비슷한가”를 봅니다. 답변이 장황하게 옆길로 새거나, 질문과 무관한 배경 설명을 길게 붙이거나, 반대로 핵심을 흐리면 생성된 역질문이 원래 질문에서 멀어집니다. 그래서 answer relevancy는 정확히 말해 **정답성보다 초점도와 간결성**을 더 잘 측정합니다.
 
-소스의 `noncommittal` 처리도 이 점을 강화합니다. `ragas==0.1.22` 구현에서는 한 샘플에 대해 생성된 역질문 집합이 noncommittal로 판정되면 그 샘플의 answer relevancy 점수는 0이 됩니다. 그리고 `evaluate()`가 여러 샘플의 점수를 모은 뒤 최종적으로 평균을 냅니다. 즉 “잘 모르겠습니다”, “확실하지 않습니다”, “정보가 부족합니다”처럼 회피적 답변이 달린 샘플은 mean에 0으로 기여합니다. 이는 relevance를 “질문과 붙어 있으면서 실제로 대답하려는 의지까지 가진 응답”으로 해석한다는 뜻입니다.
+소스의 `noncommittal` 처리도 이 점을 강화합니다. `ragas==0.1.22` 구현에서는 한 샘플에 대해 생성된 역질문 집합이 noncommittal로 판정되면 그 샘플의 answer relevancy 점수는 0이 됩니다. 그리고 `evaluate()`가 여러 샘플의 점수를 모은 뒤 최종적으로 평균을 냅니다. 즉 “잘 모르겠습니다”, “확실하지 않습니다”, “정보가 부족합니다”처럼 회피적 답변이 달린 샘플은 mean에 0으로 들어갑니다. 이 메트릭은 relevance를 “질문과 붙어 있으면서 실제로 대답하려는 응답”으로 읽습니다.
 
 이 메트릭을 faithfulness와 혼동하면 안 됩니다. 예를 들어 “몇 번 재시도하나요?”라는 질문에 “세 번 재시도한 뒤 dead-letter queue로 이동합니다. 이 시스템은 분산 워커 구조를 사용하며 장애 격리를 위해…”처럼 맞는 말과 주변 설명을 길게 덧붙인 답은 faithfulness는 높게 나올 수 있습니다. 모두 근거 안에 있는 사실이기 때문입니다. 하지만 answer relevancy는 떨어질 수 있습니다. 역질문을 생성해 보면 “이 시스템의 장애 처리 구조는 무엇인가?” 같은 다른 질문으로도 읽히기 시작하기 때문입니다.
 
@@ -263,7 +272,7 @@ scores = [
 print(sum(scores) / len(scores))
 ```
 
-요약하면 answer relevancy는 “질문에 대한 답처럼 읽히는가”를 재는 메트릭입니다. 사실 검증까지 맡기면 안 되고, 특히 retrieval failure를 직접 잡아내는 도구로 오해하면 안 됩니다. 대신 prompt가 너무 수다스러워졌는지, answer template이 불필요한 boilerplate를 붙이고 있는지, chain 조립 뒤에 질문 원문이 희미해졌는지를 잡는 데는 꽤 민감합니다.
+정리하면 answer relevancy는 “질문에 대한 답처럼 읽히는가”를 재는 메트릭입니다. 사실 검증까지 맡기면 안 되고, 특히 retrieval failure를 직접 잡아내는 도구로 오해하면 안 됩니다. 대신 prompt가 너무 수다스러워졌는지, answer template이 불필요한 boilerplate를 붙이고 있는지, chain 조립 뒤에 질문 원문이 희미해졌는지를 잡는 데는 꽤 민감합니다.
 
 ---
 
@@ -273,7 +282,7 @@ context precision은 retrieval 품질을 더 직접적으로 겨냥합니다. `r
 
 `ragas==0.1.22`의 입력 `Dataset`는 `question`, `contexts`, `answer`, `ground_truth` 열을 받습니다. `evaluate()` 내부에서는 먼저 `remap_column_names(dataset, column_map)`를 호출해 사용자가 넘긴 별칭 열을 이 기본 이름으로 정규화합니다. 그다음 context precision은 각 `context` 조각을 질문과 기준 답 축에 대조해 `verdict` 0 또는 1을 만듭니다. 따라서 이 메트릭은 “모델이 실제로 뭐라고 답했는가”보다 “정답을 재구성하는 데 이 retrieved chunk가 유용했는가”를 더 강하게 봅니다. 그래서 generation보다 retrieval ranking 메트릭에 가깝습니다.
 
-![순서 가중치가 들어간 precision at k 계산](../../assets/rag-deep-dive/06/06-04-context-precision-at-k-ranking.ko.png)
+![순서 가중치가 들어간 precision at k 계산](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-04-context-precision-at-k-ranking.ko.png)
 
 *순서 가중치가 들어간 precision at k 계산*
 
@@ -317,7 +326,7 @@ print(average_precision(ranking))
 
 RAGAS 0.1.x의 `evaluate()`는 기본적으로 Hugging Face `Dataset`과 `question`·`contexts`·`answer`·`ground_truth` 열을 사용합니다. 다만 실제 운영 데이터셋 이름이 다를 수 있으므로, `column_map` 파라미터로 **canonical name -> existing dataset column** 방향의 매핑을 넘길 수 있습니다. 즉 `{"question": "query"}`는 RAGAS의 `question` 슬롯이 현재 데이터셋의 `query` 열에서 값을 읽는다는 뜻입니다. 같은 방식으로 `retrieved_passages`, `prediction`, `reference_answer` 같은 이름도 실행 직전에 정규화할 수 있습니다.
 
-![CI에서 faithfulness 임계값을 거는 품질 게이트](../../assets/rag-deep-dive/06/06-05-quality-gate-pipeline-integration.ko.png)
+![CI에서 faithfulness 임계값을 거는 품질 게이트](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-05-quality-gate-pipeline-integration.ko.png)
 
 *CI에서 faithfulness 임계값을 거는 품질 게이트*
 
@@ -387,6 +396,8 @@ if __name__ == "__main__":
     run_quality_gate()
 ```
 
+## 정리
+
 pytest에 붙이고 싶다면 더 간단합니다. 위 함수를 감싼 테스트 하나만 있으면 됩니다.
 
 ```python
@@ -403,14 +414,46 @@ faithfulness를 최우선 게이트로 두는 이유도 자연스럽습니다. c
 LangChain의 `EvaluatorType`과 `load_evaluator()`는 QA, criteria, exact match 같은 범용 evaluator를 붙이기에 좋습니다. 다만 retrieval-grounded faithfulness를 직접 계산해 주지는 않습니다. 이 지점을 RAGAS가 메웁니다.
 
 시리즈의 마지막 결론은 단순합니다. **좋은 RAG는 조립으로 끝나지 않고, 평가를 통해 계약을 수치로 고정할 때 비로소 운영 가능한 시스템이 됩니다.**
+
+## 처음 질문으로 돌아가기
+
+- **RAGAS 평가는 왜 데이터셋 열 설계가 곧 평가 가능 범위를 결정할까요?**
+  질문, 답변, contexts, ground truth 같은 열이 있어야 특정 메트릭을 계산할 수 있으므로, 열 설계가 곧 평가 가능한 품질 범위를 정합니다.
+
+- **Faithfulness는 답변이 그럴듯한지가 아니라 무엇을 근거와 대조할까요?**
+  Faithfulness는 답변을 주장 단위로 쪼개고 각 주장이 제공된 근거에서 지지되는지 확인합니다. 문장이 자연스러운지는 별도 문제가 아닙니다.
+
+- **품질 게이트를 CI나 운영에 넣을 때 어떤 실패를 차단해야 할까요?**
+  근거 없는 답변, 낮은 faithfulness, 회귀된 retrieval 품질, 기준 이하 점수 변동은 CI나 운영 배포 게이트에서 막아야 합니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [RAG Deep Dive (1/6): 문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
+- [RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR](./03-retriever-design.md)
+- [RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부](./04-prompt-construction-and-context-injection.md)
+- [RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL](./05-rag-chain-assembly.md)
+- **RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (현재 글)**
+
+<!-- toc:end -->
+
 ---
 
 ## 참고 자료
 
-1. [`ragas==0.1.22` package index](https://pypi.org/project/ragas/0.1.22/)
-2. `ragas/evaluation.py` from installed `ragas==0.1.22`
-3. `ragas/metrics/_faithfulness.py` from installed `ragas==0.1.22`
-4. `ragas/metrics/_answer_relevance.py` from installed `ragas==0.1.22`
-5. `ragas/metrics/_context_precision.py` from installed `ragas==0.1.22`
-6. [`langchain/evaluation/loading.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/loading.py)
-7. [`langchain/evaluation/schema.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/schema.py)
+### 공식 문서
+
+- [RAGAS evaluation quickstart](https://docs.ragas.io/en/stable/getstarted/evaluation/)
+- [RAGAS metrics overview](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/)
+- [LangChain evaluation concepts](https://python.langchain.com/docs/concepts/evaluation/)
+
+### 소스 코드
+
+- [RAGAS `evaluation.py` source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/evaluation.py)
+- [RAGAS faithfulness metric source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_faithfulness.py)
+- [RAGAS answer relevancy metric source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_answer_relevance.py)
+- [RAGAS context precision metric source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_context_precision.py)
+- [LangChain evaluation loading source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/loading.py)
+
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/rag-deep-dive/ko)

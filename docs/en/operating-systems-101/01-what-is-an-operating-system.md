@@ -1,10 +1,10 @@
 ---
 series: operating-systems-101
 episode: 1
-title: What Is an Operating System?
-status: content-ready
+title: "Operating Systems 101 (1/10): What Is an Operating System?"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,20 +18,33 @@ tags:
   - Kernel
   - Abstraction
 seo_description: How an operating system manages hardware and exposes clean abstractions like processes, files, and sockets to application code.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# What Is an Operating System?
+# Operating Systems 101 (1/10): What Is an Operating System?
 
-> Operating Systems 101 series (1/10)
+When people first hear "operating system," they often picture the software that boots a computer and launches applications. In production, the more useful question is different: why does the same code run fine on one machine, fail to open a file on another, and die with an out-of-memory kill somewhere else?
 
-<!-- a-grade-intro:begin -->
+To answer that, you have to stop treating the OS as background scenery. It is the execution environment that constantly decides how CPU, memory, disks, and the network are shared.
 
-**Core question**: How do all the programs on a single computer coexist without trampling each other's CPU, memory, and files?
+This is the first post in the Operating Systems 101 series. It sets up the mental model for the rest of the series by framing the OS as both a resource manager and an abstraction layer.
 
-> An operating system (OS) sits between hardware and applications. It coordinates how CPU, memory, disks, and the network are shared, and it wraps raw hardware in clean abstractions like processes, files, and sockets that application code can use. This series follows both roles end to end and explains the machinery that you depend on every day but rarely see.
 
-<!-- a-grade-intro:end -->
+![operating systems 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/01/01-01-where-the-operating-system-sits.en.png)
+*operating systems 101 chapter 1 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is an Operating System??
+- Which signal should the example or diagram make visible for What Is an Operating System??
+- What failure should be prevented first when What Is an Operating System? reaches a real system?
+
+## Questions this article answers
+
+- What problem does an operating system actually exist to solve?
+- Why are kernel mode and user mode separated in the first place?
+- What do abstractions like processes, files, and sockets actually hide?
+- Why does understanding the operating system make production troubleshooting easier for developers?
 
 ## What You Will Learn
 
@@ -46,9 +59,9 @@ The OS is invisible until something breaks. Out-of-memory kills, zombie processe
 
 > Your application sits on the OS, the OS sits on the hardware. If you do not know the cost of crossing those boundaries, you cannot reason about performance or stability.
 
-## Concept at a Glance
-
 > The OS is the software layer between user programs and hardware. Above, it exposes a small, simple interface to applications through system calls. Below, it talks directly to hardware via schedulers, memory managers, file systems, and device drivers.
+
+### Where the operating system sits
 
 ```text
 +---------------------------------------------+
@@ -214,7 +227,18 @@ An operating system is the software layer that manages hardware on behalf of app
 
 The next article zooms into the most fundamental abstraction: the process. We look at what a process actually contains, how a thread differs from a process, and how new processes are born.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is an Operating System??**
+  - The article treats What Is an Operating System? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is an Operating System??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is an Operating System? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is an Operating System? (current)**
 - Processes and Threads (upcoming)
 - Scheduling (upcoming)
@@ -225,6 +249,7 @@ The next article zooms into the most fundamental abstraction: the process. We lo
 - File Systems (upcoming)
 - System Calls (upcoming)
 - Containers and the Operating System (upcoming)
+
 <!-- toc:end -->
 
 ## References

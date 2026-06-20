@@ -1,10 +1,10 @@
 ---
 series: data-science-career-101
 episode: 9
-title: Building Domain Expertise
-status: content-ready
+title: "Data Science Career 101 (9/10): Building Domain Expertise"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,21 +16,28 @@ tags:
   - Expertise
   - BusinessSense
   - Beginner
-seo_description: A beginner-friendly tour of building domain expertise in a data role.
-last_reviewed: '2026-05-04'
+seo_description: Strengthen your impact as a data professional by building domain expertise and connecting technical analysis to business value and strategic goals.
+last_reviewed: '2026-05-14'
 ---
 
-# Building Domain Expertise
+# Data Science Career 101 (9/10): Building Domain Expertise
 
-> Data Science Career 101 series (9/10)
+At some point in a data career, technical competence stops being the main differentiator. Two people can write the same query or build the same dashboard, but one of them will ask a much better follow-up question because they understand the business language, the decision context, and the operational reality behind the metric.
 
-<!-- a-grade-intro:begin -->
+That is domain expertise. It is easy to postpone because there is always another technical topic to study, but even a modest amount of domain understanding can dramatically improve the quality of your questions, your prioritization, and your interpretation of the same numbers.
 
-**Core question**: How do you build *domain expertise*?
+This is post 9 in the Data Science Career 101 series.
 
-> Questions, metrics, documents, the field, vocabulary.
 
-<!-- a-grade-intro:end -->
+![data science career 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/09/09-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 9 flow overview*
+> In domain knowledge, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
+## Questions to Keep in Mind
+
+- Why does domain expertise change the quality of data work so much?
+- How should you start learning the vocabulary and KPI structure of an industry?
+- Why does field observation improve metric interpretation?
 
 ## What You Will Learn
 
@@ -42,17 +49,11 @@ last_reviewed: '2026-05-04'
 
 ## Why It Matters
 
-Tech can be replicated; domain compounds.
+Technical patterns are often portable. Domain judgment is what makes the same pattern useful in the right place.
 
-## Concept at a Glance
+You cannot reliably interpret retention, fraud, churn, utilization, or margin if you do not understand the business model and the operating constraints behind those words.
 
-```mermaid
-flowchart LR
-    V[Vocab] --> M[Metric]
-    M --> F[Field]
-    F --> L[Loop]
-```
-
+Domain expertise is what separates a person who knows how to run a query from a person who knows what question to ask. It grows faster if you read your company's business context, not just the code.
 ## Key Terms
 
 - **domain**: An industry or business area.
@@ -69,6 +70,7 @@ flowchart LR
 
 ## Hands-on: Five-Step Domain Study
 
+Pick one domain (marketing, finance, operations). Spend one month: read strategy docs, sit in one meeting, run one query, write one analysis, ask one industry expert.
 ### Step 1 — Build a Glossary
 
 ```text
@@ -121,7 +123,9 @@ flowchart LR
 
 ## How This Shows Up in Production
 
-In fintech, healthcare, and games, the domain shifts the answer.
+In domain-heavy industries such as fintech, healthcare, and gaming, the same metric can imply completely different actions depending on regulation, user behavior, and operating model.
+
+That is why senior data people are often the ones who can translate between numbers and business reality without reducing either side to vague summaries.
 
 ## How a Senior Engineer Thinks
 
@@ -146,24 +150,38 @@ In fintech, healthcare, and games, the domain shifts the answer.
 
 ## Wrap-up and Next Steps
 
-Next post covers *The Path to Senior in Data*.
+Domain expertise grows slowly, but it compounds hard. A stronger glossary leads to better questions, better questions lead to better metrics, and better metrics lead to more credible analysis.
+
+The next post closes the series by looking at what changes as you grow from junior execution toward senior impact.
+
+## Answering the Opening Questions
+
+- **Why does domain expertise change the quality of data work so much?**
+  - The article treats Building Domain Expertise as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should you start learning the vocabulary and KPI structure of an industry?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why does field observation improve metric interpretation?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
-- [What Is a Data Career](./01-what-is-data-career.md)
-- [Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
-- [Designing the Learning Path](./03-learning-path.md)
-- [The Data Portfolio](./04-data-portfolio.md)
-- [SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
-- [The ML Interview](./06-ml-interview.md)
-- [The Case Interview](./07-case-interview.md)
-- [Settling into the First Data Job](./08-first-job.md)
+## In this series
+
+- [Data Science Career 101 (1/10): What Is a Data Career](./01-what-is-data-career.md)
+- [Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
+- [Data Science Career 101 (3/10): Designing the Learning Path](./03-learning-path.md)
+- [Data Science Career 101 (4/10): The Data Portfolio](./04-data-portfolio.md)
+- [Data Science Career 101 (5/10): SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
+- [Data Science Career 101 (6/10): The ML Interview](./06-ml-interview.md)
+- [Data Science Career 101 (7/10): The Case Interview](./07-case-interview.md)
+- [Data Science Career 101 (8/10): Settling into the First Data Job](./08-first-job.md)
 - **Building Domain Expertise (current)**
 - The Path to Senior in Data (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Domain-Driven Design](https://www.domainlanguage.com/ddd/)
-- [Lean Analytics](https://leananalyticsbook.com/)
-- [Industry KPI catalogs](https://www.klipfolio.com/resources/kpi-examples)
-- [The Personal MBA](https://personalmba.com/)
+- [Eric Evans - Domain-Driven Design](https://www.domainlanguage.com/ddd/)
+- [Alistair Croll and Benjamin Yoskovitz - Lean Analytics](https://leananalyticsbook.com/)
+- [Klipfolio - KPI Examples and Templates](https://www.klipfolio.com/resources/kpi-examples)
+- [Josh Kaufman - The Personal MBA](https://personalmba.com/)

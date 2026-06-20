@@ -1,11 +1,11 @@
 ---
-title: Environment Variables and PATH
+title: "Linux CLI 101 (8/10): Environment Variables and PATH"
 series: linux-cli-101
 episode: 8
 language: en
-status: content-ready
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,36 +17,26 @@ tags:
 - bashrc
 - Shell
 - Configuration
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: Environment variables are name tags attached to processes, and PATH
   is the map the Shell uses to find commands.
 ---
 
-# Environment Variables and PATH
+# Linux CLI 101 (8/10): Environment Variables and PATH
 
-> Linux CLI 101 series (8/10)
+Environment variables sit behind a lot of everyday confusion: a command installs successfully but cannot be found, a script sees a variable in your shell but not in Python, or a setting works in one terminal and disappears in the next.
 
----
+This is post 8 in the Linux CLI 101 series.
 
-<!-- a-grade-intro:begin -->
 
-## Key Questions
+![Linux CLI 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/08/08-01-big-picture.en.png)
+*Linux CLI 101 chapter 8 flow overview*
 
-- What are environment variables and why are they needed?
-- What does the output of `echo $PATH` mean?
-- What is the difference between `export` and a plain variable assignment?
-- When do `.bashrc`, `.bash_profile`, and `.profile` each run?
+## Questions to Keep in Mind
 
-> Environment variables are name tags attached to processes, and PATH is the map the Shell uses to find commands.
-
-<!-- a-grade-intro:end -->
-
-## What you will learn
-
-- Viewing and setting environment variables with `echo`, `env`, `export`
-- How PATH drives command lookup
-- Adding permanent settings to `.bashrc` and `.bash_profile`
-- Managing application configuration with `.env` files
+- Viewing and setting environment variables with `echo`, `env`, `export`?
+- How PATH drives command lookup?
+- Adding permanent settings to `.bashrc` and `.bash_profile`?
 
 ## Why it matters
 
@@ -243,16 +233,25 @@ On the other hand, too many environment variables become hard to manage. At that
 
 The next post covers **shell scripting basics** — writing scripts to automate repetitive tasks.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
-- [Permissions and Ownership](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- [grep, find, xargs](./05-grep-find-xargs.md)
-- [Pipes and Redirection](./06-pipe-and-redirection.md)
-- [Process Management](./07-process-management.md)
+- **Viewing and setting environment variables with `echo`, `env`, `export`?**
+  - The article treats Environment Variables and PATH as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How PATH drives command lookup?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Adding permanent settings to `.bashrc` and `.bash_profile`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): Permissions and Ownership](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents](./04-viewing-files.md)
+- [Linux CLI 101 (5/10): grep, find, xargs — The Search Trio](./05-grep-find-xargs.md)
+- [Linux CLI 101 (6/10): Pipes and Redirection](./06-pipe-and-redirection.md)
+- [Linux CLI 101 (7/10): Process Management](./07-process-management.md)
 - **Environment Variables and PATH (current)**
 - Shell Script Basics (upcoming)
 - SSH and Remote Access (upcoming)

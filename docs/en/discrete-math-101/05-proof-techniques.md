@@ -1,10 +1,10 @@
 ---
 series: discrete-math-101
 episode: 5
-title: Proof Techniques
+title: "Discrete Math 101 (5/10): Proof Techniques"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: Direct, contrapositive, contradiction, and inductive proofs —
 last_reviewed: '2026-05-04'
 ---
 
-# Proof Techniques
+# Discrete Math 101 (5/10): Proof Techniques
+
+This is post 5 in the Discrete Math 101 series.
 
 > Discrete Math 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: How do we guarantee that an algorithm "always" works correctly? Even if 100 tests pass, can't input 100,001 still fail?
 
 > A proof is a rigorous argument that a statement holds in every possible case. Direct proof, contrapositive, contradiction, and mathematical induction are the four core techniques in discrete math, and they are the same tools used to prove algorithm correctness and termination. This article walks through each technique and shows how it applies to real code verification.
 
-<!-- a-grade-intro:end -->
+
+![discrete math 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/05/05-01-big-picture.en.png)
+*discrete math 101 chapter 5 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Proof Techniques?
+- Which signal should the example or diagram make visible for Proof Techniques?
+- What failure should be prevented first when Proof Techniques reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 Tests can show the presence of bugs but not their absence. Distributed consensus algorithms, cryptographic protocols, and compiler optimizations all rely on formal proofs. Recursive functions are proven correct by induction; algorithm termination is proven via well-founded measures.
 
 > A proof = a guarantee for every possible input.
-
-## Concept at a Glance
 
 > The proof technique you choose depends on the form of the statement: P → Q for direct/contrapositive, ¬P for contradiction, ∀n: P(n) for induction.
 
@@ -113,7 +119,6 @@ def verify_direct(limit: int = 1000) -> bool:
         assert (n ** 2) % 2 == 0
     return True
 
-
 print(f"Verified: {verify_direct()}")
 ```
 
@@ -132,7 +137,6 @@ def contrapositive_check(limit: int = 1000) -> None:
         if n % 2 == 1:           # n odd
             assert (n ** 2) % 2 == 1   # n² odd
 
-
 contrapositive_check()
 print("Contrapositive cases verified")
 ```
@@ -150,7 +154,6 @@ The contrapositive proves P → Q by proving ¬Q → ¬P. Both have the same tru
 
 import math
 
-
 def is_rational_approx(x: float, max_q: int = 10000) -> bool:
     """Empirical: does x have an exact fraction with denominator ≤ max_q?"""
     for q in range(1, max_q):
@@ -158,7 +161,6 @@ def is_rational_approx(x: float, max_q: int = 10000) -> bool:
         if abs(x - p / q) < 1e-15:
             return True
     return False
-
 
 print(f"Is √2 expressible as fraction with q ≤ 10000? {is_rational_approx(math.sqrt(2))}")
 ```
@@ -173,14 +175,11 @@ Contradiction assumes the negation of the conclusion and derives a contradiction
 # Inductive step: assuming P(k), prove P(k+1)
 #   1 + 2 + ... + k + (k+1) = k(k+1)/2 + (k+1) = (k+1)(k+2)/2 ✓
 
-
 def gauss_sum(n: int) -> int:
     return n * (n + 1) // 2
 
-
 def actual_sum(n: int) -> int:
     return sum(range(1, n + 1))
-
 
 for n in [1, 10, 100, 1000]:
     assert gauss_sum(n) == actual_sum(n)
@@ -207,7 +206,6 @@ def binary_search(arr: list, target: int) -> int:
         else:
             high = mid - 1
     return -1
-
 
 # Termination: high - low strictly decreases each iteration
 # Correctness: loop invariant + termination condition
@@ -270,17 +268,29 @@ A proof guarantees correctness across every possible input. The four techniques 
 
 Next, we cover sequences and recurrences — induction's natural partner and an essential tool for algorithm analysis.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Proof Techniques?**
+  - The article treats Proof Techniques as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Proof Techniques?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Proof Techniques reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
-- [Propositions and Logic](./02-propositions-and-logic.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Relations and Equivalence](./04-relations-and-equivalence.md)
+## In this series
+
+- [Discrete Math 101 (1/10): What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
+- [Discrete Math 101 (2/10): Propositions and Logic](./02-propositions-and-logic.md)
+- [Discrete Math 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Discrete Math 101 (4/10): Relations and Equivalence](./04-relations-and-equivalence.md)
 - **Proof Techniques (current)**
 - Sequences and Recurrence (upcoming)
 - Combinatorics (upcoming)
 - Graph Theory Basics (upcoming)
 - Trees and Graph Traversal (upcoming)
 - Discrete Mathematics and Algorithms (upcoming)
+
 <!-- toc:end -->
 
 ## References

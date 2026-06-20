@@ -1,10 +1,10 @@
 ---
 series: pytest-101
 episode: 7
-title: Testing Files, Environment Variables, and Time
+title: "pytest 101 (7/10): Testing Files, Environment Variables, and Time"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,21 +16,29 @@ tags:
   - tmp_path
   - freezegun
   - System Resource Testing
-seo_description: Test file I/O, environment variables, and time-dependent code with pytest.
+seo_description: Test file I/O with tmp_path, environment variables with monkeypatch, and time-dependent logic with freezegun for stable and reproducible tests.
 last_reviewed: '2026-05-04'
 ---
 
-# Testing Files, Environment Variables, and Time
+# pytest 101 (7/10): Testing Files, Environment Variables, and Time
+
+This is post 7 in the pytest 101 series.
 
 > pytest 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: How do you reliably test code that reads files or depends on the current time?
 
 > pytest's `tmp_path` fixture manages temporary files, `monkeypatch` isolates environment variables, and `freezegun` freezes the clock. This article covers patterns for testing code that depends on system resources.
 
-<!-- a-grade-intro:end -->
+
+![pytest 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/07/07-01-big-picture.en.png)
+*pytest 101 chapter 7 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Testing Files, Environment Variables, and Time?
+- Which signal should the example or diagram make visible for Testing Files, Environment Variables, and Time?
+- What failure should be prevented first when Testing Files, Environment Variables, and Time reaches a real system?
 
 ## What You Will Learn
 
@@ -51,7 +59,7 @@ Master these three patterns and you can isolate most system dependencies.
 
 > system resource isolation = controlling files, env vars, and time within the test scope
 
-```
+```text
 [Before Isolation]                [After Isolation]
 files → real path collisions      tmp_path → auto-cleanup
 env vars → global pollution       monkeypatch → restored after test
@@ -344,17 +352,29 @@ Files, environment variables, and time are "the world outside your code." If you
 
 With tmp_path, monkeypatch, and freezegun, you can isolate system resources for stable, reproducible tests. Next, we'll learn how to measure coverage and evaluate test quality.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Testing Files, Environment Variables, and Time?**
+  - The article treats Testing Files, Environment Variables, and Time as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Testing Files, Environment Variables, and Time?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Testing Files, Environment Variables, and Time reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Write Tests?](./01-why-write-tests.md)
-- [Writing Your First pytest Test](./02-first-pytest-test.md)
-- [Assert and Exception Testing](./03-assert-and-exceptions.md)
-- [Understanding Fixtures](./04-fixtures.md)
-- [Parametrization](./05-parametrization.md)
-- [Mock and Monkeypatch](./06-mock-and-monkeypatch.md)
+## In this series
+
+- [pytest 101 (1/10): Why Write Tests?](./01-why-write-tests.md)
+- [pytest 101 (2/10): Writing Your First pytest Test](./02-first-pytest-test.md)
+- [pytest 101 (3/10): Assert and Exception Testing](./03-assert-and-exceptions.md)
+- [pytest 101 (4/10): Understanding Fixtures](./04-fixtures.md)
+- [pytest 101 (5/10): Parametrization](./05-parametrization.md)
+- [pytest 101 (6/10): Mock and Monkeypatch](./06-mock-and-monkeypatch.md)
 - **Testing Files, Environment Variables, and Time (current)**
 - Coverage and Test Quality (upcoming)
 - Test Automation with GitHub Actions (upcoming)
 - Writing Testable Code (upcoming)
+
 <!-- toc:end -->
 
 ## References

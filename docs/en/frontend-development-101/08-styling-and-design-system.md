@@ -1,10 +1,10 @@
 ---
 series: frontend-development-101
 episode: 8
-title: Styling and Design Systems
+title: "Frontend Development 101 (8/10): Styling and Design Systems"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -20,23 +20,28 @@ seo_description: CSS Modules, Tailwind, design tokens — keep styling consisten
 last_reviewed: '2026-05-04'
 ---
 
-# Styling and Design Systems
+# Frontend Development 101 (8/10): Styling and Design Systems
 
-> Frontend Development 101 series (8/10)
+At the start of a project, it feels harmless to hand-pick one color for one button and one spacing value for one card. That convenience disappears as the project and the team grow. Tiny inconsistencies accumulate, dark mode becomes expensive, and the interface starts to feel unfinished even when the logic works.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Frontend Development 101 series. Here we look at styling as a system for operating consistency rather than as ad hoc CSS. Colors, spacing, and typography need shared tokens and shared components if the UI is going to stay coherent over time.
 
-**Core question**: How do you keep design *consistent* as a project grows?
 
-> Through *design tokens* and a *component library*. Manage every color, spacing, and typography choice *in one place*.
+![frontend development 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 8 flow overview*
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Styling and Design Systems?
+- Which signal should the example or diagram make visible for Styling and Design Systems?
+- What failure should be prevented first when Styling and Design Systems reaches a real system?
 
 ## What You Will Learn
 
 - A *comparison* of styling approaches (global CSS, CSS Modules, CSS-in-JS, Tailwind)
 - The role of *design tokens* (color, spacing, typography)
 - The internal structure of a *component library*
+
 - Dark mode and theming
 - *Automatically enforcing* consistency
 
@@ -45,16 +50,6 @@ last_reviewed: '2026-05-04'
 Even with consistent code, *inconsistent design* makes users *uneasy*. Buttons that differ per page make a product feel *unfinished*. A design system is *consistency at team scale*.
 
 > A great design system gets *designers and engineers speaking the same language*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Tokens["Design tokens"] --> Comp["Components"]
-    Comp --> Pages["Pages"]
-    Tokens --> Theme["Light/Dark theme"]
-    Theme --> Pages
-```
 
 ## Key Terms
 
@@ -132,6 +127,16 @@ function Button({ children, variant = "primary" }) {
 # Catches arbitrary class names and bad token usage at lint time.
 ```
 
+## Verification
+
+- Change one token value and confirm that the button and surface styles update together rather than one component at a time.
+- Turn on dark mode and verify that contrast and state styles move with the theme instead of remaining hard-coded.
+
+## If It Fails, Check This First
+
+- If only part of the UI changes, search for hard-coded colors or spacing values that bypass the token layer.
+- If dark mode does not apply, check the `darkMode` configuration and where the theme class is attached.
+
 ## What to Notice in This Code
 
 - All colors appear by *name* (like `primary`) — change in *one place*.
@@ -155,6 +160,7 @@ Most teams catalog components in *Storybook* and unify styling with *Tailwind/CS
 - *Color without a token* gets caught in code review.
 - Build the design system *with designers*, not for them.
 - New components must answer: *why doesn't an existing one work?*
+
 - Storybook is *unit testing for components*.
 - Dark mode should be solved *purely by tokens*.
 
@@ -176,22 +182,38 @@ Most teams catalog components in *Storybook* and unify styling with *Tailwind/CS
 
 Even styling needs *shared vocabulary*. Next, we look at the build tools that turn your code into something *the browser can read*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Styling and Design Systems?**
+  - The article treats Styling and Design Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Styling and Design Systems?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Styling and Design Systems reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
-- [HTML and CSS Basics](./02-html-and-css-basics.md)
-- [JavaScript Basics](./03-javascript-basics.md)
-- [Components and State](./04-components-and-state.md)
-- [Routing and Pages](./05-routing-and-pages.md)
-- [API Calls and Async](./06-api-calls-and-async.md)
-- [Forms and Validation](./07-forms-and-validation.md)
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML and CSS Basics](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript Basics](./03-javascript-basics.md)
+- [Frontend Development 101 (4/10): Components and State](./04-components-and-state.md)
+- [Frontend Development 101 (5/10): Routing and Pages](./05-routing-and-pages.md)
+- [Frontend Development 101 (6/10): API Calls and Async](./06-api-calls-and-async.md)
+- [Frontend Development 101 (7/10): Forms and Validation](./07-forms-and-validation.md)
 - **Styling and Design Systems (current)**
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
-- [Tailwind CSS docs](https://tailwindcss.com/)
-- [Storybook](https://storybook.js.org/)
-- [Design Tokens W3C draft](https://www.w3.org/community/design-tokens/)
-- [Material Design](https://m3.material.io/)
+### Official Docs
+- [Tailwind CSS documentation](https://tailwindcss.com/docs/installation)
+- [Storybook documentation](https://storybook.js.org/docs)
+- [W3C Design Tokens Community Group](https://www.w3.org/community/design-tokens/)
+
+### Verification and Further Reading
+- [Material Design 3](https://m3.material.io/)
+- [MDN: prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)

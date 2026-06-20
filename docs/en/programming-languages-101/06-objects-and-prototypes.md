@@ -1,10 +1,10 @@
 ---
 series: programming-languages-101
 episode: 6
-title: Objects and Prototypes
-status: content-ready
+title: "Programming Languages 101 (6/10): Objects and Prototypes"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,45 +18,39 @@ tags:
   - Class
   - Inheritance
 seo_description: Class-based and prototype-based OOP are two expressions of the same object idea. Trace how method lookup actually works in each model.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Objects and Prototypes
+# Programming Languages 101 (6/10): Objects and Prototypes
 
-> Programming Languages 101 series (6/10)
+Java classes and JavaScript prototypes are both called object-oriented, but their surfaces look very different. The interesting question is not whether one is “real OOP.” It is what both systems are actually trying to solve underneath.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Programming Languages 101 series.
 
-**Core question**: We call both Java classes and JavaScript prototypes "OOP," so why do they look so different?
+In this post, we will define an object first as a bundle of state and behavior, then compare the two common ways languages build that bundle: classes and prototypes. The key difference is not marketing or syntax. It is where a method lookup goes next when the current object does not have the answer.
 
-> An object bundles **state and the methods that operate on it**. There are two ways to make that bundle — **class-based**, where you stamp out instances from a blueprint, and **prototype-based**, where you make new objects by extending an existing one. The decisive difference is how method lookup happens.
 
-<!-- a-grade-intro:end -->
+![programming languages 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/06/06-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 6 flow overview*
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- A precise definition of "object" under two models
-- The method-lookup difference between class-based and prototype-based
-- That Python classes are themselves objects
-- The relationship between inheritance and delegation
-- That closures and objects are two views of the same idea
+- What boundary should you inspect first when applying Objects and Prototypes?
+- Which signal should the example or diagram make visible for Objects and Prototypes?
+- What failure should be prevented first when Objects and Prototypes reaches a real system?
+
+## Questions this article answers
+
+- What is the simplest way to define an object?
+- How do class-based and prototype-based models differ in method lookup?
+- What does it mean when people say that classes themselves are objects in Python?
+- What is the relationship between inheritance and delegation?
 
 ## Why It Matters
 
 Once you understand the object model precisely, "why is this method being called?" or "why does super behave this way?" becomes a single answer. Knowing both models lets you adapt to any new OOP language fast.
 
 > Object = state + behavior. Classes and prototypes are different tools for making the same kind of bundle.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    A["instance"] -->|not found| B["class"]
-    B -->|not found| C["parent class"]
-    C -->|not found| D["object (root)"]
-    E["JS instance"] -->|prototype chain| F["prototype object"]
-    F --> G["Object.prototype"]
-```
 
 Class-based on top, prototype-based below. Same idea: **delegate one level up when not found**.
 
@@ -221,17 +215,29 @@ When designing, write down "what state does this object hold?" first. If the ans
 
 Objects bundle state and behavior; the two models are different ways of building that bundle. Either way, the essence is delegation. Next we look at how those objects live and die in memory — memory management.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Objects and Prototypes?**
+  - The article treats Objects and Prototypes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Objects and Prototypes?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Objects and Prototypes reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
-- [Type Systems](./03-type-system.md)
-- [Scope and Binding](./04-scope-and-binding.md)
-- [Functions and Closures](./05-functions-and-closures.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
+- [Programming Languages 101 (3/10): Type Systems](./03-type-system.md)
+- [Programming Languages 101 (4/10): Scope and Binding](./04-scope-and-binding.md)
+- [Programming Languages 101 (5/10): Functions and Closures](./05-functions-and-closures.md)
 - **Objects and Prototypes (current)**
 - Memory Management (upcoming)
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,10 +1,10 @@
 ---
 series: technical-writing-101
 episode: 9
-title: Blog vs Documentation
-status: content-ready
+title: "Technical Writing 101 (9/10): Blog vs Documentation"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -16,44 +16,36 @@ tags:
   - Documentation
   - Diataxis
   - Beginner
-seo_description: A beginner-friendly tour of the difference between blog posts and official documentation in software engineering teams.
-last_reviewed: '2026-05-04'
+seo_description: Separate blog posts from documentation by ownership, freshness, and canonical truth so teams do not mix the two jobs.
+last_reviewed: '2026-05-15'
 ---
 
-# Blog vs Documentation
+# Technical Writing 101 (9/10): Blog vs Documentation
 
-> Technical Writing 101 series (9/10)
+A postmortem article can be excellent context and still be the wrong place to store today's official rollout steps. A reference page can be correct and still fail to explain why the team made a controversial design choice. Blogs and docs both help engineering teams, but they do different jobs.
 
-<!-- a-grade-intro:begin -->
+Strong teams do not force one format to replace the other. They separate ownership, freshness rules, and publication goals, then connect the two with deliberate links.
 
-**Core question**: Why must *blogs* and *official docs* not be *mixed up*?
+This is post 9 in the Technical Writing 101 series. It distinguishes blogs from documentation by role, lifespan, and canonical ownership.
 
-> Their *lifespan* and *ownership* differ.
 
-<!-- a-grade-intro:end -->
+![technical writing 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/09/09-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 9 flow overview*
+> Blogs preserve experience and interpretation; documentation preserves the current operational truth.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The four quadrants of *Diátaxis*
-- The *lifespan* of blog vs docs
-- What *blogs* do well
-- What *docs* do well
-- *Linking* the two
+- The four quadrants of *Diátaxis?
+- The *lifespan* of blog vs docs?
+- What *blogs* do well?
 
 ## Why It Matters
 
 When *kinds of writing* mix up, the *reader* gets *lost*.
 
-## Concept at a Glance
+> Mental model: blogs preserve context and interpretation, while docs preserve the current truth.
 
-```mermaid
-flowchart LR
-    Tut[Tutorial] --> Doc[Documentation]
-    HT[How-to] --> Doc
-    Ref[Reference] --> Doc
-    Exp[Explanation] --> Blog[Blog]
-```
-
+Blogs and docs both serve engineering teams, but they have different owners, freshness rules, and lifespans. Separating them with clear ownership and deliberate links prevents the reader from following stale advice or citing context as official policy.
 ## Key Terms
 
 - **Diátaxis**: A *four quadrant* documentation model.
@@ -68,31 +60,35 @@ flowchart LR
 
 **After**: *Blogs* hold *experience*; *docs* hold *truth*.
 
+## Separate ownership and freshness before channels
+
+| Dimension | Blog | Documentation |
+| --- | --- | --- |
+| Main owner | Individual author or editorial team | Product or platform owner |
+| Freshness rule | Accurate at the time of writing | Kept current as the source of truth |
+| Reader expectation | Context, experience, interpretation | Procedure, policy, reference |
+| Update style | Revised when needed | Updated alongside code or process changes |
+| Link direction | Points readers to canonical docs | Links out to background and rationale |
+
+The difference matters operationally more than stylistically. A deployment blog post can explain trade-offs well, while the official document must keep today's commands, version limits, and rollout order correct. Mixing those jobs usually hurts both.
+
 ## Hands-on: Mapping the Quadrants
 
 ### Step 1 — Tutorial
 
-```python
-tutorial = "First-time learning"
-```
+Use **tutorial** for first-time learning.
 
 ### Step 2 — How-to
 
-```python
-how_to = "Solving a specific problem"
-```
+Use **how-to** for solving a specific problem.
 
 ### Step 3 — Reference
 
-```python
-reference = "API specification"
-```
+Use **reference** for API specifications and other authoritative lookups.
 
 ### Step 4 — Explanation
 
-```python
-explanation = "Why a design was chosen"
-```
+Use **explanation** when the goal is to show why a design was chosen.
 
 ### Step 5 — Blog vs docs
 
@@ -144,17 +140,29 @@ Engineering teams *separate* blogs from docs and *version control* the docs alon
 
 The next post is *Pre-publish Checklist*.
 
+## Answering the Opening Questions
+
+- **The four quadrants of *Diátaxis?**
+  - The article treats Blog vs Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The *lifespan* of blog vs docs?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What *blogs* do well?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
-- [Title and Structure](./03-title-and-structure.md)
-- [Explaining Concepts](./04-explaining-concepts.md)
-- [Explaining Example Code](./05-explaining-example-code.md)
-- [Using Figures and Tables](./06-using-figures-and-tables.md)
-- [Writing the README](./07-writing-the-readme.md)
-- [Writing Tutorials](./08-writing-tutorials.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): Title and Structure](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): Explaining Concepts](./04-explaining-concepts.md)
+- [Technical Writing 101 (5/10): Explaining Example Code](./05-explaining-example-code.md)
+- [Technical Writing 101 (6/10): Using Figures and Tables](./06-using-figures-and-tables.md)
+- [Technical Writing 101 (7/10): Writing the README](./07-writing-the-readme.md)
+- [Technical Writing 101 (8/10): Writing Tutorials](./08-writing-tutorials.md)
 - **Blog vs Documentation (current)**
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

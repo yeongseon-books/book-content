@@ -1,10 +1,10 @@
 ---
 series: discrete-math-101
 episode: 9
-title: Trees and Graph Traversal
+title: "Discrete Math 101 (9/10): Trees and Graph Traversal"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,25 @@ seo_description: Trees, BFS and DFS, spanning trees, and the minimum spanning tr
 last_reviewed: '2026-05-04'
 ---
 
-# Trees and Graph Traversal
+# Discrete Math 101 (9/10): Trees and Graph Traversal
+
+This is post 9 in the Discrete Math 101 series.
 
 > Discrete Math 101 series (9/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: On a graph, how do we answer "where can we get from here?" or "what is the cheapest way to connect everything?"
 
 > A tree is a connected acyclic graph — the most common substructure in graph algorithms. This article walks through the two fundamental graph traversals, breadth-first search (BFS) and depth-first search (DFS), and the concepts of spanning trees and minimum spanning trees (MST), with working code.
 
-<!-- a-grade-intro:end -->
+
+![discrete math 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/09/09-01-big-picture.en.png)
+*discrete math 101 chapter 9 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Trees and Graph Traversal?
+- Which signal should the example or diagram make visible for Trees and Graph Traversal?
+- What failure should be prevented first when Trees and Graph Traversal reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +53,6 @@ last_reviewed: '2026-05-04'
 File systems, the DOM, compiler ASTs, database indexes — almost every system hides a tree. BFS and DFS are the starting points of graph algorithms and underpin shortest-path search, cycle detection, topological sort, and MST.
 
 > A tree is the simplest non-trivial graph; traversal is the basic motion of every graph algorithm.
-
-## Concept at a Glance
 
 > Tree: a connected, acyclic, undirected graph. With n vertices it has exactly n-1 edges, and any two vertices are connected by exactly one path.
 
@@ -88,7 +94,6 @@ def friends_of_friends(person):
 ```python
 from collections import deque
 
-
 def reachable_within(graph, start, max_distance):
     """All vertices within distance max_distance from start."""
     visited = {start: 0}
@@ -111,7 +116,6 @@ def reachable_within(graph, start, max_distance):
 ```python
 from collections import defaultdict
 
-
 def is_tree(edges: list, n_nodes: int) -> bool:
     """Test whether an undirected graph is a tree — check edge count and connectivity."""
     if len(edges) != n_nodes - 1:
@@ -129,7 +133,6 @@ def is_tree(edges: list, n_nodes: int) -> bool:
         stack.extend(adj[v] - visited)
     return len(visited) == n_nodes
 
-
 tree_edges = [(1, 2), (1, 3), (2, 4), (2, 5), (3, 6)]
 print(f"is tree: {is_tree(tree_edges, 6)}")
 ```
@@ -145,18 +148,26 @@ def bfs(graph: dict, start) -> dict:
     queue = deque([start])
     while queue:
         v = queue.popleft()
-        for u in graph[v]:
+        for u in sorted(graph[v]):
             if u not in distances:
                 distances[u] = distances[v] + 1
                 queue.append(u)
     return distances
-
 
 graph = {1: [2, 3], 2: [1, 4, 5], 3: [1, 6], 4: [2], 5: [2], 6: [3]}
 print(f"distances from 1: {bfs(graph, 1)}")
 ```
 
 BFS visits closer vertices first by using a queue. When all edge weights are equal, BFS finds shortest paths.
+
+**Expected output**
+
+```text
+distances from 1: {1: 0, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2}
+```
+
+- Vertices `2` and `3` must be one edge away from `1`, and `4`, `5`, `6` must be two edges away.
+- If the distances are wrong, the usual bug is marking visited too late or accidentally using stack behavior instead of queue behavior.
 
 ### Step 3: DFS — depth-first search
 
@@ -173,7 +184,6 @@ def dfs_recursive(graph: dict, start, visited=None) -> list:
         order.extend(dfs_recursive(graph, u, visited))
     return order
 
-
 def dfs_iterative(graph: dict, start) -> list:
     """Stack-based DFS — safe when depth is large."""
     visited, order, stack = set(), [], [start]
@@ -185,12 +195,21 @@ def dfs_iterative(graph: dict, start) -> list:
         stack.extend(sorted(graph[v], reverse=True))
     return order
 
-
 print(f"DFS recursive: {dfs_recursive(graph, 1)}")
 print(f"DFS iterative: {dfs_iterative(graph, 1)}")
 ```
 
 DFS goes deep along a single path before backtracking. It is the engine for cycle detection, topological sort, and strongly connected components.
+
+**Expected output**
+
+```text
+DFS recursive: [1, 2, 4, 5, 3, 6]
+DFS iterative: [1, 2, 4, 5, 3, 6]
+```
+
+- In this walkthrough both versions match because neighbor order is fixed with `sorted(...)`.
+- If your order differs, the first thing to inspect is not the DFS idea itself but the neighbor ordering used during traversal.
 
 ### Step 4: Spanning trees from BFS/DFS
 
@@ -202,18 +221,26 @@ def spanning_tree_bfs(graph: dict, start) -> list:
     queue = deque([start])
     while queue:
         v = queue.popleft()
-        for u in graph[v]:
+        for u in sorted(graph[v]):
             if u not in visited:
                 visited.add(u)
                 tree.append((v, u))
                 queue.append(u)
     return tree
 
-
 print(f"spanning tree (BFS): {spanning_tree_bfs(graph, 1)}")
 ```
 
 Both BFS and DFS produce a spanning tree of the graph — a subgraph that contains every vertex and has no cycles.
+
+**Expected output**
+
+```text
+spanning tree (BFS): [(1, 2), (1, 3), (2, 4), (2, 5), (3, 6)]
+```
+
+- A BFS spanning tree fixes each parent the first time the vertex is discovered, so this edge list should be stable for the sample graph.
+- The tree must contain exactly `|V| - 1 = 5` edges because it spans 6 vertices.
 
 ### Step 5: Minimum spanning tree (MST) — Kruskal
 
@@ -243,12 +270,24 @@ def kruskal_mst(n_nodes: int, weighted_edges: list) -> list:
             break
     return mst
 
-
 edges = [(1, 0, 1), (4, 0, 2), (2, 1, 2), (3, 1, 3), (5, 2, 3)]
-print(f"MST: {kruskal_mst(4, edges)}")
+mst = kruskal_mst(4, edges)
+total_weight = sum(w for _, _, w in mst)
+print(f"MST: {mst}")
+print(f"total weight: {total_weight}")
 ```
 
 Kruskal sorts edges by weight and picks each one that does not form a cycle. It is used in network design, clustering, and circuit layout.
+
+**Expected output**
+
+```text
+MST: [(0, 1, 1), (1, 2, 2), (1, 3, 3)]
+total weight: 6
+```
+
+- The algorithm should keep the three cheapest non-cycling edges and stop after `n_nodes - 1` edges.
+- If you get a different answer, inspect the Union-Find cycle check first; that is the most common Kruskal bug.
 
 ## Notable Points
 
@@ -301,22 +340,34 @@ A tree is a connected acyclic graph. BFS and DFS are the most fundamental traver
 
 The next article ties everything together: how all the discrete-math topics covered so far show up in algorithm analysis and real engineering work.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Trees and Graph Traversal?**
+  - The article treats Trees and Graph Traversal as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Trees and Graph Traversal?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Trees and Graph Traversal reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
-- [Propositions and Logic](./02-propositions-and-logic.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Relations and Equivalence](./04-relations-and-equivalence.md)
-- [Proof Techniques](./05-proof-techniques.md)
-- [Sequences and Recurrence](./06-sequences-and-recurrence.md)
-- [Combinatorics](./07-combinatorics.md)
-- [Graph Theory Basics](./08-graph-theory-basics.md)
+## In this series
+
+- [Discrete Math 101 (1/10): What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
+- [Discrete Math 101 (2/10): Propositions and Logic](./02-propositions-and-logic.md)
+- [Discrete Math 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Discrete Math 101 (4/10): Relations and Equivalence](./04-relations-and-equivalence.md)
+- [Discrete Math 101 (5/10): Proof Techniques](./05-proof-techniques.md)
+- [Discrete Math 101 (6/10): Sequences and Recurrence](./06-sequences-and-recurrence.md)
+- [Discrete Math 101 (7/10): Combinatorics](./07-combinatorics.md)
+- [Discrete Math 101 (8/10): Graph Theory Basics](./08-graph-theory-basics.md)
 - **Trees and Graph Traversal (current)**
 - Discrete Mathematics and Algorithms (upcoming)
+
 <!-- toc:end -->
 
 ## References
 
 - [Discrete Mathematics and Its Applications — Kenneth Rosen, Chapter 11](https://www.mheducation.com/highered/product/discrete-mathematics-its-applications-rosen/M9781259676512.html)
-- [Wikipedia — Tree (graph theory)](https://en.wikipedia.org/wiki/Tree_(graph_theory))
-- [Wikipedia — Minimum Spanning Tree](https://en.wikipedia.org/wiki/Minimum_spanning_tree)
+- [Algorithms — Sedgewick & Wayne, Section 4.1 Undirected Graphs](https://algs4.cs.princeton.edu/41graph/)
 - [Algorithms — Sedgewick & Wayne, Chapter 4.3](https://algs4.cs.princeton.edu/43mst/)
+- [MIT Mathematics for Computer Science — Trees and Graph Traversal](https://courses.csail.mit.edu/6.042/spring18/mcs.pdf)

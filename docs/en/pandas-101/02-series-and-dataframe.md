@@ -1,10 +1,10 @@
 ---
 series: pandas-101
 episode: 2
-title: Series and DataFrame
-status: content-ready
+title: "Pandas 101 (2/10): Series and DataFrame"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,42 +17,31 @@ tags:
   - Python
   - Beginner
 seo_description: A clear introduction to the two core Pandas data structures — Series and DataFrame — covering index, dtype, and column-wise thinking with code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Series and DataFrame
+# Pandas 101 (2/10): Series and DataFrame
 
-> Pandas 101 series (2/10)
+Very early in Pandas, most people run into the same question: are Series and DataFrame just two names for similar containers, or are they different views of one data model? If that relationship stays fuzzy, column selection, arithmetic, sorting, and joins all feel like memorized syntax instead of predictable behavior.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Pandas 101 series.
 
-**Core question**: Are *Series* and *DataFrame* *two unrelated things*, or *one family*?
+The core idea in this chapter is simple. A DataFrame is a collection of Series that share the same label system. Once that model clicks, many Pandas behaviors stop feeling magical and start feeling consistent.
 
-> *A DataFrame is *a collection of Series* sharing the *same label system*.*
 
-<!-- a-grade-intro:end -->
+![pandas 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/02/02-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 2 flow overview*
+> *DataFrame is really a *collection of Series* that share the same index. Understand this, and alignment, broadcasting, and method chaining all make sense.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- The *internal structure* of a *Series*
-- *Column-oriented* thinking with *DataFrame*
-- The role of the *Index*
-- A 5-step build-from-scratch
-- Five common mistakes
+- The *internal structure* of a *Series?
+- Column-oriented* thinking with *DataFrame?
+- The role of the *Index?
 
 ## Why It Matters
 
 *Every Pandas operation* eventually reduces to *Series-level work*. A *DataFrame column is a Series*. Understanding this model makes *everything else easy*.
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Series1["Series A"] --> DF["DataFrame"]
-    Series2["Series B"] --> DF
-    Series3["Series C"] --> DF
-    DF --> Index["shared Index"]
-```
 
 ## Key Terms
 
@@ -95,6 +84,17 @@ df = pd.DataFrame({
 print(df)
 ```
 
+This output makes the model concrete: two labeled columns sharing one index. That shared label system is why later alignment, joins, and selections feel so natural in Pandas.
+
+**Expected output:**
+
+```text
+   x   y
+a  1  10
+b  2  20
+c  3  30
+```
+
 ### Step 4 — Column selection returns a Series
 
 ```python
@@ -108,6 +108,18 @@ print(type(col), col)
 s1 = pd.Series([1, 2, 3], index=["a", "b", "c"])
 s2 = pd.Series([10, 20, 30], index=["b", "c", "d"])
 print(s1 + s2)
+```
+
+The important part is not the arithmetic itself but the label alignment behind it. Pandas lines the indexes up first, then performs the addition only where labels overlap.
+
+**Expected output:**
+
+```text
+a     NaN
+b    12.0
+c    23.0
+d     NaN
+dtype: float64
 ```
 
 ## What to Notice in This Code
@@ -149,21 +161,33 @@ A/B test comparison, time series aggregation, joining *data from multiple source
 2. Add two Series with *different indexes* and inspect the *NaN positions*.
 3. Show in code the *type difference* between *df["x"]* and *df[["x"]]*.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 A DataFrame is *a collection of Series*. Next we cover *reading CSV and Excel files*.
 
+## Answering the Opening Questions
+
+- **The *internal structure* of a *Series?**
+  - The article treats Series and DataFrame as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Column-oriented* thinking with *DataFrame?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The role of the *Index?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
 - **Series and DataFrame (current)**
 - Reading CSV and Excel (upcoming)
 - Filtering and Selection (upcoming)
 - Handling Missing Values (upcoming)
-- groupby (upcoming)
+- Groupby and Aggregation (upcoming)
 - Merge and Join (upcoming)
 - Time Series (upcoming)
-- apply and Vectorization (upcoming)
-- Real-world Data Analysis (upcoming)
+- Apply and Vectorization (upcoming)
+- Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

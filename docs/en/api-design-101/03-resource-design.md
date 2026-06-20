@@ -1,10 +1,10 @@
 ---
 series: api-design-101
 episode: 3
-title: Resource Design
-status: content-ready
+title: "API Design 101 (3/10): Resource Design"
+status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -18,28 +18,27 @@ tags:
   - URL
   - Backend
 seo_description: A practical guide to modeling REST resources — naming, plurals, hierarchies, sub-resources, and identifiers — for backend juniors.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Resource Design
+# API Design 101 (3/10): Resource Design
 
-> API Design 101 series (3/10)
+Public URLs usually outlive the database tables and controller names that inspired them. A sloppy path chosen in week one can still be sitting in SDKs, logs, dashboards, and customer code a year later.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the API Design 101 series.
 
-**Core question**: What does it actually mean to *design good URLs* in a REST API?
+Here, we treat a good REST path as the output of a solid resource model rather than a naming exercise. Once the resource boundary, hierarchy, and identifier strategy are clear, methods, docs, and caching rules become much easier to keep coherent.
 
-> It means modeling *resource boundaries* and *relationships* well. The URL is just the visible result.
 
-<!-- a-grade-intro:end -->
+![api design 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/03/03-01-concept-at-a-glance.en.png)
+*api design 101 chapter 3 flow overview*
+> Resource design is not about naming — it is about finding the natural hierarchy in your domain and making that hierarchy visible in every URL.
 
-## What You Will Learn
+## Questions to Keep in Mind
 
-- How to draw resource boundaries
-- Rules for nouns, plurals, and hierarchy
-- Modeling sub-resources
-- Choosing and exposing identifiers
-- Anti-patterns that keep coming back
+- How to draw resource boundaries?
+- Rules for nouns, plurals, and hierarchy?
+- Modeling sub-resources?
 
 ## Why It Matters
 
@@ -47,16 +46,7 @@ Once a URL is public, it is *expensive to change*. A bad resource model warps ev
 
 > If your resources wobble, everything wobbles.
 
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    A["/users"] --> B["/users/42"]
-    B --> C["/users/42/orders"]
-    C --> D["/users/42/orders/9"]
-```
-
-Collection → item → sub-collection → sub-item.
+When the hierarchy is visible from the path alone, docs and debugging get simpler. When everything collapses into flat query parameters, teams start arguing about what the "real" resource even is.
 
 ## Key Terms
 
@@ -70,13 +60,13 @@ Collection → item → sub-collection → sub-item.
 
 **Before (verbs, singular, flat)**
 
-```
+```http
 GET /getUserOrder?userId=42&orderId=9
 ```
 
 **After (nouns, plural, hierarchical)**
 
-```
+```http
 GET /users/42/orders/9
 ```
 
@@ -86,7 +76,7 @@ You can read it and understand it.
 
 ### Step 1 — Start with Nouns
 
-```
+```text
 /users
 /orders
 /articles
@@ -96,7 +86,7 @@ Plurals by default — collections hold *many*.
 
 ### Step 2 — Attach Identifiers
 
-```
+```text
 /users/42
 /orders/9
 /articles/python-logging
@@ -106,7 +96,7 @@ Numeric ids and meaningful slugs both work.
 
 ### Step 3 — Sub-resources
 
-```
+```text
 /users/42/orders          # the orders that belong to user 42
 /users/42/orders/9        # order 9 within that scope
 ```
@@ -133,7 +123,7 @@ A collection and a single item are *different endpoints*.
 
 ### Step 5 — Restraint on Depth
 
-```
+```text
 # Good
 /users/42/orders
 
@@ -169,6 +159,12 @@ GitHub's `/repos/{owner}/{repo}/issues/{number}` is the canonical example of nou
 - Express *actions* as state changes; if unavoidable, mark them with `:verb`.
 - Public ids should be *opaque* (UUIDs, slugs).
 
+## Verification Signals and Failure Modes
+
+- **Expected output:** Looking at `/users`, `/users/42`, and `/users/42/orders`, you should be able to explain collection, item, and sub-collection roles without extra narration.
+- **First check:** If the same resource appears under `/user/42`, `/users?id=42`, and `/members/42`, you no longer have a stable canonical URL.
+- **Failure mode:** Let nesting grow without restraint and caching, authorization, and documentation all become harder—until explicit action endpoints start appearing as damage control.
+
 ## Checklist
 
 - [ ] Are all collections plural?
@@ -187,9 +183,20 @@ GitHub's `/repos/{owner}/{repo}/issues/{number}` is the canonical example of nou
 
 Resources define the shape of your API. The next episode turns to *what actions* live on those resources — HTTP methods and status codes.
 
+## Answering the Opening Questions
+
+- **How to draw resource boundaries?**
+  - The article treats Resource Design as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Rules for nouns, plurals, and hierarchy?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Modeling sub-resources?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
-- [REST Basics](./02-rest-basics.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
+- [API Design 101 (2/10): REST Basics](./02-rest-basics.md)
 - **Resource Design (current)**
 - HTTP Methods and Status Codes (upcoming)
 - Request and Response Schemas (upcoming)
@@ -198,6 +205,7 @@ Resources define the shape of your API. The next episode turns to *what actions*
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

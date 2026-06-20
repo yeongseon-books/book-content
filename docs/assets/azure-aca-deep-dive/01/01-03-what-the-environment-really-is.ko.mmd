@@ -1,0 +1,13 @@
+flowchart TD
+    subgraph Env["ACA 환경 (Log Analytics 작업 영역, VNet)"]
+        subgraph App1["컨테이너 앱 1"]
+            R1["리비전 1"]
+        end
+        subgraph App2["컨테이너 앱 2"]
+            R2["리비전 1"]
+        end
+        Envoy["Envoy 프록시 (수신)"]
+        Envoy --> App1
+        Envoy --> App2
+    end
+    External["외부 트래픽"] --> Envoy

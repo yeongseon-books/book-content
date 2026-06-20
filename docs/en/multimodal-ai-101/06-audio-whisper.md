@@ -1,11 +1,11 @@
 ---
-title: Audio Processing and Whisper STT
+title: "Multimodal AI 101 (6/10): Audio Processing and Whisper STT"
 series: multimodal-ai-101
 episode: 6
 language: en
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -21,11 +21,21 @@ seo_description: Before OpenAI Whisper landed in September 2022, production STT 
   Google Speech, AWS Transcribe, or Azure Speech.
 ---
 
-# Audio Processing and Whisper STT
+# Multimodal AI 101 (6/10): Audio Processing and Whisper STT
+
+This is post 6 in the Multimodal AI 101 series.
 
 > Multimodal AI 101 series (6/10)
 
----
+
+![Multimodal AI 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/06/06-01-big-picture.en.png)
+*Multimodal AI 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Audio Processing and Whisper STT?
+- Which signal should the example or diagram make visible for Audio Processing and Whisper STT?
+- What failure should be prevented first when Audio Processing and Whisper STT reaches a real system?
 
 ## Why Whisper became the STT default
 
@@ -37,7 +47,7 @@ This episode covers what you actually need to run Whisper in production STT.
 
 ## Whisper architecture at a glance
 
-```
+```text
 [audio waveform] -> log-Mel spectrogram (80 channels)
                           |
                           v
@@ -232,6 +242,34 @@ Self-hosting still costs USD 1-3 per hour per GPU instance. Push queue length, G
 - VAD filter, word-level timestamps, and `initial_prompt` are critical for accuracy and stability.
 - Long audio uses auto-chunking; subtitles use SRT conversion; realtime uses sliding-window streaming.
 - Verify sample-rate conversion, silence hallucination, domain prompts, separate diarization, and cost monitoring before production.
+
+---
+
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Audio Processing and Whisper STT?**
+  - The article treats Audio Processing and Whisper STT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Audio Processing and Whisper STT?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Audio Processing and Whisper STT reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Multimodal AI 101 (1/10): Why Multimodal AI Matters](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
+- [Multimodal AI 101 (3/10): Vision-Language Model Architecture](./03-vlm-architecture.md)
+- [Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines](./04-captioning-ocr-pipelines.md)
+- [Multimodal AI 101 (5/10): Multimodal RAG: Searching Images and Text Together](./05-multimodal-rag.md)
+- **Audio Processing and Whisper STT (current)**
+- Text-to-Image with Diffusion (upcoming)
+- Multimodal Embeddings and Cross-modal Search (upcoming)
+- Video Understanding - From Frame Sampling to Video-LLaVA (upcoming)
+- Building a Production Multimodal Application (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [Radford et al. - Robust Speech Recognition via Large-Scale Weak Supervision (Whisper)](https://arxiv.org/abs/2212.04356)

@@ -1,10 +1,10 @@
 ---
 series: algorithms-101
 episode: 4
-title: Sorting Algorithms
+title: "Algorithms 101 (4/10): Sorting Algorithms"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -21,17 +21,23 @@ seo_description: Why comparison sorting is bounded by O(n log n), the trade-offs
 last_reviewed: '2026-05-04'
 ---
 
-# Sorting Algorithms
-
-> Algorithms 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
+# Algorithms 101 (4/10): Sorting Algorithms
 
 **Core question**: Why is Python's `sorted` so consistently fast, and what does it do that a textbook quicksort does not?
 
-> Sorting is the preprocessing step of almost every other algorithm. Comparison-based sorts have an information-theoretic lower bound of O(n log n). Within that envelope, mergesort, quicksort, and heapsort differ in stability, memory, and cache behaviour. Python's standard library uses Timsort, which adapts to the partial order found in real data. Picking a sort means weighing data shape, memory, and external constraints together.
+Sorting is the preprocessing step of almost every other algorithm. Comparison-based sorts have an information-theoretic lower bound of O(n log n). Within that envelope, mergesort, quicksort, and heapsort differ in stability, memory, and cache behaviour.
 
-<!-- a-grade-intro:end -->
+This is post 4 in the Algorithms 101 series. Here we cover the trade-offs among textbook sorting algorithms and why Timsort wins so often in production code.
+
+
+![algorithms 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/04/04-01-big-picture.en.png)
+*algorithms 101 chapter 4 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Sorting Algorithms?
+- Which signal should the example or diagram make visible for Sorting Algorithms?
+- What failure should be prevented first when Sorting Algorithms reaches a real system?
 
 ## What You Will Learn
 
@@ -45,8 +51,6 @@ last_reviewed: '2026-05-04'
 Sorting underpins index construction, batch processing, joins, window aggregations, and ML preprocessing. The cost of every downstream algorithm depends on which sort precedes it. Without a clear sense of trade-offs, you cannot estimate the cost of the rest of the pipeline.
 
 > Understanding sorting is the first vocabulary of algorithm design.
-
-## Concept at a Glance
 
 > The decision tree of comparison sorts has depth log(n!) ≈ n log n, so O(n log n) is the lower bound. Mergesort is stable, uses O(n) extra memory, and guarantees O(n log n). Quicksort is in-place, averages O(n log n), but degrades to O(n²) on bad pivots. Heapsort is in-place and guaranteed O(n log n) but unstable. Timsort layers run detection on top of mergesort.
 
@@ -254,10 +258,21 @@ Within the same asymptotic envelope, sorts differ by stability, memory, and adap
 
 The next article covers recursion and divide and conquer — call stacks, recurrences, and the path from divide and conquer toward dynamic programming.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Sorting Algorithms?**
+  - The article treats Sorting Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Sorting Algorithms?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Sorting Algorithms reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an Algorithm?](./01-what-is-an-algorithm.md)
-- [Time and Space Complexity](./02-time-and-space-complexity.md)
-- [Search Algorithms](./03-search-algorithms.md)
+## In this series
+
+- [Algorithms 101 (1/10): What Is an Algorithm?](./01-what-is-an-algorithm.md)
+- [Algorithms 101 (2/10): Time and Space Complexity](./02-time-and-space-complexity.md)
+- [Algorithms 101 (3/10): Search Algorithms](./03-search-algorithms.md)
 - **Sorting Algorithms (current)**
 - Recursion and Divide and Conquer (upcoming)
 - Dynamic Programming (upcoming)
@@ -265,6 +280,7 @@ The next article covers recursion and divide and conquer — call stacks, recurr
 - Graph Algorithms (upcoming)
 - String Algorithm Basics (upcoming)
 - Algorithm Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

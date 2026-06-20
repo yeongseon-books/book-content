@@ -1,10 +1,10 @@
 ---
 series: secure-coding-101
 episode: 6
-title: Secret and Key Management
+title: "Secure Coding 101 (6/10): Secret and Key Management"
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -17,22 +17,30 @@ tags:
   - SecureCoding
   - DevSecOps
 seo_description: Environment variables, secret managers, key rotation, secret scanning, and a five-step playbook for safe key management.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Secret and Key Management
+# Secure Coding 101 (6/10): Secret and Key Management
 
-> Secure Coding 101 series (6/10)
+Secrets tend to stay invisible right up to the moment they become the most expensive line in the incident report. A database password in a repository, a signing key copied across environments, or a CI job that prints environment variables can leave a system operational on the surface while making it extremely fragile to recover once something leaks.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Secure Coding 101 series.
 
-**Core question**: Where do we put secrets so we can *rotate them anytime* and *never leak them by accident*?
+In this chapter, we will treat secret handling as an operating model rather than a storage trick: separation from code, central secret storage, access control, masking, rotation, and post-leak recovery. That wider frame is what distinguishes a merely hidden secret from a recoverable one.
 
-> *Secrets must live *outside the code*, stay *short-lived*, and be *rotatable any time*.*
+> Secrets belong outside the codebase, with short lifetimes, explicit access control, and a rotation path you can execute under pressure.
 
-<!-- a-grade-intro:end -->
 
-## What You Will Learn
+![secure coding 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/06/06-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 6 flow overview*
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Secret and Key Management?
+- Which signal should the example or diagram make visible for Secret and Key Management?
+- What failure should be prevented first when Secret and Key Management reaches a real system?
+
+## Questions This Chapter Answers
 
 - What counts as a *secret*
 - Why *hard-coded* secrets are dangerous
@@ -45,15 +53,6 @@ last_reviewed: '2026-05-04'
 The most common incident is a *secret committed to git*. Once pushed, it is *forever traceable*. Even *history rewrite* is not a complete fix.
 
 > *Design every secret on the assumption that it *will leak someday*.*
-
-## Concept at a Glance
-
-```mermaid
-flowchart LR
-    Code["Code"] -->|read| Env["Env vars"]
-    Env -->|fetch| Vault["Secret manager"]
-    Vault --> Rotate["Periodic rotation"]
-```
 
 ## Key Terms
 
@@ -107,6 +106,26 @@ def mask(s, keep=4):
 print("API key:", mask(API_KEY))
 ```
 
+## When rotation fails in production
+
+Rotation usually breaks not because the secret manager cannot mint a new value, but because the surrounding system still assumes the old one.
+
+```text
+Failure mode: new DB password issued, app still uses pooled old connections
+What to verify:
+1. connection pool recycle / reload timing
+2. rollout order across workers and jobs
+3. old credential revocation delay
+
+Failure mode: JWT signing key changed, old tokens fail immediately
+What to verify:
+1. overlapping key IDs (kid) during transition
+2. grace period for active sessions
+3. cache invalidation in API gateways
+```
+
+These checks matter because secret rotation is successful only when the application can survive it without guesswork. A secret that is easy to create but hard to rotate is still operational debt.
+
 ## What to Notice in This Code
 
 - A *secret manager* makes *access auditing* the default.
@@ -150,17 +169,29 @@ Most teams adopt *Vault*, *AWS Secrets Manager*, *Doppler*, or *1Password Connec
 
 Safe secrets keep *recovery cost* small. Next we tackle the oldest attack — *SQL injection*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Secret and Key Management?**
+  - The article treats Secret and Key Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Secret and Key Management?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Secret and Key Management reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Secure Coding?](./01-what-is-secure-coding.md)
-- [Input Validation](./02-input-validation.md)
-- [Authentication and Session](./03-authentication-and-session.md)
-- [Authorization and Permissions](./04-authorization-and-permissions.md)
-- [Safe Data Storage](./05-safe-data-storage.md)
+## In this series
+
+- [Secure Coding 101 (1/10): What Is Secure Coding?](./01-what-is-secure-coding.md)
+- [Secure Coding 101 (2/10): Input Validation](./02-input-validation.md)
+- [Secure Coding 101 (3/10): Authentication and Session](./03-authentication-and-session.md)
+- [Secure Coding 101 (4/10): Authorization and Permissions](./04-authorization-and-permissions.md)
+- [Secure Coding 101 (5/10): Safe Data Storage](./05-safe-data-storage.md)
 - **Secret and Key Management (current)**
 - SQL Injection and Safe ORM Usage (upcoming)
 - XSS and CSRF Defense (upcoming)
 - Managing Dependency Vulnerabilities (upcoming)
 - Safe Logging and Audit (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -169,3 +200,4 @@ Safe secrets keep *recovery cost* small. Next we tackle the oldest attack — *S
 - [HashiCorp Vault](https://developer.hashicorp.com/vault/docs)
 - [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/)
 - [GitHub — Secret scanning](https://docs.github.com/en/code-security/secret-scanning)
+- [The Twelve-Factor App — Config](https://12factor.net/config)

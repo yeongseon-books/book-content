@@ -1,11 +1,11 @@
 ---
-title: Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified
+title: "SQLAlchemy 101 (1/10): Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified"
 series: sqlalchemy-101
 episode: 1
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
@@ -22,7 +22,11 @@ seo_description: The Engine in SQLAlchemy is "the ability to talk to a database,
   into an object." A Connection is the actual communication channel; an Engine is…
 ---
 
-# Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified
+# SQLAlchemy 101 (1/10): Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified
+
+The Engine in SQLAlchemy is the capability to talk to a database, packaged as an object. This post starts by separating that abstraction from the concrete communication channel called Connection.
+
+This is the first article in the SQLAlchemy 101 series.
 
 > SQLAlchemy 101 series (1/10)
 
@@ -32,32 +36,21 @@ When you `pip install sqlalchemy` and write your first lines of code, the most c
 
 This series walks through SQLAlchemy 2.x using SQLite, end to end. The first post tackles the lowest layer: what `Engine` and `Connection` are, and why they were designed this way. ORM and Session show up later in the series. For now, we focus on a very concrete question: how does a single line of SQL travel from your Python code to a SQLite file on disk?
 
-![Getting started with SQLAlchemy 2.x - engine and connection demystified](../../assets/sqlalchemy-101/01/01-01-getting-started-with-sqlalchemy-2-x-engi.en.png)
+![Getting started with SQLAlchemy 2.x - engine and connection demystified](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-01-getting-started-with-sqlalchemy-2-x-engi.en.png)
 
 *Getting started with SQLAlchemy 2.x - engine and connection demystified*
-## What you will learn
 
-- That SQLAlchemy is split into two layers, Core and ORM, and that Engine and Connection are the entry points to Core
-- That `create_engine()` returns a factory bundling a dialect, the DB-API driver, a connection pool, and a parsed URL
-- How the 1.x to 2.x transition changed defaults: `future=True` everywhere, unified `select()`, `Mapped[]` typing, native async
-- The difference between `engine.connect()` and `engine.begin()`, and how 2.x makes transactions explicit
-- How to run raw SQL safely with `text()` and named parameter binding
-- SQLite URL conventions (`sqlite:///`, `sqlite:////`, `:memory:`) and how to apply PRAGMA via events
+![sqlalchemy 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-02-why-this-matters.en.png)
+*sqlalchemy 101 chapter 1 flow overview*
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- Do I still need to import `sqlite3` when I use SQLAlchemy?
-- Does `create_engine()` open a SQLite file immediately, or is it lazy?
-- Why was `engine.execute("SELECT 1")` removed in 2.x?
-- How does a Connection differ from an ORM Session?
-- Should I default to `with engine.connect()` or `with engine.begin()`?
-- Where do I enable SQLite's `foreign_keys` PRAGMA in SQLAlchemy?
+- That SQLAlchemy is split into two layers, Core and ORM, and that Engine and Connection are the entry points to Core?
+- That `create_engine()` returns a factory bundling a dialect, the DB-API driver, a connection pool, and a parsed URL?
+- How the 1.x to 2.x transition changed defaults: `future=True` everywhere, unified `select()`, `Mapped[]` typing, native async?
 
 ## Why this matters
 
-![Why this matters](../../assets/sqlalchemy-101/01/01-02-why-this-matters.en.png)
-
-*Why this matters*
 Many SQLAlchemy tutorials begin with `Base = declarative_base()` from the ORM. As a result, when something breaks outside the ORM, say a connection drops or a transaction commits unexpectedly, beginners have no idea where to look. Engine and Connection are the foundation that supports the ORM Session, and when something goes wrong inside a Session, you ultimately have to debug at the Connection level.
 
 In production, the most common SQLAlchemy headaches start at the Engine layer. SQLite's `database is locked` errors, `Lost connection` retries, connection pool exhaustion, autocommit mode confusion: all of these are configured on the Engine. Without a clear mental model, you end up tweaking `pool_size`, `pool_recycle`, and `connect_args` by guesswork.
@@ -66,7 +59,7 @@ Finally, the 1.x-to-2.x transition is not just a syntax change, it's a usage-mod
 
 ## Mental Model
 
-![Mental model](../../assets/sqlalchemy-101/01/01-03-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-03-mental-model.en.png)
 
 *Mental model*
 The Engine in SQLAlchemy is "the ability to talk to a database, made into an object." A Connection is the actual communication channel; an Engine is the factory that holds the configuration and capability to manufacture those channels.
@@ -75,7 +68,7 @@ The Engine in SQLAlchemy is "the ability to talk to a database, made into an obj
 
 Visually:
 
-```
+```text
 Application code
       │
       ▼
@@ -100,7 +93,7 @@ Three things matter. First, the Engine bundles a dialect (which database family)
 
 ## Core concepts
 
-![Core concepts](../../assets/sqlalchemy-101/01/01-04-core-concepts.en.png)
+![Core concepts](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-04-core-concepts.en.png)
 
 *Core concepts*
 ### Two layers: Core and ORM
@@ -217,7 +210,7 @@ Now you get:
 
 ## Step-by-step practice
 
-![Step-by-step practice](../../assets/sqlalchemy-101/01/01-05-step-by-step-practice.en.png)
+![Step-by-step practice](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-05-step-by-step-practice.en.png)
 
 *Step-by-step practice*
 This section walks from an empty directory to a working SQLAlchemy 2.x program.
@@ -400,19 +393,28 @@ In this post we looked at SQLAlchemy from the bottom up. The Engine is a lazy fa
 
 Next, we move one layer up to **MetaData, Table, Column, and the type system**. That's where Core stops being "raw SQL with extra plumbing" and starts becoming a proper Python representation of your schema. Once Core SQL expressions click, the ORM in post 4 onwards reads almost like English.
 
+## Answering the Opening Questions
+
+- **That SQLAlchemy is split into two layers, Core and ORM, and that Engine and Connection are the entry points to Core?**
+  - The article treats Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **That `create_engine()` returns a factory bundling a dialect, the DB-API driver, a connection pool, and a parsed URL?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How the 1.x to 2.x transition changed defaults: `future=True` everywhere, unified `select()`, `Mapped[]` typing, native async?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- **Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified (current)**
-- SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column (upcoming)
-- SQLAlchemy Core - select, insert, update, delete in 2.x Style (upcoming)
-- ORM Basics: Defining Models with DeclarativeBase and mapped_column (upcoming)
-- Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)
-- ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)
-- Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
-- Events, hybrid_property, and custom types (upcoming)
-- Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
-- Production patterns: pools, observability, migrations, and deploys (upcoming)
+- **SQLAlchemy 101 (1/10): Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified (current)**
+- SQLAlchemy 101 (2/10): SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column (upcoming)
+- SQLAlchemy 101 (3/10): SQLAlchemy Core - select, insert, update, delete in 2.x Style (upcoming)
+- SQLAlchemy 101 (4/10): ORM Basics: Defining Models with DeclarativeBase and mapped_column (upcoming)
+- SQLAlchemy 101 (5/10): Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)
+- SQLAlchemy 101 (6/10): ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)
+- SQLAlchemy 101 (7/10): Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
+- SQLAlchemy 101 (8/10): Events, hybrid_property, and custom types (upcoming)
+- SQLAlchemy 101 (9/10): Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
+- SQLAlchemy 101 (10/10): Production patterns: pools, observability, migrations, and deploys (upcoming)
 
 <!-- toc:end -->
 
@@ -423,3 +425,7 @@ Next, we move one layer up to **MetaData, Table, Column, and the type system**. 
 - [SQLAlchemy 2.0 Migration Guide](https://docs.sqlalchemy.org/en/20/changelog/migration_20.html)
 - [SQLite URL forms in SQLAlchemy](https://docs.sqlalchemy.org/en/20/dialects/sqlite.html#connect-strings)
 - [PEP 249 - Python Database API Specification 2.0](https://peps.python.org/pep-0249/)
+
+### Related Series
+
+- [Python DB-API 101](../python-dbapi-101/01-why-db-api-pep-249.md) — covers the PEP 249 DB-API that SQLAlchemy is built on top of. Drop down to it when SQLAlchemy connection pooling, transactions, or cursor behavior feels like magic and you need to see the driver calls underneath.

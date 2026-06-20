@@ -1,0 +1,11 @@
+flowchart TD
+    A["추정(Estimation)"] --> B["점 추정(Point Estimation)"]
+    A --> C["구간 추정(Interval Estimation)"]
+    B --> B1["단일 값으로 모수 추정"]
+    C --> C1["신뢰구간(Confidence Interval) 제공"]
+    B1 --> D["표본 평균(Sample Mean)"]
+    C1 --> E["오차 한계(Margin of Error) 고려"]
+    D --> F["불확실성 반영 어려움"]
+    E --> G["신뢰수준(Confidence Level) 동반"]
+    F --> H["한계점 보완 필요"]
+    G --> I["구간 내 모수 존재 확률 아님"]

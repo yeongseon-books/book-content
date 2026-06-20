@@ -1,11 +1,11 @@
 ---
-title: Deployment and Kudu — build, sync, release from the inside
+title: "Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside"
 series: azure-app-service-deep-dive
 episode: 4
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   mkdocs: true
   ebook: true
@@ -14,12 +14,15 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-04-29'
-seo_description: Microsoft doesn't publicly document the full implementation details
-  of the App Service Front-End, Worker, and File Server layers.
+last_reviewed: '2026-05-15'
+seo_description: Trace App Service deployment from Kudu upload through Oryx build, run-from-package, slot warm-up, and runtime readiness.
 ---
 
-# Deployment and Kudu — build, sync, release from the inside
+# Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside
+
+“Deployment succeeded” is one of the most misleading sentences in App Service operations. An artifact can upload cleanly, land in the right path, and still leave you with a process that never becomes ready.
+
+This is the fourth post in the Azure App Service Deep Dive series.
 
 ## Source Version
 
@@ -46,21 +49,17 @@ the build stage is tightly connected to **Oryx**.
 
 This post follows that path end to end.
 
----
+![azure app service deep dive chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png)
+*azure app service deep dive chapter 4 flow overview*
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Where does Kudu run, and through what stages does an App Service 'deployment' actually flow?
 - How are ZIP deploy, OneDeploy, GitHub Actions, and Run From Package fundamentally different?
 - When you swap a Deployment Slot, what gets swapped and what does not?
-- What does the warm-up page actually guarantee during a swap?
-- Which deployment models allow automatic rollback on failure, and which do not?
 
 ## The deployment pipeline in one picture
 
-![Deployment path from upload to startup](../../assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png)
-
-*Deployment path from upload to startup*
 Read deployment incidents through these four stages.
 
 1. artifact upload failed
@@ -103,7 +102,7 @@ It accepts a zip artifact,
 turns it into deployment metadata,
 and feeds it into the deployment flow.
 
-![ZipDeploy request entering the deployment flow](../../assets/azure-app-service-deep-dive/04/04-02-what-zipdeploy-actually-means.en.png)
+![ZipDeploy request entering the deployment flow](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-02-what-zipdeploy-actually-means.en.png)
 
 *ZipDeploy request entering the deployment flow*
 ZipDeploy is not always the same as “unzip and run.”
@@ -147,7 +146,7 @@ that means:
 - Oryx installs dependencies and builds artifacts
 - Oryx can also generate runtime startup behavior
 
-![Oryx entering the Linux code app path](../../assets/azure-app-service-deep-dive/04/04-03-where-oryx-enters-for-linux-code-apps.en.png)
+![Oryx entering the Linux code app path](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-03-where-oryx-enters-for-linux-code-apps.en.png)
 
 *Oryx entering the Linux code app path*
 That is why “deployment succeeded but startup failed” on Linux App Service is often a joint Kudu-plus-Oryx problem rather than a pure Kudu problem.
@@ -177,7 +176,7 @@ The run-from-package documentation states the critical fact very clearly.
 
 **The ZIP contents are not copied into `wwwroot`; the ZIP package itself is mounted as the read-only `wwwroot`.**
 
-![ZIP package mounted as read-only wwwroot](../../assets/azure-app-service-deep-dive/04/04-02-run-from-package-turns-wwwroot-into-a-mo.en.png)
+![ZIP package mounted as read-only wwwroot](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-02-run-from-package-turns-wwwroot-into-a-mo.en.png)
 
 *ZIP package mounted as read-only wwwroot*
 The benefits are real.
@@ -198,7 +197,7 @@ But the meaning of the runtime filesystem changes.
 
 Slots keep deployment off the production URL until the new version is already running.
 
-![Production routing flips after staging warm-up](../../assets/azure-app-service-deep-dive/04/04-05-why-slot-deployment-feels-safer.en.png)
+![Production routing flips after staging warm-up](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-05-why-slot-deployment-feels-safer.en.png)
 
 *Production routing flips after staging warm-up*
 The key is routing,
@@ -282,15 +281,24 @@ az webapp config appsettings list -n my-app -g my-rg --slot staging \
 - [ ] Confirmed no code relies on writing to a read-only filesystem under Run From Package
 - [ ] Separated deployment privileges from slot privileges
 
+## Answering the Opening Questions
+
+- **Where does Kudu run, and through what stages does an App Service 'deployment' actually flow?**
+  - The article treats Deployment and Kudu — build, sync, release from the inside as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How are ZIP deploy, OneDeploy, GitHub Actions, and Run From Package fundamentally different?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When you swap a Deployment Slot, what gets swapped and what does not?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
-- [Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
-- [Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
-- **Deployment and Kudu — build, sync, release from the inside (current)**
-- Scaling internals — how Scale Out decisions become new workers (upcoming)
-- Cold start and warmup — why the first request is expensive (upcoming)
+- [Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
+- [Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
+- [Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
+- **Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside (current)**
+- Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers (upcoming)
+- Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive (upcoming)
 
 <!-- toc:end -->
 
