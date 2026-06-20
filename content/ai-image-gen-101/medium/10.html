@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AI Image Generation 101 (10/10): Production Workflows</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>AI Image Generation 101 (10/10): Production Workflows</h1>
+<p>Over 9 posts, we've covered prompt structure, style, composition, lighting, complex scenes, consistency, text, and variations. Now the final question: "How do I actually use all this when creating real content?"</p>
+<p>Today we build ready-to-use templates for blog thumbnails, YouTube thumbnails, Instagram posts, presentation backgrounds, icon sets, and newsletter headers. We also compare a bad prompt against a good one to crystallize the series' core lesson.</p>
+<p>This is the final post in the AI Image Generation 101 series.</p>
+<hr>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Define Purpose&quot;] --&gt; B[&quot;Select Prompt Formula&quot;]
+    B --&gt; C[&quot;Generate + Evaluate&quot;]
+    C --&gt; D[&quot;Post-process&quot;]
+    D --&gt; E[&quot;Publish&quot;]
+    C --&gt;|&quot;Not satisfied&quot;| B
+</code></pre>
+<p><em>Production image creation workflow</em></p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What's the optimal prompt formula for each content type?</li>
+<li>How much difference does a "bad prompt" vs "good prompt" actually make?</li>
+<li>How does an open-source tool change the workflow?</li>
+</ul>
+<hr>
+<h2>Template 1: Blog Thumbnail</h2>
+<p><img alt="Blog thumbnail" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/10/01-blog-thumbnail.png"></p>
+<p><em>Blog thumbnail: topic as visual metaphor, flat style, clean background.</em></p>
+<p><strong>Prompt formula</strong>:</p>
+<pre><code>[Topic as visual metaphor] + flat illustration style + 
+clean white background + [brand color] accents + 
+centered composition + soft even lighting
+</code></pre>
+<p><strong>Techniques applied</strong>: Style (Ep.3 flat vector) + Composition (Ep.4 centered) + Lighting (Ep.5 even)</p>
+<hr>
+<h2>Template 2: YouTube Thumbnail</h2>
+<p><img alt="YouTube thumbnail" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/10/02-youtube-thumbnail.png"></p>
+<p><em>YouTube thumbnail: expressive person + dramatic lighting + close-up.</em></p>
+<p><strong>Prompt formula</strong>:</p>
+<pre><code>[Person + strong emotional expression] + cinematic photography style + 
+dramatic [color] lighting + close-up shot + 
+high energy composition
+</code></pre>
+<p><strong>Techniques applied</strong>: Composition (Ep.4 close-up) + Lighting (Ep.5 cinematic) + Style (Ep.3 photorealistic)</p>
+<hr>
+<h2>Template 3: Instagram Post</h2>
+<p><img alt="Instagram" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/10/03-instagram-flatlay.png"></p>
+<p><em>Instagram flat lay: overhead minimal workspace.</em></p>
+<p><strong>Prompt formula</strong>:</p>
+<pre><code>[Prop arrangement description] + flat lay composition + bird's eye view + 
+clean bright photography + warm natural light + 
+pastel color palette
+</code></pre>
+<p><strong>Techniques applied</strong>: Composition (Ep.4 bird's eye) + Lighting (Ep.5 natural) + Complex scene (Ep.6 element placement)</p>
+<hr>
+<h2>Template 4: Presentation Background</h2>
+<p><img alt="Presentation" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/10/04-presentation-bg.png"></p>
+<p><em>Presentation background: abstract gradient + text space reserved.</em></p>
+<p><strong>Prompt formula</strong>:</p>
+<pre><code>abstract flowing gradient shapes in [colors] + 
+minimalist design + clean and modern + 
+plenty of empty space for text placement + 
+corporate aesthetic
+</code></pre>
+<p><strong>Key</strong>: <code>plenty of empty space for text placement</code> ensures room for slide text.</p>
+<hr>
+<h2>Template 5: Icon Set</h2>
+<p><img alt="Icon set" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/10/05-icon-set.png"></p>
+<p><em>Icon set: 4 icons in consistent style.</em></p>
+<p><strong>Prompt formula</strong>:</p>
+<pre><code>a set of [N] consistent [subject] icons in a grid + 
+same [style] style + consistent [color] palette + 
+white background + clean geometric shapes
+</code></pre>
+<p><strong>Techniques applied</strong>: Consistency (Ep.7 style lock) + Style (Ep.3 flat vector)</p>
+<hr>
+<h2>Template 6: Newsletter Header</h2>
+<p><img alt="Newsletter" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/10/06-newsletter-header.png"></p>
+<p><em>Newsletter header: visual metaphor + text space.</em></p>
+<p><strong>Prompt formula</strong>:</p>
+<pre><code>[Topic as visual scene] + [style] style + 
+centered composition with space for text at the top + 
+warm [lighting] lighting + soft bokeh background
+</code></pre>
+<hr>
+<h2>Before and After: Bad Prompt vs Good Prompt</h2>
+<p>The series' core lesson, distilled into one comparison.</p>
+<p><strong>Bad Prompt</strong></p>
+<blockquote>
+<p>a nice pretty beautiful photo of something cool and awesome, amazing image</p>
+</blockquote>
+<p><img alt="Bad prompt" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/10/07-bad-prompt-result.png"></p>
+<p><em>Bad prompt: adjective dump — "nice," "pretty," "beautiful," "awesome." AI decides everything.</em></p>
+<p><strong>Good Prompt</strong></p>
+<blockquote>
+<p>A professional food photographer setup: a golden-brown sourdough loaf on a rustic wooden cutting board, scattered flour, a linen napkin, and a vintage bread knife, overhead bird's eye view composition, photorealistic style, soft natural window light from the left, warm earthy color palette, shallow depth of field</p>
+</blockquote>
+<p><img alt="Good prompt" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/10/08-good-prompt-result.png"></p>
+<p><em>Good prompt: subject (bread), props (cutting board, flour, napkin), composition (bird's eye), style (photorealistic), lighting (left-side natural), color (warm earth tones) — all specified.</em></p>
+<p><strong>What makes the difference</strong>:</p>
+<p><strong>Subject</strong><br>
+- Bad Prompt: "something cool"<br>
+- Good Prompt: "sourdough loaf on cutting board"</p>
+<p><strong>Style</strong><br>
+- Bad Prompt: (none)<br>
+- Good Prompt: "photorealistic"</p>
+<p><strong>Composition</strong><br>
+- Bad Prompt: (none)<br>
+- Good Prompt: "overhead bird's eye view"</p>
+<p><strong>Lighting</strong><br>
+- Bad Prompt: (none)<br>
+- Good Prompt: "soft natural window light from left"</p>
+<p><strong>Color</strong><br>
+- Bad Prompt: (none)<br>
+- Good Prompt: "warm earthy color palette"</p>
+<p><strong>Detail</strong><br>
+- Bad Prompt: (none)<br>
+- Good Prompt: "scattered flour, linen napkin, bread knife"</p>
+<hr>
+<h2>Batch Generation with Open-Source Tools</h2>
+<p>Every image in this series was generated using <a href="https://github.com/NomaDamas/god-tibo-imagen">god-tibo-imagen</a>, an open-source tool. Compared to ChatGPT's web interface:</p>
+<p><strong>ChatGPT web</strong><br>
+- Pros: Intuitive, instant<br>
+- Cons: One at a time, no automation</p>
+<p><strong>Open-source (god-tibo-imagen)</strong><br>
+- Pros: Script-driven batch generation<br>
+- Cons: Initial setup required</p>
+<p><strong>Batch generation example</strong> (Python):</p>
+<pre><code class="language-python">from gti import Client
+
+client = Client()
+
+# Generate same subject in 8 styles at once
+styles = ['photorealistic', 'watercolor', 'oil painting', 'pixel art',
+          'anime', '3D render', 'flat vector', 'pencil sketch']
+
+for style in styles:
+    client.generate_image(
+        prompt=f'a cozy bookshop interior, {style} style',
+        output_path=f'output/bookshop-{style}.png'
+    )
+</code></pre>
+<p>Build this script once, swap the subject when needed, and generate complete style comparison sets automatically.</p>
+<hr>
+<h2>Full Series Summary: Core Principles from 10 Posts</h2>
+<p><strong>1. First Image</strong><br>
+- Key Lesson: Specific vs vague prompts</p>
+<p><strong>2. Prompt Structure</strong><br>
+- Key Lesson: 5-element layering: subject + style + setting + lighting + composition</p>
+<p><strong>3. Style</strong><br>
+- Key Lesson: One style keyword determines overall mood</p>
+<p><strong>4. Composition</strong><br>
+- Key Lesson: Camera distance + angle = emotion control</p>
+<p><strong>5. Color and Lighting</strong><br>
+- Key Lesson: One lighting keyword transforms the entire scene</p>
+<p><strong>6. Complex Scenes</strong><br>
+- Key Lesson: Anchor structure + individual actions + layered depth</p>
+<p><strong>7. Consistency</strong><br>
+- Key Lesson: Character sheet: color + shape identifiers</p>
+<p><strong>8. Text</strong><br>
+- Key Lesson: Short English, uppercase, environment text is safest</p>
+<p><strong>9. Reference Variations</strong><br>
+- Key Lesson: Anchor prompt + vary one axis at a time</p>
+<p><strong>10. Production</strong><br>
+- Key Lesson: Purpose-specific templates + open-source automation</p>
+<p><strong>The one principle that runs through everything</strong>: <strong>Use nouns and verbs, not adjectives.</strong> Not "a beautiful image" but "what subject, in what style, where, under what light, from what angle." Give AI concrete instructions and it understands your intent.</p>
+<hr>
+<h2>Answering the Opening Questions</h2>
+<p><strong>What's the optimal prompt formula for each type?</strong></p>
+<p>Blog: flat illustration + centered. YouTube: close-up + cinematic lighting. Instagram: flat lay + natural light. Presentation: abstract gradient + text space. Each template in this post is ready to copy-paste for immediate use.</p>
+<p><strong>How much difference between bad and good prompts?</strong></p>
+<p>The gap between "nice pretty beautiful awesome" and "golden-brown sourdough, rustic cutting board, bird's eye view, left-side natural light." Adjective dumps give AI zero actionable information. Specific nouns produce specific results.</p>
+<p><strong>How does an open-source tool change the workflow?</strong></p>
+<p>From manual one-at-a-time generation to script-driven batch creation. Generate the same subject in 8 styles or the same character in 4 scenes in one run. Comparison and selection become dramatically faster.</p>
+<hr>
+<h2>Series Index</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/01-first-image-generation.md">AI Image Generation 101 (1/10): Creating Your First Image</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/02-prompt-structure.md">AI Image Generation 101 (2/10): The Structure of a Good Prompt</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/03-mastering-styles.md">AI Image Generation 101 (3/10): Mastering Styles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/04-composition-and-perspective.md">AI Image Generation 101 (4/10): Composition and Perspective</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/05-color-and-lighting.md">AI Image Generation 101 (5/10): Color and Lighting</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/06-complex-scene-design.md">AI Image Generation 101 (6/10): Designing Complex Scenes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/07-consistency-across-images.md">AI Image Generation 101 (7/10): Maintaining Consistency</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/08-text-and-typography.md">AI Image Generation 101 (8/10): Text and Typography</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/09-reference-image-editing.md">AI Image Generation 101 (9/10): Working with Reference Images</a></li>
+<li><strong>AI Image Generation 101 (10/10): Production Workflows (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/images">OpenAI Image Generation Guide</a></li>
+<li><a href="https://github.com/NomaDamas/god-tibo-imagen">god-tibo-imagen GitHub Repository</a></li>
+</ul>
+<p class="tags-line">Tags: AI, ChatGPT, Image Generation, Prompt Engineering</p>
+</body>
+</html>

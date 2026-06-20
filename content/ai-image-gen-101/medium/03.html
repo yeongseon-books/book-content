@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AI Image Generation 101 (3/10): Mastering Styles</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>AI Image Generation 101 (3/10): Mastering Styles</h1>
+<p>You need a photo-like image for your blog header. Next day, you want an illustration for a social post. Then a flat icon for a presentation slide. Each task calls for a different visual language, but you keep getting similar-looking results because you don't know which style keywords exist or what they actually produce.</p>
+<p>Today we generate one scene in 8 distinct styles. After this post, you'll pick the right style keyword on the first try.</p>
+<p>This is post 3 in the AI Image Generation 101 series.</p>
+<hr>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Same Scene&quot;] --&gt; B[&quot;Photorealistic&quot;]
+    A --&gt; C[&quot;Watercolor&quot;]
+    A --&gt; D[&quot;Oil Painting&quot;]
+    A --&gt; E[&quot;Pixel Art&quot;]
+    A --&gt; F[&quot;Anime&quot;]
+    A --&gt; G[&quot;3D Render&quot;]
+    A --&gt; H[&quot;Flat Vector&quot;]
+    A --&gt; I[&quot;Pencil Sketch&quot;]
+</code></pre>
+<p><em>One scene transformed into 8 styles — today's experiment</em></p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>When is a photorealistic style more appropriate than an illustration, and vice versa?</li>
+<li>Watercolor and oil painting are both "painted" styles — how do they actually differ in output?</li>
+<li>Which style works best for blogs, social media, and presentations respectively?</li>
+</ul>
+<hr>
+<h2>Experiment Design: One Scene, 8 Styles</h2>
+<p>We generate the same scene in 8 styles. The shared scene description:</p>
+<blockquote>
+<p>A rainy evening, a cozy independent bookshop with warm lighting turned on. Wet cobblestones reflecting the light.</p>
+</blockquote>
+<p>Only the style keyword changes. Everything else stays identical.</p>
+<hr>
+<h2>1. Photorealistic</h2>
+<blockquote>
+<p>...photorealistic photography style, 35mm film grain</p>
+</blockquote>
+<p><img alt="Photorealistic style" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/01-photorealistic.png"></p>
+<p><em>Photorealistic style: natural light behavior, water reflection on stone, material textures rendered faithfully.</em></p>
+<p><strong>Characteristics</strong>: Looks like a real photograph. Textures, reflections, and light falloff behave as a camera would capture them.</p>
+<p><strong>Use cases</strong>: Product photography, travel blogs, food photography, social media posts where realism sells.</p>
+<p><strong>Keywords</strong>: <code>photorealistic</code>, <code>photography</code>, <code>35mm film</code>, <code>DSLR</code>, <code>Canon EOS</code>, <code>shallow depth of field</code></p>
+<hr>
+<h2>2. Watercolor</h2>
+<blockquote>
+<p>...watercolor painting style, soft edges and color bleeding</p>
+</blockquote>
+<p><img alt="Watercolor style" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/02-watercolor.png"></p>
+<p><em>Watercolor style: soft boundaries, colors bleeding into each other, a warm and immersive quality.</em></p>
+<p><strong>Characteristics</strong>: Edges are soft and diffused. Colors bleed and overlap. The overall feel is warm and dreamy.</p>
+<p><strong>Use cases</strong>: Invitation cards, postcards, emotional blog thumbnails, lifestyle social content.</p>
+<p><strong>Keywords</strong>: <code>watercolor</code>, <code>watercolour painting</code>, <code>soft washes</code>, <code>color bleeding</code>, <code>wet-on-wet</code></p>
+<hr>
+<h2>3. Oil Painting</h2>
+<blockquote>
+<p>...oil painting style, thick impasto brushstrokes, rich saturated colors</p>
+</blockquote>
+<p><img alt="Oil painting style" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/03-oil-painting.png"></p>
+<p><em>Oil painting style: thick visible brushstrokes, deep saturated colors. Compared to watercolor, it feels heavier and more textured.</em></p>
+<p><strong>Characteristics</strong>: Visible brushwork with impasto texture. Colors are deep and saturated. The image carries weight and physical presence that watercolor lacks.</p>
+<p><strong>Watercolor vs Oil Painting comparison</strong>:</p>
+<p><strong>Edges</strong><br>
+- Watercolor: Soft and bleeding<br>
+- Oil Painting: Defined but textured</p>
+<p><strong>Colors</strong><br>
+- Watercolor: Transparent and light<br>
+- Oil Painting: Deep and dense</p>
+<p><strong>Mood</strong><br>
+- Watercolor: Light and dreamy<br>
+- Oil Painting: Heavy and dramatic</p>
+<p><strong>Best for</strong><br>
+- Watercolor: Flowers, landscapes, lighthearted scenes<br>
+- Oil Painting: Portraits, cityscapes, dramatic scenes</p>
+<p><strong>Keywords</strong>: <code>oil painting</code>, <code>impasto</code>, <code>thick brushstrokes</code>, <code>rich colors</code>, <code>gallery painting</code></p>
+<hr>
+<h2>4. Pixel Art</h2>
+<blockquote>
+<p>...pixel art style, 16-bit retro game aesthetic, limited color palette</p>
+</blockquote>
+<p><img alt="Pixel art style" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/04-pixel-art.png"></p>
+<p><em>Pixel art style: dot-based graphics with a retro game feel. Simple but distinctive.</em></p>
+<p><strong>Characteristics</strong>: Retro game aesthetic. A limited color palette forces deliberate choices, creating a nostalgic and playful mood.</p>
+<p><strong>Use cases</strong>: Gaming content, tech blogs, developer community posts, distinctive thumbnails.</p>
+<p><strong>Keywords</strong>: <code>pixel art</code>, <code>8-bit</code>, <code>16-bit</code>, <code>retro game</code>, <code>sprite</code>, <code>limited palette</code></p>
+<hr>
+<h2>5. Anime/Manga</h2>
+<blockquote>
+<p>...anime illustration style, Studio Ghibli inspired, soft pastel colors</p>
+</blockquote>
+<p><img alt="Anime style" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/05-anime.png"></p>
+<p><em>Anime style: soft pastel tones with detailed background rendering. Warm and nostalgic atmosphere.</em></p>
+<p><strong>Characteristics</strong>: Detailed backgrounds with soft color palettes. Creates a warm, inviting mood that feels both familiar and fantastical.</p>
+<p><strong>Use cases</strong>: YouTube thumbnails, storytelling content, character-driven posts.</p>
+<p><strong>Keywords</strong>: <code>anime style</code>, <code>manga illustration</code>, <code>Studio Ghibli</code>, <code>Makoto Shinkai</code>, <code>cel shading</code>, <code>pastel colors</code></p>
+<hr>
+<h2>6. 3D Render</h2>
+<blockquote>
+<p>...3D render style, Pixar-like aesthetic, smooth surfaces, volumetric lighting</p>
+</blockquote>
+<p><img alt="3D render style" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/06-3d-render.png"></p>
+<p><em>3D render style: smooth surfaces, soft volumetric lighting. Evokes Pixar/Disney animation.</em></p>
+<p><strong>Characteristics</strong>: Clean smooth surfaces, soft lighting with volumetric quality. Feels polished and modern — like a frame from an animated film.</p>
+<p><strong>Use cases</strong>: App/UI mockups, cute branding, children's content, product introductions.</p>
+<p><strong>Keywords</strong>: <code>3D render</code>, <code>Pixar style</code>, <code>Blender</code>, <code>Cinema 4D</code>, <code>smooth</code>, <code>volumetric lighting</code>, <code>octane render</code></p>
+<hr>
+<h2>7. Flat Vector</h2>
+<blockquote>
+<p>...flat vector illustration style, clean geometric shapes, limited flat color palette, no gradients</p>
+</blockquote>
+<p><img alt="Flat vector style" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/07-flat-vector.png"></p>
+<p><em>Flat vector style: clean geometric shapes and flat colors. Optimized for digital content.</em></p>
+<p><strong>Characteristics</strong>: Clean and simple. No gradients — flat color planes and geometric shapes. Scales perfectly and looks professional at any size.</p>
+<p><strong>Use cases</strong>: Website illustrations, app icons, infographics, presentation diagrams.</p>
+<p><strong>Keywords</strong>: <code>flat vector</code>, <code>flat design</code>, <code>geometric</code>, <code>minimal illustration</code>, <code>no gradients</code>, <code>SVG style</code></p>
+<hr>
+<h2>8. Pencil Sketch</h2>
+<blockquote>
+<p>...pencil sketch style, detailed line work, cross-hatching for shadows, black and white</p>
+</blockquote>
+<p><img alt="Pencil sketch style" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/03/08-pencil-sketch.png"></p>
+<p><em>Pencil sketch style: line detail and cross-hatching convey depth without color. Traditional and intellectual.</em></p>
+<p><strong>Characteristics</strong>: Black and white line drawing. Cross-hatching creates tonal range without color. Feels traditional, academic, and intentional.</p>
+<p><strong>Use cases</strong>: Architecture visualization, concept art, academic content, journal/notebook aesthetics.</p>
+<p><strong>Keywords</strong>: <code>pencil sketch</code>, <code>pencil drawing</code>, <code>line art</code>, <code>cross-hatching</code>, <code>graphite</code>, <code>black and white</code></p>
+<hr>
+<h2>Style Selection Guide</h2>
+<p>A quick reference for choosing the right style based on your goal.</p>
+<p><strong>Product shots, food photos</strong><br>
+- Recommended Style: Photorealistic<br>
+- Why: Realism builds trust</p>
+<p><strong>Emotional blogs, invitations</strong><br>
+- Recommended Style: Watercolor<br>
+- Why: Soft and warm</p>
+<p><strong>Portfolio, artistic content</strong><br>
+- Recommended Style: Oil Painting<br>
+- Why: Weight and depth</p>
+<p><strong>Gaming/tech blogs</strong><br>
+- Recommended Style: Pixel Art<br>
+- Why: Distinctive and playful</p>
+<p><strong>Character-driven content</strong><br>
+- Recommended Style: Anime<br>
+- Why: Approachable and expressive</p>
+<p><strong>App/web design mockups</strong><br>
+- Recommended Style: 3D Render / Flat Vector<br>
+- Why: Clean and modern</p>
+<p><strong>Academic, conceptual</strong><br>
+- Recommended Style: Pencil Sketch<br>
+- Why: Professional and intellectual</p>
+<hr>
+<h2>Combining Styles</h2>
+<p>You're not limited to a single style. Combinations often produce distinctive results.</p>
+<p>Effective combinations:</p>
+<p><strong>Photo + Cinema</strong><br>
+- Prompt Keywords: <code>cinematic photography, anamorphic lens</code><br>
+- Result: Dramatic movie-frame feel</p>
+<p><strong>Watercolor + Digital</strong><br>
+- Prompt Keywords: <code>digital watercolor, clean edges</code><br>
+- Result: Watercolor mood with sharper definition</p>
+<p><strong>Pixel + Anime</strong><br>
+- Prompt Keywords: <code>pixel art anime style</code><br>
+- Result: Charming retro-meets-Japan aesthetic</p>
+<p><strong>3D + Isometric</strong><br>
+- Prompt Keywords: <code>3D isometric render</code><br>
+- Result: Diagram/map-like clarity</p>
+<hr>
+<h2>Key Takeaway: Style as the Strongest Lever</h2>
+<p>After applying 8 styles to the same bookshop scene, what's clear:</p>
+<ul>
+<li>Style is the single most powerful element for setting an image's overall mood</li>
+<li>Each style has a distinct personality and use case — knowing them prevents trial-and-error</li>
+<li>Combining styles gives you unique results that stand out from default outputs</li>
+</ul>
+<p>In the next post, we'll explore composition and perspective — how the camera angle and framing transform the same subject into entirely different images.</p>
+<hr>
+<h2>Answering the Opening Questions</h2>
+<p><strong>When is photorealistic more appropriate than illustration?</strong></p>
+<p>Photorealistic works when you need the viewer to trust what they see — product photos, food, travel. Illustration styles work when you need to convey mood, concept, or personality over literal accuracy.</p>
+<p><strong>How do watercolor and oil painting actually differ?</strong></p>
+<p>Watercolor has soft bleeding edges, transparent colors, and feels light. Oil painting has thick visible brushwork, saturated colors, and feels heavy. Use watercolor for emotional/lighthearted scenes, oil painting for dramatic/weighty scenes.</p>
+<p><strong>Which style for blogs, social media, and presentations?</strong></p>
+<p>Blogs: photorealistic (product/review) or flat vector (technical explanation). Social media: anime (character-driven) or watercolor (emotional). Presentations: flat vector (diagrams) or 3D render (mockups).</p>
+<hr>
+<h2>Series Index</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/01-first-image-generation.md">AI Image Generation 101 (1/10): Creating Your First Image</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/02-prompt-structure.md">AI Image Generation 101 (2/10): The Structure of a Good Prompt</a></li>
+<li><strong>AI Image Generation 101 (3/10): Mastering Styles (current)</strong></li>
+<li>AI Image Generation 101 (4/10): Composition and Perspective (upcoming)</li>
+<li>AI Image Generation 101 (5/10): Color and Lighting (upcoming)</li>
+<li>AI Image Generation 101 (6/10): Designing Complex Scenes (upcoming)</li>
+<li>AI Image Generation 101 (7/10): Maintaining Consistency (upcoming)</li>
+<li>AI Image Generation 101 (8/10): Text and Typography (upcoming)</li>
+<li>AI Image Generation 101 (9/10): Working with Reference Images (upcoming)</li>
+<li>AI Image Generation 101 (10/10): Production Workflows (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/images">OpenAI Image Generation Guide</a></li>
+<li><a href="https://github.com/NomaDamas/god-tibo-imagen">god-tibo-imagen GitHub Repository</a></li>
+</ul>
+<p class="tags-line">Tags: AI, ChatGPT, Image Generation, Prompt Engineering</p>
+</body>
+</html>

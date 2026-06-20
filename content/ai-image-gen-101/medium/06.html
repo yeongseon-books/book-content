@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AI Image Generation 101 (6/10): Designing Complex Scenes</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>AI Image Generation 101 (6/10): Designing Complex Scenes</h1>
+<p>One person is easy. But ask for "two people having a conversation" and they merge, overlap, or stare in wrong directions. The more elements in a scene, the more AI decides arbitrarily — and the harder it gets to match your intent.</p>
+<p>Today we scale from a single person to multi-person scenes, layered compositions, spatial division, and dynamic interactions. We'll also show what failure looks like when you push too hard.</p>
+<p>This is post 6 in the AI Image Generation 101 series.</p>
+<hr>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Complexity Levels&quot;] --&gt; B[&quot;1 Person&quot;]
+    B --&gt; C[&quot;2 People + Interaction&quot;]
+    C --&gt; D[&quot;Multi-person&quot;]
+    D --&gt; E[&quot;Layer Arrangement&quot;]
+    E --&gt; F[&quot;Spatial Division&quot;]
+    F --&gt; G[&quot;Action + Interaction&quot;]
+</code></pre>
+<p><em>Stepwise approach to complex scenes</em></p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>Where does AI fail most often when placing multiple people?</li>
+<li>What changes when you specify foreground/midground/background layers?</li>
+<li>What prompt structure avoids chaos in complex scenes?</li>
+</ul>
+<hr>
+<h2>Level 1: Single Person — Baseline</h2>
+<blockquote>
+<p>A chef in a white coat standing alone in a modern kitchen, holding a knife, clean stainless steel counter, photorealistic, medium shot</p>
+</blockquote>
+<p><img alt="Single person" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/06/01-single-person.png"></p>
+<p><em>Single person: clear subject, simple background. The easiest difficulty level for AI.</em></p>
+<p>One person with a simple background is where AI performs most reliably. This is our baseline.</p>
+<hr>
+<h2>Level 2: Two People Interacting</h2>
+<blockquote>
+<p>A chef in a white coat teaching a young apprentice how to chop vegetables in a modern kitchen, both facing the cutting board, photorealistic, medium shot</p>
+</blockquote>
+<p><img alt="Two people" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/06/02-two-people.png"></p>
+<p><em>Two people: specifying their relationship and shared action produces natural interaction.</em></p>
+<p><strong>Key technique</strong>: Define the <strong>relationship</strong> (teacher-student) and a <strong>shared action</strong> (both facing the cutting board).</p>
+<p><strong>Two-person prompt checklist</strong>:<br>
+- Distinguishing features for each (clothing, age, role)<br>
+- Relationship or interaction (teaching, talking, handing over)<br>
+- Gaze/body direction (both facing the cutting board)<br>
+- Spatial arrangement (side by side, facing each other, behind)</p>
+<hr>
+<h2>Level 3: Multi-Person Scene (5+)</h2>
+<blockquote>
+<p>A busy restaurant kitchen with five chefs working at different stations, one grilling, one plating, one chopping, steam rising from pots, organized chaos, photorealistic, wide shot</p>
+</blockquote>
+<p><img alt="Multi-person" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/06/03-busy-kitchen.png"></p>
+<p><em>Multi-person: assigning unique actions to each person makes them distinguishable.</em></p>
+<p><strong>Key technique</strong>: Each of the 5 people gets a <strong>unique action</strong> (grilling, plating, chopping). Writing "five chefs" alone produces five people in identical poses.</p>
+<p><strong>Multi-person principles</strong>:</p>
+<p><strong>Unique actions</strong><br>
+- Bad: "five people working"<br>
+- Good: "one grilling, one plating, one chopping"</p>
+<p><strong>Spatial distribution</strong><br>
+- Bad: "chefs in a kitchen"<br>
+- Good: "each at a different station"</p>
+<p><strong>Atmosphere keywords</strong><br>
+- Bad: (none)<br>
+- Good: "organized chaos, steam rising"</p>
+<hr>
+<h2>Level 4: Foreground/Midground/Background Layers</h2>
+<blockquote>
+<p>foreground shows a beautifully plated dish in sharp focus... midground shows a chef garnishing... background shows the rest of the kitchen team with soft bokeh</p>
+</blockquote>
+<p><img alt="Layer arrangement" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/06/04-foreground-mid-back.png"></p>
+<p><em>Layered depth: foreground (dish), midground (chef), background (team). Focus differences guide the viewer's eye.</em></p>
+<p><strong>Key technique</strong>: Explicitly name <code>foreground</code>, <code>midground</code>, <code>background</code> and specify what occupies each. Add <code>shallow depth of field</code> to create focus graduation.</p>
+<p><strong>Layer prompt structure</strong>:</p>
+<pre><code>[Foreground: subject + sharp focus] + 
+[Midground: subject + slightly blurred] + 
+[Background: subject + soft bokeh] + 
+shallow depth of field
+</code></pre>
+<p>This transforms "a scene with many things" into a <strong>depth-guided composition</strong> where the viewer's eye follows your intent.</p>
+<hr>
+<h2>Level 5: Spatial Division</h2>
+<blockquote>
+<p>on the left side a traditional wooden ramen stall with a Japanese chef, on the right side a modern fusion taco stand with a Mexican chef, both sides connected by a shared counter</p>
+</blockquote>
+<p><img alt="Spatial division" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/06/05-spatial-left-right.png"></p>
+<p><em>Spatial division: explicitly splitting left/right creates a symmetric, balanced composition.</em></p>
+<p><strong>Key technique</strong>: <code>on the left side... on the right side...</code> explicitly divides the canvas. Effective for comparison images, before/after, or two-world contrasts.</p>
+<p><strong>Spatial keywords</strong>:<br>
+- Left/Right: <code>on the left</code>, <code>on the right</code>, <code>left half</code>, <code>right half</code><br>
+- Top/Bottom: <code>top portion</code>, <code>bottom portion</code>, <code>upper half</code>, <code>lower half</code><br>
+- Connection: <code>connected by</code>, <code>shared</code>, <code>between them</code></p>
+<hr>
+<h2>Level 6: Action and Interaction</h2>
+<blockquote>
+<p>a chef tossing a flaming pan high in the air... a wide-eyed apprentice jumps back in surprise... another chef in the background calmly plates food</p>
+</blockquote>
+<p><img alt="Action and interaction" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/06/06-action-interaction.png"></p>
+<p><em>Action scene: giving each person a different reaction to the same moment creates drama.</em></p>
+<p><strong>Key technique</strong>: Three people showing <strong>contrasting reactions</strong> to the same moment. One acts (tossing fire), one reacts (jumping back in surprise), one ignores (calmly working). This contrast creates narrative tension.</p>
+<hr>
+<h2>Failure Case: Overcrowding</h2>
+<blockquote>
+<p>A confusing overcrowded scene with too many elements: ten different people doing ten different activities, dogs, cats, children...</p>
+</blockquote>
+<p><img alt="Overcrowded" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/06/07-bad-overcrowded.png"></p>
+<p><em>Overcrowded: too many elements causes AI to merge, drop, or distort elements.</em></p>
+<p><strong>Why it fails</strong>: AI has a complexity ceiling. Requesting 10+ people with animals, furniture, and props simultaneously causes elements to be omitted or unnaturally merged.</p>
+<p><strong>Complexity limits</strong>:</p>
+<p><strong>1-3 people + simple BG</strong><br>
+- Stability: Very stable<br>
+- Strategy: Use directly</p>
+<p><strong>4-6 people + medium BG</strong><br>
+- Stability: Mostly stable<br>
+- Strategy: Give each a unique action</p>
+<p><strong>7+ people</strong><br>
+- Stability: Unstable<br>
+- Strategy: Describe as groups</p>
+<p><strong>10+ simultaneous elements</strong><br>
+- Stability: High failure rate<br>
+- Strategy: Generate separately, composite</p>
+<hr>
+<h2>Success Case: Organized Complex Scene</h2>
+<blockquote>
+<p>A well-organized complex family dinner scene: a large rectangular table with eight family members of different ages, grandmother at the head serving roast turkey...</p>
+</blockquote>
+<p><img alt="Organized complex scene" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/06/08-good-organized.png"></p>
+<p><em>Organized complexity: an anchor structure (table) plus clearly defined positions and actions keeps 8 people stable.</em></p>
+<p><strong>Why it works</strong>: A central structure (large rectangular table) anchors the layout. Every person is defined by their <strong>relationship to this structure</strong> (grandmother at the head, children reaching for rolls, parents pouring wine).</p>
+<hr>
+<h2>Complex Scene Prompt Formula</h2>
+<pre><code>1. Define central structure/setting (table, stage, street)
+2. Each person: role + action + position
+3. Relationships/interactions between people
+4. Atmosphere/lighting
+5. Composition (wide shot mandatory)
+</code></pre>
+<p><strong>Core principles</strong>:<br>
+- Place the anchor structure first, then arrange people around it<br>
+- Give each person distinguishable traits and actions<br>
+- Beyond 7 people, describe in groups rather than individually<br>
+- Use <code>wide shot</code> to ensure all elements are visible</p>
+<hr>
+<h2>Key Takeaway</h2>
+<p>Building complex scenes step by step:</p>
+<ul>
+<li>1→2 people: specify relationship and interaction</li>
+<li>Multi-person: each person needs a unique action</li>
+<li>Foreground/midground/background layers create guided depth</li>
+<li>Overcrowding fails — use anchor structures and relationship-based placement</li>
+</ul>
+<p>In the next post, we'll explore maintaining consistency — generating the same character repeatedly across multiple images.</p>
+<hr>
+<h2>Answering the Opening Questions</h2>
+<p><strong>Where does AI fail most when placing multiple people?</strong></p>
+<p>At 7+ people without specific actions, figures merge or disappear. The fix: give each person a unique action and position, and use a central structure (table, counter) as a spatial anchor.</p>
+<p><strong>What changes with foreground/midground/background layers?</strong></p>
+<p>A flat "scene with many things" becomes a depth-guided composition where the viewer's eye follows your chosen focal point. AI applies focus differences that naturally prioritize the most important element.</p>
+<p><strong>What prompt structure avoids chaos?</strong></p>
+<p>Central structure definition, then per-person role/action/position, then relationships, then atmosphere, then composition. When everyone is defined by their relationship to the anchor structure, AI's placement decisions become reliable.</p>
+<hr>
+<h2>Series Index</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/01-first-image-generation.md">AI Image Generation 101 (1/10): Creating Your First Image</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/02-prompt-structure.md">AI Image Generation 101 (2/10): The Structure of a Good Prompt</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/03-mastering-styles.md">AI Image Generation 101 (3/10): Mastering Styles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/04-composition-and-perspective.md">AI Image Generation 101 (4/10): Composition and Perspective</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/05-color-and-lighting.md">AI Image Generation 101 (5/10): Color and Lighting</a></li>
+<li><strong>AI Image Generation 101 (6/10): Designing Complex Scenes (current)</strong></li>
+<li>AI Image Generation 101 (7/10): Maintaining Consistency (upcoming)</li>
+<li>AI Image Generation 101 (8/10): Text and Typography (upcoming)</li>
+<li>AI Image Generation 101 (9/10): Working with Reference Images (upcoming)</li>
+<li>AI Image Generation 101 (10/10): Production Workflows (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/images">OpenAI Image Generation Guide</a></li>
+<li><a href="https://github.com/NomaDamas/god-tibo-imagen">god-tibo-imagen GitHub Repository</a></li>
+</ul>
+<p class="tags-line">Tags: AI, ChatGPT, Image Generation, Prompt Engineering</p>
+</body>
+</html>

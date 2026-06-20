@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AI Image Generation 101 (1/10): Creating Your First Image</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>AI Image Generation 101 (1/10): Creating Your First Image</h1>
+<p>You need a blog thumbnail but don't have budget for a designer. You want an eye-catching social media image but stock photos feel generic. You need a presentation illustration but can't find the right one on free image sites.</p>
+<p>ChatGPT's image generation is built for exactly these moments. Describe what you want in plain text, and AI creates an image matching your description. But here's the thing: the same tool produces wildly different results depending on how you describe what you want.</p>
+<p>This is the first post in the AI Image Generation 101 series. Here, we'll create our first images with ChatGPT and directly compare how small changes in our prompts lead to dramatically different outcomes.</p>
+<hr>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Write Prompt&quot;] --&gt; B[&quot;AI Interprets&quot;]
+    B --&gt; C[&quot;Generate Image&quot;]
+    C --&gt; D[&quot;Check Result&quot;]
+    D --&gt;|&quot;Satisfied&quot;| E[&quot;Done&quot;]
+    D --&gt;|&quot;Needs Revision&quot;| A
+</code></pre>
+<p><em>The image generation flow from prompt to final result</em></p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>When asking ChatGPT to generate an image, how detailed should your description be to get what you actually want?</li>
+<li>If you just say "draw me a cat," what kind of cat will you get? Will it match what you imagined?</li>
+<li>Every time you change your prompt the results differ — which elements have the biggest impact?</li>
+</ul>
+<hr>
+<h2>What Is ChatGPT Image Generation?</h2>
+<p>ChatGPT's image generation takes a text description and produces an image from it. You don't need to know professional design tools — just describe the scene you want in plain language.</p>
+<p>There are two ways to use this capability:</p>
+<p><strong>ChatGPT Web/App</strong><br>
+- Description: Request directly in the chat window<br>
+- Best For: Everyone</p>
+<p><strong>Open-source tool (god-tibo-imagen)</strong><br>
+- Description: Automate via code<br>
+- Best For: People with repetitive tasks</p>
+<p>This series covers both approaches. The prompt-writing techniques are identical regardless of the tool — only the interface differs.</p>
+<hr>
+<h2>First Experiment: Simple Prompt vs Detailed Prompt</h2>
+<p>Let's make two images of the same subject and compare.</p>
+<p><strong>Experiment 1: A Cat</strong></p>
+<p><strong>Prompt A</strong> (2 words):</p>
+<blockquote>
+<p>a cat</p>
+</blockquote>
+<p><strong>Prompt B</strong> (detailed description):</p>
+<blockquote>
+<p>A fluffy orange tabby cat sitting on a windowsill at golden hour, soft warm sunlight streaming through the window, bokeh background of a cozy living room, photorealistic style, shallow depth of field</p>
+</blockquote>
+<p>Compare the results:</p>
+<p><strong><img alt="a cat prompt result" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/01/01-simple-prompt.png"></strong><br>
+- Prompt B: Detailed description: <img alt="detailed cat prompt result" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/01/02-detailed-prompt.png"></p>
+<p><em>Left: AI decided everything about the cat. Right: orange tabby, windowsill, golden hour lighting — all specified in the prompt.</em></p>
+<p>Notice the key difference. With just "a cat," the AI arbitrarily decides the breed, color, pose, background, and lighting. It's like rolling dice. The detailed prompt, on the other hand, guides the AI toward what you actually had in mind.</p>
+<p><strong>Experiment 2: A Mountain</strong></p>
+<p><strong>Prompt A</strong> (2 words):</p>
+<blockquote>
+<p>a mountain</p>
+</blockquote>
+<p><strong>Prompt B</strong> (detailed description):</p>
+<blockquote>
+<p>A snow-capped mountain peak at sunrise, dramatic pink and orange clouds reflecting in a crystal-clear alpine lake in the foreground, pine trees framing the edges, landscape photography style, wide-angle lens</p>
+</blockquote>
+<p><strong><img alt="a mountain prompt result" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/01/03-vague-landscape.png"></strong><br>
+- Prompt B: Detailed description: <img alt="detailed mountain prompt result" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/01/04-detailed-landscape.png"></p>
+<p><em>Left: AI's arbitrary mountain. Right: sunrise, lake reflection, pine tree framing — all specified.</em></p>
+<p>See the pattern? A simple prompt delegates almost every creative decision to the AI. A detailed prompt is you directing the AI toward your vision.</p>
+<hr>
+<h2>The 5 Core Elements of a Prompt</h2>
+<p>We've confirmed that detailed prompts produce better results. So what exactly should you include?</p>
+<p><strong>Subject</strong><br>
+- Description: What to draw<br>
+- Example: Orange tabby cat</p>
+<p><strong>Style</strong><br>
+- Description: What mood/medium<br>
+- Example: Photorealistic, watercolor</p>
+<p><strong>Composition</strong><br>
+- Description: What angle/framing<br>
+- Example: Close-up, overhead shot</p>
+<p><strong>Lighting</strong><br>
+- Description: How light behaves<br>
+- Example: Warm afternoon sun, neon glow</p>
+<p><strong>Background</strong><br>
+- Description: What's behind the subject<br>
+- Example: Cozy living room, city skyline</p>
+<p>You don't need all five every time. A subject alone will produce an image. But the more elements you specify, the closer the result matches your intent.</p>
+<p><strong>Experiment 3: A Coffee Cup</strong></p>
+<p>Let's see the difference when adding elements incrementally.</p>
+<p><strong>Prompt A</strong> (subject only):</p>
+<blockquote>
+<p>a coffee cup on a table</p>
+</blockquote>
+<p><strong>Prompt B</strong> (all 5 elements):</p>
+<blockquote>
+<p>A steaming latte with beautiful latte art in a ceramic cup, sitting on a rustic wooden table in a cozy cafe, morning light coming through the window, warm tones, overhead shot, food photography style</p>
+</blockquote>
+<p><strong><img alt="coffee basic prompt" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/01/05-coffee-basic.png"></strong><br>
+- All 5 elements: <img alt="coffee detailed prompt" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/01/06-coffee-detailed.png"></p>
+<p><em>Left: subject only. Right: style (food photography), composition (overhead), lighting (morning light), background (cafe) all specified.</em></p>
+<p>The right image is ready for Instagram or a blog post. The only investment was 30 extra seconds writing a better prompt.</p>
+<hr>
+<h2>Three Tips for Your First Prompts</h2>
+<p>Based on what we've observed across these experiments:</p>
+<p><strong>1. Be Specific</strong></p>
+<p>"A pretty flower" is vague. "Cherry blossom petals drifting down a tree-lined path on a spring morning" gives the AI something concrete to work with. AI can't see what's in your head — it only understands what you put into words.</p>
+<p><strong>2. Name the Style</strong></p>
+<p>Adding "photorealistic," "watercolor painting," "Pixar animation style," or "minimalist flat design" gives the AI a strong signal for the overall mood and rendering approach.</p>
+<p><strong>3. You Don't Need Perfection on the First Try</strong></p>
+<p>If the first result doesn't match your vision, revise the prompt and regenerate. Image generation is an iterative process, not a one-shot deal. You can also give follow-up instructions like "make it brighter," "simplify the background," or "shift the subject slightly left."</p>
+<hr>
+<h2>Generating Images with the Open-Source Tool</h2>
+<p>Every example image in this series was generated using <a href="https://github.com/NomaDamas/god-tibo-imagen">god-tibo-imagen</a>, an open-source tool. It lets you automate ChatGPT's image generation from code.</p>
+<pre><code class="language-python">from gti import Client
+
+client = Client()
+result = client.generate_image(
+    prompt=&quot;A fluffy orange tabby cat sitting on a windowsill at golden hour&quot;,
+    output_path=&quot;my-cat.png&quot;
+)
+print(f&quot;Image saved to: {result.saved_path}&quot;)
+</code></pre>
+<p>With this tool, you can easily run experiments — generating the same prompt multiple times, or comparing slight variations side by side. We'll cover this in detail later in the series.</p>
+<p>You can achieve the same results by typing the same prompt directly into ChatGPT's web interface. The prompt technique is what matters, not the tool.</p>
+<hr>
+<h2>Summary: What We Learned Creating Our First Images</h2>
+<p>Three experiments, one clear lesson:</p>
+<ul>
+<li>Simple prompts delegate almost all creative decisions to the AI</li>
+<li>Detailed prompts guide the AI toward your specific vision</li>
+<li>Five elements — subject, style, composition, lighting, background — determine the output</li>
+</ul>
+<p>In the next post, we'll dive deeper into prompt structure: the specific formula for combining these elements effectively.</p>
+<hr>
+<h2>Answering the Opening Questions</h2>
+<p><strong>When asking ChatGPT to generate an image, how detailed should your description be?</strong></p>
+<p>Specify as many of the five elements (subject, style, composition, lighting, background) as you can. You don't need all five, but the more you include, the closer the result gets to your intent.</p>
+<p><strong>If you just say "draw me a cat," what kind of cat will you get?</strong></p>
+<p>You'll get whatever the AI decides — breed, color, pose, background, lighting all chosen arbitrarily. The chance it matches what you imagined is low.</p>
+<p><strong>Which elements have the biggest impact when changing prompts?</strong></p>
+<p>Style and lighting shift the overall mood most dramatically. The same cat rendered "photorealistic" versus "watercolor" produces completely different images. We'll explore style in depth in post 3.</p>
+<hr>
+<h2>Series Index</h2>
+<ul>
+<li><strong>AI Image Generation 101 (1/10): Creating Your First Image (current)</strong></li>
+<li>AI Image Generation 101 (2/10): The Structure of a Good Prompt (upcoming)</li>
+<li>AI Image Generation 101 (3/10): Mastering Styles (upcoming)</li>
+<li>AI Image Generation 101 (4/10): Composition and Perspective (upcoming)</li>
+<li>AI Image Generation 101 (5/10): Color and Lighting (upcoming)</li>
+<li>AI Image Generation 101 (6/10): Designing Complex Scenes (upcoming)</li>
+<li>AI Image Generation 101 (7/10): Maintaining Consistency (upcoming)</li>
+<li>AI Image Generation 101 (8/10): Text and Typography (upcoming)</li>
+<li>AI Image Generation 101 (9/10): Working with Reference Images (upcoming)</li>
+<li>AI Image Generation 101 (10/10): Production Workflows (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://help.openai.com/en/articles/9055440-using-dall-e-and-browsing-in-chatgpt">ChatGPT Image Generation Official Guide</a></li>
+<li><a href="https://github.com/NomaDamas/god-tibo-imagen">god-tibo-imagen GitHub Repository</a></li>
+</ul>
+<p class="tags-line">Tags: AI, ChatGPT, Image Generation, Prompt Engineering</p>
+</body>
+</html>

@@ -44,6 +44,7 @@ make tistory-one SERIES=python-101 EPISODE=3
 | [llm-from-scratch-101](./content/llm-from-scratch-101) | PyTorch 2.x로 토크나이저부터 챗봇까지, ~720 LOC의 작은 GPT |
 | [multimodal-ai-101](./content/multimodal-ai-101) | 텍스트 + 이미지 + 오디오 + 영상을 다루는 multimodal AI |
 | [korean-ai-stack-101](./content/korean-ai-stack-101) | 한국어 임베딩, OCR, 국내 LLM API |
+| [ai-image-gen-101](./content/ai-image-gen-101) | ChatGPT 이미지 생성 프롬프트 엔지니어링 — 스타일, 구도, 색감, 장면 설계, 실전 워크플로우 |
 | [ai-web-dev-101](./content/ai-web-dev-101) | AI API부터 배포까지, 초급 개발자를 위한 입문 |
 
 ### 프로그래밍

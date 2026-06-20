@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AI Image Generation 101 (4/10): Composition and Perspective</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>AI Image Generation 101 (4/10): Composition and Perspective</h1>
+<p>You know a close-up works better for thumbnails and a wide shot suits travel headers. But when writing prompts, you keep getting whatever angle the AI randomly picks because you don't know the specific keywords that control the camera.</p>
+<p>Today we take one scene — a medieval castle on a sea cliff — and shoot it at 4 distances and 4 angles. After this post, you'll control the virtual camera on the first try.</p>
+<p>This is post 4 in the AI Image Generation 101 series.</p>
+<hr>
+<pre><code class="language-mermaid">flowchart TD
+    A[&quot;Same Scene&quot;] --&gt; B[&quot;Camera Distance&quot;]
+    A --&gt; C[&quot;Camera Angle&quot;]
+    B --&gt; D[&quot;Extreme Close-up&quot;]
+    B --&gt; E[&quot;Close-up&quot;]
+    B --&gt; F[&quot;Medium Shot&quot;]
+    B --&gt; G[&quot;Wide Shot&quot;]
+    C --&gt; H[&quot;Bird's Eye&quot;]
+    C --&gt; I[&quot;Low Angle&quot;]
+    C --&gt; J[&quot;Dutch Angle&quot;]
+    C --&gt; K[&quot;Isometric&quot;]
+</code></pre>
+<p><em>Two axes of composition: camera distance and camera angle</em></p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>How do close-up and wide shot create different emotions from the same scene?</li>
+<li>How does camera angle (above/below/tilted) change the mood?</li>
+<li>Which composition works best for thumbnails, banners, and diagrams respectively?</li>
+</ul>
+<hr>
+<h2>Experiment Design</h2>
+<p>Shared scene:</p>
+<blockquote>
+<p>A medieval stone castle perched on a dramatic sea cliff, crashing waves below, cloudy sky.</p>
+</blockquote>
+<p>We change only the <strong>distance</strong> or <strong>angle</strong> keyword. Everything else stays the same.</p>
+<hr>
+<h2>Part 1: Camera Distance — How Close Is the Lens</h2>
+<p><strong>1. Extreme Close-up</strong></p>
+<blockquote>
+<p>...extreme close-up of weathered stone wall texture with moss and cracks</p>
+</blockquote>
+<p><img alt="Extreme close-up" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/04/01-extreme-closeup.png"></p>
+<p><em>Extreme close-up: moss-covered stone texture fills the entire frame. Context disappears — only material remains.</em></p>
+<p><strong>Effect</strong>: Isolates texture and detail. Removes all surrounding context, making the material itself the subject.</p>
+<p><strong>Use cases</strong>: Product detail shots, texture showcases, sensory social media content.</p>
+<p><strong>Keywords</strong>: <code>extreme close-up</code>, <code>macro shot</code>, <code>texture detail</code>, <code>filling the frame</code></p>
+<hr>
+<p><strong>2. Close-up</strong></p>
+<blockquote>
+<p>...close-up shot focusing on the castle entrance gate with iron portcullis</p>
+</blockquote>
+<p><img alt="Close-up" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/04/02-closeup.png"></p>
+<p><em>Close-up: the gate and portcullis are the clear subject, while minimal context (stone walls, sky) anchors location.</em></p>
+<p><strong>Effect</strong>: Locks the viewer's eye on a single element while maintaining just enough context to establish meaning.</p>
+<p><strong>Use cases</strong>: YouTube thumbnails, portraits, product hero shots.</p>
+<p><strong>Keywords</strong>: <code>close-up</code>, <code>portrait shot</code>, <code>head shot</code>, <code>detail shot</code></p>
+<hr>
+<p><strong>3. Medium Shot</strong></p>
+<blockquote>
+<p>...medium shot showing the full castle tower and surrounding walls</p>
+</blockquote>
+<p><img alt="Medium shot" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/04/03-medium-shot.png"></p>
+<p><em>Medium shot: the main tower and walls are fully visible. Form is clear while detail remains present.</em></p>
+<p><strong>Effect</strong>: Shows the full form of the subject while revealing its relationship to surroundings. The most "neutral" distance.</p>
+<p><strong>Use cases</strong>: Blog body images, explanatory illustrations, general scene depiction.</p>
+<p><strong>Keywords</strong>: <code>medium shot</code>, <code>mid shot</code>, <code>waist shot</code>, <code>full body shot</code></p>
+<hr>
+<p><strong>4. Wide Shot</strong></p>
+<blockquote>
+<p>...wide shot showing the entire castle complex with the cliff and ocean below</p>
+</blockquote>
+<p><img alt="Wide shot" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/04/04-wide-shot.png"></p>
+<p><em>Wide shot: castle, cliff, and ocean all visible. Environment dominates over the subject itself.</em></p>
+<p><strong>Effect</strong>: Reveals the full environment. The subject becomes part of a larger story — atmosphere and narrative take over.</p>
+<p><strong>Use cases</strong>: Travel blog heroes, wallpapers, landing page banners, environment introductions.</p>
+<p><strong>Keywords</strong>: <code>wide shot</code>, <code>establishing shot</code>, <code>landscape</code>, <code>full scene</code>, <code>panoramic</code></p>
+<hr>
+<p><strong>Distance Comparison Summary</strong></p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Distance</th>
+<th>What's Visible</th>
+<th>Feel</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Extreme Close-up</td>
+<td>Texture/detail only</td>
+<td>Sensory, abstract</td>
+<td>Texture emphasis, social</td>
+</tr>
+<tr>
+<td>Close-up</td>
+<td>One subject</td>
+<td>Focused, impactful</td>
+<td>Thumbnails, portraits</td>
+</tr>
+<tr>
+<td>Medium Shot</td>
+<td>Subject + some background</td>
+<td>Neutral, explanatory</td>
+<td>Body images, general</td>
+</tr>
+<tr>
+<td>Wide Shot</td>
+<td>Full environment</td>
+<td>Narrative, atmospheric</td>
+<td>Banners, wallpapers, travel</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Part 2: Camera Angle — Where You're Looking From</h2>
+<p><strong>5. Bird's Eye View</strong></p>
+<blockquote>
+<p>...bird's eye view directly from above looking down, aerial photography</p>
+</blockquote>
+<p><img alt="Bird's eye view" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/04/05-birds-eye.png"></p>
+<p><em>Bird's eye view: the castle and cliff from directly above. Structure and layout are immediately legible, like reading a map.</em></p>
+<p><strong>Effect</strong>: Looking straight down reveals spatial relationships and overall structure. Provides a god-like, objective perspective.</p>
+<p><strong>Use cases</strong>: Maps/floor plans, architectural overviews, infographics, structural explanations.</p>
+<p><strong>Keywords</strong>: <code>bird's eye view</code>, <code>top-down view</code>, <code>aerial photography</code>, <code>overhead shot</code>, <code>drone shot</code></p>
+<hr>
+<p><strong>6. Low Angle (Worm's Eye)</strong></p>
+<blockquote>
+<p>...worm's eye view from the base of the cliff looking up at the castle towering above, dramatic low angle</p>
+</blockquote>
+<p><img alt="Low angle" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/04/06-worms-eye.png"></p>
+<p><em>Low angle: looking up from the cliff base, the castle looms massive and imposing above.</em></p>
+<p><strong>Effect</strong>: Looking up makes the subject appear larger, more powerful, and imposing. Conveys authority, grandeur, or threat.</p>
+<p><strong>Use cases</strong>: Building/monument emphasis, heroic feel, dramatic posters, conveying power.</p>
+<p><strong>Keywords</strong>: <code>worm's eye view</code>, <code>low angle</code>, <code>looking up</code>, <code>dramatic perspective</code>, <code>towering</code></p>
+<hr>
+<p><strong>7. Dutch Angle</strong></p>
+<blockquote>
+<p>...Dutch angle tilted 30 degrees creating tension and unease, dramatic atmosphere</p>
+</blockquote>
+<p><img alt="Dutch angle" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/04/07-dutch-angle.png"></p>
+<p><em>Dutch angle: 30-degree tilt creates instability and tension. The same scene now feels uneasy.</em></p>
+<p><strong>Effect</strong>: Intentional tilt introduces visual instability and psychological tension. A classic technique from horror and thriller cinematography.</p>
+<p><strong>Use cases</strong>: Horror/thriller mood, dynamic action, unstable situations, creative compositions.</p>
+<p><strong>Keywords</strong>: <code>Dutch angle</code>, <code>tilted camera</code>, <code>canted angle</code>, <code>diagonal composition</code></p>
+<hr>
+<p><strong>8. Isometric</strong></p>
+<blockquote>
+<p>...isometric perspective as if viewing a 3D model, clean architectural visualization style</p>
+</blockquote>
+<p><img alt="Isometric" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/04/08-isometric.png"></p>
+<p><em>Isometric: uniform scale with no perspective distortion. Clean, technical, map-like clarity.</em></p>
+<p><strong>Effect</strong>: No perspective distortion means uniform scale throughout the image. Feels like a technical diagram or game map — optimized for conveying spatial information clearly.</p>
+<p><strong>Use cases</strong>: Architectural visualization, game map design, infographics, technical diagrams, presentations.</p>
+<p><strong>Keywords</strong>: <code>isometric</code>, <code>isometric view</code>, <code>axonometric</code>, <code>no perspective distortion</code>, <code>architectural visualization</code></p>
+<hr>
+<p><strong>Angle Comparison Summary</strong></p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Angle</th>
+<th>Viewing Direction</th>
+<th>Feel</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bird's Eye</td>
+<td>Top to bottom</td>
+<td>Objective, structural</td>
+<td>Maps, layout explanations</td>
+</tr>
+<tr>
+<td>Low Angle</td>
+<td>Bottom to top</td>
+<td>Imposing, grand</td>
+<td>Building emphasis, heroic</td>
+</tr>
+<tr>
+<td>Dutch Angle</td>
+<td>Tilted diagonal</td>
+<td>Uneasy, tense, dynamic</td>
+<td>Horror, action, creative</td>
+</tr>
+<tr>
+<td>Isometric</td>
+<td>45-degree elevated</td>
+<td>Orderly, technical</td>
+<td>Diagrams, games</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Combining Distance and Angle</h2>
+<p>Specify both simultaneously for precise control.</p>
+<p><strong>Close-up + Low Angle</strong><br>
+- Prompt Example: <code>close-up, low angle looking up</code><br>
+- Result: Makes a person look heroic</p>
+<p><strong>Wide + Bird's Eye</strong><br>
+- Prompt Example: <code>wide shot, aerial bird's eye view</code><br>
+- Result: Full terrain at a glance</p>
+<p><strong>Medium + Dutch Angle</strong><br>
+- Prompt Example: <code>medium shot, Dutch angle tilt</code><br>
+- Result: Tense character scene</p>
+<p><strong>Wide + Isometric</strong><br>
+- Prompt Example: <code>wide isometric view</code><br>
+- Result: Clean structural visualization</p>
+<hr>
+<h2>Key Takeaway</h2>
+<p>After shooting the same castle in 8 compositions:</p>
+<ul>
+<li>Camera distance determines "what to focus on" — detail vs atmosphere</li>
+<li>Camera angle determines "what emotion to evoke" — imposing vs stable vs tense</li>
+<li>Combining distance and angle gives you precise control over the final feeling</li>
+</ul>
+<p>In the next post, we'll explore color and lighting — changing the time of day and light source to completely transform the mood of the same scene.</p>
+<hr>
+<h2>Answering the Opening Questions</h2>
+<p><strong>How do close-up and wide shot create different emotions?</strong></p>
+<p>Close-up locks the viewer's attention on a single element, creating focus and impact. Wide shot reveals the full environment, creating narrative and atmosphere. Same castle, but in close-up "stone texture" is the story, while in wide shot "a lonely castle on a cliff" is the story.</p>
+<p><strong>How does camera angle change the mood?</strong></p>
+<p>Low angle creates imposing grandeur. Bird's eye creates objectivity and structural clarity. Dutch angle creates unease and tension. Isometric creates order and precision. One angle change turns the same scene from a horror movie frame to an architectural blueprint.</p>
+<p><strong>Which composition for thumbnails, banners, and diagrams?</strong></p>
+<p>Thumbnails: close-up (impact). Banners/wallpapers: wide shot (atmosphere). Diagrams: isometric (clarity). Dramatic posters: low angle (grandeur). The answer isn't "what to show" — it's "what emotion to give."</p>
+<hr>
+<h2>Series Index</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/01-first-image-generation.md">AI Image Generation 101 (1/10): Creating Your First Image</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/02-prompt-structure.md">AI Image Generation 101 (2/10): The Structure of a Good Prompt</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/03-mastering-styles.md">AI Image Generation 101 (3/10): Mastering Styles</a></li>
+<li><strong>AI Image Generation 101 (4/10): Composition and Perspective (current)</strong></li>
+<li>AI Image Generation 101 (5/10): Color and Lighting (upcoming)</li>
+<li>AI Image Generation 101 (6/10): Designing Complex Scenes (upcoming)</li>
+<li>AI Image Generation 101 (7/10): Maintaining Consistency (upcoming)</li>
+<li>AI Image Generation 101 (8/10): Text and Typography (upcoming)</li>
+<li>AI Image Generation 101 (9/10): Working with Reference Images (upcoming)</li>
+<li>AI Image Generation 101 (10/10): Production Workflows (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/images">OpenAI Image Generation Guide</a></li>
+<li><a href="https://github.com/NomaDamas/god-tibo-imagen">god-tibo-imagen GitHub Repository</a></li>
+<li><a href="https://digital-photography-school.com/composition/">Photography Composition Techniques (Digital Photography School)</a></li>
+</ul>
+<p class="tags-line">Tags: AI, ChatGPT, Image Generation, Prompt Engineering</p>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AI Image Generation 101 (5/10): Color and Lighting</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>AI Image Generation 101 (5/10): Color and Lighting</h1>
+<p>Same cafe, same person, same book. But one photo feels warm and nostalgic while another feels cold and cinematic. The difference isn't location or composition — it's <strong>lighting</strong>. Most photos you instinctively call "moody" or "atmospheric" on Instagram owe that quality to a single lighting keyword.</p>
+<p>Today we generate one scene under 8 different lighting conditions: 4 natural, 4 artificial. After this, you'll control mood with a single keyword swap.</p>
+<p>This is post 5 in the AI Image Generation 101 series.</p>
+<hr>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Same Scene&quot;] --&gt; B[&quot;Natural Light&quot;]
+    A --&gt; C[&quot;Artificial/Special Light&quot;]
+    B --&gt; D[&quot;Golden Hour&quot;]
+    B --&gt; E[&quot;Blue Hour&quot;]
+    B --&gt; F[&quot;Harsh Noon&quot;]
+    B --&gt; G[&quot;Overcast&quot;]
+    C --&gt; H[&quot;Neon&quot;]
+    C --&gt; I[&quot;Candlelight&quot;]
+    C --&gt; J[&quot;Backlit Silhouette&quot;]
+    C --&gt; K[&quot;Studio Rim Light&quot;]
+</code></pre>
+<p><em>Two branches of lighting: natural and artificial</em></p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>How do golden hour and blue hour transform the same scene differently?</li>
+<li>Neon and candlelight are both artificial — how far apart do they land in mood?</li>
+<li>When is backlit silhouette the right choice?</li>
+</ul>
+<hr>
+<h2>Experiment Design</h2>
+<p>Shared scene:</p>
+<blockquote>
+<p>A person sitting alone at a small outdoor cafe table reading a book, cobblestone street, European city.</p>
+</blockquote>
+<p>Only the lighting keyword changes.</p>
+<hr>
+<h2>Part 1: Natural Light — Time of Day as Color Palette</h2>
+<p><strong>1. Golden Hour</strong></p>
+<blockquote>
+<p>...golden hour warm sunset light casting long orange shadows</p>
+</blockquote>
+<p><img alt="Golden hour" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/05/01-golden-hour.png"></p>
+<p><em>Golden hour: long orange shadows, warm tones wrap the entire scene. Nostalgic and emotional.</em></p>
+<p><strong>Effect</strong>: The warm orange light just before sunset softens everything. Shadows stretch long, color contrast is rich, and the mood turns tender.</p>
+<p><strong>Use cases</strong>: Emotional blogs, travel posts, lifestyle social content, romantic scenes.</p>
+<p><strong>Keywords</strong>: <code>golden hour</code>, <code>warm sunset light</code>, <code>magic hour</code>, <code>long shadows</code>, <code>warm orange tones</code></p>
+<hr>
+<p><strong>2. Blue Hour</strong></p>
+<blockquote>
+<p>...blue hour twilight, cool blue ambient light mixed with warm cafe interior glow</p>
+</blockquote>
+<p><img alt="Blue hour" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/05/02-blue-hour.png"></p>
+<p><em>Blue hour: cool blue sky contrasts with warm interior glow. Sophisticated and cinematic.</em></p>
+<p><strong>Effect</strong>: The cool blue ambient light after sunset plays against warm interior light. This dual-temperature contrast is what gives movie posters their "cinematic" quality.</p>
+<p><strong>Use cases</strong>: Cinematic mood, sophisticated branding, urban nightscape content.</p>
+<p><strong>Keywords</strong>: <code>blue hour</code>, <code>twilight</code>, <code>cool blue ambient</code>, <code>warm interior glow</code>, <code>cinematic lighting</code></p>
+<p><strong>Golden Hour vs Blue Hour</strong>:</p>
+<p><strong>Color temperature</strong><br>
+- Golden Hour: Warm orange<br>
+- Blue Hour: Cool blue</p>
+<p><strong>Shadows</strong><br>
+- Golden Hour: Long and soft<br>
+- Blue Hour: Short and diffused</p>
+<p><strong>Mood</strong><br>
+- Golden Hour: Emotional, nostalgic<br>
+- Blue Hour: Sophisticated, cinematic</p>
+<p><strong>Time</strong><br>
+- Golden Hour: 30 min before sunset<br>
+- Blue Hour: 20 min after sunset</p>
+<hr>
+<p><strong>3. Harsh Noon</strong></p>
+<blockquote>
+<p>...harsh midday sun directly overhead, strong contrast, sharp defined shadows</p>
+</blockquote>
+<p><img alt="Harsh noon" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/05/03-harsh-noon.png"></p>
+<p><em>Harsh noon: overhead sun creates short, hard-edged shadows and extreme contrast.</em></p>
+<p><strong>Effect</strong>: Sun directly overhead creates the shortest, hardest shadows. Extreme contrast produces a raw, unforgiving look.</p>
+<p><strong>Use cases</strong>: Intense atmosphere, summer feel, raw documentary style, high contrast effects.</p>
+<p><strong>Keywords</strong>: <code>harsh midday sun</code>, <code>high noon</code>, <code>strong contrast</code>, <code>sharp shadows</code>, <code>direct overhead light</code></p>
+<hr>
+<p><strong>4. Overcast</strong></p>
+<blockquote>
+<p>...overcast cloudy day, soft diffused even lighting with no harsh shadows</p>
+</blockquote>
+<p><img alt="Overcast" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/05/04-overcast.png"></p>
+<p><em>Overcast: clouds act as a giant softbox, creating even light with almost no shadows.</em></p>
+<p><strong>Effect</strong>: Cloud cover acts as a massive diffuser. Shadows nearly disappear, producing soft, even illumination across the scene.</p>
+<p><strong>Use cases</strong>: Product photography (clean, shadow-free), calm blogs, fashion photos, neutral tone.</p>
+<p><strong>Keywords</strong>: <code>overcast</code>, <code>soft diffused light</code>, <code>cloudy day</code>, <code>even lighting</code>, <code>no harsh shadows</code></p>
+<hr>
+<h2>Part 2: Artificial Light — Color and Direction Create Drama</h2>
+<p><strong>5. Neon</strong></p>
+<blockquote>
+<p>...nighttime cyberpunk neon lighting, pink and blue neon signs reflecting on wet streets</p>
+</blockquote>
+<p><img alt="Neon" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/05/05-neon.png"></p>
+<p><em>Neon: pink and blue neon reflected on wet cobblestones. An ordinary cafe transforms into cyberpunk territory.</em></p>
+<p><strong>Effect</strong>: Saturated artificial color dominates the entire scene. An everyday location becomes science fiction in a single keyword swap.</p>
+<p><strong>Use cases</strong>: Cyberpunk/sci-fi content, music album covers, nightlife, tech branding.</p>
+<p><strong>Keywords</strong>: <code>neon lighting</code>, <code>cyberpunk</code>, <code>neon signs</code>, <code>pink and blue neon</code>, <code>wet street reflections</code></p>
+<hr>
+<p><strong>6. Candlelight</strong></p>
+<blockquote>
+<p>...candlelight only, warm flickering orange glow, dark surroundings, intimate atmosphere</p>
+</blockquote>
+<p><img alt="Candlelight" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/05/06-candlelight.png"></p>
+<p><em>Candlelight: only the warm flicker of a candle illuminates the scene. Darkness surrounds, creating a private space.</em></p>
+<p><strong>Effect</strong>: Extremely narrow light radius isolates the subject in a warm bubble. Everything beyond fades to black, creating intimacy.</p>
+<p><strong>Use cases</strong>: Romantic scenes, intimate interviews, emotional content, dinner atmosphere.</p>
+<p><strong>Keywords</strong>: <code>candlelight</code>, <code>warm flickering glow</code>, <code>single candle</code>, <code>intimate lighting</code>, <code>dark surroundings</code></p>
+<p><strong>Neon vs Candlelight</strong> — both artificial, opposite mood:</p>
+<p><strong>Color</strong><br>
+- Neon: Saturated pink/blue<br>
+- Candlelight: Warm orange</p>
+<p><strong>Range</strong><br>
+- Neon: Wide reflections<br>
+- Candlelight: Narrow and focused</p>
+<p><strong>Mood</strong><br>
+- Neon: Futuristic, stimulating<br>
+- Candlelight: Classical, intimate</p>
+<p><strong>Best for</strong><br>
+- Neon: Sci-fi, tech, nightlife<br>
+- Candlelight: Romance, emotion, evening</p>
+<hr>
+<p><strong>7. Backlit Silhouette</strong></p>
+<blockquote>
+<p>...strong backlight silhouette, sun directly behind the person creating rim light and lens flare</p>
+</blockquote>
+<p><img alt="Backlit silhouette" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/05/07-backlit.png"></p>
+<p><em>Backlit: sun behind the subject leaves only the outline glowing. Dramatic and mysterious.</em></p>
+<p><strong>Effect</strong>: Light source behind the subject illuminates only the edge outline while the front stays dark. Creates mystery and drama.</p>
+<p><strong>Use cases</strong>: Posters, inspirational content, mysterious mood, artistic portraits.</p>
+<p><strong>Keywords</strong>: <code>backlit</code>, <code>silhouette</code>, <code>rim light</code>, <code>lens flare</code>, <code>contre-jour</code>, <code>sun behind subject</code></p>
+<hr>
+<p><strong>8. Studio Rim Light</strong></p>
+<blockquote>
+<p>...dramatic studio lighting with rim light and dark background, cinematic high contrast</p>
+</blockquote>
+<p><img alt="Studio rim light" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/05/08-studio-rim.png"></p>
+<p><em>Studio rim light: dark background with only the subject's outline illuminated. Movie-poster-grade drama.</em></p>
+<p><strong>Effect</strong>: Pushes the background to black and concentrates light on the subject's edge. The professional, controlled look you see in movie posters and high-end profile photos.</p>
+<p><strong>Use cases</strong>: Profile photos, movie posters, premium branding, professional portrait photography.</p>
+<p><strong>Keywords</strong>: <code>studio lighting</code>, <code>rim light</code>, <code>dark background</code>, <code>cinematic lighting</code>, <code>high contrast</code>, <code>edge light</code></p>
+<hr>
+<h2>Lighting Selection Guide</h2>
+<p><strong>Warm and emotional</strong><br>
+- Recommended Lighting: Golden Hour<br>
+- Keywords: <code>golden hour, warm light</code></p>
+<p><strong>Sophisticated and cinematic</strong><br>
+- Recommended Lighting: Blue Hour<br>
+- Keywords: <code>blue hour, cinematic</code></p>
+<p><strong>Intense and raw</strong><br>
+- Recommended Lighting: Harsh Noon<br>
+- Keywords: <code>harsh noon, high contrast</code></p>
+<p><strong>Soft and even</strong><br>
+- Recommended Lighting: Overcast<br>
+- Keywords: <code>overcast, soft diffused</code></p>
+<p><strong>Futuristic / sci-fi</strong><br>
+- Recommended Lighting: Neon<br>
+- Keywords: <code>neon, cyberpunk</code></p>
+<p><strong>Intimate and warm</strong><br>
+- Recommended Lighting: Candlelight<br>
+- Keywords: <code>candlelight, intimate</code></p>
+<p><strong>Mysterious and dramatic</strong><br>
+- Recommended Lighting: Backlit<br>
+- Keywords: <code>backlit, silhouette</code></p>
+<p><strong>Professional / premium</strong><br>
+- Recommended Lighting: Studio Rim<br>
+- Keywords: <code>studio rim light</code></p>
+<hr>
+<h2>Key Takeaway</h2>
+<p>After comparing the same cafe scene under 8 lighting setups:</p>
+<ul>
+<li>Lighting controls mood through color temperature (warm/cool) and contrast (hard/soft)</li>
+<li>For natural light, specify the time of day. For artificial light, specify the light source color and position</li>
+<li>A single lighting keyword can flip the same scene from emotional blog to cyberpunk poster</li>
+</ul>
+<p>In the next post, we'll tackle complex scene design — placing multiple people and elements in a single frame.</p>
+<hr>
+<h2>Answering the Opening Questions</h2>
+<p><strong>How do golden hour and blue hour transform the same scene?</strong></p>
+<p>Golden hour wraps everything in warm orange for an emotional, nostalgic feel. Blue hour introduces cool blue ambient light against warm interiors for a sophisticated, cinematic mood. Same cafe, but golden hour makes it "a cozy afternoon" while blue hour makes it "a scene from a film."</p>
+<p><strong>How far apart are neon and candlelight in mood?</strong></p>
+<p>Worlds apart. Neon floods the scene with saturated color, creating a futuristic, stimulating environment. Candlelight illuminates only a narrow radius with warm orange, creating a classical, intimate space. Same artificial light source category, but neon builds a street and candlelight builds a room.</p>
+<p><strong>When is backlit silhouette the right choice?</strong></p>
+<p>When you want to hide identity or create mystery. It works best when the outline and atmosphere matter more than facial detail — posters, inspirational content, artistic profiles.</p>
+<hr>
+<h2>Series Index</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/01-first-image-generation.md">AI Image Generation 101 (1/10): Creating Your First Image</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/02-prompt-structure.md">AI Image Generation 101 (2/10): The Structure of a Good Prompt</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/03-mastering-styles.md">AI Image Generation 101 (3/10): Mastering Styles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/04-composition-and-perspective.md">AI Image Generation 101 (4/10): Composition and Perspective</a></li>
+<li><strong>AI Image Generation 101 (5/10): Color and Lighting (current)</strong></li>
+<li>AI Image Generation 101 (6/10): Designing Complex Scenes (upcoming)</li>
+<li>AI Image Generation 101 (7/10): Maintaining Consistency (upcoming)</li>
+<li>AI Image Generation 101 (8/10): Text and Typography (upcoming)</li>
+<li>AI Image Generation 101 (9/10): Working with Reference Images (upcoming)</li>
+<li>AI Image Generation 101 (10/10): Production Workflows (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/images">OpenAI Image Generation Guide</a></li>
+<li><a href="https://github.com/NomaDamas/god-tibo-imagen">god-tibo-imagen GitHub Repository</a></li>
+</ul>
+<p class="tags-line">Tags: AI, ChatGPT, Image Generation, Prompt Engineering</p>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AI Image Generation 101 (2/10): The Structure of a Good Prompt</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>AI Image Generation 101 (2/10): The Structure of a Good Prompt</h1>
+<p>"Draw me a cool robot." Result appears but it's not what you imagined. "Make a pretty landscape." It's a landscape, but something feels off. "Create an amazing image." It looks impressive, but this isn't what you wanted.</p>
+<p>Sound familiar? The problem isn't what you put in your prompt — it's how you put it. Words like "beautiful," "amazing," and "stunning" give AI almost zero actionable information. AI needs concrete instructions.</p>
+<p>This is post 2 in the AI Image Generation 101 series. Here, we'll learn the specific structure of an effective prompt and experiment with adding elements one by one to see exactly how results change.</p>
+<hr>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Subject&quot;] --&gt; B[&quot;Style&quot;]
+    B --&gt; C[&quot;Setting&quot;]
+    C --&gt; D[&quot;Lighting&quot;]
+    D --&gt; E[&quot;Composition&quot;]
+    E --&gt; F[&quot;Complete Prompt&quot;]
+</code></pre>
+<p><em>The layering structure of prompt elements</em></p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>How does the image change each time you add a new element to your prompt?</li>
+<li>Do more adjectives like "beautiful" and "amazing" produce better images?</li>
+<li>Does the order of elements in your prompt affect the result?</li>
+</ul>
+<hr>
+<h2>The Prompt Formula: Layering</h2>
+<p>A good prompt isn't about writing more — it's about writing precisely. The key is layering: adding one element at a time.</p>
+<pre><code>[Subject] + [Style] + [Setting/Background] + [Lighting] + [Composition/Angle]
+</code></pre>
+<p>Let's test this formula using a robot as our subject. We'll add one element at a time and watch the image transform.</p>
+<hr>
+<h2>Experiment: Stacking Elements One by One</h2>
+<p><strong>Layer 1: Subject Only</strong></p>
+<blockquote>
+<p>a robot</p>
+</blockquote>
+<p><img alt="Subject only result" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/01-subject-only.png"></p>
+<p><em>Subject only: AI decides the robot's form, color, background, and mood arbitrarily.</em></p>
+<p>A robot appeared, but what style? Where is it? What's the mood? All decided by the AI.</p>
+<p><strong>Layer 2: Subject + Style</strong></p>
+<blockquote>
+<p>a robot, watercolor painting style</p>
+</blockquote>
+<p><img alt="Subject + style" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/02-subject-style.png"></p>
+<p><em>Adding style changed the entire feel. The soft edges and color blending characteristic of watercolor appeared.</em></p>
+<p>One element added, and the same robot becomes a completely different image. Style is that powerful.</p>
+<p><strong>Layer 3: Subject + Style + Setting</strong></p>
+<blockquote>
+<p>a robot, watercolor painting style, standing in a flower garden</p>
+</blockquote>
+<p><img alt="Subject + style + setting" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/03-subject-style-setting.png"></p>
+<p><em>Setting gives the image a story. "A robot exists" becomes "a robot is in a flower garden."</em></p>
+<p>When you give the subject a place, the image gains narrative. The viewer wonders why the robot is there — that's engagement.</p>
+<p><strong>Layer 4: Subject + Style + Setting + Lighting</strong></p>
+<blockquote>
+<p>a robot, watercolor painting style, standing in a flower garden, golden hour sunlight casting long shadows</p>
+</blockquote>
+<p><img alt="Subject + style + setting + lighting" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/04-subject-style-setting-light.png"></p>
+<p><em>Lighting shifts the temperature of the entire image. Long shadows add depth and drama.</em></p>
+<p>Lighting can completely transform the mood of an image. The same scene under "noon," "night," or "neon glow" produces entirely different results.</p>
+<p><strong>Layer 5: Complete Prompt (All 5 Elements)</strong></p>
+<blockquote>
+<p>a friendly robot with round eyes and a small antenna, watercolor painting style, standing in a flower garden surrounded by sunflowers and daisies, golden hour sunlight casting long soft shadows, gentle warm atmosphere, wide shot showing the full scene</p>
+</blockquote>
+<p><img alt="Complete prompt result" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/05-full-formula.png"></p>
+<p><em>All 5 elements specified. Subject personality (friendly), setting details (sunflowers, daisies), and composition (wide shot) are all defined.</em></p>
+<p>With all five elements in place, the AI has almost no room for arbitrary decisions. The result is much closer to your actual vision.</p>
+<hr>
+<h2>Common Mistake: Adjective Dumping</h2>
+<p>Many people think: "If I want better results, shouldn't I add more praise?" Let's test that theory.</p>
+<blockquote>
+<p>a beautiful amazing stunning incredible gorgeous wonderful fantastic robot in a nice pretty lovely amazing place with great lighting and awesome colors</p>
+</blockquote>
+<p><img alt="Adjective dumping result" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/06-bad-adjectives.png"></p>
+<p><em>Dumping adjectives: flashy perhaps, but lacking specificity.</em></p>
+<p>Compare this to the Layer 5 result above. No matter how many adjectives you pile on, AI can't interpret them as concrete instructions. "Stunning" means nothing specific. "Round eyes and a small antenna" means everything.</p>
+<p><strong>beautiful, amazing, stunning</strong><br>
+- Effective: round eyes, small antenna</p>
+<p><strong>nice pretty lovely place</strong><br>
+- Effective: flower garden with sunflowers and daisies</p>
+<p><strong>great lighting</strong><br>
+- Effective: golden hour sunlight casting long shadows</p>
+<p><strong>awesome colors</strong><br>
+- Effective: warm orange tones</p>
+<p>The rule is simple: <strong>use nouns and verbs instead of adjectives.</strong> "Beautiful cat" tells AI nothing. "Fluffy orange Persian with bright green eyes" tells it everything.</p>
+<hr>
+<h2>Does Order Matter?</h2>
+<p>Does the sequence of elements in your prompt affect the output? Let's compare the same content in two different orders.</p>
+<p><strong>Setting first</strong>:</p>
+<blockquote>
+<p>In a dimly lit cyberpunk alley at night, a small delivery robot with glowing blue eyes navigates through puddles reflecting neon signs, cinematic photography style</p>
+</blockquote>
+<p><strong>Subject first</strong>:</p>
+<blockquote>
+<p>A small delivery robot with glowing blue eyes, cinematic photography style, navigating through puddles in a dimly lit cyberpunk alley at night, neon signs reflecting in the water</p>
+</blockquote>
+<p><strong><img alt="Setting-first order" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/07-order-setting-first.png"></strong><br>
+- Subject first: <img alt="Subject-first order" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/02/08-order-subject-first.png"></p>
+<p><em>Same elements, different order</em></p>
+<p>Both produce similar results, but there are subtle differences. Two general patterns:</p>
+<p><strong>Subject first</strong><br>
+- Tendency: Subject larger and centered<br>
+- Best For: Product shots, character focus</p>
+<p><strong>Setting first</strong><br>
+- Tendency: Environment more prominent<br>
+- Best For: Landscapes, mood-driven scenes</p>
+<p>Practical tip: <strong>put the most important element first.</strong> AI tends to give slightly more weight to what comes at the beginning of your prompt.</p>
+<hr>
+<h2>Three Ready-to-Use Templates</h2>
+<p>Now that you know the formula, here are practical templates for common use cases.</p>
+<p><strong>Blog Thumbnail Template</strong></p>
+<pre><code>[Blog topic icon or metaphor], flat illustration style, 
+clean white background, vibrant [brand color] accents, 
+centered composition, soft even lighting
+</code></pre>
+<p>Example: "A magnifying glass examining lines of code, flat illustration style, clean white background, vibrant blue and purple accents, centered composition, soft even lighting"</p>
+<p><strong>Social Media Post Template</strong></p>
+<pre><code>[Main subject doing action], [photography style], 
+[specific location], [time of day] lighting, 
+[angle] shot, [mood] atmosphere
+</code></pre>
+<p>Example: "A person reading a book in a cozy window seat, lifestyle photography style, modern minimalist apartment, afternoon golden light, medium shot, peaceful calm atmosphere"</p>
+<p><strong>Presentation Illustration Template</strong></p>
+<pre><code>[Concept or process as visual metaphor], 
+isometric illustration style, pastel color palette, 
+clean minimal background, soft shadows, 
+slightly above eye-level perspective
+</code></pre>
+<p>Example: "A conveyor belt transforming raw materials into finished products as visual metaphor for data pipeline, isometric illustration style, pastel blue and mint color palette, clean minimal background, soft shadows"</p>
+<hr>
+<h2>Summary: The Core of Prompt Structure</h2>
+<p>What we learned today:</p>
+<ol>
+<li><strong>Layering</strong>: Stack elements in order — subject, style, setting, lighting, composition</li>
+<li><strong>Specificity</strong>: Use nouns and verbs instead of adjectives</li>
+<li><strong>Priority</strong>: Put the most important element first</li>
+</ol>
+<p>In the next post, we'll dive deep into "style" — the single element that most dramatically transforms the overall mood of your image.</p>
+<hr>
+<h2>Answering the Opening Questions</h2>
+<p><strong>How does the image change each time you add a new element?</strong></p>
+<p>With subject only, AI decides everything else. Adding style sets the mood, setting creates narrative, lighting shifts temperature, and composition controls the viewer's eye. Each layer reduces AI's arbitrary decisions.</p>
+<p><strong>Do more adjectives produce better images?</strong></p>
+<p>No. "Beautiful amazing stunning" gives AI no concrete direction. "Round eyes, small antenna, surrounded by sunflowers" gives it everything it needs. Replace adjectives with specific nouns and verbs.</p>
+<p><strong>Does element order affect the result?</strong></p>
+<p>Slightly. AI tends to give more weight to content that appears first. Place your most important element at the beginning — subject first for character focus, setting first for mood-driven scenes.</p>
+<hr>
+<h2>Series Index</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/01-first-image-generation.md">AI Image Generation 101 (1/10): Creating Your First Image</a></li>
+<li><strong>AI Image Generation 101 (2/10): The Structure of a Good Prompt (current)</strong></li>
+<li>AI Image Generation 101 (3/10): Mastering Styles (upcoming)</li>
+<li>AI Image Generation 101 (4/10): Composition and Perspective (upcoming)</li>
+<li>AI Image Generation 101 (5/10): Color and Lighting (upcoming)</li>
+<li>AI Image Generation 101 (6/10): Designing Complex Scenes (upcoming)</li>
+<li>AI Image Generation 101 (7/10): Maintaining Consistency (upcoming)</li>
+<li>AI Image Generation 101 (8/10): Text and Typography (upcoming)</li>
+<li>AI Image Generation 101 (9/10): Working with Reference Images (upcoming)</li>
+<li>AI Image Generation 101 (10/10): Production Workflows (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/images">OpenAI DALL-E Prompt Guide</a></li>
+<li><a href="https://github.com/NomaDamas/god-tibo-imagen">god-tibo-imagen GitHub Repository</a></li>
+</ul>
+<p class="tags-line">Tags: AI, ChatGPT, Image Generation, Prompt Engineering</p>
+</body>
+</html>

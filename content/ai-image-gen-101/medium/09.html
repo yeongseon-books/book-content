@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AI Image Generation 101 (9/10): Working with Reference Images</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>AI Image Generation 101 (9/10): Working with Reference Images</h1>
+<p>You generated an image you love. Now you want "this exact feeling, but in spring" or "same space, different style." While uploading reference images for direct editing is one approach, you can create compelling variations through prompt manipulation alone.</p>
+<p>Today we build one "anchor scene" and transform it along 4 axes: season change, style transfer, element swap, and mood shift. This is the art of prompt-based variation.</p>
+<p>This is post 9 in the AI Image Generation 101 series.</p>
+<hr>
+<pre><code class="language-mermaid">flowchart TD
+    A[&quot;Anchor Scene&quot;] --&gt; B[&quot;Season Change&quot;]
+    A --&gt; C[&quot;Style Transfer&quot;]
+    A --&gt; D[&quot;Element Swap&quot;]
+    A --&gt; E[&quot;Mood Shift&quot;]
+    B --&gt; F[&quot;Winter to Spring&quot;]
+    B --&gt; G[&quot;Winter to Summer Night&quot;]
+    B --&gt; H[&quot;Winter to Autumn Rain&quot;]
+    C --&gt; I[&quot;Photo to Watercolor&quot;]
+    C --&gt; J[&quot;Photo to Anime&quot;]
+    D --&gt; K[&quot;Armchair to Hammock&quot;]
+    E --&gt; L[&quot;Cozy to Horror&quot;]
+</code></pre>
+<p><em>Four variation axes from one anchor scene</em></p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>If you keep the base prompt and only change the season, does it still read as the same space?</li>
+<li>How well do composition and elements survive a style transfer?</li>
+<li>Can a mood shift alone tell a completely different story?</li>
+</ul>
+<hr>
+<h2>Building the Anchor Scene</h2>
+<p>The starting point for all variations:</p>
+<pre><code>A cozy reading nook with a large window overlooking a snowy forest, 
+a plush armchair with a wool blanket, 
+a cup of hot cocoa on the side table, 
+warm interior lighting, photorealistic, medium shot
+</code></pre>
+<p><img alt="Anchor scene" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/09/01-original-scene.png"></p>
+<p><em>Anchor scene: a cozy window reading nook overlooking a snowy forest. This prompt is the foundation for all variations.</em></p>
+<p>Breaking down the structural elements:</p>
+<p><strong>Space</strong><br>
+- Description: Reading nook + large window<br>
+- Modifiable?: Fixed (anchor)</p>
+<p><strong>Window view</strong><br>
+- Description: Snowy forest<br>
+- Modifiable?: Season changeable</p>
+<p><strong>Furniture</strong><br>
+- Description: Armchair + blanket<br>
+- Modifiable?: Element swappable</p>
+<p><strong>Props</strong><br>
+- Description: Hot cocoa<br>
+- Modifiable?: Season-adaptive</p>
+<p><strong>Lighting</strong><br>
+- Description: Warm interior<br>
+- Modifiable?: Mood-adaptive</p>
+<p><strong>Style</strong><br>
+- Description: Photorealistic<br>
+- Modifiable?: Style transferable</p>
+<hr>
+<h2>Variation 1: Season Change</h2>
+<p><strong>Spring Version</strong></p>
+<p><img alt="Spring" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/09/02-season-spring.png"></p>
+<p><em>Spring: snowy forest becomes cherry blossom garden, wool blanket becomes cotton throw, hot cocoa becomes iced tea.</em></p>
+<p><strong>Changed</strong>: Window view (snow to cherry blossoms), blanket (wool to cotton), drink (cocoa to iced tea), lighting (warm to bright natural)</p>
+<p><strong>Summer Night Version</strong></p>
+<p><img alt="Summer night" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/09/03-season-summer-night.png"></p>
+<p><em>Summer night: fireflies and stars through the window, linen blanket, lemonade. Same space, completely different season.</em></p>
+<p><strong>Changed</strong>: Window view (snow to fireflies/stars), blanket (wool to linen), drink (cocoa to lemonade), lighting (interior to moonlight mix)</p>
+<p><strong>Autumn Rain Version</strong></p>
+<p><img alt="Autumn rain" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/09/04-season-autumn.png"></p>
+<p><em>Autumn rain: golden-red foliage and raindrops on glass. Thick knit blanket and spiced cider.</em></p>
+<p><strong>Changed</strong>: Window view (snow to fall foliage/rain), blanket (wool to knit), drink (cocoa to cider), weather (clear to rainy)</p>
+<p><strong>Season change formula</strong>:</p>
+<pre><code>[Keep space structure] + [Change window view] + [Adapt props to season] + [Adjust lighting]
+</code></pre>
+<hr>
+<h2>Variation 2: Style Transfer</h2>
+<p>Same scene description, only the style keyword changes.</p>
+<p><strong>Watercolor Version</strong></p>
+<p><img alt="Watercolor" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/09/05-style-watercolor.png"></p>
+<p><em>Watercolor: the same space becomes soft and dreamlike. Composition and element placement stay similar.</em></p>
+<p><strong>Anime Version</strong></p>
+<p><img alt="Anime" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/09/06-style-anime.png"></p>
+<p><em>Anime: Ghibli-style rendering. Warm colors and detailed backgrounds create a different world.</em></p>
+<p><strong>Style transfer key</strong>: Replace <code>photorealistic</code> with a different style keyword.</p>
+<p><strong>photorealistic</strong><br>
+- Target: Watercolor<br>
+- Replacement Keywords: <code>watercolor painting style, soft washes</code></p>
+<p><strong>photorealistic</strong><br>
+- Target: Anime<br>
+- Replacement Keywords: <code>anime illustration style, Studio Ghibli</code></p>
+<p><strong>photorealistic</strong><br>
+- Target: Oil painting<br>
+- Replacement Keywords: <code>oil painting style, thick brushstrokes</code></p>
+<p><strong>photorealistic</strong><br>
+- Target: Pixel art<br>
+- Replacement Keywords: <code>pixel art style, 16-bit</code></p>
+<hr>
+<h2>Variation 3: Element Swap</h2>
+<p>Keep the spatial structure, change one key element.</p>
+<p><strong>Armchair to Hanging Hammock</strong></p>
+<p><img alt="Element swap" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/09/07-element-swap.png"></p>
+<p><em>Element swap: armchair replaced with a macrame hanging chair shifts the vibe to bohemian.</em></p>
+<p><strong>Element swap technique</strong>: Substitute one noun in the prompt for another.</p>
+<p><strong>Armchair</strong><br>
+- Replacement: Hanging hammock<br>
+- Mood Shift: Classic to bohemian</p>
+<p><strong>Hot cocoa</strong><br>
+- Replacement: Wine glass<br>
+- Mood Shift: Cozy to sophisticated</p>
+<p><strong>Wool blanket</strong><br>
+- Replacement: Fur rug<br>
+- Mood Shift: Casual to luxury</p>
+<p><strong>Side table</strong><br>
+- Replacement: Tree stump<br>
+- Mood Shift: Indoor to natural</p>
+<hr>
+<h2>Variation 4: Mood Shift</h2>
+<p>Keep the same spatial structure, dramatically invert the mood.</p>
+<p><strong>Cozy to Horror</strong></p>
+<p><img alt="Horror version" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/09/08-mood-horror.png"></p>
+<p><em>Horror version: the same reading nook, abandoned and decayed. Structure is identical but the story is completely different.</em></p>
+<p><strong>What changed</strong>:</p>
+<p><strong>Window</strong><br>
+- Cozy Original: Large window<br>
+- Horror Version: Cracked window</p>
+<p><strong>View</strong><br>
+- Cozy Original: Snowy forest<br>
+- Horror Version: Dark dead forest, fog</p>
+<p><strong>Chair</strong><br>
+- Cozy Original: Plush armchair<br>
+- Horror Version: Dusty torn chair, cobwebs</p>
+<p><strong>Props</strong><br>
+- Cozy Original: Hot cocoa<br>
+- Horror Version: Overturned cup, dried stains</p>
+<p><strong>Lighting</strong><br>
+- Cozy Original: Warm interior<br>
+- Horror Version: Cold blue-grey</p>
+<p><strong>Added</strong><br>
+- Cozy Original: (none)<br>
+- Horror Version: Cobwebs</p>
+<p><strong>Mood shift key</strong>: Apply opposite adjectives and states to the same structures. "Plush" becomes "dusty torn." "Warm" becomes "cold blue-grey." "Snowy" becomes "dark dead."</p>
+<hr>
+<h2>Combining Variations</h2>
+<p>You can apply multiple axes simultaneously:</p>
+<pre><code>Season + Style:
+&quot;Same space, autumn, watercolor style&quot;
+
+Element swap + Mood:
+&quot;Hammock chair, horror atmosphere&quot;
+</code></pre>
+<p>More combined axes means more departure from the original, but as long as the <strong>core structure</strong> (window reading nook) remains, the result reads as "a different version of the same space."</p>
+<hr>
+<h2>Prompt Variation Practical Guide</h2>
+<ol>
+<li><strong>Lock the anchor prompt first</strong>: Refine until you get a result you like</li>
+<li><strong>Define what's fixed</strong>: The core structure that never changes (space, composition, subject)</li>
+<li><strong>Change one axis at a time</strong>: Multiple simultaneous changes break the connection to the original</li>
+<li><strong>Save successful variations</strong>: Reuse them as templates</li>
+</ol>
+<hr>
+<h2>Key Takeaway</h2>
+<p>Creating 4 variations from one anchor scene:</p>
+<ul>
+<li>Keeping spatial structure as anchor makes the space recognizable across season/style/mood changes</li>
+<li>Style transfer is simplest — swap one keyword</li>
+<li>Mood shift works by applying opposite adjectives to the same structures</li>
+<li>Change one axis at a time to maintain connection with the original</li>
+</ul>
+<p>In the final post, we'll bring everything together — a production workflow for creating thumbnails, social posts, and presentations at scale.</p>
+<hr>
+<h2>Answering the Opening Questions</h2>
+<p><strong>Does changing only the season keep it recognizable as the same space?</strong></p>
+<p>Yes. When the spatial structure (window reading nook) stays as anchor and only window view, props, and lighting change seasonally, it reads as "same space, different season." The key is fixing the structure and varying only the details.</p>
+<p><strong>How well do composition and elements survive style transfer?</strong></p>
+<p>With identical scene descriptions, composition and element placement stay similar. Proportions and detail levels may vary by style, so results aren't pixel-identical, but they're recognizably the same scene.</p>
+<p><strong>Can a mood shift alone tell a different story?</strong></p>
+<p>Absolutely. The same reading nook goes from "cozy winter afternoon" to "abandoned horror space" with adjective and state changes alone. The shared structure actually makes the contrast more dramatic.</p>
+<hr>
+<h2>Series Index</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/01-first-image-generation.md">AI Image Generation 101 (1/10): Creating Your First Image</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/02-prompt-structure.md">AI Image Generation 101 (2/10): The Structure of a Good Prompt</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/03-mastering-styles.md">AI Image Generation 101 (3/10): Mastering Styles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/04-composition-and-perspective.md">AI Image Generation 101 (4/10): Composition and Perspective</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/05-color-and-lighting.md">AI Image Generation 101 (5/10): Color and Lighting</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/06-complex-scene-design.md">AI Image Generation 101 (6/10): Designing Complex Scenes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/07-consistency-across-images.md">AI Image Generation 101 (7/10): Maintaining Consistency</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-image-gen-101/en/08-text-and-typography.md">AI Image Generation 101 (8/10): Text and Typography</a></li>
+<li><strong>AI Image Generation 101 (9/10): Working with Reference Images (current)</strong></li>
+<li>AI Image Generation 101 (10/10): Production Workflows (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/images">OpenAI Image Generation Guide</a></li>
+<li><a href="https://github.com/NomaDamas/god-tibo-imagen">god-tibo-imagen GitHub Repository</a></li>
+</ul>
+<p class="tags-line">Tags: AI, ChatGPT, Image Generation, Prompt Engineering</p>
+</body>
+</html>
