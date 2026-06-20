@@ -22,7 +22,7 @@ seo_description: "이미지 생성 프롬프트의 5가지 구성 요소와 조�
 
 "이쁜 로봇 좌 그려줘." 결과는 나오는데 내가 상상한 것과는 다릅니다. "예쁜 풍경 그려줘." 풍경은 나오는데 어딘가 이상합니다. "멋있는 이미지 만들어줘." 멋있긴 한데 원한 게 이게 아닙니다.
 
-이런 경험, 익숙하시죠? 문제는 프롬프트에 \"무엇을\" 넣었느냐가 아니라 \"어떻게\" 넣었느냐에 있습니다. \"예쁘다\", \"멋있다\", \"놀라운\" 같은 형용사는 AI에게 거의 정보를 주지 못합니다. AI는 구체적인 지시가 필요합니다.
+이런 경험, 익숙하시죠? 문제는 프롬프트에 "무엇을" 넣었느냐가 아니라 "어떻게" 넣었느냐에 있습니다. "예쁘다", "멋있다", "놀라운" 같은 형용사는 AI에게 거의 정보를 주지 못합니다. AI는 구체적인 지시가 필요합니다.
 
 이 글은 AI 이미지 생성 101 시리즈의 2번째 글입니다. 여기서는 좋은 프롬프트의 구체적인 구조를 배우고, 요소를 하나씩 추가하면서 결과가 어떻게 달라지는지 실험해 보겠습니다.
 
@@ -41,7 +41,7 @@ seo_description: "이미지 생성 프롬프트의 5가지 구성 요소와 조�
 
 ## 프롬프트 공식: 레이어링 방식
 
-좋은 프롬프트는 \"많이 쓰는 것\"이 아니라 \"정확하게 쓰는 것\"입니다. 핵심은 레이어링—요소를 하나씩 취하는 것입니다.
+좋은 프롬프트는 "많이 쓰는 것"이 아니라 "정확하게 쓰는 것"입니다. 핵심은 레이어링—요소를 하나씩 쌓는 것입니다.
 
 ```
 [주제] + [스타일] + [배경/장소] + [조명] + [구도/앙글]
@@ -101,11 +101,25 @@ seo_description: "이미지 생성 프롬프트의 5가지 구성 요소와 조�
 
 *5가지 요소를 모두 넣은 결과. 주제의 성격(친근한), 배경의 디테일(해바라기, 데이지), 구도(와이드샷)까지 지정.*
 
-5가지 요소를 모두 넣으니 AI가 제 마음대로 결정할 여지가 거의 없어졌습니다. 내가 원하는 장면에 훨씬 가깝습니다.
+5가지 요소를 모두 넣으니 AI가 마음대로 결정할 여지가 거의 없어졌습니다. 내가 원하는 장면에 훨씬 가깝습니다.
 
 ---
 
-## 흔한 실수: 븈 형용사 나열
+## 단계별 결과 비교
+
+위의 5단계를 한눈에 비교해 보면:
+
+| 단계 | 프롬프트 요소 | AI가 결정하는 것 | 내가 통제하는 것 |
+|------|------------|----------------|----------------|
+| 1단계 | 주제만 | 스타일, 배경, 조명, 구도 전부 | 주제만 |
+| 2단계 | 주제 + 스타일 | 배경, 조명, 구도 | 주제 + 전체 분위기 |
+| 3단계 | + 배경 | 조명, 구도 | 장소와 상황 추가 |
+| 4단계 | + 조명 | 구도만 | 온도감과 그림자 추가 |
+| 5단계 | 모든 요소 | 거의 없음 | 결과의 대부분 |
+
+---
+
+## 흔한 실수: 빈 형용사 나열
 
 많은 사람이 "더 좋은 결과를 얻으려면 칭찬을 많이 넣으면 되지 않을까?" 생각합니다. 실험해 보겠습니다.
 
@@ -125,6 +139,20 @@ seo_description: "이미지 생성 프롬프트의 5가지 구성 요소와 조�
 | awesome colors | 따뜻한 주황색 톤 |
 
 규칙은 간단합니다: **형용사보다 명사와 동사로 쓰세요.** "예쁜 고양이"보다 "털이 덮인 오렌지색 페르시안"이 AI에게 훨씬 명확한 지시입니다.
+
+---
+
+## 자주 하는 실수 모음
+
+프롬프트를 처음 쓸 때 자주 빠지는 함정들입니다.
+
+| 실수 유형 | 나쁜 예시 | 좋은 예시 | 이유 |
+|----------|---------|---------|------|
+| 감탄사 남발 | "amazing, awesome, stunning" | "detailed, sharp focus, 8K" | 감탄사는 AI에게 정보 없음 |
+| 모순된 지시 | "dark and bright simultaneously" | "dark background, bright subject" | 모순은 예상 불가한 결과 |
+| 불필요한 부정 | "not ugly, not bad, not boring" | 원하는 것을 직접 서술 | 부정보다 긍정 표현이 효과적 |
+| 과도한 길이 | 200단어 이상의 프롬프트 | 핵심 5요소만 50-80단어 | 너무 길면 중요 요소가 묻힘 |
+| 스타일 충돌 | "photorealistic anime pixel art" | 하나의 스타일만 선택 | 스타일 충돌은 혼란 결과 |
 
 ---
 
@@ -164,8 +192,8 @@ seo_description: "이미지 생성 프롬프트의 5가지 구성 요소와 조�
 ### 블로그 썸네일용
 
 ```
-[Blog topic icon or metaphor], flat illustration style, 
-clean white background, vibrant [brand color] accents, 
+[Blog topic icon or metaphor], flat illustration style,
+clean white background, vibrant [brand color] accents,
 centered composition, soft even lighting
 ```
 
@@ -174,23 +202,52 @@ centered composition, soft even lighting
 ### SNS 포스트용
 
 ```
-[Main subject doing action], [photography style], 
-[specific location], [time of day] lighting, 
+[Main subject doing action], [photography style],
+[specific location], [time of day] lighting,
 [angle] shot, [mood] atmosphere
 ```
 
 예: "A person reading a book in a cozy window seat, lifestyle photography style, modern minimalist apartment, afternoon golden light, medium shot, peaceful calm atmosphere"
 
-### 프레젤테이션 일러스트용
+### 프레젠테이션 일러스트용
 
 ```
-[Concept or process as visual metaphor], 
-isometric illustration style, pastel color palette, 
-clean minimal background, soft shadows, 
+[Concept or process as visual metaphor],
+isometric illustration style, pastel color palette,
+clean minimal background, soft shadows,
 slightly above eye-level perspective
 ```
 
 예: "A conveyor belt transforming raw materials into finished products as visual metaphor for data pipeline, isometric illustration style, pastel blue and mint color palette, clean minimal background, soft shadows"
+
+---
+
+## 프롬프트 개선 워크플로우
+
+좋은 프롬프트를 만드는 것은 한 번에 되지 않습니다. 다음 워크플로우를 따르세요.
+
+```
+1. 최소 프롬프트로 시작 (주제만)
+2. 결과를 보고 부족한 요소 파악
+3. 요소 하나씩 추가하며 재생성
+4. 원하는 결과에 가까워지면 저장
+5. 성공한 프롬프트를 템플릿으로 보관
+```
+
+**언제 멈춰야 하는가**: 이미지 생성에 완벽이란 없습니다. "이 정도면 내 목적에 맞다"는 기준을 미리 정해두고, 그 기준에 도달하면 멈추세요. 완벽을 추구하다 보면 시간만 낭비하게 됩니다.
+
+---
+
+## 고급 기법: 네거티브 프롬프트
+
+원하지 않는 요소를 명시적으로 제외하는 방법도 있습니다. 일부 AI 도구는 "네거티브 프롬프트"를 별도로 지정할 수 있지만, ChatGPT에서는 일반 프롬프트 안에 포함시킵니다.
+
+**포함 방식**: `without text`, `no watermark`, `no people`, `avoid blur`
+
+예시:
+> A scenic mountain lake at dawn, photorealistic photography, dramatic morning mist, wide angle landscape shot, without any text or watermarks, no birds or people
+
+이 방식은 자주 나타나는 원치 않는 요소를 억제할 때 유용합니다.
 
 ---
 
@@ -201,6 +258,7 @@ slightly above eye-level perspective
 1. **레이어링**: 주제 → 스타일 → 배경 → 조명 → 구도 순서로 쌓는다
 2. **구체성**: 형용사 대신 명사와 동사로 쓴다
 3. **순서**: 가장 중요한 요소를 앞에 둔다
+4. **반복**: 한 번에 완성하려 하지 말고, 요소를 하나씩 추가하며 개선한다
 
 다음 글에서는 5가지 요소 중 이미지의 전체 분위기를 가장 크게 바꾸는 "스타일"을 깊이 파고들겠습니다.
 

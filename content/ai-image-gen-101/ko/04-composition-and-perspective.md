@@ -65,6 +65,9 @@ seo_description: "같은 장면을 거리와 각도로 완전히 다른 이미�
 
 **키워드**: `extreme close-up`, `macro shot`, `texture detail`, `filling the frame`
 
+**프롬프트 예시**:
+> Extreme close-up macro shot of weathered medieval castle stone wall, ancient moss-covered granite texture, deep cracks and weathering detail, photorealistic, sharp focus on texture
+
 ---
 
 ### 2. 클로즈업 (Close-up)
@@ -216,6 +219,34 @@ seo_description: "같은 장면을 거리와 각도로 완전히 다른 이미�
 
 ---
 
+## 자주 하는 실수
+
+구도 프롬프트에서 많이 빠지는 함정들입니다.
+
+| 실수 | 예시 | 해결책 |
+|------|------|--------|
+| 구도 미지정 | 구도 관련 키워드 없음 | 반드시 촬영 거리 + 각도 지정 |
+| 모순된 거리 | "close-up wide shot" | 하나만 선택 |
+| 각도 과도 지정 | 너무 많은 각도 동시 요청 | 하나의 각도만 |
+| 극단적 각도 오남용 | 모든 이미지에 Dutch angle | 목적에 맞게 선택 |
+
+---
+
+## 용도별 구도 빠른 선택 가이드
+
+콘텐츠 유형별로 권장 구도를 정리했습니다.
+
+| 콘텐츠 유형 | 추천 거리 | 추천 각도 | 키워드 조합 |
+|-----------|---------|---------|-----------|
+| 유튜브 썸네일 | 클로즈업 | 약간 로우 앵글 | `close-up, slightly low angle` |
+| 블로그 배너 | 와이드 | 아이 레벨 | `wide establishing shot, eye level` |
+| 인스타 제품 | 클로즈업 | 버드아이 | `flat lay, top-down view` |
+| 프레젠테이션 | 미디엄~와이드 | 아이소메트릭 | `isometric view, clean composition` |
+| 포스터 | 클로즈업 | 로우 앵글 | `dramatic low angle, portrait` |
+| 여행 사진 | 와이드 | 아이 레벨 | `wide landscape, eye level` |
+
+---
+
 ## 정리: 구도가 바꾸는 것
 
 같은 성을 8가지 구도로 찍어보면서 확인한 것:
@@ -223,6 +254,7 @@ seo_description: "같은 장면을 거리와 각도로 완전히 다른 이미�
 - 촬영 거리는 "무엇에 집중할지"를 결정한다 — 디테일 vs 전체 분위기
 - 카메라 각도는 "어떤 감정을 줄지"를 결정한다 — 위압 vs 안정 vs 긴장
 - 거리와 각도를 조합하면 의도한 느낌을 정밀하게 만들 수 있다
+- 구도는 목적이 먼저다 — "어떤 감정을 전달할지"에서 출발하라
 
 다음 글에서는 색감과 조명—같은 장면의 시간대와 조명을 바꿔 분위기를 완전히 전환하는 방법을 다룹니다.
 

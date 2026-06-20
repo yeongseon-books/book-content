@@ -55,6 +55,9 @@ AI 이미지 생성에서 가장 오래된 약점 중 하나가 **텍스트**입
 
 **키워드**: `neon sign`, `neon tubes`, `glowing text`, `illuminated lettering`
 
+**프롬프트 예시**:
+> A vintage diner interior with a glowing red neon sign reading "OPEN 24 HOURS" in cursive neon tubes, 1950s American aesthetic, warm interior lighting, photorealistic
+
 ---
 
 ### 2. 칠판/간판
@@ -68,6 +71,9 @@ AI 이미지 생성에서 가장 오래된 약점 중 하나가 **텍스트**입
 **왜 잘 되는가**: 칠판/손글씨는 약간의 불규칙함이 자연스럽습니다. AI의 텍스트 생성 약점이 오히려 "손으로 쓴 느낌"이 되어 장점으로 전환됩니다.
 
 **키워드**: `chalkboard`, `chalk writing`, `handwritten sign`, `cafe menu board`
+
+**프롬프트 예시**:
+> A rustic cafe chalkboard menu sign with "TODAY'S SPECIAL" written in white chalk lettering, decorative borders, cozy cafe atmosphere in the background, photorealistic
 
 ---
 
@@ -85,6 +91,14 @@ AI 이미지 생성에서 가장 오래된 약점 중 하나가 **텍스트**입
 
 **키워드**: `movie poster`, `title text`, `bold typography`, `cinematic poster design`
 
+**영화 포스터 프롬프트 구조**:
+```
+[장면 설명], cinematic movie poster style,
+large bold title text "[제목]" at the top,
+dramatic lighting, [색상 팔레트],
+professional poster design
+```
+
 ---
 
 ### 4. 로고 디자인
@@ -99,6 +113,16 @@ AI 이미지 생성에서 가장 오래된 약점 중 하나가 **텍스트**입
 
 **키워드**: `logo design`, `monogram`, `letter mark`, `geometric typography`, `brand identity`
 
+**로고 디자인 아이디어**:
+
+| 글자 | 형태 결합 아이디어 |
+|------|---------------|
+| A | 산 봉우리 모양 |
+| O | 태양 또는 지구 |
+| S | 뱀 또는 강 곡선 |
+| T | 나무 |
+| B | 나비 날개 |
+
 ---
 
 ### 5. 북커버
@@ -110,6 +134,15 @@ AI 이미지 생성에서 가장 오래된 약점 중 하나가 **텍스트**입
 *북커버: 제목 + 분위기 있는 배경. 텍스트가 2단어로 짧아서 비교적 정확하다.*
 
 **키워드**: `book cover design`, `elegant serif font`, `literary fiction aesthetic`, `cover art`
+
+**북커버 프롬프트 구조**:
+```
+Book cover design for "[제목]",
+[배경 장면] as the background,
+title in [폰트 스타일] at the top,
+author name in small text at the bottom,
+[분위기/색상], professional book cover design
+```
 
 ---
 
@@ -162,7 +195,21 @@ AI 이미지 생성에서 가장 오래된 약점 중 하나가 **텍스트**입
 
 ---
 
-## 실전 워크플로우: AI + 후처리
+## 자주 하는 실수
+
+텍스트 포함 이미지에서 자주 발생하는 실수들입니다.
+
+| 실수 | 예시 | 문제 | 해결책 |
+|------|------|------|--------|
+| 너무 긴 텍스트 | "An extraordinary adventure begins with a single step" | 글자 오류 빈발 | 6단어 이내로 줄이기 |
+| CJK 문자 요청 | 한국어/중국어 텍스트 | 불안정한 결과 | 영어로 대체 후 별도 추가 |
+| 소문자 긴 단어 | "photosynthesis" | 철자 오류 | 대문자 또는 짧은 단어 |
+| 위치 미지정 | 텍스트 위치 없음 | 이상한 위치에 배치 | "at the top", "centered" 지정 |
+| 따옴표 미사용 | text without quotes | 인식 불안정 | "EXACT TEXT" 형식 사용 |
+
+---
+
+## 텍스트 없이 생성 후 추가하는 방법
 
 현재 AI만으로 완벽한 타이포그래피를 얻기는 어렵습니다. 실전에서는 다음 워크플로우를 권장합니다:
 
@@ -173,7 +220,46 @@ AI 이미지 생성에서 가장 오래된 약점 중 하나가 **텍스트**입
 ```
 
 **AI가 처리하기 좋은 것**: 배경, 일러스트, 분위기, 레이아웃 컨셉
+
 **사람이 처리하기 좋은 것**: 정확한 텍스트, 폰트 선택, 정렬, 커닝
+
+**텍스트 공간 확보 프롬프트**:
+> [배경 장면], leave a clean empty space at the top for title text, wide banner format, [스타일]
+
+이렇게 하면 텍스트가 들어갈 여백을 미리 확보할 수 있습니다.
+
+---
+
+## 타이포그래피 용어 프롬프트 사전
+
+텍스트 관련 프롬프트에 쓸 수 있는 용어들입니다.
+
+| 효과 | 키워드 |
+|------|--------|
+| 두꺼운 글자 | `bold`, `heavy weight`, `thick strokes` |
+| 가는 글자 | `thin`, `light weight`, `hairline` |
+| 기울어진 글자 | `italic`, `slanted`, `oblique` |
+| 장식적 글자 | `ornate`, `decorative`, `flourishes` |
+| 현대적 | `sans-serif`, `modern`, `clean` |
+| 고전적 | `serif`, `vintage`, `traditional` |
+| 손글씨 | `handwritten`, `calligraphy`, `script` |
+| 3D 효과 | `3D text`, `embossed`, `raised letters` |
+
+---
+
+## 실전 워크플로우: AI + 후처리
+
+```
+텍스트가 필요한 경우:
+1. AI: "배경 이미지 only, no text" 생성
+2. Canva: 텍스트 레이어 추가, 폰트 선택
+3. 완성: 배경(AI) + 텍스트(사람) 결합
+
+텍스트가 장면 일부인 경우 (네온 사인 등):
+1. 짧은 텍스트(2-4단어)만 AI에 요청
+2. 결과 확인 후 오류 있으면 재생성
+3. 허용 가능한 수준이면 사용
+```
 
 ---
 
@@ -185,6 +271,7 @@ AI 이미지 생성에서 가장 오래된 약점 중 하나가 **텍스트**입
 - 네온 사인, 칠판 같은 환경 속 텍스트는 약간의 불완전함이 자연스러움이 된다
 - 긴 텍스트나 CJK 문자는 여전히 불안정하다
 - 실전에서는 AI로 배경을 만들고 텍스트는 별도 도구로 추가하는 것이 최선이다
+- 텍스트가 꼭 필요한 장면이라면 짧고, 대문자이고, 따옴표로 감싸서 요청하라
 
 다음 글에서는 레퍼런스 이미지 활용—기존 이미지를 참고해서 새로운 이미지를 만드는 기법을 다룹니다.
 

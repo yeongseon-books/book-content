@@ -46,8 +46,8 @@ seo_description: "같은 캐릭터를 여러 장면에서 일관되게 생성하
 우리의 캐릭터:
 
 ```
-a young woman with short black bob haircut, round glasses, 
-wearing a yellow raincoat over a striped navy and white shirt, 
+a young woman with short black bob haircut, round glasses,
+wearing a yellow raincoat over a striped navy and white shirt,
 carrying a brown leather satchel
 ```
 
@@ -143,7 +143,7 @@ carrying a brown leather satchel
 ## 캐릭터 정의서 작성 공식
 
 ```
-[성별/나이대] + [헤어스타일 + 색상] + [얼굴 특징] + 
+[성별/나이대] + [헤어스타일 + 색상] + [얼굴 특징] +
 [상의 색상 + 형태] + [하의] + [소품/액세서리]
 ```
 
@@ -165,6 +165,19 @@ carrying a brown leather satchel
 
 ---
 
+## 자주 하는 실수
+
+일관성 작업에서 자주 발생하는 실수들입니다.
+
+| 실수 | 예시 | 결과 | 해결책 |
+|------|------|------|--------|
+| 식별자 부족 | "a woman with glasses" | 매번 다른 안경, 다른 사람 | 3개 이상 식별자 조합 |
+| 얼굴 일관성 집착 | "exact same face" 요구 | 실망스러운 결과 | 색상/형태 기반으로 전환 |
+| 정의서 미보관 | 매번 새로 씀 | 미묘하게 다른 설명 | 텍스트 파일로 저장 |
+| 스타일 무시 | 스타일 변경 시 정의서 미사용 | 스타일 따라 캐릭터 변함 | 스타일 변경 후에도 정의서 유지 |
+
+---
+
 ## 세계관 일관성
 
 캐릭터뿐 아니라 배경/세계관도 일관성을 유지해야 하는 경우가 있습니다.
@@ -172,8 +185,8 @@ carrying a brown leather satchel
 **세계관 정의서 예시**:
 
 ```
-Setting: 1920s Art Deco city, brass and copper tones, 
-geometric architecture, steam-powered vehicles, 
+Setting: 1920s Art Deco city, brass and copper tones,
+geometric architecture, steam-powered vehicles,
 gas lamps with warm amber glow, cobblestone streets
 ```
 
@@ -187,6 +200,21 @@ gas lamps with warm amber glow, cobblestone streets
 
 ---
 
+## 시리즈 이미지 제작을 위한 워크플로우
+
+실제 블로그 시리즈나 만화 시리즈를 만들 때 사용하는 워크플로우입니다.
+
+```
+1. 캐릭터 정의서 작성 (텍스트 파일로 저장)
+2. 세계관/배경 정의서 작성 (필요한 경우)
+3. 각 장면의 "변수" 결정 (장소, 행동, 감정)
+4. 프롬프트 = [캐릭터 정의서] + [세계관 정의서] + [장면 변수]
+5. 생성 후 핵심 식별자 확인 (색상, 형태)
+6. 식별자가 유지되지 않은 경우 재생성
+```
+
+---
+
 ## 일관성 체크리스트
 
 시리즈 이미지를 만들 때 사용하는 체크리스트:
@@ -196,6 +224,7 @@ gas lamps with warm amber glow, cobblestone streets
 3. 형태 기반 식별자가 1개 이상 포함되었는가?
 4. 정의서를 모든 프롬프트에 동일하게 사용했는가?
 5. 세계관/배경 설정이 필요한 경우 별도 정의서를 만들었는가?
+6. 생성 결과에서 핵심 식별자가 유지되었는지 확인했는가?
 
 ---
 
@@ -207,6 +236,7 @@ gas lamps with warm amber glow, cobblestone streets
 - 색상과 형태 기반 식별자가 가장 안정적으로 유지된다
 - 얼굴 디테일은 현재 AI의 한계 — 집착보다는 식별 가능 수준을 목표로 한다
 - 스타일이 바뀌어도 핵심 식별자는 유지된다
+- 정의서를 저장하고 재사용하는 것이 효율적인 워크플로우의 핵심이다
 
 다음 글에서는 텍스트와 타이포그래피—이미지 안에 글씨를 넣는 기법을 다룹니다.
 

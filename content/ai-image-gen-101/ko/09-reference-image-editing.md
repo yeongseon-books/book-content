@@ -44,9 +44,9 @@ seo_description: "하나의 장면을 기준으로 계절, 스타일, 분위기,
 모든 변형의 출발점이 될 기준 프롬프트:
 
 ```
-A cozy reading nook with a large window overlooking a snowy forest, 
-a plush armchair with a wool blanket, 
-a cup of hot cocoa on the side table, 
+A cozy reading nook with a large window overlooking a snowy forest,
+a plush armchair with a wool blanket,
+a cup of hot cocoa on the side table,
 warm interior lighting, photorealistic, medium shot
 ```
 
@@ -77,6 +77,14 @@ warm interior lighting, photorealistic, medium shot
 
 **바꾼 것**: 창밖 풍경(눈 → 벚꽃), 담요(울 → 면), 음료(핫초코 → 아이스티), 조명(따뜻한 → 밝은 자연광)
 
+**봄 버전 프롬프트**:
+```
+A cozy reading nook with a large window overlooking a cherry blossom garden,
+a plush armchair with a light cotton throw,
+a glass of iced tea on the side table,
+bright natural spring light, photorealistic, medium shot
+```
+
 ### 여름 밤 버전
 
 ![여름 밤](https://yeongseon-books.github.io/book-public-assets/assets/ai-image-gen-101/09/03-season-summer-night.png)
@@ -98,6 +106,15 @@ warm interior lighting, photorealistic, medium shot
 ```
 [공간 구조 유지] + [창밖 풍경 변경] + [소품을 계절에 맞게] + [조명 조정]
 ```
+
+**계절별 키워드 치환표**:
+
+| 요소 | 봄 | 여름 | 가을 | 겨울 |
+|------|-----|------|------|------|
+| 창밖 | cherry blossom | fireflies, stars | autumn leaves | snowy forest |
+| 담요 | light cotton | linen | knit wool | heavy wool |
+| 음료 | iced tea | lemonade | warm cider | hot cocoa |
+| 조명 | bright natural | moonlight | warm amber | cozy warm |
 
 ---
 
@@ -174,6 +191,19 @@ warm interior lighting, photorealistic, medium shot
 
 ---
 
+## 자주 하는 실수
+
+변형 작업에서 자주 발생하는 실수들입니다.
+
+| 실수 | 예시 | 결과 | 해결책 |
+|------|------|------|--------|
+| 앵커 요소 변경 | 공간 구조 자체를 바꿈 | 원본과 다른 장면으로 읽힘 | 공간/구도는 고정 |
+| 한 번에 여러 축 변형 | 계절 + 스타일 + 요소 동시 변경 | 원본과 연결 끊어짐 | 한 번에 하나의 축만 |
+| 기준 프롬프트 미확정 | 기준이 없이 변형 시작 | 일관성 없는 시리즈 | 기준 먼저 확정 후 변형 |
+| 변형 내용 미저장 | 성공한 변형 프롬프트 미저장 | 재현 불가 | 성공 프롬프트를 텍스트 파일로 저장 |
+
+---
+
 ## 변형 조합하기
 
 4가지 변형 축을 동시에 적용할 수도 있습니다:
@@ -187,6 +217,14 @@ warm interior lighting, photorealistic, medium shot
 ```
 
 변형 축을 조합할수록 원본에서 더 멀어지지만, **핵심 구조**(창가의 독서 공간)를 유지하면 "같은 공간의 다른 버전"으로 읽힙니다.
+
+**2축 조합 예시**:
+
+| 1축 | 2축 | 결과 |
+|-----|-----|------|
+| 봄 계절 | 수채화 스타일 | 봄의 독서 공간, 수채화 버전 |
+| 공포 분위기 | 픽셀아트 스타일 | 레트로 공포 게임 느낌 |
+| 행잉 해먹 | 여름밤 계절 | 보헤미안 여름 독서 공간 |
 
 ---
 
@@ -207,6 +245,7 @@ warm interior lighting, photorealistic, medium shot
 - 스타일 변환은 키워드 하나를 교체하면 되어 가장 간단하다
 - 분위기 전환은 같은 구조에 반대 형용사를 적용하는 것이 핵심이다
 - 한 번에 하나의 축만 바꾸면 원본과의 연결을 유지할 수 있다
+- 성공한 기준 프롬프트와 변형 프롬프트를 파일로 저장해 재사용하라
 
 다음 글(마지막)에서는 실전 워크플로우—지금까지 배운 모든 기법을 합쳐 썸네일, SNS, 프레젠테이션용 이미지를 대량 제작하는 방법을 다룹니다.
 

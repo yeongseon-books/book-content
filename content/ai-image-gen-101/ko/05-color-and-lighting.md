@@ -65,6 +65,9 @@ seo_description: "같은 카페 장면을 8가지 조명으로 생성하며 골�
 
 **키워드**: `golden hour`, `warm sunset light`, `magic hour`, `long shadows`, `warm orange tones`
 
+**실제 적용 예시**:
+> A woman reading a book alone at a small outdoor cafe table on a cobblestone street, golden hour warm sunset light casting long orange shadows, glowing warm tones, photorealistic, medium shot
+
 ---
 
 ### 2. 블루아워 (Blue Hour)
@@ -214,6 +217,52 @@ seo_description: "같은 카페 장면을 8가지 조명으로 생성하며 골�
 
 ---
 
+## 자주 하는 실수
+
+조명 프롬프트에서 많이 겪는 문제들입니다.
+
+| 실수 | 예시 | 결과 | 해결책 |
+|------|------|------|--------|
+| 조명 미지정 | 조명 키워드 없음 | AI가 임의 결정 | 반드시 조명 키워드 추가 |
+| 모순된 조명 | "bright and dark simultaneously" | 혼란스러운 이미지 | 하나의 조명만 선택 |
+| 부적절한 조명 선택 | 음식 사진에 네온 조명 | 음식이 이상하게 보임 | 목적에 맞는 조명 선택 |
+| 조명 과잉 지정 | 너무 많은 조명 키워드 | 효과 충돌 | 2-3개 핵심 키워드만 |
+
+---
+
+## 색온도와 분위기의 관계
+
+조명을 이해하려면 색온도 개념이 도움이 됩니다.
+
+| 색온도 | 느낌 | 대표 조명 |
+|--------|------|----------|
+| 2000-3000K (따뜻한 주황) | 친밀함, 편안함 | 캔들라이트, 골든아워 |
+| 3500-4500K (중간 흰빛) | 자연스러움, 균형 | 실내 형광등, 흐린 날 |
+| 5500-6500K (차가운 파랑) | 시원함, 집중 | 정오 햇살, 블루아워 |
+| 7000K+ (매우 차가운 파랑) | 차갑고 으스스함 | 달빛, 의료 조명 |
+
+프롬프트에서 이 개념을 활용할 수 있습니다:
+
+```
+따뜻한 느낌 원할 때: warm tones, amber light, 2700K
+차가운 느낌 원할 때: cool tones, blue-white light, 6500K
+```
+
+---
+
+## 조명 조합 기법
+
+두 가지 조명을 조합하면 더 풍부한 분위기를 만들 수 있습니다.
+
+| 조합 | 키워드 | 효과 |
+|------|--------|------|
+| 골든아워 + 내부 조명 | `golden exterior light + warm interior glow` | 창가 장면의 안팎 대비 |
+| 네온 + 비 | `neon reflections on wet pavement` | 사이버펑크 도시 느낌 |
+| 캔들라이트 + 달빛 | `candlelight + soft moonlight through window` | 역사적/신비로운 분위기 |
+| 스튜디오 + 컬러 젤 | `studio rim light + blue gel lighting` | 상업 광고 느낌 |
+
+---
+
 ## 정리: 조명이 바꾸는 것
 
 같은 카페 장면을 8가지 조명으로 비교하면서 확인한 것:
@@ -221,6 +270,7 @@ seo_description: "같은 카페 장면을 8가지 조명으로 생성하며 골�
 - 조명은 색온도(따뜻/차가움)와 대비(강/약)로 분위기를 결정한다
 - 자연광은 시간대를 지정하면 되고, 인공광은 광원의 색과 위치를 지정하면 된다
 - 조명 키워드 하나가 같은 장면을 감성 블로그에서 사이버펑크 포스터로 바꿀 수 있다
+- 조명은 "무엇을 보여줄지"만큼 "어떻게 느끼게 할지"를 결정하는 핵심 요소다
 
 다음 글에서는 복잡한 장면 설계하기—여러 인물과 요소를 한 화면에 배치하는 방법을 다룹니다.
 

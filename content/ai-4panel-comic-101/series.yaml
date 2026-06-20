@@ -1,0 +1,32 @@
+id: ai-4panel-comic-101
+articles:
+- idx: 1
+  slug: 01-what-is-4panel-comic
+  status: draft
+- idx: 2
+  slug: 02-story-seed
+  status: draft
+- idx: 3
+  slug: 03-character-design
+  status: draft
+- idx: 4
+  slug: 04-scene-and-framing
+  status: draft
+- idx: 5
+  slug: 05-first-4panel
+  status: draft
+- idx: 6
+  slug: 06-emotion-and-expression
+  status: draft
+- idx: 7
+  slug: 07-dialogue-and-effects
+  status: draft
+- idx: 8
+  slug: 08-series-expansion
+  status: draft
+- idx: 9
+  slug: 09-genre-variations
+  status: draft
+- idx: 10
+  slug: 10-production-workflow
+  status: draft

@@ -49,6 +49,15 @@ seo_description: "여러 인물과 요소를 한 화면에 배치하는 복잡�
 
 한 명의 인물 + 단순한 배경은 AI가 가장 안정적으로 생성합니다. 이것이 기준선입니다.
 
+**1인 장면 성공 요소**:
+
+| 요소 | 설명 | 예시 |
+|------|------|------|
+| 인물 설명 | 외형, 의상, 행동 | "A chef in a white coat holding a knife" |
+| 배경 | 명확하고 단순한 배경 | "modern kitchen, stainless steel counter" |
+| 스타일 | 표현 방식 | "photorealistic" |
+| 구도 | 거리와 각도 | "medium shot" |
+
 ---
 
 ## 2단계: 2인 상호작용
@@ -66,6 +75,15 @@ seo_description: "여러 인물과 요소를 한 화면에 배치하는 복잡�
 - 관계 또는 상호작용 (가르치는, 대화하는, 건네주는)
 - 시선/신체 방향 (둘 다 도마를 향해)
 - 공간적 배치 (나란히, 마주보고, 뒤에서)
+
+**2인 장면 패턴 예시**:
+
+| 관계 | 배치 | 키워드 |
+|------|------|--------|
+| 교사-학생 | 나란히 | `side by side, teacher demonstrating to student` |
+| 대화 | 마주보고 | `facing each other, in conversation` |
+| 협력 | 같은 방향 | `working together toward the same goal` |
+| 전달 | 손에서 손으로 | `handing something between them` |
 
 ---
 
@@ -102,13 +120,21 @@ seo_description: "여러 인물과 요소를 한 화면에 배치하는 복잡�
 **레이어 프롬프트 구조**:
 
 ```
-[전경: 대상 + sharp focus] + 
-[중경: 대상 + slightly blurred] + 
-[배경: 대상 + soft bokeh] + 
+[전경: 대상 + sharp focus] +
+[중경: 대상 + slightly blurred] +
+[배경: 대상 + soft bokeh] +
 shallow depth of field
 ```
 
 이 구조를 사용하면 단순히 "여러 요소가 있는 장면"이 아니라 시선이 유도되는 **깊이 있는 구도**가 됩니다.
+
+**레이어 지정 예시**:
+
+| 레이어 | 키워드 | 초점 |
+|--------|--------|------|
+| 전경 | `in the foreground`, `front of frame` | `sharp focus`, `in focus` |
+| 중경 | `in the midground`, `middle of scene` | `slightly out of focus` |
+| 배경 | `in the background`, `far background` | `soft bokeh`, `blurred background` |
 
 ---
 
@@ -127,6 +153,15 @@ shallow depth of field
 - 상/하: `top portion`, `bottom portion`, `upper half`, `lower half`
 - 연결: `connected by`, `shared`, `between them`
 
+**공간 분할 활용 사례**:
+
+| 사용 목적 | 공간 분할 방법 |
+|---------|-------------|
+| Before/After 비교 | 좌우 분할 |
+| 두 세계 대비 | 좌우 또는 상하 분할 |
+| 타임라인 | 좌에서 우로 시간 흐름 |
+| 계층 구조 | 상에서 하로 위계 표현 |
+
 ---
 
 ## 6단계: 동작과 상호작용
@@ -138,6 +173,15 @@ shallow depth of field
 *동작 장면: 각 인물에게 서로 다른 반응을 부여하면 드라마가 만들어진다.*
 
 **핵심 기법**: 같은 순간에 세 사람이 **서로 다른 반응**을 보이게 했습니다. 한 명은 행동(불 던지기), 한 명은 반응(놀라서 뒤로), 한 명은 무관심(묵묵히 작업). 이 대비가 드라마를 만듭니다.
+
+**동작 묘사 키워드**:
+
+| 동작 유형 | 키워드 예시 |
+|----------|-----------|
+| 동적 행동 | `tossing`, `jumping`, `running`, `spinning` |
+| 감정 반응 | `wide-eyed surprise`, `laughing`, `grimacing` |
+| 정적 행동 | `calmly working`, `quietly observing` |
+| 물리적 상태 | `mid-air`, `leaning forward`, `frozen in place` |
 
 ---
 
@@ -192,6 +236,53 @@ shallow depth of field
 
 ---
 
+## 자주 하는 실수
+
+복잡한 장면에서 자주 발생하는 실수와 해결책입니다.
+
+| 실수 | 예시 | 문제 | 해결책 |
+|------|------|------|--------|
+| 인물 구분 없음 | "many people in a cafe" | 모두 같아 보임 | 각 인물에게 특징 부여 |
+| 위치 지정 없음 | "five people working" | 무작위 배치 | "on the left/right/center" 지정 |
+| 앵커 없음 | 구조물 없이 많은 인물 | 혼란스러운 배치 | 테이블/무대 등 중심 구조물 먼저 |
+| 과도한 요소 | 10명 + 동물 + 소품 | 일부 사라지거나 합침 | 요소 수 줄이기 |
+| 구도 미지정 | wide shot 없음 | 일부 잘림 | `wide shot` 추가 |
+
+---
+
+## 복잡한 장면 구조 템플릿
+
+실전에서 바로 쓸 수 있는 템플릿입니다.
+
+### 소규모 팀 작업 장면
+
+```
+[중심 공간] with [N] people,
+person 1 on the left [역할 + 행동],
+person 2 in the center [역할 + 행동],
+person 3 on the right [역할 + 행동],
+[분위기], photorealistic, wide shot
+```
+
+### 군중 속 주인공 장면
+
+```
+[군중 설명] in the background (out of focus),
+in the center foreground [주인공 + 상세 묘사] in sharp focus,
+[배경/장소], [조명], [스타일]
+```
+
+### 공간 비교 장면
+
+```
+On the left side [공간 A + 특징],
+on the right side [공간 B + 특징],
+connected by [연결 요소],
+[전체 분위기], [스타일], wide shot
+```
+
+---
+
 ## 정리
 
 복잡한 장면을 단계적으로 쌓아올리면서 확인한 것:
@@ -200,6 +291,7 @@ shallow depth of field
 - 다인 장면은 각 인물에게 고유한 행동을 부여해야 한다
 - 전경/중경/배경 레이어를 지정하면 깊이감이 생긴다
 - 과도한 요소는 실패를 부르므로, 중심 구조물 + 관계 기반 배치가 안전하다
+- 복잡도 한계(7명)를 넘어가면 그룹 단위로 묘사하거나 분할 생성을 고려한다
 
 다음 글에서는 일관성 유지하기—같은 캐릭터를 여러 이미지에 걸쳐 반복 생성하는 방법을 다룹니다.
 

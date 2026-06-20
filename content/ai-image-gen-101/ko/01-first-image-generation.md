@@ -130,7 +130,7 @@ ChatGPT의 이미지 생성 기능은 텍스트 설명을 받아 이미지를 �
 
 *왼쪽: 주제만 지정. 오른쪽: 스타일(푸드 포토), 구도(오버헤드), 조명(아침 자연광), 배경(카페)을 모두 지정.*
 
-오른쪽 이미지는 인스타그램이나 블로그에 바로 올릴 수 있는 수준입니다. 프롬프트에 30초만 더 투자했을 뿐인데 결과의 차이는 큭니다.
+오른쪽 이미지는 인스타그램이나 블로그에 바로 올릴 수 있는 수준입니다. 프롬프트에 30초만 더 투자했을 뿐인데 결과의 차이는 큽니다.
 
 ---
 
@@ -140,15 +140,95 @@ ChatGPT의 이미지 생성 기능은 텍스트 설명을 받아 이미지를 �
 
 ### 1. 구체적으로 쓰세요
 
-"예쁜 꽃"보다 "분홍색 벩꽃이 흔날리는 봄날의 가로수길"이 낫습니다. AI는 우리 머릿속 이미지를 볼 수 없으니까, 문자로 전달할 수 있는 만큼만 이해합니다.
+"예쁜 꽃"보다 "분홍색 벚꽃이 흩날리는 봄날의 가로수길"이 낫습니다. AI는 우리 머릿속 이미지를 볼 수 없으니까, 문자로 전달할 수 있는 만큼만 이해합니다.
+
+구체성을 높이는 방법:
+- **색상**: "꽃"이 아니라 "분홍색 벚꽃"
+- **수량**: "사람들"이 아니라 "세 명의 사람"
+- **행동**: "앉아 있는"이 아니라 "무릎을 꿇고 책을 읽고 있는"
+- **상태**: "오래된"이 아니라 "이끼가 낀 풍화된 돌로 만들어진"
 
 ### 2. 스타일을 명시하세요
 
 "사진처럼", "수채화처럼", "픽사 애니메이션 스타일로" 같은 표현을 넣으면 AI가 전체 분위기를 결정하는 데 큰 도움이 됩니다.
 
+자주 쓰이는 스타일 키워드:
+
+| 카테고리 | 키워드 예시 |
+|----------|------------|
+| 사진 계열 | photorealistic, DSLR photography, film grain |
+| 회화 계열 | watercolor, oil painting, pencil sketch |
+| 디지털 계열 | flat vector, 3D render, pixel art |
+| 애니메이션 계열 | anime style, Studio Ghibli, Pixar |
+| 분위기 계열 | cinematic, editorial, documentary |
+
 ### 3. 한 번에 완벽할 필요 없습니다
 
 첫 결과가 마음에 안 들면, 프롬프트를 수정해서 다시 만들면 됩니다. 이미지 생성은 반복적인 과정이지, 한 번에 완성하는 과정이 아닙니다. "조금 더 밝게", "배경을 단순하게", "좀 더 왼쪽으로" 같은 수정 지시를 이어서 줄 수도 있습니다.
+
+프롬프트 수정 예시:
+
+| 상황 | 수정 방향 | 추가 키워드 |
+|------|----------|------------|
+| 색이 너무 어둡다 | 밝기 조정 | bright, well-lit, vibrant |
+| 배경이 복잡하다 | 단순화 | clean background, minimal |
+| 주인공이 작게 나왔다 | 구도 변경 | close-up, portrait shot |
+| 분위기가 차갑다 | 색온도 변경 | warm tones, golden light |
+
+---
+
+## 자주 하는 실수
+
+첫 이미지 생성에서 많은 사람이 겪는 실수들입니다.
+
+| 실수 | 구체적 예시 | 해결책 |
+|------|-----------|--------|
+| 추상적 형용사 남발 | "beautiful amazing stunning cat" | "short-haired orange tabby cat" |
+| 너무 많은 주제 동시 요청 | "고양이 + 강아지 + 토끼 + 새 + 물고기" | 주인공 하나에 집중 |
+| 스타일 미지정 | 스타일 키워드 없음 | "photorealistic" 또는 원하는 스타일 추가 |
+| 결과 한 번에 포기 | 첫 결과가 이상하다고 중단 | 프롬프트 수정 후 재시도 |
+| 영어 vs 한국어 혼용 | 한국어와 영어 섞어서 사용 | 한 언어로 통일 (영어 권장) |
+
+---
+
+## Before & After: 프롬프트 개선 예시
+
+### 예시 1: 홈 오피스
+
+**Before (나쁜 프롬프트)**:
+> 좋은 사무실 이미지
+
+**After (개선된 프롬프트)**:
+> A minimalist home office with a white wooden desk, a MacBook, a small succulent plant, a coffee mug, and a notebook. Morning sunlight streaming in through large windows, warm bright atmosphere, interior photography style, slightly above eye level
+
+**차이**: Before는 AI에게 모든 것을 맡깁니다. After는 가구(흰 나무 책상), 소품(맥북, 다육이, 머그컵, 노트), 조명(아침 햇살), 스타일(인테리어 사진)을 모두 명시합니다.
+
+### 예시 2: 음식 사진
+
+**Before (나쁜 프롬프트)**:
+> 맛있어 보이는 라면 사진
+
+**After (개선된 프롬프트)**:
+> A steaming bowl of Korean ramyeon with a rich red broth, topped with a perfectly soft-boiled egg cut in half, green onions, and dried seaweed, served in a traditional Korean ceramic bowl on a dark wooden table, food photography overhead shot, warm soft lighting
+
+**차이**: Before는 "맛있어 보이는"이라는 주관적 형용사만 있습니다. After는 재료(반숙 계란, 파, 김), 그릇(한국 도자기), 배경(어두운 나무 테이블), 구도(오버헤드), 조명(따뜻한 소프트)을 모두 지정합니다.
+
+---
+
+## 프롬프트 구조 연습: 3단계 확장법
+
+처음에는 간단하게 시작해서 조금씩 요소를 추가하는 방법을 연습해 보세요.
+
+**1단계**: 주제만 (최소 프롬프트)
+> A lighthouse
+
+**2단계**: 주제 + 스타일 + 조명
+> A lighthouse at dusk, photorealistic, golden sunset light
+
+**3단계**: 주제 + 스타일 + 조명 + 구도 + 배경
+> A tall white lighthouse on a rocky coastal cliff at dusk, photorealistic photography, dramatic golden sunset casting long shadows, wide establishing shot, turbulent waves crashing against the rocks below, overcast sky with breaks of warm light
+
+이 3단계 확장법으로 연습하면 자연스럽게 풍부한 프롬프트를 작성하게 됩니다.
 
 ---
 
@@ -171,6 +251,31 @@ print(f"이미지 저장 위치: {result.saved_path}")
 
 코드 없이 ChatGPT 웹사이트에서 동일한 프롬프트를 입력해도 같은 결과를 얻을 수 있습니다. 프롬프트 작성법이 핵심이지, 도구가 핵심이 아닙니다.
 
+### ChatGPT 웹에서 이미지 생성하는 방법
+
+1. ChatGPT Plus 또는 Team 플랜에 로그인합니다
+2. 대화창에 이미지를 설명하는 프롬프트를 입력합니다
+3. "이미지 생성해줘"라고 덧붙이거나, 이미지 생성 모드를 선택합니다
+4. 생성된 이미지를 다운로드하거나 추가 수정을 요청합니다
+
+무료 ChatGPT 사용자도 제한적으로 이미지 생성을 사용할 수 있습니다. 무료 한도가 부족하면 이 시리즈의 오픈소스 도구를 활용하는 방법을 참고하세요.
+
+---
+
+## 자주 묻는 질문
+
+**Q: 한국어로 프롬프트를 써도 되나요?**
+
+한국어로도 이미지가 생성되지만, 영어 프롬프트가 더 풍부하고 정확한 결과를 냅니다. AI 모델이 영어 데이터로 주로 훈련되었기 때문입니다. 익숙해질 때까지는 영어 프롬프트를 권장합니다.
+
+**Q: 원하는 결과가 안 나올 때 어떻게 해야 하나요?**
+
+두 가지 방향이 있습니다. 첫째, 프롬프트에 더 구체적인 정보를 추가합니다. 둘째, 원하지 않는 요소를 명시적으로 제외합니다 (예: "without text", "no people", "clear sky without clouds"). 보통 2-3번 수정하면 원하는 결과에 근접합니다.
+
+**Q: 생성한 이미지를 상업적으로 사용해도 되나요?**
+
+ChatGPT/DALL-E로 생성한 이미지의 사용 정책은 OpenAI 이용약관을 확인해야 합니다. 일반적으로 개인 사용과 많은 상업적 사용이 허용되지만, 정확한 범위는 약관을 참조하세요.
+
 ---
 
 ## 정리: 첫 이미지를 만들어보면서 배운 것
@@ -180,6 +285,7 @@ print(f"이미지 저장 위치: {result.saved_path}")
 - 단순한 프롬프트는 AI에게 거의 모든 결정을 맡긴다
 - 상세한 프롬프트는 내가 원하는 방향으로 안내한다
 - 주제, 스타일, 구도, 조명, 배경의 5가지 요소가 결과를 좌우한다
+- 처음부터 완벽할 필요 없다 — 수정하면서 개선해 나간다
 
 다음 글에서는 이 5가지 요소 중 가장 영향력이 큰 "프롬프트 구조"를 더 깊이 파고들겠습니다.
 

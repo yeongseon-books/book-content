@@ -48,12 +48,21 @@ seo_description: "시리즈에서 배운 모든 기법을 합쳐 블로그 썸�
 **프롬프트 공식**:
 
 ```
-[주제의 시각적 메타포] + flat illustration style + 
-clean white background + [브랜드 색상] accents + 
+[주제의 시각적 메타포] + flat illustration style +
+clean white background + [브랜드 색상] accents +
 centered composition + soft even lighting
 ```
 
 **적용 기법**: 스타일(Ep.3 플랫 벡터) + 구도(Ep.4 센터 구도) + 조명(Ep.5 균일 조명)
+
+**블로그 썸네일 체크리스트**:
+
+| 체크 항목 | 이유 |
+|---------|------|
+| 주제가 한눈에 보이는가? | 썸네일은 0.5초 안에 내용을 전달해야 함 |
+| 배경이 너무 복잡하지 않은가? | 단순한 배경이 주제를 돋보이게 함 |
+| 텍스트가 들어갈 공간이 있는가? | 제목/부제목 추가를 위한 여백 확보 |
+| 가로로 긴 비율인가? | 블로그 썸네일은 16:9 또는 2:1 비율 |
 
 ---
 
@@ -66,12 +75,21 @@ centered composition + soft even lighting
 **프롬프트 공식**:
 
 ```
-[인물 + 강한 감정 표현] + cinematic photography style + 
-dramatic [색상] lighting + close-up shot + 
+[인물 + 강한 감정 표현] + cinematic photography style +
+dramatic [색상] lighting + close-up shot +
 high energy composition
 ```
 
 **적용 기법**: 구도(Ep.4 클로즈업) + 조명(Ep.5 시네마틱) + 스타일(Ep.3 사진)
+
+**유튜브 썸네일 특징**:
+
+| 요소 | 권장 사항 |
+|------|---------|
+| 인물 | 과장된 감정 표현 (놀람, 기쁨, 충격) |
+| 배경 | 눈길을 끄는 색상 대비 |
+| 구도 | 클로즈업 + 약간 로우 앵글 |
+| 색상 | 빨강, 주황, 노랑 같은 강한 색상 |
 
 ---
 
@@ -84,12 +102,21 @@ high energy composition
 **프롬프트 공식**:
 
 ```
-[소품 배치 설명] + flat lay composition + bird's eye view + 
-clean bright photography + warm natural light + 
+[소품 배치 설명] + flat lay composition + bird's eye view +
+clean bright photography + warm natural light +
 pastel color palette
 ```
 
 **적용 기법**: 구도(Ep.4 버드아이) + 조명(Ep.5 자연광) + 복잡한 장면(Ep.6 요소 배치)
+
+**인스타그램 플랫레이 소품 배치 예시**:
+
+| 테마 | 소품 조합 |
+|------|---------|
+| 카페 작업 | 맥북 + 커피 + 노트 + 식물 |
+| 독서 | 책 + 안경 + 북마크 + 따뜻한 음료 |
+| 요리 | 재료 + 도마 + 칼 + 허브 |
+| 여행 | 지도 + 카메라 + 여권 + 선글라스 |
 
 ---
 
@@ -102,13 +129,22 @@ pastel color palette
 **프롬프트 공식**:
 
 ```
-abstract flowing gradient shapes in [색상] + 
-minimalist design + clean and modern + 
-plenty of empty space for text placement + 
+abstract flowing gradient shapes in [색상] +
+minimalist design + clean and modern +
+plenty of empty space for text placement +
 corporate aesthetic
 ```
 
 **핵심**: `plenty of empty space for text placement`를 명시해야 텍스트가 들어갈 여백이 생깁니다.
+
+**프레젠테이션 배경 색상 가이드**:
+
+| 목적 | 추천 색상 | 느낌 |
+|------|---------|------|
+| 기업 발표 | 파랑, 진회색 | 신뢰, 전문적 |
+| 창의적 발표 | 보라, 핑크 | 혁신, 독창적 |
+| 환경/지속가능성 | 초록, 갈색 | 자연, 안정 |
+| 에너지/열정 | 빨강, 주황 | 활동적, 긴박 |
 
 ---
 
@@ -121,12 +157,20 @@ corporate aesthetic
 **프롬프트 공식**:
 
 ```
-a set of [N] consistent [주제] icons in a grid + 
-same [스타일] style + consistent [색상] palette + 
+a set of [N] consistent [주제] icons in a grid +
+same [스타일] style + consistent [색상] palette +
 white background + clean geometric shapes
 ```
 
 **적용 기법**: 일관성(Ep.7 스타일 고정) + 스타일(Ep.3 플랫 벡터)
+
+**아이콘 세트 활용 예시**:
+
+| 사용 목적 | 아이콘 예시 |
+|---------|-----------|
+| 서비스 소개 | 빠름/저렴/안전/편리 아이콘 4종 |
+| 기능 설명 | 편집/공유/저장/분석 아이콘 4종 |
+| 단계 설명 | 1-2-3-4 단계 아이콘 |
 
 ---
 
@@ -139,8 +183,8 @@ white background + clean geometric shapes
 **프롬프트 공식**:
 
 ```
-[주제의 시각적 장면] + [스타일] style + 
-centered composition with space for text at the top + 
+[주제의 시각적 장면] + [스타일] style +
+centered composition with space for text at the top +
 warm [조명] lighting + soft bokeh background
 ```
 
@@ -207,6 +251,21 @@ for style in styles:
 ```
 
 이런 스크립트를 한 번 만들어두면, 새 주제가 생길 때마다 주제만 바꿔서 전체 스타일 비교 세트를 자동 생성할 수 있습니다.
+
+---
+
+## 실전 이미지 제작 체크리스트
+
+이미지를 발행하기 전 최종 확인 목록입니다.
+
+| 확인 항목 | 세부 기준 |
+|---------|---------|
+| 목적 적합성 | 이 이미지가 콘텐츠의 목적을 달성하는가? |
+| 구도 | 주제가 명확하게 보이는가? |
+| 색감 | 브랜드 색상과 일치하는가? |
+| 텍스트 공간 | 제목/설명을 추가할 여백이 있는가? |
+| 해상도 | 해당 플랫폼 최소 해상도 이상인가? |
+| 원본 저장 | 고해상도 원본을 저장했는가? |
 
 ---
 
