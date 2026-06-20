@@ -98,6 +98,46 @@ print("acc:", model.score(X, y))
 
 **예상 출력:** `X.shape`, `y.shape`는 `(150, 4)`, `(150,)`처럼 작은 표 데이터를 보여 주고, `predict`는 클래스 ID 배열을 출력합니다. 마지막 정확도는 대체로 높게 나오지만, 여기서는 **훈련 데이터 점수**라는 점을 먼저 기억해야 합니다.
 
+## 모델 비교: 첫 번째 ML의 선택지
+
+처음 머신러닝을 시작할 때 어떤 모델을 골라야 할지 막막합니다. 아래 표는 입문 단계에서 자주 만나는 모델들의 특징을 요약합니다.
+
+| 모델 | 유형 | 해석 가능성 | 전처리 필요도 | 추천 시작 상황 |
+|---|---|---|---|---|
+| LogisticRegression | 분류 | 높음 | 스케일링 필요 | 이진 분류 베이스라인 |
+| LinearRegression | 회귀 | 높음 | 스케일링 권장 | 연속값 예측 베이스라인 |
+| DecisionTreeClassifier | 분류 | 중간 | 거의 불필요 | 규칙을 시각화하고 싶을 때 |
+| KMeans | 군집 | 낮음 | 스케일링 필수 | 레이블 없는 탐색 |
+
+베이스라인 없이 바로 복잡한 모델로 시작하면 어디서 성능이 나오는지 알 수 없습니다. 항상 단순한 모델부터 시작합니다.
+
+## 규칙 기반 vs 머신러닝 코드 비교
+
+규칙 기반 접근법과 머신러닝 접근법이 같은 문제에서 어떻게 다른지 살펴봅니다.
+
+```python
+# 규칙 기반: 사람이 직접 경계를 정합니다
+def classify_rule(petal_length):
+    if petal_length < 2.0:
+        return "setosa"
+    elif petal_length < 4.5:
+        return "versicolor"
+    else:
+        return "virginica"
+
+# 머신러닝: 데이터에서 경계를 학습합니다
+from sklearn.datasets import load_iris
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
+X, y = load_iris(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42)
+model = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
+print("ML 정확도:", model.score(Xte, yte))
+```
+
+규칙 기반은 새로운 품종이 등장하면 사람이 규칙을 다시 써야 합니다. 머신러닝은 새로운 데이터를 주면 모델이 스스로 경계를 다시 그립니다.
+
 ## ML이 적합한 문제 vs 부적합한 문제
 
 **적합한 경우:**
@@ -130,19 +170,56 @@ print("Accuracy:", model.score(X, y))  # 예: 0.97
 - 여기서 `score`는 **훈련 정확도**일 뿐이며, 일반화 성능을 바로 뜻하지는 않습니다.
 - 어떤 모델을 고를지는 **문제 유형**에 따라 달라집니다.
 
+## 학습 파이프라인 전체 예제
+
+실제로 프로젝트를 시작할 때 사용하는 최소한의 패턴입니다.
+
+```python
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+
+# 1. 데이터
+X, y = load_iris(return_X_y=True)
+
+# 2. 분할 (분할이 먼저입니다)
+Xtr, Xte, ytr, yte = train_test_split(
+    X, y, test_size=0.2, stratify=y, random_state=42
+)
+
+# 3. 전처리 (훈련 데이터만 fit)
+sc = StandardScaler().fit(Xtr)
+Xtr_s = sc.transform(Xtr)
+Xte_s = sc.transform(Xte)
+
+# 4. 학습
+model = LogisticRegression(max_iter=1000).fit(Xtr_s, ytr)
+
+# 5. 평가
+print("훈련 점수:", model.score(Xtr_s, ytr))
+print("테스트 점수:", model.score(Xte_s, yte))
+print(classification_report(yte, model.predict(Xte_s)))
+```
+
+이 패턴을 지키면 누수와 과적합 진단의 기반이 만들어집니다. 분할을 먼저 하고, 전처리는 훈련 데이터로만 `fit`하는 순서가 핵심입니다.
+
 ## 실패 신호를 먼저 이렇게 읽습니다
 
 - 훈련 정확도는 높은데 새 데이터에서 바로 무너지면, 모델보다 먼저 **입력 분포 변화**나 **타깃 정의의 모호함**을 의심해야 합니다.
 - 팀이 `X`와 `y`가 무엇인지 한 문장으로 설명하지 못하면, 아직 모델 비교 단계가 아니라 **문제 정의 단계**에 머물러 있는 것입니다.
 - 노트북에서 늘 같은 샘플 행만 확인하며 잘 된다고 느낀다면, 알고리즘보다 먼저 **누수**와 **암기** 가능성을 살펴봐야 합니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수
 
-1. **훈련 데이터 점수만 보고 성공을 판단합니다.**
-2. **피처 스케일링을 무시합니다.**
-3. **피처 안에 타깃 누수(target leakage)가 섞인 것을 놓칩니다.**
-4. **랜덤 시드를 고정하지 않아 재현 가능한 결과를 남기지 못합니다.**
-5. **결측치나 이상치를 처리하지 않은 채 학습을 시작합니다.**
+| 실수 | 증상 | 해결 방향 |
+|---|---|---|
+| 훈련 점수만 보고 성공 판단 | 테스트에서 점수 폭락 | 분리된 테스트 세트로 평가 |
+| 피처 스케일링 무시 | 모델 불안정, 수렴 실패 | StandardScaler 적용 |
+| 타깃 누수(leakage) | 비현실적으로 높은 점수 | 피처 검토, 분할 순서 확인 |
+| 랜덤 시드 미고정 | 결과 재현 불가 | `random_state=42` 등 고정 |
+| 결측치·이상치 미처리 | 모델 학습 실패 또는 왜곡 | EDA 단계에서 먼저 처리 |
 
 ## 실무에서는 이렇게 나타납니다
 
@@ -189,3 +266,5 @@ print("Accuracy:", model.score(X, y))  # 예: 0.97
 1. `iris`가 아닌 **자신의 데이터셋**으로 `fit / predict`를 실행해 보세요.
 2. `score`가 왜 **과도하게 낙관적**일 수 있는지 설명해 보세요.
 3. 피처 스케일링이 결과를 바꾸는 예시를 하나 만들어 보세요.
+4. 규칙 기반으로 풀기 어려운 문제를 하나 찾아 머신러닝으로 어떻게 접근할지 설명해 보세요.
+5. `train_test_split`을 추가해서 훈련 점수와 테스트 점수의 차이를 관찰해 보세요.

@@ -61,75 +61,128 @@ Kubernetes를 배우는 이유도 여기 있습니다. 많은 입문자가 Kuber
 
 ## 도입 전과 후
 
-Kubernetes가 없을 때는 서버마다 수동으로 `docker run`을 실행하고, 죽은 컨테이너가 있으면 사람이 다시 올립니다. 같은 환경을 다른 서버에 재현하기도 쉽지 않습니다.
+| 항목 | Kubernetes 이전 | Kubernetes 도입 후 |
+|---|---|---|
+| 컨테이너 관리 | 서버마다 수동 `docker run` | 원하는 상태 선언으로 자동 유지 |
+| 장애 복구 | 사람이 직접 컨테이너 재시작 | 컨트롤러 루프가 자동 감지·복구 |
+| 환경 재현 | 설정 파일을 별도 관리, 실수 잦음 | YAML 파일 하나로 반복 재현 가능 |
+| 배포 방식 | 서비스 중단 후 수동 교체 | 롤링 업데이트로 무중단 배포 |
+| 스케일링 | 수동으로 서버 추가 및 배포 | HPA 등으로 부하에 따라 자동 조절 |
 
 Kubernetes를 도입하면 상황이 달라집니다. 원하는 상태를 YAML로 선언하면 같은 구성을 다른 환경에 반복해서 적용할 수 있고, 시스템이 현재 상태를 계속 목표 상태에 맞추려 합니다. 재현성과 자동 복구가 여기서 시작됩니다.
+
+## 핵심 컴포넌트 살펴보기
+
+Kubernetes 클러스터는 크게 컨트롤 플레인과 워커 노드로 나뉩니다.
+
+### 컨트롤 플레인 컴포넌트
+
+```yaml
+# 컨트롤 플레인의 주요 구성요소
+controlPlane:
+  apiServer:
+    역할: 클러스터의 모든 요청을 처리하는 프론트엔드
+    통신: kubectl, 다른 컴포넌트와 REST API로 통신
+  etcd:
+    역할: 클러스터 전체 상태를 저장하는 분산 키-값 스토어
+    주의: 직접 접근 금지, API 서버를 통해서만 조작
+  scheduler:
+    역할: 새 파드를 어느 노드에 배치할지 결정
+    기준: 노드의 자원 가용량, taint/toleration, affinity
+  controllerManager:
+    역할: 다양한 컨트롤러를 실행하는 프로세스
+    예시: ReplicaSet 컨트롤러, Node 컨트롤러
+```
+
+### 워커 노드 컴포넌트
+
+```yaml
+# 각 워커 노드에서 실행되는 컴포넌트
+workerNode:
+  kubelet:
+    역할: API 서버와 통신하며 파드를 생성·유지·삭제
+    특징: 노드에서 실제 컨테이너 상태를 맞추는 에이전트
+  kubeProxy:
+    역할: 네트워크 규칙을 관리해 서비스 통신 경로 구성
+    방식: iptables 또는 IPVS 기반 로드밸런싱
+  containerRuntime:
+    역할: 실제로 컨테이너를 실행하는 런타임
+    예시: containerd, CRI-O
+```
 
 ## 단계별로 첫 클러스터 둘러보기
 
 ### 1단계 — 현재 컨텍스트 확인
 
-```python
-import subprocess
-
-def current_context():
-    res = subprocess.run(
-        ["kubectl", "config", "current-context"],
-        capture_output=True, text=True, check=True,
-    )
-    return res.stdout.strip()
+```bash
+kubectl config current-context
 ```
 
 가장 먼저 볼 값은 현재 컨텍스트입니다. `kubectl`은 단일 클러스터 전용 도구가 아니므로, 지금 어떤 클러스터를 바라보는지부터 확인해야 합니다. 입문 단계에서도 이 습관이 중요합니다.
 
+```bash
+# 여러 클러스터 컨텍스트 목록 보기
+kubectl config get-contexts
+
+# 특정 컨텍스트로 전환
+kubectl config use-context my-cluster
+```
+
 ### 2단계 — 노드 목록 확인
 
-```python
-def get_nodes():
-    res = subprocess.run(
-        ["kubectl", "get", "nodes", "-o", "wide"],
-        capture_output=True, text=True, check=True,
-    )
-    return res.stdout
+```bash
+kubectl get nodes -o wide
+```
+
+출력 예시:
+```
+NAME          STATUS   ROLES           AGE   VERSION   INTERNAL-IP    OS-IMAGE
+master-node   Ready    control-plane   5d    v1.28.0   192.168.1.10   Ubuntu 22.04
+worker-01     Ready    <none>          5d    v1.28.0   192.168.1.11   Ubuntu 22.04
+worker-02     Ready    <none>          5d    v1.28.0   192.168.1.12   Ubuntu 22.04
 ```
 
 노드 목록은 이 클러스터가 실제로 어떤 실행 자원을 갖고 있는지 보여 줍니다. Kubernetes가 논리적인 제어 시스템처럼 보여도, 결국 워크로드는 워커 노드 위에서 돌아갑니다.
 
 ### 3단계 — 네임스페이스 확인
 
-```python
-def list_namespaces():
-    res = subprocess.run(
-        ["kubectl", "get", "ns"],
-        capture_output=True, text=True, check=True,
-    )
-    return res.stdout
+```bash
+kubectl get namespaces
+```
+
+출력 예시:
+```
+NAME              STATUS   AGE
+default           Active   5d
+kube-node-lease   Active   5d
+kube-public       Active   5d
+kube-system       Active   5d
 ```
 
 네임스페이스는 Kubernetes에서 가장 기본적인 격리 단위입니다. 워크로드를 그냥 한곳에 모두 넣는 대신, 환경이나 팀 단위로 나눠 운영하기 시작하는 출발점이라고 보면 됩니다.
 
 ### 4단계 — 시스템 파드 보기
 
-```python
-def system_pods():
-    res = subprocess.run(
-        ["kubectl", "-n", "kube-system", "get", "pods"],
-        capture_output=True, text=True, check=True,
-    )
-    return res.stdout
+```bash
+kubectl -n kube-system get pods
+```
+
+출력 예시:
+```
+NAME                                   READY   STATUS    RESTARTS   AGE
+coredns-5dd5756b68-4j9lm              1/1     Running   0          5d
+etcd-master-node                      1/1     Running   0          5d
+kube-apiserver-master-node            1/1     Running   0          5d
+kube-controller-manager-master-node   1/1     Running   0          5d
+kube-scheduler-master-node            1/1     Running   0          5d
 ```
 
 `kube-system` 네임스페이스를 보면 클러스터가 스스로를 운영하기 위해 어떤 구성요소를 띄우는지 감이 옵니다. Kubernetes는 단일 바이너리 하나가 아니라 여러 컴포넌트가 함께 움직이는 시스템이라는 점이 여기서 드러납니다.
 
 ### 5단계 — 클러스터 상태 확인
 
-```python
-def cluster_info():
-    res = subprocess.run(
-        ["kubectl", "cluster-info"],
-        capture_output=True, text=True, check=True,
-    )
-    return res.stdout
+```bash
+kubectl cluster-info
 ```
 
 `cluster-info`는 클러스터 접근 경로를 빠르게 확인할 때 유용합니다. 처음에는 단순 조회처럼 보이지만, 실제 운영에서는 API 서버 접근 문제를 확인하는 첫 단계가 되기도 합니다.
@@ -150,19 +203,55 @@ kubectl cluster-info
 - `kubectl get nodes`가 timeout 나면 인증 정보보다 네트워크 경로나 API 서버 가용성을 먼저 확인하는 편이 빠릅니다.
 - `cluster-info`는 되는데 노드가 `NotReady`면 Kubernetes 개념 문제가 아니라 클러스터 상태 문제입니다.
 
-- `kubectl`은 API 서버와 통신합니다.
-- `etcd`를 직접 만지는 흐름은 일반적인 운영 경로가 아닙니다.
-- 네임스페이스가 기본 격리 단위라는 감각을 일찍 익히는 편이 좋습니다.
+## 트러블슈팅 시나리오
 
-이 세 가지를 먼저 잡아 두면 Kubernetes를 "명령을 내리면 즉시 컨테이너가 뜨는 도구"로 오해하지 않게 됩니다. 사용자가 하는 일은 대부분 선언이고, 실제 조정은 컨트롤 플레인이 맡습니다.
+### 시나리오 1: 노드가 NotReady 상태
 
-## 자주 하는 실수 다섯 가지
+```bash
+# 노드 상세 확인
+kubectl describe node worker-01
 
-1. Kubernetes를 단순히 컨테이너와 같은 뜻으로 받아들입니다.
-2. 노드 수만 늘리면 운영 문제가 자동으로 해결된다고 생각합니다.
-3. `etcd`를 일반 데이터 저장소처럼 직접 다루려 합니다.
-4. `kubectl` 컨텍스트를 확인하지 않고 잘못된 클러스터에 적용합니다.
-5. 워크로드 규모가 아주 작은데도 Kubernetes부터 도입합니다.
+# 노드에서 kubelet 로그 확인
+journalctl -u kubelet -n 50
+
+# 자주 나오는 원인
+# - 디스크 공간 부족 (Condition: DiskPressure)
+# - 메모리 부족 (Condition: MemoryPressure)
+# - 네트워크 플러그인 오류 (Condition: NetworkUnavailable)
+```
+
+### 시나리오 2: kubectl 명령이 응답 없음
+
+```bash
+# API 서버 직접 접근 테스트
+curl -k https://<api-server-ip>:6443/healthz
+
+# kubeconfig 파일 확인
+kubectl config view
+
+# 인증서 만료 확인 (kubeadm 기반 클러스터)
+kubeadm certs check-expiration
+```
+
+### 시나리오 3: 잘못된 컨텍스트에 명령 실행
+
+```bash
+# 현재 컨텍스트 확인 필수
+kubectl config current-context
+
+# 특정 컨텍스트로 단일 명령 실행 (전환 없이)
+kubectl --context=staging-cluster get pods
+```
+
+## 자주 하는 실수
+
+| 실수 | 증상 | 올바른 접근 |
+|---|---|---|
+| Kubernetes를 컨테이너와 동일시 | "컨테이너만 잘 돌리면 된다"는 사고방식 | 오케스트레이터 관점에서 원하는 상태 모델 이해 |
+| 노드만 늘리면 해결된다고 생각 | 노드 추가 후에도 장애 지속 | 애플리케이션 설계와 리소스 제한을 함께 검토 |
+| etcd 직접 수정 시도 | 클러스터 상태 불일치 | API 서버를 통한 상태 변경만 허용 |
+| 컨텍스트 확인 없이 명령 실행 | 운영 클러스터에 개발 설정 적용 | 모든 작업 전 `kubectl config current-context` 확인 |
+| 규모 무관하게 Kubernetes 도입 | 오버엔지니어링, 운영 부담 증가 | 컨테이너 수 기준으로 도구 선택 (소규모: Compose) |
 
 ## 실무에서는 이렇게 봅니다
 
@@ -170,18 +259,30 @@ kubectl cluster-info
 
 시니어 엔지니어는 Kubernetes를 볼 때 기능 목록보다 멘탈 모델을 먼저 봅니다. 원하는 상태를 선언하는 도구인지, 현재 상태를 그쪽으로 계속 밀어 붙이는 제어 시스템인지, 그리고 그 제어를 사람이 어디까지 직접 맡아야 하는지부터 구분합니다. 이 관점이 있어야 뒤에서 Deployment와 HPA를 볼 때도 흐름이 이어집니다.
 
+```bash
+# 실무에서 자주 쓰는 첫 진단 명령 모음
+kubectl get nodes -o wide                    # 노드 전체 상태
+kubectl get pods -A --field-selector=status.phase!=Running  # 비정상 파드 전체
+kubectl top nodes                             # 노드 자원 사용량
+kubectl get events --sort-by=.lastTimestamp  # 최근 이벤트 시간순
+```
+
 ## 운영 체크리스트
 
 - [ ] 적용 전 현재 컨텍스트를 확인했는가
 - [ ] 워크로드를 네임스페이스로 나눌 계획이 있는가
 - [ ] 원하는 상태를 YAML로 관리할 준비가 되었는가
 - [ ] 관리형 Kubernetes를 먼저 검토했는가
+- [ ] 컨트롤 플레인 컴포넌트 역할을 팀이 이해하고 있는가
+- [ ] etcd 백업 전략을 마련했는가 (자체 운영 클러스터의 경우)
 
 ## 연습 문제
 
 1. 컨트롤 플레인의 역할을 한 줄로 설명해 보세요.
 2. 원하는 상태가 왜 Kubernetes의 핵심인지 한 줄로 적어 보세요.
 3. Kubernetes 도입을 미루는 편이 나은 상황을 하나 떠올려 보세요.
+4. `kubectl get nodes`가 timeout 날 때 가장 먼저 확인할 것은 무엇인가요?
+5. kube-system 네임스페이스에 어떤 파드가 있어야 하는지 나열해 보세요.
 
 ## 마무리와 다음 글
 
@@ -196,14 +297,11 @@ Kubernetes는 '컨테이너를 많이 돌리는 도구'가 아니라 원하는 �
 ## 처음 질문으로 돌아가기
 
 - **오케스트레이션이라는 말은 실제로 무엇을 대신해 줄까요?**
-  - 이 그림을 볼 때 가장 먼저 기억할 점은 `kubectl`이 직접 컨테이너를 띄우지 않는다는 사실입니다
+  - 사람이 수동으로 하던 배치, 복구, 교체, 스케일링 결정을 컨트롤러 루프가 대신합니다. `kubectl`이 직접 컨테이너를 띄우지 않고 API 서버에 원하는 상태를 전달하면, 이후는 시스템이 맞춥니다.
 - **컨트롤 플레인과 워커 노드는 어떤 식으로 역할을 나눌까요?**
-  - 이 그림을 볼 때 가장 먼저 기억할 점은 `kubectl`이 직접 컨테이너를 띄우지 않는다는 사실입니다
+  - 컨트롤 플레인은 상태를 저장하고 스케줄을 결정하며 컨트롤러를 실행합니다. 워커 노드는 kubelet이 지시를 받아 실제로 컨테이너를 실행합니다.
 - **원하는 상태 모델이 왜 Kubernetes의 핵심 철학일까요?**
-  - 이 그림을 볼 때 가장 먼저 기억할 점은 `kubectl`이 직접 컨테이너를 띄우지 않는다는 사실입니다
-  - 이 그림을 볼 때 가장 먼저 기억할 점은 `kubectl`이 직접 컨테이너를 띄우지 않는다는 사실입니다. 사용자는 `kubectl`로 원하는 상태를 API 서버에 전달하고, 이후의 배치와 조정은 컨트롤 플레인 구성요소가 맡습니다.
-  - Kubernetes가 없을 때는 서버마다 수동으로 `docker run`을 실행하고, 죽은 컨테이너가 있으면 사람이 다시 올립니다
-  - 가장 먼저 볼 값은 현재 컨텍스트입니다
+  - 사람이 명령형으로 매번 상태를 맞추지 않아도, 선언한 목표를 시스템이 계속 유지하기 때문입니다. 이 차이가 재현성과 자동 복구의 출발점입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
