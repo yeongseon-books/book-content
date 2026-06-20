@@ -562,7 +562,7 @@ loss masking을 통해 instruction 구간을 손실에서 제외하고 response 
 - [LLM from Scratch 101 (6/9): 기울기로 배우기](./06-training-loop.md)
 - [LLM from Scratch 101 (7/9): 샘플링 — 학습된 모델에서 글 뽑아내기](./07-inference.md)
 - **LLM from Scratch 101 (8/9): 베이스 모델을 우리 작업에 맞추기 (현재 글)**
-- [LLM from Scratch 101 (9/9): 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍](./09-chatbot-wrapper.md)
+- LLM from Scratch 101 (9/9): 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍 (예정)
 
 <!-- toc:end -->
 

@@ -207,6 +207,17 @@ nav:
               - "AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기": ko/ai-web-dev-101/05-ai-agent.md
               - "AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기": ko/ai-web-dev-101/06-deploy.md
               - "AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법": ko/ai-web-dev-101/07-eval-improve.md
+          - AI 이미지 생성 101:
+              - "첫 이미지 생성하기": ko/ai-image-gen-101/01-first-image-generation.md
+              - "좋은 프롬프트의 구조": ko/ai-image-gen-101/02-prompt-structure.md
+              - "스타일 마스터하기": ko/ai-image-gen-101/03-mastering-styles.md
+              - "구도와 시점": ko/ai-image-gen-101/04-composition-and-perspective.md
+              - "색감과 조명": ko/ai-image-gen-101/05-color-and-lighting.md
+              - "복잡한 장면 설계하기": ko/ai-image-gen-101/06-complex-scene-design.md
+              - "일관성 유지하기": ko/ai-image-gen-101/07-consistency-across-images.md
+              - "텍스트와 타이포그래피": ko/ai-image-gen-101/08-text-and-typography.md
+              - "레퍼런스 이미지 활용": ko/ai-image-gen-101/09-reference-image-editing.md
+              - "실전 워크플로우": ko/ai-image-gen-101/10-production-workflow.md
       - 프로그래밍:
           - Computer Science 101:
               - "Computer Science란 무엇인가?": ko/computer-science-101/01-what-is-computer-science.md
@@ -1139,6 +1150,17 @@ nav:
               - "Document text extraction with CLOVA OCR API": en/korean-ai-stack-101/04-clova-ocr.md
               - "Using HyperCLOVA X and Solar API": en/korean-ai-stack-101/05-hyperclova-solar-api.md
               - "Assembling a Korean RAG pipeline": en/korean-ai-stack-101/06-korean-rag-pipeline.md
+          - AI Image Generation 101:
+              - "Creating Your First Image": en/ai-image-gen-101/01-first-image-generation.md
+              - "The Structure of a Good Prompt": en/ai-image-gen-101/02-prompt-structure.md
+              - "Mastering Styles": en/ai-image-gen-101/03-mastering-styles.md
+              - "Composition and Perspective": en/ai-image-gen-101/04-composition-and-perspective.md
+              - "Color and Lighting": en/ai-image-gen-101/05-color-and-lighting.md
+              - "Designing Complex Scenes": en/ai-image-gen-101/06-complex-scene-design.md
+              - "Maintaining Consistency": en/ai-image-gen-101/07-consistency-across-images.md
+              - "Text and Typography": en/ai-image-gen-101/08-text-and-typography.md
+              - "Working with Reference Images": en/ai-image-gen-101/09-reference-image-editing.md
+              - "Production Workflows": en/ai-image-gen-101/10-production-workflow.md
       - 프로그래밍:
           - Computer Science 101:
               - "What Is Computer Science?": en/computer-science-101/01-what-is-computer-science.md

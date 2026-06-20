@@ -508,7 +508,7 @@ def format_pass_rate(outputs):
 - [LLM Fine-tuning 101 (3/6): LoRA 어댑터 구성](./03-lora.md)
 - [LLM Fine-tuning 101 (4/6): 학습 루프와 하이퍼파라미터](./04-training.md)
 - **LLM Fine-tuning 101 (5/6): 모델 평가 (현재 글)**
-- [LLM Fine-tuning 101 (6/6): 모델 서빙](./06-serving.md)
+- LLM Fine-tuning 101 (6/6): 모델 서빙 (예정)
 
 <!-- toc:end -->
 
