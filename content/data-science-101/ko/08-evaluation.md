@@ -37,7 +37,6 @@ last_reviewed: '2026-05-15'
 - 분류 문제에서 precision, recall, F1, ROC AUC는 각각 무엇을 말해 줄까요?
 - 회귀 문제에서 MAE, RMSE, R²는 어떻게 다를까요?
 - 이 단계에서 흔히 빠지는 함정은 무엇이고 어떻게 피할까요?
-- 이 단계에서 흔히 빠지는 함정은 무엇이고 어떻게 피할 수 있을까요?
 
 ## 이 글에서 배우는 내용
 
@@ -187,7 +186,7 @@ cm = confusion_matrix(y_test, y_pred)
 print(cm)
 print(classification_report(y_test, y_pred, digits=4))
 
-# 테네시, FP, FN, TP
+# TN, FP, FN, TP
 TN, FP, FN, TP = cm.ravel()
 print({"false_positive": int(FP), "false_negative": int(FN)})
 ```
@@ -223,51 +222,16 @@ print("best_threshold:", round(best_t, 2), "best_f1:", round(best_f1, 4))
 
 평가는 실험의 끝이 아니라 운영 시작점입니다. 지표를 비용과 연결해야 실제 서비스에서 의미 있는 성능 관리가 가능합니다.
 
-### 보강 메모: 팀 운영 관점에서 꼭 남겨야 할 기록
-
-입문 프로젝트에서는 코드가 돌아가는 것만으로도 큰 성취를 느끼기 쉽습니다. 하지만 실무에서 더 중요한 것은 같은 결과를 팀이 다시 만들 수 있는가입니다. 그래서 본문 실습을 수행한 뒤에는 다음 항목을 반드시 문서로 남기는 습관이 필요합니다.
-
-- 실행 날짜와 데이터 버전
-- 사용한 핵심 컬럼 목록과 정의
-- 주요 가정(제외한 데이터, 임계값, 기간)
-- 결과 해석 시 주의할 제약 조건
-- 다음 반복에서 확인할 질문
-
-이 다섯 가지를 기록하면 다음 사이클에서 같은 논의를 처음부터 반복하지 않아도 됩니다. 특히 모델 점수나 차트 결과처럼 숫자가 좋아 보이는 상황일수록 제약 조건을 함께 적는 것이 중요합니다. 수치의 강점과 약점을 함께 남겨야 팀이 과신하지 않고, 반대로 필요한 행동은 빠르게 실행할 수 있습니다.
-
-### 보강 예시: 재현 가능한 결과 패키지 만들기
-
-```python
-from pathlib import Path
-import json
-import datetime as dt
-
-meta = {
-    "run_at": dt.datetime.utcnow().isoformat(),
-    "dataset": "example_v1",
-    "assumptions": [
-        "trial users excluded",
-        "analysis window = last 30 days",
-        "threshold fixed before final test",
-    ],
-    "next_question": "Which segment shows largest variance next week?",
-}
-
-out = Path("artifacts")
-out.mkdir(exist_ok=True)
-(out / "run_meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
-print("saved", out / "run_meta.json")
-```
-
-이 코드는 분석 산출물을 실행 메타데이터와 함께 저장하는 가장 작은 예시입니다. 이렇게 작은 기록이 쌓이면 팀 차원의 학습 속도가 크게 올라갑니다. 프로젝트는 한 번의 정답을 찾는 작업이 아니라 반복을 통해 품질을 높이는 작업이기 때문입니다.
 ## 처음 질문으로 돌아가기
 
 - **정확도가 높으면 정말 좋은 모델이라고 말할 수 있을까요?**
-  - - accuracy가 쉽게 오해를 만드는 이유 - 분류 문제에서 precision, recall, F1, ROC AUC를 읽는 법 - 회귀 문제에서 MAE, RMSE, R²를 비교하는 법 - 5단계 평가 실습 흐름 - 평가 단계에서 흔한 함정 다섯 가지 지표가 문제와 어긋나면 모델은 잘못된 방향으로 최적화됩니다
+  - 그렇지 않습니다. 클래스 불균형이 큰 문제에서는 모든 샘플을 다수 클래스로 예측해도 정확도가 높게 나옵니다. 사기 탐지 문제에서 정확도 99%이지만 recall이 5%라면 실제 사기의 95%를 놓치고 있습니다. 정확도는 데이터가 균형에 가까울 때만 신뢰할 수 있는 지표입니다.
+
 - **분류 문제에서 precision, recall, F1, ROC AUC는 각각 무엇을 말해 줄까요?**
-  - - accuracy가 쉽게 오해를 만드는 이유 - 분류 문제에서 precision, recall, F1, ROC AUC를 읽는 법 - 회귀 문제에서 MAE, RMSE, R²를 비교하는 법 - 5단계 평가 실습 흐름 - 평가 단계에서 흔한 함정 다섯 가지 지표가 문제와 어긋나면 모델은 잘못된 방향으로 최적화됩니다
+  - Precision은 양성으로 예측한 것 중 실제 양성 비율로, 오탐 비용이 클 때 중요합니다. Recall은 실제 양성 중 잡은 비율로, 놓치는 비용이 클 때 중요합니다. F1은 둘의 조화평균으로 균형이 필요할 때 씁니다. ROC AUC는 특정 임계값 하나에 덜 의존하며 모델의 전체적인 구분 능력을 비교할 때 유용합니다.
+
 - **회귀 문제에서 MAE, RMSE, R²는 어떻게 다를까요?**
-  - - accuracy가 쉽게 오해를 만드는 이유 - 분류 문제에서 precision, recall, F1, ROC AUC를 읽는 법 - 회귀 문제에서 MAE, RMSE, R²를 비교하는 법 - 5단계 평가 실습 흐름 - 평가 단계에서 흔한 함정 다섯 가지 지표가 문제와 어긋나면 모델은 잘못된 방향으로 최적화됩니다
+  - MAE는 절대 오차 평균으로 직관적이고 이상치에 강합니다. RMSE는 오차를 제곱해 합산하므로 큰 오차에 더 민감하게 반응합니다. R²는 모델이 실제 데이터 분산을 얼마나 설명하는지 보여 주는 비율 지표입니다. 이상치가 많은 데이터에서는 RMSE 대신 MAE를 주 지표로 선택하는 것이 더 안전합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

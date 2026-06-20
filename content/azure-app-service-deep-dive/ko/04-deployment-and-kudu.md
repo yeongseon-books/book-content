@@ -225,11 +225,19 @@ done
 
 이 기준은 배포 자동화 파이프라인에도 그대로 넣을 수 있습니다. readiness 실패가 임계치를 넘으면 승격을 중단하고 이전 슬롯으로 되돌리는 정책을 코드화해 두는 편이 안전합니다.
 
-또한 배포 로그를 장기 보존해 두면 계절성 장애 분석에 도움이 됩니다. 특정 월이나 특정 빌드 도구 버전에서만 startup 지연이 반복되는지를 확인할 수 있어, 플랫폼 이슈와 애플리케이션 이슈를 구분하는 근거가 됩니다.
+## 배포 단계별 실패 진단 테이블
 
-배포 파이프라인 변경 시에는 이 로그 포맷을 유지해 이전 릴리스와 비교 가능성을 보장해야 합니다.
+배포 문제를 계층으로 분류하면 로그를 보는 순서도 명확해집니다.
 
-이 원칙은 필수입니다.
+| 실패 단계 | 증상 | 점검 도구 | 빠른 대응 |
+|---|---|---|---|
+| Upload 실패 | HTTP 4xx/5xx from SCM endpoint | `api/deployments` status | 인증, 파일 크기 한도 확인 |
+| Build/restore 실패 | Kudu log에 npm install/pip 오류 | `api/deployments/<id>/log` | `SCM_DO_BUILD_DURING_DEPLOYMENT` 값 확인 |
+| File placement 실패 | `api/vfs/site/wwwroot/` 파일 없음 | Kudu VFS endpoint | run-from-package 설정 확인 |
+| Startup 실패 | HTTP 200 없음, 앱 로그에 startup 오류 | App Service 로그 스트림 | startup command, port 바인딩 확인 |
+| Warm-up 지연 | 첫 요청 TTFB 급증 | curl 루프, Application Insights | warm-up route 추가, slot swap 전 readiness 확인 |
+
+이 표를 런북에 포함하면 온콜 엔지니어가 "배포가 이상하다"는 알림을 받았을 때 로그를 보기 전에 먼저 어느 단계 문제인지 가설을 세울 수 있습니다.
 
 ## 흔히 헷갈리는 지점
 
@@ -246,6 +254,8 @@ done
 - [ ] run-from-package 환경에서 `wwwroot` 쓰기 가정이 없는지 검토했습니다.
 - [ ] slot warm-up이 주요 요청 경로를 실제로 예열하는지 검증했습니다.
 - [ ] 배포 권한과 slot 운영 권한을 분리해 최소 권한으로 관리했습니다.
+- [ ] 배포 단계별 실패 진단 테이블을 팀 런북에 포함했습니다.
+- [ ] 롤백 기준(성공률 임계치, TTFB 상한)을 숫자로 정의하고 파이프라인에 넣었습니다.
 
 ## 정리
 
@@ -258,12 +268,13 @@ done
 ## 처음 질문으로 돌아가기
 
 - **Kudu는 App Service에서 정확히 어떤 공개 표면을 제공할까요?**
-  - 배포를 한 단계로 생각하면 실패 분석이 항상 늦어집니다
+  - Kudu는 App Service의 SCM companion service로, artifact를 받는 API 표면(`/api/zipdeploy`, `/api/publish`), 배포 이력 조회(`/api/deployments`), 파일시스템 접근(`/api/vfs`), 진단 도구를 포함합니다. 이 표면이 배포 파이프라인의 upload와 deployment orchestration 단계를 담당합니다.
+
 - **ZipDeploy는 단순히 ZIP을 풀어 놓는 동작과 어떻게 다를까요?**
-  - 배포를 한 단계로 생각하면 실패 분석이 항상 늦어집니다
+  - ZipDeploy는 ZIP artifact를 SCM에 전달하는 행위입니다. 그 이후 동작은 `SCM_DO_BUILD_DURING_DEPLOYMENT` 설정과 `WEBSITE_RUN_FROM_PACKAGE` 설정에 따라 달라집니다. build automation이 켜져 있으면 server-side 빌드가 추가되고, run-from-package가 켜져 있으면 ZIP 자체가 `wwwroot`로 마운트됩니다. 같은 요청이지만 최종 파일 배치 의미가 설정에 따라 달라집니다.
+
 - **Windows code app의 고전적인 Kudu 경로와 Linux code app의 Oryx 경로는 어디서 갈릴까요?**
-  - 배포를 한 단계로 생각하면 실패 분석이 항상 늦어집니다
-  - 배포를 한 단계로 생각하면 실패 분석이 항상 늦어집니다. artifact upload가 실패했는지, server-side build가 실패했는지, 파일 placement는 끝났지만 runtime startup이 실패했는지를 구분하지 못하면 로그를 보는 순서도 흐려집니다.
+  - Windows code app은 Kudu가 artifact를 받아 `wwwroot`에 동기화하고, 필요하면 `deploy.cmd` 또는 `deploy.sh`를 실행합니다. Linux code app에서는 Kudu 또는 App Service build service가 Oryx를 호출해 언어 감지, 의존성 설치, startup script 생성까지 맡깁니다. 분기 지점은 OS 유형과 `SCM_DO_BUILD_DURING_DEPLOYMENT` 설정 조합입니다. Linux App Service에서 startup 오류가 발생하면 Kudu 로그가 아닌 Oryx의 detect-build-startup 결과를 먼저 확인해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -52,7 +52,7 @@ Azure Functions는 다양한 트리거를 지원하지만, 워커로 넘어가�
 
 ## 핵심 관점
 
-Azure Functions invocation은 “트리거가 함수를 호출한다”는 한 문장보다 더 구체적인 경로를 가집니다. WebJobs SDK가 트리거 이벤트를 감지하면 `IFunctionInvoker` 구현이 실행되고, out-of-proc 경로에서는 `WorkerFunctionInvoker`가 직접 사용자 코드를 호출하는 대신 `IFunctionInvocationDispatcher`에 위임합니다. 이때 실제 운반체가 되는 것이 `ScriptInvocationContext`입니다.
+Azure Functions invocation은 "트리거가 함수를 호출한다"는 한 문장보다 더 구체적인 경로를 가집니다. WebJobs SDK가 트리거 이벤트를 감지하면 `IFunctionInvoker` 구현이 실행되고, out-of-proc 경로에서는 `WorkerFunctionInvoker`가 직접 사용자 코드를 호출하는 대신 `IFunctionInvocationDispatcher`에 위임합니다. 이때 실제 운반체가 되는 것이 `ScriptInvocationContext`입니다.
 
 이 context는 다시 protobuf `InvocationRequest`로 변환되어 특정 워커의 outbound 채널로 밀려나고, 응답은 `invocation_id`를 키로 같은 워커의 inbound 경로를 통해 되돌아옵니다. 즉 이번 글에서 봐야 할 것은 함수 호출 자체보다 **호스트가 호출을 표현하고 상관관계 짓는 방식**입니다.
 
@@ -72,7 +72,7 @@ Azure Functions 호스트는 WebJobs SDK 위에 올라가 있습니다. 큐 메�
 
 이 객체의 역할은 분명합니다. 사용자 메서드를 직접 호출하는 대신, **`IFunctionInvocationDispatcher`에 실행을 위임**합니다. C# in-process와 달리 Node, Python, Java, isolated .NET 같은 경로에서는 실제 실행 주체가 워커 프로세스이기 때문입니다.
 
-### 2단계: `IFunctionInvocationDispatcher`는 “호출을 어딘가로 보내는 능력”을 추상화합니다
+### 2단계: `IFunctionInvocationDispatcher`는 "호출을 어딘가로 보내는 능력"을 추상화합니다
 
 `IFunctionInvocationDispatcher`는 호스트가 함수를 외부 실행 경계로 보내는 능력을 감싼 추상화입니다. 기본 경로는 `RpcFunctionInvocationDispatcher`이고, `httpWorkerOptions.Value.Description != null`일 때만 `HttpFunctionInvocationDispatcher`가 선택됩니다. 즉 분기 기준은 trigger 종류가 아니라 **HTTP worker / custom handler 모드가 설정되어 있는지 여부**입니다.
 
@@ -129,7 +129,7 @@ message RpcTraceContext {
 
 ### 5단계: `GrpcWorkerChannel.SendInvocationRequest`가 워커별 outbound 채널로 보냅니다
 
-실제 전송 시점에는 `GrpcWorkerChannel`이 다시 등장합니다. dispatcher가 “이 호출을 이 워커로 보내라”고 하면, 채널 객체는 `ScriptInvocationContext`를 `InvocationRequest`로 바꾸고, `invocation_id`를 키로 `TaskCompletionSource`를 메모리 딕셔너리에 등록한 뒤, `new StreamingMessage { InvocationRequest = invocationRequest }`를 해당 워커의 `_outbound` writer로 씁니다.
+실제 전송 시점에는 `GrpcWorkerChannel`이 다시 등장합니다. dispatcher가 "이 호출을 이 워커로 보내라"고 하면, 채널 객체는 `ScriptInvocationContext`를 `InvocationRequest`로 바꾸고, `invocation_id`를 키로 `TaskCompletionSource`를 메모리 딕셔너리에 등록한 뒤, `new StreamingMessage { InvocationRequest = invocationRequest }`를 해당 워커의 `_outbound` writer로 씁니다.
 
 중요한 보정 하나가 있습니다. 상관관계 키는 새로 만든 `request_id`가 아닙니다. 실제 왕복 correlation은 이미 `InvocationRequest` 안에 들어 있는 `invocation_id`로 이뤄집니다. 이 점을 놓치면 응답 매칭 경로를 잘못 이해하게 됩니다.
 
@@ -139,7 +139,7 @@ message RpcTraceContext {
 
 워커는 `oneof content == invocation_request`인 `StreamingMessage`를 받으면 `function_id`로 대상 함수를 찾고, `input_data`를 언어 네이티브 객체로 바꾸고, `trigger_metadata`로 context를 채운 뒤 사용자 함수를 호출합니다. 반환값은 `InvocationResponse.return_value`의 `TypedData`로 직렬화되고, output binding 결과는 `output_data`에 담기며, 성공/실패/취소 여부는 `result.status`에 들어갑니다.
 
-언어별 구현체는 다르지만, 이 여덟 단계 자체는 공통입니다. 이것이 “프로토콜은 하나이고 워커 구현만 다르다”는 말의 실제 의미입니다.
+언어별 구현체는 다르지만, 이 여덟 단계 자체는 공통입니다. 이것이 "프로토콜은 하나이고 워커 구현만 다르다"는 말의 실제 의미입니다.
 
 ### 7단계: 응답은 `invocation_id`로 매칭되어 원래 `Task`를 깨웁니다
 
@@ -225,6 +225,45 @@ TotalMs=425
 
 이 구분이 없으면 잘못된 튜닝을 하게 됩니다. 예를 들어 큐 처리량 문제를 HTTP 동시성 설정으로 해결하려 하면 아무 변화가 없습니다. 설정은 "같은 단어"가 아니라 "같은 계층"에서 비교해야 합니다.
 
+## invocation 실패 진단 테이블
+
+invocation이 실패하거나 지연될 때 아래 표를 기준으로 계층을 먼저 분류하면 디버깅 경로를 단축할 수 있습니다.
+
+| 증상 | 의심 계층 | 확인 경로 |
+|---|---|---|
+| 함수가 실행되지 않음 (트리거 무반응) | WebJobs SDK 트리거 listener | Application Insights에서 trigger heartbeat 확인 |
+| invocation이 시작됐으나 응답 없음 | dispatcher → worker 채널 | `OutboundQueueWaitMs` 지표, worker 프로세스 상태 확인 |
+| 함수 실행 중 timeout | worker 실행 시간, host timeout 설정 | `functionTimeout` 값, 외부 API 응답 시간 확인 |
+| 응답이 왔으나 SDK 후처리 실패 | SDK 후속 처리 (메시지 삭제, HTTP 응답) | trigger-specific 오류 로그 확인 |
+| 동시 호출 수가 기대보다 낮음 | batchSize, maxConcurrentRequests, throttle | host.json 설정과 WorkerConcurrencyManager 로그 비교 |
+
+Application Insights KQL로 invocation 단계별 지연을 추출하는 쿼리도 운영 런북에 포함해 두면 유용합니다.
+
+```kql
+// 함수별 invocation P95 지연 확인
+requests
+| where timestamp > ago(1h)
+| where name == "YourFunctionName"
+| summarize
+    p50 = percentile(duration, 50),
+    p95 = percentile(duration, 95),
+    p99 = percentile(duration, 99),
+    failRate = countif(success == false) * 100.0 / count()
+  by name, bin(timestamp, 5m)
+| order by timestamp desc
+
+// 워커 오류가 invocation_id 기준으로 어디서 발생했는지 추적
+traces
+| where timestamp > ago(1h)
+| where customDimensions["InvocationId"] != ""
+| extend invocationId = tostring(customDimensions["InvocationId"])
+| where message contains "Error" or severityLevel >= 3
+| project timestamp, invocationId, message, severityLevel
+| order by timestamp desc
+```
+
+이 두 쿼리는 "어느 함수가 느린가"와 "어느 invocation에서 오류가 났는가"를 각각 빠르게 답합니다.
+
 ## 흔히 헷갈리는 지점
 
 - **모든 trigger가 다른 invocation 메커니즘을 갖는 것은 아닙니다.** trigger는 앞단이 다를 뿐, 워커로 넘어갈 때는 공통 `InvocationRequest` 경로로 정규화됩니다.
@@ -240,24 +279,27 @@ TotalMs=425
 - [ ] trigger별 retry 정책과 poison-path를 문서화했습니다.
 - [ ] invocation 실패를 일시 오류와 영구 오류로 분류하는 알림 정책을 정했습니다.
 - [ ] 장시간 실행 호출을 Durable Functions 후보로 분류했습니다.
+- [ ] invocation 단계별 지연 (OutboundQueueWait, WorkerExecution) 을 모니터링 대시보드에 포함했습니다.
+- [ ] cancellation token을 존중하는 함수 코드 패턴을 팀 가이드로 공유했습니다.
 
 ## 정리
 
 이번 글은 트리거 이벤트가 실제 워커 호출로 변환되는 경로를 고정했습니다. WebJobs SDK가 `IFunctionInvoker`를 호출하면, out-of-proc 모델에서는 `WorkerFunctionInvoker`가 `ScriptInvocationContext`를 만들고 dispatcher에 넘깁니다. dispatcher는 그것을 `InvocationRequest`로 바꿔 워커별 채널에 밀어 넣고, 응답은 `invocation_id`를 키로 다시 원래 `Task`에 매칭됩니다.
 
-이 경로를 알면 Azure Functions invocation이 동기 함수 호출이 아니라 비동기 메시지 왕복이라는 사실이 명확해집니다. timeout, retry, long-running invocation, concurrent invocations를 이해할 때도 “한 번의 함수 호출”이 아니라 “한 번의 요청-응답 상관관계”로 생각해야 정확합니다.
+이 경로를 알면 Azure Functions invocation이 동기 함수 호출이 아니라 비동기 메시지 왕복이라는 사실이 명확해집니다. timeout, retry, long-running invocation, concurrent invocations를 이해할 때도 "한 번의 함수 호출"이 아니라 "한 번의 요청-응답 상관관계"로 생각해야 정확합니다.
 
 다음 글에서는 이제 인스턴스 하나 바깥으로 올라갑니다. 같은 invocation 파이프라인이 한 인스턴스 안에서 아무리 잘 돌아가도, 어느 시점에는 인스턴스 자체를 더 늘려야 합니다. 다음 편에서는 그 스케일아웃 결정을 누가 내리고, 호스트는 어떤 신호만 제공하는지, 그리고 인스턴스 내부 워커 동시성과 외부 scale controller를 어떻게 구분해야 하는지를 보겠습니다.
 
 ## 처음 질문으로 돌아가기
 
 - **dispatcher는 한 번의 invocation을 어떤 단계로 나눠 처리할까요?**
-  - Azure Functions는 다양한 트리거를 지원하지만, 워커로 넘어가는 순간에는 모두 같은 invocation 파이프라인으로 정규화됩니다
+  - `WorkerFunctionInvoker`가 `ScriptInvocationContext`를 만들어 dispatcher에 넘기는 것이 1단계입니다. dispatcher는 context를 `InvocationRequest` protobuf로 직렬화하고, 워커별 채널에 `TaskCompletionSource`를 등록하면서 outbound writer에 메시지를 씁니다. 워커 응답이 `invocation_id`로 매칭되어 돌아오면 `TaskCompletionSource`가 완결되고, SDK가 trigger 후처리를 마무리합니다.
+
 - **invocation context는 어디서 만들어지고 누가 해제할까요?**
-  - Azure Functions는 다양한 트리거를 지원하지만, 워커로 넘어가는 순간에는 모두 같은 invocation 파이프라인으로 정규화됩니다
+  - `ScriptInvocationContext`는 `WorkerFunctionInvoker`가 만들고 dispatcher에 전달합니다. context 안의 `TaskCompletionSource`는 `GrpcWorkerChannel`이 워커 응답을 받아 `SetResult`를 호출할 때 완결됩니다. 즉 context의 생애는 `WorkerFunctionInvoker` 생성 → dispatcher 위임 → 워커 응답 수신 → `TaskCompletionSource` 완결로 이어지고, 완결 이후 SDK가 context를 정리합니다.
+
 - **`maxConcurrentRequests`, `batchSize` 같은 동시성 제어는 어디에서 실제로 영향을 줄까요?**
-  - Azure Functions는 다양한 트리거를 지원하지만, 워커로 넘어가는 순간에는 모두 같은 invocation 파이프라인으로 정규화됩니다
-  - Azure Functions는 다양한 트리거를 지원하지만, 워커로 넘어가는 순간에는 모두 같은 invocation 파이프라인으로 정규화됩니다.
+  - `batchSize`는 trigger listener가 이벤트를 읽어오는 앞단에서 작동하고, `maxConcurrentRequests`는 HTTP invocation 처리 동시성에 걸립니다. `FUNCTIONS_WORKER_PROCESS_COUNT`는 인스턴스 내부 워커 수를 결정하고, `WorkerChannelThrottleProvider`는 워커가 포화 상태일 때 outbound 채널 직전에서 추가 invocation을 지연시킵니다. 같은 "동시성"이라는 단어지만 작동 계층이 다르기 때문에 문제 원인에 맞는 계층을 먼저 찾아야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

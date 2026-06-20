@@ -226,6 +226,47 @@ print('det(M) =', np.linalg.det(M))  # 면적 변환 비율
 
 변환을 수식이 아니라 "공간 조작"으로 읽는 순간, 선형대수는 훨씬 실용적인 도구가 됩니다.
 
+## 변환 파이프라인 디버깅
+
+실무에서 변환 순서나 부호 오류는 디버깅하기 까다롭습니다. 단위 벡터를 추적하면 어느 단계에서 틀렸는지 빠르게 파악할 수 있습니다.
+
+```python
+import numpy as np
+
+def trace_transform(M, label=''):
+    """단위 벡터에 변환을 적용해 각 축의 이동을 출력합니다."""
+    e1 = np.array([1.0, 0.0])
+    e2 = np.array([0.0, 1.0])
+    print(f'[{label}] e1 -> {M @ e1}')
+    print(f'[{label}] e2 -> {M @ e2}')
+    print(f'[{label}] det = {np.linalg.det(M):.4f}')
+
+theta = np.pi / 6  # 30도
+
+R = np.array([[np.cos(theta), -np.sin(theta)],
+              [np.sin(theta),  np.cos(theta)]])
+S = np.diag([3.0, 1.0])
+
+trace_transform(S, 'Scale')
+trace_transform(R, 'Rotate')
+trace_transform(R @ S, 'Scale then Rotate')
+trace_transform(S @ R, 'Rotate then Scale')
+```
+
+단위 벡터 `e1`, `e2`가 변환 후 어디로 가는지 확인하면 회전 방향이 맞는지, 스케일이 원하는 축에 적용됐는지 즉시 알 수 있습니다.
+
+## 변환별 행렬식 해석
+
+| 변환 유형 | det 범위 | 의미 |
+| --- | --- | --- |
+| 회전 | det = 1 | 면적 보존, 방향 보존 |
+| 반사 | det = -1 | 면적 보존, 방향 반전 |
+| 균일 확대 (k배) | det = k^n | 면적 k^n 배 증가 |
+| 사영 | det = 0 | 차원 손실, 역행렬 없음 |
+| 전단 | det = 1 | 면적 보존, 형태 변형 |
+
+행렬식이 0이면 역변환이 불가능합니다. 신경망에서 가중치 행렬의 행렬식이 0에 가까워지면 그래디언트 소실 문제가 발생할 수 있습니다.
+
 ## 자주 하는 실수
 
 | 실수 | 증상 | 올바른 접근 |
@@ -248,6 +289,8 @@ print('det(M) =', np.linalg.det(M))  # 면적 변환 비율
 - [ ] 행렬 곱을 변환 합성으로 설명할 수 있습니다.
 - [ ] 순서가 결과를 바꾼다는 점을 이해합니다.
 - [ ] 선형변환과 비선형변환의 차이를 말할 수 있습니다.
+- [ ] 행렬식으로 면적 배율과 방향 반전 여부를 판단할 수 있습니다.
+- [ ] 단위 벡터 추적으로 변환 파이프라인을 디버깅할 수 있습니다.
 
 ## 연습 문제
 
